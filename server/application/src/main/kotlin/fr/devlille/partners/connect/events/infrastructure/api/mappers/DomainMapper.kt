@@ -1,12 +1,13 @@
-package fr.devlille.partners.connect.events.infrastructure.api
+package fr.devlille.partners.connect.events.infrastructure.api.mappers
 
-import fr.devlille.partners.connect.events.domain.EventEntity
+import fr.devlille.partners.connect.events.domain.Event
+import fr.devlille.partners.connect.events.infrastructure.api.CreateOrUpdateEventRequest
 import kotlinx.datetime.LocalDateTime
 import java.util.UUID
 import kotlin.uuid.ExperimentalUuidApi
 
 @OptIn(ExperimentalUuidApi::class)
-fun CreateOrUpdateEventRequest.toEntity(id: UUID): EventEntity = EventEntity(
+fun CreateOrUpdateEventRequest.toDomain(id: UUID = UUID.randomUUID()): Event = Event(
     id = id,
     name = name,
     startTime = LocalDateTime.parse(start_time),

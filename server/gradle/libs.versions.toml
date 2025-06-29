@@ -12,6 +12,7 @@ postgresql = "42.7.1"
 [libraries]
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
+exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
 exposed-kotlin-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datetime", version.ref = "exposed" }
 
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
@@ -36,7 +37,7 @@ postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" 
 
 # Libraries can be bundled together for easier import
 [bundles]
-exposed = ["exposed-core", "exposed-jdbc", "exposed-kotlin-datetime", "postgresql", "h2"]
+exposed = ["exposed-core", "exposed-jdbc", "exposed-dao", "exposed-kotlin-datetime", "postgresql", "h2"]
 kotlinx-ecosystem = ["kotlinx-datetime", "kotlinx-serialization", "kotlinx-coroutines"]
 koin-ktor = ["insert-koin", "insert-koin-logger"]
 ktor-server = ["ktor-server-core", "ktor-server-netty", "ktor-server-negotiation", "ktor-server-statuspages", "ktor-server-cors", "ktor-server-conditional", "ktor-serialization-json"]

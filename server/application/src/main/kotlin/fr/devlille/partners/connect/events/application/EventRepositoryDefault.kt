@@ -1,80 +1,76 @@
 package fr.devlille.partners.connect.events.application
 
-import fr.devlille.partners.connect.events.domain.EventEntity
+import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.domain.EventRepository
-import fr.devlille.partners.connect.events.domain.EventSummaryEntity
-import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
-import org.jetbrains.exposed.v1.jdbc.insert
-import org.jetbrains.exposed.v1.jdbc.selectAll
+import fr.devlille.partners.connect.events.domain.EventSummary
+import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import org.jetbrains.exposed.v1.jdbc.update
+import java.util.UUID
 
 class EventRepositoryDefault(
-    private val table: EventsTable
+    private val entity: UUIDEntityClass<EventEntity>
 ) : EventRepository {
-    override fun getAllEvents(): List<EventSummaryEntity> = transaction {
-        table.selectAll().map {
-            EventSummaryEntity(
-                id = it[table.id].value,
-                name = it[table.name],
-                startTime = it[table.startTime],
-                endTime = it[table.endTime],
-                submissionStartTime = it[table.submissionStartTime],
-                submissionEndTime = it[table.submissionEndTime]
+    override fun getAllEvents(): List<EventSummary> = transaction {
+        entity.all().map {
+            EventSummary(
+                id = it.id.value,
+                name = it.name,
+                startTime = it.startTime,
+                endTime = it.endTime,
+                submissionStartTime = it.submissionStartTime,
+                submissionEndTime = it.submissionEndTime
             )
         }
     }
 
-    override fun createEvent(event: EventEntity) {
-        transaction {
-            table.insert {
-                it[id] = event.id
-                it[name] = event.name
-                it[startTime] = event.startTime
-                it[endTime] = event.endTime
-                it[submissionStartTime] = event.submissionStartTime
-                it[submissionEndTime] = event.submissionEndTime
-                it[address] = event.address
-                it[contactPhone] = event.contactPhone
-                it[contactEmail] = event.contactEmail
-                it[legalName] = event.legalName
-                it[siret] = event.siret
-                it[siren] = event.siren
-                it[tva] = event.tva
-                it[dAndB] = event.dAndB
-                it[nace] = event.nace
-                it[naf] = event.naf
-                it[duns] = event.duns
-                it[iban] = event.iban
-                it[bic] = event.bic
-                it[ribUrl] = event.ribUrl
-            }
-        }
+    override fun createEvent(event: Event): UUID = transaction {
+        entity.new {
+            name = event.name
+            startTime = event.startTime
+            endTime = event.endTime
+            submissionStartTime = event.submissionStartTime
+            submissionEndTime = event.submissionEndTime
+            address = event.address
+            contactPhone = event.contactPhone
+            contactEmail = event.contactEmail
+            legalName = event.legalName
+            siret = event.siret
+            siren = event.siren
+            tva = event.tva
+            dAndB = event.dAndB
+            nace = event.nace
+            naf = event.naf
+            duns = event.duns
+            iban = event.iban
+            bic = event.bic
+            ribUrl = event.ribUrl
+        }.id.value
     }
 
-    override fun updateEvent(event: EventEntity) {
-        transaction {
-            table.update({ table.id eq event.id }) {
-                it[name] = event.name
-                it[startTime] = event.startTime
-                it[endTime] = event.endTime
-                it[submissionStartTime] = event.submissionStartTime
-                it[submissionEndTime] = event.submissionEndTime
-                it[address] = event.address
-                it[contactPhone] = event.contactPhone
-                it[contactEmail] = event.contactEmail
-                it[legalName] = event.legalName
-                it[siret] = event.siret
-                it[siren] = event.siren
-                it[tva] = event.tva
-                it[dAndB] = event.dAndB
-                it[nace] = event.nace
-                it[naf] = event.naf
-                it[duns] = event.duns
-                it[iban] = event.iban
-                it[bic] = event.bic
-                it[ribUrl] = event.ribUrl
-            }
-        }
+    override fun updateEvent(event: Event): UUID = transaction {
+        val entity = entity.findById(event.id) ?: throw IllegalArgumentException("Event not found")
+
+        entity.name = event.name
+        entity.startTime = event.startTime
+        entity.endTime = event.endTime
+        entity.submissionStartTime = event.submissionStartTime
+        entity.submissionEndTime = event.submissionEndTime
+        entity.address = event.address
+        entity.contactPhone = event.contactPhone
+        entity.contactEmail = event.contactEmail
+        entity.legalName = event.legalName
+        entity.siret = event.siret
+        entity.siren = event.siren
+        entity.tva = event.tva
+        entity.dAndB = event.dAndB
+        entity.nace = event.nace
+        entity.naf = event.naf
+        entity.duns = event.duns
+        entity.iban = event.iban
+        entity.bic = event.bic
+        entity.ribUrl = event.ribUrl
+
+        entity.id.value
     }
 }

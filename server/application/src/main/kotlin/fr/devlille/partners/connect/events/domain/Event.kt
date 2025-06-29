@@ -5,7 +5,7 @@ import java.util.UUID
 import kotlin.uuid.ExperimentalUuidApi
 
 @OptIn(ExperimentalUuidApi::class)
-data class EventEntity(
+data class Event(
     val id: UUID,
     val name: String,
     val startTime: LocalDateTime,
