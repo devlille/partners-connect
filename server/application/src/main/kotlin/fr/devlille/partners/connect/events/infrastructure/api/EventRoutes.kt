@@ -1,7 +1,9 @@
 package fr.devlille.partners.connect.events.infrastructure.api
 
 import fr.devlille.partners.connect.events.domain.EventRepository
-import fr.devlille.partners.connect.events.domain.EventSummaryEntity
+import fr.devlille.partners.connect.events.domain.EventSummary
+import fr.devlille.partners.connect.events.infrastructure.api.mappers.toResponse
+import fr.devlille.partners.connect.events.infrastructure.api.mappers.toDomain
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -17,22 +19,23 @@ fun Route.eventRoutes() {
 
     get {
         val events = repository.getAllEvents()
-        call.respond(events.map(EventSummaryEntity::toApi))
+        call.respond(events.map(EventSummary::toResponse))
     }
 
     post {
         val request = call.receive<CreateOrUpdateEventRequest>()
-        val id = UUID.randomUUID()
-        val event = request.toEntity(id)
-        repository.createEvent(event)
-        call.respond(HttpStatusCode.Created, CreateOrUpdateEventResponse(id.toString()))
+        call.respond(
+            status = HttpStatusCode.Created,
+            message = CreateOrUpdateEventResponse(repository.createEvent(request.toDomain()).toString())
+        )
     }
 
     put("/{id}") {
         val id = UUID.fromString(call.parameters["id"]!!)
         val request = call.receive<CreateOrUpdateEventRequest>()
-        val event = request.toEntity(id)
-        repository.updateEvent(event)
-        call.respond(HttpStatusCode.OK, CreateOrUpdateEventResponse(id.toString()))
+        call.respond(
+            status = HttpStatusCode.OK,
+            message = CreateOrUpdateEventResponse(repository.updateEvent(request.toDomain(id)).toString())
+        )
     }
 }

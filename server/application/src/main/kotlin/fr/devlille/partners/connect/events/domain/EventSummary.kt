@@ -3,7 +3,7 @@ package fr.devlille.partners.connect.events.domain
 import kotlinx.datetime.LocalDateTime
 import java.util.UUID
 
-class EventSummaryEntity(
+class EventSummary(
     val id: UUID,
     val name: String,
     val startTime: LocalDateTime,
