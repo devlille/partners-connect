@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
     application
 }
 
@@ -12,6 +13,8 @@ dependencies {
     implementation(libs.bundles.kotlinx.ecosystem)
     implementation(libs.bundles.ktor.server)
     implementation(libs.bundles.koin.ktor)
+    testImplementation(kotlin("test"))
+    testImplementation(libs.ktor.server.test)
 }
 
 tasks.test {
