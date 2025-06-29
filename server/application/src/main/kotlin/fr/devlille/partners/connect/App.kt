@@ -10,6 +10,7 @@ import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.response.*
 import kotlinx.serialization.json.Json
+import org.jetbrains.exposed.v1.jdbc.Database
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
@@ -17,6 +18,7 @@ import org.koin.logger.slf4jLogger
 const val PORT = 8080
 
 fun main() {
+    Database.connect(url = "jdbc:h2:mem:regular", driver = "org.h2.Driver")
     embeddedServer(Netty, PORT) {
         module()
     }.start(wait = true)
