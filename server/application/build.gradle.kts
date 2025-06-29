@@ -8,6 +8,7 @@ application {
 }
 
 dependencies {
+    implementation(libs.bundles.exposed)
     implementation(libs.bundles.kotlinx.ecosystem)
     implementation(libs.bundles.ktor.server)
     implementation(libs.bundles.koin.ktor)
