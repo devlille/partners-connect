@@ -1,19 +1,28 @@
 package fr.devlille.partners.connect
 
+import fr.devlille.partners.connect.auth.infrastructure.api.UserSession
+import fr.devlille.partners.connect.auth.infrastructure.api.authRoutes
+import fr.devlille.partners.connect.auth.infrastructure.bindings.userModule
+import fr.devlille.partners.connect.auth.infrastructure.plugins.configureSecurity
 import fr.devlille.partners.connect.events.infrastructure.api.eventRoutes
 import fr.devlille.partners.connect.events.infrastructure.bindings.eventModule
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
-import io.ktor.http.*
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
-import io.ktor.server.application.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.plugins.cors.routing.*
+import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.statuspages.StatusPages
-import io.ktor.server.response.*
+import io.ktor.server.response.respondText
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import io.ktor.server.sessions.Sessions
+import io.ktor.server.sessions.cookie
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
@@ -50,7 +59,7 @@ fun Application.module() {
 
     install(Koin) {
         slf4jLogger()
-        modules(eventModule)
+        modules(userModule, eventModule)
     }
 
     install(ContentNegotiation) {
@@ -63,7 +72,19 @@ fun Application.module() {
         }
     }
 
+    install(Sessions) {
+        cookie<UserSession>("user_session")
+    }
+
+    val redirects = mutableMapOf<String, String>()
+    configureSecurity { state, redirectUrl ->
+        redirects[state] = redirectUrl
+    }
+
     routing {
+        route("auth") {
+            authRoutes { redirects[it] }
+        }
         route("events") {
             eventRoutes()
         }
