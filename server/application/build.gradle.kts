@@ -12,6 +12,7 @@ dependencies {
     implementation(libs.bundles.exposed)
     implementation(libs.bundles.kotlinx.ecosystem)
     implementation(libs.bundles.ktor.server)
+    implementation(libs.bundles.ktor.client)
     implementation(libs.bundles.koin.ktor)
     testImplementation(kotlin("test"))
     testImplementation(libs.ktor.server.test)
