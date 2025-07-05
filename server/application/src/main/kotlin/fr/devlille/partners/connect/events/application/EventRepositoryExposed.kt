@@ -8,7 +8,7 @@ import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
-class EventRepositoryDefault(
+class EventRepositoryExposed(
     private val entity: UUIDEntityClass<EventEntity>
 ) : EventRepository {
     override fun getAllEvents(): List<EventSummary> = transaction {

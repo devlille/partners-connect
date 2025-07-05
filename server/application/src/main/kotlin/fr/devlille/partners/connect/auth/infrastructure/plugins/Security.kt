@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.auth.infrastructure.plugins
 
+import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.java.Java
 import io.ktor.http.HttpMethod
@@ -19,8 +20,8 @@ fun Application.configureSecurity(redirect: (state: String, redirectUrl: String)
                     authorizeUrl = "https://accounts.google.com/o/oauth2/auth",
                     accessTokenUrl = "https://accounts.google.com/o/oauth2/token",
                     requestMethod = HttpMethod.Post,
-                    clientId = System.getenv("PARTNERS_CONNECT_CLIENT_ID"),
-                    clientSecret = System.getenv("PARTNERS_CONNECT_CLIENT_SECRET"),
+                    clientId = SystemVarEnv.GoogleProvider.clientId,
+                    clientSecret = SystemVarEnv.GoogleProvider.clientSecret,
                     defaultScopes = listOf("openid", "profile", "email"),
                     extraAuthParameters = listOf("access_type" to "offline"),
                     onStateCreated = { call, state ->

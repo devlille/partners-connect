@@ -1,4 +1,4 @@
-package fr.devlille.partners.connect.auth.infrastructure.api
+package fr.devlille.partners.connect.internal.infrastructure.api
 
 import kotlinx.serialization.Serializable
 
