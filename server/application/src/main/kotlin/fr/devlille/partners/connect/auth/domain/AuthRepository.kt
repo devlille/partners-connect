@@ -1,5 +1,5 @@
 package fr.devlille.partners.connect.auth.domain
 
-interface UserRepository {
+interface AuthRepository {
     suspend fun getUserInfo(token: String): UserInfo
 }

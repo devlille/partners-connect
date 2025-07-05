@@ -16,6 +16,7 @@ dependencies {
     implementation(libs.bundles.koin.ktor)
     testImplementation(kotlin("test"))
     testImplementation(libs.ktor.server.test)
+    testImplementation(libs.ktor.client.mock)
 }
 
 tasks.test {
