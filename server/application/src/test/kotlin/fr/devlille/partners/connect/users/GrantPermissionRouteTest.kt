@@ -18,7 +18,6 @@ import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import org.jetbrains.exposed.v1.jdbc.transactions.transactionManager
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -40,7 +39,7 @@ class GrantPermissionRouteTest {
     fun `return 401 if token is expired or invalid`() = testApplication {
         application {
             module(
-                modules = listOf(mockNetworkingEngineModule, authModule, eventModule, userModule)
+                modules = listOf(mockNetworkingEngineModule, authModule, eventModule, userModule),
             )
         }
 
@@ -56,7 +55,7 @@ class GrantPermissionRouteTest {
     fun `return 404 if authenticated user is not in DB`() = testApplication {
         application {
             module(
-                modules = listOf(mockNetworkingEngineModule, authModule, eventModule, userModule)
+                modules = listOf(mockNetworkingEngineModule, authModule, eventModule, userModule),
             )
         }
 
@@ -75,7 +74,7 @@ class GrantPermissionRouteTest {
         application {
             module(
                 databaseUrl = "jdbc:h2:mem:${UUID.randomUUID()};DB_CLOSE_DELAY=-1",
-                modules = listOf(mockNetworkingEngineModule, authModule, eventModule, userModule)
+                modules = listOf(mockNetworkingEngineModule, authModule, eventModule, userModule),
             )
             transaction {
                 UserEntity.new(userId) {
@@ -101,7 +100,7 @@ class GrantPermissionRouteTest {
         application {
             module(
                 databaseUrl = "jdbc:h2:mem:${UUID.randomUUID()};DB_CLOSE_DELAY=-1",
-                modules = listOf(mockNetworkingEngineModule, authModule, eventModule, userModule)
+                modules = listOf(mockNetworkingEngineModule, authModule, eventModule, userModule),
             )
             transaction {
                 val granter = UserEntity.new(granterId) {

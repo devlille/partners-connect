@@ -2,8 +2,8 @@ package fr.devlille.partners.connect.events.infrastructure.api
 
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventSummary
-import fr.devlille.partners.connect.events.infrastructure.api.mappers.toResponse
 import fr.devlille.partners.connect.events.infrastructure.api.mappers.toDomain
+import fr.devlille.partners.connect.events.infrastructure.api.mappers.toResponse
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -26,7 +26,7 @@ fun Route.eventRoutes() {
         val request = call.receive<CreateOrUpdateEventRequest>()
         call.respond(
             status = HttpStatusCode.Created,
-            message = CreateOrUpdateEventResponse(repository.createEvent(request.toDomain()).toString())
+            message = CreateOrUpdateEventResponse(repository.createEvent(request.toDomain()).toString()),
         )
     }
 
@@ -35,7 +35,7 @@ fun Route.eventRoutes() {
         val request = call.receive<CreateOrUpdateEventRequest>()
         call.respond(
             status = HttpStatusCode.OK,
-            message = CreateOrUpdateEventResponse(repository.updateEvent(request.toDomain(id)).toString())
+            message = CreateOrUpdateEventResponse(repository.updateEvent(request.toDomain(id)).toString()),
         )
     }
 }

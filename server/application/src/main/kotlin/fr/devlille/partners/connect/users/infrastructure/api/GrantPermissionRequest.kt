@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 class GrantPermissionRequest(
     @SerialName("user_ids")
-    val userIds: List<String>
+    val userIds: List<String>,
 )

@@ -6,5 +6,5 @@ import fr.devlille.partners.connect.users.domain.User
 fun UserInfo.toDomain(): User = User(
     displayName = "$givenName $firstName",
     email = email,
-    pictureUrl = pictureUrl
+    pictureUrl = pictureUrl,
 )

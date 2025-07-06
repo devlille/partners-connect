@@ -9,7 +9,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
 class EventRepositoryExposed(
-    private val entity: UUIDEntityClass<EventEntity>
+    private val entity: UUIDEntityClass<EventEntity>,
 ) : EventRepository {
     override fun getAllEvents(): List<EventSummary> = transaction {
         entity.all().map {
@@ -19,7 +19,7 @@ class EventRepositoryExposed(
                 startTime = it.startTime,
                 endTime = it.endTime,
                 submissionStartTime = it.submissionStartTime,
-                submissionEndTime = it.submissionEndTime
+                submissionEndTime = it.submissionEndTime,
             )
         }
     }

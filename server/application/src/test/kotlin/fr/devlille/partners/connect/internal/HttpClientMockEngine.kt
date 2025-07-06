@@ -17,7 +17,7 @@ val mockedAdminUser = GoogleUserInfo(
     picture = "https://example.com/john_doe.jpg",
     email = "john.doe@contact.com",
     emailVerified = true,
-    hd = "contact.com"
+    hd = "contact.com",
 )
 
 val mockEngine = MockEngine { request ->
@@ -26,13 +26,13 @@ val mockEngine = MockEngine { request ->
             respond(
                 content = """{"error":"Unauthorized"}""",
                 status = HttpStatusCode.Unauthorized,
-                headers = headersOf(HttpHeaders.ContentType, "application/json")
+                headers = headersOf(HttpHeaders.ContentType, "application/json"),
             )
         } else {
             respond(
                 content = Json.encodeToString(mockedAdminUser),
                 status = HttpStatusCode.OK,
-                headers = headersOf(HttpHeaders.ContentType, "application/json")
+                headers = headersOf(HttpHeaders.ContentType, "application/json"),
             )
         }
     } else {

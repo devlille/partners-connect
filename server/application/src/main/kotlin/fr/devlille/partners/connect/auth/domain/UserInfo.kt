@@ -4,5 +4,5 @@ class UserInfo(
     val givenName: String,
     val firstName: String,
     val pictureUrl: String,
-    val email: String
+    val email: String,
 )

@@ -51,7 +51,7 @@ fun Route.authRoutes(callback: (state: String) -> String?) {
     get("/me") {
         call.respond(
             status = HttpStatusCode.OK,
-            message = authRepository.getUserInfo(call.token).toResponse()
+            message = authRepository.getUserInfo(call.token).toResponse(),
         )
     }
 

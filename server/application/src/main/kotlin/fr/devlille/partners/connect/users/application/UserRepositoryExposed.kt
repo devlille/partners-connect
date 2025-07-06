@@ -13,7 +13,7 @@ import java.util.UUID
 
 class UserRepositoryExposed(
     private val usersTable: UsersTable,
-    private val permsTable: EventPermissionsTable
+    private val permsTable: EventPermissionsTable,
 ) : UserRepository {
     override fun createUser(user: User) {
         transaction {
