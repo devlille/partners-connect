@@ -10,10 +10,10 @@ import kotlin.uuid.ExperimentalUuidApi
 fun CreateOrUpdateEventRequest.toDomain(id: UUID = UUID.randomUUID()): Event = Event(
     id = id,
     name = name,
-    startTime = LocalDateTime.parse(start_time),
-    endTime = LocalDateTime.parse(end_time),
-    submissionStartTime = LocalDateTime.parse(submission_start_time),
-    submissionEndTime = LocalDateTime.parse(submission_end_time),
+    startTime = LocalDateTime.parse(startTime),
+    endTime = LocalDateTime.parse(endTime),
+    submissionStartTime = LocalDateTime.parse(submissionStartTime),
+    submissionEndTime = LocalDateTime.parse(submissionEndTime),
     address = address,
     contactPhone = contact.phone,
     contactEmail = contact.email,
@@ -21,11 +21,11 @@ fun CreateOrUpdateEventRequest.toDomain(id: UUID = UUID.randomUUID()): Event = E
     siret = legal?.siret,
     siren = legal?.siren,
     tva = legal?.tva,
-    dAndB = legal?.d_and_b,
+    dAndB = legal?.dAndB,
     nace = legal?.nace,
     naf = legal?.naf,
     duns = legal?.duns,
     iban = banking?.iban,
     bic = banking?.bic,
-    ribUrl = banking?.rib_url
+    ribUrl = banking?.ribUrl
 )

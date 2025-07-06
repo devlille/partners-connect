@@ -15,6 +15,7 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
+@Suppress("ThrowsCount")
 fun Route.userRoutes() {
     val authRepository by inject<AuthRepository>()
     val userRepository by inject<UserRepository>()

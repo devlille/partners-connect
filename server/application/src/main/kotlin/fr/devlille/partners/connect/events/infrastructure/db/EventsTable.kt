@@ -1,3 +1,4 @@
+@file:Suppress("MagicNumber")
 package fr.devlille.partners.connect.events.infrastructure.db
 
 import kotlinx.datetime.Clock
