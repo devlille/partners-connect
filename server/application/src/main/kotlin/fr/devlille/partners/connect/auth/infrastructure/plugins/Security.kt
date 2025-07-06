@@ -25,7 +25,7 @@ fun Application.configureSecurity(redirect: (state: String, redirectUrl: String)
                     defaultScopes = listOf("openid", "profile", "email"),
                     extraAuthParameters = listOf("access_type" to "offline"),
                     onStateCreated = { call, state ->
-                        //saves new state with redirect url value
+                        // saves new state with redirect url value
                         call.request.queryParameters["redirectUrl"]?.let {
                             redirect(state, it)
                         }

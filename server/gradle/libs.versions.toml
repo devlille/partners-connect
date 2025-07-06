@@ -1,4 +1,5 @@
 [versions]
+detekt = "1.23.8"
 exposed = "1.0.0-beta-2"
 h2 = "2.2.224"
 kotlin = "2.1.21"
@@ -54,5 +55,6 @@ ktor-server = ["ktor-server-core", "ktor-server-auth", "ktor-server-netty", "kto
 ktor-client = ["ktor-client-core", "ktor-client-json", "ktor-client-logging", "ktor-client-serialization", "ktor-client-negotiation", "ktor-client-java"]
 
 [plugins]
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

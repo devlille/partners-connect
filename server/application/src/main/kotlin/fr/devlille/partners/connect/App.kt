@@ -1,6 +1,5 @@
 package fr.devlille.partners.connect
 
-import fr.devlille.partners.connect.internal.infrastructure.api.UserSession
 import fr.devlille.partners.connect.auth.infrastructure.api.authRoutes
 import fr.devlille.partners.connect.auth.infrastructure.bindings.authModule
 import fr.devlille.partners.connect.auth.infrastructure.plugins.configureSecurity
@@ -8,6 +7,7 @@ import fr.devlille.partners.connect.events.infrastructure.api.eventRoutes
 import fr.devlille.partners.connect.events.infrastructure.bindings.eventModule
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
+import fr.devlille.partners.connect.internal.infrastructure.api.UserSession
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkEngineModule
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.users.infrastructure.api.userRoutes
@@ -57,15 +57,50 @@ fun Application.module(
     databasePassword: String = SystemVarEnv.Exposed.dbPassword,
     modules: List<Module> = listOf(networkEngineModule, authModule, eventModule, userModule)
 ) {
-    Database.connect(
+    configureDatabase(
         url = databaseUrl,
         driver = databaseDriver,
         user = databaseUser,
         password = databasePassword
     )
+    configureCors()
+    install(Koin) {
+        slf4jLogger()
+        modules(modules)
+    }
+    configureContentNegotiation()
+    configureStatusPage()
+    install(Sessions) {
+        cookie<UserSession>("user_session")
+    }
+    val redirects = mutableMapOf<String, String>()
+    configureSecurity { state, redirectUrl ->
+        redirects[state] = redirectUrl
+    }
+    routing {
+        route("auth") {
+            authRoutes { redirects[it] }
+        }
+        route("events") {
+            eventRoutes()
+        }
+        userRoutes()
+    }
+}
+
+private fun configureDatabase(url: String, driver: String, user: String, password: String) {
+    Database.connect(
+        url = url,
+        driver = driver,
+        user = user,
+        password = password
+    )
     transaction {
         SchemaUtils.create(EventsTable, UsersTable, EventPermissionsTable)
     }
+}
+
+private fun Application.configureCors() {
     install(CORS) {
         allowMethod(HttpMethod.Options)
         allowMethod(HttpMethod.Put)
@@ -74,16 +109,20 @@ fun Application.module(
         allowMethod(HttpMethod.Patch)
         allowHeader(HttpHeaders.Authorization)
     }
+}
 
-    install(Koin) {
-        slf4jLogger()
-        modules(modules)
-    }
-
+private fun Application.configureContentNegotiation() {
     install(ContentNegotiation) {
-        json(Json { ignoreUnknownKeys = true; prettyPrint = true })
+        json(
+            Json {
+                ignoreUnknownKeys = true
+                prettyPrint = true
+            }
+        )
     }
+}
 
+private fun Application.configureStatusPage() {
     install(StatusPages) {
         exception<BadRequestException> { call, cause ->
             call.respondText(text = cause.message ?: "400 Bad Request", status = HttpStatusCode.BadRequest)
@@ -97,24 +136,5 @@ fun Application.module(
         exception<Throwable> { call, cause ->
             call.respondText(text = "500: $cause", status = HttpStatusCode.InternalServerError)
         }
-    }
-
-    install(Sessions) {
-        cookie<UserSession>("user_session")
-    }
-
-    val redirects = mutableMapOf<String, String>()
-    configureSecurity { state, redirectUrl ->
-        redirects[state] = redirectUrl
-    }
-
-    routing {
-        route("auth") {
-            authRoutes { redirects[it] }
-        }
-        route("events") {
-            eventRoutes()
-        }
-        userRoutes()
     }
 }

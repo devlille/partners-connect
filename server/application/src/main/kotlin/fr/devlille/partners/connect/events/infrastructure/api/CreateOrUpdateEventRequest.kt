@@ -1,14 +1,19 @@
 package fr.devlille.partners.connect.events.infrastructure.api
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class CreateOrUpdateEventRequest(
     val name: String,
-    val start_time: String,
-    val end_time: String,
-    val submission_start_time: String,
-    val submission_end_time: String,
+    @SerialName("start_time")
+    val startTime: String,
+    @SerialName("end_time")
+    val endTime: String,
+    @SerialName("submission_start_time")
+    val submissionStartTime: String,
+    @SerialName("submission_end_time")
+    val submissionEndTime: String,
     val address: String,
     val contact: Contact,
     val legal: Legal? = null,
@@ -27,7 +32,8 @@ data class Legal(
     val siret: String? = null,
     val siren: String? = null,
     val tva: String? = null,
-    val d_and_b: String? = null,
+    @SerialName("d_and_b")
+    val dAndB: String? = null,
     val nace: String? = null,
     val naf: String? = null,
     val duns: String? = null
@@ -37,5 +43,6 @@ data class Legal(
 data class Banking(
     val iban: String? = null,
     val bic: String? = null,
-    val rib_url: String? = null
+    @SerialName("rib_url")
+    val ribUrl: String? = null
 )
