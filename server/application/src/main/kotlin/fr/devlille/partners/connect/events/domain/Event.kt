@@ -25,5 +25,5 @@ data class Event(
     val duns: String?,
     val iban: String?,
     val bic: String?,
-    val ribUrl: String?
+    val ribUrl: String?,
 )

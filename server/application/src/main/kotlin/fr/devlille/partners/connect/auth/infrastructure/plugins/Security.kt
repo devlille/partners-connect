@@ -29,7 +29,7 @@ fun Application.configureSecurity(redirect: (state: String, redirectUrl: String)
                         call.request.queryParameters["redirectUrl"]?.let {
                             redirect(state, it)
                         }
-                    }
+                    },
                 )
             }
             client = HttpClient(Java)

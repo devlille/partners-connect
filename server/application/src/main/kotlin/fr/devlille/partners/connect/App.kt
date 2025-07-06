@@ -46,7 +46,7 @@ fun main() {
     embeddedServer(
         factory = Netty,
         port = PORT,
-        module = Application::module
+        module = Application::module,
     ).start(wait = true)
 }
 
@@ -55,13 +55,13 @@ fun Application.module(
     databaseDriver: String = SystemVarEnv.Exposed.dbDriver,
     databaseUser: String = SystemVarEnv.Exposed.dbUser,
     databasePassword: String = SystemVarEnv.Exposed.dbPassword,
-    modules: List<Module> = listOf(networkEngineModule, authModule, eventModule, userModule)
+    modules: List<Module> = listOf(networkEngineModule, authModule, eventModule, userModule),
 ) {
     configureDatabase(
         url = databaseUrl,
         driver = databaseDriver,
         user = databaseUser,
-        password = databasePassword
+        password = databasePassword,
     )
     configureCors()
     install(Koin) {
@@ -93,7 +93,7 @@ private fun configureDatabase(url: String, driver: String, user: String, passwor
         url = url,
         driver = driver,
         user = user,
-        password = password
+        password = password,
     )
     transaction {
         SchemaUtils.create(EventsTable, UsersTable, EventPermissionsTable)
@@ -117,7 +117,7 @@ private fun Application.configureContentNegotiation() {
             Json {
                 ignoreUnknownKeys = true
                 prettyPrint = true
-            }
+            },
         )
     }
 }

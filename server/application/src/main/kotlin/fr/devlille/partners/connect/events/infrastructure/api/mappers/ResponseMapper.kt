@@ -9,5 +9,5 @@ fun EventSummary.toResponse(): EventSummaryResponse = EventSummaryResponse(
     startTime = startTime,
     endTime = endTime,
     submissionStartTime = submissionStartTime,
-    submissionEndTime = submissionEndTime
+    submissionEndTime = submissionEndTime,
 )

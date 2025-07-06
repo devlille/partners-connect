@@ -9,5 +9,5 @@ class EventSummary(
     val startTime: LocalDateTime,
     val endTime: LocalDateTime,
     val submissionStartTime: LocalDateTime,
-    val submissionEndTime: LocalDateTime
+    val submissionEndTime: LocalDateTime,
 )

@@ -25,7 +25,7 @@ fun Route.userRoutes() {
             val eventId = call.parameters["eventId"] ?: throw BadRequestException("event id is required")
             call.respond(
                 HttpStatusCode.OK,
-                userRepository.findUsersByEventId(eventId)
+                userRepository.findUsersByEventId(eventId),
             )
         }
         post("/grant") {

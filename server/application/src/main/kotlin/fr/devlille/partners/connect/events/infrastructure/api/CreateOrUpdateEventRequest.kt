@@ -17,13 +17,13 @@ data class CreateOrUpdateEventRequest(
     val address: String,
     val contact: Contact,
     val legal: Legal? = null,
-    val banking: Banking? = null
+    val banking: Banking? = null,
 )
 
 @Serializable
 data class Contact(
     val phone: String? = null,
-    val email: String? = null
+    val email: String? = null,
 )
 
 @Serializable
@@ -36,7 +36,7 @@ data class Legal(
     val dAndB: String? = null,
     val nace: String? = null,
     val naf: String? = null,
-    val duns: String? = null
+    val duns: String? = null,
 )
 
 @Serializable
@@ -44,5 +44,5 @@ data class Banking(
     val iban: String? = null,
     val bic: String? = null,
     @SerialName("rib_url")
-    val ribUrl: String? = null
+    val ribUrl: String? = null,
 )

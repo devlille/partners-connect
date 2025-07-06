@@ -9,5 +9,5 @@ class UserInfo(
     val displayName: String,
     @SerialName("picture_url")
     val pictureUrl: String,
-    val email: String
+    val email: String,
 )

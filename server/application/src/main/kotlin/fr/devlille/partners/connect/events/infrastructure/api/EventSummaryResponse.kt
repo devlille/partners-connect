@@ -15,5 +15,5 @@ class EventSummaryResponse(
     @SerialName("submission_start_time")
     val submissionStartTime: LocalDateTime,
     @SerialName("submission_end_time")
-    val submissionEndTime: LocalDateTime
+    val submissionEndTime: LocalDateTime,
 )

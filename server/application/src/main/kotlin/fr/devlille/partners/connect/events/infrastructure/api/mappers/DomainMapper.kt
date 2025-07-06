@@ -27,5 +27,5 @@ fun CreateOrUpdateEventRequest.toDomain(id: UUID = UUID.randomUUID()): Event = E
     duns = legal?.duns,
     iban = banking?.iban,
     bic = banking?.bic,
-    ribUrl = banking?.ribUrl
+    ribUrl = banking?.ribUrl,
 )

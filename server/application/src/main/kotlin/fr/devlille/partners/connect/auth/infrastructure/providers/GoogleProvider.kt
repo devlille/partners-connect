@@ -28,5 +28,5 @@ class GoogleUserInfo(
     val email: String,
     @SerialName("email_verified")
     val emailVerified: Boolean,
-    val hd: String
+    val hd: String,
 )

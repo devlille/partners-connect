@@ -7,6 +7,7 @@ kotlinx-datetime = "0.6.1"
 kotlinx-serialization = "1.7.3"
 kotlinx-coroutines = "1.9.0"
 koin = "4.1.0"
+ktlint = "12.3.0"
 ktor = "3.2.0"
 postgresql = "42.7.1"
 
@@ -58,3 +59,4 @@ ktor-client = ["ktor-client-core", "ktor-client-json", "ktor-client-logging", "k
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }

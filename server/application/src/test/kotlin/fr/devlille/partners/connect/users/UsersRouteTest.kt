@@ -15,7 +15,6 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class UsersRouteTest {
-
     @Test
     fun `GET returns empty list when no users exist`() = testApplication {
         application {
@@ -36,10 +35,16 @@ class UsersRouteTest {
         application {
             module()
             val user1 = transaction {
-                UserEntity.new { email = "edit@example.com"; name = "Alice" }
+                UserEntity.new {
+                    email = "edit@example.com"
+                    name = "Alice"
+                }
             }
             val user2 = transaction {
-                UserEntity.new { email = "noedit@example.com"; name = "Bob" }
+                UserEntity.new {
+                    email = "noedit@example.com"
+                    name = "Bob"
+                }
             }
             transaction {
                 EventPermissionEntity.new {

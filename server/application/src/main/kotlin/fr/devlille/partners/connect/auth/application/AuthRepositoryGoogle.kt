@@ -5,7 +5,7 @@ import fr.devlille.partners.connect.auth.domain.UserInfo
 import fr.devlille.partners.connect.auth.infrastructure.providers.GoogleProvider
 
 class AuthRepositoryGoogle(
-    private val googleProvider: GoogleProvider
+    private val googleProvider: GoogleProvider,
 ) : AuthRepository {
     override suspend fun getUserInfo(token: String): UserInfo {
         val googleUserInfo = googleProvider.getGoogleUserInfo(token)
@@ -13,7 +13,7 @@ class AuthRepositoryGoogle(
             givenName = googleUserInfo.givenName,
             firstName = googleUserInfo.familyName,
             pictureUrl = googleUserInfo.picture,
-            email = googleUserInfo.email
+            email = googleUserInfo.email,
         )
     }
 }
