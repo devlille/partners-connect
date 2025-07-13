@@ -10,6 +10,12 @@ import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedExce
 import fr.devlille.partners.connect.internal.infrastructure.api.UserSession
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkEngineModule
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
+import fr.devlille.partners.connect.sponsoring.infrastructure.api.sponsoringRoutes
+import fr.devlille.partners.connect.sponsoring.infrastructure.bindings.sponsoringModule
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationsTable
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionsTable
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPacksTable
 import fr.devlille.partners.connect.users.infrastructure.api.userRoutes
 import fr.devlille.partners.connect.users.infrastructure.bindings.userModule
 import fr.devlille.partners.connect.users.infrastructure.db.EventPermissionsTable
@@ -55,7 +61,7 @@ fun Application.module(
     databaseDriver: String = SystemVarEnv.Exposed.dbDriver,
     databaseUser: String = SystemVarEnv.Exposed.dbUser,
     databasePassword: String = SystemVarEnv.Exposed.dbPassword,
-    modules: List<Module> = listOf(networkEngineModule, authModule, eventModule, userModule),
+    modules: List<Module> = listOf(networkEngineModule, authModule, eventModule, userModule, sponsoringModule),
 ) {
     configureDatabase(
         url = databaseUrl,
@@ -85,6 +91,7 @@ fun Application.module(
             eventRoutes()
         }
         userRoutes()
+        sponsoringRoutes()
     }
 }
 
@@ -96,7 +103,18 @@ private fun configureDatabase(url: String, driver: String, user: String, passwor
         password = password,
     )
     transaction {
-        SchemaUtils.create(EventsTable, UsersTable, EventPermissionsTable)
+        SchemaUtils.create(
+            // events
+            EventsTable,
+            // users
+            UsersTable,
+            EventPermissionsTable,
+            // sponsoring
+            PackOptionsTable,
+            SponsoringOptionsTable,
+            SponsoringPacksTable,
+            OptionTranslationsTable,
+        )
     }
 }
 
