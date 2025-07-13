@@ -34,7 +34,7 @@ fun Route.userRoutes() {
             val token = call.token
             val userInfo = authRepository.getUserInfo(token)
             val hasPerm = userRepository.hasEditPermissionByEmail(userInfo.email, eventId)
-            if (!hasPerm || SystemVarEnv.owner == userInfo.email) {
+            if (!hasPerm && SystemVarEnv.owner != userInfo.email) {
                 throw UnauthorizedException("You do not have permission to grant users for this event")
             }
             userRepository.grantUsers(eventId, request.userIds)
