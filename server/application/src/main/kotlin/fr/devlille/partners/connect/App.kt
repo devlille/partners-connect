@@ -96,13 +96,13 @@ fun Application.module(
 }
 
 private fun configureDatabase(url: String, driver: String, user: String, password: String) {
-    Database.connect(
+    val db = Database.connect(
         url = url,
         driver = driver,
         user = user,
         password = password,
     )
-    transaction {
+    transaction(db) {
         SchemaUtils.create(
             // events
             EventsTable,

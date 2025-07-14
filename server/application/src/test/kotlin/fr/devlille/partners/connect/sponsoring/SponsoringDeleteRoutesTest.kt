@@ -1,12 +1,14 @@
 package fr.devlille.partners.connect.sponsoring
 
-import fr.devlille.partners.connect.internal.insertMockedEvent
-import fr.devlille.partners.connect.module
+import fr.devlille.partners.connect.internal.insertMockedAdminUser
+import fr.devlille.partners.connect.internal.moduleMockedNetwork
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import io.ktor.client.request.delete
+import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import org.jetbrains.exposed.v1.jdbc.insert
@@ -24,8 +26,8 @@ class SponsoringDeleteRoutesTest {
         val optionId = UUID.randomUUID()
 
         application {
-            module()
-            insertMockedEvent(eventId)
+            moduleMockedNetwork()
+            insertMockedAdminUser(eventId)
             transaction {
                 val option = SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId
@@ -45,7 +47,9 @@ class SponsoringDeleteRoutesTest {
             }
         }
 
-        val response = client.delete("/events/$eventId/packs/$packId/options/$optionId")
+        val response = client.delete("/events/$eventId/packs/$packId/options/$optionId") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
         assertEquals(HttpStatusCode.NoContent, response.status)
     }
 
@@ -56,11 +60,13 @@ class SponsoringDeleteRoutesTest {
         val packId = UUID.randomUUID()
 
         application {
-            module()
-            insertMockedEvent(eventId)
+            moduleMockedNetwork()
+            insertMockedAdminUser(eventId)
         }
 
-        val response = client.delete("/events/$eventId/packs/$packId/options/$optionId")
+        val response = client.delete("/events/$eventId/packs/$packId/options/$optionId") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
         assertEquals(HttpStatusCode.NotFound, response.status)
     }
 
@@ -70,8 +76,8 @@ class SponsoringDeleteRoutesTest {
         val optionId = UUID.randomUUID()
 
         application {
-            module()
-            insertMockedEvent(eventId)
+            moduleMockedNetwork()
+            insertMockedAdminUser(eventId)
             transaction {
                 val option = SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId
@@ -91,7 +97,9 @@ class SponsoringDeleteRoutesTest {
             }
         }
 
-        val response = client.delete("/events/$eventId/options/$optionId")
+        val response = client.delete("/events/$eventId/options/$optionId") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
         assertEquals(HttpStatusCode.BadRequest, response.status)
         assertTrue(response.bodyAsText().contains("cannot be deleted"))
     }
@@ -102,17 +110,19 @@ class SponsoringDeleteRoutesTest {
         val optionId = UUID.randomUUID()
 
         application {
-            module()
-            insertMockedEvent(eventId)
+            moduleMockedNetwork()
+            insertMockedAdminUser(eventId)
             transaction {
-                val option = SponsoringOptionEntity.new(optionId) {
+                SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId
                     this.price = 80
                 }
             }
         }
 
-        val response = client.delete("/events/$eventId/options/$optionId")
+        val response = client.delete("/events/$eventId/options/$optionId") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
         assertEquals(HttpStatusCode.NoContent, response.status)
     }
 
@@ -122,8 +132,8 @@ class SponsoringDeleteRoutesTest {
         val packId = UUID.randomUUID()
 
         application {
-            module()
-            insertMockedEvent(eventId)
+            moduleMockedNetwork()
+            insertMockedAdminUser(eventId)
             transaction {
                 val option = SponsoringOptionEntity.new {
                     this.eventId = eventId
@@ -143,7 +153,9 @@ class SponsoringDeleteRoutesTest {
             }
         }
 
-        val response = client.delete("/events/$eventId/packs/$packId")
+        val response = client.delete("/events/$eventId/packs/$packId") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
         assertEquals(HttpStatusCode.BadRequest, response.status)
         assertTrue(response.bodyAsText().contains("cannot be deleted"))
     }
@@ -154,10 +166,10 @@ class SponsoringDeleteRoutesTest {
         val packId = UUID.randomUUID()
 
         application {
-            module()
-            insertMockedEvent(eventId)
+            moduleMockedNetwork()
+            insertMockedAdminUser(eventId)
             transaction {
-                val pack = SponsoringPackEntity.new(packId) {
+                SponsoringPackEntity.new(packId) {
                     this.eventId = eventId
                     this.name = "Bronze"
                     this.basePrice = 100
@@ -166,7 +178,9 @@ class SponsoringDeleteRoutesTest {
             }
         }
 
-        val response = client.delete("/events/$eventId/packs/$packId")
+        val response = client.delete("/events/$eventId/packs/$packId") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
         assertEquals(HttpStatusCode.NoContent, response.status)
     }
 }
