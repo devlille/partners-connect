@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.sponsoring.infrastructure.api
 
+import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedEventPlugin
 import fr.devlille.partners.connect.sponsoring.domain.AttachOptionsToPack
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringPack
@@ -30,6 +31,7 @@ private fun Route.packRoutes() {
     val optRepository by inject<OptionRepository>()
 
     route("/packs") {
+        install(AuthorizedEventPlugin)
         get {
             val eventId = call.parameters["eventId"] ?: throw BadRequestException("Missing event id")
             val acceptLanguage = call.request.headers["Accept-Language"]
@@ -72,6 +74,7 @@ private fun Route.optionRoutes() {
     val repository by inject<OptionRepository>()
 
     route("/options") {
+        install(AuthorizedEventPlugin)
         get {
             val eventId = call.parameters["eventId"] ?: throw BadRequestException("Missing event id")
             val acceptLanguage = call.request.headers["Accept-Language"]
