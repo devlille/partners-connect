@@ -47,15 +47,16 @@ class UserRepositoryExposed(
             .empty().not()
     }
 
-    override fun grantUsers(eventId: String, userIds: List<String>) = transaction {
+    override fun grantUsers(eventId: String, userEmails: List<String>) = transaction {
         val eventUUID = UUID.fromString(eventId)
-        userIds.forEach { userId ->
-            val userUUID = UUID.fromString(userId)
-            val userEntity = UserEntity.findById(userUUID)
-                ?: throw NotFoundException("User with id: $userId not found")
+        userEmails.forEach { userEmail ->
+            val userEntity = UserEntity
+                .find { UsersTable.email eq userEmail }
+                .singleOrNull()
+                ?: throw NotFoundException("User with email: $userEmail not found")
 
             val existing = EventPermissionEntity
-                .find { (permsTable.eventId eq eventUUID) and (permsTable.userId eq userUUID) }
+                .find { (permsTable.eventId eq eventUUID) and (permsTable.userId eq userEntity.id) }
                 .firstOrNull()
 
             if (existing != null) {

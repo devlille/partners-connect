@@ -30,7 +30,7 @@ class GrantPermissionRouteTest {
         }
         val response = client.post("/events/${UUID.randomUUID()}/users/grant") {
             contentType(ContentType.Application.Json)
-            setBody(Json.encodeToString(GrantPermissionRequest(userIds = emptyList())))
+            setBody(Json.encodeToString(GrantPermissionRequest(userEmails = emptyList())))
         }
         assertEquals(HttpStatusCode.Unauthorized, response.status)
     }
@@ -46,7 +46,7 @@ class GrantPermissionRouteTest {
         val response = client.post("/events/${UUID.randomUUID()}/users/grant") {
             header("Authorization", "Bearer invalid")
             contentType(ContentType.Application.Json)
-            setBody(Json.encodeToString(GrantPermissionRequest(userIds = emptyList())))
+            setBody(Json.encodeToString(GrantPermissionRequest(userEmails = emptyList())))
         }
         assertEquals(HttpStatusCode.Unauthorized, response.status)
     }
@@ -62,7 +62,7 @@ class GrantPermissionRouteTest {
         val response = client.post("/events/${UUID.randomUUID()}/users/grant") {
             header("Authorization", "Bearer valid")
             contentType(ContentType.Application.Json)
-            setBody(Json.encodeToString(GrantPermissionRequest(userIds = emptyList())))
+            setBody(Json.encodeToString(GrantPermissionRequest(userEmails = emptyList())))
         }
         assertEquals(HttpStatusCode.NotFound, response.status)
     }
@@ -87,7 +87,7 @@ class GrantPermissionRouteTest {
         val response = client.post("/events/$eventId/users/grant") {
             header("Authorization", "Bearer valid")
             contentType(ContentType.Application.Json)
-            setBody(Json.encodeToString(GrantPermissionRequest(userIds = listOf(UUID.randomUUID().toString()))))
+            setBody(Json.encodeToString(GrantPermissionRequest(userEmails = listOf(UUID.randomUUID().toString()))))
         }
         assertEquals(HttpStatusCode.Unauthorized, response.status)
     }
@@ -122,7 +122,7 @@ class GrantPermissionRouteTest {
         val response = client.post("/events/$eventId/users/grant") {
             header("Authorization", "Bearer valid")
             contentType(ContentType.Application.Json)
-            setBody(Json.encodeToString(GrantPermissionRequest(userIds = listOf(targetId.toString()))))
+            setBody(Json.encodeToString(GrantPermissionRequest(userEmails = listOf("bob@example.com"))))
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
