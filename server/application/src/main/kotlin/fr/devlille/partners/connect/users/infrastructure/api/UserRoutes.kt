@@ -37,7 +37,7 @@ fun Route.userRoutes() {
             if (!hasPerm && SystemVarEnv.owner != userInfo.email) {
                 throw UnauthorizedException("You do not have permission to grant users for this event")
             }
-            userRepository.grantUsers(eventId, request.userIds)
+            userRepository.grantUsers(eventId, request.userEmails)
             call.respond(HttpStatusCode.OK, "Permissions granted")
         }
     }

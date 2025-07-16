@@ -7,5 +7,5 @@ interface UserRepository {
 
     fun hasEditPermissionByEmail(email: String, eventId: String): Boolean
 
-    fun grantUsers(eventId: String, userIds: List<String>)
+    fun grantUsers(eventId: String, userEmails: List<String>)
 }
