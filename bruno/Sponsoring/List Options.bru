@@ -1,0 +1,28 @@
+meta {
+  name: List Options
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{scheme}}://{{base_url}}/events/:event_id/options
+  body: none
+  auth: none
+}
+
+params:path {
+  event_id: {{event_id}}
+}
+
+headers {
+  Accept-Language: fr
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "name": "Gold",
+    "price": 9000,
+    "maxQuantity": 20
+  }
+}

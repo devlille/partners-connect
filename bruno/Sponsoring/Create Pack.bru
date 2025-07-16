@@ -1,0 +1,27 @@
+meta {
+  name: Create Pack
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/events/:event_id/packs
+  body: json
+  auth: none
+}
+
+params:path {
+  event_id: {{event_id}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "name": "Gold",
+    "price": 9000,
+    "max_quantity": 20
+  }
+}

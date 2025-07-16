@@ -1,0 +1,37 @@
+meta {
+  name: Create Option
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/events/:event_id/options
+  body: json
+  auth: none
+}
+
+params:path {
+  event_id: {{event_id}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "translations": [
+      {
+        "language": "fr",
+        "name": "Communication vidéo",
+        "description": "Une communication vidéo est mise en avant sur votre espace partenaire sur nos supports de communication"
+      },
+      {
+        "language": "en",
+        "name": "Communication video",
+        "description": "A communication video is published on your partner page in our different digital support"
+      }
+    ],
+    "price": 100
+  }
+}

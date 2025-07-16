@@ -1,0 +1,25 @@
+meta {
+  name: Grant
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/events/:event_id/users/grant
+  body: json
+  auth: none
+}
+
+params:path {
+  event_id: {{event_id}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "user_ids": ["302d33ac-d2c0-4ca3-b37f-e07837e9e6a6"]
+  }
+}
