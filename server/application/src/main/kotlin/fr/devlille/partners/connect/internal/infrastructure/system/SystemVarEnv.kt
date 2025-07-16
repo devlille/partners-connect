@@ -1,5 +1,7 @@
 package fr.devlille.partners.connect.internal.infrastructure.system
 
+import org.jetbrains.exposed.v1.crypt.Algorithms
+
 object SystemVarEnv {
     val owner: String = System.getenv("OWNER") ?: ""
 
@@ -10,8 +12,18 @@ object SystemVarEnv {
         val dbPassword: String = System.getenv("EXPOSED_DB_PASSWORD") ?: ""
     }
 
+    object Crypto {
+        val key: String = System.getenv("CRYPTO_KEY") ?: "passwd"
+        val salt: String = System.getenv("CRYPTO_SALT") ?: "4420d1918d"
+        val algorithm = Algorithms.AES_256_PBE_GCM(password = key, salt = salt)
+    }
+
     object GoogleProvider {
         val clientId: String = System.getenv("GOOGLE_CLIENT_ID")
         val clientSecret: String = System.getenv("GOOGLE_CLIENT_SECRET")
+    }
+
+    object ThirdParty {
+        val slackKey: String = System.getenv("SLACK_KEY") ?: ""
     }
 }

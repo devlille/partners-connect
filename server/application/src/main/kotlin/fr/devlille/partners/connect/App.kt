@@ -6,6 +6,10 @@ import fr.devlille.partners.connect.auth.infrastructure.plugins.configureSecurit
 import fr.devlille.partners.connect.events.infrastructure.api.eventRoutes
 import fr.devlille.partners.connect.events.infrastructure.bindings.eventModule
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
+import fr.devlille.partners.connect.integrations.infrastructure.api.integrationRoutes
+import fr.devlille.partners.connect.integrations.infrastructure.bindings.integrationModule
+import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
+import fr.devlille.partners.connect.integrations.infrastructure.db.SlackIntegrationsTable
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.UserSession
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkEngineModule
@@ -61,7 +65,14 @@ fun Application.module(
     databaseDriver: String = SystemVarEnv.Exposed.dbDriver,
     databaseUser: String = SystemVarEnv.Exposed.dbUser,
     databasePassword: String = SystemVarEnv.Exposed.dbPassword,
-    modules: List<Module> = listOf(networkEngineModule, authModule, eventModule, userModule, sponsoringModule),
+    modules: List<Module> = listOf(
+        networkEngineModule,
+        authModule,
+        eventModule,
+        userModule,
+        sponsoringModule,
+        integrationModule,
+    ),
 ) {
     configureDatabase(
         url = databaseUrl,
@@ -92,6 +103,7 @@ fun Application.module(
         }
         userRoutes()
         sponsoringRoutes()
+        integrationRoutes()
     }
 }
 
@@ -104,6 +116,9 @@ private fun configureDatabase(url: String, driver: String, user: String, passwor
     )
     transaction(db) {
         SchemaUtils.create(
+            // integrations
+            IntegrationsTable,
+            SlackIntegrationsTable,
             // events
             EventsTable,
             // users
