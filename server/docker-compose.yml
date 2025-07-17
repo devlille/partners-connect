@@ -1,0 +1,44 @@
+services:
+  app:
+    build: .
+    container_name: partners-connect-server
+    depends_on:
+      - postgres-db
+    environment:
+      EXPOSED_DB_URL: ${EXPOSED_DB_URL}
+      EXPOSED_DB_DRIVER: ${EXPOSED_DB_DRIVER}
+      EXPOSED_DB_USER: ${POSTGRES_USER}
+      EXPOSED_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      CRYPTO_KEY: ${CRYPTO_KEY}
+      CRYPTO_SALT: ${CRYPTO_SALT}
+      OWNER: ${OWNER}
+    ports:
+      - "8080:8080"
+
+  postgres-db:
+    image: postgres:15
+    container_name: partners-connect-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:9.1.0
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    depends_on:
+      - postgres-db
+
+volumes:
+  postgres_data:
