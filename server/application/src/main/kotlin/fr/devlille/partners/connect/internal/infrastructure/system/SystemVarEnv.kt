@@ -22,8 +22,4 @@ object SystemVarEnv {
         val clientId: String = System.getenv("GOOGLE_CLIENT_ID")
         val clientSecret: String = System.getenv("GOOGLE_CLIENT_SECRET")
     }
-
-    object ThirdParty {
-        val slackKey: String = System.getenv("SLACK_KEY") ?: ""
-    }
 }
