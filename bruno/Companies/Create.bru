@@ -1,0 +1,25 @@
+meta {
+  name: Create
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/companies
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "DuckDuckGo",
+    "site_url": "https://duckduckgo.com/",
+    "description": "Switch to DuckDuckGo. It’s private and free!",
+    "socials": [
+      {
+        "type": "LINKEDIN",
+        "url": "https://www.linkedin.com/company/duck-duck-go/"
+      }
+    ]
+  }
+}

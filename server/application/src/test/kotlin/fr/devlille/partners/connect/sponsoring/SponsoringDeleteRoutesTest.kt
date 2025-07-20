@@ -1,7 +1,7 @@
 package fr.devlille.partners.connect.sponsoring
 
 import fr.devlille.partners.connect.internal.insertMockedAdminUser
-import fr.devlille.partners.connect.internal.moduleMockedNetwork
+import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
@@ -26,7 +26,7 @@ class SponsoringDeleteRoutesTest {
         val optionId = UUID.randomUUID()
 
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
             transaction {
                 val option = SponsoringOptionEntity.new(optionId) {
@@ -60,7 +60,7 @@ class SponsoringDeleteRoutesTest {
         val packId = UUID.randomUUID()
 
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
         }
 
@@ -76,7 +76,7 @@ class SponsoringDeleteRoutesTest {
         val optionId = UUID.randomUUID()
 
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
             transaction {
                 val option = SponsoringOptionEntity.new(optionId) {
@@ -110,7 +110,7 @@ class SponsoringDeleteRoutesTest {
         val optionId = UUID.randomUUID()
 
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
             transaction {
                 SponsoringOptionEntity.new(optionId) {
@@ -132,7 +132,7 @@ class SponsoringDeleteRoutesTest {
         val packId = UUID.randomUUID()
 
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
             transaction {
                 val option = SponsoringOptionEntity.new {
@@ -166,7 +166,7 @@ class SponsoringDeleteRoutesTest {
         val packId = UUID.randomUUID()
 
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
             transaction {
                 SponsoringPackEntity.new(packId) {

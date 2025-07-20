@@ -1,7 +1,7 @@
 package fr.devlille.partners.connect.sponsoring
 
 import fr.devlille.partners.connect.internal.insertMockedAdminUser
-import fr.devlille.partners.connect.internal.moduleMockedNetwork
+import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.TranslatedLabel
@@ -31,7 +31,7 @@ class SponsoringOptionRoutesTest {
     fun `GET returns empty list when no options exist`() = testApplication {
         val eventId = UUID.randomUUID()
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
         }
 
@@ -48,7 +48,7 @@ class SponsoringOptionRoutesTest {
     fun `POST creates an option with translations and GET returns it`() = testApplication {
         val eventId = UUID.randomUUID()
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
         }
 
@@ -96,7 +96,7 @@ class SponsoringOptionRoutesTest {
     fun `GET returns 400 when Accept-Language is missing`() = testApplication {
         val eventId = UUID.randomUUID()
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
         }
 
@@ -111,7 +111,7 @@ class SponsoringOptionRoutesTest {
     fun `POST and GET fail if translation for requested language doesn't exist`() = testApplication {
         val eventId = UUID.randomUUID()
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
         }
 

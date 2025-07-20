@@ -1,9 +1,8 @@
 package fr.devlille.partners.connect.integrations.infrastructure
 
 import fr.devlille.partners.connect.integrations.domain.CreateSlackIntegration
-import fr.devlille.partners.connect.integrations.infrastructure.db.SlackIntegrationsTable.token
 import fr.devlille.partners.connect.internal.insertMockedAdminUser
-import fr.devlille.partners.connect.internal.moduleMockedNetwork
+import fr.devlille.partners.connect.internal.moduleMocked
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -25,7 +24,7 @@ class IntegrationRoutesTest {
         val eventId = UUID.randomUUID()
 
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
         }
 
@@ -53,7 +52,7 @@ class IntegrationRoutesTest {
         val eventId = UUID.randomUUID()
 
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
         }
 
@@ -72,7 +71,7 @@ class IntegrationRoutesTest {
         val eventId = UUID.randomUUID()
 
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
         }
 

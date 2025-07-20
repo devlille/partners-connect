@@ -1,0 +1,33 @@
+meta {
+  name: Upload Logo
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/companies/:company_id/logo
+  body: multipartForm
+  auth: none
+}
+
+params:path {
+  company_id: 
+}
+
+body:json {
+  {
+    "name": "DuckDuckGo",
+    "site_url": "https://duckduckgo.com/",
+    "description": "Switch to DuckDuckGo. It’s private and free!",
+    "socials": [
+      {
+        "type": "LINKEDIN",
+        "url": "https://www.linkedin.com/company/duck-duck-go/"
+      }
+    ]
+  }
+}
+
+body:multipart-form {
+  : @file()
+}

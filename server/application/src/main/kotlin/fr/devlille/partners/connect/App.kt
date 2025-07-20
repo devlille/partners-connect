@@ -3,6 +3,10 @@ package fr.devlille.partners.connect
 import fr.devlille.partners.connect.auth.infrastructure.api.authRoutes
 import fr.devlille.partners.connect.auth.infrastructure.bindings.authModule
 import fr.devlille.partners.connect.auth.infrastructure.plugins.configureSecurity
+import fr.devlille.partners.connect.companies.infrastructure.api.companyRoutes
+import fr.devlille.partners.connect.companies.infrastructure.bindings.companyModule
+import fr.devlille.partners.connect.companies.infrastructure.db.CompaniesTable
+import fr.devlille.partners.connect.companies.infrastructure.db.CompanySocialsTable
 import fr.devlille.partners.connect.events.infrastructure.api.eventRoutes
 import fr.devlille.partners.connect.events.infrastructure.bindings.eventModule
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
@@ -13,6 +17,7 @@ import fr.devlille.partners.connect.integrations.infrastructure.db.SlackIntegrat
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.UserSession
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkEngineModule
+import fr.devlille.partners.connect.internal.infrastructure.bindings.storageModule
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.sponsoring.infrastructure.api.sponsoringRoutes
 import fr.devlille.partners.connect.sponsoring.infrastructure.bindings.sponsoringModule
@@ -67,10 +72,12 @@ fun Application.module(
     databasePassword: String = SystemVarEnv.Exposed.dbPassword,
     modules: List<Module> = listOf(
         networkEngineModule,
+        storageModule,
         authModule,
         eventModule,
         userModule,
         sponsoringModule,
+        companyModule,
         integrationModule,
     ),
 ) {
@@ -103,6 +110,7 @@ fun Application.module(
         }
         userRoutes()
         sponsoringRoutes()
+        companyRoutes()
         integrationRoutes()
     }
 }
@@ -129,6 +137,9 @@ private fun configureDatabase(url: String, driver: String, user: String, passwor
             SponsoringOptionsTable,
             SponsoringPacksTable,
             OptionTranslationsTable,
+            // companies
+            CompaniesTable,
+            CompanySocialsTable,
         )
     }
 }

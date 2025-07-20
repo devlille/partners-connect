@@ -2,7 +2,7 @@ package fr.devlille.partners.connect.sponsoring
 
 import fr.devlille.partners.connect.internal.insertMockedAdminUser
 import fr.devlille.partners.connect.internal.insertMockedEvent
-import fr.devlille.partners.connect.internal.moduleMockedNetwork
+import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.sponsoring.domain.AttachOptionsToPack
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringPack
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringPack
@@ -37,7 +37,7 @@ class SponsoringPackRoutesTest {
     fun `GET returns empty list when no packs exist`() = testApplication {
         val eventId = UUID.randomUUID()
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
         }
 
@@ -54,7 +54,7 @@ class SponsoringPackRoutesTest {
     fun `POST creates a new pack`() = testApplication {
         val eventId = UUID.randomUUID()
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
         }
 
@@ -88,7 +88,7 @@ class SponsoringPackRoutesTest {
         val eventId = UUID.randomUUID()
 
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
             transaction {
                 repeat(2) {
@@ -117,7 +117,7 @@ class SponsoringPackRoutesTest {
     fun `GET fails if Accept-Language is missing`() = testApplication {
         val eventId = UUID.randomUUID()
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
         }
 
@@ -134,7 +134,7 @@ class SponsoringPackRoutesTest {
         val optionId1 = UUID.randomUUID()
         val optionId2 = UUID.randomUUID()
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
             transaction {
                 SponsoringPackEntity.new(packId) {
@@ -194,7 +194,7 @@ class SponsoringPackRoutesTest {
     fun `POST to attach options returns 404 if pack does not exist`() = testApplication {
         val eventId = UUID.randomUUID()
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
         }
 
@@ -215,7 +215,7 @@ class SponsoringPackRoutesTest {
         val packId = UUID.randomUUID()
 
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
         }
 
@@ -242,7 +242,7 @@ class SponsoringPackRoutesTest {
         val optionId = UUID.randomUUID()
         val packId = UUID.randomUUID()
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
             transaction {
                 val option = SponsoringOptionEntity.new(optionId) {
@@ -290,7 +290,7 @@ class SponsoringPackRoutesTest {
         val optionInvalid = UUID.randomUUID()
 
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
             insertMockedEvent(otherEventId)
 
@@ -350,7 +350,7 @@ class SponsoringPackRoutesTest {
         val optionId = UUID.randomUUID()
 
         application {
-            moduleMockedNetwork()
+            moduleMocked()
             insertMockedAdminUser(eventId)
             transaction {
                 SponsoringPackEntity.new(packId) {

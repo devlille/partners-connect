@@ -3,6 +3,7 @@ package fr.devlille.partners.connect.internal.infrastructure.system
 import org.jetbrains.exposed.v1.crypt.Algorithms
 
 object SystemVarEnv {
+    val projectId: String = System.getenv("PROJECT_ID") ?: "partners-connect"
     val owner: String = System.getenv("OWNER") ?: ""
 
     object Exposed {
