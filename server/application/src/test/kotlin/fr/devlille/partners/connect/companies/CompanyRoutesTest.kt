@@ -1,0 +1,180 @@
+package fr.devlille.partners.connect.companies
+
+import fr.devlille.partners.connect.companies.domain.CreateCompany
+import fr.devlille.partners.connect.companies.domain.Social
+import fr.devlille.partners.connect.companies.domain.SocialType
+import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
+import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
+import fr.devlille.partners.connect.internal.infrastructure.bucket.Upload
+import fr.devlille.partners.connect.internal.moduleMocked
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.forms.submitFormWithBinaryData
+import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
+import io.ktor.server.testing.testApplication
+import io.mockk.every
+import io.mockk.mockk
+import junit.framework.TestCase.assertTrue
+import kotlinx.serialization.json.Json
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.koin.dsl.module
+import java.io.File
+import java.util.UUID
+import kotlin.test.Test
+import kotlin.test.assertEquals
+
+class CompanyRoutesTest {
+    private val json = Json { ignoreUnknownKeys = true }
+
+    @Test
+    fun `GET returns empty list if no companies exist`() = testApplication {
+        application { moduleMocked() }
+
+        val response = client.get("/companies")
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertEquals("[]", response.bodyAsText())
+    }
+
+    @Test
+    fun `POST creates a new company`() = testApplication {
+        val storage = mockk<Storage>()
+        every { storage.upload(any(), any(), any()) } returns Upload(
+            bucketName = "bucketName",
+            filename = "fileName",
+            url = "https://example.com/original",
+        )
+
+        application {
+            moduleMocked(mockStorage = module { single<Storage> { storage } })
+        }
+
+        val input = CreateCompany(
+            name = "DevLille",
+            siteUrl = "https://devlille.fr",
+            description = "Lille Developer Community",
+            socials = listOf(Social(SocialType.LINKEDIN, "https://linkedin.com/devlille")),
+        )
+
+        val createdResponse = client.post("/companies") {
+            contentType(ContentType.Application.Json)
+            setBody(json.encodeToString(CreateCompany.serializer(), input))
+        }
+        val id = json.decodeFromString<Map<String, String>>(createdResponse.bodyAsText())["id"]
+
+        assertEquals(HttpStatusCode.Created, createdResponse.status)
+
+        val response = client.get("/companies")
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertTrue(response.bodyAsText().contains(id!!))
+    }
+
+    @Test
+    fun `POST logo uploads and processes an SVG`() = testApplication {
+        val storage = mockk<Storage>()
+        every { storage.upload(any(), any(), any()) } returns Upload(
+            bucketName = "bucketName",
+            filename = "fileName",
+            url = "https://example.com/original",
+        )
+
+        val companyId = UUID.randomUUID()
+        every { storage.upload(any(), any(), any()) } returns Upload(
+            bucketName = "bucketName",
+            filename = "fileName",
+            url = "https://example.com/original",
+        )
+
+        application {
+            moduleMocked(mockStorage = module { single<Storage> { storage } })
+            transaction {
+                CompanyEntity.new(companyId) {
+                    name = "DevLille"
+                    siteUrl = "https://devlille.fr"
+                    description = "Dev community"
+                }
+            }
+        }
+
+        val response = client.submitFormWithBinaryData(
+            url = "/companies/$companyId/logo",
+            formData = formData {
+                append(
+                    "file",
+                    File("src/test/resources/devlille-logo.svg").readBytes(),
+                    Headers.build {
+                        append(HttpHeaders.ContentType, "image/svg+xml")
+                        append(HttpHeaders.ContentDisposition, "filename=devlille-logo.svg")
+                    },
+                )
+            },
+        )
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val body = response.bodyAsText()
+        assertTrue(body.contains("original"))
+        assertTrue(body.contains("png_1000"))
+    }
+
+    @Test
+    fun `POST logo rejects unsupported file type`() = testApplication {
+        val companyId = UUID.randomUUID()
+        application {
+            moduleMocked()
+            transaction {
+                CompanyEntity.new(companyId) {
+                    name = "Unsupported Co"
+                    siteUrl = "https://unsupported.example"
+                    description = null
+                }
+            }
+        }
+
+        val response = client.submitFormWithBinaryData(
+            url = "/companies/$companyId/logo",
+            formData = formData {
+                append(
+                    "file",
+                    "some unknown content".toByteArray(),
+                    Headers.build {
+                        append(HttpHeaders.ContentType, "application/pdf")
+                        append(HttpHeaders.ContentDisposition, "filename=brochure.pdf")
+                    },
+                )
+            },
+        )
+
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertTrue(response.bodyAsText().contains("Unsupported file type"))
+    }
+
+    @Test
+    fun `GET returns companies sorted by name`() = testApplication {
+        application {
+            moduleMocked()
+            transaction {
+                listOf("Zeta", "Alpha", "Beta").forEach {
+                    CompanyEntity.new(UUID.randomUUID()) {
+                        name = it
+                        siteUrl = "https://$it.com"
+                        description = it
+                    }
+                }
+            }
+        }
+
+        val response = client.get("/companies")
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val body = response.bodyAsText()
+        assertTrue(body.indexOf("Alpha") < body.indexOf("Beta"))
+        assertTrue(body.indexOf("Beta") < body.indexOf("Zeta"))
+    }
+}

@@ -18,10 +18,13 @@ dependencies {
     implementation(libs.bundles.ktor.client)
     implementation(libs.bundles.koin.ktor)
     implementation(libs.bundles.slack.api)
+    implementation(libs.bundles.image.processing)
+    implementation(libs.google.cloud.storage)
     testImplementation(kotlin("test"))
     testImplementation(libs.ktor.server.test)
     testImplementation(libs.ktor.client.mock)
     testImplementation(libs.bundles.okhttp.mock)
+    testImplementation(libs.mockk)
 }
 
 tasks.test {
