@@ -15,12 +15,14 @@ class UserRepositoryExposed(
     private val usersTable: UsersTable,
     private val permsTable: EventPermissionsTable,
 ) : UserRepository {
-    override fun createUser(user: User) {
+    override fun createUserIfNotExist(user: User) {
         transaction {
-            UserEntity.new {
-                this.name = user.displayName
-                this.email = user.email
-                this.pictureUrl = user.pictureUrl
+            if (UserEntity.find { usersTable.email eq user.email }.singleOrNull() == null) {
+                UserEntity.new {
+                    this.name = user.displayName
+                    this.email = user.email
+                    this.pictureUrl = user.pictureUrl
+                }
             }
         }
     }

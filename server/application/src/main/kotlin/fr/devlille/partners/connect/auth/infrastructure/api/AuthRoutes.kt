@@ -38,7 +38,7 @@ fun Route.authRoutes(callback: (state: String) -> String?) {
             val session = UserSession(state, currentPrincipal.accessToken)
             call.sessions.set(session)
             val userInfo = authRepository.getUserInfo("Bearer ${session.token}")
-            userRepository.createUser(userInfo.toDomain())
+            userRepository.createUserIfNotExist(userInfo.toDomain())
             val redirectUrl = callback(state)
             if (redirectUrl != null) {
                 call.respondRedirect(redirectUrl)
