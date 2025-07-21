@@ -1,7 +1,7 @@
 package fr.devlille.partners.connect.users.domain
 
 interface UserRepository {
-    fun createUser(user: User)
+    fun createUserIfNotExist(user: User)
 
     fun findUsersByEventId(eventId: String): List<User>
 
