@@ -1,0 +1,27 @@
+meta {
+  name: Create Partnership
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/events/:event_id/companies/:company_id/partnership
+  body: json
+  auth: none
+}
+
+params:path {
+  company_id: {{company_id}}
+  event_id: {{event_id}}
+}
+
+body:json {
+  {
+    "pack_id": "{{pack_id}}",
+    "option_ids": [],
+    "language": "fr",
+    "email": [
+      "contact@devlille.fr"
+    ]
+  }
+}

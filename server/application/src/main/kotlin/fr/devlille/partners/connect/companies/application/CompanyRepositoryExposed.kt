@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.companies.application
 
+import fr.devlille.partners.connect.companies.application.mappers.toDomain
 import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.companies.domain.CompanyRepository
 import fr.devlille.partners.connect.companies.domain.CreateCompany
@@ -8,6 +9,7 @@ import fr.devlille.partners.connect.companies.infrastructure.db.CompaniesTable
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanySocialEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanySocialsTable
+import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.lowerCase
 import org.jetbrains.exposed.v1.core.or
@@ -32,26 +34,12 @@ class CompanyRepositoryExposed : CompanyRepository {
                 }
             }
             .orderBy(CompaniesTable.name to SortOrder.ASC)
-        CompanyEntity.wrapRows(filteredQuery).map {
-            val hasMedia =
-                it.logoUrlOriginal != null && it.logoUrl1000 != null && it.logoUrl500 != null && it.logoUrl250 != null
-            Company(
-                id = it.id.value.toString(),
-                name = it.name,
-                description = it.description,
-                siteUrl = it.siteUrl,
-                medias = if (hasMedia) {
-                    Media(
-                        original = it.logoUrlOriginal!!,
-                        png1000 = it.logoUrl1000!!,
-                        png500 = it.logoUrl500!!,
-                        png250 = it.logoUrl250!!,
-                    )
-                } else {
-                    null
-                },
-            )
-        }
+        CompanyEntity.wrapRows(filteredQuery).map { it.toDomain() }
+    }
+
+    override fun getById(id: String): Company = transaction {
+        CompanyEntity.findById(UUID.fromString(id))?.toDomain()
+            ?: throw NotFoundException("Company with id $id not found")
     }
 
     override fun createOrUpdate(input: CreateCompany): String = transaction {

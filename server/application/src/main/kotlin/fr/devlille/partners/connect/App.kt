@@ -19,6 +19,11 @@ import fr.devlille.partners.connect.internal.infrastructure.api.UserSession
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkEngineModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.storageModule
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
+import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipRoutes
+import fr.devlille.partners.connect.partnership.infrastructure.bindings.partnershipModule
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailsTable
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionsTable
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.api.sponsoringRoutes
 import fr.devlille.partners.connect.sponsoring.infrastructure.bindings.sponsoringModule
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationsTable
@@ -78,6 +83,7 @@ fun Application.module(
         userModule,
         sponsoringModule,
         companyModule,
+        partnershipModule,
         integrationModule,
     ),
 ) {
@@ -111,6 +117,7 @@ fun Application.module(
         userRoutes()
         sponsoringRoutes()
         companyRoutes()
+        partnershipRoutes()
         integrationRoutes()
     }
 }
@@ -140,6 +147,10 @@ private fun configureDatabase(url: String, driver: String, user: String, passwor
             // companies
             CompaniesTable,
             CompanySocialsTable,
+            // partnerships
+            PartnershipsTable,
+            PartnershipOptionsTable,
+            PartnershipEmailsTable,
         )
     }
 }
