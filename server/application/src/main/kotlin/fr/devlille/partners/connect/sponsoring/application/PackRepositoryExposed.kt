@@ -44,6 +44,35 @@ class PackRepositoryExposed : PackRepository {
         }
     }
 
+    override fun getById(eventId: String, packId: String, language: String): SponsoringPack = transaction {
+        val eventUUID = UUID.fromString(eventId)
+        val packUUID = UUID.fromString(packId)
+        val pack = SponsoringPackEntity
+            .find { (SponsoringPacksTable.id eq packUUID) and (SponsoringPacksTable.eventId eq eventUUID) }
+            .singleOrNull() ?: throw NotFoundException("Pack not found")
+        val packOptions = PackOptionsTable.selectAll()
+            .where { PackOptionsTable.pack eq pack.id }
+            .toList()
+        val requiredOptionIds = packOptions
+            .filter { it[PackOptionsTable.required] }
+            .map { it[PackOptionsTable.option] }
+        val optionalOptions = packOptions
+            .filterNot { it[PackOptionsTable.required] }
+            .map { it[PackOptionsTable.option] }
+        SponsoringPack(
+            id = pack.id.value.toString(),
+            name = pack.name,
+            basePrice = pack.basePrice,
+            maxQuantity = pack.maxQuantity,
+            requiredOptions = pack.options
+                .filter { requiredOptionIds.contains(it.id) }
+                .map { option -> option.toSponsoringOption(language) },
+            optionalOptions = pack.options
+                .filter { optionalOptions.contains(it.id) }
+                .map { option -> option.toSponsoringOption(language) },
+        )
+    }
+
     override fun createPack(eventId: String, input: CreateSponsoringPack): String = transaction {
         val eventUUID = UUID.fromString(eventId)
         SponsoringPackEntity.new {
