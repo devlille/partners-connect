@@ -5,6 +5,7 @@ import fr.devlille.partners.connect.partnership.domain.SuggestPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionsTable
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
@@ -74,7 +75,33 @@ class PartnershipSuggestionRepositoryExposed : PartnershipSuggestionRepository {
 
         partnership.suggestionPackId = suggestedPack.id.value
         partnership.suggestionSentAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+        partnership.suggestionApprovedAt = null
+        partnership.suggestionDeclinedAt = null
 
         partnership.id.value.toString()
+    }
+
+    override fun approve(eventId: String, companyId: String, partnershipId: String): String = transaction {
+        val partnership = findPartnership(eventId, companyId, partnershipId)
+        partnership.suggestionApprovedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+        partnership.id.value.toString()
+    }
+
+    override fun decline(eventId: String, companyId: String, partnershipId: String): String = transaction {
+        val partnership = findPartnership(eventId, companyId, partnershipId)
+        partnership.suggestionDeclinedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+        partnership.id.value.toString()
+    }
+
+    private fun findPartnership(eventId: String, companyId: String, partnershipId: String): PartnershipEntity {
+        val eventUUID = UUID.fromString(eventId)
+        val companyUUID = UUID.fromString(companyId)
+        val partnershipUUID = UUID.fromString(partnershipId)
+
+        return PartnershipEntity.find {
+            (PartnershipsTable.id eq partnershipUUID) and
+                (PartnershipsTable.eventId eq eventUUID) and
+                (PartnershipsTable.companyId eq companyUUID)
+        }.singleOrNull() ?: throw NotFoundException("Partnership not found")
     }
 }
