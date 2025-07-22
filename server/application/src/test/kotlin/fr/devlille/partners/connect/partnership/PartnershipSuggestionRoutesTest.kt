@@ -24,6 +24,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class PartnershipSuggestionRoutesTest {
@@ -38,7 +39,6 @@ class PartnershipSuggestionRoutesTest {
         application {
             moduleMocked()
             insertMockedAdminUser(eventId)
-
             transaction {
                 CompanyEntity.new(companyId) {
                     this.name = "Company X"
@@ -50,7 +50,6 @@ class PartnershipSuggestionRoutesTest {
                     basePrice = 2000
                     maxQuantity = 2
                 }
-
                 val option = SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId
                     this.price = 100
@@ -66,7 +65,6 @@ class PartnershipSuggestionRoutesTest {
                     it[this.option] = optionId
                     it[this.required] = false
                 }
-
                 PartnershipEntity.new(partnershipId) {
                     this.eventId = eventId
                     this.companyId = companyId
@@ -80,10 +78,7 @@ class PartnershipSuggestionRoutesTest {
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(
                 Json.encodeToString(
-                    SuggestPartnership(
-                        packId = packId.toString(),
-                        optionIds = listOf(optionId.toString()),
-                    ),
+                    SuggestPartnership(packId = packId.toString(), optionIds = listOf(optionId.toString())),
                 ),
             )
         }
@@ -91,6 +86,8 @@ class PartnershipSuggestionRoutesTest {
         assertEquals(HttpStatusCode.OK, response.status)
         val partnership = transaction { PartnershipEntity.findById(partnershipId) }
         assertEquals(packId, partnership?.suggestionPackId)
+        assertNull(partnership?.suggestionApprovedAt)
+        assertNull(partnership?.suggestionDeclinedAt)
     }
 
     @Test

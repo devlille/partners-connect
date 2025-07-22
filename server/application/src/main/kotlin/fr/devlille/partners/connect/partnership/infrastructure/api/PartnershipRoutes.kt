@@ -13,7 +13,6 @@ import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
-import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
@@ -52,6 +51,26 @@ fun Route.partnershipRoutes() {
             val company = companyRepository.getById(companyId)
             notificationRepository
                 .sendMessage(eventId, "A new sponsorship pack suggestion has been made for ${company.name}.")
+            call.respond(HttpStatusCode.OK, mapOf("id" to id))
+        }
+
+        post("/{partnershipId}/approve") {
+            val eventId = call.parameters["eventId"] ?: throw BadRequestException("Missing event id")
+            val companyId = call.parameters["companyId"] ?: throw BadRequestException("Missing company id")
+            val partnerId = call.parameters["partnershipId"] ?: throw BadRequestException("Missing partnership id")
+            val id = suggestionRepository.approve(eventId, companyId, partnerId)
+            val company = companyRepository.getById(companyId)
+            notificationRepository.sendMessage(eventId, "Company ${company.name} approved pack suggestion.")
+            call.respond(HttpStatusCode.OK, mapOf("id" to id))
+        }
+
+        post("/{partnershipId}/decline") {
+            val eventId = call.parameters["eventId"] ?: throw BadRequestException("Missing event id")
+            val companyId = call.parameters["companyId"] ?: throw BadRequestException("Missing company id")
+            val partnerId = call.parameters["partnershipId"] ?: throw BadRequestException("Missing partnership id")
+            val id = suggestionRepository.decline(eventId, companyId, partnerId)
+            val company = companyRepository.getById(companyId)
+            notificationRepository.sendMessage(eventId, "Company ${company.name} declined pack suggestion.")
             call.respond(HttpStatusCode.OK, mapOf("id" to id))
         }
     }
