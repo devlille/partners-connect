@@ -1,0 +1,12 @@
+package fr.devlille.partners.connect.partnership.domain
+
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+class SuggestPartnership(
+    @SerialName("pack_id")
+    val packId: String,
+    @SerialName("option_ids")
+    val optionIds: List<String> = emptyList(),
+)
