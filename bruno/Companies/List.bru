@@ -5,7 +5,11 @@ meta {
 }
 
 get {
-  url: {{scheme}}://{{base_url}}/companies
+  url: {{scheme}}://{{base_url}}/companies?query=Duck
   body: none
   auth: none
+}
+
+params:query {
+  query: Duck
 }

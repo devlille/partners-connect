@@ -10,7 +10,7 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTabl
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import io.ktor.client.request.header
-import io.ktor.client.request.put
+import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
@@ -73,7 +73,7 @@ class PartnershipSuggestionRoutesTest {
             }
         }
 
-        val response = client.put("/events/$eventId/companies/$companyId/partnership/$partnershipId") {
+        val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(
@@ -101,7 +101,7 @@ class PartnershipSuggestionRoutesTest {
             insertMockedAdminUser(eventId)
         }
 
-        val response = client.put("/events/$eventId/companies/$companyId/partnership/$fakeId") {
+        val response = client.post("/events/$eventId/companies/$companyId/partnership/$fakeId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(SuggestPartnership("fake-pack", emptyList())))
@@ -133,7 +133,7 @@ class PartnershipSuggestionRoutesTest {
             }
         }
 
-        val response = client.put("/events/$eventId/companies/$companyId/partnership/$partnershipId") {
+        val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(SuggestPartnership(UUID.randomUUID().toString(), emptyList())))
@@ -191,7 +191,7 @@ class PartnershipSuggestionRoutesTest {
             }
         }
 
-        val response = client.put("/events/$eventId/companies/$companyId/partnership/$partnershipId") {
+        val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(SuggestPartnership(packId.toString(), listOf(optionId.toString()))))
@@ -244,7 +244,7 @@ class PartnershipSuggestionRoutesTest {
             }
         }
 
-        val response = client.put("/events/$eventId/companies/$companyId/partnership/$partnershipId") {
+        val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(SuggestPartnership(packId.toString(), listOf(optionId.toString()))))

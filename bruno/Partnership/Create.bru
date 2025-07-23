@@ -1,5 +1,5 @@
 meta {
-  name: Create Partnership
+  name: Create
   type: http
   seq: 1
 }
@@ -24,4 +24,9 @@ body:json {
       "contact@devlille.fr"
     ]
   }
+}
+
+script:post-response {
+  let data = res.getBody();
+  bru.setEnvVar("partnership_id", data.id)
 }

@@ -1,0 +1,42 @@
+meta {
+  name: Send mail
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://api.mailjet.com/v3.1/send
+  body: json
+  auth: basic
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:basic {
+  username: {{mailjet_api_key}}
+  password: {{mailjet_secret}}
+}
+
+body:json {
+  {
+    "Messages": [
+      {
+        "From": {
+          "Email": "contact@devlille.fr",
+          "Name": "DevLille organizers"
+        },
+        "To": [
+          {
+            "Email": "gerard@devlille.fr",
+            "Name": "Gérard Paligot"
+          }
+        ],
+        "Subject": "My first Mailjet Email!",
+        "TextPart": "Greetings from Mailjet!",
+        "HTMLPart": "<h3>Dear passenger 1, welcome to <a href=\"https://www.mailjet.com/\">Mailjet</a>!</h3><br />May the delivery force be with you!"
+      }
+    ]
+  }
+}

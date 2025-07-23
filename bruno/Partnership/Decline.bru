@@ -1,0 +1,28 @@
+meta {
+  name: Decline
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/events/:event_id/companies/:company_id/partnership/:partnership_id/decline
+  body: none
+  auth: none
+}
+
+params:path {
+  partnership_id: {{partnership_id}}
+  company_id: {{company_id}}
+  event_id: {{event_id}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "pack_id": "{{pack_id}}",
+    "option_ids": []
+  }
+}
