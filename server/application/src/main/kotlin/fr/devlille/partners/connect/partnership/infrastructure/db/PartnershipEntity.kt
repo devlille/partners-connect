@@ -17,6 +17,7 @@ class PartnershipEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var suggestionSentAt by PartnershipsTable.suggestionSentAt
     var suggestionApprovedAt by PartnershipsTable.suggestionApprovedAt
     var suggestionDeclinedAt by PartnershipsTable.suggestionDeclinedAt
+    var declinedAt by PartnershipsTable.declinedAt
     var validatedAt by PartnershipsTable.validatedAt
     var createdAt by PartnershipsTable.createdAt
 }
