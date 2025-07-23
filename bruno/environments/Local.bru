@@ -1,8 +1,12 @@
 vars {
   scheme: http
   base_url: localhost:8080
-  event_id: 79b9032a-c69b-4bde-9996-18d72b24f3b4
-  token: 
-  company_id: fa1e2efa-f146-43ea-ba44-f713c3d1a338
-  pack_id: 3de80939-fe8f-4692-a96b-b3cf5602d7a0
+  event_id: ae808be0-391e-4b75-884a-691a7b4cb599
+  token: {{process.env.JWT_TOKEN}}
+  company_id: 106642eb-0855-4840-9204-8c1b24ff726d
+  pack_id: 14fa4b5f-b81a-4c93-8eb5-57b822b93677
+  slack_token: {{process.env.SLACK_TOKEN}}
+  mailjet_api_key: {{process.env.MAILJET_API_KEY}}
+  mailjet_secret: {{process.env.MAILJET_API_KEY_SECRET}}
+  partnership_id: 3bbf5f22-1f62-4fcf-bb21-edf3e5aab915
 }

@@ -14,7 +14,6 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
-import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
@@ -23,7 +22,6 @@ fun Route.partnershipRoutes() {
     val packRepository by inject<PackRepository>()
     val companyRepository by inject<CompanyRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
-    val suggestionRepository by inject<PartnershipSuggestionRepository>()
     val notificationRepository by inject<NotificationRepository>()
 
     route("/events/{eventId}/companies/{companyId}/partnership") {
@@ -39,44 +37,33 @@ fun Route.partnershipRoutes() {
             call.respond(HttpStatusCode.Created, mapOf("id" to id))
         }
 
-        put("/{partnershipId}") {
+        route("/{partnershipId}/validate") {
             install(AuthorizedEventPlugin)
 
-            val eventId = call.parameters["eventId"] ?: throw BadRequestException("Missing event id")
-            val companyId = call.parameters["companyId"] ?: throw BadRequestException("Missing company id")
-            val partnershipId = call.parameters["partnershipId"]
-                ?: throw BadRequestException("Missing partnership id")
-            val input = call.receive<SuggestPartnership>()
-            val id = suggestionRepository.suggest(eventId, companyId, partnershipId, input)
-            val company = companyRepository.getById(companyId)
-            notificationRepository
-                .sendMessage(eventId, "A new sponsorship pack suggestion has been made for ${company.name}.")
-            call.respond(HttpStatusCode.OK, mapOf("id" to id))
+            post {
+                val eventId = call.parameters["eventId"] ?: throw BadRequestException("Missing event id")
+                val companyId = call.parameters["companyId"] ?: throw BadRequestException("Missing company id")
+                val partnerId = call.parameters["partnershipId"] ?: throw BadRequestException("Missing partnership id")
+                val id = partnershipRepository.validate(eventId, partnerId)
+                val company = companyRepository.getById(companyId)
+                val message = "Partnership ${company.name} has been validated and can now fill invoice information."
+                notificationRepository.sendMessage(eventId, message)
+                call.respond(HttpStatusCode.OK, mapOf("id" to id))
+            }
         }
 
-        post("/{partnershipId}/validate") {
+        route("/{partnershipId}/decline") {
             install(AuthorizedEventPlugin)
 
-            val eventId = call.parameters["eventId"] ?: throw BadRequestException("Missing event id")
-            val companyId = call.parameters["companyId"] ?: throw BadRequestException("Missing company id")
-            val partnerId = call.parameters["partnershipId"] ?: throw BadRequestException("Missing partnership id")
-            val id = partnershipRepository.validate(eventId, partnerId)
-            val company = companyRepository.getById(companyId)
-            val message = "Partnership ${company.name} has been validated and can now fill invoice information."
-            notificationRepository.sendMessage(eventId, message)
-            call.respond(HttpStatusCode.OK, mapOf("id" to id))
-        }
-
-        post("/{partnershipId}/decline") {
-            install(AuthorizedEventPlugin)
-
-            val eventId = call.parameters["eventId"] ?: throw BadRequestException("Missing event id")
-            val companyId = call.parameters["companyId"] ?: throw BadRequestException("Missing company id")
-            val partnerId = call.parameters["partnershipId"] ?: throw BadRequestException("Missing partnership id")
-            val id = partnershipRepository.decline(eventId, partnerId)
-            val company = companyRepository.getById(companyId)
-            notificationRepository.sendMessage(eventId, "Partnership ${company.name} has been declined.")
-            call.respond(HttpStatusCode.OK, mapOf("id" to id))
+            post {
+                val eventId = call.parameters["eventId"] ?: throw BadRequestException("Missing event id")
+                val companyId = call.parameters["companyId"] ?: throw BadRequestException("Missing company id")
+                val partnerId = call.parameters["partnershipId"] ?: throw BadRequestException("Missing partnership id")
+                val id = partnershipRepository.decline(eventId, partnerId)
+                val company = companyRepository.getById(companyId)
+                notificationRepository.sendMessage(eventId, "Partnership ${company.name} has been declined.")
+                call.respond(HttpStatusCode.OK, mapOf("id" to id))
+            }
         }
     }
 }
@@ -87,25 +74,46 @@ fun Route.partnershipSuggestionRoutes() {
     val suggestionRepository by inject<PartnershipSuggestionRepository>()
     val notificationRepository by inject<NotificationRepository>()
 
-    route("/events/{eventId}/companies/{companyId}/partnership/{partnershipId}/suggestion") {
-        post("/approve") {
-            val eventId = call.parameters["eventId"] ?: throw BadRequestException("Missing event id")
-            val companyId = call.parameters["companyId"] ?: throw BadRequestException("Missing company id")
-            val partnerId = call.parameters["partnershipId"] ?: throw BadRequestException("Missing partnership id")
-            val id = suggestionRepository.approve(eventId, companyId, partnerId)
-            val company = companyRepository.getById(companyId)
-            notificationRepository.sendMessage(eventId, "Company ${company.name} approved pack suggestion.")
-            call.respond(HttpStatusCode.OK, mapOf("id" to id))
+    route("/events/{eventId}/companies/{companyId}/partnership/{partnershipId}") {
+        route("/suggestion") {
+            post {
+                install(AuthorizedEventPlugin)
+
+                val eventId = call.parameters["eventId"] ?: throw BadRequestException("Missing event id")
+                val companyId = call.parameters["companyId"] ?: throw BadRequestException("Missing company id")
+                val partnershipId = call.parameters["partnershipId"]
+                    ?: throw BadRequestException("Missing partnership id")
+                val input = call.receive<SuggestPartnership>()
+                val id = suggestionRepository.suggest(eventId, companyId, partnershipId, input)
+                val company = companyRepository.getById(companyId)
+                notificationRepository
+                    .sendMessage(eventId, "A new sponsorship pack suggestion has been made for ${company.name}.")
+                call.respond(HttpStatusCode.OK, mapOf("id" to id))
+            }
         }
 
-        post("/decline") {
-            val eventId = call.parameters["eventId"] ?: throw BadRequestException("Missing event id")
-            val companyId = call.parameters["companyId"] ?: throw BadRequestException("Missing company id")
-            val partnerId = call.parameters["partnershipId"] ?: throw BadRequestException("Missing partnership id")
-            val id = suggestionRepository.decline(eventId, companyId, partnerId)
-            val company = companyRepository.getById(companyId)
-            notificationRepository.sendMessage(eventId, "Company ${company.name} declined pack suggestion.")
-            call.respond(HttpStatusCode.OK, mapOf("id" to id))
+        route("/suggestion/approve") {
+            post {
+                val eventId = call.parameters["eventId"] ?: throw BadRequestException("Missing event id")
+                val companyId = call.parameters["companyId"] ?: throw BadRequestException("Missing company id")
+                val partnerId = call.parameters["partnershipId"] ?: throw BadRequestException("Missing partnership id")
+                val id = suggestionRepository.approve(eventId, companyId, partnerId)
+                val company = companyRepository.getById(companyId)
+                notificationRepository.sendMessage(eventId, "Company ${company.name} approved pack suggestion.")
+                call.respond(HttpStatusCode.OK, mapOf("id" to id))
+            }
+        }
+
+        route("/suggestion/decline") {
+            post {
+                val eventId = call.parameters["eventId"] ?: throw BadRequestException("Missing event id")
+                val companyId = call.parameters["companyId"] ?: throw BadRequestException("Missing company id")
+                val partnerId = call.parameters["partnershipId"] ?: throw BadRequestException("Missing partnership id")
+                val id = suggestionRepository.decline(eventId, companyId, partnerId)
+                val company = companyRepository.getById(companyId)
+                notificationRepository.sendMessage(eventId, "Company ${company.name} declined pack suggestion.")
+                call.respond(HttpStatusCode.OK, mapOf("id" to id))
+            }
         }
     }
 }

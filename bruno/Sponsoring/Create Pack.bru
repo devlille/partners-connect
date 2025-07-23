@@ -25,3 +25,8 @@ body:json {
     "max_quantity": 20
   }
 }
+
+script:post-response {
+  let data = res.getBody();
+  bru.setEnvVar("pack_id", data.id)
+}

@@ -43,3 +43,8 @@ body:json {
     }
   }
 }
+
+script:post-response {
+  let data = res.getBody();
+  bru.setEnvVar("event_id", data.id)
+}
