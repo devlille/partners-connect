@@ -1,9 +1,9 @@
-package fr.devlille.partners.connect.integrations.infrastructure.gateways
+package fr.devlille.partners.connect.notifications.infrastructure.gateways
 
 import com.slack.api.Slack
 import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
-import fr.devlille.partners.connect.integrations.domain.NotificationGateway
 import fr.devlille.partners.connect.integrations.infrastructure.db.SlackConfigDao
+import fr.devlille.partners.connect.notifications.domain.NotificationGateway
 import java.util.UUID
 
 class SlackNotificationGateway(

@@ -19,6 +19,7 @@ import fr.devlille.partners.connect.internal.infrastructure.api.UserSession
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkEngineModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.storageModule
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
+import fr.devlille.partners.connect.notifications.infrastructure.bindings.notificationModule
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipSuggestionRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.bindings.partnershipModule
@@ -85,6 +86,7 @@ fun Application.module(
         sponsoringModule,
         companyModule,
         partnershipModule,
+        notificationModule,
         integrationModule,
     ),
 ) {

@@ -5,6 +5,7 @@ import fr.devlille.partners.connect.companies.infrastructure.bindings.companyMod
 import fr.devlille.partners.connect.integrations.infrastructure.bindings.integrationModule
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
 import fr.devlille.partners.connect.module
+import fr.devlille.partners.connect.notifications.infrastructure.bindings.notificationModule
 import fr.devlille.partners.connect.partnership.infrastructure.bindings.partnershipModule
 import fr.devlille.partners.connect.sponsoring.infrastructure.bindings.sponsoringModule
 import fr.devlille.partners.connect.users.infrastructure.bindings.userModule
@@ -31,6 +32,7 @@ fun Application.moduleMocked(
             sponsoringModule,
             companyModule,
             partnershipModule,
+            notificationModule,
             integrationModule,
             mockNetwork,
             mockStorage,
