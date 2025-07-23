@@ -54,7 +54,41 @@ fun Route.partnershipRoutes() {
             call.respond(HttpStatusCode.OK, mapOf("id" to id))
         }
 
-        post("/{partnershipId}/approve") {
+        post("/{partnershipId}/validate") {
+            install(AuthorizedEventPlugin)
+
+            val eventId = call.parameters["eventId"] ?: throw BadRequestException("Missing event id")
+            val companyId = call.parameters["companyId"] ?: throw BadRequestException("Missing company id")
+            val partnerId = call.parameters["partnershipId"] ?: throw BadRequestException("Missing partnership id")
+            val id = partnershipRepository.validate(eventId, partnerId)
+            val company = companyRepository.getById(companyId)
+            val message = "Partnership ${company.name} has been validated and can now fill invoice information."
+            notificationRepository.sendMessage(eventId, message)
+            call.respond(HttpStatusCode.OK, mapOf("id" to id))
+        }
+
+        post("/{partnershipId}/decline") {
+            install(AuthorizedEventPlugin)
+
+            val eventId = call.parameters["eventId"] ?: throw BadRequestException("Missing event id")
+            val companyId = call.parameters["companyId"] ?: throw BadRequestException("Missing company id")
+            val partnerId = call.parameters["partnershipId"] ?: throw BadRequestException("Missing partnership id")
+            val id = partnershipRepository.decline(eventId, partnerId)
+            val company = companyRepository.getById(companyId)
+            notificationRepository.sendMessage(eventId, "Partnership ${company.name} has been declined.")
+            call.respond(HttpStatusCode.OK, mapOf("id" to id))
+        }
+    }
+}
+
+@Suppress("ThrowsCount")
+fun Route.partnershipSuggestionRoutes() {
+    val companyRepository by inject<CompanyRepository>()
+    val suggestionRepository by inject<PartnershipSuggestionRepository>()
+    val notificationRepository by inject<NotificationRepository>()
+
+    route("/events/{eventId}/companies/{companyId}/partnership/{partnershipId}/suggestion") {
+        post("/approve") {
             val eventId = call.parameters["eventId"] ?: throw BadRequestException("Missing event id")
             val companyId = call.parameters["companyId"] ?: throw BadRequestException("Missing company id")
             val partnerId = call.parameters["partnershipId"] ?: throw BadRequestException("Missing partnership id")
@@ -64,7 +98,7 @@ fun Route.partnershipRoutes() {
             call.respond(HttpStatusCode.OK, mapOf("id" to id))
         }
 
-        post("/{partnershipId}/decline") {
+        post("/decline") {
             val eventId = call.parameters["eventId"] ?: throw BadRequestException("Missing event id")
             val companyId = call.parameters["companyId"] ?: throw BadRequestException("Missing company id")
             val partnerId = call.parameters["partnershipId"] ?: throw BadRequestException("Missing partnership id")

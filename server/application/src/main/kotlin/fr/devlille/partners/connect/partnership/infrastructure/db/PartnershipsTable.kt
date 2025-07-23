@@ -19,6 +19,7 @@ object PartnershipsTable : UUIDTable("partnerships") {
     val suggestionSentAt = datetime("suggestion_sent_at").nullable()
     val suggestionApprovedAt = datetime("suggestion_approved_at").nullable()
     val suggestionDeclinedAt = datetime("suggestion_declined_at").nullable()
+    val declinedAt = datetime("declined_at").nullable()
     val validatedAt = datetime("validated_at").nullable()
     val createdAt = datetime("created_at").clientDefault {
         Clock.System.now().toLocalDateTime(TimeZone.UTC)

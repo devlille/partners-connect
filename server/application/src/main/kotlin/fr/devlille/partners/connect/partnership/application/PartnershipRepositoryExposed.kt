@@ -16,6 +16,9 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptio
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -91,5 +94,25 @@ class PartnershipRepositoryExposed : PartnershipRepository {
         }
 
         partnership.id.value.toString()
+    }
+
+    override fun validate(eventId: String, partnershipId: String): String = transaction {
+        val partnership = findPartnership(eventId, partnershipId)
+        partnership.validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+        partnership.id.value.toString()
+    }
+
+    override fun decline(eventId: String, partnershipId: String): String = transaction {
+        val partnership = findPartnership(eventId, partnershipId)
+        partnership.declinedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+        partnership.id.value.toString()
+    }
+
+    private fun findPartnership(eventId: String, partnershipId: String): PartnershipEntity {
+        val partnershipIdUUID = UUID.fromString(partnershipId)
+        val eventUUID = UUID.fromString(eventId)
+        return PartnershipEntity
+            .find { (PartnershipsTable.id eq partnershipIdUUID) and (PartnershipsTable.eventId eq eventUUID) }
+            .singleOrNull() ?: throw NotFoundException("Partnership not found")
     }
 }

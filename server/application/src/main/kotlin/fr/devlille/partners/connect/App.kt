@@ -20,6 +20,7 @@ import fr.devlille.partners.connect.internal.infrastructure.bindings.networkEngi
 import fr.devlille.partners.connect.internal.infrastructure.bindings.storageModule
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipRoutes
+import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipSuggestionRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.bindings.partnershipModule
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionsTable
@@ -118,6 +119,7 @@ fun Application.module(
         sponsoringRoutes()
         companyRoutes()
         partnershipRoutes()
+        partnershipSuggestionRoutes()
         integrationRoutes()
     }
 }
