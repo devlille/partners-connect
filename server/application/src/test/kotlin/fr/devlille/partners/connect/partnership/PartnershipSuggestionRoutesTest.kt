@@ -78,7 +78,7 @@ class PartnershipSuggestionRoutesTest {
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(
                 Json.encodeToString(
-                    SuggestPartnership(packId = packId.toString(), optionIds = listOf(optionId.toString())),
+                    SuggestPartnership(packId.toString(), listOf(optionId.toString()), "en"),
                 ),
             )
         }
@@ -104,7 +104,7 @@ class PartnershipSuggestionRoutesTest {
         val response = client.post("/events/$eventId/companies/$companyId/partnership/$fakeId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(Json.encodeToString(SuggestPartnership("fake-pack", emptyList())))
+            setBody(Json.encodeToString(SuggestPartnership("fake-pack", emptyList(), "en")))
         }
 
         assertEquals(HttpStatusCode.NotFound, response.status)
@@ -136,7 +136,7 @@ class PartnershipSuggestionRoutesTest {
         val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(Json.encodeToString(SuggestPartnership(UUID.randomUUID().toString(), emptyList())))
+            setBody(Json.encodeToString(SuggestPartnership(UUID.randomUUID().toString(), emptyList(), "en")))
         }
 
         assertEquals(HttpStatusCode.NotFound, response.status)
@@ -194,7 +194,7 @@ class PartnershipSuggestionRoutesTest {
         val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(Json.encodeToString(SuggestPartnership(packId.toString(), listOf(optionId.toString()))))
+            setBody(Json.encodeToString(SuggestPartnership(packId.toString(), listOf(optionId.toString()), "en")))
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
@@ -247,7 +247,7 @@ class PartnershipSuggestionRoutesTest {
         val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(Json.encodeToString(SuggestPartnership(packId.toString(), listOf(optionId.toString()))))
+            setBody(Json.encodeToString(SuggestPartnership(packId.toString(), listOf(optionId.toString()), "en")))
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)

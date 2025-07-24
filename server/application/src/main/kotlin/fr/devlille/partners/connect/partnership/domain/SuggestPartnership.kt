@@ -9,4 +9,5 @@ class SuggestPartnership(
     val packId: String,
     @SerialName("option_ids")
     val optionIds: List<String> = emptyList(),
+    val language: String,
 )

@@ -1,0 +1,1 @@
+L'entreprise {{company_name}} a refusé la suggestion de pack.

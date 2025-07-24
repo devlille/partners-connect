@@ -1,0 +1,1 @@
+Le partenariat pour {{company_name}} a été refusé.

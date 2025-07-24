@@ -16,9 +16,14 @@ params:path {
   event_id: {{event_id}}
 }
 
+headers {
+  Authorization: Bearer {{token}}
+}
+
 body:json {
   {
     "pack_id": "{{pack_id}}",
-    "option_ids": []
+    "option_ids": [],
+    "language": "en"
   }
 }

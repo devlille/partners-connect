@@ -6,13 +6,17 @@ import fr.devlille.partners.connect.integrations.infrastructure.db.SlackConfigDa
 import fr.devlille.partners.connect.notifications.application.NotificationRepositoryExposed
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.infrastructure.gateways.SlackNotificationGateway
+import fr.devlille.partners.connect.notifications.infrastructure.gateways.SlackTemplateGateway
 import org.koin.dsl.module
 
 val notificationModule = module {
     single<NotificationRepository> {
         NotificationRepositoryExposed(
-            gateways = listOf(
+            notificationGateways = listOf(
                 SlackNotificationGateway(Slack.getInstance(SlackConfig()), SlackConfigDao()),
+            ),
+            templateGateways = listOf(
+                SlackTemplateGateway(),
             ),
         )
     }
