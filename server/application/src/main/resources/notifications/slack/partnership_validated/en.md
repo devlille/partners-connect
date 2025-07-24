@@ -1,0 +1,1 @@
+Partnership {{company_name}} has been validated and can now fill invoice information.

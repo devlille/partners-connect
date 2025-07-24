@@ -1,0 +1,1 @@
+Company {{company_name}} declined pack suggestion.

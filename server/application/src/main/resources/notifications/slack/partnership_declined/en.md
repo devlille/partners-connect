@@ -1,0 +1,1 @@
+Partnership for {{company_name}} has been declined.
