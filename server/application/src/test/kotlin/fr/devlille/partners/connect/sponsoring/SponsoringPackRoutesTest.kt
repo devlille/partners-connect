@@ -6,7 +6,6 @@ import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.sponsoring.domain.AttachOptionsToPack
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringPack
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringPack
-import fr.devlille.partners.connect.sponsoring.infrastructure.api.SponsoringIdentifier
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
@@ -71,7 +70,7 @@ class SponsoringPackRoutesTest {
         }
 
         assertEquals(HttpStatusCode.Created, response.status)
-        val createdId = json.decodeFromString<SponsoringIdentifier>(response.bodyAsText()).id
+        val createdId = json.decodeFromString<Map<String, String>>(response.bodyAsText())["id"]
 
         val persisted = transaction {
             SponsoringPackEntity.findById(UUID.fromString(createdId))

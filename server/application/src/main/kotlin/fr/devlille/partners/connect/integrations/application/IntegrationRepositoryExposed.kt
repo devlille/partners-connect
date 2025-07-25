@@ -10,12 +10,11 @@ import java.util.UUID
 class IntegrationRepositoryExposed(
     private val registrars: List<IntegrationRegistrar<*>>,
 ) : IntegrationRepository {
-    override fun register(eventId: String, usage: IntegrationUsage, input: CreateIntegration): String {
+    override fun register(eventId: UUID, usage: IntegrationUsage, input: CreateIntegration): UUID {
         val registrar = registrars.find { it.supports(input) && usage in it.supportedUsages }
             ?: throw NotFoundException("No registrar found for input ${input::class.simpleName} and usage $usage")
         @Suppress("UNCHECKED_CAST")
         return (registrar as IntegrationRegistrar<CreateIntegration>)
-            .register(UUID.fromString(eventId), usage, input)
-            .toString()
+            .register(eventId, usage, input)
     }
 }

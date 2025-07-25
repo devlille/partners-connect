@@ -5,7 +5,6 @@ import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.TranslatedLabel
-import fr.devlille.partners.connect.sponsoring.infrastructure.api.SponsoringIdentifier
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -68,8 +67,8 @@ class SponsoringOptionRoutesTest {
 
         assertEquals(HttpStatusCode.Created, postResponse.status)
 
-        val id = json.decodeFromString<SponsoringIdentifier>(postResponse.bodyAsText()).id
-        assertNotNull(id)
+        val response = json.decodeFromString<Map<String, String>>(postResponse.bodyAsText())
+        assertNotNull(response["id"])
 
         val responseFr = client.get("/events/$eventId/options") {
             header(HttpHeaders.AcceptLanguage, "fr")

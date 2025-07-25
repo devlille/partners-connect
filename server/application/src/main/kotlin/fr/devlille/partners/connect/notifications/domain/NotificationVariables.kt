@@ -22,7 +22,7 @@ sealed interface NotificationVariables {
 
         override fun populate(content: String): String = content
             .replace("{{event_name}}", event.name)
-            .replace("{{event_contact}}", event.contactEmail)
+            .replace("{{event_contact}}", event.contact.email)
             .replace("{{pack_name}}", pack.name)
             .replace("{{company_name}}", company.name)
     }
@@ -37,7 +37,7 @@ sealed interface NotificationVariables {
 
         override fun populate(content: String): String = content
             .replace("{{event_name}}", event.name)
-            .replace("{{event_contact}}", event.contactEmail)
+            .replace("{{event_contact}}", event.contact.email)
             .replace("{{pack_name}}", pack.name)
             .replace("{{company_name}}", company.name)
     }
@@ -51,7 +51,7 @@ sealed interface NotificationVariables {
 
         override fun populate(content: String): String = content
             .replace("{{event_name}}", event.name)
-            .replace("{{event_contact}}", event.contactEmail)
+            .replace("{{event_contact}}", event.contact.email)
             .replace("{{company_name}}", company.name)
     }
 
@@ -64,7 +64,7 @@ sealed interface NotificationVariables {
 
         override fun populate(content: String): String = content
             .replace("{{event_name}}", event.name)
-            .replace("{{event_contact}}", event.contactEmail)
+            .replace("{{event_contact}}", event.contact.email)
             .replace("{{company_name}}", company.name)
     }
 
@@ -78,7 +78,7 @@ sealed interface NotificationVariables {
 
         override fun populate(content: String): String = content
             .replace("{{event_name}}", event.name)
-            .replace("{{event_contact}}", event.contactEmail)
+            .replace("{{event_contact}}", event.contact.email)
             .replace("{{pack_name}}", pack.name)
             .replace("{{company_name}}", company.name)
     }
@@ -92,7 +92,7 @@ sealed interface NotificationVariables {
 
         override fun populate(content: String): String = content
             .replace("{{event_name}}", event.name)
-            .replace("{{event_contact}}", event.contactEmail)
+            .replace("{{event_contact}}", event.contact.email)
             .replace("{{company_name}}", company.name)
     }
 }

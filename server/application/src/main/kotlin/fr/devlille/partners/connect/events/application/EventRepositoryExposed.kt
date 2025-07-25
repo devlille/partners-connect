@@ -1,8 +1,11 @@
 package fr.devlille.partners.connect.events.application
 
+import fr.devlille.partners.connect.events.domain.Banking
+import fr.devlille.partners.connect.events.domain.Contact
 import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventSummary
+import fr.devlille.partners.connect.events.domain.Legal
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
@@ -15,7 +18,7 @@ class EventRepositoryExposed(
     override fun getAllEvents(): List<EventSummary> = transaction {
         entity.all().map {
             EventSummary(
-                id = it.id.value,
+                id = it.id.value.toString(),
                 name = it.name,
                 startTime = it.startTime,
                 endTime = it.endTime,
@@ -25,30 +28,32 @@ class EventRepositoryExposed(
         }
     }
 
-    override fun getById(eventId: String): Event = transaction {
-        val event = entity.findById(UUID.fromString(eventId))
+    override fun getById(eventId: UUID): Event = transaction {
+        val event = entity.findById(eventId)
             ?: throw NotFoundException("Event with id $eventId not found")
         Event(
-            id = event.id.value,
             name = event.name,
             startTime = event.startTime,
             endTime = event.endTime,
             submissionStartTime = event.submissionStartTime,
             submissionEndTime = event.submissionEndTime,
             address = event.address,
-            contactPhone = event.contactPhone,
-            contactEmail = event.contactEmail,
-            legalName = event.legalName,
-            siret = event.siret,
-            siren = event.siren,
-            tva = event.tva,
-            dAndB = event.dAndB,
-            nace = event.nace,
-            naf = event.naf,
-            duns = event.duns,
-            iban = event.iban,
-            bic = event.bic,
-            ribUrl = event.ribUrl,
+            contact = Contact(phone = event.contactPhone, email = event.contactEmail),
+            legal = Legal(
+                name = event.legalName,
+                siret = event.siret,
+                siren = event.siren,
+                tva = event.tva,
+                dAndB = event.dAndB,
+                nace = event.nace,
+                naf = event.naf,
+                duns = event.duns,
+            ),
+            banking = Banking(
+                iban = event.iban,
+                bic = event.bic,
+                ribUrl = event.ribUrl,
+            ),
         )
     }
 
@@ -60,24 +65,24 @@ class EventRepositoryExposed(
             submissionStartTime = event.submissionStartTime
             submissionEndTime = event.submissionEndTime
             address = event.address
-            contactPhone = event.contactPhone
-            contactEmail = event.contactEmail
-            legalName = event.legalName
-            siret = event.siret
-            siren = event.siren
-            tva = event.tva
-            dAndB = event.dAndB
-            nace = event.nace
-            naf = event.naf
-            duns = event.duns
-            iban = event.iban
-            bic = event.bic
-            ribUrl = event.ribUrl
+            contactPhone = event.contact.phone
+            contactEmail = event.contact.email
+            legalName = event.legal?.name
+            siret = event.legal?.siret
+            siren = event.legal?.siren
+            tva = event.legal?.tva
+            dAndB = event.legal?.dAndB
+            nace = event.legal?.nace
+            naf = event.legal?.naf
+            duns = event.legal?.duns
+            iban = event.banking?.iban
+            bic = event.banking?.bic
+            ribUrl = event.banking?.ribUrl
         }.id.value
     }
 
-    override fun updateEvent(event: Event): UUID = transaction {
-        val entity = entity.findById(event.id) ?: throw IllegalArgumentException("Event not found")
+    override fun updateEvent(id: UUID, event: Event): UUID = transaction {
+        val entity = entity.findById(id) ?: throw IllegalArgumentException("Event not found")
 
         entity.name = event.name
         entity.startTime = event.startTime
@@ -85,19 +90,19 @@ class EventRepositoryExposed(
         entity.submissionStartTime = event.submissionStartTime
         entity.submissionEndTime = event.submissionEndTime
         entity.address = event.address
-        entity.contactPhone = event.contactPhone
-        entity.contactEmail = event.contactEmail
-        entity.legalName = event.legalName
-        entity.siret = event.siret
-        entity.siren = event.siren
-        entity.tva = event.tva
-        entity.dAndB = event.dAndB
-        entity.nace = event.nace
-        entity.naf = event.naf
-        entity.duns = event.duns
-        entity.iban = event.iban
-        entity.bic = event.bic
-        entity.ribUrl = event.ribUrl
+        entity.contactPhone = event.contact.phone
+        entity.contactEmail = event.contact.email
+        entity.legalName = event.legal?.name
+        entity.siret = event.legal?.siret
+        entity.siren = event.legal?.siren
+        entity.tva = event.legal?.tva
+        entity.dAndB = event.legal?.dAndB
+        entity.nace = event.legal?.nace
+        entity.naf = event.legal?.naf
+        entity.duns = event.legal?.duns
+        entity.iban = event.banking?.iban
+        entity.bic = event.banking?.bic
+        entity.ribUrl = event.banking?.ribUrl
 
         entity.id.value
     }

@@ -1,8 +1,11 @@
 package fr.devlille.partners.connect.companies.infrastructure.db
 
+import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.core.lowerCase
 import org.jetbrains.exposed.v1.dao.UUIDEntity
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
+import org.jetbrains.exposed.v1.jdbc.SizedIterable
 import java.util.UUID
 
 class CompanyEntity(id: EntityID<UUID>) : UUIDEntity(id) {
@@ -16,4 +19,13 @@ class CompanyEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var logoUrl500 by CompaniesTable.logoUrl500
     var logoUrl250 by CompaniesTable.logoUrl250
     var createdAt by CompaniesTable.createdAt
+}
+
+fun UUIDEntityClass<CompanyEntity>.listByQuery(query: String?): SizedIterable<CompanyEntity> {
+    val companies = if (query.isNullOrBlank()) {
+        this.all()
+    } else {
+        this.find { CompaniesTable.name.lowerCase() like "%${query.lowercase()}%" }
+    }
+    return companies.orderBy(CompaniesTable.name to SortOrder.ASC)
 }

@@ -41,7 +41,6 @@ class IntegrationRoutesTest {
             setBody(requestBody)
         }
 
-        println(response.bodyAsText())
         assertEquals(HttpStatusCode.Created, response.status)
         val responseBody = response.bodyAsText()
         assertTrue(responseBody.contains("id"), "Expected integration id in response")

@@ -11,3 +11,7 @@ class PartnershipOptionEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var partnership by PartnershipEntity referencedOn PartnershipOptionsTable.partnershipId
     var optionId by PartnershipOptionsTable.optionId
 }
+
+fun UUIDEntityClass<PartnershipOptionEntity>.deleteAllByPartnershipId(partnershipId: UUID): Unit = this
+    .find { PartnershipOptionsTable.partnershipId eq partnershipId }
+    .forEach { it.delete() }

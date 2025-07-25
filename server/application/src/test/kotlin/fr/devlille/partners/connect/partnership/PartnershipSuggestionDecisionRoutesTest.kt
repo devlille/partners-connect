@@ -5,7 +5,6 @@ import fr.devlille.partners.connect.internal.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import io.ktor.client.request.post
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import junit.framework.TestCase.assertTrue
@@ -69,7 +68,6 @@ class PartnershipSuggestionDecisionRoutesTest {
         }
 
         val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnerId/suggestion-decline")
-        println(response.bodyAsText())
         assertEquals(HttpStatusCode.OK, response.status)
 
         transaction {

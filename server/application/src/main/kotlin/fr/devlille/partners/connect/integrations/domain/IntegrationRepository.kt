@@ -1,5 +1,7 @@
 package fr.devlille.partners.connect.integrations.domain
 
+import java.util.UUID
+
 interface IntegrationRepository {
-    fun register(eventId: String, usage: IntegrationUsage, input: CreateIntegration): String
+    fun register(eventId: UUID, usage: IntegrationUsage, input: CreateIntegration): UUID
 }

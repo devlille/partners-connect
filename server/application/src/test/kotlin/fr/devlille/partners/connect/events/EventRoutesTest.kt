@@ -1,6 +1,5 @@
 package fr.devlille.partners.connect.events
 
-import fr.devlille.partners.connect.events.infrastructure.api.CreateOrUpdateEventResponse
 import fr.devlille.partners.connect.module
 import io.ktor.client.request.get
 import io.ktor.client.request.post
@@ -59,8 +58,8 @@ class EventRoutesTest {
 
         assertEquals(HttpStatusCode.Created, response.status)
         val responseText = response.bodyAsText()
-        val responseBody = Json.decodeFromString<CreateOrUpdateEventResponse>(responseText)
-        assertNotNull(responseBody.id)
+        val responseBody = Json.decodeFromString<Map<String, String>>(responseText)
+        assertNotNull(responseBody["id"], "Response should contain an 'id' field")
     }
 
     @Test
@@ -73,18 +72,20 @@ class EventRoutesTest {
             setBody(testEventJson)
         }
         val createResponseText = createResponse.bodyAsText()
-        val createResponseBody = Json.decodeFromString<CreateOrUpdateEventResponse>(createResponseText)
+        val responseBody = Json.decodeFromString<Map<String, String>>(createResponseText)
+        assertNotNull(responseBody["id"], "Response should contain an 'id' field")
 
         // Then, update the event
-        val updateResponse = client.put("/events/${createResponseBody.id}") {
+        val updateResponse = client.put("/events/${responseBody["id"]}") {
             contentType(ContentType.Application.Json)
             setBody(testEventJson)
         }
 
         assertEquals(HttpStatusCode.OK, updateResponse.status)
         val updateResponseText = updateResponse.bodyAsText()
-        val updateResponseBody = Json.decodeFromString<CreateOrUpdateEventResponse>(updateResponseText)
-        assertEquals(createResponseBody.id, updateResponseBody.id)
+        val updateResponseBody = Json.decodeFromString<Map<String, String>>(updateResponseText)
+        assertNotNull(updateResponseBody["id"], "Response should contain an 'id' field")
+        assertEquals(responseBody["id"], updateResponseBody["id"])
     }
 
     @Test

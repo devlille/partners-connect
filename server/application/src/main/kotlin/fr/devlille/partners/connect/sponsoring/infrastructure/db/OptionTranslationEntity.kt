@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.sponsoring.infrastructure.db
 
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.UUIDEntity
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
@@ -13,3 +14,10 @@ class OptionTranslationEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var name by OptionTranslationsTable.name
     var description by OptionTranslationsTable.description
 }
+
+fun UUIDEntityClass<OptionTranslationEntity>.listTranslationsByOptionAndLanguage(
+    optionId: UUID,
+    language: String,
+): List<OptionTranslationEntity> = this
+    .find { (OptionTranslationsTable.option eq optionId) and (OptionTranslationsTable.language eq language) }
+    .toList()

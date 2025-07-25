@@ -1,6 +1,5 @@
 package fr.devlille.partners.connect.sponsoring.application.mappers
 
-import fr.devlille.partners.connect.sponsoring.application.toSponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import java.util.UUID
@@ -16,8 +15,8 @@ internal fun SponsoringPackEntity.toDomain(
     maxQuantity = this.maxQuantity,
     requiredOptions = this.options
         .filter { requiredOptionIds.contains(it.id.value) }
-        .map { option -> option.toSponsoringOption(language) },
+        .map { option -> option.toDomain(language) },
     optionalOptions = this.options
         .filter { optionalOptions.contains(it.id.value) }
-        .map { option -> option.toSponsoringOption(language) },
+        .map { option -> option.toDomain(language) },
 )

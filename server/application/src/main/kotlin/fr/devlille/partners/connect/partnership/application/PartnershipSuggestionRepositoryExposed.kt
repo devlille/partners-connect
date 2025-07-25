@@ -1,70 +1,69 @@
 package fr.devlille.partners.connect.partnership.application
 
+import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.domain.PartnershipSuggestionRepository
 import fr.devlille.partners.connect.partnership.domain.SuggestPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
-import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionsTable
-import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
+import fr.devlille.partners.connect.partnership.infrastructure.db.deleteAllByPartnershipId
+import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndCompanyAndPartnership
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionalOptionsByPack
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.listTranslationsByOptionAndLanguage
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.jetbrains.exposed.v1.core.and
-import org.jetbrains.exposed.v1.jdbc.selectAll
+import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
-class PartnershipSuggestionRepositoryExposed : PartnershipSuggestionRepository {
+class PartnershipSuggestionRepositoryExposed(
+    private val partnershipEntity: UUIDEntityClass<PartnershipEntity> = PartnershipEntity,
+    private val packEntity: UUIDEntityClass<SponsoringPackEntity> = SponsoringPackEntity,
+    private val partnershipOptionEntity: UUIDEntityClass<PartnershipOptionEntity> = PartnershipOptionEntity,
+    private val translationEntity: UUIDEntityClass<OptionTranslationEntity> = OptionTranslationEntity,
+    private val packOptionTable: PackOptionsTable = PackOptionsTable,
+) : PartnershipSuggestionRepository {
     override fun suggest(
-        eventId: String,
-        companyId: String,
-        partnershipId: String,
+        eventId: UUID,
+        companyId: UUID,
+        partnershipId: UUID,
         input: SuggestPartnership,
-    ): String = transaction {
-        val partnershipUUID = UUID.fromString(partnershipId)
-        val partnership = PartnershipEntity.findById(partnershipUUID)
+    ): UUID = transaction {
+        val partnership = partnershipEntity.findById(partnershipId)
             ?: throw NotFoundException("Partnership $partnershipId not found")
-
-        if (partnership.eventId != UUID.fromString(eventId) || partnership.companyId != UUID.fromString(companyId)) {
+        if (partnership.eventId != eventId || partnership.companyId != companyId) {
             throw BadRequestException("Mismatch between path and partnership")
         }
 
-        val packUUID = UUID.fromString(input.packId)
-        val suggestedPack = SponsoringPackEntity.findById(packUUID)
+        val packUUID = input.packId.toUUID()
+        val suggestedPack = packEntity.findById(packUUID)
             ?: throw NotFoundException("Pack ${input.packId} not found")
 
-        val optionalOptionIds = PackOptionsTable
-            .selectAll()
-            .where { (PackOptionsTable.pack eq packUUID) and (PackOptionsTable.required eq false) }
+        val optionalOptionIds = packOptionTable
+            .listOptionalOptionsByPack(packUUID)
             .map { it[PackOptionsTable.option].value }
 
-        val optionsUUID = input.optionIds.map { UUID.fromString(it) }
+        val optionsUUID = input.optionIds.map { it.toUUID() }
         val unknownOptions = optionsUUID.filterNot { it in optionalOptionIds }
         if (unknownOptions.isNotEmpty()) {
             throw BadRequestException("Some options are not optional in the suggested pack: $unknownOptions")
         }
 
         // Remove previous suggested options
-        PartnershipOptionEntity.find { PartnershipOptionsTable.partnershipId eq suggestedPack.id }
-            .forEach { it.delete() }
+        partnershipOptionEntity.deleteAllByPartnershipId(suggestedPack.id.value)
 
         optionsUUID.forEach {
             SponsoringOptionEntity.findById(it) ?: throw NotFoundException("Option $it not found")
-            val hasTranslation = OptionTranslationEntity
-                .find {
-                    (OptionTranslationsTable.option eq it) and
-                        (OptionTranslationsTable.language eq partnership.language)
-                }
-                .empty().not()
-
-            if (!hasTranslation) {
+            val noTranslation = translationEntity
+                .listTranslationsByOptionAndLanguage(it, partnership.language)
+                .isEmpty()
+            if (noTranslation) {
                 throw BadRequestException("Option $it does not have a translation for language ${partnership.language}")
             }
             PartnershipOptionEntity.new {
@@ -78,30 +77,23 @@ class PartnershipSuggestionRepositoryExposed : PartnershipSuggestionRepository {
         partnership.suggestionApprovedAt = null
         partnership.suggestionDeclinedAt = null
 
-        partnership.id.value.toString()
+        partnership.id.value
     }
 
-    override fun approve(eventId: String, companyId: String, partnershipId: String): String = transaction {
+    override fun approve(eventId: UUID, companyId: UUID, partnershipId: UUID): UUID = transaction {
         val partnership = findPartnership(eventId, companyId, partnershipId)
         partnership.suggestionApprovedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
-        partnership.id.value.toString()
+        partnership.id.value
     }
 
-    override fun decline(eventId: String, companyId: String, partnershipId: String): String = transaction {
+    override fun decline(eventId: UUID, companyId: UUID, partnershipId: UUID): UUID = transaction {
         val partnership = findPartnership(eventId, companyId, partnershipId)
         partnership.suggestionDeclinedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
-        partnership.id.value.toString()
+        partnership.id.value
     }
 
-    private fun findPartnership(eventId: String, companyId: String, partnershipId: String): PartnershipEntity {
-        val eventUUID = UUID.fromString(eventId)
-        val companyUUID = UUID.fromString(companyId)
-        val partnershipUUID = UUID.fromString(partnershipId)
-
-        return PartnershipEntity.find {
-            (PartnershipsTable.id eq partnershipUUID) and
-                (PartnershipsTable.eventId eq eventUUID) and
-                (PartnershipsTable.companyId eq companyUUID)
-        }.singleOrNull() ?: throw NotFoundException("Partnership not found")
-    }
+    private fun findPartnership(eventId: UUID, companyId: UUID, partnershipId: UUID): PartnershipEntity =
+        partnershipEntity
+            .singleByEventAndCompanyAndPartnership(eventId, companyId, partnershipId)
+            ?: throw NotFoundException("Partnership not found")
 }

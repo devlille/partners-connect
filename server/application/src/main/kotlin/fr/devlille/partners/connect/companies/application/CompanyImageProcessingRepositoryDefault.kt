@@ -7,7 +7,7 @@ import fr.devlille.partners.connect.internal.infrastructure.image.ImageProcessor
 import java.io.File
 
 class CompanyImageProcessingRepositoryDefault : CompanyImageProcessingRepository {
-    override fun processSvg(companyId: String, file: File): MediaBinary = MediaBinary(
+    override fun processSvg(file: File): MediaBinary = MediaBinary(
         mimeType = MimeType.SVG,
         original = file.readBytes(),
         png1000 = ImageProcessor.resizeSvg(file, width = 1000) ?: error("Failed to resize SVG to 1000px"),
@@ -15,7 +15,7 @@ class CompanyImageProcessingRepositoryDefault : CompanyImageProcessingRepository
         png250 = ImageProcessor.resizeSvg(file, width = 250) ?: error("Failed to resize SVG to 250px"),
     )
 
-    override fun processImage(companyId: String, file: File): MediaBinary = MediaBinary(
+    override fun processImage(file: File): MediaBinary = MediaBinary(
         mimeType = MimeType.PNG,
         original = file.readBytes(),
         png1000 = ImageProcessor.resizeImage(file, width = 1000) ?: error("Failed to resize image to 1000px"),

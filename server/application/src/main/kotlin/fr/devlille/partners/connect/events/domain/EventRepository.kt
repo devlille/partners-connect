@@ -5,9 +5,9 @@ import java.util.UUID
 interface EventRepository {
     fun getAllEvents(): List<EventSummary>
 
-    fun getById(eventId: String): Event
+    fun getById(eventId: UUID): Event
 
     fun createEvent(event: Event): UUID
 
-    fun updateEvent(event: Event): UUID
+    fun updateEvent(id: UUID, event: Event): UUID
 }

@@ -1,11 +1,13 @@
 package fr.devlille.partners.connect.partnership.domain
 
+import java.util.UUID
+
 interface PartnershipRepository {
-    fun register(eventId: String, companyId: String, register: RegisterPartnership): String
+    fun register(eventId: UUID, companyId: UUID, register: RegisterPartnership): UUID
 
-    fun getById(eventId: String, partnershipId: String): Partnership
+    fun getById(eventId: UUID, partnershipId: UUID): Partnership
 
-    fun validate(eventId: String, partnershipId: String): String
+    fun validate(eventId: UUID, partnershipId: UUID): UUID
 
-    fun decline(eventId: String, partnershipId: String): String
+    fun decline(eventId: UUID, partnershipId: UUID): UUID
 }

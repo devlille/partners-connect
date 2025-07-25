@@ -1,11 +1,13 @@
 package fr.devlille.partners.connect.sponsoring.domain
 
+import java.util.UUID
+
 interface PackRepository {
-    fun findPacksByEvent(eventId: String, language: String): List<SponsoringPack>
+    fun findPacksByEvent(eventId: UUID, language: String): List<SponsoringPack>
 
-    fun getById(eventId: String, packId: String, language: String): SponsoringPack
+    fun getById(eventId: UUID, packId: UUID, language: String): SponsoringPack
 
-    fun createPack(eventId: String, input: CreateSponsoringPack): String
+    fun createPack(eventId: UUID, input: CreateSponsoringPack): UUID
 
-    fun deletePack(eventId: String, packId: String)
+    fun deletePack(eventId: UUID, packId: UUID)
 }

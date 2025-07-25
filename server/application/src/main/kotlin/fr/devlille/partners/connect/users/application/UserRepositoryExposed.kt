@@ -27,30 +27,27 @@ class UserRepositoryExposed(
         }
     }
 
-    override fun findUsersByEventId(eventId: String): List<User> = transaction {
-        val eventUUID = UUID.fromString(eventId)
+    override fun findUsersByEventId(eventId: UUID): List<User> = transaction {
         EventPermissionEntity
             .find {
-                (permsTable.eventId eq eventUUID) and (permsTable.canEdit eq true)
+                (permsTable.eventId eq eventId) and (permsTable.canEdit eq true)
             }
             .map { it.user.toDomain() }
     }
 
-    override fun hasEditPermissionByEmail(email: String, eventId: String): Boolean = transaction {
-        val eventUUID = UUID.fromString(eventId)
+    override fun hasEditPermissionByEmail(email: String, eventId: UUID): Boolean = transaction {
         val user = UserEntity
             .find { usersTable.email eq email }
             .firstOrNull()
             ?: throw NotFoundException("User with email $email not found")
         EventPermissionEntity
             .find {
-                (permsTable.eventId eq eventUUID) and (permsTable.canEdit eq true) and (permsTable.userId eq user.id)
+                (permsTable.eventId eq eventId) and (permsTable.canEdit eq true) and (permsTable.userId eq user.id)
             }
             .empty().not()
     }
 
-    override fun grantUsers(eventId: String, userEmails: List<String>) = transaction {
-        val eventUUID = UUID.fromString(eventId)
+    override fun grantUsers(eventId: UUID, userEmails: List<String>) = transaction {
         userEmails.forEach { userEmail ->
             val userEntity = UserEntity
                 .find { UsersTable.email eq userEmail }
@@ -58,14 +55,14 @@ class UserRepositoryExposed(
                 ?: throw NotFoundException("User with email: $userEmail not found")
 
             val existing = EventPermissionEntity
-                .find { (permsTable.eventId eq eventUUID) and (permsTable.userId eq userEntity.id) }
+                .find { (permsTable.eventId eq eventId) and (permsTable.userId eq userEntity.id) }
                 .firstOrNull()
 
             if (existing != null) {
                 existing.canEdit = true
             } else {
                 EventPermissionEntity.new {
-                    this.eventId = eventUUID
+                    this.eventId = eventId
                     this.user = userEntity
                     this.canEdit = true
                 }

@@ -4,6 +4,7 @@ import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.infrastructure.db.MailjetIntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.get
 import fr.devlille.partners.connect.internal.infrastructure.resources.readResourceFile
+import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationGateway
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
@@ -35,7 +36,7 @@ class MailjetNotificationGateway(
         val pathContent = "/notifications/email/${variables.usageName}/content.${variables.language}.html"
         val config = MailjetIntegrationsTable[integrationId]
         val partnership = PartnershipEntity
-            .find { PartnershipsTable.companyId eq UUID.fromString(variables.company.id) }
+            .find { PartnershipsTable.companyId eq variables.company.id.toUUID() }
             .singleOrNull()
             ?: throw NotFoundException("No partnership found for company ${variables.company.id}")
         val emails = PartnershipEmailEntity
@@ -44,7 +45,7 @@ class MailjetNotificationGateway(
         val body = MailjetBody(
             messages = listOf(
                 Message(
-                    from = Contact(email = variables.event.contactEmail, name = variables.event.name),
+                    from = Contact(email = variables.event.contact.email, name = variables.event.name),
                     to = emails.map { Contact(email = it.email) },
                     subject = "[${variables.event.name}] ${variables.populate(readResourceFile(pathHeader))}",
                     htmlPart = variables.populate(readResourceFile(pathContent)),

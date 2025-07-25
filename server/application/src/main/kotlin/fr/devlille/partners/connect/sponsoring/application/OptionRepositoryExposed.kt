@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.sponsoring.application
 
+import fr.devlille.partners.connect.sponsoring.application.mappers.toDomain
 import fr.devlille.partners.connect.sponsoring.domain.AttachOptionsToPack
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.OptionRepository
@@ -10,26 +11,30 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTabl
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPacksTable
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.allByEvent
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionsAttachedByEventAndOption
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.singlePackById
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
-class OptionRepositoryExposed : OptionRepository {
-    override fun listOptionsByEvent(eventId: String, language: String): List<SponsoringOption> = transaction {
-        SponsoringOptionEntity.find { SponsoringOptionsTable.eventId eq UUID.fromString(eventId) }
-            .map { option -> option.toSponsoringOption(language) }
+class OptionRepositoryExposed(
+    private val optionEntity: UUIDEntityClass<SponsoringOptionEntity> = SponsoringOptionEntity,
+) : OptionRepository {
+    override fun listOptionsByEvent(eventId: UUID, language: String): List<SponsoringOption> = transaction {
+        optionEntity.allByEvent(eventId).map { option -> option.toDomain(language) }
     }
 
-    override fun createOption(eventId: String, input: CreateSponsoringOption): String = transaction {
-        val option = SponsoringOptionEntity.new {
-            this.eventId = UUID.fromString(eventId)
+    override fun createOption(eventId: UUID, input: CreateSponsoringOption): UUID = transaction {
+        val option = optionEntity.new {
+            this.eventId = eventId
             this.price = input.price
         }
         input.translations.forEach {
@@ -40,56 +45,43 @@ class OptionRepositoryExposed : OptionRepository {
                 this.description = it.description
             }
         }
-        option.id.value.toString()
+        option.id.value
     }
 
-    override fun deleteOption(eventId: String, optionId: String) = transaction {
-        val optionUUID = UUID.fromString(optionId)
-        val eventUUID = UUID.fromString(eventId)
-
-        val isUsed = PackOptionsTable.innerJoin(SponsoringPacksTable)
-            .selectAll()
-            .where {
-                (PackOptionsTable.option eq optionUUID) and
-                    (SponsoringPacksTable.eventId eq eventUUID)
-            }.count() > 0
-
+    override fun deleteOption(eventId: UUID, optionId: UUID) = transaction {
+        val isUsed = PackOptionsTable
+            .listOptionsAttachedByEventAndOption(eventId, optionId)
+            .empty().not()
         if (isUsed) throw BadRequestException("Option is used in a pack and cannot be deleted")
 
         // Delete translations first (FK constraint)
-        OptionTranslationsTable.deleteWhere { OptionTranslationsTable.option eq optionUUID }
+        OptionTranslationsTable.deleteWhere { OptionTranslationsTable.option eq optionId }
 
         // Then delete option
         val deleted = SponsoringOptionsTable.deleteWhere {
-            (SponsoringOptionsTable.id eq optionUUID) and (SponsoringOptionsTable.eventId eq eventUUID)
+            (SponsoringOptionsTable.id eq optionId) and (SponsoringOptionsTable.eventId eq eventId)
         }
 
         if (deleted == 0) throw NotFoundException("Option not found")
     }
 
-    override fun attachOptionsToPack(eventId: String, packId: String, options: AttachOptionsToPack) = transaction {
-        val packUUID = UUID.fromString(packId)
-        val eventUUID = UUID.fromString(eventId)
-
+    override fun attachOptionsToPack(eventId: UUID, packId: UUID, options: AttachOptionsToPack) = transaction {
         val intersect = options.required.intersect(options.optional)
         if (intersect.isNotEmpty()) {
             throw BadRequestException("options ${intersect.joinToString(",")} cannot be both required and optional")
         }
 
-        val pack = SponsoringPackEntity
-            .find { (SponsoringPacksTable.id eq packUUID) and (SponsoringPacksTable.eventId eq eventUUID) }
-            .firstOrNull()
-            ?: throw NotFoundException("Pack not found")
+        val pack = SponsoringPackEntity.singlePackById(eventId, packId)
 
         val requiredOptions = SponsoringOptionEntity
             .find {
-                (SponsoringOptionsTable.eventId eq eventUUID) and
+                (SponsoringOptionsTable.eventId eq eventId) and
                     (SponsoringOptionsTable.id inList options.required.map(UUID::fromString))
             }
 
         val optionalOptions = SponsoringOptionEntity
             .find {
-                (SponsoringOptionsTable.eventId eq eventUUID) and
+                (SponsoringOptionsTable.eventId eq eventId) and
                     (SponsoringOptionsTable.id inList options.optional.map(UUID::fromString))
             }.toList()
 
@@ -105,7 +97,7 @@ class OptionRepositoryExposed : OptionRepository {
 
         val alreadyAttached = PackOptionsTable
             .selectAll()
-            .where { (PackOptionsTable.pack eq packUUID) and (PackOptionsTable.option inList allOptionIds) }
+            .where { (PackOptionsTable.pack eq packId) and (PackOptionsTable.option inList allOptionIds) }
             .map { it[PackOptionsTable.option].value }
 
         if (alreadyAttached.isNotEmpty()) {
@@ -128,19 +120,11 @@ class OptionRepositoryExposed : OptionRepository {
         }
     }
 
-    override fun detachOptionFromPack(eventId: String, packId: String, optionId: String) = transaction {
-        val packUUID = UUID.fromString(packId)
-        val optionUUID = UUID.fromString(optionId)
-        val eventUUID = UUID.fromString(eventId)
-
-        val pack = SponsoringPackEntity.find {
-            (SponsoringPacksTable.id eq packUUID) and (SponsoringPacksTable.eventId eq eventUUID)
-        }.firstOrNull() ?: throw NotFoundException("Pack not found")
-
+    override fun detachOptionFromPack(eventId: UUID, packId: UUID, optionId: UUID) = transaction {
+        val pack = SponsoringPackEntity.singlePackById(eventId, packId)
         val deleted = PackOptionsTable.deleteWhere {
-            (PackOptionsTable.pack eq pack.id) and (PackOptionsTable.option eq optionUUID)
+            (PackOptionsTable.pack eq pack.id) and (PackOptionsTable.option eq optionId)
         }
-
         if (deleted == 0) {
             throw NotFoundException("Option not attached to pack")
         }

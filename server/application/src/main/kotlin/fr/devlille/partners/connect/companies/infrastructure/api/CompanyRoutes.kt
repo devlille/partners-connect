@@ -5,6 +5,7 @@ import fr.devlille.partners.connect.companies.domain.CompanyMediaRepository
 import fr.devlille.partners.connect.companies.domain.CompanyRepository
 import fr.devlille.partners.connect.companies.domain.CreateCompany
 import fr.devlille.partners.connect.internal.infrastructure.ktor.asFile
+import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
@@ -33,20 +34,20 @@ fun Route.companyRoutes() {
         post {
             val input = call.receive<CreateCompany>()
             val id = companyRepository.createOrUpdate(input)
-            call.respond(HttpStatusCode.Created, mapOf("id" to id))
+            call.respond(HttpStatusCode.Created, mapOf("id" to id.toString()))
         }
 
         post("/{companyId}/logo") {
-            val companyId = call.parameters["companyId"] ?: throw BadRequestException("Missing company id")
+            val companyId = call.parameters["companyId"]?.toUUID() ?: throw BadRequestException("Missing company id")
             val multipart = call.receiveMultipart()
             val part = multipart.readPart() ?: throw BadRequestException("Missing file part")
             val file = part.asFile()
             val mediaBinaries = when (part.contentType) {
-                ContentType.Image.SVG -> imageProcessingRepository.processSvg(companyId, file)
-                ContentType.Image.PNG, ContentType.Image.JPEG -> imageProcessingRepository.processImage(companyId, file)
+                ContentType.Image.SVG -> imageProcessingRepository.processSvg(file)
+                ContentType.Image.PNG, ContentType.Image.JPEG -> imageProcessingRepository.processImage(file)
                 else -> throw BadRequestException("Unsupported file type: ${part.contentType}")
             }
-            val media = mediaRepository.upload(companyId, mediaBinaries)
+            val media = mediaRepository.upload(companyId.toString(), mediaBinaries)
             companyRepository.updateLogoUrls(companyId, media)
             call.respond(HttpStatusCode.OK, media)
         }

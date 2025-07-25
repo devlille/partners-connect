@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.companies.infrastructure.db
 
+import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.UUIDEntity
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
@@ -12,3 +13,7 @@ class CompanySocialEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var type by CompanySocialsTable.type
     var url by CompanySocialsTable.url
 }
+
+fun UUIDEntityClass<CompanySocialEntity>.deleteAllByCompanyId(companyId: UUID): Unit = this
+    .find { CompanySocialsTable.companyId eq companyId }
+    .forEach { it.delete() }
