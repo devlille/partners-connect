@@ -2,7 +2,10 @@ package fr.devlille.partners.connect.internal
 
 import fr.devlille.partners.connect.auth.infrastructure.bindings.authModule
 import fr.devlille.partners.connect.companies.infrastructure.bindings.companyModule
+import fr.devlille.partners.connect.events.infrastructure.bindings.eventModule
 import fr.devlille.partners.connect.integrations.infrastructure.bindings.integrationModule
+import fr.devlille.partners.connect.internal.infrastructure.bindings.networkClientModule
+import fr.devlille.partners.connect.internal.infrastructure.bindings.storageModule
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
 import fr.devlille.partners.connect.module
 import fr.devlille.partners.connect.notifications.infrastructure.bindings.notificationModule
@@ -27,7 +30,10 @@ fun Application.moduleMocked(
     module(
         databaseUrl = "jdbc:h2:mem:${UUID.randomUUID()};DB_CLOSE_DELAY=-1",
         modules = listOf(
+            networkClientModule,
+            storageModule,
             authModule,
+            eventModule,
             userModule,
             sponsoringModule,
             companyModule,

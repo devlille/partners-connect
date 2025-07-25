@@ -60,9 +60,6 @@ class PartnershipRepositoryExposed(
             phone = register.phone
         }
 
-        PartnershipEmailEntity
-            .find { PartnershipEmailsTable.partnershipId eq partnership.id }
-            .forEach { it.delete() }
         register.emails.forEach {
             PartnershipEmailEntity.new {
                 this.partnership = partnership

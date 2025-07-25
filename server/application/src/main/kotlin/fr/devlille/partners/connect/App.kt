@@ -13,9 +13,11 @@ import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import fr.devlille.partners.connect.integrations.infrastructure.api.integrationRoutes
 import fr.devlille.partners.connect.integrations.infrastructure.bindings.integrationModule
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
+import fr.devlille.partners.connect.integrations.infrastructure.db.MailjetIntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.SlackIntegrationsTable
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.UserSession
+import fr.devlille.partners.connect.internal.infrastructure.bindings.networkClientModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkEngineModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.storageModule
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
@@ -79,6 +81,7 @@ fun Application.module(
     databasePassword: String = SystemVarEnv.Exposed.dbPassword,
     modules: List<Module> = listOf(
         networkEngineModule,
+        networkClientModule,
         storageModule,
         authModule,
         eventModule,
@@ -138,6 +141,7 @@ private fun configureDatabase(url: String, driver: String, user: String, passwor
             // integrations
             IntegrationsTable,
             SlackIntegrationsTable,
+            MailjetIntegrationsTable,
             // events
             EventsTable,
             // users

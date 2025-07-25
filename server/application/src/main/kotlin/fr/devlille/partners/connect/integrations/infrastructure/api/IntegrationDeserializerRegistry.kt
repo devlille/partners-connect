@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.integrations.infrastructure.api
 
 import fr.devlille.partners.connect.integrations.domain.CreateIntegration
+import fr.devlille.partners.connect.integrations.domain.CreateMailjetIntegration
 import fr.devlille.partners.connect.integrations.domain.CreateSlackIntegration
 import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import io.ktor.server.plugins.NotFoundException
@@ -13,6 +14,7 @@ interface IntegrationDeserializerRegistry {
 class DefaultIntegrationDeserializerRegistry : IntegrationDeserializerRegistry {
     private val serializers: Map<IntegrationProvider, KSerializer<out CreateIntegration>> = mapOf(
         IntegrationProvider.SLACK to CreateSlackIntegration.serializer(),
+        IntegrationProvider.MAILJET to CreateMailjetIntegration.serializer(),
         // Add other providers here
     )
 

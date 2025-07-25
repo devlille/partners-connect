@@ -22,8 +22,8 @@ data class CreateOrUpdateEventRequest(
 
 @Serializable
 data class Contact(
+    val email: String,
     val phone: String? = null,
-    val email: String? = null,
 )
 
 @Serializable

@@ -17,8 +17,8 @@ object EventsTable : UUIDTable("events") {
     val submissionEndTime = datetime("submission_end_time")
     val address = text("address").nullable()
 
+    val contactEmail = varchar("contact_email", 255)
     val contactPhone = varchar("contact_phone", 30).nullable()
-    val contactEmail = varchar("contact_email", 255).nullable()
 
     val legalName = varchar("legal_name", 255).nullable()
     val siret = varchar("siret", 20).nullable()

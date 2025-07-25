@@ -4,6 +4,7 @@ import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventSummary
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
@@ -22,6 +23,33 @@ class EventRepositoryExposed(
                 submissionEndTime = it.submissionEndTime,
             )
         }
+    }
+
+    override fun getById(eventId: String): Event = transaction {
+        val event = entity.findById(UUID.fromString(eventId))
+            ?: throw NotFoundException("Event with id $eventId not found")
+        Event(
+            id = event.id.value,
+            name = event.name,
+            startTime = event.startTime,
+            endTime = event.endTime,
+            submissionStartTime = event.submissionStartTime,
+            submissionEndTime = event.submissionEndTime,
+            address = event.address,
+            contactPhone = event.contactPhone,
+            contactEmail = event.contactEmail,
+            legalName = event.legalName,
+            siret = event.siret,
+            siren = event.siren,
+            tva = event.tva,
+            dAndB = event.dAndB,
+            nace = event.nace,
+            naf = event.naf,
+            duns = event.duns,
+            iban = event.iban,
+            bic = event.bic,
+            ribUrl = event.ribUrl,
+        )
     }
 
     override fun createEvent(event: Event): UUID = transaction {

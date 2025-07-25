@@ -77,7 +77,6 @@ class PartnershipRoutesTest {
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
 
-        println(response.bodyAsText())
         assertEquals(HttpStatusCode.Created, response.status)
         val bodyText = response.bodyAsText()
         assertTrue(bodyText.contains("id"))
