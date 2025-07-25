@@ -14,7 +14,7 @@ data class Event(
     val submissionEndTime: LocalDateTime,
     val address: String?,
     val contactPhone: String?,
-    val contactEmail: String?,
+    val contactEmail: String,
     val legalName: String?,
     val siret: String?,
     val siren: String?,

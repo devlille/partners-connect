@@ -25,6 +25,7 @@ class PartnershipValidationRoutesTest {
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
 
         application {
             moduleMocked()
@@ -34,7 +35,7 @@ class PartnershipValidationRoutesTest {
                     name = "Company X"
                     siteUrl = "https://companyx.com"
                 }
-                SponsoringPackEntity.new(UUID.randomUUID()) {
+                SponsoringPackEntity.new(packId) {
                     this.eventId = eventId
                     name = "Gold"
                     basePrice = 1000
@@ -44,6 +45,7 @@ class PartnershipValidationRoutesTest {
                     this.eventId = eventId
                     this.companyId = companyId
                     this.language = "en"
+                    this.selectedPackId = packId
                 }
             }
         }

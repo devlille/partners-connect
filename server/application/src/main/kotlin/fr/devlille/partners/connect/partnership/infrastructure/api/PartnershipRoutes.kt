@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.companies.domain.CompanyRepository
+import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedEventPlugin
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
@@ -20,6 +21,7 @@ import org.koin.ktor.ext.inject
 
 @Suppress("ThrowsCount")
 fun Route.partnershipRoutes() {
+    val eventRepository by inject<EventRepository>()
     val packRepository by inject<PackRepository>()
     val companyRepository by inject<CompanyRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
@@ -33,8 +35,9 @@ fun Route.partnershipRoutes() {
             val id = partnershipRepository.register(eventId, companyId, register)
             val company = companyRepository.getById(companyId)
             val pack = packRepository.getById(eventId, register.packId, register.language)
-            notificationRepository
-                .sendMessage(eventId, NotificationVariables.NewPartnership(register.language, pack, company))
+            val event = eventRepository.getById(eventId)
+            val variables = NotificationVariables.NewPartnership(register.language, event, company, pack)
+            notificationRepository.sendMessage(eventId, variables)
             call.respond(HttpStatusCode.Created, mapOf("id" to id))
         }
 
@@ -48,8 +51,11 @@ fun Route.partnershipRoutes() {
                 val id = partnershipRepository.validate(eventId, partnerId)
                 val company = companyRepository.getById(companyId)
                 val partnership = partnershipRepository.getById(eventId, partnerId)
-                notificationRepository
-                    .sendMessage(eventId, NotificationVariables.PartnershipValidated(partnership.language, company))
+                val pack = partnership.selectedPack
+                    ?: throw BadRequestException("Partnership does not have a selected pack")
+                val event = eventRepository.getById(eventId)
+                val variables = NotificationVariables.PartnershipValidated(partnership.language, event, company, pack)
+                notificationRepository.sendMessage(eventId, variables)
                 call.respond(HttpStatusCode.OK, mapOf("id" to id))
             }
         }
@@ -64,8 +70,9 @@ fun Route.partnershipRoutes() {
                 val id = partnershipRepository.decline(eventId, partnerId)
                 val company = companyRepository.getById(companyId)
                 val partnership = partnershipRepository.getById(eventId, partnerId)
-                notificationRepository
-                    .sendMessage(eventId, NotificationVariables.PartnershipDeclined(partnership.language, company))
+                val event = eventRepository.getById(eventId)
+                val variables = NotificationVariables.PartnershipDeclined(partnership.language, event, company)
+                notificationRepository.sendMessage(eventId, variables)
                 call.respond(HttpStatusCode.OK, mapOf("id" to id))
             }
         }
@@ -74,6 +81,7 @@ fun Route.partnershipRoutes() {
 
 @Suppress("ThrowsCount")
 fun Route.partnershipSuggestionRoutes() {
+    val eventRepository by inject<EventRepository>()
     val packRepository by inject<PackRepository>()
     val companyRepository by inject<CompanyRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
@@ -93,8 +101,9 @@ fun Route.partnershipSuggestionRoutes() {
                 val id = suggestionRepository.suggest(eventId, companyId, partnershipId, input)
                 val pack = packRepository.getById(eventId, input.packId, input.language)
                 val company = companyRepository.getById(companyId)
-                notificationRepository
-                    .sendMessage(eventId, NotificationVariables.NewSuggestion(input.language, pack, company))
+                val event = eventRepository.getById(eventId)
+                val variables = NotificationVariables.NewSuggestion(input.language, event, company, pack)
+                notificationRepository.sendMessage(eventId, variables)
                 call.respond(HttpStatusCode.OK, mapOf("id" to id))
             }
         }
@@ -107,8 +116,9 @@ fun Route.partnershipSuggestionRoutes() {
                 val id = suggestionRepository.approve(eventId, companyId, partnerId)
                 val company = companyRepository.getById(companyId)
                 val partnership = partnershipRepository.getById(eventId, partnerId)
-                notificationRepository
-                    .sendMessage(eventId, NotificationVariables.SuggestionApproved(partnership.language, company))
+                val event = eventRepository.getById(eventId)
+                val variables = NotificationVariables.SuggestionApproved(partnership.language, event, company)
+                notificationRepository.sendMessage(eventId, variables)
                 call.respond(HttpStatusCode.OK, mapOf("id" to id))
             }
         }
@@ -121,8 +131,9 @@ fun Route.partnershipSuggestionRoutes() {
                 val id = suggestionRepository.decline(eventId, companyId, partnerId)
                 val company = companyRepository.getById(companyId)
                 val partnership = partnershipRepository.getById(eventId, partnerId)
-                notificationRepository
-                    .sendMessage(eventId, NotificationVariables.SuggestionDeclined(partnership.language, company))
+                val event = eventRepository.getById(eventId)
+                val variables = NotificationVariables.SuggestionDeclined(partnership.language, event, company)
+                notificationRepository.sendMessage(eventId, variables)
                 call.respond(HttpStatusCode.OK, mapOf("id" to id))
             }
         }
