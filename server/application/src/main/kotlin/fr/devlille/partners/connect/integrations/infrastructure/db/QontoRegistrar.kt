@@ -15,7 +15,7 @@ class QontoRegistrar : IntegrationRegistrar<CreateIntegration.CreateQontoIntegra
     override fun register(
         eventId: UUID,
         usage: IntegrationUsage,
-        input: CreateIntegration.CreateQontoIntegration
+        input: CreateIntegration.CreateQontoIntegration,
     ): UUID = transaction {
         val integrationId = IntegrationsTable.insertAndGetId {
             it[this.eventId] = eventId

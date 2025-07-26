@@ -1,5 +1,7 @@
-package fr.devlille.partners.connect.companies.infrastructure.db
+package fr.devlille.partners.connect.partnership.infrastructure.db
 
+import fr.devlille.partners.connect.companies.infrastructure.db.CompaniesTable
+import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -7,10 +9,11 @@ import org.jetbrains.exposed.v1.core.dao.id.UUIDTable
 import org.jetbrains.exposed.v1.datetime.datetime
 
 object InvoicesTable : UUIDTable("invoices") {
+    val eventId = reference("event_id", EventsTable)
     val companyId = reference("company_id", CompaniesTable)
     val name = text("name").nullable()
     val contactFirstName = text("contact_first_name")
-    val contactSecondName = text("contact_second_name")
+    val contactLastName = text("contact_last_name")
     val contactEmail = text("contact_email")
     val address = text("address")
     val city = text("city")
@@ -27,5 +30,7 @@ object InvoicesTable : UUIDTable("invoices") {
 }
 
 enum class InvoiceStatus {
-    PENDING, SENT, PAID;
+    PENDING,
+    SENT,
+    PAID,
 }

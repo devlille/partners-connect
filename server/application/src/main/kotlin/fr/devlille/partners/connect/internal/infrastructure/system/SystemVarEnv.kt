@@ -23,4 +23,8 @@ object SystemVarEnv {
         val clientId: String = System.getenv("GOOGLE_CLIENT_ID")
         val clientSecret: String = System.getenv("GOOGLE_CLIENT_SECRET")
     }
+
+    object QontoProvider {
+        val baseUrl: String = System.getenv("QONTO_BASE_URL") ?: "https://thirdparty.qonto.com"
+    }
 }

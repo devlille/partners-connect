@@ -10,7 +10,7 @@ class CompanyInvoice(
     val vat: String,
     val siret: String,
     val address: Address,
-    val contact: Contact
+    val contact: Contact,
 )
 
 @Serializable
@@ -19,7 +19,7 @@ class Address(
     val city: String,
     @SerialName("zip_code")
     val zipCode: String,
-    val country: String
+    val country: String,
 )
 
 @Serializable
@@ -28,5 +28,5 @@ class Contact(
     val firstName: String,
     @SerialName("last_name")
     val lastName: String,
-    val email: String
+    val email: String,
 )

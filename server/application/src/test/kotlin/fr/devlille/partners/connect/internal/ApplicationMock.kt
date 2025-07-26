@@ -7,6 +7,8 @@ import fr.devlille.partners.connect.integrations.infrastructure.bindings.integra
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkClientModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.storageModule
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
+import fr.devlille.partners.connect.invoices.domain.InvoiceGateway
+import fr.devlille.partners.connect.invoices.infrastructure.bindings.invoicesModule
 import fr.devlille.partners.connect.module
 import fr.devlille.partners.connect.notifications.infrastructure.bindings.notificationModule
 import fr.devlille.partners.connect.partnership.infrastructure.bindings.partnershipModule
@@ -26,6 +28,13 @@ fun Application.moduleMocked(
     mockStorage: Module = module {
         single<Storage> { mockk() }
     },
+    mockInvoiceIntegration: Module = module {
+        single<List<InvoiceGateway>> {
+            listOf(
+                FakeInvoiceGateway(),
+            )
+        }
+    },
 ) {
     module(
         databaseUrl = "jdbc:h2:mem:${UUID.randomUUID()};DB_CLOSE_DELAY=-1",
@@ -39,9 +48,11 @@ fun Application.moduleMocked(
             companyModule,
             partnershipModule,
             notificationModule,
+            invoicesModule,
             integrationModule,
             mockNetwork,
             mockStorage,
+            mockInvoiceIntegration,
         ),
     )
 }

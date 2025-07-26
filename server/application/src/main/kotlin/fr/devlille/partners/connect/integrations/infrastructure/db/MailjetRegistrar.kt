@@ -15,7 +15,7 @@ class MailjetRegistrar : IntegrationRegistrar<CreateIntegration.CreateMailjetInt
     override fun register(
         eventId: UUID,
         usage: IntegrationUsage,
-        input: CreateIntegration.CreateMailjetIntegration
+        input: CreateIntegration.CreateMailjetIntegration,
     ): UUID = transaction {
         val integrationId = IntegrationsTable.insertAndGetId {
             it[this.eventId] = eventId

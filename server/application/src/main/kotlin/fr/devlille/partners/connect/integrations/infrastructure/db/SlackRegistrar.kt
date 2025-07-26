@@ -15,7 +15,7 @@ class SlackRegistrar : IntegrationRegistrar<CreateIntegration.CreateSlackIntegra
     override fun register(
         eventId: UUID,
         usage: IntegrationUsage,
-        input: CreateIntegration.CreateSlackIntegration
+        input: CreateIntegration.CreateSlackIntegration,
     ): UUID = transaction {
         val integrationId = IntegrationsTable.insertAndGetId {
             it[this.eventId] = eventId

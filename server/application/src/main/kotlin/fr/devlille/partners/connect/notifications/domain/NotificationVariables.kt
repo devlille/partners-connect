@@ -95,4 +95,17 @@ sealed interface NotificationVariables {
             .replace("{{event_contact}}", event.contact.email)
             .replace("{{company_name}}", company.name)
     }
+
+    data class NewInvoice(
+        override val language: String,
+        override val event: Event,
+        override val company: Company,
+    ) : NotificationVariables {
+        override val usageName: String = "new_invoice"
+
+        override fun populate(content: String): String = content
+            .replace("{{event_name}}", event.name)
+            .replace("{{event_contact}}", event.contact.email)
+            .replace("{{company_name}}", company.name)
+    }
 }
