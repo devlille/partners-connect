@@ -5,9 +5,13 @@ meta {
 }
 
 get {
-  url: https://thirdparty-sandbox.staging.qonto.co/v2/clients
+  url: https://thirdparty-sandbox.staging.qonto.co/v2/clients?filter[tax_identification_number]=32878178601143
   body: none
   auth: none
+}
+
+params:query {
+  filter[tax_identification_number]: 32878178601143
 }
 
 headers {
