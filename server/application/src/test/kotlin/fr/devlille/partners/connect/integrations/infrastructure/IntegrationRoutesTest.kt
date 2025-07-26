@@ -1,6 +1,6 @@
 package fr.devlille.partners.connect.integrations.infrastructure
 
-import fr.devlille.partners.connect.integrations.domain.CreateSlackIntegration
+import fr.devlille.partners.connect.integrations.domain.CreateIntegration
 import fr.devlille.partners.connect.internal.insertMockedAdminUser
 import fr.devlille.partners.connect.internal.moduleMocked
 import io.ktor.client.request.header
@@ -29,7 +29,7 @@ class IntegrationRoutesTest {
         }
 
         val requestBody = Json.encodeToString(
-            CreateSlackIntegration(
+            CreateIntegration.CreateSlackIntegration(
                 token = "xoxb-test-token",
                 channel = "#test",
             ),
