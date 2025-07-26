@@ -9,26 +9,27 @@ import org.jetbrains.exposed.v1.jdbc.insertAndGetId
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
-class SlackRegistrar : IntegrationRegistrar<CreateIntegration.CreateSlackIntegration> {
-    override val supportedUsages = setOf(IntegrationUsage.NOTIFICATION)
+class QontoRegistrar : IntegrationRegistrar<CreateIntegration.CreateQontoIntegration> {
+    override val supportedUsages = setOf(IntegrationUsage.INVOICE)
 
     override fun register(
         eventId: UUID,
         usage: IntegrationUsage,
-        input: CreateIntegration.CreateSlackIntegration
+        input: CreateIntegration.CreateQontoIntegration
     ): UUID = transaction {
         val integrationId = IntegrationsTable.insertAndGetId {
             it[this.eventId] = eventId
-            it[this.provider] = IntegrationProvider.SLACK
+            it[this.provider] = IntegrationProvider.QONTO
             it[this.usage] = usage
         }
-        SlackIntegrationsTable.insert {
+        QontoIntegrationsTable.insert {
             it[this.integrationId] = integrationId.value
-            it[this.token] = input.token
-            it[this.channel] = input.channel
+            it[this.apiKey] = input.apiKey
+            it[this.secret] = input.secret
+            it[this.sandboxToken] = input.sandboxToken
         }
         integrationId.value
     }
 
-    override fun supports(input: CreateIntegration): Boolean = input is CreateIntegration.CreateSlackIntegration
+    override fun supports(input: CreateIntegration): Boolean = input is CreateIntegration.CreateQontoIntegration
 }
