@@ -1,9 +1,11 @@
 package fr.devlille.partners.connect.companies.infrastructure.bindings
 
 import fr.devlille.partners.connect.companies.application.CompanyImageProcessingRepositoryDefault
+import fr.devlille.partners.connect.companies.application.CompanyInvoiceRepositoryExposed
 import fr.devlille.partners.connect.companies.application.CompanyMediaRepositoryGoogleCloud
 import fr.devlille.partners.connect.companies.application.CompanyRepositoryExposed
 import fr.devlille.partners.connect.companies.domain.CompanyImageProcessingRepository
+import fr.devlille.partners.connect.companies.domain.CompanyInvoiceRepository
 import fr.devlille.partners.connect.companies.domain.CompanyMediaRepository
 import fr.devlille.partners.connect.companies.domain.CompanyRepository
 import fr.devlille.partners.connect.internal.infrastructure.bindings.storageModule
@@ -19,5 +21,8 @@ val companyModule = module {
     }
     single<CompanyImageProcessingRepository> {
         CompanyImageProcessingRepositoryDefault()
+    }
+    single<CompanyInvoiceRepository> {
+        CompanyInvoiceRepositoryExposed()
     }
 }
