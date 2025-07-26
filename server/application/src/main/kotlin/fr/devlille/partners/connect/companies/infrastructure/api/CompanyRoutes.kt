@@ -1,11 +1,9 @@
 package fr.devlille.partners.connect.companies.infrastructure.api
 
 import fr.devlille.partners.connect.companies.domain.CompanyImageProcessingRepository
-import fr.devlille.partners.connect.companies.domain.CompanyInvoiceRepository
 import fr.devlille.partners.connect.companies.domain.CompanyMediaRepository
 import fr.devlille.partners.connect.companies.domain.CompanyRepository
 import fr.devlille.partners.connect.companies.domain.CreateCompany
-import fr.devlille.partners.connect.companies.domain.CompanyInvoice
 import fr.devlille.partners.connect.internal.infrastructure.ktor.asFile
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import io.ktor.http.ContentType
@@ -17,7 +15,6 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
-import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
@@ -26,7 +23,6 @@ fun Route.companyRoutes() {
     val companyRepository by inject<CompanyRepository>()
     val imageProcessingRepository by inject<CompanyImageProcessingRepository>()
     val mediaRepository by inject<CompanyMediaRepository>()
-    val invoiceRepository by inject<CompanyInvoiceRepository>()
 
     route("/companies") {
         get {
@@ -54,23 +50,6 @@ fun Route.companyRoutes() {
             val media = mediaRepository.upload(companyId.toString(), mediaBinaries)
             companyRepository.updateLogoUrls(companyId, media)
             call.respond(HttpStatusCode.OK, media)
-        }
-        get("/{companyId}/invoice") {
-            val companyId = call.parameters["companyId"]?.toUUID() ?: throw BadRequestException("Missing company id")
-            val invoice = invoiceRepository.getByCompanyId(companyId)
-            call.respond(HttpStatusCode.OK, invoice)
-        }
-        post("/{companyId}/invoice") {
-            val companyId = call.parameters["companyId"]?.toUUID() ?: throw BadRequestException("Missing company id")
-            val input = call.receive<CompanyInvoice>()
-            val invoiceId = invoiceRepository.createOrUpdate(companyId, input)
-            call.respond(mapOf("id" to invoiceId.toString()))
-        }
-        put("/{companyId}/invoice") {
-            val companyId = call.parameters["companyId"]?.toUUID() ?: throw BadRequestException("Missing company id")
-            val input = call.receive<CompanyInvoice>()
-            val invoiceId = invoiceRepository.createOrUpdate(companyId, input)
-            call.respond(HttpStatusCode.OK, mapOf("id" to invoiceId.toString()))
         }
     }
 }

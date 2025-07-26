@@ -1,0 +1,1 @@
+Une nouvelle facture a été créée pour l'entreprise {{company_name}}.

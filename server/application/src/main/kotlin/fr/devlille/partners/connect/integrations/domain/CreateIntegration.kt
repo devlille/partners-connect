@@ -21,5 +21,5 @@ sealed interface CreateIntegration {
         val secret: String,
         @SerialName("sandbox_token")
         val sandboxToken: String,
-    ): CreateIntegration
+    ) : CreateIntegration
 }

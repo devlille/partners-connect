@@ -3,14 +3,14 @@ package fr.devlille.partners.connect.companies.application.mappers
 import fr.devlille.partners.connect.companies.domain.Address
 import fr.devlille.partners.connect.companies.domain.CompanyInvoice
 import fr.devlille.partners.connect.companies.domain.Contact
-import fr.devlille.partners.connect.companies.infrastructure.db.InvoiceEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceEntity
 
 fun InvoiceEntity.toDomain(): CompanyInvoice = CompanyInvoice(
     name = name,
     contact = Contact(
         firstName = contactFirstName,
-        lastName = contactSecondName,
-        email = contactEmail
+        lastName = contactLastName,
+        email = contactEmail,
     ),
     address = Address(
         address = address,
@@ -20,5 +20,5 @@ fun InvoiceEntity.toDomain(): CompanyInvoice = CompanyInvoice(
     ),
     siret = siret,
     vat = vat,
-    po = po
+    po = po,
 )

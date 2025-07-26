@@ -7,7 +7,6 @@ import fr.devlille.partners.connect.companies.infrastructure.api.companyRoutes
 import fr.devlille.partners.connect.companies.infrastructure.bindings.companyModule
 import fr.devlille.partners.connect.companies.infrastructure.db.CompaniesTable
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanySocialsTable
-import fr.devlille.partners.connect.companies.infrastructure.db.InvoicesTable
 import fr.devlille.partners.connect.events.infrastructure.api.eventRoutes
 import fr.devlille.partners.connect.events.infrastructure.bindings.eventModule
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
@@ -23,10 +22,13 @@ import fr.devlille.partners.connect.internal.infrastructure.bindings.networkClie
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkEngineModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.storageModule
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
+import fr.devlille.partners.connect.invoices.infrastructure.bindings.invoicesModule
 import fr.devlille.partners.connect.notifications.infrastructure.bindings.notificationModule
+import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipInvoiceRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipSuggestionRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.bindings.partnershipModule
+import fr.devlille.partners.connect.partnership.infrastructure.db.InvoicesTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
@@ -92,6 +94,7 @@ fun Application.module(
         companyModule,
         partnershipModule,
         notificationModule,
+        invoicesModule,
         integrationModule,
     ),
 ) {
@@ -125,6 +128,7 @@ fun Application.module(
         userRoutes()
         sponsoringRoutes()
         companyRoutes()
+        partnershipInvoiceRoutes()
         partnershipRoutes()
         partnershipSuggestionRoutes()
         integrationRoutes()
