@@ -1,0 +1,48 @@
+meta {
+  name: Create invoice
+  type: http
+  seq: 4
+}
+
+post {
+  url: https://thirdparty-sandbox.staging.qonto.co/v2/client_invoices
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: {{qonto_api_key}}:{{qonto_secret}}
+  Content-Type: application/json
+  X-Qonto-Staging-Token: {{qonto_sandbox}}
+}
+
+body:json {
+  {
+    "settings": {
+      "late_payment_penalties": null,
+      "legal_fixed_compensation": null,
+      "legal_capital_share": {
+        "currency": "EUR"
+      }
+    },
+    "client_id": "53f50be8-f747-4a40-96dc-779b9aef62d8",
+    "due_date": "2026-06-12",
+    "issue_date": "2025-10-12",
+    "currency": "EUR",
+    "payment_methods": {
+      "iban": "FR7616958000016086070099689"
+    },
+    "purchase_order": "PO98765",
+    "items": [
+      {
+        "title": "Pack Gold",
+        "quantity": "1",
+        "unit_price": {
+          "value": "5000",
+          "currency": "EUR"
+        },
+        "vat_rate": "0"
+      }
+    ]
+  }
+}

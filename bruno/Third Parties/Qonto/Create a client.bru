@@ -1,0 +1,41 @@
+meta {
+  name: Create a client
+  type: http
+  seq: 3
+}
+
+post {
+  url: https://thirdparty-sandbox.staging.qonto.co/v2/clients
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: {{qonto_api_key}}:{{qonto_secret}}
+  Content-Type: application/json
+  X-Qonto-Staging-Token: {{qonto_sandbox}}
+}
+
+body:json {
+  {
+    "name": "SFEIR",
+    "first_name": "John",
+    "last_name": "Doe",
+    "type": "company",
+    "email": "john.doe@qonto.eu",
+    "extra_emails": [
+      "additional@email.com",
+      "backup@email.com"
+    ],
+    "vat_number": "FR65827999616",
+    "tax_identification_number": "32878178601143",
+    "billing_address": {
+      "street_address": "74 rue des Arts",
+      "city": "Lille",
+      "zip_code": "59800",
+      "country_code": "FR"
+    },
+    "currency": "EUR",
+    "locale": "FR"
+  }
+}
