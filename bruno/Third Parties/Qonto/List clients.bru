@@ -1,0 +1,16 @@
+meta {
+  name: List clients
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://thirdparty-sandbox.staging.qonto.co/v2/clients
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{qonto_api_key}}:{{qonto_secret}}
+  X-Qonto-Staging-Token: {{qonto_sandbox}}
+}
