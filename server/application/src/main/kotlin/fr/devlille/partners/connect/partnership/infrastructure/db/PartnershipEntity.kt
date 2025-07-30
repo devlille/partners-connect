@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.partnership.infrastructure.db
 
+import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.UUIDEntity
@@ -13,6 +14,7 @@ class PartnershipEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var companyId by PartnershipsTable.companyId
     var phone by PartnershipsTable.phone
     var language by PartnershipsTable.language
+    var assignmentUrl by PartnershipsTable.assignmentUrl
     var selectedPackId by PartnershipsTable.selectedPackId
     var suggestionPackId by PartnershipsTable.suggestionPackId
     var suggestionSentAt by PartnershipsTable.suggestionSentAt
@@ -21,6 +23,33 @@ class PartnershipEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var declinedAt by PartnershipsTable.declinedAt
     var validatedAt by PartnershipsTable.validatedAt
     var createdAt by PartnershipsTable.createdAt
+}
+
+@Suppress("ReturnCount")
+fun PartnershipEntity.validatedPackId(): UUID? {
+    if (suggestionPackId != null) {
+        if (suggestionApprovedAt.compareToNull(suggestionDeclinedAt) > 0) {
+            return suggestionPackId!!
+        }
+    }
+    if (selectedPackId != null) {
+        if (validatedAt.compareToNull(declinedAt) > 0) {
+            return selectedPackId!!
+        }
+    }
+    return null
+}
+
+private fun LocalDateTime?.compareToNull(other: LocalDateTime?): Int {
+    return if (this == null && other == null) {
+        0
+    } else if (this == null) {
+        -1
+    } else if (other == null) {
+        1
+    } else {
+        this.compareTo(other)
+    }
 }
 
 fun UUIDEntityClass<PartnershipEntity>.singleByEventAndCompany(

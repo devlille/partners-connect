@@ -16,6 +16,7 @@ enum class MimeType(val value: String, val extension: String) {
     SVG("image/svg+xml", "svg"),
     WEBP("image/webp", "webp"),
     JSON("application/json", "json"),
+    PDF("application/pdf", "pdf"),
     OCTET_STREAM("application/octet-stream", "bin"),
 }
 

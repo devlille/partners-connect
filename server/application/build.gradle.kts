@@ -20,6 +20,8 @@ dependencies {
     implementation(libs.bundles.slack.api)
     implementation(libs.bundles.image.processing)
     implementation(libs.google.cloud.storage)
+    implementation(libs.flexmark)
+    implementation(libs.mustache)
     testImplementation(kotlin("test"))
     testImplementation(libs.ktor.server.test)
     testImplementation(libs.ktor.client.mock)

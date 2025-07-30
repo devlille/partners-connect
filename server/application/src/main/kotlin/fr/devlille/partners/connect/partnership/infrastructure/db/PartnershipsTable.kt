@@ -14,6 +14,7 @@ object PartnershipsTable : UUIDTable("partnerships") {
     val companyId = uuid("company_id").references(CompaniesTable.id)
     val phone = text("phone").nullable()
     val language = text("language")
+    val assignmentUrl = text("assignment_url").nullable()
     val selectedPackId = uuid("selected_pack_id").references(SponsoringPacksTable.id).nullable()
     val suggestionPackId = uuid("suggestion_pack_id").references(SponsoringPacksTable.id).nullable()
     val suggestionSentAt = datetime("suggestion_sent_at").nullable()
