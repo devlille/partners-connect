@@ -46,26 +46,44 @@
     <main>
       <h2>
         <span>Sponsor</span>
-        Zenika
+        {{ companyName }}
       </h2>
 
       <div class="tabs-block">
         <ul class="tabs">
           <li>
-            <button type="button">Information</button>
+            <button type="button" @click="activeTab = 'information'" :class="{ active: activeTab === 'information' }">Information</button>
           </li>
           <li>
-            <button type="button">Facturation</button>
+            <button type="button" @click="activeTab = 'suggestions'" :class="{ active: activeTab === 'suggestions' }">Suggestions</button>
+          </li>
+          <li>
+            <button type="button" @click="activeTab = 'facturation'" :class="{ active: activeTab === 'facturation' }">Facturation</button>
           </li>
           <li role="presentation">
-            <button type="button">Billeterie</button>
+            <button type="button" @click="activeTab = 'billeterie'" :class="{ active: activeTab === 'billeterie' }">Billeterie</button>
           </li>
           <li>
-            <button type="button">Stand</button>
+            <button type="button" @click="activeTab = 'stand'" :class="{ active: activeTab === 'stand' }">Stand</button>
           </li>
         </ul>
-        <div class="tab-content auto-scroll"></div>
-        <div class="tab-content auto-scroll">
+        
+        <!-- Information Tab -->
+        <div v-show="activeTab === 'information'" class="tab-content auto-scroll">
+          <p>Information content goes here...</p>
+        </div>
+
+        <!-- Suggestions Tab -->
+        <div v-show="activeTab === 'suggestions'" class="tab-content auto-scroll">
+          <SuggestionManager 
+            :eventId="eventId" 
+            :companyId="companyId"
+            @refresh="loadPartnership"
+          />
+        </div>
+
+        <!-- Facturation Tab -->
+        <div v-show="activeTab === 'facturation'" class="tab-content auto-scroll">
           <form class="m-b-double">
             <fieldset>
               <legend>Données de facturation</legend>
@@ -92,8 +110,15 @@
             <li><a href="#">Facture 2025</a></li>
           </ul>
         </div>
-        <div class="tab-content auto-scroll">
-          dklsfjs qkfsmdlkjf mslkdjfmlskjdf
+
+        <!-- Billeterie Tab -->
+        <div v-show="activeTab === 'billeterie'" class="tab-content auto-scroll">
+          <p>Billeterie content...</p>
+        </div>
+
+        <!-- Stand Tab -->
+        <div v-show="activeTab === 'stand'" class="tab-content auto-scroll">
+          <p>Stand content...</p>
         </div>
       </div>
     </main>
@@ -104,28 +129,46 @@
   </footer>
 </template>
 
-<script>
-export default {
-  head() {
-    return {
-      script: [
-        {
-          src: "/js/main-nav.js",
-          type: "text/javascript",
-          defer: true,
-        },
-        {
-          src: "/js/autoScroll.js",
-          type: "text/javascript",
-          defer: true,
-        },
-        {
-          src: "/js/tabs.js",
-          type: "text/javascript",
-          defer: true,
-        },
-      ],
-    };
-  },
-};
+<script setup>
+// Mock data - in a real app, these would come from route params or authentication
+const eventId = ref('550e8400-e29b-41d4-a716-446655440000') // Example UUID
+const companyId = ref('660e8400-e29b-41d4-a716-446655440001') // Example UUID
+const companyName = ref('Zenika')
+const activeTab = ref('suggestions') // Default to suggestions tab
+
+const partnership = ref(null)
+const loading = ref(false)
+const error = ref(null)
+
+const loadPartnership = async () => {
+  loading.value = true
+  error.value = null
+  
+  try {
+    const response = await $fetch(`/api/events/${eventId.value}/companies/${companyId.value}/partnership`)
+    partnership.value = response
+  } catch (err) {
+    error.value = err.message || 'Failed to load partnership'
+    console.error('Error loading partnership:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Load partnership data on component mount
+onMounted(() => {
+  loadPartnership()
+})
 </script>
+
+<style scoped>
+.tabs button.active {
+  background-color: #f0f0f0;
+  border-bottom: 2px solid #007bff;
+}
+
+.tab-content {
+  padding: 20px;
+  min-height: 400px;
+}
+</style>
