@@ -4,6 +4,8 @@ detekt = "1.23.8"
 exposed = "1.0.0-beta-2"
 h2 = "2.2.224"
 okhttp = "4.12.0"
+flexmark = "0.64.8"
+mustache = "0.9.10"
 slack = "1.45.3"
 kotlin = "2.1.21"
 kotlinx-datetime = "0.6.1"
@@ -30,6 +32,9 @@ exposed-kotlin-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datet
 
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okhttp-mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp" }
+
+flexmark = { module = "com.vladsch.flexmark:flexmark-all", version.ref = "flexmark" }
+mustache = { module = "com.github.spullara.mustache.java:compiler", version.ref = "mustache" }
 
 slack = { module = "com.slack.api:slack-api-client", version.ref = "slack" }
 slack-api-model = { module = "com.slack.api:slack-api-model-kotlin-extension", version.ref = "slack" }

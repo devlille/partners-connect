@@ -8,8 +8,10 @@ import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.invoices.domain.InvoiceRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
+import fr.devlille.partners.connect.partnership.domain.PartnershipAssignmentRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipInvoiceRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
+import fr.devlille.partners.connect.partnership.domain.PartnershipStorageRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipSuggestionRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
 import fr.devlille.partners.connect.partnership.domain.SuggestPartnership
@@ -148,6 +150,27 @@ fun Route.partnershipSuggestionRoutes() {
             val variables = NotificationVariables.SuggestionDeclined(partnership.language, event, company)
             notificationRepository.sendMessage(eventId, variables)
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
+        }
+    }
+}
+
+@Suppress("ThrowsCount")
+fun Route.partnershipAssignmentRoutes() {
+    val assignmentRepository by inject<PartnershipAssignmentRepository>()
+    val storageRepository by inject<PartnershipStorageRepository>()
+
+    route("/events/{eventId}/companies/{companyId}/partnership/{partnershipId}/assignment") {
+        install(AuthorizedEventPlugin)
+
+        post {
+            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val companyId = call.parameters["companyId"]?.toUUID()
+                ?: throw BadRequestException("Missing company id")
+            val partnershipId = call.parameters["partnershipId"]?.toUUID()
+                ?: throw BadRequestException("Missing partnership id")
+            val pdfBinary = assignmentRepository.generateAssignment(eventId, companyId, partnershipId)
+            val assignmentUrl = storageRepository.uploadAssignment(eventId, companyId, partnershipId, pdfBinary)
+            call.respond(HttpStatusCode.OK, mapOf("assignmenet_url" to assignmentUrl))
         }
     }
 }
