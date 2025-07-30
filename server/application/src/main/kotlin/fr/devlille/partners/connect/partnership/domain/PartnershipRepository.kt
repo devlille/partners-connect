@@ -7,6 +7,8 @@ interface PartnershipRepository {
 
     fun getById(eventId: UUID, partnershipId: UUID): Partnership
 
+    fun getByCompany(eventId: UUID, companyId: UUID): Partnership?
+
     fun validate(eventId: UUID, partnershipId: UUID): UUID
 
     fun decline(eventId: UUID, partnershipId: UUID): UUID

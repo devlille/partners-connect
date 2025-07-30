@@ -97,38 +97,12 @@ class PartnershipRepositoryExposed(
 
     override fun getById(eventId: UUID, partnershipId: UUID): Partnership = transaction {
         val partnership = findPartnership(eventId, partnershipId)
-        Partnership(
-            id = partnership.id.value.toString(),
-            language = partnership.language,
-            phone = partnership.phone,
-            emails = PartnershipEmailEntity
-                .find { PartnershipEmailsTable.partnershipId eq partnership.id }
-                .map { it.email },
-            selectedPack = partnership.selectedPackId?.let {
-                val pack = packEntity.singlePackById(eventId, it)
-                pack.toDomain(
-                    language = partnership.language,
-                    requiredOptionIds = PackOptionsTable.listOptionsByPack(it)
-                        .filter { it[PackOptionsTable.required] }
-                        .map { it[PackOptionsTable.option].value },
-                    optionalOptions = PackOptionsTable.listOptionsByPack(it)
-                        .filterNot { it[PackOptionsTable.required] }
-                        .map { it[PackOptionsTable.option].value },
-                )
-            },
-            suggestionPack = partnership.suggestionPackId?.let {
-                val pack = packEntity.singlePackById(eventId, it)
-                pack.toDomain(
-                    language = partnership.language,
-                    requiredOptionIds = PackOptionsTable.listOptionsByPack(it)
-                        .filter { it[PackOptionsTable.required] }
-                        .map { it[PackOptionsTable.option].value },
-                    optionalOptions = PackOptionsTable.listOptionsByPack(it)
-                        .filterNot { it[PackOptionsTable.required] }
-                        .map { it[PackOptionsTable.option].value },
-                )
-            },
-        )
+        buildPartnership(partnership)
+    }
+
+    override fun getByCompany(eventId: UUID, companyId: UUID): Partnership? = transaction {
+        val partnership = partnershipEntity.singleByEventAndCompany(eventId, companyId)
+        partnership?.let { buildPartnership(it) }
     }
 
     override fun validate(eventId: UUID, partnershipId: UUID): UUID = transaction {
@@ -146,4 +120,42 @@ class PartnershipRepositoryExposed(
     private fun findPartnership(eventId: UUID, partnershipId: UUID): PartnershipEntity = partnershipEntity
         .singleByEventAndPartnership(eventId, partnershipId)
         ?: throw NotFoundException("Partnership not found")
+
+    private fun buildPartnership(partnership: PartnershipEntity): Partnership {
+        return Partnership(
+            id = partnership.id.value.toString(),
+            language = partnership.language,
+            phone = partnership.phone,
+            emails = PartnershipEmailEntity
+                .find { PartnershipEmailsTable.partnershipId eq partnership.id }
+                .map { it.email },
+            selectedPack = partnership.selectedPackId?.let {
+                val pack = packEntity.singlePackById(partnership.eventId, it)
+                pack.toDomain(
+                    language = partnership.language,
+                    requiredOptionIds = PackOptionsTable.listOptionsByPack(it)
+                        .filter { it[PackOptionsTable.required] }
+                        .map { it[PackOptionsTable.option].value },
+                    optionalOptions = PackOptionsTable.listOptionsByPack(it)
+                        .filterNot { it[PackOptionsTable.required] }
+                        .map { it[PackOptionsTable.option].value },
+                )
+            },
+            suggestionPack = partnership.suggestionPackId?.let {
+                val pack = packEntity.singlePackById(partnership.eventId, it)
+                pack.toDomain(
+                    language = partnership.language,
+                    requiredOptionIds = PackOptionsTable.listOptionsByPack(it)
+                        .filter { it[PackOptionsTable.required] }
+                        .map { it[PackOptionsTable.option].value },
+                    optionalOptions = PackOptionsTable.listOptionsByPack(it)
+                        .filterNot { it[PackOptionsTable.required] }
+                        .map { it[PackOptionsTable.option].value },
+                )
+            },
+            suggestionSentAt = partnership.suggestionSentAt?.toString(),
+            suggestionApprovedAt = partnership.suggestionApprovedAt?.toString(),
+            suggestionDeclinedAt = partnership.suggestionDeclinedAt?.toString(),
+        )
+    }
 }

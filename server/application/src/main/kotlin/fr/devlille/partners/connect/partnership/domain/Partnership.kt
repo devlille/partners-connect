@@ -14,4 +14,10 @@ class Partnership(
     val selectedPack: SponsoringPack? = null,
     @SerialName("suggestion_pack")
     val suggestionPack: SponsoringPack? = null,
+    @SerialName("suggestion_sent_at")
+    val suggestionSentAt: String? = null,
+    @SerialName("suggestion_approved_at")
+    val suggestionApprovedAt: String? = null,
+    @SerialName("suggestion_declined_at")
+    val suggestionDeclinedAt: String? = null,
 )

@@ -35,6 +35,17 @@ fun Route.partnershipRoutes() {
     val notificationRepository by inject<NotificationRepository>()
 
     route("/events/{eventId}/companies/{companyId}/partnership") {
+        get {
+            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val companyId = call.parameters["companyId"]?.toUUID() ?: throw BadRequestException("Missing company id")
+            val partnership = partnershipRepository.getByCompany(eventId, companyId)
+            if (partnership != null) {
+                call.respond(HttpStatusCode.OK, partnership)
+            } else {
+                call.respond(HttpStatusCode.NotFound, mapOf("message" to "Partnership not found"))
+            }
+        }
+
         post {
             val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
             val companyId = call.parameters["companyId"]?.toUUID() ?: throw BadRequestException("Missing company id")
