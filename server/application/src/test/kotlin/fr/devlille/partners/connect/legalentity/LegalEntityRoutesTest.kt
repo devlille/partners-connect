@@ -1,6 +1,6 @@
 package fr.devlille.partners.connect.legalentity
 
-import fr.devlille.partners.connect.internal.insertMockedAdminUser
+import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.internal.mockedAdminUser
 import fr.devlille.partners.connect.internal.moduleMocked
 import io.ktor.client.request.get
@@ -46,7 +46,7 @@ class LegalEntityRoutesTest {
     fun `POST creates a legal entity`() = testApplication {
         application {
             moduleMocked()
-            insertMockedAdminUser(UUID.randomUUID())
+            insertMockedEventWithAdminUser(UUID.randomUUID())
         }
 
         val response = client.post("/legal-entities") {
@@ -79,7 +79,7 @@ class LegalEntityRoutesTest {
     fun `GET returns a legal entity when it exists`() = testApplication {
         application {
             moduleMocked()
-            insertMockedAdminUser()
+            insertMockedEventWithAdminUser()
         }
 
         val postResponse = client.post("/legal-entities") {
@@ -99,7 +99,7 @@ class LegalEntityRoutesTest {
     fun `GET returns 404 when legal entity does not exist`() = testApplication {
         application {
             moduleMocked()
-            insertMockedAdminUser(UUID.randomUUID())
+            insertMockedEventWithAdminUser(UUID.randomUUID())
         }
 
         val response = client.get("/legal-entities/${UUID.randomUUID()}")

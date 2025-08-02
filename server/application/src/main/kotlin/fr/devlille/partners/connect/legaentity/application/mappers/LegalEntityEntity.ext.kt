@@ -20,5 +20,5 @@ fun LegalEntityEntity.toDomain(): LegalEntity = LegalEntity(
     createdAt = this.createdAt,
     publishedAt = this.publishedAt,
     representativeUserEmail = this.representativeUser.email,
-    representativeRole = this.representativeRole
+    representativeRole = this.representativeRole,
 )

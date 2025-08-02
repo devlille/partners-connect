@@ -1,7 +1,7 @@
 package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
-import fr.devlille.partners.connect.internal.insertMockedAdminUser
+import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
@@ -29,7 +29,7 @@ class PartnershipValidationRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
             transaction {
                 CompanyEntity.new(companyId) {
                     name = "Company X"
@@ -68,7 +68,7 @@ class PartnershipValidationRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
         }
 
         val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/validate") {
@@ -87,7 +87,7 @@ class PartnershipValidationRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
             transaction {
                 CompanyEntity.new(companyId) {
                     name = "Company Y"
@@ -119,7 +119,7 @@ class PartnershipValidationRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
         }
 
         val response = client.delete("/events/$eventId/companies/$companyId/partnership/$partnershipId/decline") {

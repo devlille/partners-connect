@@ -1,7 +1,7 @@
 package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
-import fr.devlille.partners.connect.internal.insertMockedAdminUser
+import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.domain.SuggestPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
@@ -38,7 +38,7 @@ class PartnershipSuggestionRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
             transaction {
                 CompanyEntity.new(companyId) {
                     this.name = "Company X"
@@ -98,7 +98,7 @@ class PartnershipSuggestionRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
         }
 
         val response = client.post("/events/$eventId/companies/$companyId/partnership/$fakeId/suggestion") {
@@ -118,7 +118,7 @@ class PartnershipSuggestionRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
 
             transaction {
                 CompanyEntity.new(companyId) {
@@ -152,7 +152,7 @@ class PartnershipSuggestionRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
 
             transaction {
                 CompanyEntity.new(companyId) {
@@ -211,7 +211,7 @@ class PartnershipSuggestionRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
 
             transaction {
                 CompanyEntity.new(companyId) {

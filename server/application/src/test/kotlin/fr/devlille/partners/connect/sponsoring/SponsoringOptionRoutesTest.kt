@@ -1,6 +1,6 @@
 package fr.devlille.partners.connect.sponsoring
 
-import fr.devlille.partners.connect.internal.insertMockedAdminUser
+import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringOption
@@ -31,7 +31,7 @@ class SponsoringOptionRoutesTest {
         val eventId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
         }
 
         val response = client.get("/events/$eventId/options") {
@@ -48,7 +48,7 @@ class SponsoringOptionRoutesTest {
         val eventId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
         }
 
         val request = CreateSponsoringOption(
@@ -96,7 +96,7 @@ class SponsoringOptionRoutesTest {
         val eventId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
         }
 
         val response = client.get("/events/$eventId/options") {
@@ -111,7 +111,7 @@ class SponsoringOptionRoutesTest {
         val eventId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
         }
 
         val request = CreateSponsoringOption(

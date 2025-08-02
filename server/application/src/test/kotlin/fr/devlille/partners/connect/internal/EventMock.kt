@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.internal
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.legaentity.infrastructure.db.LegalEntityEntity
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
@@ -16,17 +17,7 @@ fun insertMockedEvent(
     address: String = "123 Test St, Test City, TC 12345",
     contactEmail: String = "contact@mail.com",
     contactPhone: String? = null,
-    legalName: String? = null,
-    siret: String? = null,
-    siren: String? = null,
-    tva: String? = null,
-    dAndB: String? = null,
-    nace: String? = null,
-    naf: String? = null,
-    duns: String? = null,
-    iban: String? = null,
-    bic: String? = null,
-    ribUrl: String? = null,
+    legalEntity: LegalEntityEntity = insertLegalEntity(),
 ): EventEntity = transaction {
     EventEntity.new(id) {
         this.name = name
@@ -37,16 +28,6 @@ fun insertMockedEvent(
         this.address = address
         this.contactPhone = contactPhone
         this.contactEmail = contactEmail
-        this.legalName = legalName
-        this.siret = siret
-        this.siren = siren
-        this.tva = tva
-        this.dAndB = dAndB
-        this.nace = nace
-        this.naf = naf
-        this.duns = duns
-        this.iban = iban
-        this.bic = bic
-        this.ribUrl = ribUrl
+        this.legalEntity = legalEntity
     }
 }

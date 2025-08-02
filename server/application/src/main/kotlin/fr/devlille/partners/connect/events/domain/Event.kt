@@ -17,33 +17,12 @@ data class Event(
     val submissionEndTime: LocalDateTime,
     val address: String,
     val contact: Contact,
-    val legal: Legal? = null,
-    val banking: Banking? = null,
+    @SerialName("legal_entity_id")
+    val legalEntityId: String,
 )
 
 @Serializable
 data class Contact(
     val email: String,
     val phone: String? = null,
-)
-
-@Serializable
-data class Legal(
-    val name: String? = null,
-    val siret: String? = null,
-    val siren: String? = null,
-    val tva: String? = null,
-    @SerialName("d_and_b")
-    val dAndB: String? = null,
-    val nace: String? = null,
-    val naf: String? = null,
-    val duns: String? = null,
-)
-
-@Serializable
-data class Banking(
-    val iban: String? = null,
-    val bic: String? = null,
-    @SerialName("rib_url")
-    val ribUrl: String? = null,
 )

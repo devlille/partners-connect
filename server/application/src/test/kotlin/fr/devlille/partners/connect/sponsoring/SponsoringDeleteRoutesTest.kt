@@ -1,6 +1,6 @@
 package fr.devlille.partners.connect.sponsoring
 
-import fr.devlille.partners.connect.internal.insertMockedAdminUser
+import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
@@ -27,7 +27,7 @@ class SponsoringDeleteRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
             transaction {
                 val option = SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId
@@ -61,7 +61,7 @@ class SponsoringDeleteRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
         }
 
         val response = client.delete("/events/$eventId/packs/$packId/options/$optionId") {
@@ -77,7 +77,7 @@ class SponsoringDeleteRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
             transaction {
                 val option = SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId
@@ -111,7 +111,7 @@ class SponsoringDeleteRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
             transaction {
                 SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId
@@ -133,7 +133,7 @@ class SponsoringDeleteRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
             transaction {
                 val option = SponsoringOptionEntity.new {
                     this.eventId = eventId
@@ -167,7 +167,7 @@ class SponsoringDeleteRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
             transaction {
                 SponsoringPackEntity.new(packId) {
                     this.eventId = eventId

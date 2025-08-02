@@ -73,9 +73,6 @@ class QontoInvoiceGateway(
         } else {
             clients.clients.first()
         }
-        if (event.iban == null) {
-            throw NotFoundException("Event $eventId does not have an IBAN set")
-        }
         val request = event.toQontoInvoiceRequest(
             clientId = client.id,
             invoicePo = invoice.po,
@@ -149,9 +146,7 @@ class QontoInvoiceGateway(
             dueDate = "${now.year}-${"%02d".format(now.monthNumber)}-${"%02d".format(now.dayOfMonth)}",
             issueDate = "${startTime.year}-$eventMonth-$eventDay",
             currency = "EUR",
-            paymentMethods = QontoPaymentMethods(
-                iban = iban!!,
-            ),
+            paymentMethods = QontoPaymentMethods(iban = legalEntity.iban),
             purchaseOrder = invoicePo,
             items = invoiceItems,
         )

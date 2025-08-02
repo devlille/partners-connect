@@ -151,7 +151,6 @@ class PartnershipInvoiceRoutesTest {
             setBody(json.encodeToString(CompanyInvoice.serializer(), sampleInvoiceInput()))
         }
 
-        println(response.bodyAsText())
         assertEquals(HttpStatusCode.Companion.OK, response.status)
         val body = response.bodyAsText()
         assertTrue(body.contains("id"))
