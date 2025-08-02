@@ -1,17 +1,23 @@
 package fr.devlille.partners.connect.events
 
-import fr.devlille.partners.connect.module
+import fr.devlille.partners.connect.internal.insertMockedAdminUser
+import fr.devlille.partners.connect.internal.insertMockedEvent
+import fr.devlille.partners.connect.internal.insertMockedUser
+import fr.devlille.partners.connect.internal.moduleMocked
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
+import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -48,11 +54,15 @@ class EventRoutesTest {
     """
 
     @Test
-    fun testCreateEvent() = testApplication {
-        application { module() }
+    fun `POST creates an event and grants access to creator`() = testApplication {
+        application {
+            moduleMocked()
+            insertMockedAdminUser(UUID.randomUUID())
+        }
 
         val response = client.post("/events") {
             contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
             setBody(testEventJson)
         }
 
@@ -63,38 +73,63 @@ class EventRoutesTest {
     }
 
     @Test
-    fun testUpdateEvent() = testApplication {
-        application { module() }
+    fun `PUT updates an existing event`() = testApplication {
+        application {
+            moduleMocked()
+            insertMockedAdminUser(UUID.randomUUID())
+        }
 
-        // First, create the event
         val createResponse = client.post("/events") {
             contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
             setBody(testEventJson)
         }
-        val createResponseText = createResponse.bodyAsText()
-        val responseBody = Json.decodeFromString<Map<String, String>>(createResponseText)
-        assertNotNull(responseBody["id"], "Response should contain an 'id' field")
 
-        // Then, update the event
-        val updateResponse = client.put("/events/${responseBody["id"]}") {
+        val responseBody = Json.decodeFromString<Map<String, String>>(createResponse.bodyAsText())
+        val createdId = responseBody["id"]
+        assertNotNull(createdId)
+
+        val updateResponse = client.put("/events/$createdId") {
             contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
             setBody(testEventJson)
         }
 
         assertEquals(HttpStatusCode.OK, updateResponse.status)
-        val updateResponseText = updateResponse.bodyAsText()
-        val updateResponseBody = Json.decodeFromString<Map<String, String>>(updateResponseText)
-        assertNotNull(updateResponseBody["id"], "Response should contain an 'id' field")
-        assertEquals(responseBody["id"], updateResponseBody["id"])
+        val updateBody = Json.decodeFromString<Map<String, String>>(updateResponse.bodyAsText())
+        assertEquals(createdId, updateBody["id"])
     }
 
     @Test
-    fun testGetAllEvents() = testApplication {
-        application { module() }
+    fun `PUT returns 401 when user has no access to the event`() = testApplication {
+        val eventId = UUID.randomUUID()
 
-        // Ensure one event exists
+        application {
+            moduleMocked()
+            insertMockedEvent(eventId)
+            insertMockedUser()
+        }
+
+        val updateResponse = client.put("/events/$eventId") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(testEventJson)
+        }
+
+        assertEquals(HttpStatusCode.Unauthorized, updateResponse.status)
+    }
+
+    @Test
+    fun `GET returns all events`() = testApplication {
+        val eventId = UUID.randomUUID()
+        application {
+            moduleMocked()
+            insertMockedAdminUser(eventId)
+        }
+
         client.post("/events") {
             contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
             setBody(testEventJson)
         }
 
