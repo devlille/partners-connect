@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.partnership.infrastructure.db
 
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.UUIDEntity
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
@@ -9,9 +10,17 @@ class PartnershipOptionEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     companion object : UUIDEntityClass<PartnershipOptionEntity>(PartnershipOptionsTable)
 
     var partnership by PartnershipEntity referencedOn PartnershipOptionsTable.partnershipId
+    var packId by PartnershipOptionsTable.packId
     var optionId by PartnershipOptionsTable.optionId
 }
 
-fun UUIDEntityClass<PartnershipOptionEntity>.deleteAllByPartnershipId(partnershipId: UUID): Unit = this
-    .find { PartnershipOptionsTable.partnershipId eq partnershipId }
+fun UUIDEntityClass<PartnershipOptionEntity>.listByPartnershipAndPack(
+    partnershipId: UUID,
+    packId: UUID,
+): List<PartnershipOptionEntity> = this
+    .find { (PartnershipOptionsTable.partnershipId eq partnershipId) and (PartnershipOptionsTable.packId eq packId) }
+    .toList()
+
+fun UUIDEntityClass<PartnershipOptionEntity>.deleteAllByPartnershipId(partnershipId: UUID, packId: UUID): Unit = this
+    .find { (PartnershipOptionsTable.partnershipId eq partnershipId) and (PartnershipOptionsTable.packId eq packId) }
     .forEach { it.delete() }

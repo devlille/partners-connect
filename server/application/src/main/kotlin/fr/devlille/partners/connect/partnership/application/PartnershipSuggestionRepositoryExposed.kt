@@ -40,13 +40,11 @@ class PartnershipSuggestionRepositoryExposed(
         if (partnership.eventId != eventId || partnership.companyId != companyId) {
             throw BadRequestException("Mismatch between path and partnership")
         }
-
-        val packUUID = input.packId.toUUID()
-        val suggestedPack = packEntity.findById(packUUID)
+        val suggestedPack = packEntity.findById(input.packId.toUUID())
             ?: throw NotFoundException("Pack ${input.packId} not found")
 
         val optionalOptionIds = packOptionTable
-            .listOptionalOptionsByPack(packUUID)
+            .listOptionalOptionsByPack(suggestedPack.id.value)
             .map { it[PackOptionsTable.option].value }
 
         val optionsUUID = input.optionIds.map { it.toUUID() }
@@ -56,10 +54,10 @@ class PartnershipSuggestionRepositoryExposed(
         }
 
         // Remove previous suggested options
-        partnershipOptionEntity.deleteAllByPartnershipId(suggestedPack.id.value)
+        partnershipOptionEntity.deleteAllByPartnershipId(partnership.id.value, suggestedPack.id.value)
 
         optionsUUID.forEach {
-            SponsoringOptionEntity.findById(it) ?: throw NotFoundException("Option $it not found")
+            val option = SponsoringOptionEntity.findById(it) ?: throw NotFoundException("Option $it not found")
             val noTranslation = translationEntity
                 .listTranslationsByOptionAndLanguage(it, partnership.language)
                 .isEmpty()
@@ -68,7 +66,8 @@ class PartnershipSuggestionRepositoryExposed(
             }
             PartnershipOptionEntity.new {
                 this.partnership = partnership
-                this.optionId = it
+                this.packId = suggestedPack.id
+                this.optionId = option.id
             }
         }
 

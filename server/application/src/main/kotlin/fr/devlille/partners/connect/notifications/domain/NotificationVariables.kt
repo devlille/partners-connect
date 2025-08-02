@@ -2,7 +2,7 @@ package fr.devlille.partners.connect.notifications.domain
 
 import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.events.domain.Event
-import fr.devlille.partners.connect.sponsoring.domain.SponsoringPack
+import fr.devlille.partners.connect.partnership.domain.PartnershipPack
 
 sealed interface NotificationVariables {
     val usageName: String
@@ -16,7 +16,7 @@ sealed interface NotificationVariables {
         override val language: String,
         override val event: Event,
         override val company: Company,
-        val pack: SponsoringPack,
+        val pack: PartnershipPack,
     ) : NotificationVariables {
         override val usageName: String = "new_partnership"
 
@@ -31,7 +31,7 @@ sealed interface NotificationVariables {
         override val language: String,
         override val event: Event,
         override val company: Company,
-        val pack: SponsoringPack,
+        val pack: PartnershipPack,
     ) : NotificationVariables {
         override val usageName: String = "new_suggestion"
 
@@ -72,7 +72,7 @@ sealed interface NotificationVariables {
         override val language: String,
         override val event: Event,
         override val company: Company,
-        val pack: SponsoringPack,
+        val pack: PartnershipPack,
     ) : NotificationVariables {
         override val usageName: String = "partnership_validated"
 
