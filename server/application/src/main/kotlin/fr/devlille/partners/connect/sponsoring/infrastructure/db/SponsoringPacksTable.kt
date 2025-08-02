@@ -9,5 +9,6 @@ object SponsoringPacksTable : UUIDTable("sponsoring_packs") {
     val eventId = uuid("event_id").references(EventsTable.id)
     val name = varchar("name", 255)
     val basePrice = integer("base_price")
+    val withBooth = bool("with_booth").default(false)
     val maxQuantity = integer("max_quantity").nullable()
 }
