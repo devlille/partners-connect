@@ -13,9 +13,9 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipSuggestionRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
 import fr.devlille.partners.connect.partnership.domain.SuggestPartnership
-import fr.devlille.partners.connect.sponsoring.domain.PackRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
+import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -29,7 +29,6 @@ import kotlin.getValue
 @Suppress("ThrowsCount")
 fun Route.partnershipRoutes() {
     val eventRepository by inject<EventRepository>()
-    val packRepository by inject<PackRepository>()
     val companyRepository by inject<CompanyRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
     val notificationRepository by inject<NotificationRepository>()
@@ -41,7 +40,9 @@ fun Route.partnershipRoutes() {
             val register = call.receive<RegisterPartnership>()
             val id = partnershipRepository.register(eventId, companyId, register)
             val company = companyRepository.getById(companyId)
-            val pack = packRepository.getById(eventId, register.packId.toUUID(), register.language)
+            val partnership = partnershipRepository.getById(eventId, id)
+            val pack = partnership.selectedPack
+                ?: throw NotFoundException("Partnership does not have a selected pack")
             val event = eventRepository.getById(eventId)
             val variables = NotificationVariables.NewPartnership(register.language, event, company, pack)
             notificationRepository.sendMessage(eventId, variables)
@@ -93,7 +94,6 @@ fun Route.partnershipRoutes() {
 @Suppress("ThrowsCount")
 fun Route.partnershipSuggestionRoutes() {
     val eventRepository by inject<EventRepository>()
-    val packRepository by inject<PackRepository>()
     val companyRepository by inject<CompanyRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
     val suggestionRepository by inject<PartnershipSuggestionRepository>()
@@ -110,7 +110,9 @@ fun Route.partnershipSuggestionRoutes() {
                     ?: throw BadRequestException("Missing partnership id")
                 val input = call.receive<SuggestPartnership>()
                 val id = suggestionRepository.suggest(eventId, companyId, partnershipId, input)
-                val pack = packRepository.getById(eventId, input.packId.toUUID(), input.language)
+                val partnership = partnershipRepository.getById(eventId, id)
+                val pack = partnership.suggestionPack
+                    ?: throw NotFoundException("Partnership does not have a suggestion pack")
                 val company = companyRepository.getById(companyId)
                 val event = eventRepository.getById(eventId)
                 val variables = NotificationVariables.NewSuggestion(input.language, event, company, pack)

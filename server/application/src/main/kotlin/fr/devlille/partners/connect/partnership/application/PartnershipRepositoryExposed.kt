@@ -3,6 +3,7 @@ package fr.devlille.partners.connect.partnership.application
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
+import fr.devlille.partners.connect.partnership.application.mappers.toDomain
 import fr.devlille.partners.connect.partnership.domain.Partnership
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
@@ -10,15 +11,14 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEma
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.listByPartnershipAndPack
 import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndCompany
 import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndPartnership
-import fr.devlille.partners.connect.sponsoring.application.mappers.toDomain
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionalOptionsByPack
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionsByPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listTranslationsByOptionAndLanguage
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.singlePackById
 import io.ktor.server.plugins.BadRequestException
@@ -41,8 +41,7 @@ class PartnershipRepositoryExposed(
             ?: throw NotFoundException("Event $eventId not found")
         CompanyEntity.findById(companyId)
             ?: throw NotFoundException("Company $companyId not found")
-        val packUUID = register.packId.toUUID()
-        packEntity.findById(packUUID)
+        val pack = packEntity.findById(register.packId.toUUID())
             ?: throw NotFoundException("Pack ${register.packId} not found")
 
         val existing = partnershipEntity.singleByEventAndCompany(eventId, companyId)
@@ -53,7 +52,7 @@ class PartnershipRepositoryExposed(
         val partnership = PartnershipEntity.new {
             this.eventId = eventId
             this.companyId = companyId
-            selectedPackId = packUUID
+            selectedPackId = pack.id.value
             language = register.language
             phone = register.phone
         }
@@ -66,7 +65,7 @@ class PartnershipRepositoryExposed(
         }
 
         val optionalOptionIds = packOptionTable
-            .listOptionalOptionsByPack(packUUID)
+            .listOptionalOptionsByPack(pack.id.value)
             .map { it[PackOptionsTable.option].value }
 
         val optionsUUID = register.optionIds.map { it.toUUID() }
@@ -77,7 +76,7 @@ class PartnershipRepositoryExposed(
         }
 
         optionsUUID.forEach {
-            SponsoringOptionEntity.findById(it) ?: throw NotFoundException("Option $it not found")
+            val option = SponsoringOptionEntity.findById(it) ?: throw NotFoundException("Option $it not found")
 
             val noTranslations = translationEntity
                 .listTranslationsByOptionAndLanguage(it, register.language)
@@ -88,7 +87,8 @@ class PartnershipRepositoryExposed(
             }
             PartnershipOptionEntity.new {
                 this.partnership = partnership
-                this.optionId = it
+                this.packId = pack.id
+                this.optionId = option.id
             }
         }
 
@@ -104,28 +104,20 @@ class PartnershipRepositoryExposed(
             emails = PartnershipEmailEntity
                 .find { PartnershipEmailsTable.partnershipId eq partnership.id }
                 .map { it.email },
-            selectedPack = partnership.selectedPackId?.let {
-                val pack = packEntity.singlePackById(eventId, it)
+            selectedPack = partnership.selectedPackId?.let { packId ->
+                val pack = packEntity.singlePackById(eventId, packId)
                 pack.toDomain(
                     language = partnership.language,
-                    requiredOptionIds = PackOptionsTable.listOptionsByPack(it)
-                        .filter { it[PackOptionsTable.required] }
-                        .map { it[PackOptionsTable.option].value },
-                    optionalOptions = PackOptionsTable.listOptionsByPack(it)
-                        .filterNot { it[PackOptionsTable.required] }
-                        .map { it[PackOptionsTable.option].value },
+                    optionIds = PartnershipOptionEntity.listByPartnershipAndPack(partnershipId, packId)
+                        .map { it.id.value },
                 )
             },
-            suggestionPack = partnership.suggestionPackId?.let {
-                val pack = packEntity.singlePackById(eventId, it)
+            suggestionPack = partnership.suggestionPackId?.let { packId ->
+                val pack = packEntity.singlePackById(eventId, packId)
                 pack.toDomain(
                     language = partnership.language,
-                    requiredOptionIds = PackOptionsTable.listOptionsByPack(it)
-                        .filter { it[PackOptionsTable.required] }
-                        .map { it[PackOptionsTable.option].value },
-                    optionalOptions = PackOptionsTable.listOptionsByPack(it)
-                        .filterNot { it[PackOptionsTable.required] }
-                        .map { it[PackOptionsTable.option].value },
+                    optionIds = PartnershipOptionEntity.listByPartnershipAndPack(partnershipId, packId)
+                        .map { it.id.value },
                 )
             },
         )
