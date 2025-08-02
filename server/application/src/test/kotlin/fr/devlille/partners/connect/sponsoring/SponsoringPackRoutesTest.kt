@@ -1,6 +1,6 @@
 package fr.devlille.partners.connect.sponsoring
 
-import fr.devlille.partners.connect.internal.insertMockedAdminUser
+import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.internal.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.sponsoring.domain.AttachOptionsToPack
@@ -37,7 +37,7 @@ class SponsoringPackRoutesTest {
         val eventId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
         }
 
         val response = client.get("/events/$eventId/packs") {
@@ -54,7 +54,7 @@ class SponsoringPackRoutesTest {
         val eventId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
         }
 
         val body = CreateSponsoringPack(
@@ -88,7 +88,7 @@ class SponsoringPackRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
             transaction {
                 repeat(2) {
                     SponsoringPackEntity.new {
@@ -117,7 +117,7 @@ class SponsoringPackRoutesTest {
         val eventId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
         }
 
         val response = client.get("/events/$eventId/packs") {
@@ -134,7 +134,7 @@ class SponsoringPackRoutesTest {
         val optionId2 = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
             transaction {
                 SponsoringPackEntity.new(packId) {
                     this.eventId = eventId
@@ -194,7 +194,7 @@ class SponsoringPackRoutesTest {
         val eventId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
         }
 
         val attachRequest = AttachOptionsToPack(required = emptyList(), optional = emptyList())
@@ -215,7 +215,7 @@ class SponsoringPackRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
         }
 
         val response = client.post("/events/$eventId/packs/$packId/options") {
@@ -242,7 +242,7 @@ class SponsoringPackRoutesTest {
         val packId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
             transaction {
                 val option = SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId
@@ -290,7 +290,7 @@ class SponsoringPackRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
             insertMockedEvent(otherEventId)
 
             transaction {
@@ -350,7 +350,7 @@ class SponsoringPackRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
             transaction {
                 SponsoringPackEntity.new(packId) {
                     this.eventId = eventId

@@ -1,12 +1,12 @@
 package fr.devlille.partners.connect.events.application
 
-import fr.devlille.partners.connect.events.domain.Banking
 import fr.devlille.partners.connect.events.domain.Contact
 import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventSummary
-import fr.devlille.partners.connect.events.domain.Legal
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
+import fr.devlille.partners.connect.legaentity.infrastructure.db.LegalEntityEntity
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -39,51 +39,30 @@ class EventRepositoryExposed(
             submissionEndTime = event.submissionEndTime,
             address = event.address,
             contact = Contact(phone = event.contactPhone, email = event.contactEmail),
-            legal = Legal(
-                name = event.legalName,
-                siret = event.siret,
-                siren = event.siren,
-                tva = event.tva,
-                dAndB = event.dAndB,
-                nace = event.nace,
-                naf = event.naf,
-                duns = event.duns,
-            ),
-            banking = Banking(
-                iban = event.iban,
-                bic = event.bic,
-                ribUrl = event.ribUrl,
-            ),
+            legalEntityId = event.legalEntity.id.value.toString(),
         )
     }
 
     override fun createEvent(event: Event): UUID = transaction {
+        val legalEntity = LegalEntityEntity.findById(event.legalEntityId.toUUID())
+            ?: throw NotFoundException("Legal entity with id ${event.legalEntityId} not found")
         entity.new {
-            name = event.name
-            startTime = event.startTime
-            endTime = event.endTime
-            submissionStartTime = event.submissionStartTime
-            submissionEndTime = event.submissionEndTime
-            address = event.address
-            contactPhone = event.contact.phone
-            contactEmail = event.contact.email
-            legalName = event.legal?.name
-            siret = event.legal?.siret
-            siren = event.legal?.siren
-            tva = event.legal?.tva
-            dAndB = event.legal?.dAndB
-            nace = event.legal?.nace
-            naf = event.legal?.naf
-            duns = event.legal?.duns
-            iban = event.banking?.iban
-            bic = event.banking?.bic
-            ribUrl = event.banking?.ribUrl
+            this.name = event.name
+            this.startTime = event.startTime
+            this.endTime = event.endTime
+            this.submissionStartTime = event.submissionStartTime
+            this.submissionEndTime = event.submissionEndTime
+            this.address = event.address
+            this.contactPhone = event.contact.phone
+            this.contactEmail = event.contact.email
+            this.legalEntity = legalEntity
         }.id.value
     }
 
     override fun updateEvent(id: UUID, event: Event): UUID = transaction {
+        val legalEntity = LegalEntityEntity.findById(event.legalEntityId.toUUID())
+            ?: throw NotFoundException("Legal entity with id ${event.legalEntityId} not found")
         val entity = entity.findById(id) ?: throw IllegalArgumentException("Event not found")
-
         entity.name = event.name
         entity.startTime = event.startTime
         entity.endTime = event.endTime
@@ -92,18 +71,7 @@ class EventRepositoryExposed(
         entity.address = event.address
         entity.contactPhone = event.contact.phone
         entity.contactEmail = event.contact.email
-        entity.legalName = event.legal?.name
-        entity.siret = event.legal?.siret
-        entity.siren = event.legal?.siren
-        entity.tva = event.legal?.tva
-        entity.dAndB = event.legal?.dAndB
-        entity.nace = event.legal?.nace
-        entity.naf = event.legal?.naf
-        entity.duns = event.legal?.duns
-        entity.iban = event.banking?.iban
-        entity.bic = event.banking?.bic
-        entity.ribUrl = event.banking?.ribUrl
-
+        entity.legalEntity = legalEntity
         entity.id.value
     }
 }

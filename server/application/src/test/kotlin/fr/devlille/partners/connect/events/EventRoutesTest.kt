@@ -1,8 +1,8 @@
 package fr.devlille.partners.connect.events
 
+import fr.devlille.partners.connect.internal.insertLegalEntity
 import fr.devlille.partners.connect.internal.insertMockedAdminUser
 import fr.devlille.partners.connect.internal.insertMockedEvent
-import fr.devlille.partners.connect.internal.insertMockedUser
 import fr.devlille.partners.connect.internal.moduleMocked
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -23,7 +23,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 class EventRoutesTest {
-    private val testEventJson = """
+    private fun testEvent(legalEntityId: String) = """
         {
             "name": "DevLille 2025",
             "start_time": "2025-06-12T09:00:00",
@@ -35,35 +35,22 @@ class EventRoutesTest {
                 "phone": "+33 6 12 34 56 78",
                 "email": "contact@devlille.fr"
             },
-            "legal": {
-                "name": "DevLille Org",
-                "siret": "12345678900019",
-                "siren": "123456789",
-                "tva": "FR123456789",
-                "d_and_b": "123456789",
-                "nace": "62.01Z",
-                "naf": "62.01Z",
-                "duns": "987654321"
-            },
-            "banking": {
-                "iban": "FR7630006000011234567890189",
-                "bic": "AGRIFRPPXXX",
-                "rib_url": "https://example.com/rib.pdf"
-            }
+            "legal_entity_id": "$legalEntityId"
         }
     """
 
     @Test
     fun `POST creates an event and grants access to creator`() = testApplication {
+        val legalEntityId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockedAdminUser(UUID.randomUUID())
+            insertLegalEntity(id = legalEntityId, representativeUser = insertMockedAdminUser())
         }
 
         val response = client.post("/events") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(testEventJson)
+            setBody(testEvent(legalEntityId.toString()))
         }
 
         assertEquals(HttpStatusCode.Created, response.status)
@@ -74,15 +61,16 @@ class EventRoutesTest {
 
     @Test
     fun `PUT updates an existing event`() = testApplication {
+        val legalEntityId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockedAdminUser(UUID.randomUUID())
+            insertLegalEntity(id = legalEntityId, representativeUser = insertMockedAdminUser())
         }
 
         val createResponse = client.post("/events") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(testEventJson)
+            setBody(testEvent(legalEntityId.toString()))
         }
 
         val responseBody = Json.decodeFromString<Map<String, String>>(createResponse.bodyAsText())
@@ -92,7 +80,7 @@ class EventRoutesTest {
         val updateResponse = client.put("/events/$createdId") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(testEventJson)
+            setBody(testEvent(legalEntityId.toString()))
         }
 
         assertEquals(HttpStatusCode.OK, updateResponse.status)
@@ -102,18 +90,21 @@ class EventRoutesTest {
 
     @Test
     fun `PUT returns 401 when user has no access to the event`() = testApplication {
+        val legalEntityId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEvent(eventId)
-            insertMockedUser()
+            insertMockedEvent(
+                eventId,
+                legalEntity = insertLegalEntity(id = legalEntityId, representativeUser = insertMockedAdminUser()),
+            )
         }
 
         val updateResponse = client.put("/events/$eventId") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(testEventJson)
+            setBody(testEvent(legalEntityId.toString()))
         }
 
         assertEquals(HttpStatusCode.Unauthorized, updateResponse.status)
@@ -121,16 +112,17 @@ class EventRoutesTest {
 
     @Test
     fun `GET returns all events`() = testApplication {
+        val legalEntityId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertLegalEntity(id = legalEntityId, representativeUser = insertMockedAdminUser())
         }
 
         client.post("/events") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(testEventJson)
+            setBody(testEvent(legalEntityId.toString()))
         }
 
         val response = client.get("/events")

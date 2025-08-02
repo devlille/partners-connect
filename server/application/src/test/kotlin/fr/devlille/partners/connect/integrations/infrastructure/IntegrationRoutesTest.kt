@@ -1,7 +1,7 @@
 package fr.devlille.partners.connect.integrations.infrastructure
 
 import fr.devlille.partners.connect.integrations.domain.CreateIntegration
-import fr.devlille.partners.connect.internal.insertMockedAdminUser
+import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.internal.moduleMocked
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -25,7 +25,7 @@ class IntegrationRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
         }
 
         val requestBody = Json.encodeToString(
@@ -52,7 +52,7 @@ class IntegrationRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
         }
 
         val response = client.post("/events/$eventId/integrations/slack/invalid_usage") {
@@ -71,7 +71,7 @@ class IntegrationRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedAdminUser(eventId)
+            insertMockedEventWithAdminUser(eventId)
         }
 
         val response = client.post("/events/$eventId/integrations/invalid_provider/notification") {
