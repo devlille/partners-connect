@@ -32,8 +32,10 @@ class CompanyRepositoryExposed(
     override fun createOrUpdate(input: CreateCompany): UUID = transaction {
         val company = companyEntity.new {
             name = input.name
-            description = input.description
             siteUrl = input.siteUrl
+            headOffice = input.headOffice
+            siret = input.siret
+            description = input.description
         }
 
         companySocialEntity.deleteAllByCompanyId(company.id.value)

@@ -10,6 +10,8 @@ internal fun CompanyEntity.toDomain(): Company {
     return Company(
         id = id.value.toString(),
         name = name,
+        headOffice = headOffice,
+        siret = siret,
         description = description,
         siteUrl = siteUrl,
         medias = if (hasMedia) {

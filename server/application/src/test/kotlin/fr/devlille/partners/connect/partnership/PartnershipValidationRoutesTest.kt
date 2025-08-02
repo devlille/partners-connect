@@ -1,6 +1,6 @@
 package fr.devlille.partners.connect.partnership
 
-import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
+import fr.devlille.partners.connect.internal.insertMockCompany
 import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
@@ -30,11 +30,8 @@ class PartnershipValidationRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
+            insertMockCompany(companyId)
             transaction {
-                CompanyEntity.new(companyId) {
-                    name = "Company X"
-                    siteUrl = "https://companyx.com"
-                }
                 SponsoringPackEntity.new(packId) {
                     this.eventId = eventId
                     name = "Gold"
@@ -88,11 +85,8 @@ class PartnershipValidationRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
+            insertMockCompany(companyId)
             transaction {
-                CompanyEntity.new(companyId) {
-                    name = "Company Y"
-                    siteUrl = "https://companyy.com"
-                }
                 PartnershipEntity.new(partnershipId) {
                     this.eventId = eventId
                     this.companyId = companyId
