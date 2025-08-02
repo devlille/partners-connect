@@ -3,9 +3,9 @@ package fr.devlille.partners.connect.companies
 import fr.devlille.partners.connect.companies.domain.CreateCompany
 import fr.devlille.partners.connect.companies.domain.Social
 import fr.devlille.partners.connect.companies.domain.SocialType
-import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Upload
+import fr.devlille.partners.connect.internal.insertMockCompany
 import fr.devlille.partners.connect.internal.moduleMocked
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
@@ -59,6 +59,8 @@ class CompanyRoutesTest {
         val input = CreateCompany(
             name = "DevLille",
             siteUrl = "https://devlille.fr",
+            headOffice = "Lille, France",
+            siret = "12345678901234",
             description = "Lille Developer Community",
             socials = listOf(Social(SocialType.LINKEDIN, "https://linkedin.com/devlille")),
         )
@@ -94,13 +96,7 @@ class CompanyRoutesTest {
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            transaction {
-                CompanyEntity.new(companyId) {
-                    name = "DevLille"
-                    siteUrl = "https://devlille.fr"
-                    description = "Dev community"
-                }
-            }
+            insertMockCompany(companyId)
         }
 
         val response = client.submitFormWithBinaryData(
@@ -128,13 +124,7 @@ class CompanyRoutesTest {
         val companyId = UUID.randomUUID()
         application {
             moduleMocked()
-            transaction {
-                CompanyEntity.new(companyId) {
-                    name = "Unsupported Co"
-                    siteUrl = "https://unsupported.example"
-                    description = null
-                }
-            }
+            insertMockCompany(companyId)
         }
 
         val response = client.submitFormWithBinaryData(
@@ -161,11 +151,7 @@ class CompanyRoutesTest {
             moduleMocked()
             transaction {
                 listOf("Zeta", "Alpha", "Beta").forEach {
-                    CompanyEntity.new(UUID.randomUUID()) {
-                        name = it
-                        siteUrl = "https://$it.com"
-                        description = it
-                    }
+                    insertMockCompany(name = it, description = it)
                 }
             }
         }

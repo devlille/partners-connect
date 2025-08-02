@@ -13,6 +13,8 @@ class CompanyEntity(id: EntityID<UUID>) : UUIDEntity(id) {
 
     var name by CompaniesTable.name
     var description by CompaniesTable.description
+    var headOffice by CompaniesTable.headOffice
+    var siret by CompaniesTable.siret
     var siteUrl by CompaniesTable.siteUrl
     var logoUrlOriginal by CompaniesTable.logoUrlOriginal
     var logoUrl1000 by CompaniesTable.logoUrl1000

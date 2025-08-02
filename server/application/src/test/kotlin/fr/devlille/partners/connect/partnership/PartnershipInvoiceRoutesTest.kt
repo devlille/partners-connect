@@ -3,10 +3,10 @@ package fr.devlille.partners.connect.partnership
 import fr.devlille.partners.connect.companies.domain.Address
 import fr.devlille.partners.connect.companies.domain.CompanyInvoice
 import fr.devlille.partners.connect.companies.domain.Contact
-import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
+import fr.devlille.partners.connect.internal.insertMockCompany
 import fr.devlille.partners.connect.internal.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceEntity
@@ -60,13 +60,8 @@ class PartnershipInvoiceRoutesTest {
         application {
             moduleMocked()
             val event = insertMockedEvent(eventId)
+            val company = insertMockCompany(companyId)
             transaction {
-                val company = CompanyEntity.new(companyId) {
-                    name = "DevLille"
-                    siteUrl = "https://devlille.fr"
-                    description = "Dev community"
-                }
-
                 InvoiceEntity.new {
                     this.event = event
                     this.company = company
@@ -103,13 +98,7 @@ class PartnershipInvoiceRoutesTest {
         application {
             moduleMocked()
             insertMockedEvent(eventId)
-            transaction {
-                CompanyEntity.new(companyId) {
-                    name = "DevLille"
-                    siteUrl = "https://devlille.fr"
-                    description = "Dev community"
-                }
-            }
+            insertMockCompany(companyId)
         }
 
         val response = client.get("/events/$eventId/companies/$companyId/partnership/$partnershipId/invoice")
@@ -127,12 +116,8 @@ class PartnershipInvoiceRoutesTest {
         application {
             moduleMocked()
             insertMockedEvent(eventId)
+            insertMockCompany(companyId)
             transaction {
-                CompanyEntity.new(companyId) {
-                    name = "DevLille"
-                    siteUrl = "https://devlille.fr"
-                    description = "Dev community"
-                }
                 PartnershipEntity.new(partnershipId) {
                     this.eventId = eventId
                     this.companyId = companyId
@@ -165,12 +150,8 @@ class PartnershipInvoiceRoutesTest {
         application {
             moduleMocked()
             val event = insertMockedEvent(eventId)
+            val company = insertMockCompany(companyId)
             transaction {
-                val company = CompanyEntity.new(companyId) {
-                    name = "DevLille"
-                    siteUrl = "https://devlille.fr"
-                    description = "Dev community"
-                }
                 PartnershipEntity.new(partnershipId) {
                     this.eventId = eventId
                     this.companyId = companyId

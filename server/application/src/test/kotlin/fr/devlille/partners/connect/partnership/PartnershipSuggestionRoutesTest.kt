@@ -1,6 +1,6 @@
 package fr.devlille.partners.connect.partnership
 
-import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
+import fr.devlille.partners.connect.internal.insertMockCompany
 import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.domain.SuggestPartnership
@@ -39,11 +39,8 @@ class PartnershipSuggestionRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
+            insertMockCompany(companyId)
             transaction {
-                CompanyEntity.new(companyId) {
-                    this.name = "Company X"
-                    this.siteUrl = "https://companyx.com"
-                }
                 SponsoringPackEntity.new(packId) {
                     this.eventId = eventId
                     name = "Gold"
@@ -119,12 +116,8 @@ class PartnershipSuggestionRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
-
+            insertMockCompany(companyId)
             transaction {
-                CompanyEntity.new(companyId) {
-                    this.name = "Company X"
-                    this.siteUrl = "https://companyx.com"
-                }
                 PartnershipEntity.new(partnershipId) {
                     this.eventId = eventId
                     this.companyId = companyId
@@ -153,12 +146,9 @@ class PartnershipSuggestionRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
+            insertMockCompany(companyId)
 
             transaction {
-                CompanyEntity.new(companyId) {
-                    this.name = "Company X"
-                    this.siteUrl = "https://companyx.com"
-                }
                 SponsoringPackEntity.new(packId) {
                     this.eventId = eventId
                     name = "Gold"
@@ -212,12 +202,8 @@ class PartnershipSuggestionRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
-
+            insertMockCompany(companyId)
             transaction {
-                CompanyEntity.new(companyId) {
-                    this.name = "Company X"
-                    this.siteUrl = "https://companyx.com"
-                }
                 SponsoringPackEntity.new(packId) {
                     this.eventId = eventId
                     name = "Gold"

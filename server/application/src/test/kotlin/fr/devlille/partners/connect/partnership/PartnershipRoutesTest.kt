@@ -1,6 +1,6 @@
 package fr.devlille.partners.connect.partnership
 
-import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
+import fr.devlille.partners.connect.internal.insertMockCompany
 import fr.devlille.partners.connect.internal.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
@@ -35,11 +35,8 @@ class PartnershipRoutesTest {
         application {
             moduleMocked()
             insertMockedEvent(eventId)
+            insertMockCompany(companyId)
             transaction {
-                CompanyEntity.new(companyId) {
-                    this.name = "Company X"
-                    this.siteUrl = "https://companyx.com"
-                }
                 SponsoringPackEntity.new(packId) {
                     this.eventId = eventId
                     this.name = "Gold"
@@ -135,11 +132,8 @@ class PartnershipRoutesTest {
         application {
             moduleMocked()
             insertMockedEvent(eventId)
+            insertMockCompany(companyId)
             transaction {
-                CompanyEntity.new(companyId) {
-                    this.name = "Company X"
-                    this.siteUrl = "https://companyx.com"
-                }
                 SponsoringPackEntity.new(packId) {
                     this.eventId = eventId
                     this.name = "Silver"
@@ -177,11 +171,8 @@ class PartnershipRoutesTest {
         application {
             moduleMocked()
             insertMockedEvent(eventId)
+            insertMockCompany(companyId)
             transaction {
-                CompanyEntity.new(companyId) {
-                    this.name = "Company X"
-                    this.siteUrl = "https://companyx.com"
-                }
                 SponsoringPackEntity.new(packId) {
                     this.eventId = eventId
                     this.name = "Bronze"
@@ -223,11 +214,8 @@ class PartnershipRoutesTest {
         application {
             moduleMocked()
             insertMockedEvent(eventId)
+            insertMockCompany(companyId)
             transaction {
-                CompanyEntity.new(companyId) {
-                    this.name = "Company X"
-                    this.siteUrl = "https://companyx.com"
-                }
                 SponsoringPackEntity.new(packId) {
                     this.eventId = eventId
                     this.name = "Diamond"
