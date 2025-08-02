@@ -13,6 +13,7 @@ class SponsoringPackEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var eventId by SponsoringPacksTable.eventId
     var name by SponsoringPacksTable.name
     var basePrice by SponsoringPacksTable.basePrice
+    var withBooth by SponsoringPacksTable.withBooth
     var maxQuantity by SponsoringPacksTable.maxQuantity
     val options by SponsoringOptionEntity via PackOptionsTable
 }

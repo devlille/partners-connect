@@ -50,6 +50,7 @@ class PackRepositoryExposed(
             this.eventId = eventId
             this.name = input.name
             this.basePrice = input.price
+            this.withBooth = input.withBooth
             this.maxQuantity = input.maxQuantity
         }.id.value
     }
