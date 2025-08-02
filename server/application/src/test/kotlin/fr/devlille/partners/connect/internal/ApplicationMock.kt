@@ -9,6 +9,7 @@ import fr.devlille.partners.connect.internal.infrastructure.bindings.storageModu
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
 import fr.devlille.partners.connect.invoices.domain.InvoiceGateway
 import fr.devlille.partners.connect.invoices.infrastructure.bindings.invoicesModule
+import fr.devlille.partners.connect.legaentity.infrastructure.bindings.legalEntityModule
 import fr.devlille.partners.connect.module
 import fr.devlille.partners.connect.notifications.infrastructure.bindings.notificationModule
 import fr.devlille.partners.connect.partnership.infrastructure.bindings.partnershipModule
@@ -42,6 +43,7 @@ fun Application.moduleMocked(
             networkClientModule,
             storageModule,
             authModule,
+            legalEntityModule,
             eventModule,
             userModule,
             sponsoringModule,

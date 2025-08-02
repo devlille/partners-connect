@@ -23,6 +23,9 @@ import fr.devlille.partners.connect.internal.infrastructure.bindings.networkEngi
 import fr.devlille.partners.connect.internal.infrastructure.bindings.storageModule
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.invoices.infrastructure.bindings.invoicesModule
+import fr.devlille.partners.connect.legaentity.infrastructure.api.legalEntityRoutes
+import fr.devlille.partners.connect.legaentity.infrastructure.bindings.legalEntityModule
+import fr.devlille.partners.connect.legaentity.infrastructure.db.LegalEntitiesTable
 import fr.devlille.partners.connect.notifications.infrastructure.bindings.notificationModule
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipInvoiceRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipRoutes
@@ -88,6 +91,7 @@ fun Application.module(
         networkClientModule,
         storageModule,
         authModule,
+        legalEntityModule,
         eventModule,
         userModule,
         sponsoringModule,
@@ -122,6 +126,7 @@ fun Application.module(
         route("auth") {
             authRoutes { redirects[it] }
         }
+        legalEntityRoutes()
         route("events") {
             eventRoutes()
         }
@@ -149,6 +154,8 @@ private fun configureDatabase(url: String, driver: String, user: String, passwor
             SlackIntegrationsTable,
             MailjetIntegrationsTable,
             QontoIntegrationsTable,
+            // legal entities
+            LegalEntitiesTable,
             // events
             EventsTable,
             // users
