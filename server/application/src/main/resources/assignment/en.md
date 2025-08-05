@@ -9,7 +9,7 @@ Represented by **{{legalEntity.representative.name}}** , in the condition of **{
 as one of the Parties,
 
 and **{{company.name}}** here referred as the Partner (register number: {{company.siret}}) with head-quarters located 
-at **{{company.headOffice}}**. Represented by **{{company.contact.name}}**, **{{company.contact.role}}**.
+at **{{company.headOffice}}**. Represented by **{{partnership.contact.name}}**, **{{partnership.contact.role}}**.
 
 **It has been decided and agreed-upon the following terms:**
 

@@ -13,6 +13,8 @@ object PartnershipsTable : UUIDTable("partnerships") {
     val eventId = uuid("event_id").references(EventsTable.id)
     val companyId = uuid("company_id").references(CompaniesTable.id)
     val phone = text("phone").nullable()
+    val contactName = text("contact_name")
+    val contactRole = text("contact_role")
     val language = text("language")
     val assignmentUrl = text("assignment_url").nullable()
     val selectedPackId = uuid("selected_pack_id").references(SponsoringPacksTable.id).nullable()

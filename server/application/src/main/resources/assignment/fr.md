@@ -10,7 +10,7 @@ L'association **{{legalEntity.name}}**, régie par la loi 1901, déclarée à la
 Ci-après "L'Association".
 
 Et d'autre part l'entreprise : **{{company.name}}**, société inscrite sous le n° {{company.siret}}, dont le siège 
-social est **{{company.headOffice}}**. Représentée par **{{company.contact.name}}**, **{{company.contact.role}}**.
+social est **{{company.headOffice}}**. Représentée par **{{partnership.contact.name}}**, **{{partnership.contact.role}}**.
 
 Ci-après "le Partenaire".
 

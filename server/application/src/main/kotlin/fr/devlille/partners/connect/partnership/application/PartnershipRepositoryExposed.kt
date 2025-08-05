@@ -52,9 +52,11 @@ class PartnershipRepositoryExposed(
         val partnership = PartnershipEntity.new {
             this.eventId = eventId
             this.companyId = companyId
-            selectedPackId = pack.id.value
-            language = register.language
-            phone = register.phone
+            this.selectedPackId = pack.id.value
+            this.phone = register.phone
+            this.contactName = register.contactName
+            this.contactRole = register.contactRole
+            this.language = register.language
         }
 
         register.emails.forEach {

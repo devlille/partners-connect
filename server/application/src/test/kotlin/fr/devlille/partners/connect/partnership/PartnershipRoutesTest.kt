@@ -9,7 +9,6 @@ import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
@@ -62,6 +61,8 @@ class PartnershipRoutesTest {
             optionIds = listOf(optionId.toString()),
             language = "en",
             phone = "+33600000000",
+            contactName = "John Doe",
+            contactRole = "Marketing Manager",
             emails = listOf("partner@example.com"),
         )
 
@@ -77,9 +78,16 @@ class PartnershipRoutesTest {
 
     @Test
     fun `POST returns 404 when event not found`() = testApplication {
+        val body = RegisterPartnership(
+            packId = "pack",
+            optionIds = listOf(),
+            contactName = "John Doe",
+            contactRole = "Marketing Manager",
+            language = "en",
+        )
         val response = client.post("/events/${UUID.randomUUID()}/companies/${UUID.randomUUID()}/partnership") {
             contentType(ContentType.Application.Json)
-            setBody(Json.encodeToString(RegisterPartnership.serializer(), RegisterPartnership("pack", listOf(), "en")))
+            setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
         assertEquals(HttpStatusCode.NotFound, response.status)
     }
@@ -92,9 +100,16 @@ class PartnershipRoutesTest {
             insertMockedEvent(eventId)
         }
 
+        val body = RegisterPartnership(
+            packId = "pack",
+            optionIds = listOf(),
+            contactName = "John Doe",
+            contactRole = "Marketing Manager",
+            language = "en",
+        )
         val response = client.post("/events/$eventId/companies/${UUID.randomUUID()}/partnership") {
             contentType(ContentType.Application.Json)
-            setBody(Json.encodeToString(RegisterPartnership.serializer(), RegisterPartnership("pack", listOf(), "en")))
+            setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
         assertEquals(HttpStatusCode.NotFound, response.status)
     }
@@ -108,14 +123,16 @@ class PartnershipRoutesTest {
             insertMockedEvent(eventId)
         }
 
+        val body = RegisterPartnership(
+            packId = UUID.randomUUID().toString(),
+            optionIds = listOf(),
+            contactName = "John Doe",
+            contactRole = "Marketing Manager",
+            language = "en",
+        )
         val response = client.post("/events/$eventId/companies/$companyId/partnership") {
             contentType(ContentType.Application.Json)
-            setBody(
-                Json.encodeToString(
-                    RegisterPartnership.serializer(),
-                    RegisterPartnership(UUID.randomUUID().toString(), listOf(), "en"),
-                ),
-            )
+            setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
         assertEquals(HttpStatusCode.NotFound, response.status)
     }
@@ -133,14 +150,16 @@ class PartnershipRoutesTest {
             insertMockPartnership(eventId, companyId, selectedPackId = packId)
         }
 
+        val body = RegisterPartnership(
+            packId = packId.toString(),
+            optionIds = listOf(),
+            contactName = "John Doe",
+            contactRole = "Marketing Manager",
+            language = "en",
+        )
         val response = client.post("/events/$eventId/companies/$companyId/partnership") {
             contentType(ContentType.Application.Json)
-            setBody(
-                Json.encodeToString(
-                    RegisterPartnership.serializer(),
-                    RegisterPartnership(packId.toString(), listOf(), "en"),
-                ),
-            )
+            setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
         assertEquals(HttpStatusCode.BadRequest, response.status)
     }
@@ -170,14 +189,16 @@ class PartnershipRoutesTest {
             }
         }
 
+        val body = RegisterPartnership(
+            packId = packId.toString(),
+            optionIds = listOf(optionId.toString()),
+            contactName = "John Doe",
+            contactRole = "Marketing Manager",
+            language = "en",
+        )
         val response = client.post("/events/$eventId/companies/$companyId/partnership") {
             contentType(ContentType.Application.Json)
-            setBody(
-                Json.encodeToString(
-                    RegisterPartnership.serializer(),
-                    RegisterPartnership(packId.toString(), listOf(optionId.toString()), "en"),
-                ),
-            )
+            setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
         assertEquals(HttpStatusCode.BadRequest, response.status)
         assertTrue(response.bodyAsText().contains("not optional"))
@@ -208,14 +229,16 @@ class PartnershipRoutesTest {
             }
         }
 
+        val body = RegisterPartnership(
+            packId = packId.toString(),
+            optionIds = listOf(optionId.toString()),
+            contactName = "John Doe",
+            contactRole = "Marketing Manager",
+            language = "fr",
+        )
         val response = client.post("/events/$eventId/companies/$companyId/partnership") {
             contentType(ContentType.Application.Json)
-            setBody(
-                Json.encodeToString(
-                    RegisterPartnership.serializer(),
-                    RegisterPartnership(packId.toString(), listOf(optionId.toString()), "fr"),
-                ),
-            )
+            setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
         assertEquals(HttpStatusCode.BadRequest, response.status)
         assertTrue(response.bodyAsText().contains("does not have a translation"))
