@@ -7,11 +7,11 @@ import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
 import fr.devlille.partners.connect.internal.insertMockCompany
+import fr.devlille.partners.connect.internal.insertMockPartnership
 import fr.devlille.partners.connect.internal.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
-import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.put
@@ -117,12 +117,8 @@ class PartnershipInvoiceRoutesTest {
             moduleMocked()
             insertMockedEvent(eventId)
             insertMockCompany(companyId)
+            insertMockPartnership(eventId, companyId, partnershipId)
             transaction {
-                PartnershipEntity.new(partnershipId) {
-                    this.eventId = eventId
-                    this.companyId = companyId
-                    this.language = "en"
-                }
                 IntegrationsTable.insertAndGetId {
                     it[this.eventId] = eventId
                     it[this.provider] = IntegrationProvider.QONTO
@@ -151,12 +147,8 @@ class PartnershipInvoiceRoutesTest {
             moduleMocked()
             val event = insertMockedEvent(eventId)
             val company = insertMockCompany(companyId)
+            insertMockPartnership(eventId, companyId, partnershipId)
             transaction {
-                PartnershipEntity.new(partnershipId) {
-                    this.eventId = eventId
-                    this.companyId = companyId
-                    this.language = "en"
-                }
                 IntegrationsTable.insertAndGetId {
                     it[this.eventId] = eventId
                     it[this.provider] = IntegrationProvider.QONTO

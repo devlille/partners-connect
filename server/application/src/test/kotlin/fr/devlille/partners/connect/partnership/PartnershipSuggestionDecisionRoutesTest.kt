@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.internal.insertMockCompany
+import fr.devlille.partners.connect.internal.insertMockPartnership
 import fr.devlille.partners.connect.internal.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
@@ -24,13 +25,7 @@ class PartnershipSuggestionDecisionRoutesTest {
             moduleMocked()
             insertMockedEvent(eventId)
             insertMockCompany(companyId)
-            transaction {
-                PartnershipEntity.new(partnerId) {
-                    this.eventId = eventId
-                    this.companyId = companyId
-                    this.language = "en"
-                }
-            }
+            insertMockPartnership(eventId, companyId, partnerId)
         }
 
         val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnerId/suggestion-approve")
@@ -52,13 +47,7 @@ class PartnershipSuggestionDecisionRoutesTest {
             moduleMocked()
             insertMockedEvent(eventId)
             insertMockCompany(companyId)
-            transaction {
-                PartnershipEntity.new(partnerId) {
-                    this.eventId = eventId
-                    this.companyId = companyId
-                    this.language = "en"
-                }
-            }
+            insertMockPartnership(eventId, companyId, partnerId)
         }
 
         val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnerId/suggestion-decline")

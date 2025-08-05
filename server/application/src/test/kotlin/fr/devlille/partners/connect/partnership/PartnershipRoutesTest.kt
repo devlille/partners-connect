@@ -1,10 +1,11 @@
 package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.internal.insertMockCompany
+import fr.devlille.partners.connect.internal.insertMockPartnership
+import fr.devlille.partners.connect.internal.insertMockSponsoringPack
 import fr.devlille.partners.connect.internal.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
-import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
@@ -133,20 +134,8 @@ class PartnershipRoutesTest {
             moduleMocked()
             insertMockedEvent(eventId)
             insertMockCompany(companyId)
-            transaction {
-                SponsoringPackEntity.new(packId) {
-                    this.eventId = eventId
-                    this.name = "Silver"
-                    this.basePrice = 1000
-                    this.maxQuantity = 1
-                }
-                PartnershipEntity.new {
-                    this.eventId = eventId
-                    this.companyId = companyId
-                    this.selectedPackId = packId
-                    this.language = "en"
-                }
-            }
+            insertMockSponsoringPack(packId, eventId)
+            insertMockPartnership(eventId, companyId, selectedPackId = packId)
         }
 
         val response = client.post("/events/$eventId/companies/$companyId/partnership") {

@@ -1,6 +1,8 @@
 package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.internal.insertMockCompany
+import fr.devlille.partners.connect.internal.insertMockPartnership
+import fr.devlille.partners.connect.internal.insertMockSponsoringPack
 import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.domain.SuggestPartnership
@@ -8,7 +10,6 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEnt
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -40,13 +41,9 @@ class PartnershipSuggestionRoutesTest {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
             insertMockCompany(companyId)
+            insertMockSponsoringPack(packId, eventId)
+            insertMockPartnership(eventId, companyId, partnershipId)
             transaction {
-                SponsoringPackEntity.new(packId) {
-                    this.eventId = eventId
-                    name = "Gold"
-                    basePrice = 2000
-                    maxQuantity = 2
-                }
                 val option = SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId
                     this.price = 100
@@ -61,11 +58,6 @@ class PartnershipSuggestionRoutesTest {
                     it[this.pack] = packId
                     it[this.option] = optionId
                     it[this.required] = false
-                }
-                PartnershipEntity.new(partnershipId) {
-                    this.eventId = eventId
-                    this.companyId = companyId
-                    this.language = "en"
                 }
             }
         }
@@ -117,13 +109,7 @@ class PartnershipSuggestionRoutesTest {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
             insertMockCompany(companyId)
-            transaction {
-                PartnershipEntity.new(partnershipId) {
-                    this.eventId = eventId
-                    this.companyId = companyId
-                    this.language = "en"
-                }
-            }
+            insertMockPartnership(eventId, companyId, partnershipId)
         }
 
         val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/suggestion") {
@@ -147,15 +133,9 @@ class PartnershipSuggestionRoutesTest {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
             insertMockCompany(companyId)
-
+            insertMockSponsoringPack(packId, eventId)
+            insertMockPartnership(eventId, companyId, partnershipId)
             transaction {
-                SponsoringPackEntity.new(packId) {
-                    this.eventId = eventId
-                    name = "Gold"
-                    basePrice = 2000
-                    maxQuantity = 2
-                }
-
                 val option = SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId
                     this.price = 100
@@ -171,12 +151,6 @@ class PartnershipSuggestionRoutesTest {
                     it[this.pack] = packId
                     it[this.option] = optionId
                     it[this.required] = true
-                }
-
-                PartnershipEntity.new(partnershipId) {
-                    this.eventId = eventId
-                    this.companyId = companyId
-                    this.language = "en"
                 }
             }
         }
@@ -203,14 +177,9 @@ class PartnershipSuggestionRoutesTest {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
             insertMockCompany(companyId)
+            insertMockSponsoringPack(packId, eventId)
+            insertMockPartnership(eventId, companyId, partnershipId, language = "fr")
             transaction {
-                SponsoringPackEntity.new(packId) {
-                    this.eventId = eventId
-                    name = "Gold"
-                    basePrice = 2000
-                    maxQuantity = 2
-                }
-
                 SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId
                     this.price = 100
@@ -220,12 +189,6 @@ class PartnershipSuggestionRoutesTest {
                     it[this.pack] = packId
                     it[this.option] = optionId
                     it[this.required] = false
-                }
-
-                PartnershipEntity.new(partnershipId) {
-                    this.eventId = eventId
-                    this.companyId = companyId
-                    this.language = "fr"
                 }
             }
         }
