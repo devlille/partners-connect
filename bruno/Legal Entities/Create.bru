@@ -1,0 +1,42 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/legal-entities
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Google Developer Groups Lille (GDG Lille)",
+    "head_office": "74 Rue des Beaux Arts, 59000 Lille",
+    "siret": "12345678900019",
+    "siren": "123456789",
+    "tva": "FR123456789",
+    "d_and_b": "123456789",
+    "nace": "62.01Z",
+    "naf": "62.01Z",
+    "duns": "987654321",
+    "iban": "FR7616958000016086070099689",
+    "bic": "AGRIFRPPXXX",
+    "rib_url": "https://example.com/rib.pdf",
+    "representative_user_email": "gerard@devlille.fr",
+    "representative_role": "President",
+    "creation_location": "Lille",
+    "created_at": "2025-01-01T00:00:00",
+    "published_at": "2025-01-01T00:00:00"
+  }
+}
+
+script:post-response {
+  let data = res.getBody();
+  bru.setEnvVar("legal_entity_id", data.id)
+}

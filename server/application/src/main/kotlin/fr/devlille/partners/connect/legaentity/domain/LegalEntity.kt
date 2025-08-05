@@ -19,6 +19,7 @@ data class LegalEntity(
     val duns: String? = null,
     val iban: String,
     val bic: String,
+    @SerialName("rib_url")
     val ribUrl: String,
     @SerialName("representative_user_email")
     val representativeUserEmail: String,
