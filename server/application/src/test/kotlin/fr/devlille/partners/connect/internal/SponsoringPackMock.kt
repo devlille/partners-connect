@@ -11,7 +11,7 @@ fun insertMockSponsoringPack(
     name: String = "Mock Sponsoring Pack",
     basePrice: Int = 1000,
     withBooth: Boolean = false,
-    maxQuantity: Int = 100,
+    maxQuantity: Int? = 100,
 ): SponsoringPackEntity = transaction {
     SponsoringPackEntity.new(id) {
         this.eventId = eventId

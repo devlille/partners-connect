@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.sponsoring
 
+import fr.devlille.partners.connect.internal.insertMockSponsoringPack
 import fr.devlille.partners.connect.internal.insertMockedEvent
 import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.internal.moduleMocked
@@ -89,15 +90,13 @@ class SponsoringPackRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
-            transaction {
-                repeat(2) {
-                    SponsoringPackEntity.new {
-                        this.eventId = eventId
-                        this.name = "Pack$it"
-                        this.basePrice = 1000 * (it + 1)
-                        this.maxQuantity = 3 + it
-                    }
-                }
+            repeat(2) {
+                insertMockSponsoringPack(
+                    eventId = eventId,
+                    name = "Pack$it",
+                    basePrice = 1000 * (it + 1),
+                    maxQuantity = 3 + it,
+                )
             }
         }
 
@@ -135,14 +134,8 @@ class SponsoringPackRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
+            insertMockSponsoringPack(packId, eventId)
             transaction {
-                SponsoringPackEntity.new(packId) {
-                    this.eventId = eventId
-                    this.name = "Silver"
-                    this.basePrice = 500
-                    this.maxQuantity = 2
-                }
-
                 val option1 = SponsoringOptionEntity.new(optionId1) {
                     this.eventId = eventId
                     this.price = 100
@@ -243,6 +236,7 @@ class SponsoringPackRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
+            insertMockSponsoringPack(packId, eventId)
             transaction {
                 val option = SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId
@@ -253,12 +247,6 @@ class SponsoringPackRoutesTest {
                     this.language = "en"
                     this.name = "Logo on website"
                     this.description = "Visible on all pages"
-                }
-                SponsoringPackEntity.new(packId) {
-                    this.eventId = eventId
-                    this.name = "Gold"
-                    this.basePrice = 500
-                    this.maxQuantity = 3
                 }
             }
         }
@@ -292,15 +280,8 @@ class SponsoringPackRoutesTest {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
             insertMockedEvent(otherEventId)
-
+            insertMockSponsoringPack(packId, eventId)
             transaction {
-                SponsoringPackEntity.new(packId) {
-                    this.eventId = eventId
-                    this.name = "Bronze"
-                    this.basePrice = 200
-                    this.maxQuantity = 3
-                }
-
                 val valid = SponsoringOptionEntity.new(optionValid) {
                     this.eventId = eventId
                     this.price = 100
@@ -351,14 +332,8 @@ class SponsoringPackRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
+            insertMockSponsoringPack(packId, eventId)
             transaction {
-                SponsoringPackEntity.new(packId) {
-                    this.eventId = eventId
-                    this.name = "Gold"
-                    this.basePrice = 800
-                    this.maxQuantity = 1
-                }
-
                 val option = SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId
                     this.price = 300
