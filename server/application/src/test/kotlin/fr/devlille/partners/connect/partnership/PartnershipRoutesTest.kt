@@ -37,13 +37,8 @@ class PartnershipRoutesTest {
             moduleMocked()
             insertMockedEvent(eventId)
             insertMockCompany(companyId)
+            insertMockSponsoringPack(packId, eventId)
             transaction {
-                SponsoringPackEntity.new(packId) {
-                    this.eventId = eventId
-                    this.name = "Gold"
-                    this.basePrice = 2000
-                    this.maxQuantity = 2
-                }
                 SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId
                     this.price = 100
@@ -161,13 +156,8 @@ class PartnershipRoutesTest {
             moduleMocked()
             insertMockedEvent(eventId)
             insertMockCompany(companyId)
+            insertMockSponsoringPack(packId, eventId)
             transaction {
-                SponsoringPackEntity.new(packId) {
-                    this.eventId = eventId
-                    this.name = "Bronze"
-                    this.basePrice = 500
-                    this.maxQuantity = 1
-                }
                 SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId
                     this.price = 200
@@ -204,13 +194,8 @@ class PartnershipRoutesTest {
             moduleMocked()
             insertMockedEvent(eventId)
             insertMockCompany(companyId)
+            insertMockSponsoringPack(packId, eventId)
             transaction {
-                SponsoringPackEntity.new(packId) {
-                    this.eventId = eventId
-                    this.name = "Diamond"
-                    this.basePrice = 10000
-                    this.maxQuantity = 1
-                }
                 SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId
                     this.price = 500

@@ -1,10 +1,10 @@
 package fr.devlille.partners.connect.sponsoring
 
+import fr.devlille.partners.connect.internal.insertMockSponsoringPack
 import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import io.ktor.client.request.delete
 import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
@@ -28,16 +28,11 @@ class SponsoringDeleteRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
+            val pack = insertMockSponsoringPack(packId, eventId, maxQuantity = null)
             transaction {
                 val option = SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId
                     this.price = 100
-                }
-                val pack = SponsoringPackEntity.new(packId) {
-                    this.eventId = eventId
-                    this.name = "Pack A"
-                    this.basePrice = 100
-                    this.maxQuantity = null
                 }
                 PackOptionsTable.insert {
                     it[this.pack] = pack.id
@@ -78,16 +73,11 @@ class SponsoringDeleteRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
+            val pack = insertMockSponsoringPack(eventId = eventId)
             transaction {
                 val option = SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId
                     this.price = 50
-                }
-                val pack = SponsoringPackEntity.new {
-                    this.eventId = eventId
-                    this.name = "Gold"
-                    this.basePrice = 300
-                    this.maxQuantity = null
                 }
                 PackOptionsTable.insert {
                     it[this.pack] = pack.id
@@ -134,16 +124,11 @@ class SponsoringDeleteRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
+            val pack = insertMockSponsoringPack(packId, eventId, maxQuantity = null)
             transaction {
                 val option = SponsoringOptionEntity.new {
                     this.eventId = eventId
                     this.price = 60
-                }
-                val pack = SponsoringPackEntity.new(packId) {
-                    this.eventId = eventId
-                    this.name = "Silver"
-                    this.basePrice = 200
-                    this.maxQuantity = null
                 }
                 PackOptionsTable.insert {
                     it[this.pack] = pack.id
@@ -168,14 +153,7 @@ class SponsoringDeleteRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
-            transaction {
-                SponsoringPackEntity.new(packId) {
-                    this.eventId = eventId
-                    this.name = "Bronze"
-                    this.basePrice = 100
-                    this.maxQuantity = null
-                }
-            }
+            insertMockSponsoringPack(packId, eventId, maxQuantity = null)
         }
 
         val response = client.delete("/events/$eventId/packs/$packId") {
