@@ -13,6 +13,8 @@ class PartnershipEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var eventId by PartnershipsTable.eventId
     var companyId by PartnershipsTable.companyId
     var phone by PartnershipsTable.phone
+    var contactName by PartnershipsTable.contactName
+    var contactRole by PartnershipsTable.contactRole
     var language by PartnershipsTable.language
     var assignmentUrl by PartnershipsTable.assignmentUrl
     var selectedPackId by PartnershipsTable.selectedPackId

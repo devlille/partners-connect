@@ -88,17 +88,11 @@ internal fun EventEntity.toAssignmentEvent(formatter: DateTimeFormat<LocalDate>)
     )
 }
 
-internal fun CompanyEntity.toAssignmentCompany(): Company {
-    return Company(
-        name = this.name,
-        siret = this.siret,
-        headOffice = this.headOffice,
-        contact = Contact(
-            name = "John",
-            role = "Contact Person",
-        ),
-    )
-}
+internal fun CompanyEntity.toAssignmentCompany(): Company = Company(
+    name = this.name,
+    siret = this.siret,
+    headOffice = this.headOffice,
+)
 
 @Suppress("ThrowsCount")
 internal fun PartnershipEntity.toAssignmentPartnership(): Partnership {
@@ -116,6 +110,7 @@ internal fun PartnershipEntity.toAssignmentPartnership(): Partnership {
             Option(name = translation.name)
         },
         hasBooth = pack.withBooth,
+        contact = Contact(name = this.contactName, role = this.contactRole),
     )
 }
 
@@ -154,13 +149,13 @@ class Company(
     val name: String,
     val siret: String,
     val headOffice: String,
-    val contact: Contact,
 )
 
 class Partnership(
     val amount: String,
     val options: List<Option>,
     val hasBooth: Boolean,
+    val contact: Contact,
 )
 
 class Option(

@@ -11,6 +11,8 @@ fun insertMockPartnership(
     companyId: UUID = UUID.randomUUID(),
     partnershipId: UUID = UUID.randomUUID(),
     phone: String? = null,
+    contactName: String = "John Doe",
+    contactRole: String = "Developer",
     language: String = "en",
     assignmentUrl: String? = null,
     selectedPackId: UUID? = null,
@@ -25,6 +27,8 @@ fun insertMockPartnership(
         this.eventId = eventId
         this.companyId = companyId
         this.phone = phone
+        this.contactName = contactName
+        this.contactRole = contactRole
         this.language = language
         this.assignmentUrl = assignmentUrl
         this.selectedPackId = selectedPackId
