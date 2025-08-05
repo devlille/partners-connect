@@ -33,7 +33,7 @@ class LegalEntityRoutesTest {
             "duns": "987654321",
             "iban": "FR7630006000011234567890189",
             "bic": "AGRIFRPPXXX",
-            "ribUrl": "https://example.com/rib.pdf",
+            "rib_url": "https://example.com/rib.pdf",
             "representative_user_email": "${mockedAdminUser.email}",
             "representative_role": "President",
             "creation_location": "Lille",

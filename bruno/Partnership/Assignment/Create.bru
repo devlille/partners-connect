@@ -1,0 +1,41 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/events/:event_id/companies/:company_id/partnership/:partnership_id/assignment
+  body: none
+  auth: none
+}
+
+params:path {
+  partnership_id: {{partnership_id}}
+  company_id: {{company_id}}
+  event_id: {{event_id}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "name": "DuckDuckGo",
+    "po": "P07654",
+    "vat": "FR65827999616",
+    "siret": "32878178601143",
+    "address": {
+      "address": "74 rue des Arts",
+      "city": "Lille",
+      "zip_code": "59800",
+      "country": "FR"
+    },
+    "contact": {
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john.doe@mail.fr"
+    }
+  }
+}
