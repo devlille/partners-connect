@@ -1,10 +1,11 @@
 package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.internal.insertMockCompany
+import fr.devlille.partners.connect.internal.insertMockPartnership
+import fr.devlille.partners.connect.internal.insertMockSponsoringPack
 import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import io.ktor.client.request.delete
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -31,20 +32,8 @@ class PartnershipValidationRoutesTest {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
             insertMockCompany(companyId)
-            transaction {
-                SponsoringPackEntity.new(packId) {
-                    this.eventId = eventId
-                    name = "Gold"
-                    basePrice = 1000
-                    maxQuantity = 5
-                }
-                PartnershipEntity.new(partnershipId) {
-                    this.eventId = eventId
-                    this.companyId = companyId
-                    this.language = "en"
-                    this.selectedPackId = packId
-                }
-            }
+            insertMockSponsoringPack(packId, eventId)
+            insertMockPartnership(eventId, companyId, partnershipId, selectedPackId = packId)
         }
 
         val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/validate") {
@@ -86,13 +75,7 @@ class PartnershipValidationRoutesTest {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
             insertMockCompany(companyId)
-            transaction {
-                PartnershipEntity.new(partnershipId) {
-                    this.eventId = eventId
-                    this.companyId = companyId
-                    this.language = "en"
-                }
-            }
+            insertMockPartnership(eventId, companyId, partnershipId)
         }
 
         val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/decline") {
