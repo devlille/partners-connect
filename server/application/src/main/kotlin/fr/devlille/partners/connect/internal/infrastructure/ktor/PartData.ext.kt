@@ -3,21 +3,20 @@ package fr.devlille.partners.connect.internal.infrastructure.ktor
 import io.ktor.http.content.PartData
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.utils.io.jvm.javaio.toInputStream
-import java.io.File
+import java.io.ByteArrayOutputStream
 
-fun PartData?.asFile(): File {
+fun PartData?.asByteArray(): ByteArray {
     if (this !is PartData.FileItem) {
         throw BadRequestException("PartData is not a file")
     }
     try {
-        val fileName = this.originalFileName ?: "uploaded_file"
-        val file = File(fileName)
+        val output = ByteArrayOutputStream()
         this.provider().toInputStream().use { input ->
-            file.outputStream().buffered().use { output ->
+            output.buffered().use { output ->
                 input.copyTo(output)
             }
         }
-        return file
+        return output.toByteArray()
     } finally {
         this.dispose()
     }

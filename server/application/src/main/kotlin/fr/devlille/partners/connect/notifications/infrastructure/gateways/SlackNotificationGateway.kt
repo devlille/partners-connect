@@ -15,9 +15,13 @@ class SlackNotificationGateway(
     override val provider = IntegrationProvider.SLACK
 
     override fun send(integrationId: UUID, variables: NotificationVariables): Boolean {
-        val config = SlackIntegrationsTable[integrationId]
         val path = "/notifications/${provider.name.lowercase()}/${variables.usageName}/${variables.language}.md"
-        val message = variables.populate(readResourceFile(path))
+        val message = try {
+            variables.populate(readResourceFile(path))
+        } catch (_: IllegalArgumentException) {
+            return false
+        }
+        val config = SlackIntegrationsTable[integrationId]
         val response = slack.methods(config.token).chatPostMessage {
             it.channel(config.channel).text(message)
         }
