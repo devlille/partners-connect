@@ -34,6 +34,16 @@ class MailjetNotificationGateway(
     override fun send(integrationId: UUID, variables: NotificationVariables): Boolean = runBlocking {
         val pathHeader = "/notifications/email/${variables.usageName}/header.${variables.language}.txt"
         val pathContent = "/notifications/email/${variables.usageName}/content.${variables.language}.html"
+        val subject = try {
+            variables.populate(readResourceFile(pathHeader))
+        } catch (_: IllegalArgumentException) {
+            return@runBlocking false
+        }
+        val htmlPart = try {
+            variables.populate(readResourceFile(pathContent))
+        } catch (_: IllegalArgumentException) {
+            return@runBlocking false
+        }
         val config = MailjetIntegrationsTable[integrationId]
         val partnership = PartnershipEntity
             .find { PartnershipsTable.companyId eq variables.company.id.toUUID() }
@@ -47,8 +57,8 @@ class MailjetNotificationGateway(
                 Message(
                     from = Contact(email = variables.event.contact.email, name = variables.event.name),
                     to = emails.map { Contact(email = it.email) },
-                    subject = "[${variables.event.name}] ${variables.populate(readResourceFile(pathHeader))}",
-                    htmlPart = variables.populate(readResourceFile(pathContent)),
+                    subject = "[${variables.event.name}] $subject",
+                    htmlPart = htmlPart,
                 ),
             ),
         )

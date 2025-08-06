@@ -27,7 +27,7 @@ import fr.devlille.partners.connect.legaentity.infrastructure.api.legalEntityRou
 import fr.devlille.partners.connect.legaentity.infrastructure.bindings.legalEntityModule
 import fr.devlille.partners.connect.legaentity.infrastructure.db.LegalEntitiesTable
 import fr.devlille.partners.connect.notifications.infrastructure.bindings.notificationModule
-import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipAssignmentRoutes
+import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipAgreementRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipInvoiceRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipSuggestionRoutes
@@ -134,7 +134,7 @@ fun Application.module(
         userRoutes()
         sponsoringRoutes()
         companyRoutes()
-        partnershipAssignmentRoutes()
+        partnershipAgreementRoutes()
         partnershipInvoiceRoutes()
         partnershipRoutes()
         partnershipSuggestionRoutes()

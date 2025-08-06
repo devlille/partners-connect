@@ -4,7 +4,7 @@ import fr.devlille.partners.connect.companies.domain.CompanyImageProcessingRepos
 import fr.devlille.partners.connect.companies.domain.CompanyMediaRepository
 import fr.devlille.partners.connect.companies.domain.CompanyRepository
 import fr.devlille.partners.connect.companies.domain.CreateCompany
-import fr.devlille.partners.connect.internal.infrastructure.ktor.asFile
+import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -41,10 +41,10 @@ fun Route.companyRoutes() {
             val companyId = call.parameters["companyId"]?.toUUID() ?: throw BadRequestException("Missing company id")
             val multipart = call.receiveMultipart()
             val part = multipart.readPart() ?: throw BadRequestException("Missing file part")
-            val file = part.asFile()
+            val bytes = part.asByteArray()
             val mediaBinaries = when (part.contentType) {
-                ContentType.Image.SVG -> imageProcessingRepository.processSvg(file)
-                ContentType.Image.PNG, ContentType.Image.JPEG -> imageProcessingRepository.processImage(file)
+                ContentType.Image.SVG -> imageProcessingRepository.processSvg(bytes)
+                ContentType.Image.PNG, ContentType.Image.JPEG -> imageProcessingRepository.processImage(bytes)
                 else -> throw BadRequestException("Unsupported file type: ${part.contentType}")
             }
             val media = mediaRepository.upload(companyId.toString(), mediaBinaries)

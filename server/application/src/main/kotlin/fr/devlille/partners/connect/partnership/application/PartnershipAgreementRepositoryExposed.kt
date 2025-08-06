@@ -6,7 +6,7 @@ import fr.devlille.partners.connect.internal.infrastructure.pdf.renderMarkdownTo
 import fr.devlille.partners.connect.internal.infrastructure.resources.readResourceFile
 import fr.devlille.partners.connect.internal.infrastructure.templating.templating
 import fr.devlille.partners.connect.legaentity.infrastructure.db.LegalEntityEntity
-import fr.devlille.partners.connect.partnership.domain.PartnershipAssignmentRepository
+import fr.devlille.partners.connect.partnership.domain.PartnershipAgreementRepository
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.listByPartnershipAndPack
@@ -28,34 +28,45 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.time.Duration.Companion.days
 
-class PartnershipAssignmentRepositoryExposed : PartnershipAssignmentRepository {
+class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
     @OptIn(FormatStringsInDatetimeFormats::class)
-    override fun generateAssignment(eventId: UUID, partnershipId: UUID): ByteArray = transaction {
+    override fun generateAgreement(eventId: UUID, partnershipId: UUID): ByteArray = transaction {
         val event = EventEntity.findById(eventId) ?: throw NotFoundException("Event not found")
         val partnership = PartnershipEntity.findById(partnershipId) ?: throw NotFoundException("Partnership not found")
-        val template = readResourceFile("/assignment/${partnership.language}.md")
+        val template = readResourceFile("/agreement/${partnership.language}.md")
         val formatter = LocalDate.Format { byUnicodePattern("yyyy/MM/dd") }
-        val assignment = Assignment(
-            legalEntity = event.legalEntity.toAssignmentLegalEntity(formatter),
-            event = event.toAssignmentEvent(formatter),
-            company = partnership.company.toAssignmentCompany(),
-            partnership = partnership.toAssignmentPartnership(),
+        val agreement = Agreement(
+            legalEntity = event.legalEntity.toAgreementLegalEntity(formatter),
+            event = event.toAgreementEvent(formatter),
+            company = partnership.company.toAgreementCompany(),
+            partnership = partnership.toAgreementPartnership(),
             createdAt = Clock.System.now().toLocalDateTime(TimeZone.UTC).date.format(formatter),
             location = "Lille, France",
         )
-        val markdown = templating(template, assignment)
+        val markdown = templating(template, agreement)
         renderMarkdownToPdf(markdown)
     }
 
-    override fun updateAssignmentUrl(eventId: UUID, partnershipId: UUID, assignmentUrl: String): UUID = transaction {
+    override fun updateAgreementUrl(eventId: UUID, partnershipId: UUID, agreementUrl: String): UUID = transaction {
         val partnership = PartnershipEntity.singleByEventAndPartnership(eventId, partnershipId)
             ?: throw NotFoundException("Partnership not found")
-        partnership.assignmentUrl = assignmentUrl
+        partnership.agreementUrl = agreementUrl
+        partnership.id.value
+    }
+
+    override fun updateAgreementSignedUrl(
+        eventId: UUID,
+        partnershipId: UUID,
+        agreementSignedUrl: String,
+    ): UUID = transaction {
+        val partnership = PartnershipEntity.singleByEventAndPartnership(eventId, partnershipId)
+            ?: throw NotFoundException("Partnership not found")
+        partnership.agreementSignedUrl = agreementSignedUrl
         partnership.id.value
     }
 }
 
-internal fun LegalEntityEntity.toAssignmentLegalEntity(formatter: DateTimeFormat<LocalDate>): LegalEntity {
+internal fun LegalEntityEntity.toAgreementLegalEntity(formatter: DateTimeFormat<LocalDate>): LegalEntity {
     return LegalEntity(
         name = this.name,
         headOffice = this.headOffice,
@@ -71,7 +82,7 @@ internal fun LegalEntityEntity.toAssignmentLegalEntity(formatter: DateTimeFormat
     )
 }
 
-internal fun EventEntity.toAssignmentEvent(formatter: DateTimeFormat<LocalDate>): Event {
+internal fun EventEntity.toAgreementEvent(formatter: DateTimeFormat<LocalDate>): Event {
     return Event(
         name = this.name,
         paymentDeadline = this.endTime
@@ -88,14 +99,14 @@ internal fun EventEntity.toAssignmentEvent(formatter: DateTimeFormat<LocalDate>)
     )
 }
 
-internal fun CompanyEntity.toAssignmentCompany(): Company = Company(
+internal fun CompanyEntity.toAgreementCompany(): Company = Company(
     name = this.name,
     siret = this.siret,
     headOffice = this.headOffice,
 )
 
 @Suppress("ThrowsCount")
-internal fun PartnershipEntity.toAssignmentPartnership(): Partnership {
+internal fun PartnershipEntity.toAgreementPartnership(): Partnership {
     val pack = this.validatedPack()
         ?: throw NotFoundException("Validated pack not found for partnership")
     val options = PartnershipOptionEntity.listByPartnershipAndPack(this.id.value, pack.id.value)
@@ -112,7 +123,7 @@ internal fun PartnershipEntity.toAssignmentPartnership(): Partnership {
     )
 }
 
-class Assignment(
+class Agreement(
     val legalEntity: LegalEntity,
     val event: Event,
     val company: Company,

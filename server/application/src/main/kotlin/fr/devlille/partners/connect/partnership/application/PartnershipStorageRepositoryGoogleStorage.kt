@@ -8,13 +8,26 @@ import java.util.UUID
 class PartnershipStorageRepositoryGoogleStorage(
     private val storage: Storage,
 ) : PartnershipStorageRepository {
-    override fun uploadAssignment(
+    override fun uploadAgreement(
         eventId: UUID,
         partnershipId: UUID,
         content: ByteArray,
     ): String {
         val uploaded = storage.upload(
-            filename = "events/$eventId/partnerships/$partnershipId/assignment.pdf",
+            filename = "events/$eventId/partnerships/$partnershipId/agreement.pdf",
+            content = content,
+            mimeType = MimeType.PDF,
+        )
+        return uploaded.url
+    }
+
+    override fun uploadSignedAgreement(
+        eventId: UUID,
+        partnershipId: UUID,
+        content: ByteArray,
+    ): String {
+        val uploaded = storage.upload(
+            filename = "events/$eventId/partnerships/$partnershipId/signed-agreement.pdf",
             content = content,
             mimeType = MimeType.PDF,
         )

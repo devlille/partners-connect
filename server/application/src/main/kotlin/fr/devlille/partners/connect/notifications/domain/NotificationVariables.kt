@@ -96,6 +96,17 @@ sealed interface NotificationVariables {
             .replace("{{company_name}}", company.name)
     }
 
+    data class PartnershipAgreementSigned(
+        override val language: String,
+        override val event: Event,
+        override val company: Company,
+    ) : NotificationVariables {
+        override val usageName: String = "partnership_agreement_signed"
+
+        override fun populate(content: String): String = content
+            .replace("{{company_name}}", company.name)
+    }
+
     data class NewInvoice(
         override val language: String,
         override val event: Event,

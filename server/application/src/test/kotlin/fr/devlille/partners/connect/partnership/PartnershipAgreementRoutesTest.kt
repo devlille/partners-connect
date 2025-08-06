@@ -9,9 +9,14 @@ import fr.devlille.partners.connect.internal.insertMockSponsoringPack
 import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.internal.insertMockedUser
 import fr.devlille.partners.connect.internal.moduleMocked
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndPartnership
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
@@ -20,20 +25,21 @@ import io.mockk.mockk
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.koin.dsl.module
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class PartnershipAssignmentRoutesTest {
+class PartnershipAgreementRoutesTest {
     @Test
-    fun `POST generates assignment PDF and returns URL`() = testApplication {
+    fun `POST generates agreement PDF and returns URL`() = testApplication {
         val storage = mockk<Storage>()
         val expectedUrl = "https://example.com/generated.pdf"
         every { storage.upload(any(), any(), any()) } returns Upload(
             bucketName = "bucket",
-            filename = "assignment.pdf",
+            filename = "agreement.pdf",
             url = expectedUrl,
         )
 
@@ -52,7 +58,7 @@ class PartnershipAssignmentRoutesTest {
             )
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/assignment") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -66,7 +72,7 @@ class PartnershipAssignmentRoutesTest {
         val storage = mockk<Storage>()
         every { storage.upload(any(), any(), any()) } returns Upload(
             bucketName = "bucket",
-            filename = "assignment.pdf",
+            filename = "agreement.pdf",
             url = "https://example.com/irrelevant.pdf",
         )
 
@@ -78,7 +84,7 @@ class PartnershipAssignmentRoutesTest {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/assignment") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -90,7 +96,7 @@ class PartnershipAssignmentRoutesTest {
         val storage = mockk<Storage>()
         every { storage.upload(any(), any(), any()) } returns Upload(
             bucketName = "bucket",
-            filename = "assignment.pdf",
+            filename = "agreement.pdf",
             url = "https://example.com/irrelevant.pdf",
         )
 
@@ -103,7 +109,7 @@ class PartnershipAssignmentRoutesTest {
             insertMockedEventWithAdminUser(eventId)
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/assignment") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -115,7 +121,7 @@ class PartnershipAssignmentRoutesTest {
         val storage = mockk<Storage>()
         every { storage.upload(any(), any(), any()) } returns Upload(
             bucketName = "bucket",
-            filename = "assignment.pdf",
+            filename = "agreement.pdf",
             url = "https://example.com/irrelevant.pdf",
         )
 
@@ -129,7 +135,7 @@ class PartnershipAssignmentRoutesTest {
             insertMockCompany(companyId)
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/assignment") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -157,7 +163,7 @@ class PartnershipAssignmentRoutesTest {
             )
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/assignment") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -184,7 +190,7 @@ class PartnershipAssignmentRoutesTest {
             )
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/assignment") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -193,7 +199,7 @@ class PartnershipAssignmentRoutesTest {
     }
 
     @Test
-    fun `POST returns 500 when assignment template for language is missing`() = testApplication {
+    fun `POST returns 500 when agreement template for language is missing`() = testApplication {
         val storage = mockk<Storage>()
         every { storage.upload(any(), any(), any()) } returns Upload("bucket", "file", "https://example.com")
 
@@ -213,11 +219,155 @@ class PartnershipAssignmentRoutesTest {
             )
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/assignment") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
         assertEquals(HttpStatusCode.InternalServerError, response.status)
         assertTrue(response.bodyAsText().contains("Missing resource"))
+    }
+
+    @Test
+    fun `POST upload signed agreement PDF and returns URL`() = testApplication {
+        val storage = mockk<Storage>()
+        val expectedUrl = "https://example.com/signed-generated.pdf"
+        every { storage.upload(any(), any(), any()) } returns Upload(
+            bucketName = "bucket",
+            filename = "signed-agreement.pdf",
+            url = expectedUrl,
+        )
+
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val partnershipId = UUID.randomUUID()
+
+        application {
+            moduleMocked(mockStorage = module { single<Storage> { storage } })
+            insertMockPartnership(
+                id = partnershipId,
+                event = insertMockedEventWithAdminUser(eventId),
+                company = insertMockCompany(companyId),
+                selectedPack = insertMockSponsoringPack(eventId = eventId),
+                validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
+            )
+        }
+
+        val response = client.submitFormWithBinaryData(
+            url = "/events/$eventId/partnership/$partnershipId/signed-agreement",
+            formData = formData {
+                append(
+                    "file",
+                    "some unknown content".toByteArray(),
+                    Headers.build {
+                        append(HttpHeaders.ContentType, "application/pdf")
+                        append(HttpHeaders.ContentDisposition, "filename=signed.pdf")
+                    },
+                )
+            },
+        )
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val body = response.bodyAsText()
+        assertTrue(body.contains(expectedUrl))
+        val partnership = transaction { PartnershipEntity.singleByEventAndPartnership(eventId, partnershipId) }
+        assertEquals(expectedUrl, partnership?.agreementSignedUrl)
+    }
+
+    @Test
+    fun `POST upload signed agreement - returns 404 if partnership not found`() = testApplication {
+        val storage = mockk<Storage>()
+        every { storage.upload(any(), any(), any()) } returns Upload(
+            bucketName = "bucket",
+            filename = "signed-agreement.pdf",
+            url = "https://example.com/signed-generated.pdf",
+        )
+
+        val eventId = UUID.randomUUID()
+        val partnershipId = UUID.randomUUID()
+
+        application {
+            moduleMocked(mockStorage = module { single<Storage> { storage } })
+        }
+
+        val response = client.submitFormWithBinaryData(
+            url = "/events/$eventId/partnership/$partnershipId/signed-agreement",
+            formData = formData {
+                append(
+                    "file",
+                    "some content".toByteArray(),
+                    Headers.build {
+                        append(HttpHeaders.ContentType, "application/pdf")
+                        append(HttpHeaders.ContentDisposition, "filename=signed.pdf")
+                    },
+                )
+            },
+        )
+
+        assertEquals(HttpStatusCode.NotFound, response.status)
+    }
+
+    @Test
+    fun `POST upload signed agreement - returns 400 if file part is missing`() = testApplication {
+        val storage = mockk<Storage>()
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val partnershipId = UUID.randomUUID()
+
+        application {
+            moduleMocked(mockStorage = module { single<Storage> { storage } })
+            insertMockPartnership(
+                id = partnershipId,
+                event = insertMockedEventWithAdminUser(eventId),
+                company = insertMockCompany(companyId),
+                selectedPack = insertMockSponsoringPack(eventId = eventId),
+                validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
+            )
+        }
+
+        val response = client.submitFormWithBinaryData(
+            url = "/events/$eventId/partnership/$partnershipId/signed-agreement",
+            formData = formData {
+                // Intentionally not appending the file part to simulate the error
+            },
+        )
+
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertTrue(response.bodyAsText().contains("Missing file part"))
+    }
+
+    @Test
+    fun `POST upload signed agreement - returns 400 if content type is not PDF`() = testApplication {
+        val storage = mockk<Storage>()
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val partnershipId = UUID.randomUUID()
+
+        application {
+            moduleMocked(mockStorage = module { single<Storage> { storage } })
+            insertMockPartnership(
+                id = partnershipId,
+                event = insertMockedEventWithAdminUser(eventId),
+                company = insertMockCompany(companyId),
+                selectedPack = insertMockSponsoringPack(eventId = eventId),
+                validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
+            )
+        }
+
+        val response = client.submitFormWithBinaryData(
+            url = "/events/$eventId/partnership/$partnershipId/signed-agreement",
+            formData = formData {
+                append(
+                    "file",
+                    "<html>not a pdf</html>".toByteArray(),
+                    Headers.build {
+                        append(HttpHeaders.ContentType, "text/html")
+                        append(HttpHeaders.ContentDisposition, "filename=invalid.html")
+                    },
+                )
+            },
+        )
+
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertTrue(response.bodyAsText().contains("Invalid file type"))
     }
 }

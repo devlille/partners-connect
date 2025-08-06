@@ -17,7 +17,8 @@ fun insertMockPartnership(
     contactName: String = "John Doe",
     contactRole: String = "Developer",
     language: String = "en",
-    assignmentUrl: String? = null,
+    agreementUrl: String? = null,
+    agreementSignedUrl: String? = null,
     selectedPack: SponsoringPackEntity? = null,
     suggestionPack: SponsoringPackEntity? = null,
     suggestionSentAt: LocalDateTime? = null,
@@ -33,7 +34,8 @@ fun insertMockPartnership(
         this.contactName = contactName
         this.contactRole = contactRole
         this.language = language
-        this.assignmentUrl = assignmentUrl
+        this.agreementUrl = agreementUrl
+        this.agreementSignedUrl = agreementSignedUrl
         this.selectedPack = selectedPack
         this.suggestionPack = suggestionPack
         this.suggestionSentAt = suggestionSentAt
