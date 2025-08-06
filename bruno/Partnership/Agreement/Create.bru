@@ -1,18 +1,22 @@
 meta {
-  name: Upload signed
+  name: Create
   type: http
-  seq: 2
+  seq: 1
 }
 
 post {
-  url: {{scheme}}://{{base_url}}/events/:event_id/partnership/:partnership_id/signed-assignment
-  body: multipartForm
+  url: {{scheme}}://{{base_url}}/events/:event_id/partnership/:partnership_id/agreement
+  body: none
   auth: none
 }
 
 params:path {
-  partnership_id: {{partnership_id}}
   event_id: {{event_id}}
+  partnership_id: {{partnership_id}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
 }
 
 body:json {
@@ -33,8 +37,4 @@ body:json {
       "email": "john.doe@mail.fr"
     }
   }
-}
-
-body:multipart-form {
-  : @file()
 }
