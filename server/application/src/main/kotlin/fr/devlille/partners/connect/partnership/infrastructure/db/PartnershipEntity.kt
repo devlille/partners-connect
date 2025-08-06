@@ -1,5 +1,8 @@
 package fr.devlille.partners.connect.partnership.infrastructure.db
 
+import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
+import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
@@ -10,15 +13,15 @@ import java.util.UUID
 class PartnershipEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     companion object : UUIDEntityClass<PartnershipEntity>(PartnershipsTable)
 
-    var eventId by PartnershipsTable.eventId
-    var companyId by PartnershipsTable.companyId
+    var event by EventEntity referencedOn PartnershipsTable.eventId
+    var company by CompanyEntity referencedOn PartnershipsTable.companyId
     var phone by PartnershipsTable.phone
     var contactName by PartnershipsTable.contactName
     var contactRole by PartnershipsTable.contactRole
     var language by PartnershipsTable.language
     var assignmentUrl by PartnershipsTable.assignmentUrl
-    var selectedPackId by PartnershipsTable.selectedPackId
-    var suggestionPackId by PartnershipsTable.suggestionPackId
+    var selectedPack by SponsoringPackEntity optionalReferencedOn PartnershipsTable.selectedPackId
+    var suggestionPack by SponsoringPackEntity optionalReferencedOn PartnershipsTable.suggestionPackId
     var suggestionSentAt by PartnershipsTable.suggestionSentAt
     var suggestionApprovedAt by PartnershipsTable.suggestionApprovedAt
     var suggestionDeclinedAt by PartnershipsTable.suggestionDeclinedAt
@@ -28,15 +31,15 @@ class PartnershipEntity(id: EntityID<UUID>) : UUIDEntity(id) {
 }
 
 @Suppress("ReturnCount")
-fun PartnershipEntity.validatedPackId(): UUID? {
-    if (suggestionPackId != null) {
+fun PartnershipEntity.validatedPack(): SponsoringPackEntity? {
+    if (suggestionPack != null) {
         if (suggestionApprovedAt.compareToNull(suggestionDeclinedAt) > 0) {
-            return suggestionPackId!!
+            return suggestionPack
         }
     }
-    if (selectedPackId != null) {
+    if (selectedPack != null) {
         if (validatedAt.compareToNull(declinedAt) > 0) {
-            return selectedPackId!!
+            return selectedPack
         }
     }
     return null

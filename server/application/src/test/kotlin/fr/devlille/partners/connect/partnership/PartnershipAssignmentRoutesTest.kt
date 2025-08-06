@@ -43,14 +43,11 @@ class PartnershipAssignmentRoutesTest {
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            insertMockedEventWithAdminUser(eventId)
-            insertMockCompany(companyId)
-            val pack = insertMockSponsoringPack(eventId = eventId)
             insertMockPartnership(
-                eventId = eventId,
-                companyId = companyId,
-                partnershipId = partnershipId,
-                selectedPackId = pack.id.value,
+                id = partnershipId,
+                event = insertMockedEventWithAdminUser(eventId),
+                company = insertMockCompany(companyId),
+                selectedPack = insertMockSponsoringPack(eventId = eventId),
                 validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )
         }
@@ -150,16 +147,12 @@ class PartnershipAssignmentRoutesTest {
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-
             val legalEntity = insertLegalEntity(representativeUser = insertMockedUser(name = null))
-            insertMockedEventWithAdminUser(eventId = eventId, legalEntity = legalEntity)
-            insertMockCompany(companyId)
-            val pack = insertMockSponsoringPack(eventId = eventId)
             insertMockPartnership(
-                eventId = eventId,
-                companyId = companyId,
-                partnershipId = partnershipId,
-                selectedPackId = pack.id.value,
+                id = partnershipId,
+                event = insertMockedEventWithAdminUser(eventId = eventId, legalEntity = legalEntity),
+                company = insertMockCompany(companyId),
+                selectedPack = insertMockSponsoringPack(eventId = eventId),
                 validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )
         }
@@ -183,13 +176,10 @@ class PartnershipAssignmentRoutesTest {
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-
-            insertMockedEventWithAdminUser(eventId)
-            insertMockCompany(companyId)
             insertMockPartnership(
-                eventId = eventId,
-                companyId = companyId,
-                partnershipId = partnershipId,
+                id = partnershipId,
+                event = insertMockedEventWithAdminUser(eventId),
+                company = insertMockCompany(companyId),
                 validatedAt = null,
             )
         }
@@ -213,15 +203,11 @@ class PartnershipAssignmentRoutesTest {
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-
-            insertMockedEventWithAdminUser(eventId)
-            insertMockCompany(companyId)
-            val pack = insertMockSponsoringPack(eventId = eventId)
             insertMockPartnership(
-                eventId = eventId,
-                companyId = companyId,
-                partnershipId = partnershipId,
-                selectedPackId = pack.id.value,
+                id = partnershipId,
+                event = insertMockedEventWithAdminUser(eventId),
+                company = insertMockCompany(companyId),
+                selectedPack = insertMockSponsoringPack(eventId = eventId),
                 validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
                 language = "xx",
             )

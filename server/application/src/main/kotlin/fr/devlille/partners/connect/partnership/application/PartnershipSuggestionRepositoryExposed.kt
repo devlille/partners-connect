@@ -37,7 +37,7 @@ class PartnershipSuggestionRepositoryExposed(
     ): UUID = transaction {
         val partnership = partnershipEntity.findById(partnershipId)
             ?: throw NotFoundException("Partnership $partnershipId not found")
-        if (partnership.eventId != eventId || partnership.companyId != companyId) {
+        if (partnership.event.id.value != eventId || partnership.company.id.value != companyId) {
             throw BadRequestException("Mismatch between path and partnership")
         }
         val suggestedPack = packEntity.findById(input.packId.toUUID())
@@ -71,7 +71,7 @@ class PartnershipSuggestionRepositoryExposed(
             }
         }
 
-        partnership.suggestionPackId = suggestedPack.id.value
+        partnership.suggestionPack = suggestedPack
         partnership.suggestionSentAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
         partnership.suggestionApprovedAt = null
         partnership.suggestionDeclinedAt = null

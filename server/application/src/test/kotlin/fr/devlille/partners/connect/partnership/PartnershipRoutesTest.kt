@@ -144,10 +144,11 @@ class PartnershipRoutesTest {
         val packId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockedEvent(eventId)
-            insertMockCompany(companyId)
-            insertMockSponsoringPack(packId, eventId)
-            insertMockPartnership(eventId, companyId, selectedPackId = packId)
+            insertMockPartnership(
+                event = insertMockedEvent(eventId),
+                company = insertMockCompany(companyId),
+                selectedPack = insertMockSponsoringPack(packId, eventId)
+            )
         }
 
         val body = RegisterPartnership(

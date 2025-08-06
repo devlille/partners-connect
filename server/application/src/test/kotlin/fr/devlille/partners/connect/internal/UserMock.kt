@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.internal
 
+import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.legaentity.infrastructure.db.LegalEntityEntity
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -8,11 +9,13 @@ import java.util.UUID
 fun insertMockedEventWithAdminUser(
     eventId: UUID = UUID.randomUUID(),
     legalEntity: LegalEntityEntity = insertLegalEntity(),
-) {
+): EventEntity {
+    val mockedEvent = insertMockedEvent(eventId, legalEntity = legalEntity)
     insertMockedEventPermission(
-        eventId = insertMockedEvent(eventId, legalEntity = legalEntity).id.value,
+        eventId = mockedEvent.id.value,
         user = insertMockedAdminUser(),
     )
+    return mockedEvent
 }
 
 fun insertMockedAdminUser(

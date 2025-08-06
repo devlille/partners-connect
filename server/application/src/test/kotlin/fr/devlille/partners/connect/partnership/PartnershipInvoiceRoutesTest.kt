@@ -9,6 +9,7 @@ import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsT
 import fr.devlille.partners.connect.internal.insertMockCompany
 import fr.devlille.partners.connect.internal.insertMockPartnership
 import fr.devlille.partners.connect.internal.insertMockedEvent
+import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
@@ -115,9 +116,11 @@ class PartnershipInvoiceRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEvent(eventId)
-            insertMockCompany(companyId)
-            insertMockPartnership(eventId, companyId, partnershipId)
+            insertMockPartnership(
+                id = partnershipId,
+                event = insertMockedEventWithAdminUser(eventId),
+                company = insertMockCompany(companyId),
+            )
             transaction {
                 IntegrationsTable.insertAndGetId {
                     it[this.eventId] = eventId
@@ -147,7 +150,11 @@ class PartnershipInvoiceRoutesTest {
             moduleMocked()
             val event = insertMockedEvent(eventId)
             val company = insertMockCompany(companyId)
-            insertMockPartnership(eventId, companyId, partnershipId)
+            insertMockPartnership(
+                id = partnershipId,
+                event = event,
+                company = company,
+            )
             transaction {
                 IntegrationsTable.insertAndGetId {
                     it[this.eventId] = eventId

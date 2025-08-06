@@ -39,10 +39,12 @@ class PartnershipSuggestionRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
-            insertMockCompany(companyId)
+            insertMockPartnership(
+                id = partnershipId,
+                event = insertMockedEventWithAdminUser(eventId),
+                company = insertMockCompany(companyId)
+            )
             insertMockSponsoringPack(packId, eventId)
-            insertMockPartnership(eventId, companyId, partnershipId)
             transaction {
                 val option = SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId
@@ -74,7 +76,8 @@ class PartnershipSuggestionRoutesTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
         val partnership = transaction { PartnershipEntity.findById(partnershipId) }
-        assertEquals(packId, partnership?.suggestionPackId)
+        val suggestionPack = transaction { partnership?.suggestionPack }
+        assertEquals(packId, suggestionPack?.id?.value)
         assertNull(partnership?.suggestionApprovedAt)
         assertNull(partnership?.suggestionDeclinedAt)
     }
@@ -107,9 +110,11 @@ class PartnershipSuggestionRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
-            insertMockCompany(companyId)
-            insertMockPartnership(eventId, companyId, partnershipId)
+            insertMockPartnership(
+                id = partnershipId,
+                event = insertMockedEventWithAdminUser(eventId),
+                company = insertMockCompany(companyId)
+            )
         }
 
         val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/suggestion") {
@@ -131,10 +136,12 @@ class PartnershipSuggestionRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
-            insertMockCompany(companyId)
+            insertMockPartnership(
+                id = partnershipId,
+                event = insertMockedEventWithAdminUser(eventId),
+                company = insertMockCompany(companyId)
+            )
             insertMockSponsoringPack(packId, eventId)
-            insertMockPartnership(eventId, companyId, partnershipId)
             transaction {
                 val option = SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId
@@ -175,10 +182,13 @@ class PartnershipSuggestionRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
-            insertMockCompany(companyId)
+            insertMockPartnership(
+                id = partnershipId,
+                event = insertMockedEventWithAdminUser(eventId),
+                company = insertMockCompany(companyId),
+                language = "fr"
+            )
             insertMockSponsoringPack(packId, eventId)
-            insertMockPartnership(eventId, companyId, partnershipId, language = "fr")
             transaction {
                 SponsoringOptionEntity.new(optionId) {
                     this.eventId = eventId

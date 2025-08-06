@@ -10,15 +10,15 @@ import org.jetbrains.exposed.v1.core.dao.id.UUIDTable
 import org.jetbrains.exposed.v1.datetime.datetime
 
 object PartnershipsTable : UUIDTable("partnerships") {
-    val eventId = uuid("event_id").references(EventsTable.id)
-    val companyId = uuid("company_id").references(CompaniesTable.id)
+    val eventId = reference("event_id", EventsTable)
+    val companyId = reference("company_id", CompaniesTable)
     val phone = text("phone").nullable()
     val contactName = text("contact_name")
     val contactRole = text("contact_role")
     val language = text("language")
     val assignmentUrl = text("assignment_url").nullable()
-    val selectedPackId = uuid("selected_pack_id").references(SponsoringPacksTable.id).nullable()
-    val suggestionPackId = uuid("suggestion_pack_id").references(SponsoringPacksTable.id).nullable()
+    val selectedPackId = reference("selected_pack_id", SponsoringPacksTable).nullable()
+    val suggestionPackId = reference("suggestion_pack_id", SponsoringPacksTable).nullable()
     val suggestionSentAt = datetime("suggestion_sent_at").nullable()
     val suggestionApprovedAt = datetime("suggestion_approved_at").nullable()
     val suggestionDeclinedAt = datetime("suggestion_declined_at").nullable()

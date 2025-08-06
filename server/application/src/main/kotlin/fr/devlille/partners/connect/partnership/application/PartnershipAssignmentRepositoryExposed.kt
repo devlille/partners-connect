@@ -10,8 +10,7 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipAssignmentRepo
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.listByPartnershipAndPack
-import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPackId
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
@@ -96,11 +95,9 @@ internal fun CompanyEntity.toAssignmentCompany(): Company = Company(
 
 @Suppress("ThrowsCount")
 internal fun PartnershipEntity.toAssignmentPartnership(): Partnership {
-    val packId = this.validatedPackId()
+    val pack = this.validatedPack()
         ?: throw NotFoundException("Validated pack not found for partnership")
-    val pack = SponsoringPackEntity.findById(packId)
-        ?: throw NotFoundException("Sponsoring pack not found")
-    val options = PartnershipOptionEntity.listByPartnershipAndPack(this.id.value, packId)
+    val options = PartnershipOptionEntity.listByPartnershipAndPack(this.id.value, pack.id.value)
     val amount = pack.basePrice + options.filter { it.option.price != null }.sumOf { it.option.price!! }
     return Partnership(
         amount = "$amount",

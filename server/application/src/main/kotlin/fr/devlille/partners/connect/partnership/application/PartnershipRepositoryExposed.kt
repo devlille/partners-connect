@@ -20,7 +20,6 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptio
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionalOptionsByPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listTranslationsByOptionAndLanguage
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.singlePackById
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
@@ -37,9 +36,9 @@ class PartnershipRepositoryExposed(
     private val packOptionTable: PackOptionsTable = PackOptionsTable,
 ) : PartnershipRepository {
     override fun register(eventId: UUID, companyId: UUID, register: RegisterPartnership): UUID = transaction {
-        EventEntity.findById(eventId)
+        val event = EventEntity.findById(eventId)
             ?: throw NotFoundException("Event $eventId not found")
-        CompanyEntity.findById(companyId)
+        val company = CompanyEntity.findById(companyId)
             ?: throw NotFoundException("Company $companyId not found")
         val pack = packEntity.findById(register.packId.toUUID())
             ?: throw NotFoundException("Pack ${register.packId} not found")
@@ -50,9 +49,9 @@ class PartnershipRepositoryExposed(
         }
 
         val partnership = PartnershipEntity.new {
-            this.eventId = eventId
-            this.companyId = companyId
-            this.selectedPackId = pack.id.value
+            this.event = event
+            this.company = company
+            this.selectedPack = pack
             this.phone = register.phone
             this.contactName = register.contactName
             this.contactRole = register.contactRole
@@ -106,19 +105,17 @@ class PartnershipRepositoryExposed(
             emails = PartnershipEmailEntity
                 .find { PartnershipEmailsTable.partnershipId eq partnership.id }
                 .map { it.email },
-            selectedPack = partnership.selectedPackId?.let { packId ->
-                val pack = packEntity.singlePackById(eventId, packId)
+            selectedPack = partnership.selectedPack?.let { pack ->
                 pack.toDomain(
                     language = partnership.language,
-                    optionIds = PartnershipOptionEntity.listByPartnershipAndPack(partnershipId, packId)
+                    optionIds = PartnershipOptionEntity.listByPartnershipAndPack(partnershipId, pack.id.value)
                         .map { it.id.value },
                 )
             },
-            suggestionPack = partnership.suggestionPackId?.let { packId ->
-                val pack = packEntity.singlePackById(eventId, packId)
+            suggestionPack = partnership.suggestionPack?.let { pack ->
                 pack.toDomain(
                     language = partnership.language,
-                    optionIds = PartnershipOptionEntity.listByPartnershipAndPack(partnershipId, packId)
+                    optionIds = PartnershipOptionEntity.listByPartnershipAndPack(partnershipId, pack.id.value)
                         .map { it.id.value },
                 )
             },
