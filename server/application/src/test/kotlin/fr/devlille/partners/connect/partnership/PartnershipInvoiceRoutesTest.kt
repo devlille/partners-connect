@@ -60,12 +60,15 @@ class PartnershipInvoiceRoutesTest {
 
         application {
             moduleMocked()
-            val event = insertMockedEvent(eventId)
-            val company = insertMockCompany(companyId)
+            val partnership = insertMockPartnership(
+                id = partnershipId,
+                event = insertMockedEvent(eventId),
+                company = insertMockCompany(companyId),
+            )
             transaction {
                 InvoiceEntity.new {
-                    this.event = event
-                    this.company = company
+                    this.event = partnership.event
+                    this.partnership = partnership
                     this.name = "DevLille SAS"
                     this.contactFirstName = "Jean"
                     this.contactLastName = "Dupont"
@@ -82,7 +85,7 @@ class PartnershipInvoiceRoutesTest {
             }
         }
 
-        val response = client.get("/events/$eventId/companies/$companyId/partnership/$partnershipId/invoice")
+        val response = client.get("/events/$eventId/partnership/$partnershipId/invoice")
 
         assertEquals(HttpStatusCode.Companion.OK, response.status)
         val body = response.bodyAsText()
@@ -102,7 +105,7 @@ class PartnershipInvoiceRoutesTest {
             insertMockCompany(companyId)
         }
 
-        val response = client.get("/events/$eventId/companies/$companyId/partnership/$partnershipId/invoice")
+        val response = client.get("/events/$eventId/partnership/$partnershipId/invoice")
 
         assertEquals(HttpStatusCode.Companion.NotFound, response.status)
         assertTrue(response.bodyAsText().contains("Invoice not found"))
@@ -130,7 +133,7 @@ class PartnershipInvoiceRoutesTest {
             }
         }
 
-        val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/invoice") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/invoice") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(CompanyInvoice.serializer(), sampleInvoiceInput()))
         }
@@ -148,12 +151,10 @@ class PartnershipInvoiceRoutesTest {
 
         application {
             moduleMocked()
-            val event = insertMockedEvent(eventId)
-            val company = insertMockCompany(companyId)
-            insertMockPartnership(
+            val partnership = insertMockPartnership(
                 id = partnershipId,
-                event = event,
-                company = company,
+                event = insertMockedEvent(eventId),
+                company = insertMockCompany(companyId),
             )
             transaction {
                 IntegrationsTable.insertAndGetId {
@@ -162,8 +163,8 @@ class PartnershipInvoiceRoutesTest {
                     it[this.usage] = IntegrationUsage.INVOICE
                 }
                 InvoiceEntity.new {
-                    this.event = event
-                    this.company = company
+                    this.event = partnership.event
+                    this.partnership = partnership
                     this.name = "Old Name"
                     this.contactFirstName = "Old"
                     this.contactLastName = "Name"
@@ -180,7 +181,7 @@ class PartnershipInvoiceRoutesTest {
             }
         }
 
-        val response = client.put("/events/$eventId/companies/$companyId/partnership/$partnershipId/invoice") {
+        val response = client.put("/events/$eventId/partnership/$partnershipId/invoice") {
             contentType(ContentType.Application.Json)
             setBody(
                 json.encodeToString(
@@ -196,9 +197,8 @@ class PartnershipInvoiceRoutesTest {
     }
 
     @Test
-    fun `POST fails if company not found`() = testApplication {
+    fun `POST fails if partnership not found`() = testApplication {
         val eventId = UUID.randomUUID()
-        val fakeCompanyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
         application {
@@ -206,19 +206,18 @@ class PartnershipInvoiceRoutesTest {
             insertMockedEvent(eventId)
         }
 
-        val response = client.post("/events/$eventId/companies/$fakeCompanyId/partnership/$partnershipId/invoice") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/invoice") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(CompanyInvoice.serializer(), sampleInvoiceInput()))
         }
 
         assertEquals(HttpStatusCode.Companion.NotFound, response.status)
-        assertTrue(response.bodyAsText().contains("Company not found"))
+        assertTrue(response.bodyAsText().contains("Partnership not found"))
     }
 
     @Test
-    fun `PUT fails if company not found`() = testApplication {
+    fun `PUT fails if partnership not found`() = testApplication {
         val eventId = UUID.randomUUID()
-        val fakeCompanyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
         application {
@@ -226,12 +225,12 @@ class PartnershipInvoiceRoutesTest {
             insertMockedEvent(eventId)
         }
 
-        val response = client.put("/events/$eventId/companies/$fakeCompanyId/partnership/$partnershipId/invoice") {
+        val response = client.put("/events/$eventId/partnership/$partnershipId/invoice") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(CompanyInvoice.serializer(), sampleInvoiceInput()))
         }
 
         assertEquals(HttpStatusCode.Companion.NotFound, response.status)
-        assertTrue(response.bodyAsText().contains("Company not found"))
+        assertTrue(response.bodyAsText().contains("Partnership not found"))
     }
 }

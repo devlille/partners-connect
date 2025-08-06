@@ -1,5 +1,7 @@
 package fr.devlille.partners.connect.partnership.application
 
+import fr.devlille.partners.connect.companies.application.mappers.toDomain
+import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
@@ -35,9 +37,10 @@ class PartnershipRepositoryExposed(
     private val translationEntity: UUIDEntityClass<OptionTranslationEntity> = OptionTranslationEntity,
     private val packOptionTable: PackOptionsTable = PackOptionsTable,
 ) : PartnershipRepository {
-    override fun register(eventId: UUID, companyId: UUID, register: RegisterPartnership): UUID = transaction {
+    override fun register(eventId: UUID, register: RegisterPartnership): UUID = transaction {
         val event = EventEntity.findById(eventId)
             ?: throw NotFoundException("Event $eventId not found")
+        val companyId = register.companyId.toUUID()
         val company = CompanyEntity.findById(companyId)
             ?: throw NotFoundException("Company $companyId not found")
         val pack = packEntity.findById(register.packId.toUUID())
@@ -120,6 +123,10 @@ class PartnershipRepositoryExposed(
                 )
             },
         )
+    }
+
+    override fun getCompanyByPartnershipId(eventId: UUID, partnershipId: UUID): Company = transaction {
+        findPartnership(eventId, partnershipId).company.toDomain()
     }
 
     override fun validate(eventId: UUID, partnershipId: UUID): UUID = transaction {

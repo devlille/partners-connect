@@ -6,7 +6,7 @@ import fr.devlille.partners.connect.partnership.domain.SuggestPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.deleteAllByPartnershipId
-import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndCompanyAndPartnership
+import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndPartnership
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
@@ -31,18 +31,12 @@ class PartnershipSuggestionRepositoryExposed(
 ) : PartnershipSuggestionRepository {
     override fun suggest(
         eventId: UUID,
-        companyId: UUID,
         partnershipId: UUID,
         input: SuggestPartnership,
     ): UUID = transaction {
-        val partnership = partnershipEntity.findById(partnershipId)
-            ?: throw NotFoundException("Partnership $partnershipId not found")
-        if (partnership.event.id.value != eventId || partnership.company.id.value != companyId) {
-            throw BadRequestException("Mismatch between path and partnership")
-        }
+        val partnership = findPartnership(eventId, partnershipId)
         val suggestedPack = packEntity.findById(input.packId.toUUID())
             ?: throw NotFoundException("Pack ${input.packId} not found")
-
         val optionalOptionIds = packOptionTable
             .listOptionalOptionsByPack(suggestedPack.id.value)
             .map { it[PackOptionsTable.option].value }
@@ -79,20 +73,20 @@ class PartnershipSuggestionRepositoryExposed(
         partnership.id.value
     }
 
-    override fun approve(eventId: UUID, companyId: UUID, partnershipId: UUID): UUID = transaction {
-        val partnership = findPartnership(eventId, companyId, partnershipId)
+    override fun approve(eventId: UUID, partnershipId: UUID): UUID = transaction {
+        val partnership = findPartnership(eventId, partnershipId)
         partnership.suggestionApprovedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
         partnership.id.value
     }
 
-    override fun decline(eventId: UUID, companyId: UUID, partnershipId: UUID): UUID = transaction {
-        val partnership = findPartnership(eventId, companyId, partnershipId)
+    override fun decline(eventId: UUID, partnershipId: UUID): UUID = transaction {
+        val partnership = findPartnership(eventId, partnershipId)
         partnership.suggestionDeclinedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
         partnership.id.value
     }
 
-    private fun findPartnership(eventId: UUID, companyId: UUID, partnershipId: UUID): PartnershipEntity =
+    private fun findPartnership(eventId: UUID, partnershipId: UUID): PartnershipEntity =
         partnershipEntity
-            .singleByEventAndCompanyAndPartnership(eventId, companyId, partnershipId)
+            .singleByEventAndPartnership(eventId, partnershipId)
             ?: throw NotFoundException("Partnership not found")
 }

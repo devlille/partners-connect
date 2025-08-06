@@ -4,9 +4,9 @@ import fr.devlille.partners.connect.companies.domain.CompanyInvoice
 import java.util.UUID
 
 interface PartnershipInvoiceRepository {
-    fun getByCompanyId(eventId: UUID, companyId: UUID): CompanyInvoice
+    fun getByPartnershipId(eventId: UUID, partnershipId: UUID): CompanyInvoice
 
-    fun createOrUpdate(eventId: UUID, companyId: UUID, input: CompanyInvoice): UUID
+    fun createOrUpdate(eventId: UUID, partnershipId: UUID, input: CompanyInvoice): UUID
 
-    fun updateInvoiceUrl(eventId: UUID, companyId: UUID, invoiceUrl: String): UUID
+    fun updateInvoiceUrl(eventId: UUID, partnershipId: UUID, invoiceUrl: String): UUID
 }

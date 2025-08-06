@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RegisterPartnership(
+    @SerialName("company_id")
+    val companyId: String,
     @SerialName("pack_id")
     val packId: String,
     @SerialName("option_ids")

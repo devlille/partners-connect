@@ -1,7 +1,7 @@
 package fr.devlille.partners.connect.partnership.infrastructure.db
 
-import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.UUIDEntity
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
@@ -11,7 +11,7 @@ class InvoiceEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     companion object : UUIDEntityClass<InvoiceEntity>(InvoicesTable)
 
     var event by EventEntity referencedOn InvoicesTable.eventId
-    var company by CompanyEntity.Companion referencedOn InvoicesTable.companyId
+    var partnership by PartnershipEntity referencedOn InvoicesTable.partnershipId
     var name by InvoicesTable.name
     var contactFirstName by InvoicesTable.contactFirstName
     var contactLastName by InvoicesTable.contactLastName
@@ -27,3 +27,10 @@ class InvoiceEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var status by InvoicesTable.status
     var createdAt by InvoicesTable.createdAt
 }
+
+fun UUIDEntityClass<InvoiceEntity>.singleByEventAndPartnership(
+    eventId: UUID,
+    partnershipId: UUID,
+): InvoiceEntity? = this
+    .find { (InvoicesTable.eventId eq eventId) and (InvoicesTable.partnershipId eq partnershipId) }
+    .singleOrNull()

@@ -12,7 +12,7 @@ import java.util.UUID
 class InvoiceRepositoryExposed(
     private val invoiceGateways: List<InvoiceGateway>,
 ) : InvoiceRepository {
-    override fun createInvoice(eventId: UUID, companyId: UUID): String = transaction {
+    override fun createInvoice(eventId: UUID, partnershipId: UUID): String = transaction {
         val integrations = IntegrationsTable
             .findByEventIdAndUsage(eventId, IntegrationUsage.INVOICE)
             .toList()
@@ -27,6 +27,6 @@ class InvoiceRepositoryExposed(
         val integrationId = integration[IntegrationsTable.id].value
         val gateway = invoiceGateways.find { it.provider == provider }
             ?: throw NotFoundException("No gateway for provider $provider")
-        gateway.createInvoice(integrationId, eventId, companyId)
+        gateway.createInvoice(integrationId, eventId, partnershipId)
     }
 }

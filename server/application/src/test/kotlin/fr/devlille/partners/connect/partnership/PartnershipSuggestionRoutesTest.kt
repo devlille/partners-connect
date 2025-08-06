@@ -42,7 +42,7 @@ class PartnershipSuggestionRoutesTest {
             insertMockPartnership(
                 id = partnershipId,
                 event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockCompany(companyId)
+                company = insertMockCompany(companyId),
             )
             insertMockSponsoringPack(packId, eventId)
             transaction {
@@ -64,7 +64,7 @@ class PartnershipSuggestionRoutesTest {
             }
         }
 
-        val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/suggestion") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(
@@ -93,7 +93,7 @@ class PartnershipSuggestionRoutesTest {
             insertMockedEventWithAdminUser(eventId)
         }
 
-        val response = client.post("/events/$eventId/companies/$companyId/partnership/$fakeId/suggestion") {
+        val response = client.post("/events/$eventId/partnership/$fakeId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(SuggestPartnership("fake-pack", emptyList(), "en")))
@@ -113,11 +113,11 @@ class PartnershipSuggestionRoutesTest {
             insertMockPartnership(
                 id = partnershipId,
                 event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockCompany(companyId)
+                company = insertMockCompany(companyId),
             )
         }
 
-        val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/suggestion") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(SuggestPartnership(UUID.randomUUID().toString(), emptyList(), "en")))
@@ -139,7 +139,7 @@ class PartnershipSuggestionRoutesTest {
             insertMockPartnership(
                 id = partnershipId,
                 event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockCompany(companyId)
+                company = insertMockCompany(companyId),
             )
             insertMockSponsoringPack(packId, eventId)
             transaction {
@@ -162,7 +162,7 @@ class PartnershipSuggestionRoutesTest {
             }
         }
 
-        val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/suggestion") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(SuggestPartnership(packId.toString(), listOf(optionId.toString()), "en")))
@@ -186,7 +186,7 @@ class PartnershipSuggestionRoutesTest {
                 id = partnershipId,
                 event = insertMockedEventWithAdminUser(eventId),
                 company = insertMockCompany(companyId),
-                language = "fr"
+                language = "fr",
             )
             insertMockSponsoringPack(packId, eventId)
             transaction {
@@ -203,7 +203,7 @@ class PartnershipSuggestionRoutesTest {
             }
         }
 
-        val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/suggestion") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(SuggestPartnership(packId.toString(), listOf(optionId.toString()), "en")))

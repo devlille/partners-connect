@@ -10,12 +10,11 @@ class PartnershipStorageRepositoryGoogleStorage(
 ) : PartnershipStorageRepository {
     override fun uploadAssignment(
         eventId: UUID,
-        companyId: UUID,
         partnershipId: UUID,
         content: ByteArray,
     ): String {
         val uploaded = storage.upload(
-            filename = "events/$eventId/partnerships/$partnershipId/assignment-$companyId.pdf",
+            filename = "events/$eventId/partnerships/$partnershipId/assignment.pdf",
             content = content,
             mimeType = MimeType.PDF,
         )
