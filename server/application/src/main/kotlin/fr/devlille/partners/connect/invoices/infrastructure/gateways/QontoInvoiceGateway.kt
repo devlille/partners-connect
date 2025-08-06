@@ -12,6 +12,7 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoicesTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndCompany
+import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionsTable
@@ -50,23 +51,13 @@ class QontoInvoiceGateway(
         val partnership = PartnershipEntity
             .singleByEventAndCompany(eventId, companyId)
             ?: throw NotFoundException("No partnership found for event $eventId and company $companyId")
-        val selectedPackId = partnership.selectedPackId
-        val suggestionPackId = partnership.suggestionPackId
-        val pack = if (selectedPackId != null) {
-            SponsoringPackEntity.findById(selectedPackId)
-                ?: throw NotFoundException("Selected pack $selectedPackId not found")
-        } else if (suggestionPackId != null) {
-            SponsoringPackEntity.findById(suggestionPackId)
-                ?: throw NotFoundException("Suggested pack $suggestionPackId not found")
-        } else {
-            throw NotFoundException("No sponsoring pack found for partnership ${partnership.id}")
-        }
+        val pack = partnership.validatedPack()
+            ?: throw NotFoundException("No sponsoring pack found for partnership ${partnership.id}")
         val optionIds = PackOptionsTable.listOptionalOptionsByPack(pack.id.value)
             .map { it[PackOptionsTable.option].value }
         val optionalOptions = SponsoringOptionEntity
             .find { (SponsoringOptionsTable.eventId eq eventId) and (SponsoringOptionsTable.id inList optionIds) }
             .toList()
-
         val clients = listClients(taxId = invoice.siret, config = config)
         val client = if (clients.clients.isEmpty()) {
             createClient(invoice.toQontoClientRequest(), config).client

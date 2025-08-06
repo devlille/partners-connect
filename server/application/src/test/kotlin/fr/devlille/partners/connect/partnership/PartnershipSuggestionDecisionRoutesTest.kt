@@ -23,9 +23,11 @@ class PartnershipSuggestionDecisionRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEvent(eventId)
-            insertMockCompany(companyId)
-            insertMockPartnership(eventId, companyId, partnerId)
+            insertMockPartnership(
+                id = partnerId,
+                event = insertMockedEvent(eventId),
+                company = insertMockCompany(companyId)
+            )
         }
 
         val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnerId/suggestion-approve")
@@ -45,9 +47,11 @@ class PartnershipSuggestionDecisionRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEvent(eventId)
-            insertMockCompany(companyId)
-            insertMockPartnership(eventId, companyId, partnerId)
+            insertMockPartnership(
+                id = partnerId,
+                event = insertMockedEvent(eventId),
+                company = insertMockCompany(companyId)
+            )
         }
 
         val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnerId/suggestion-decline")

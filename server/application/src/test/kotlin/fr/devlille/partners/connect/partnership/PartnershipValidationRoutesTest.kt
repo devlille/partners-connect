@@ -30,10 +30,12 @@ class PartnershipValidationRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
-            insertMockCompany(companyId)
-            insertMockSponsoringPack(packId, eventId)
-            insertMockPartnership(eventId, companyId, partnershipId, selectedPackId = packId)
+            insertMockPartnership(
+                id = partnershipId,
+                event = insertMockedEventWithAdminUser(eventId),
+                company = insertMockCompany(companyId),
+                selectedPack = insertMockSponsoringPack(packId, eventId)
+            )
         }
 
         val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/validate") {
@@ -73,9 +75,11 @@ class PartnershipValidationRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
-            insertMockCompany(companyId)
-            insertMockPartnership(eventId, companyId, partnershipId)
+            insertMockPartnership(
+                id = partnershipId,
+                event = insertMockedEventWithAdminUser(eventId),
+                company = insertMockCompany(companyId),
+            )
         }
 
         val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/decline") {
