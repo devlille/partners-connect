@@ -11,6 +11,6 @@ class FakeInvoiceGateway : InvoiceGateway {
     override fun createInvoice(
         integrationId: UUID,
         eventId: UUID,
-        companyId: UUID,
+        partnershipId: UUID,
     ): String = "https://fake-invoice-url.com/invoice/${UUID.randomUUID()}"
 }

@@ -58,6 +58,7 @@ class PartnershipRoutesTest {
 
         val body = RegisterPartnership(
             packId = packId.toString(),
+            companyId = companyId.toString(),
             optionIds = listOf(optionId.toString()),
             language = "en",
             phone = "+33600000000",
@@ -66,7 +67,7 @@ class PartnershipRoutesTest {
             emails = listOf("partner@example.com"),
         )
 
-        val response = client.post("/events/$eventId/companies/$companyId/partnership") {
+        val response = client.post("/events/$eventId/partnership") {
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
@@ -79,13 +80,14 @@ class PartnershipRoutesTest {
     @Test
     fun `POST returns 404 when event not found`() = testApplication {
         val body = RegisterPartnership(
+            companyId = UUID.randomUUID().toString(),
             packId = "pack",
             optionIds = listOf(),
             contactName = "John Doe",
             contactRole = "Marketing Manager",
             language = "en",
         )
-        val response = client.post("/events/${UUID.randomUUID()}/companies/${UUID.randomUUID()}/partnership") {
+        val response = client.post("/events/${UUID.randomUUID()}/partnership") {
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
@@ -101,13 +103,14 @@ class PartnershipRoutesTest {
         }
 
         val body = RegisterPartnership(
+            companyId = UUID.randomUUID().toString(),
             packId = "pack",
             optionIds = listOf(),
             contactName = "John Doe",
             contactRole = "Marketing Manager",
             language = "en",
         )
-        val response = client.post("/events/$eventId/companies/${UUID.randomUUID()}/partnership") {
+        val response = client.post("/events/$eventId/partnership") {
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
@@ -124,13 +127,14 @@ class PartnershipRoutesTest {
         }
 
         val body = RegisterPartnership(
+            companyId = companyId.toString(),
             packId = UUID.randomUUID().toString(),
             optionIds = listOf(),
             contactName = "John Doe",
             contactRole = "Marketing Manager",
             language = "en",
         )
-        val response = client.post("/events/$eventId/companies/$companyId/partnership") {
+        val response = client.post("/events/$eventId/partnership") {
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
@@ -147,18 +151,19 @@ class PartnershipRoutesTest {
             insertMockPartnership(
                 event = insertMockedEvent(eventId),
                 company = insertMockCompany(companyId),
-                selectedPack = insertMockSponsoringPack(packId, eventId)
+                selectedPack = insertMockSponsoringPack(packId, eventId),
             )
         }
 
         val body = RegisterPartnership(
+            companyId = companyId.toString(),
             packId = packId.toString(),
             optionIds = listOf(),
             contactName = "John Doe",
             contactRole = "Marketing Manager",
             language = "en",
         )
-        val response = client.post("/events/$eventId/companies/$companyId/partnership") {
+        val response = client.post("/events/$eventId/partnership") {
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
@@ -191,13 +196,14 @@ class PartnershipRoutesTest {
         }
 
         val body = RegisterPartnership(
+            companyId = companyId.toString(),
             packId = packId.toString(),
             optionIds = listOf(optionId.toString()),
             contactName = "John Doe",
             contactRole = "Marketing Manager",
             language = "en",
         )
-        val response = client.post("/events/$eventId/companies/$companyId/partnership") {
+        val response = client.post("/events/$eventId/partnership") {
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
@@ -231,13 +237,14 @@ class PartnershipRoutesTest {
         }
 
         val body = RegisterPartnership(
+            companyId = companyId.toString(),
             packId = packId.toString(),
             optionIds = listOf(optionId.toString()),
             contactName = "John Doe",
             contactRole = "Marketing Manager",
             language = "fr",
         )
-        val response = client.post("/events/$eventId/companies/$companyId/partnership") {
+        val response = client.post("/events/$eventId/partnership") {
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }

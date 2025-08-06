@@ -6,5 +6,5 @@ import java.util.UUID
 interface InvoiceGateway {
     val provider: IntegrationProvider
 
-    fun createInvoice(integrationId: UUID, eventId: UUID, companyId: UUID): String
+    fun createInvoice(integrationId: UUID, eventId: UUID, partnershipId: UUID): String
 }

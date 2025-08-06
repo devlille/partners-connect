@@ -26,11 +26,11 @@ class PartnershipSuggestionDecisionRoutesTest {
             insertMockPartnership(
                 id = partnerId,
                 event = insertMockedEvent(eventId),
-                company = insertMockCompany(companyId)
+                company = insertMockCompany(companyId),
             )
         }
 
-        val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnerId/suggestion-approve")
+        val response = client.post("/events/$eventId/partnership/$partnerId/suggestion-approve")
         assertEquals(HttpStatusCode.OK, response.status)
 
         transaction {
@@ -50,11 +50,11 @@ class PartnershipSuggestionDecisionRoutesTest {
             insertMockPartnership(
                 id = partnerId,
                 event = insertMockedEvent(eventId),
-                company = insertMockCompany(companyId)
+                company = insertMockCompany(companyId),
             )
         }
 
-        val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnerId/suggestion-decline")
+        val response = client.post("/events/$eventId/partnership/$partnerId/suggestion-decline")
         assertEquals(HttpStatusCode.OK, response.status)
 
         transaction {
@@ -69,7 +69,7 @@ class PartnershipSuggestionDecisionRoutesTest {
     fun `POST approve returns 404 for unknown partnership`() = testApplication {
         val randomUUID = UUID.randomUUID()
         val response = client.post(
-            "/events/$randomUUID/companies/$randomUUID/partnership/$randomUUID/suggestion-approve",
+            "/events/$randomUUID/partnership/$randomUUID/suggestion-approve",
         )
         assertEquals(HttpStatusCode.NotFound, response.status)
     }
@@ -78,7 +78,7 @@ class PartnershipSuggestionDecisionRoutesTest {
     fun `POST decline returns 404 for unknown partnership`() = testApplication {
         val randomUUID = UUID.randomUUID()
         val response = client.post(
-            "/events/$randomUUID/companies/$randomUUID/partnership/$randomUUID/suggestion-decline",
+            "/events/$randomUUID/partnership/$randomUUID/suggestion-decline",
         )
         assertEquals(HttpStatusCode.NotFound, response.status)
     }

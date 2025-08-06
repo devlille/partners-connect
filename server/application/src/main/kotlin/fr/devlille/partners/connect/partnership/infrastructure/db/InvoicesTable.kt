@@ -1,6 +1,5 @@
 package fr.devlille.partners.connect.partnership.infrastructure.db
 
-import fr.devlille.partners.connect.companies.infrastructure.db.CompaniesTable
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -10,7 +9,7 @@ import org.jetbrains.exposed.v1.datetime.datetime
 
 object InvoicesTable : UUIDTable("invoices") {
     val eventId = reference("event_id", EventsTable)
-    val companyId = reference("company_id", CompaniesTable)
+    val partnershipId = reference("partnership_id", PartnershipsTable)
     val name = text("name").nullable()
     val contactFirstName = text("contact_first_name")
     val contactLastName = text("contact_last_name")

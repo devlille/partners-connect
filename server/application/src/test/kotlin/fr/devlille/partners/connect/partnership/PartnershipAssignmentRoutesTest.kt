@@ -52,7 +52,7 @@ class PartnershipAssignmentRoutesTest {
             )
         }
 
-        val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/assignment") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/assignment") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -78,7 +78,7 @@ class PartnershipAssignmentRoutesTest {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
         }
 
-        val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/assignment") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/assignment") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -103,7 +103,7 @@ class PartnershipAssignmentRoutesTest {
             insertMockedEventWithAdminUser(eventId)
         }
 
-        val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/assignment") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/assignment") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -129,7 +129,7 @@ class PartnershipAssignmentRoutesTest {
             insertMockCompany(companyId)
         }
 
-        val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/assignment") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/assignment") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -157,7 +157,7 @@ class PartnershipAssignmentRoutesTest {
             )
         }
 
-        val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/assignment") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/assignment") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -184,7 +184,7 @@ class PartnershipAssignmentRoutesTest {
             )
         }
 
-        val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/assignment") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/assignment") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -213,7 +213,7 @@ class PartnershipAssignmentRoutesTest {
             )
         }
 
-        val response = client.post("/events/$eventId/companies/$companyId/partnership/$partnershipId/assignment") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/assignment") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 

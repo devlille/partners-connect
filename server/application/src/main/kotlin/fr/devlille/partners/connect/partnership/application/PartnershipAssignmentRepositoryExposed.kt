@@ -10,6 +10,7 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipAssignmentRepo
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.listByPartnershipAndPack
+import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
@@ -29,16 +30,15 @@ import kotlin.time.Duration.Companion.days
 
 class PartnershipAssignmentRepositoryExposed : PartnershipAssignmentRepository {
     @OptIn(FormatStringsInDatetimeFormats::class)
-    override fun generateAssignment(eventId: UUID, companyId: UUID, partnershipId: UUID): ByteArray = transaction {
+    override fun generateAssignment(eventId: UUID, partnershipId: UUID): ByteArray = transaction {
         val event = EventEntity.findById(eventId) ?: throw NotFoundException("Event not found")
-        val company = CompanyEntity.findById(companyId) ?: throw NotFoundException("Company not found")
         val partnership = PartnershipEntity.findById(partnershipId) ?: throw NotFoundException("Partnership not found")
         val template = readResourceFile("/assignment/${partnership.language}.md")
         val formatter = LocalDate.Format { byUnicodePattern("yyyy/MM/dd") }
         val assignment = Assignment(
             legalEntity = event.legalEntity.toAssignmentLegalEntity(formatter),
             event = event.toAssignmentEvent(formatter),
-            company = company.toAssignmentCompany(),
+            company = partnership.company.toAssignmentCompany(),
             partnership = partnership.toAssignmentPartnership(),
             createdAt = Clock.System.now().toLocalDateTime(TimeZone.UTC).date.format(formatter),
             location = "Lille, France",
@@ -48,7 +48,8 @@ class PartnershipAssignmentRepositoryExposed : PartnershipAssignmentRepository {
     }
 
     override fun updateAssignmentUrl(eventId: UUID, partnershipId: UUID, assignmentUrl: String): UUID = transaction {
-        val partnership = PartnershipEntity.findById(partnershipId) ?: throw NotFoundException("Partnership not found")
+        val partnership = PartnershipEntity.singleByEventAndPartnership(eventId, partnershipId)
+            ?: throw NotFoundException("Partnership not found")
         partnership.assignmentUrl = assignmentUrl
         partnership.id.value
     }
