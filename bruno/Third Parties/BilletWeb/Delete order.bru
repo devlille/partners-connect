@@ -1,0 +1,25 @@
+meta {
+  name: Delete order
+  type: http
+  seq: 5
+}
+
+post {
+  url: https://www.billetweb.fr/api/event/:event_id/delete_order
+  body: json
+  auth: none
+}
+
+params:path {
+  event_id: 1299342
+}
+
+headers {
+  Authorization: Basic {{billetweb_basic}}
+}
+
+body:json {
+  [
+    "105187573"
+  ]
+}

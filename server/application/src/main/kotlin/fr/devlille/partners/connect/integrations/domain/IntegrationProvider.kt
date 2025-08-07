@@ -4,4 +4,5 @@ enum class IntegrationProvider {
     SLACK,
     MAILJET,
     QONTO,
+    BILLETWEB,
 }
