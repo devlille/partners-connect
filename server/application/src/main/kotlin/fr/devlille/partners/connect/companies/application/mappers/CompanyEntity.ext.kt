@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.companies.application.mappers
 
+import fr.devlille.partners.connect.companies.domain.Address
 import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.companies.domain.Media
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
@@ -10,8 +11,14 @@ internal fun CompanyEntity.toDomain(): Company {
     return Company(
         id = id.value.toString(),
         name = name,
-        headOffice = headOffice,
+        headOffice = Address(
+            address = address,
+            city = city,
+            zipCode = zipCode,
+            country = country,
+        ),
         siret = siret,
+        vat = vat,
         description = description,
         siteUrl = siteUrl,
         medias = if (hasMedia) {

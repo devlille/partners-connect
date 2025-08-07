@@ -10,7 +10,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
 class QontoRegistrar : IntegrationRegistrar<CreateIntegration.CreateQontoIntegration> {
-    override val supportedUsages = setOf(IntegrationUsage.INVOICE)
+    override val supportedUsages = setOf(IntegrationUsage.BILLING)
 
     override fun register(
         eventId: UUID,

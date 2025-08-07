@@ -1,12 +1,12 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
-import fr.devlille.partners.connect.companies.domain.CompanyInvoice
+import fr.devlille.partners.connect.billing.domain.BillingRepository
+import fr.devlille.partners.connect.companies.domain.CompanyBillingData
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
-import fr.devlille.partners.connect.invoices.domain.InvoiceRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
-import fr.devlille.partners.connect.partnership.domain.PartnershipInvoiceRepository
+import fr.devlille.partners.connect.partnership.domain.PartnershipBillingRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
@@ -21,29 +21,29 @@ import org.koin.ktor.ext.inject
 import kotlin.getValue
 
 @Suppress("ThrowsCount")
-fun Route.partnershipInvoiceRoutes() {
-    val partnershipInvoiceRepository by inject<PartnershipInvoiceRepository>()
-    val invoiceRepository by inject<InvoiceRepository>()
+fun Route.partnershipBillingRoutes() {
+    val partnershipBillingRepository by inject<PartnershipBillingRepository>()
+    val billingRepository by inject<BillingRepository>()
     val eventRepository by inject<EventRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
     val notificationRepository by inject<NotificationRepository>()
 
-    route("/events/{eventId}/partnership/{partnershipId}/invoice") {
+    route("/events/{eventId}/partnership/{partnershipId}/billing") {
         get {
             val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
-            val invoice = partnershipInvoiceRepository.getByPartnershipId(eventId, partnershipId)
+            val invoice = partnershipBillingRepository.getByPartnershipId(eventId, partnershipId)
             call.respond(HttpStatusCode.OK, invoice)
         }
         post {
             val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
-            val input = call.receive<CompanyInvoice>()
-            val invoiceId = partnershipInvoiceRepository.createOrUpdate(eventId, partnershipId, input)
-            val invoiceUrl = invoiceRepository.createInvoice(eventId, partnershipId)
-            partnershipInvoiceRepository.updateInvoiceUrl(eventId, partnershipId, invoiceUrl)
+            val input = call.receive<CompanyBillingData>()
+            val invoiceId = partnershipBillingRepository.createOrUpdate(eventId, partnershipId, input)
+            val invoiceUrl = billingRepository.createBilling(eventId, partnershipId)
+            partnershipBillingRepository.updateInvoiceUrl(eventId, partnershipId, invoiceUrl)
             val event = eventRepository.getById(eventId)
             val company = partnershipRepository.getCompanyByPartnershipId(eventId, partnershipId)
             val partnership = partnershipRepository.getById(eventId, partnershipId)
@@ -55,16 +55,16 @@ fun Route.partnershipInvoiceRoutes() {
             val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
-            val input = call.receive<CompanyInvoice>()
-            val invoiceId = partnershipInvoiceRepository.createOrUpdate(eventId, partnershipId, input)
-            val invoiceUrl = invoiceRepository.createInvoice(eventId, partnershipId)
-            partnershipInvoiceRepository.updateInvoiceUrl(eventId, partnershipId, invoiceUrl)
+            val input = call.receive<CompanyBillingData>()
+            val billingId = partnershipBillingRepository.createOrUpdate(eventId, partnershipId, input)
+            val invoiceUrl = billingRepository.createBilling(eventId, partnershipId)
+            partnershipBillingRepository.updateInvoiceUrl(eventId, partnershipId, invoiceUrl)
             val event = eventRepository.getById(eventId)
             val company = partnershipRepository.getCompanyByPartnershipId(eventId, partnershipId)
             val partnership = partnershipRepository.getById(eventId, partnershipId)
             val variables = NotificationVariables.NewInvoice(partnership.language, event, company)
             notificationRepository.sendMessage(eventId, variables)
-            call.respond(HttpStatusCode.OK, mapOf("id" to invoiceId.toString(), "invoiceUrl" to invoiceUrl))
+            call.respond(HttpStatusCode.OK, mapOf("id" to billingId.toString(), "invoiceUrl" to invoiceUrl))
         }
     }
 }

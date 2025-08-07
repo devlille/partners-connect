@@ -9,8 +9,12 @@ import org.jetbrains.exposed.v1.datetime.datetime
 object CompaniesTable : UUIDTable("companies") {
     val name = text("name")
     val siteUrl = text("site_url")
-    val headOffice = text("head_office")
+    val address = text("address")
+    val city = text("city")
+    val zipCode = text("zip_code")
+    val country = varchar("country", 2)
     val siret = text("siret")
+    val vat = text("vat")
     val description = text("description").nullable()
     val logoUrlOriginal = text("logo_url_original").nullable()
     val logoUrl1000 = text("logo_url_1000").nullable()
