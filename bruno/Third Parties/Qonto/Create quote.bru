@@ -1,0 +1,39 @@
+meta {
+  name: Create quote
+  type: http
+  seq: 4
+}
+
+post {
+  url: https://thirdparty-sandbox.staging.qonto.co/v2/quotes
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: {{qonto_api_key}}:{{qonto_secret}}
+  Content-Type: application/json
+  X-Qonto-Staging-Token: {{qonto_sandbox}}
+}
+
+body:json {
+  {
+    "client_id": "53f50be8-f747-4a40-96dc-779b9aef62d8",
+    "issue_date": "2026-06-12",
+    "expiry_date": "2026-06-12",
+    "currency": "EUR",
+    "items": [
+      {
+        "title": "Pack Gold",
+        "currency": "EUR",
+        "quantity": "1",
+        "unit_price": {
+          "value": "1000",
+          "currency": "EUR"
+        },
+        "vat_rate": "0"
+      }
+    ],
+    "terms_and_conditions": " "
+  }
+}

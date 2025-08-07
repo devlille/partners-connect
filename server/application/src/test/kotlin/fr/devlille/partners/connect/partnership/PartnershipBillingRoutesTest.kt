@@ -124,7 +124,7 @@ class PartnershipBillingRoutesTest {
         }
 
         println(response.bodyAsText())
-        assertEquals(HttpStatusCode.Companion.OK, response.status)
+        assertEquals(HttpStatusCode.Created, response.status)
         val body = response.bodyAsText()
         assertTrue(body.contains("id"))
     }
