@@ -1,0 +1,1 @@
+New quote has been created for company {{company_name}}.

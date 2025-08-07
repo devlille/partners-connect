@@ -1,15 +1,16 @@
 package fr.devlille.partners.connect.billing.infrastructure.gateways
 
-import fr.devlille.partners.connect.billing.domain.Billing
 import fr.devlille.partners.connect.billing.domain.BillingGateway
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoClient
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoClientInvoiceResponse
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoClientRequest
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoClientResponse
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoClientsResponse
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoInvoiceItem
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoInvoiceRequest
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoQuoteRequest
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoQuoteResponse
-import fr.devlille.partners.connect.billing.infrastructure.gateways.models.mappers.invoiceItem
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.mappers.invoiceItems
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.mappers.toQontoClientRequest
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.mappers.toQontoInvoiceRequest
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.mappers.toQontoQuoteRequest
@@ -19,7 +20,7 @@ import fr.devlille.partners.connect.integrations.infrastructure.db.QontoIntegrat
 import fr.devlille.partners.connect.integrations.infrastructure.db.get
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
-import fr.devlille.partners.connect.partnership.infrastructure.db.BillingsTable
+import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
@@ -32,9 +33,9 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpHeaders
 import io.ktor.server.plugins.NotFoundException
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.jdbc.transactions.experimental.suspendedTransactionAsync
 import java.util.UUID
 
 class QontoBillingGateway(
@@ -42,12 +43,42 @@ class QontoBillingGateway(
 ) : BillingGateway {
     override val provider: IntegrationProvider = IntegrationProvider.QONTO
 
-    override fun createBilling(integrationId: UUID, eventId: UUID, partnershipId: UUID): Billing = runBlocking {
-        val config = QontoIntegrationsTable[integrationId]
-        val billing = BillingEntity
-            .find { (BillingsTable.eventId eq eventId) and (BillingsTable.partnershipId eq partnershipId) }
-            .singleOrNull()
-            ?: throw NotFoundException("No billing found for company $partnershipId")
+    override suspend fun createInvoice(integrationId: UUID, eventId: UUID, partnershipId: UUID): String =
+        suspendedTransactionAsync {
+            val config = QontoIntegrationsTable[integrationId]
+            val billing = BillingEntity.singleByEventAndPartnership(eventId, partnershipId)
+                ?: throw NotFoundException("No billing found for company $partnershipId")
+            val items = invoiceItems(eventId, billing)
+            val client = getClient(billing, config)
+            val request = billing.event.toQontoInvoiceRequest(
+                clientId = client.id,
+                invoicePo = billing.po,
+                invoiceItems = items,
+            )
+            createInvoice(request, config).clientInvoice.invoiceUrl
+        }.await()
+
+    override suspend fun createQuote(integrationId: UUID, eventId: UUID, partnershipId: UUID): String =
+        suspendedTransactionAsync {
+            val config = QontoIntegrationsTable[integrationId]
+            val billing = BillingEntity.singleByEventAndPartnership(eventId, partnershipId)
+                ?: throw NotFoundException("No billing found for company $partnershipId")
+            val items = invoiceItems(eventId, billing)
+            val client = getClient(billing, config)
+            val request = billing.event.toQontoQuoteRequest(clientId = client.id, invoiceItems = items)
+            createQuote(request, config).quoteUrl
+        }.await()
+
+    private suspend fun getClient(billing: BillingEntity, config: QontoConfig): QontoClient {
+        val clients = listClients(taxId = billing.partnership.company.siret, config = config)
+        return if (clients.clients.isEmpty()) {
+            createClient(billing.toQontoClientRequest(), config).client
+        } else {
+            clients.clients.first()
+        }
+    }
+
+    private fun invoiceItems(eventId: UUID, billing: BillingEntity): List<QontoInvoiceItem> {
         val pack = billing.partnership.validatedPack()
             ?: throw NotFoundException("No sponsoring pack found for partnership ${billing.partnership.id}")
         val optionIds = PackOptionsTable.listOptionalOptionsByPack(pack.id.value)
@@ -55,26 +86,7 @@ class QontoBillingGateway(
         val optionalOptions = SponsoringOptionEntity
             .find { (SponsoringOptionsTable.eventId eq eventId) and (SponsoringOptionsTable.id inList optionIds) }
             .toList()
-        val clients = listClients(taxId = billing.partnership.company.siret, config = config)
-        val client = if (clients.clients.isEmpty()) {
-            createClient(billing.toQontoClientRequest(), config).client
-        } else {
-            clients.clients.first()
-        }
-        val items = invoiceItem(billing.partnership.language, pack, optionalOptions)
-        val invoiceRequest = billing.event.toQontoInvoiceRequest(
-            clientId = client.id,
-            invoicePo = billing.po,
-            invoiceItems = items,
-        )
-        val quoteRequest = billing.event.toQontoQuoteRequest(
-            clientId = client.id,
-            invoiceItems = items,
-        )
-        Billing(
-            invoiceUrl = createInvoice(invoiceRequest, config).clientInvoice.invoiceUrl,
-            quoteUrl = createQuote(quoteRequest, config).quoteUrl,
-        )
+        return invoiceItems(billing.partnership.language, pack, optionalOptions)
     }
 
     private suspend fun listClients(taxId: String, config: QontoConfig): QontoClientsResponse {

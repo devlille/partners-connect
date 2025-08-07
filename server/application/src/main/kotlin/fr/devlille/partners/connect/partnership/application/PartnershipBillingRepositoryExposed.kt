@@ -1,6 +1,5 @@
 package fr.devlille.partners.connect.partnership.application
 
-import fr.devlille.partners.connect.billing.domain.Billing
 import fr.devlille.partners.connect.companies.application.mappers.toDomain
 import fr.devlille.partners.connect.companies.domain.CompanyBillingData
 import fr.devlille.partners.connect.partnership.domain.PartnershipBillingRepository
@@ -46,11 +45,17 @@ class PartnershipBillingRepositoryExposed : PartnershipBillingRepository {
         }.id.value
     }
 
-    override fun updateBillingUrls(eventId: UUID, partnershipId: UUID, billing: Billing): UUID = transaction {
+    override fun updateInvoiceUrl(eventId: UUID, partnershipId: UUID, invoiceUrl: String): UUID = transaction {
         val existing = BillingEntity.singleByEventAndPartnership(eventId, partnershipId)
             ?: throw NotFoundException("Invoice not found for partnership ID: $partnershipId")
-        existing.invoicePdfUrl = billing.invoiceUrl
-        existing.quotePdfUrl = billing.quoteUrl
+        existing.invoicePdfUrl = invoiceUrl
+        existing.id.value
+    }
+
+    override fun updateQuoteUrl(eventId: UUID, partnershipId: UUID, quoteUrl: String): UUID = transaction {
+        val existing = BillingEntity.singleByEventAndPartnership(eventId, partnershipId)
+            ?: throw NotFoundException("Invoice not found for partnership ID: $partnershipId")
+        existing.quotePdfUrl = quoteUrl
         existing.id.value
     }
 }

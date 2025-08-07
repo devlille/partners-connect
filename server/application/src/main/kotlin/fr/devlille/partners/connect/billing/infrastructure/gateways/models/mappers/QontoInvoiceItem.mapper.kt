@@ -7,7 +7,7 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackE
 import io.ktor.server.plugins.NotFoundException
 
 @Suppress("SpreadOperator")
-internal fun invoiceItem(
+internal fun invoiceItems(
     language: String,
     pack: SponsoringPackEntity,
     options: List<SponsoringOptionEntity>,
