@@ -1,0 +1,27 @@
+meta {
+  name: BilletWeb integration
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/events/:event_id/integrations/billetweb/ticketing
+  body: json
+  auth: none
+}
+
+params:path {
+  event_id: {{event_id}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "basic": "{{billetweb_basic}}",
+    "event_id": "123455",
+    "rate_id": "1299342"
+  }
+}
