@@ -1,4 +1,4 @@
-package fr.devlille.partners.connect.billing.infrastructure.gateways
+package fr.devlille.partners.connect.billing.infrastructure.gateways.models
 
 import kotlinx.serialization.Serializable
 

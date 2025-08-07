@@ -1,0 +1,31 @@
+package fr.devlille.partners.connect.billing.infrastructure.gateways.models.mappers
+
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoInvoiceItem
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoInvoiceRequest
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoInvoiceSettings
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoLegalCapitalShare
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoPaymentMethods
+import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+
+internal fun EventEntity.toQontoInvoiceRequest(
+    clientId: String,
+    invoicePo: String?,
+    invoiceItems: List<QontoInvoiceItem>,
+): QontoInvoiceRequest {
+    val now = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+    val eventMonth = "%02d".format(startTime.monthNumber)
+    val eventDay = "%02d".format(startTime.dayOfMonth)
+    return QontoInvoiceRequest(
+        settings = QontoInvoiceSettings(legalCapitalShare = QontoLegalCapitalShare(currency = "EUR")),
+        clientId = clientId,
+        dueDate = "${now.year}-${"%02d".format(now.monthNumber)}-${"%02d".format(now.dayOfMonth)}",
+        issueDate = "${startTime.year}-$eventMonth-$eventDay",
+        currency = "EUR",
+        paymentMethods = QontoPaymentMethods(iban = legalEntity.iban),
+        purchaseOrder = invoicePo,
+        items = invoiceItems,
+    )
+}

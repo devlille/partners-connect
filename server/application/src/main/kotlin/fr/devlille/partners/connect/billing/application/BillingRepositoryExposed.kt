@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.billing.application
 
+import fr.devlille.partners.connect.billing.domain.Billing
 import fr.devlille.partners.connect.billing.domain.BillingGateway
 import fr.devlille.partners.connect.billing.domain.BillingRepository
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
@@ -12,7 +13,7 @@ import java.util.UUID
 class BillingRepositoryExposed(
     private val billingGateways: List<BillingGateway>,
 ) : BillingRepository {
-    override fun createBilling(eventId: UUID, partnershipId: UUID): String = transaction {
+    override fun createBilling(eventId: UUID, partnershipId: UUID): Billing = transaction {
         val integrations = IntegrationsTable
             .findByEventIdAndUsage(eventId, IntegrationUsage.BILLING)
             .toList()

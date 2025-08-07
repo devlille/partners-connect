@@ -1,7 +1,18 @@
 package fr.devlille.partners.connect.billing.infrastructure.gateways
 
+import fr.devlille.partners.connect.billing.domain.Billing
 import fr.devlille.partners.connect.billing.domain.BillingGateway
-import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoClientInvoiceResponse
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoClientRequest
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoClientResponse
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoClientsResponse
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoInvoiceRequest
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoQuoteRequest
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoQuoteResponse
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.mappers.invoiceItem
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.mappers.toQontoClientRequest
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.mappers.toQontoInvoiceRequest
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.mappers.toQontoQuoteRequest
 import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.infrastructure.db.QontoConfig
 import fr.devlille.partners.connect.integrations.infrastructure.db.QontoIntegrationsTable
@@ -13,7 +24,6 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionsTable
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionalOptionsByPack
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -23,9 +33,6 @@ import io.ktor.client.request.setBody
 import io.ktor.http.HttpHeaders
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.core.and
 import java.util.UUID
@@ -35,7 +42,7 @@ class QontoBillingGateway(
 ) : BillingGateway {
     override val provider: IntegrationProvider = IntegrationProvider.QONTO
 
-    override fun createBilling(integrationId: UUID, eventId: UUID, partnershipId: UUID): String = runBlocking {
+    override fun createBilling(integrationId: UUID, eventId: UUID, partnershipId: UUID): Billing = runBlocking {
         val config = QontoIntegrationsTable[integrationId]
         val billing = BillingEntity
             .find { (BillingsTable.eventId eq eventId) and (BillingsTable.partnershipId eq partnershipId) }
@@ -54,12 +61,20 @@ class QontoBillingGateway(
         } else {
             clients.clients.first()
         }
-        val request = billing.event.toQontoInvoiceRequest(
+        val items = invoiceItem(billing.partnership.language, pack, optionalOptions)
+        val invoiceRequest = billing.event.toQontoInvoiceRequest(
             clientId = client.id,
             invoicePo = billing.po,
-            invoiceItems = invoiceItem(billing.partnership.language, pack, optionalOptions),
+            invoiceItems = items,
         )
-        createInvoice(request, config).clientInvoice.invoiceUrl
+        val quoteRequest = billing.event.toQontoQuoteRequest(
+            clientId = client.id,
+            invoiceItems = items,
+        )
+        Billing(
+            invoiceUrl = createInvoice(invoiceRequest, config).clientInvoice.invoiceUrl,
+            quoteUrl = createQuote(quoteRequest, config).quoteUrl,
+        )
     }
 
     private suspend fun listClients(taxId: String, config: QontoConfig): QontoClientsResponse {
@@ -94,69 +109,14 @@ class QontoBillingGateway(
         return response.body<QontoClientInvoiceResponse>()
     }
 
-    private fun BillingEntity.toQontoClientRequest(): QontoClientRequest {
-        val company = this.partnership.company
-        return QontoClientRequest(
-            name = this.name ?: company.name,
-            firstName = this.contactFirstName,
-            lastName = this.contactLastName,
-            type = "company",
-            email = this.contactEmail,
-            extraEmails = listOf(),
-            vatNumber = company.vat,
-            taxId = company.siret,
-            billingAddress = QontoBillingAddress(
-                streetAddress = company.address,
-                city = company.city,
-                zipCode = company.zipCode,
-                countryCode = company.country,
-            ),
-            currency = "EUR",
-            locale = "FR",
-        )
+    private suspend fun createQuote(request: QontoQuoteRequest, config: QontoConfig): QontoQuoteResponse {
+        val route = "${SystemVarEnv.QontoProvider.baseUrl}/v2/quotes"
+        val response = httpClient.post(route) {
+            headers[HttpHeaders.Authorization] = "${config.apiKey}:${config.secret}"
+            headers["X-Qonto-Staging-Token"] = config.sandboxToken
+            headers[HttpHeaders.ContentType] = "application/json"
+            setBody(Json.encodeToString(QontoQuoteRequest.serializer(), request))
+        }
+        return response.body<QontoQuoteResponse>()
     }
-
-    private fun EventEntity.toQontoInvoiceRequest(
-        clientId: String,
-        invoicePo: String?,
-        invoiceItems: List<QontoInvoiceItem>,
-    ): QontoInvoiceRequest {
-        val now = Clock.System.now().toLocalDateTime(TimeZone.UTC)
-        val eventMonth = "%02d".format(startTime.monthNumber)
-        val eventDay = "%02d".format(startTime.dayOfMonth)
-        return QontoInvoiceRequest(
-            settings = QontoInvoiceSettings(legalCapitalShare = QontoLegalCapitalShare(currency = "EUR")),
-            clientId = clientId,
-            dueDate = "${now.year}-${"%02d".format(now.monthNumber)}-${"%02d".format(now.dayOfMonth)}",
-            issueDate = "${startTime.year}-$eventMonth-$eventDay",
-            currency = "EUR",
-            paymentMethods = QontoPaymentMethods(iban = legalEntity.iban),
-            purchaseOrder = invoicePo,
-            items = invoiceItems,
-        )
-    }
-
-    @Suppress("SpreadOperator")
-    private fun invoiceItem(
-        language: String,
-        pack: SponsoringPackEntity,
-        options: List<SponsoringOptionEntity>,
-    ): List<QontoInvoiceItem> = listOf(
-        QontoInvoiceItem(
-            title = "Sponsoring ${pack.name}",
-            quantity = "1",
-            unitPrice = QontoMoneyAmount(value = "${pack.basePrice}", currency = "EUR"),
-            vatRate = "0",
-        ),
-        *options.map { option ->
-            val translation = option.translations.firstOrNull { it.language == language }
-                ?: throw NotFoundException("Translation not found for option ${option.id} in language $language")
-            QontoInvoiceItem(
-                title = translation.name,
-                quantity = "1",
-                unitPrice = QontoMoneyAmount(value = "${option.price}", currency = "EUR"),
-                vatRate = "0",
-            )
-        }.toTypedArray(),
-    )
 }
