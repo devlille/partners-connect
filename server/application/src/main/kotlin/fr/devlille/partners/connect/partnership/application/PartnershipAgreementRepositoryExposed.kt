@@ -102,7 +102,7 @@ internal fun EventEntity.toAgreementEvent(formatter: DateTimeFormat<LocalDate>):
 internal fun CompanyEntity.toAgreementCompany(): Company = Company(
     name = this.name,
     siret = this.siret,
-    headOffice = this.headOffice,
+    headOffice = "${this.address}, ${this.zipCode} ${this.city}, ${this.country}",
 )
 
 @Suppress("ThrowsCount")

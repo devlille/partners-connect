@@ -1,14 +1,14 @@
 package fr.devlille.partners.connect.internal
 
 import fr.devlille.partners.connect.auth.infrastructure.bindings.authModule
+import fr.devlille.partners.connect.billing.domain.BillingGateway
+import fr.devlille.partners.connect.billing.infrastructure.bindings.billingModule
 import fr.devlille.partners.connect.companies.infrastructure.bindings.companyModule
 import fr.devlille.partners.connect.events.infrastructure.bindings.eventModule
 import fr.devlille.partners.connect.integrations.infrastructure.bindings.integrationModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkClientModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.storageModule
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
-import fr.devlille.partners.connect.invoices.domain.InvoiceGateway
-import fr.devlille.partners.connect.invoices.infrastructure.bindings.invoicesModule
 import fr.devlille.partners.connect.legaentity.infrastructure.bindings.legalEntityModule
 import fr.devlille.partners.connect.module
 import fr.devlille.partners.connect.notifications.infrastructure.bindings.notificationModule
@@ -29,10 +29,10 @@ fun Application.moduleMocked(
     mockStorage: Module = module {
         single<Storage> { mockk() }
     },
-    mockInvoiceIntegration: Module = module {
-        single<List<InvoiceGateway>> {
+    mockBillingIntegration: Module = module {
+        single<List<BillingGateway>> {
             listOf(
-                FakeInvoiceGateway(),
+                FakeBillingGateway(),
             )
         }
     },
@@ -50,11 +50,11 @@ fun Application.moduleMocked(
             companyModule,
             partnershipModule,
             notificationModule,
-            invoicesModule,
+            billingModule,
             integrationModule,
             mockNetwork,
             mockStorage,
-            mockInvoiceIntegration,
+            mockBillingIntegration,
         ),
     )
 }

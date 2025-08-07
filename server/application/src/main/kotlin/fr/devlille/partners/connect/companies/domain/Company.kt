@@ -8,11 +8,21 @@ data class Company(
     val id: String,
     val name: String,
     @SerialName("head_office")
-    val headOffice: String,
+    val headOffice: Address,
     val siret: String,
+    val vat: String,
     val description: String?,
     val siteUrl: String,
     val medias: Media?,
+)
+
+@Serializable
+class Address(
+    val address: String,
+    val city: String,
+    @SerialName("zip_code")
+    val zipCode: String,
+    val country: String,
 )
 
 @Serializable

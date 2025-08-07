@@ -33,8 +33,12 @@ class CompanyRepositoryExposed(
         val company = companyEntity.new {
             name = input.name
             siteUrl = input.siteUrl
-            headOffice = input.headOffice
+            address = input.headOffice.address
+            city = input.headOffice.city
+            zipCode = input.headOffice.zipCode
+            country = input.headOffice.country
             siret = input.siret
+            vat = input.vat
             description = input.description
         }
 

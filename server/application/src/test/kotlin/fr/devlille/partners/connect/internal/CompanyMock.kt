@@ -8,15 +8,23 @@ import java.util.UUID
 fun insertMockCompany(
     id: UUID = UUID.randomUUID(),
     name: String = "Mock Company",
-    headOffice: String = "123 Mock St, Mock City, MC 12345",
+    address: String = "123 Mock St",
+    city: String = "Mock City",
+    zipCode: String = "12345",
+    country: String = "MO",
     siret: String = "12345678901234",
+    vat: String = "FR12345678901",
     description: String? = "This is a mock company for testing purposes.",
     siteUrl: String = "https://www.mockcompany.com",
 ): CompanyEntity = transaction {
     CompanyEntity.new(id) {
         this.name = name
-        this.headOffice = headOffice
+        this.address = address
+        this.city = city
+        this.zipCode = zipCode
+        this.country = country
         this.siret = siret
+        this.vat = vat
         this.description = description
         this.siteUrl = siteUrl
         this.logoUrlOriginal = null

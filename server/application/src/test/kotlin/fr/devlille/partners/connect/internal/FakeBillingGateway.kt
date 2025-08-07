@@ -1,14 +1,14 @@
 package fr.devlille.partners.connect.internal
 
+import fr.devlille.partners.connect.billing.domain.BillingGateway
 import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
-import fr.devlille.partners.connect.invoices.domain.InvoiceGateway
 import java.util.UUID
 
-class FakeInvoiceGateway : InvoiceGateway {
+class FakeBillingGateway : BillingGateway {
     override val provider: IntegrationProvider
         get() = IntegrationProvider.QONTO
 
-    override fun createInvoice(
+    override fun createBilling(
         integrationId: UUID,
         eventId: UUID,
         partnershipId: UUID,

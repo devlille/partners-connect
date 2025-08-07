@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.companies
 
+import fr.devlille.partners.connect.companies.domain.Address
 import fr.devlille.partners.connect.companies.domain.CreateCompany
 import fr.devlille.partners.connect.companies.domain.Social
 import fr.devlille.partners.connect.companies.domain.SocialType
@@ -59,8 +60,14 @@ class CompanyRoutesTest {
         val input = CreateCompany(
             name = "DevLille",
             siteUrl = "https://devlille.fr",
-            headOffice = "Lille, France",
+            headOffice = Address(
+                address = "123 Rue de Lille",
+                city = "Lille",
+                zipCode = "59000",
+                country = "FR",
+            ),
             siret = "12345678901234",
+            vat = "FR12345678901",
             description = "Lille Developer Community",
             socials = listOf(Social(SocialType.LINKEDIN, "https://linkedin.com/devlille")),
         )

@@ -1,24 +1,15 @@
 package fr.devlille.partners.connect.companies.application.mappers
 
-import fr.devlille.partners.connect.companies.domain.Address
-import fr.devlille.partners.connect.companies.domain.CompanyInvoice
+import fr.devlille.partners.connect.companies.domain.CompanyBillingData
 import fr.devlille.partners.connect.companies.domain.Contact
-import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 
-fun InvoiceEntity.toDomain(): CompanyInvoice = CompanyInvoice(
+fun BillingEntity.toDomain(): CompanyBillingData = CompanyBillingData(
     name = name,
     contact = Contact(
         firstName = contactFirstName,
         lastName = contactLastName,
         email = contactEmail,
     ),
-    address = Address(
-        address = address,
-        city = city,
-        zipCode = zipCode,
-        country = country,
-    ),
-    siret = siret,
-    vat = vat,
     po = po,
 )

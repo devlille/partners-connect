@@ -4,13 +4,14 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class CreateCompany(
+data class CreateCompany(
     val name: String,
     @SerialName("site_url")
     val siteUrl: String,
     @SerialName("head_office")
-    val headOffice: String,
+    val headOffice: Address,
     val siret: String,
+    val vat: String,
     val description: String? = null,
     val socials: List<Social> = emptyList(),
 )
