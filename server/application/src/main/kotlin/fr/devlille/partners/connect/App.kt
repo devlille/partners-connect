@@ -17,6 +17,7 @@ import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsT
 import fr.devlille.partners.connect.integrations.infrastructure.db.MailjetIntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.QontoIntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.SlackIntegrationsTable
+import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.UserSession
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkClientModule
@@ -42,6 +43,7 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslati
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPacksTable
+import fr.devlille.partners.connect.tickets.infrastructure.bindings.ticketingModule
 import fr.devlille.partners.connect.users.infrastructure.api.userRoutes
 import fr.devlille.partners.connect.users.infrastructure.bindings.userModule
 import fr.devlille.partners.connect.users.infrastructure.db.EventPermissionsTable
@@ -59,6 +61,7 @@ import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.plugins.statuspages.exception
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
@@ -100,6 +103,7 @@ fun Application.module(
         partnershipModule,
         notificationModule,
         billingModule,
+        ticketingModule,
         integrationModule,
     ),
 ) {
@@ -209,6 +213,9 @@ private fun Application.configureStatusPage() {
         }
         exception<UnauthorizedException> { call, cause ->
             call.respondText(text = cause.message ?: "401 Unauthorized", status = HttpStatusCode.Unauthorized)
+        }
+        exception<ForbiddenException> { call, cause ->
+            call.respondText(text = cause.message ?: "403 Forbidden", status = HttpStatusCode.Forbidden)
         }
         exception<NotFoundException> { call, cause ->
             call.respondText(text = cause.message ?: "404 Not Found", status = HttpStatusCode.NotFound)

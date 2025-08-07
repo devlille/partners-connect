@@ -22,4 +22,13 @@ sealed interface CreateIntegration {
         @SerialName("sandbox_token")
         val sandboxToken: String,
     ) : CreateIntegration
+
+    @Serializable
+    class CreateBilletWebIntegration(
+        val basic: String,
+        @SerialName("event_id")
+        val eventId: String,
+        @SerialName("rate_id")
+        val rateId: String,
+    ) : CreateIntegration
 }

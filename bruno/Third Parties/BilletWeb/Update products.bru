@@ -1,0 +1,30 @@
+meta {
+  name: Update products
+  type: http
+  seq: 4
+}
+
+post {
+  url: https://www.billetweb.fr/api/event/:event_id/update_product
+  body: json
+  auth: none
+}
+
+params:path {
+  event_id: 1299342
+}
+
+headers {
+  Authorization: Basic {{billetweb_basic}}
+}
+
+body:json {
+  [
+    {
+      "id": "257901127",
+      "name": "Jeanne",
+      "firstname": "Doe",
+      "used": "0"
+    }
+  ]
+}

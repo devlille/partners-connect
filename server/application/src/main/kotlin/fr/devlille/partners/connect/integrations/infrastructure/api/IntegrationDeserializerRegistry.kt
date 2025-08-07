@@ -14,6 +14,7 @@ class DefaultIntegrationDeserializerRegistry : IntegrationDeserializerRegistry {
         IntegrationProvider.SLACK to CreateIntegration.CreateSlackIntegration.serializer(),
         IntegrationProvider.MAILJET to CreateIntegration.CreateMailjetIntegration.serializer(),
         IntegrationProvider.QONTO to CreateIntegration.CreateQontoIntegration.serializer(),
+        IntegrationProvider.BILLETWEB to CreateIntegration.CreateBilletWebIntegration.serializer(),
         // Add other providers here
     )
 

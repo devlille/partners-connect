@@ -1,0 +1,39 @@
+meta {
+  name: Add order
+  type: http
+  seq: 3
+}
+
+post {
+  url: https://www.billetweb.fr/api/event/:event_id/add_order
+  body: json
+  auth: none
+}
+
+params:path {
+  event_id: 1299342
+}
+
+headers {
+  Authorization: Basic {{billetweb_basic}}
+}
+
+body:json {
+  [
+    {
+      "name": "John",
+      "firstname": "Doe",
+      "email": "john.doe@mail.com",
+      "payment_type": "free",
+      "products": [
+        {
+          "ticket": "6475189",
+          "name": "John",
+          "firstname": "Doe",
+          "email": "john.doe@mail.com",
+          "used": "0"
+        }
+      ]
+    }
+  ]
+}
