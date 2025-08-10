@@ -61,6 +61,7 @@ class SponsoringPackRoutesTest {
         val body = CreateSponsoringPack(
             name = "Gold",
             price = 3000,
+            nbTickets = 1,
             maxQuantity = 5,
         )
 
