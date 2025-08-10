@@ -51,6 +51,7 @@ class PackRepositoryExposed(
             this.name = input.name
             this.basePrice = input.price
             this.withBooth = input.withBooth
+            this.nbTickets = input.nbTickets
             this.maxQuantity = input.maxQuantity
         }.id.value
     }

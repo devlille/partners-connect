@@ -13,6 +13,7 @@ import fr.devlille.partners.connect.events.infrastructure.bindings.eventModule
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import fr.devlille.partners.connect.integrations.infrastructure.api.integrationRoutes
 import fr.devlille.partners.connect.integrations.infrastructure.bindings.integrationModule
+import fr.devlille.partners.connect.integrations.infrastructure.db.BilletWebIntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.MailjetIntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.QontoIntegrationsTable
@@ -32,10 +33,12 @@ import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipAg
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipBillingRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipSuggestionRoutes
+import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipTicketingRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.bindings.partnershipModule
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionsTable
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipTicketsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.api.sponsoringRoutes
 import fr.devlille.partners.connect.sponsoring.infrastructure.bindings.sponsoringModule
@@ -61,7 +64,6 @@ import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.statuspages.StatusPages
-import io.ktor.server.plugins.statuspages.exception
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
@@ -142,6 +144,7 @@ fun Application.module(
         partnershipBillingRoutes()
         partnershipRoutes()
         partnershipSuggestionRoutes()
+        partnershipTicketingRoutes()
         integrationRoutes()
     }
 }
@@ -160,6 +163,7 @@ private fun configureDatabase(url: String, driver: String, user: String, passwor
             SlackIntegrationsTable,
             MailjetIntegrationsTable,
             QontoIntegrationsTable,
+            BilletWebIntegrationsTable,
             // legal entities
             LegalEntitiesTable,
             // events
@@ -180,6 +184,7 @@ private fun configureDatabase(url: String, driver: String, user: String, passwor
             PartnershipsTable,
             PartnershipOptionsTable,
             PartnershipEmailsTable,
+            PartnershipTicketsTable,
         )
     }
 }
