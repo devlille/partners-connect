@@ -182,79 +182,11 @@
             </div> -->
 
       <div class="results-list grid">
-        <div class="card">
-          <h3><a href="sponsor.html">Sfeir</a></h3>
-          <dl>
-            <dt>Facturation</dt>
-            <dd>15/05/2025</dd>
-            <dt>Status</dt>
-            <dd>Activé</dd>
-            <dt>Pack</dt>
-            <dd>Gold</dd>
-          </dl>
-        </div>
-        <div class="card">
-          <h3><a href="#">Zenika</a></h3>
-          <dl>
-            <dt>Facturation</dt>
-            <dd>15/05/2025</dd>
-            <dt>Status</dt>
-            <dd>Activé</dd>
-            <dt>Pack</dt>
-            <dd>Argent</dd>
-          </dl>
-        </div>
-        <div class="card">
-          <h3><a href="#">Zenika</a></h3>
-          <dl>
-            <dt>Facturation</dt>
-            <dd>15/05/2025</dd>
-            <dt>Status</dt>
-            <dd>Activé</dd>
-            <dt>Pack</dt>
-            <dd>Argent</dd>
-          </dl>
-        </div>
-        <div class="card">
-          <h3><a href="#">Zenika</a></h3>
-          <dl>
-            <dt>Facturation</dt>
-            <dd>15/05/2025</dd>
-            <dt>Status</dt>
-            <dd>Activé</dd>
-            <dt>Pack</dt>
-            <dd>Argent</dd>
-          </dl>
-        </div>
-        <div class="card">
-          <h3><a href="#">Zenika</a></h3>
-          <dl>
-            <dt>Facturation</dt>
-            <dd>15/05/2025</dd>
-            <dt>Status</dt>
-            <dd>Activé</dd>
-            <dt>Pack</dt>
-            <dd>Argent</dd>
-          </dl>
-        </div>
-        <div class="card">
-          <h3><a href="#">Zenika</a></h3>
-          <dl>
-            <dt>Facturation</dt>
-            <dd>15/05/2025</dd>
-            <dt>Status</dt>
-            <dd>Activé</dd>
-            <dt>Pack</dt>
-            <dd>Argent</dd>
-          </dl>
-        </div>
+        <SponsorTile  :partner="{ name: 'Zenika', billingDate: '01/02/2025', pack: 'Gold', status: 'Activé' }"/>
       </div>
     </main>
   </div>
-
-  <footer>
-    <p>&copy; DevLille, 2025 -</p>
-  </footer>
+  <Footer />
 </template>
 
 <script>

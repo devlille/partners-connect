@@ -98,10 +98,7 @@
       </div>
     </main>
   </div>
-
-  <footer>
-    <p>&copy; DevLille, 2025 -</p>
-  </footer>
+  <Footer />
 </template>
 
 <script>
