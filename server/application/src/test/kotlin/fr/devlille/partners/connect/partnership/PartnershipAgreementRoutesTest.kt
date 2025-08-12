@@ -2,13 +2,13 @@ package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Upload
-import fr.devlille.partners.connect.internal.insertLegalEntity
 import fr.devlille.partners.connect.internal.insertMockCompany
 import fr.devlille.partners.connect.internal.insertMockPartnership
 import fr.devlille.partners.connect.internal.insertMockSponsoringPack
 import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.internal.insertMockedUser
 import fr.devlille.partners.connect.internal.moduleMocked
+import fr.devlille.partners.connect.legalentity.factories.insertLegalEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndPartnership
 import io.ktor.client.request.forms.formData

@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.internal
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.legaentity.infrastructure.db.LegalEntityEntity
+import fr.devlille.partners.connect.legalentity.factories.insertLegalEntity
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID

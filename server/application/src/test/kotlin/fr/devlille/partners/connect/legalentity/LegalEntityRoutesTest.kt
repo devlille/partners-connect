@@ -1,8 +1,9 @@
 package fr.devlille.partners.connect.legalentity
 
 import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
-import fr.devlille.partners.connect.internal.mockedAdminUser
 import fr.devlille.partners.connect.internal.moduleMocked
+import fr.devlille.partners.connect.legaentity.domain.LegalEntity
+import fr.devlille.partners.connect.legalentity.factories.createLegalEntity
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -20,27 +21,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 class LegalEntityRoutesTest {
-    private val testLegalEntityJson = """
-        {
-            "name": "DevLille Org",
-            "head_office": "123 rue de la République, Lille, France",
-            "siret": "12345678900019",
-            "siren": "123456789",
-            "tva": "FR123456789",
-            "d_and_b": "123456789",
-            "nace": "62.01Z",
-            "naf": "62.01Z",
-            "duns": "987654321",
-            "iban": "FR7630006000011234567890189",
-            "bic": "AGRIFRPPXXX",
-            "rib_url": "https://example.com/rib.pdf",
-            "representative_user_email": "${mockedAdminUser.email}",
-            "representative_role": "President",
-            "creation_location": "Lille",
-            "created_at": "2025-08-01T00:00:00",
-            "published_at": "2025-08-02T00:00:00"
-        }
-    """.trimIndent()
+    private val json = Json { ignoreUnknownKeys = true }
 
     @Test
     fun `POST creates a legal entity`() = testApplication {
@@ -52,7 +33,7 @@ class LegalEntityRoutesTest {
         val response = client.post("/legal-entities") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(testLegalEntityJson)
+            setBody(json.encodeToString(LegalEntity.serializer(), createLegalEntity()))
         }
 
         assertEquals(HttpStatusCode.Created, response.status)
@@ -61,18 +42,23 @@ class LegalEntityRoutesTest {
     }
 
     @Test
-    fun `POST fails if representative user does not exist`() = testApplication {
-        application {
-            moduleMocked()
-        }
+    fun `POST fails if representative user does not exist`() {
+        val legalEntity = createLegalEntity()
 
-        val response = client.post("/legal-entities") {
-            contentType(ContentType.Application.Json)
-            header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(testLegalEntityJson)
-        }
+        testApplication {
+            application {
+                moduleMocked()
+            }
 
-        assertEquals(HttpStatusCode.NotFound, response.status)
+            val response = client.post("/legal-entities") {
+                contentType(ContentType.Application.Json)
+                header(HttpHeaders.Authorization, "Bearer valid")
+                setBody(json.encodeToString(LegalEntity.serializer(), legalEntity))
+            }
+
+            assertEquals(HttpStatusCode.NotFound, response.status)
+            assertEquals("User with email ${legalEntity.representativeUserEmail} not found", response.bodyAsText())
+        }
     }
 
     @Test
@@ -85,7 +71,7 @@ class LegalEntityRoutesTest {
         val postResponse = client.post("/legal-entities") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(testLegalEntityJson)
+            setBody(json.encodeToString(LegalEntity.serializer(), createLegalEntity()))
         }
         val postResponseBody = Json.decodeFromString<Map<String, String>>(postResponse.bodyAsText())
         val legalEntityId = UUID.fromString(postResponseBody["id"])

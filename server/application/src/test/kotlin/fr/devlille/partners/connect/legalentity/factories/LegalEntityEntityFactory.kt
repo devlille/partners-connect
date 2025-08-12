@@ -1,5 +1,6 @@
-package fr.devlille.partners.connect.internal
+package fr.devlille.partners.connect.legalentity.factories
 
+import fr.devlille.partners.connect.internal.insertMockedUser
 import fr.devlille.partners.connect.legaentity.infrastructure.db.LegalEntityEntity
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import kotlinx.datetime.Clock.System
