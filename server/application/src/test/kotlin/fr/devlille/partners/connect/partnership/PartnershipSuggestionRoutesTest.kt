@@ -3,13 +3,13 @@ package fr.devlille.partners.connect.partnership
 import fr.devlille.partners.connect.internal.insertMockCompany
 import fr.devlille.partners.connect.internal.insertMockPartnership
 import fr.devlille.partners.connect.internal.insertMockSponsoringPack
-import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.domain.SuggestPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
+import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody

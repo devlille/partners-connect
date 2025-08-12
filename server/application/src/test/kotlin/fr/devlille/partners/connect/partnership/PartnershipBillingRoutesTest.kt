@@ -8,10 +8,10 @@ import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsT
 import fr.devlille.partners.connect.internal.insertMockCompany
 import fr.devlille.partners.connect.internal.insertMockPartnership
 import fr.devlille.partners.connect.internal.insertMockedEvent
-import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
+import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.put

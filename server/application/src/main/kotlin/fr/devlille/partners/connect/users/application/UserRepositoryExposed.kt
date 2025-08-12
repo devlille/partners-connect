@@ -1,23 +1,22 @@
 package fr.devlille.partners.connect.users.application
 
+import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.users.domain.User
 import fr.devlille.partners.connect.users.domain.UserRepository
 import fr.devlille.partners.connect.users.infrastructure.db.EventPermissionEntity
-import fr.devlille.partners.connect.users.infrastructure.db.EventPermissionsTable
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
-import fr.devlille.partners.connect.users.infrastructure.db.UsersTable
+import fr.devlille.partners.connect.users.infrastructure.db.hasPermission
+import fr.devlille.partners.connect.users.infrastructure.db.listUserGrantedByEvent
+import fr.devlille.partners.connect.users.infrastructure.db.singleEventPermission
+import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
 import io.ktor.server.plugins.NotFoundException
-import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
-class UserRepositoryExposed(
-    private val usersTable: UsersTable,
-    private val permsTable: EventPermissionsTable,
-) : UserRepository {
+class UserRepositoryExposed : UserRepository {
     override fun createUserIfNotExist(user: User) {
         transaction {
-            if (UserEntity.find { usersTable.email eq user.email }.singleOrNull() == null) {
+            if (UserEntity.singleUserByEmail(user.email) == null) {
                 UserEntity.new {
                     this.name = user.displayName
                     this.email = user.email
@@ -29,40 +28,29 @@ class UserRepositoryExposed(
 
     override fun findUsersByEventId(eventId: UUID): List<User> = transaction {
         EventPermissionEntity
-            .find {
-                (permsTable.eventId eq eventId) and (permsTable.canEdit eq true)
-            }
+            .listUserGrantedByEvent(eventId)
             .map { it.user.toDomain() }
     }
 
     override fun hasEditPermissionByEmail(email: String, eventId: UUID): Boolean = transaction {
-        val user = UserEntity
-            .find { usersTable.email eq email }
-            .firstOrNull()
+        val user = UserEntity.singleUserByEmail(email)
             ?: throw NotFoundException("User with email $email not found")
         EventPermissionEntity
-            .find {
-                (permsTable.eventId eq eventId) and (permsTable.canEdit eq true) and (permsTable.userId eq user.id)
-            }
-            .empty().not()
+            .hasPermission(eventId = eventId, userId = user.id.value)
     }
 
     override fun grantUsers(eventId: UUID, userEmails: List<String>) = transaction {
+        val event = EventEntity.findById(eventId) ?: throw NotFoundException("Event with ID: $eventId not found")
         userEmails.forEach { userEmail ->
             val userEntity = UserEntity
-                .find { UsersTable.email eq userEmail }
-                .singleOrNull()
+                .singleUserByEmail(userEmail)
                 ?: throw NotFoundException("User with email: $userEmail not found")
-
-            val existing = EventPermissionEntity
-                .find { (permsTable.eventId eq eventId) and (permsTable.userId eq userEntity.id) }
-                .firstOrNull()
-
+            val existing = EventPermissionEntity.singleEventPermission(eventId = eventId, userId = userEntity.id.value)
             if (existing != null) {
                 existing.canEdit = true
             } else {
                 EventPermissionEntity.new {
-                    this.eventId = eventId
+                    this.event = event
                     this.user = userEntity
                     this.canEdit = true
                 }

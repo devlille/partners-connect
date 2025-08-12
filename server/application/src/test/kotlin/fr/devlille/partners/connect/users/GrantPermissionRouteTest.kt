@@ -1,10 +1,12 @@
 package fr.devlille.partners.connect.users
 
-import fr.devlille.partners.connect.internal.mockedAdminUser
+import fr.devlille.partners.connect.internal.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
+import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
+import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
+import fr.devlille.partners.connect.users.factories.insertMockedUser
 import fr.devlille.partners.connect.users.infrastructure.api.GrantPermissionRequest
 import fr.devlille.partners.connect.users.infrastructure.db.EventPermissionEntity
-import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -19,6 +21,32 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class GrantPermissionRouteTest {
+    @Test
+    fun `grant users when authenticated user has permission`() = testApplication {
+        val eventId = UUID.randomUUID()
+        val targetId = UUID.randomUUID()
+        application {
+            moduleMocked()
+            insertMockedEventWithAdminUser(
+                eventId = eventId,
+            )
+            insertMockedUser(id = targetId, email = "bob@example.com")
+        }
+
+        val response = client.post("/events/$eventId/users/grant") {
+            header("Authorization", "Bearer valid")
+            contentType(ContentType.Application.Json)
+            setBody(Json.encodeToString(GrantPermissionRequest(userEmails = listOf("bob@example.com"))))
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        transaction {
+            val perms = EventPermissionEntity.all().toList()
+            assertEquals(2, perms.size)
+            assertEquals(true, perms.find { it.user.id.value == targetId }?.canEdit)
+        }
+    }
+
     @Test
     fun `return 401 if no Authorization header`() = testApplication {
         application { moduleMocked() }
@@ -56,61 +84,19 @@ class GrantPermissionRouteTest {
 
     @Test
     fun `return 401 if authenticated user has no right to grant`() = testApplication {
-        val userId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val email = "noedit@mail.com"
         application {
             moduleMocked()
-            transaction {
-                UserEntity.new(userId) {
-                    email = mockedAdminUser.email
-                    name = mockedAdminUser.name
-                }
-                // No permission given
-            }
+            insertMockedEvent(eventId)
+            insertMockedAdminUser()
+            insertMockedUser(email = email)
         }
         val response = client.post("/events/$eventId/users/grant") {
             header("Authorization", "Bearer valid")
             contentType(ContentType.Application.Json)
-            setBody(Json.encodeToString(GrantPermissionRequest(userEmails = listOf(UUID.randomUUID().toString()))))
+            setBody(Json.encodeToString(GrantPermissionRequest(userEmails = listOf(email))))
         }
         assertEquals(HttpStatusCode.Unauthorized, response.status)
-    }
-
-    @Test
-    fun `grant users when authenticated user has permission`() = testApplication {
-        val eventId = UUID.randomUUID()
-        val granterId = UUID.randomUUID()
-        val targetId = UUID.randomUUID()
-        application {
-            moduleMocked()
-            transaction {
-                val granter = UserEntity.new(granterId) {
-                    email = mockedAdminUser.email
-                    name = mockedAdminUser.name
-                }
-                UserEntity.new(targetId) {
-                    email = "bob@example.com"
-                    name = "Bob"
-                }
-                EventPermissionEntity.new {
-                    this.eventId = eventId
-                    this.user = granter
-                    this.canEdit = true
-                }
-            }
-        }
-
-        val response = client.post("/events/$eventId/users/grant") {
-            header("Authorization", "Bearer valid")
-            contentType(ContentType.Application.Json)
-            setBody(Json.encodeToString(GrantPermissionRequest(userEmails = listOf("bob@example.com"))))
-        }
-
-        assertEquals(HttpStatusCode.OK, response.status)
-        transaction {
-            val perms = EventPermissionEntity.all().toList()
-            assertEquals(2, perms.size)
-            assertEquals(true, perms.find { it.user.id.value == targetId }?.canEdit)
-        }
     }
 }

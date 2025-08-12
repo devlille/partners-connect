@@ -7,7 +7,6 @@ import fr.devlille.partners.connect.internal.insertMockPartnershipTicket
 import fr.devlille.partners.connect.internal.insertMockSponsoringPack
 import fr.devlille.partners.connect.internal.insertMockedBilling
 import fr.devlille.partners.connect.internal.insertMockedEvent
-import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipTicketEntity
@@ -16,7 +15,7 @@ import fr.devlille.partners.connect.tickets.domain.TicketData
 import fr.devlille.partners.connect.tickets.domain.TicketOrder
 import fr.devlille.partners.connect.tickets.infrastructure.gateways.models.CreateOrderResponseItem
 import fr.devlille.partners.connect.tickets.infrastructure.gateways.models.ProductDetail
-import io.ktor.client.call.body
+import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond

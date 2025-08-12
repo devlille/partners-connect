@@ -1,6 +1,8 @@
-package fr.devlille.partners.connect.internal
+package fr.devlille.partners.connect.users.factories
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.internal.insertMockedEvent
+import fr.devlille.partners.connect.internal.mockedAdminUser
 import fr.devlille.partners.connect.legaentity.infrastructure.db.LegalEntityEntity
 import fr.devlille.partners.connect.legalentity.factories.insertLegalEntity
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
@@ -13,7 +15,7 @@ fun insertMockedEventWithAdminUser(
 ): EventEntity {
     val mockedEvent = insertMockedEvent(eventId, legalEntity = legalEntity)
     insertMockedEventPermission(
-        eventId = mockedEvent.id.value,
+        event = mockedEvent,
         user = insertMockedAdminUser(),
     )
     return mockedEvent

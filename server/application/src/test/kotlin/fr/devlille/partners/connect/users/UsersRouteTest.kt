@@ -1,13 +1,13 @@
 package fr.devlille.partners.connect.users
 
-import fr.devlille.partners.connect.module
-import fr.devlille.partners.connect.users.infrastructure.db.EventPermissionEntity
-import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
+import fr.devlille.partners.connect.internal.insertMockedEvent
+import fr.devlille.partners.connect.internal.moduleMocked
+import fr.devlille.partners.connect.users.factories.insertMockedEventPermission
+import fr.devlille.partners.connect.users.factories.insertMockedUser
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
-import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -18,7 +18,7 @@ class UsersRouteTest {
     @Test
     fun `GET returns empty list when no users exist`() = testApplication {
         application {
-            module()
+            moduleMocked()
         }
 
         val eventId = UUID.randomUUID()
@@ -31,71 +31,51 @@ class UsersRouteTest {
     @Test
     fun `GET returns only users who can edit`() = testApplication {
         val eventId = UUID.randomUUID()
+        val editEmail = "edit@example.com"
+        val noEditEmail = "noedit@example.com"
 
         application {
-            module()
-            val user1 = transaction {
-                UserEntity.new {
-                    email = "edit@example.com"
-                    name = "Alice"
-                }
-            }
-            val user2 = transaction {
-                UserEntity.new {
-                    email = "noedit@example.com"
-                    name = "Bob"
-                }
-            }
-            transaction {
-                EventPermissionEntity.new {
-                    this.eventId = eventId
-                    this.user = user1
-                    this.canEdit = true
-                }
-                EventPermissionEntity.new {
-                    this.eventId = eventId
-                    this.user = user2
-                    this.canEdit = false
-                }
-            }
+            moduleMocked()
+            val event = insertMockedEvent(eventId)
+            insertMockedEventPermission(
+                event = event,
+                user = insertMockedUser(email = editEmail),
+                canEdit = true,
+            )
+            insertMockedEventPermission(
+                event = event,
+                user = insertMockedUser(email = noEditEmail),
+                canEdit = false,
+            )
         }
 
         val response = client.get("/events/$eventId/users")
         val body = response.bodyAsText()
 
         assertEquals(HttpStatusCode.OK, response.status)
-        assertTrue { body.contains("edit@example.com") }
-        assertFalse { body.contains("noedit@example.com") }
+        assertTrue { body.contains(editEmail) }
+        assertFalse { body.contains(noEditEmail) }
     }
 
     @Test
     fun `GET returns only users for correct event`() = testApplication {
-        val eventA = UUID.randomUUID()
-        val eventB = UUID.randomUUID()
+        val eventIdA = UUID.randomUUID()
+        val eventIdB = UUID.randomUUID()
         application {
-            module()
-            val userA = transaction {
-                UserEntity.new { email = "a@example.com" }
-            }
-            val userB = transaction {
-                UserEntity.new { email = "b@example.com" }
-            }
-
-            transaction {
-                EventPermissionEntity.new {
-                    this.eventId = eventA
-                    this.user = userA
-                    this.canEdit = true
-                }
-                EventPermissionEntity.new {
-                    this.eventId = eventB
-                    this.user = userB
-                    this.canEdit = true
-                }
-            }
+            moduleMocked()
+            insertMockedEventPermission(
+                event = insertMockedEvent(eventIdA),
+                user = insertMockedUser(email = "a@example.com"),
+                canEdit = true,
+            )
+            insertMockedEventPermission(
+                event = insertMockedEvent(eventIdB),
+                user = insertMockedUser(email = "b@example.com"),
+                canEdit = true,
+            )
         }
 
-        val response = client.get("/events/$eventA/users")
+        val response = client.get("/events/$eventIdA/users")
         val body = response.bodyAsText()
 
         assertEquals(HttpStatusCode.OK, response.status)

@@ -1,10 +1,10 @@
 package fr.devlille.partners.connect.sponsoring
 
 import fr.devlille.partners.connect.internal.insertMockSponsoringPack
-import fr.devlille.partners.connect.internal.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
+import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.request.delete
 import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText

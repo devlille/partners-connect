@@ -5,16 +5,14 @@ import fr.devlille.partners.connect.legaentity.domain.LegalEntity
 import fr.devlille.partners.connect.legaentity.domain.LegalEntityRepository
 import fr.devlille.partners.connect.legaentity.infrastructure.db.LegalEntityEntity
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
-import fr.devlille.partners.connect.users.infrastructure.db.UsersTable
+import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
 class LegalEntityRepositoryExposed : LegalEntityRepository {
     override fun create(entity: LegalEntity): UUID = transaction {
-        val user = UserEntity
-            .find { UsersTable.email eq entity.representativeUserEmail }
-            .singleOrNull()
+        val user = UserEntity.singleUserByEmail(entity.representativeUserEmail)
             ?: throw NotFoundException("User with email ${entity.representativeUserEmail} not found")
         val entity = LegalEntityEntity.new {
             this.name = entity.name

@@ -1,9 +1,9 @@
 package fr.devlille.partners.connect.events
 
-import fr.devlille.partners.connect.internal.insertMockedAdminUser
 import fr.devlille.partners.connect.internal.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.legalentity.factories.insertLegalEntity
+import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
