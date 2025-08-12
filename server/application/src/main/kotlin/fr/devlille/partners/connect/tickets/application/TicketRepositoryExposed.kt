@@ -54,9 +54,10 @@ class TicketRepositoryExposed(
         if (billing.status != InvoiceStatus.PAID) {
             throw ForbiddenException("Invoice status ${billing.status} is not PAID")
         }
-        val validatedPack = billing.partnership.validatedPack()
+        val validatedPack = transaction { billing.partnership.validatedPack() }
+        val partnership = transaction { billing.partnership }
         if (validatedPack == null) {
-            throw NotFoundException("No validated pack found for partnership ${billing.partnership.id}")
+            throw NotFoundException("No validated pack found for partnership ${partnership.id}")
         } else if (validatedPack.nbTickets < tickets.size) {
             val message = """
 Not enough tickets in the validated pack: ${validatedPack.nbTickets} available, ${tickets.size} requested
@@ -67,7 +68,7 @@ Not enough tickets in the validated pack: ${validatedPack.nbTickets} available, 
         transaction {
             order.tickets.forEach { ticket ->
                 PartnershipTicketEntity.new(ticket.id) {
-                    this.partnership = billing.partnership
+                    this.partnership = partnership
                     this.orderId = order.id
                     this.externalId = ticket.extId
                     this.url = ticket.url
@@ -88,7 +89,7 @@ Not enough tickets in the validated pack: ${validatedPack.nbTickets} available, 
             ?: throw NotFoundException("No gateway for provider $provider")
         val ticket = gateway.updateTicket(integrationId, ticketId, data)
         transaction {
-            PartnershipTicketsTable.upsert {
+            PartnershipTicketsTable.upsert(PartnershipTicketsTable.id) {
                 it[PartnershipTicketsTable.id] = ticket.id
                 it[PartnershipTicketsTable.externalId] = ticket.extId
                 it[PartnershipTicketsTable.url] = ticket.url

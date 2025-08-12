@@ -7,7 +7,7 @@ import fr.devlille.partners.connect.tickets.infrastructure.gateways.models.Creat
 import fr.devlille.partners.connect.tickets.infrastructure.gateways.models.ProductDetail
 
 fun CreateOrderResponseItem.toDomain(data: List<TicketData>): TicketOrder {
-    require(data.size != productsDetails.size) { "Data size must match products details size" }
+    require(data.size == productsDetails.size) { "Data size must match products details size" }
     return TicketOrder(
         id = id,
         tickets = productsDetails.mapIndexed { index, productDetail ->
