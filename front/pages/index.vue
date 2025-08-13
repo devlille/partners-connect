@@ -1,9 +1,6 @@
 <template>
   <header>
-    <h1>
-      <img src="/img/logodfl.svg" alt="DevLille" />
-      Demande de Partenariat
-    </h1>
+    <MainTitle> Demande de Partenariat </MainTitle>
   </header>
 
   <div id="container">
@@ -42,7 +39,6 @@
       </form>
     </main>
   </div>
-  <Footer />
 </template>
 
 <script>
@@ -70,6 +66,10 @@ export default {
   },
   mounted() {
     document.body.id = "partners";
+
+    definePageMeta({
+      layout: "minimal",
+    });
   },
 };
 </script>
