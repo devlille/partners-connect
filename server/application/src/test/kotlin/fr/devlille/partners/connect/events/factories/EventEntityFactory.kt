@@ -1,4 +1,4 @@
-package fr.devlille.partners.connect.internal
+package fr.devlille.partners.connect.events.factories
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.legaentity.infrastructure.db.LegalEntityEntity

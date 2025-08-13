@@ -1,9 +1,12 @@
 package fr.devlille.partners.connect.events
 
-import fr.devlille.partners.connect.internal.insertMockedEvent
+import fr.devlille.partners.connect.events.domain.Event
+import fr.devlille.partners.connect.events.factories.createEvent
+import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.legalentity.factories.insertLegalEntity
 import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
+import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -23,21 +26,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 class EventRoutesTest {
-    private fun testEvent(legalEntityId: String) = """
-        {
-            "name": "DevLille 2025",
-            "start_time": "2025-06-12T09:00:00",
-            "end_time": "2025-06-13T18:00:00",
-            "submission_start_time": "2025-01-01T00:00:00",
-            "submission_end_time": "2025-03-01T23:59:59",
-            "address": "Lille Grand Palais, Lille, France",
-            "contact": {
-                "phone": "+33 6 12 34 56 78",
-                "email": "contact@devlille.fr"
-            },
-            "legal_entity_id": "$legalEntityId"
-        }
-    """
+    private val json = Json { ignoreUnknownKeys = true }
 
     @Test
     fun `POST creates an event and grants access to creator`() = testApplication {
@@ -50,7 +39,7 @@ class EventRoutesTest {
         val response = client.post("/events") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(testEvent(legalEntityId.toString()))
+            setBody(json.encodeToString(Event.serializer(), createEvent(legalEntityId)))
         }
 
         assertEquals(HttpStatusCode.Created, response.status)
@@ -61,31 +50,25 @@ class EventRoutesTest {
 
     @Test
     fun `PUT updates an existing event`() = testApplication {
+        val eventId = UUID.randomUUID()
         val legalEntityId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertLegalEntity(id = legalEntityId, representativeUser = insertMockedAdminUser())
+            insertMockedEventWithAdminUser(
+                eventId = eventId,
+                legalEntity = insertLegalEntity(id = legalEntityId),
+            )
         }
 
-        val createResponse = client.post("/events") {
+        val response = client.put("/events/$eventId") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(testEvent(legalEntityId.toString()))
+            setBody(json.encodeToString(Event.serializer(), createEvent(legalEntityId)))
         }
 
-        val responseBody = Json.decodeFromString<Map<String, String>>(createResponse.bodyAsText())
-        val createdId = responseBody["id"]
-        assertNotNull(createdId)
-
-        val updateResponse = client.put("/events/$createdId") {
-            contentType(ContentType.Application.Json)
-            header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(testEvent(legalEntityId.toString()))
-        }
-
-        assertEquals(HttpStatusCode.OK, updateResponse.status)
-        val updateBody = Json.decodeFromString<Map<String, String>>(updateResponse.bodyAsText())
-        assertEquals(createdId, updateBody["id"])
+        assertEquals(HttpStatusCode.OK, response.status)
+        val updateBody = Json.decodeFromString<Map<String, String>>(response.bodyAsText())
+        assertEquals(eventId.toString(), updateBody["id"])
     }
 
     @Test
@@ -96,7 +79,7 @@ class EventRoutesTest {
         application {
             moduleMocked()
             insertMockedEvent(
-                eventId,
+                id = eventId,
                 legalEntity = insertLegalEntity(id = legalEntityId, representativeUser = insertMockedAdminUser()),
             )
         }
@@ -104,7 +87,7 @@ class EventRoutesTest {
         val updateResponse = client.put("/events/$eventId") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(testEvent(legalEntityId.toString()))
+            setBody(json.encodeToString(Event.serializer(), createEvent(legalEntityId)))
         }
 
         assertEquals(HttpStatusCode.Unauthorized, updateResponse.status)
@@ -122,7 +105,7 @@ class EventRoutesTest {
         client.post("/events") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(testEvent(legalEntityId.toString()))
+            setBody(json.encodeToString(Event.serializer(), createEvent(legalEntityId)))
         }
 
         val response = client.get("/events")

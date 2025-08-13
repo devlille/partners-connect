@@ -2,12 +2,12 @@ package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.companies.domain.CompanyBillingData
 import fr.devlille.partners.connect.companies.domain.Contact
+import fr.devlille.partners.connect.companies.factories.insertMockedCompany
+import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
-import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.internal.insertMockPartnership
-import fr.devlille.partners.connect.internal.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus

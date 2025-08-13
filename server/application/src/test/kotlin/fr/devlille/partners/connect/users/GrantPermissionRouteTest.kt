@@ -1,6 +1,6 @@
 package fr.devlille.partners.connect.users
 
-import fr.devlille.partners.connect.internal.insertMockedEvent
+import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser

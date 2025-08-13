@@ -1,7 +1,7 @@
 package fr.devlille.partners.connect.users.factories
 
+import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
-import fr.devlille.partners.connect.internal.insertMockedEvent
 import fr.devlille.partners.connect.internal.mockedAdminUser
 import fr.devlille.partners.connect.legaentity.infrastructure.db.LegalEntityEntity
 import fr.devlille.partners.connect.legalentity.factories.insertLegalEntity
