@@ -1,6 +1,6 @@
 package fr.devlille.partners.connect.partnership
 
-import fr.devlille.partners.connect.internal.insertMockCompany
+import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.internal.insertMockPartnership
 import fr.devlille.partners.connect.internal.insertMockSponsoringPack
 import fr.devlille.partners.connect.internal.moduleMocked
@@ -42,7 +42,7 @@ class PartnershipSuggestionRoutesTest {
             insertMockPartnership(
                 id = partnershipId,
                 event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockCompany(companyId),
+                company = insertMockedCompany(companyId),
             )
             insertMockSponsoringPack(packId, eventId)
             transaction {
@@ -113,7 +113,7 @@ class PartnershipSuggestionRoutesTest {
             insertMockPartnership(
                 id = partnershipId,
                 event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockCompany(companyId),
+                company = insertMockedCompany(companyId),
             )
         }
 
@@ -139,7 +139,7 @@ class PartnershipSuggestionRoutesTest {
             insertMockPartnership(
                 id = partnershipId,
                 event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockCompany(companyId),
+                company = insertMockedCompany(companyId),
             )
             insertMockSponsoringPack(packId, eventId)
             transaction {
@@ -185,7 +185,7 @@ class PartnershipSuggestionRoutesTest {
             insertMockPartnership(
                 id = partnershipId,
                 event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockCompany(companyId),
+                company = insertMockedCompany(companyId),
                 language = "fr",
             )
             insertMockSponsoringPack(packId, eventId)

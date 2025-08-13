@@ -1,7 +1,7 @@
 package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.internal.insertBilletWebIntegration
-import fr.devlille.partners.connect.internal.insertMockCompany
+import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.internal.insertMockPartnership
 import fr.devlille.partners.connect.internal.insertMockPartnershipTicket
 import fr.devlille.partners.connect.internal.insertMockSponsoringPack
@@ -57,7 +57,7 @@ class PartnershipTicketsRoutesTest {
                 partnership = insertMockPartnership(
                     id = partnershipId,
                     event = insertMockedEventWithAdminUser(eventId),
-                    company = insertMockCompany(),
+                    company = insertMockedCompany(),
                     validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
                 ),
             )
@@ -93,7 +93,7 @@ class PartnershipTicketsRoutesTest {
                 partnership = insertMockPartnership(
                     id = partnershipId,
                     event = insertMockedEventWithAdminUser(eventId),
-                    company = insertMockCompany(),
+                    company = insertMockedCompany(),
                     selectedPack = insertMockSponsoringPack(eventId = eventId),
                     validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
                 ),
@@ -137,7 +137,7 @@ class PartnershipTicketsRoutesTest {
                 partnership = insertMockPartnership(
                     id = partnershipId,
                     event = insertMockedEventWithAdminUser(eventId),
-                    company = insertMockCompany(),
+                    company = insertMockedCompany(),
                 ),
             )
             insertBilletWebIntegration(eventId = eventId)
@@ -176,7 +176,7 @@ class PartnershipTicketsRoutesTest {
                 partnership = insertMockPartnership(
                     id = partnershipId,
                     event = insertMockedEventWithAdminUser(eventId),
-                    company = insertMockCompany(),
+                    company = insertMockedCompany(),
                     selectedPack = insertMockSponsoringPack(eventId = eventId, nbTickets = 0),
                     validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
                 ),
@@ -218,7 +218,7 @@ class PartnershipTicketsRoutesTest {
                 partnership = insertMockPartnership(
                     id = partnershipId,
                     event = insertMockedEventWithAdminUser(eventId),
-                    company = insertMockCompany(),
+                    company = insertMockedCompany(),
                     selectedPack = insertMockSponsoringPack(eventId = eventId),
                     validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
                 ),
@@ -260,7 +260,7 @@ class PartnershipTicketsRoutesTest {
             val partnership = insertMockPartnership(
                 id = partnershipId,
                 event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockCompany(),
+                company = insertMockedCompany(),
                 selectedPack = insertMockSponsoringPack(eventId = eventId),
                 validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )
@@ -303,7 +303,7 @@ class PartnershipTicketsRoutesTest {
             insertMockPartnership(
                 id = partnershipId,
                 event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockCompany(),
+                company = insertMockedCompany(),
                 validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )
         }

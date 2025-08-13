@@ -1,6 +1,6 @@
 package fr.devlille.partners.connect.partnership
 
-import fr.devlille.partners.connect.internal.insertMockCompany
+import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.internal.insertMockPartnership
 import fr.devlille.partners.connect.internal.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
@@ -26,7 +26,7 @@ class PartnershipSuggestionDecisionRoutesTest {
             insertMockPartnership(
                 id = partnerId,
                 event = insertMockedEvent(eventId),
-                company = insertMockCompany(companyId),
+                company = insertMockedCompany(companyId),
             )
         }
 
@@ -50,7 +50,7 @@ class PartnershipSuggestionDecisionRoutesTest {
             insertMockPartnership(
                 id = partnerId,
                 event = insertMockedEvent(eventId),
-                company = insertMockCompany(companyId),
+                company = insertMockedCompany(companyId),
             )
         }
 

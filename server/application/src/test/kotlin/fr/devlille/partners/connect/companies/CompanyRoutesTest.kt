@@ -6,7 +6,7 @@ import fr.devlille.partners.connect.companies.domain.Social
 import fr.devlille.partners.connect.companies.domain.SocialType
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Upload
-import fr.devlille.partners.connect.internal.insertMockCompany
+import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.internal.moduleMocked
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
@@ -24,7 +24,6 @@ import io.mockk.every
 import io.mockk.mockk
 import junit.framework.TestCase.assertTrue
 import kotlinx.serialization.json.Json
-import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.koin.dsl.module
 import java.io.File
 import java.util.UUID
@@ -93,17 +92,16 @@ class CompanyRoutesTest {
             filename = "fileName",
             url = "https://example.com/original",
         )
-
-        val companyId = UUID.randomUUID()
         every { storage.upload(any(), any(), any()) } returns Upload(
             bucketName = "bucketName",
             filename = "fileName",
             url = "https://example.com/original",
         )
+        val companyId = UUID.randomUUID()
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            insertMockCompany(companyId)
+            insertMockedCompany(companyId)
         }
 
         val response = client.submitFormWithBinaryData(
@@ -131,7 +129,7 @@ class CompanyRoutesTest {
         val companyId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockCompany(companyId)
+            insertMockedCompany(companyId)
         }
 
         val response = client.submitFormWithBinaryData(
@@ -156,10 +154,8 @@ class CompanyRoutesTest {
     fun `GET returns companies sorted by name`() = testApplication {
         application {
             moduleMocked()
-            transaction {
-                listOf("Zeta", "Alpha", "Beta").forEach {
-                    insertMockCompany(name = it, description = it)
-                }
+            listOf("Zeta", "Alpha", "Beta").forEach {
+                insertMockedCompany(name = it, description = it)
             }
         }
 

@@ -2,7 +2,7 @@ package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Upload
-import fr.devlille.partners.connect.internal.insertMockCompany
+import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.internal.insertMockPartnership
 import fr.devlille.partners.connect.internal.insertMockSponsoringPack
 import fr.devlille.partners.connect.internal.moduleMocked
@@ -52,7 +52,7 @@ class PartnershipAgreementRoutesTest {
             insertMockPartnership(
                 id = partnershipId,
                 event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockCompany(companyId),
+                company = insertMockedCompany(companyId),
                 selectedPack = insertMockSponsoringPack(eventId = eventId),
                 validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )
@@ -132,7 +132,7 @@ class PartnershipAgreementRoutesTest {
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
             insertMockedEventWithAdminUser(eventId)
-            insertMockCompany(companyId)
+            insertMockedCompany(companyId)
         }
 
         val response = client.post("/events/$eventId/partnership/$partnershipId/agreement") {
@@ -157,7 +157,7 @@ class PartnershipAgreementRoutesTest {
             insertMockPartnership(
                 id = partnershipId,
                 event = insertMockedEventWithAdminUser(eventId = eventId, legalEntity = legalEntity),
-                company = insertMockCompany(companyId),
+                company = insertMockedCompany(companyId),
                 selectedPack = insertMockSponsoringPack(eventId = eventId),
                 validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )
@@ -185,7 +185,7 @@ class PartnershipAgreementRoutesTest {
             insertMockPartnership(
                 id = partnershipId,
                 event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockCompany(companyId),
+                company = insertMockedCompany(companyId),
                 validatedAt = null,
             )
         }
@@ -212,7 +212,7 @@ class PartnershipAgreementRoutesTest {
             insertMockPartnership(
                 id = partnershipId,
                 event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockCompany(companyId),
+                company = insertMockedCompany(companyId),
                 selectedPack = insertMockSponsoringPack(eventId = eventId),
                 validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
                 language = "xx",
@@ -246,7 +246,7 @@ class PartnershipAgreementRoutesTest {
             insertMockPartnership(
                 id = partnershipId,
                 event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockCompany(companyId),
+                company = insertMockedCompany(companyId),
                 selectedPack = insertMockSponsoringPack(eventId = eventId),
                 validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )
@@ -318,7 +318,7 @@ class PartnershipAgreementRoutesTest {
             insertMockPartnership(
                 id = partnershipId,
                 event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockCompany(companyId),
+                company = insertMockedCompany(companyId),
                 selectedPack = insertMockSponsoringPack(eventId = eventId),
                 validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )
@@ -347,7 +347,7 @@ class PartnershipAgreementRoutesTest {
             insertMockPartnership(
                 id = partnershipId,
                 event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockCompany(companyId),
+                company = insertMockedCompany(companyId),
                 selectedPack = insertMockSponsoringPack(eventId = eventId),
                 validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )

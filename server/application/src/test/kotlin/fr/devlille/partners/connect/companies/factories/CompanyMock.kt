@@ -1,11 +1,11 @@
-package fr.devlille.partners.connect.internal
+package fr.devlille.partners.connect.companies.factories
 
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
 @Suppress("LongParameterList")
-fun insertMockCompany(
+fun insertMockedCompany(
     id: UUID = UUID.randomUUID(),
     name: String = "Mock Company",
     address: String = "123 Mock St",

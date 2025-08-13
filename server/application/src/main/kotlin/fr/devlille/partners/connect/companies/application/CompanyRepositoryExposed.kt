@@ -10,27 +10,23 @@ import fr.devlille.partners.connect.companies.infrastructure.db.CompanySocialEnt
 import fr.devlille.partners.connect.companies.infrastructure.db.deleteAllByCompanyId
 import fr.devlille.partners.connect.companies.infrastructure.db.listByQuery
 import io.ktor.server.plugins.NotFoundException
-import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
-class CompanyRepositoryExposed(
-    private val companyEntity: UUIDEntityClass<CompanyEntity> = CompanyEntity,
-    private val companySocialEntity: UUIDEntityClass<CompanySocialEntity> = CompanySocialEntity,
-) : CompanyRepository {
+class CompanyRepositoryExposed : CompanyRepository {
     override fun list(query: String?): List<Company> = transaction {
-        companyEntity
+        CompanyEntity
             .listByQuery(query)
             .map(CompanyEntity::toDomain)
     }
 
     override fun getById(id: UUID): Company = transaction {
-        companyEntity.findById(id)?.toDomain()
+        CompanyEntity.findById(id)?.toDomain()
             ?: throw NotFoundException("Company with id $id not found")
     }
 
     override fun createOrUpdate(input: CreateCompany): UUID = transaction {
-        val company = companyEntity.new {
+        val company = CompanyEntity.new {
             name = input.name
             siteUrl = input.siteUrl
             address = input.headOffice.address
@@ -42,10 +38,10 @@ class CompanyRepositoryExposed(
             description = input.description
         }
 
-        companySocialEntity.deleteAllByCompanyId(company.id.value)
+        CompanySocialEntity.deleteAllByCompanyId(company.id.value)
 
         input.socials.forEach {
-            companySocialEntity.new {
+            CompanySocialEntity.new {
                 this.company = company
                 this.type = it.type
                 this.url = it.url
@@ -56,7 +52,7 @@ class CompanyRepositoryExposed(
     }
 
     override fun updateLogoUrls(companyId: UUID, uploaded: Media): UUID = transaction {
-        val company = companyEntity[companyId]
+        val company = CompanyEntity[companyId]
         company.logoUrlOriginal = uploaded.original
         company.logoUrl1000 = uploaded.png1000
         company.logoUrl500 = uploaded.png500

@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.internal
 
+import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
@@ -12,7 +13,7 @@ import java.util.UUID
 fun insertMockPartnership(
     id: UUID = UUID.randomUUID(),
     event: EventEntity = insertMockedEvent(),
-    company: CompanyEntity = insertMockCompany(),
+    company: CompanyEntity = insertMockedCompany(),
     phone: String? = null,
     contactName: String = "John Doe",
     contactRole: String = "Developer",

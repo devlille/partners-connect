@@ -5,7 +5,7 @@ import fr.devlille.partners.connect.companies.domain.Contact
 import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
-import fr.devlille.partners.connect.internal.insertMockCompany
+import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.internal.insertMockPartnership
 import fr.devlille.partners.connect.internal.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
@@ -54,7 +54,7 @@ class PartnershipBillingRoutesTest {
             val partnership = insertMockPartnership(
                 id = partnershipId,
                 event = insertMockedEvent(eventId),
-                company = insertMockCompany(companyId),
+                company = insertMockedCompany(companyId),
             )
             transaction {
                 BillingEntity.new {
@@ -87,7 +87,7 @@ class PartnershipBillingRoutesTest {
         application {
             moduleMocked()
             insertMockedEvent(eventId)
-            insertMockCompany(companyId)
+            insertMockedCompany(companyId)
         }
 
         val response = client.get("/events/$eventId/partnership/$partnershipId/billing")
@@ -107,7 +107,7 @@ class PartnershipBillingRoutesTest {
             insertMockPartnership(
                 id = partnershipId,
                 event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockCompany(companyId),
+                company = insertMockedCompany(companyId),
             )
             transaction {
                 IntegrationsTable.insertAndGetId {
@@ -140,7 +140,7 @@ class PartnershipBillingRoutesTest {
             val partnership = insertMockPartnership(
                 id = partnershipId,
                 event = insertMockedEvent(eventId),
-                company = insertMockCompany(companyId),
+                company = insertMockedCompany(companyId),
             )
             transaction {
                 IntegrationsTable.insertAndGetId {
