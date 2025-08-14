@@ -1,14 +1,14 @@
 package fr.devlille.partners.connect.sponsoring
 
 import fr.devlille.partners.connect.events.factories.insertMockedEvent
-import fr.devlille.partners.connect.internal.insertMockSponsoringPack
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.sponsoring.domain.AttachOptionsToPack
-import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringPack
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringPack
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
+import fr.devlille.partners.connect.sponsoring.factories.createSponsoringPack
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedOptionTranslation
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedPackOptions
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringOption
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.request.get
@@ -22,7 +22,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
 import kotlinx.serialization.json.Json
-import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
@@ -58,17 +57,10 @@ class SponsoringPackRoutesTest {
             insertMockedEventWithAdminUser(eventId)
         }
 
-        val body = CreateSponsoringPack(
-            name = "Gold",
-            price = 3000,
-            nbTickets = 1,
-            maxQuantity = 5,
-        )
-
         val response = client.post("/events/$eventId/packs") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(Json.encodeToString(body))
+            setBody(Json.encodeToString(createSponsoringPack()))
         }
 
         assertEquals(HttpStatusCode.Created, response.status)
@@ -79,9 +71,9 @@ class SponsoringPackRoutesTest {
         }
 
         assertNotNull(persisted)
-        assertEquals("Gold", persisted.name)
-        assertEquals(3000, persisted.basePrice)
-        assertEquals(5, persisted.maxQuantity)
+        assertEquals("Silver", persisted.name)
+        assertEquals(2000, persisted.basePrice)
+        assertEquals(10, persisted.maxQuantity)
     }
 
     @Test
@@ -92,8 +84,8 @@ class SponsoringPackRoutesTest {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
             repeat(2) {
-                insertMockSponsoringPack(
-                    eventId = eventId,
+                insertMockedSponsoringPack(
+                    event = eventId,
                     name = "Pack$it",
                     basePrice = 1000 * (it + 1),
                     maxQuantity = 3 + it,
@@ -127,6 +119,26 @@ class SponsoringPackRoutesTest {
     }
 
     @Test
+    fun `GET fails if Accept-Language is not supported`() = testApplication {
+        val eventId = UUID.randomUUID()
+        application {
+            moduleMocked()
+            insertMockedEventWithAdminUser(eventId)
+            val pack = insertMockedSponsoringPack(event = eventId)
+            val option = insertMockedSponsoringOption(eventId = eventId)
+            insertMockedOptionTranslation(optionId = option.id.value)
+            insertMockedPackOptions(packId = pack.id.value, optionId = option.id.value)
+        }
+
+        val response = client.get("/events/$eventId/packs") {
+            header(HttpHeaders.AcceptLanguage, "xx")
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+        assertEquals(HttpStatusCode.NotFound, response.status)
+        assertTrue(response.bodyAsText().contains("Translation not found for option"))
+    }
+
+    @Test
     fun `POST to attach options adds options to pack`() = testApplication {
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
@@ -135,30 +147,11 @@ class SponsoringPackRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
-            insertMockSponsoringPack(packId, eventId)
-            transaction {
-                val option1 = SponsoringOptionEntity.new(optionId1) {
-                    this.eventId = eventId
-                    this.price = 100
-                }
-                OptionTranslationEntity.new {
-                    this.option = option1
-                    this.language = "en"
-                    this.name = "Logo"
-                    this.description = "Add logo to website"
-                }
-
-                val option2 = SponsoringOptionEntity.new(optionId2) {
-                    this.eventId = eventId
-                    this.price = 150
-                }
-                OptionTranslationEntity.new {
-                    this.option = option2
-                    this.language = "en"
-                    this.name = "Talk"
-                    this.description = "Give a talk"
-                }
-            }
+            insertMockedSponsoringPack(packId, eventId)
+            insertMockedSponsoringOption(optionId = optionId1, eventId = eventId)
+            insertMockedOptionTranslation(optionId = optionId1, name = "Logo")
+            insertMockedSponsoringOption(optionId = optionId2, eventId = eventId)
+            insertMockedOptionTranslation(optionId = optionId2, name = "Talk")
         }
 
         val attachRequest = AttachOptionsToPack(
@@ -237,19 +230,9 @@ class SponsoringPackRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
-            insertMockSponsoringPack(packId, eventId)
-            transaction {
-                val option = SponsoringOptionEntity.new(optionId) {
-                    this.eventId = eventId
-                    this.price = 100
-                }
-                OptionTranslationEntity.new {
-                    this.option = option
-                    this.language = "en"
-                    this.name = "Logo on website"
-                    this.description = "Visible on all pages"
-                }
-            }
+            insertMockedSponsoringPack(packId, eventId)
+            insertMockedSponsoringOption(optionId = optionId, eventId = eventId)
+            insertMockedOptionTranslation(optionId = optionId)
         }
 
         val response = client.post("/events/$eventId/packs/$packId/options") {
@@ -281,30 +264,11 @@ class SponsoringPackRoutesTest {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
             insertMockedEvent(otherEventId)
-            insertMockSponsoringPack(packId, eventId)
-            transaction {
-                val valid = SponsoringOptionEntity.new(optionValid) {
-                    this.eventId = eventId
-                    this.price = 100
-                }
-                OptionTranslationEntity.new {
-                    this.option = valid
-                    this.language = "en"
-                    this.name = "Shirt Logo"
-                    this.description = null
-                }
-
-                val invalid = SponsoringOptionEntity.new(optionInvalid) {
-                    this.eventId = otherEventId
-                    this.price = 80
-                }
-                OptionTranslationEntity.new {
-                    this.option = invalid
-                    this.language = "en"
-                    this.name = "Wrong Option"
-                    this.description = "Should not be accepted"
-                }
-            }
+            insertMockedSponsoringPack(packId, eventId)
+            insertMockedSponsoringOption(optionId = optionValid, eventId = eventId)
+            insertMockedOptionTranslation(optionId = optionValid)
+            insertMockedSponsoringOption(optionId = optionInvalid, eventId = otherEventId)
+            insertMockedOptionTranslation(optionId = optionInvalid)
         }
 
         val response = client.post("/events/$eventId/packs/$packId/options") {
@@ -333,25 +297,10 @@ class SponsoringPackRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
-            insertMockSponsoringPack(packId, eventId)
-            transaction {
-                val option = SponsoringOptionEntity.new(optionId) {
-                    this.eventId = eventId
-                    this.price = 300
-                }
-                OptionTranslationEntity.new {
-                    this.option = option
-                    this.language = "en"
-                    this.name = "Booth Placement"
-                    this.description = null
-                }
-
-                PackOptionsTable.insert {
-                    it[this.pack] = packId
-                    it[this.option] = optionId
-                    it[this.required] = true
-                }
-            }
+            insertMockedSponsoringPack(packId, eventId)
+            insertMockedSponsoringOption(optionId = optionId, eventId = eventId)
+            insertMockedOptionTranslation(optionId = optionId)
+            insertMockedPackOptions(packId, optionId)
         }
 
         val response = client.post("/events/$eventId/packs/$packId/options") {

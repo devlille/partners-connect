@@ -2,9 +2,9 @@ package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.internal.insertMockPartnership
-import fr.devlille.partners.connect.internal.insertMockSponsoringPack
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.request.delete
 import io.ktor.client.request.header
@@ -34,7 +34,7 @@ class PartnershipValidationRoutesTest {
                 id = partnershipId,
                 event = insertMockedEventWithAdminUser(eventId),
                 company = insertMockedCompany(companyId),
-                selectedPack = insertMockSponsoringPack(packId, eventId),
+                selectedPack = insertMockedSponsoringPack(packId, eventId),
             )
         }
 

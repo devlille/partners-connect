@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.sponsoring.application
 
+import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.sponsoring.application.mappers.toDomain
 import fr.devlille.partners.connect.sponsoring.domain.AttachOptionsToPack
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
@@ -34,7 +35,7 @@ class OptionRepositoryExposed(
 
     override fun createOption(eventId: UUID, input: CreateSponsoringOption): UUID = transaction {
         val option = optionEntity.new {
-            this.eventId = eventId
+            this.event = EventEntity.findById(eventId) ?: throw NotFoundException("Event with id $eventId not found")
             this.price = input.price
         }
         input.translations.forEach {

@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.sponsoring.application
 
+import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.sponsoring.application.mappers.toDomain
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringPack
 import fr.devlille.partners.connect.sponsoring.domain.PackRepository
@@ -10,15 +11,13 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionsByPa
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listPacksByEvent
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.singlePackById
 import io.ktor.server.plugins.BadRequestException
-import org.jetbrains.exposed.v1.dao.UUIDEntityClass
+import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
-class PackRepositoryExposed(
-    private val packEntity: UUIDEntityClass<SponsoringPackEntity> = SponsoringPackEntity,
-) : PackRepository {
+class PackRepositoryExposed : PackRepository {
     override fun findPacksByEvent(eventId: UUID, language: String): List<SponsoringPack> = transaction {
-        val packs = packEntity.listPacksByEvent(eventId)
+        val packs = SponsoringPackEntity.listPacksByEvent(eventId)
         packs.map { pack ->
             pack.toDomain(
                 language = language,
@@ -33,7 +32,7 @@ class PackRepositoryExposed(
     }
 
     override fun getById(eventId: UUID, packId: UUID, language: String): SponsoringPack = transaction {
-        val pack = packEntity.singlePackById(eventId, packId)
+        val pack = SponsoringPackEntity.singlePackById(eventId, packId)
         pack.toDomain(
             language = language,
             requiredOptionIds = PackOptionsTable.listOptionsByPack(packId)
@@ -47,7 +46,7 @@ class PackRepositoryExposed(
 
     override fun createPack(eventId: UUID, input: CreateSponsoringPack): UUID = transaction {
         SponsoringPackEntity.new {
-            this.eventId = eventId
+            this.event = EventEntity.findById(eventId) ?: throw NotFoundException("Event with id $eventId not found")
             this.name = input.name
             this.basePrice = input.price
             this.withBooth = input.withBooth
@@ -57,7 +56,7 @@ class PackRepositoryExposed(
     }
 
     override fun deletePack(eventId: UUID, packId: UUID) = transaction {
-        val pack = packEntity.singlePackById(eventId, packId)
+        val pack = SponsoringPackEntity.singlePackById(eventId, packId)
         val hasOptions = PackOptionsTable.listOptionsByPack(pack.id.value).any()
         if (hasOptions) {
             throw BadRequestException("Pack has attached options and cannot be deleted")
