@@ -3,12 +3,12 @@ package fr.devlille.partners.connect.partnership
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.internal.insertMockPartnership
-import fr.devlille.partners.connect.internal.insertMockSponsoringPack
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedOptionTranslation
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedPackOptions
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringOption
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
@@ -17,8 +17,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
 import kotlinx.serialization.json.Json
-import org.jetbrains.exposed.v1.jdbc.insert
-import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -36,24 +34,10 @@ class PartnershipRoutesTest {
             moduleMocked()
             insertMockedEvent(eventId)
             insertMockedCompany(companyId)
-            insertMockSponsoringPack(packId, eventId)
-            transaction {
-                SponsoringOptionEntity.new(optionId) {
-                    this.eventId = eventId
-                    this.price = 100
-                }
-                OptionTranslationEntity.new {
-                    this.option = SponsoringOptionEntity[optionId]
-                    this.language = "en"
-                    this.name = "Logo"
-                    this.description = "Display logo"
-                }
-                PackOptionsTable.insert {
-                    it[this.pack] = packId
-                    it[this.option] = optionId
-                    it[this.required] = false
-                }
-            }
+            insertMockedSponsoringPack(packId, eventId)
+            insertMockedSponsoringOption(optionId, eventId)
+            insertMockedOptionTranslation(optionId)
+            insertMockedPackOptions(packId, optionId, required = false)
         }
 
         val body = RegisterPartnership(
@@ -151,7 +135,7 @@ class PartnershipRoutesTest {
             insertMockPartnership(
                 event = insertMockedEvent(eventId),
                 company = insertMockedCompany(companyId),
-                selectedPack = insertMockSponsoringPack(packId, eventId),
+                selectedPack = insertMockedSponsoringPack(packId, eventId),
             )
         }
 
@@ -181,18 +165,9 @@ class PartnershipRoutesTest {
             moduleMocked()
             insertMockedEvent(eventId)
             insertMockedCompany(companyId)
-            insertMockSponsoringPack(packId, eventId)
-            transaction {
-                SponsoringOptionEntity.new(optionId) {
-                    this.eventId = eventId
-                    this.price = 200
-                }
-                PackOptionsTable.insert {
-                    it[this.pack] = packId
-                    it[this.option] = optionId
-                    it[this.required] = true
-                }
-            }
+            insertMockedSponsoringPack(packId, eventId)
+            insertMockedSponsoringOption(optionId, eventId)
+            insertMockedPackOptions(packId, optionId)
         }
 
         val body = RegisterPartnership(
@@ -220,20 +195,11 @@ class PartnershipRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEvent(eventId)
+            val event = insertMockedEvent(eventId)
             insertMockedCompany(companyId)
-            insertMockSponsoringPack(packId, eventId)
-            transaction {
-                SponsoringOptionEntity.new(optionId) {
-                    this.eventId = eventId
-                    this.price = 500
-                }
-                PackOptionsTable.insert {
-                    it[this.pack] = packId
-                    it[this.option] = optionId
-                    it[this.required] = false
-                }
-            }
+            insertMockedSponsoringPack(packId, eventId)
+            insertMockedSponsoringOption(optionId, eventId)
+            insertMockedPackOptions(packId, optionId, required = false)
         }
 
         val body = RegisterPartnership(

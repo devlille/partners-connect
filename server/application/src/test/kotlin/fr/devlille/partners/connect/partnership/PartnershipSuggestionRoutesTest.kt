@@ -2,13 +2,13 @@ package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.internal.insertMockPartnership
-import fr.devlille.partners.connect.internal.insertMockSponsoringPack
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.domain.SuggestPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedOptionTranslation
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedPackOptions
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringOption
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -20,7 +20,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
 import kotlinx.serialization.json.Json
-import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
@@ -39,29 +38,16 @@ class PartnershipSuggestionRoutesTest {
 
         application {
             moduleMocked()
+            val event = insertMockedEventWithAdminUser(eventId)
             insertMockPartnership(
                 id = partnershipId,
-                event = insertMockedEventWithAdminUser(eventId),
+                event = event,
                 company = insertMockedCompany(companyId),
             )
-            insertMockSponsoringPack(packId, eventId)
-            transaction {
-                val option = SponsoringOptionEntity.new(optionId) {
-                    this.eventId = eventId
-                    this.price = 100
-                }
-                OptionTranslationEntity.new {
-                    this.option = option
-                    this.language = "en"
-                    this.name = "Logo"
-                    this.description = "Company logo"
-                }
-                PackOptionsTable.insert {
-                    it[this.pack] = packId
-                    it[this.option] = optionId
-                    it[this.required] = false
-                }
-            }
+            insertMockedSponsoringPack(packId, eventId)
+            insertMockedSponsoringOption(optionId, eventId)
+            insertMockedOptionTranslation(optionId = optionId)
+            insertMockedPackOptions(packId, optionId, required = false)
         }
 
         val response = client.post("/events/$eventId/partnership/$partnershipId/suggestion") {
@@ -85,7 +71,6 @@ class PartnershipSuggestionRoutesTest {
     @Test
     fun `PUT fails if partnership does not exist`() = testApplication {
         val eventId = UUID.randomUUID()
-        val companyId = UUID.randomUUID()
         val fakeId = UUID.randomUUID()
 
         application {
@@ -136,30 +121,16 @@ class PartnershipSuggestionRoutesTest {
 
         application {
             moduleMocked()
+            val event = insertMockedEventWithAdminUser(eventId)
             insertMockPartnership(
                 id = partnershipId,
-                event = insertMockedEventWithAdminUser(eventId),
+                event = event,
                 company = insertMockedCompany(companyId),
             )
-            insertMockSponsoringPack(packId, eventId)
-            transaction {
-                val option = SponsoringOptionEntity.new(optionId) {
-                    this.eventId = eventId
-                    this.price = 100
-                }
-                OptionTranslationEntity.new {
-                    this.option = option
-                    this.language = "en"
-                    this.name = "Logo"
-                    this.description = "Company logo"
-                }
-
-                PackOptionsTable.insert {
-                    it[this.pack] = packId
-                    it[this.option] = optionId
-                    it[this.required] = true
-                }
-            }
+            insertMockedSponsoringPack(packId, eventId)
+            insertMockedSponsoringOption(optionId, eventId)
+            insertMockedOptionTranslation(optionId = optionId)
+            insertMockedPackOptions(packId, optionId)
         }
 
         val response = client.post("/events/$eventId/partnership/$partnershipId/suggestion") {
@@ -182,25 +153,16 @@ class PartnershipSuggestionRoutesTest {
 
         application {
             moduleMocked()
+            val event = insertMockedEventWithAdminUser(eventId)
             insertMockPartnership(
                 id = partnershipId,
-                event = insertMockedEventWithAdminUser(eventId),
+                event = event,
                 company = insertMockedCompany(companyId),
                 language = "fr",
             )
-            insertMockSponsoringPack(packId, eventId)
-            transaction {
-                SponsoringOptionEntity.new(optionId) {
-                    this.eventId = eventId
-                    this.price = 100
-                }
-
-                PackOptionsTable.insert {
-                    it[this.pack] = packId
-                    it[this.option] = optionId
-                    it[this.required] = false
-                }
-            }
+            insertMockedSponsoringPack(packId, eventId)
+            insertMockedSponsoringOption(optionId, eventId)
+            insertMockedPackOptions(packId, optionId, required = false)
         }
 
         val response = client.post("/events/$eventId/partnership/$partnershipId/suggestion") {

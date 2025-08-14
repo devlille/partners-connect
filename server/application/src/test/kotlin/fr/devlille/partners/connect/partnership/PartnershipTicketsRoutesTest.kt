@@ -5,11 +5,11 @@ import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.internal.insertBilletWebIntegration
 import fr.devlille.partners.connect.internal.insertMockPartnership
 import fr.devlille.partners.connect.internal.insertMockPartnershipTicket
-import fr.devlille.partners.connect.internal.insertMockSponsoringPack
 import fr.devlille.partners.connect.internal.insertMockedBilling
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipTicketEntity
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
 import fr.devlille.partners.connect.tickets.domain.Ticket
 import fr.devlille.partners.connect.tickets.domain.TicketData
 import fr.devlille.partners.connect.tickets.domain.TicketOrder
@@ -94,7 +94,7 @@ class PartnershipTicketsRoutesTest {
                     id = partnershipId,
                     event = insertMockedEventWithAdminUser(eventId),
                     company = insertMockedCompany(),
-                    selectedPack = insertMockSponsoringPack(eventId = eventId),
+                    selectedPack = insertMockedSponsoringPack(event = eventId),
                     validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
                 ),
             )
@@ -177,7 +177,7 @@ class PartnershipTicketsRoutesTest {
                     id = partnershipId,
                     event = insertMockedEventWithAdminUser(eventId),
                     company = insertMockedCompany(),
-                    selectedPack = insertMockSponsoringPack(eventId = eventId, nbTickets = 0),
+                    selectedPack = insertMockedSponsoringPack(event = eventId, nbTickets = 0),
                     validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
                 ),
             )
@@ -219,7 +219,7 @@ class PartnershipTicketsRoutesTest {
                     id = partnershipId,
                     event = insertMockedEventWithAdminUser(eventId),
                     company = insertMockedCompany(),
-                    selectedPack = insertMockSponsoringPack(eventId = eventId),
+                    selectedPack = insertMockedSponsoringPack(event = eventId),
                     validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
                 ),
                 status = InvoiceStatus.PENDING,
@@ -261,7 +261,7 @@ class PartnershipTicketsRoutesTest {
                 id = partnershipId,
                 event = insertMockedEventWithAdminUser(eventId),
                 company = insertMockedCompany(),
-                selectedPack = insertMockSponsoringPack(eventId = eventId),
+                selectedPack = insertMockedSponsoringPack(event = eventId),
                 validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )
             insertMockPartnershipTicket(ticketId = ticketId, partnership = partnership)

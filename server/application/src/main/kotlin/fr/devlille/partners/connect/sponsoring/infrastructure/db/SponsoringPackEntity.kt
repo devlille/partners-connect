@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.sponsoring.infrastructure.db
 
+import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
@@ -10,7 +11,7 @@ import java.util.UUID
 class SponsoringPackEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     companion object : UUIDEntityClass<SponsoringPackEntity>(SponsoringPacksTable)
 
-    var eventId by SponsoringPacksTable.eventId
+    var event by EventEntity referencedOn SponsoringPacksTable.eventId
     var name by SponsoringPacksTable.name
     var basePrice by SponsoringPacksTable.basePrice
     var withBooth by SponsoringPacksTable.withBooth

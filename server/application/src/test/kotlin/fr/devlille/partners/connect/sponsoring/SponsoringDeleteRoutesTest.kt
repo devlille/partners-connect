@@ -1,9 +1,9 @@
 package fr.devlille.partners.connect.sponsoring
 
-import fr.devlille.partners.connect.internal.insertMockSponsoringPack
 import fr.devlille.partners.connect.internal.moduleMocked
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedPackOptions
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringOption
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.request.delete
 import io.ktor.client.request.header
@@ -11,8 +11,6 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
-import org.jetbrains.exposed.v1.jdbc.insert
-import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -28,18 +26,9 @@ class SponsoringDeleteRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
-            val pack = insertMockSponsoringPack(packId, eventId, maxQuantity = null)
-            transaction {
-                val option = SponsoringOptionEntity.new(optionId) {
-                    this.eventId = eventId
-                    this.price = 100
-                }
-                PackOptionsTable.insert {
-                    it[this.pack] = pack.id
-                    it[this.option] = option.id
-                    it[this.required] = true
-                }
-            }
+            insertMockedSponsoringPack(packId, eventId, maxQuantity = null)
+            insertMockedSponsoringOption(optionId = optionId, eventId = eventId)
+            insertMockedPackOptions(packId, optionId)
         }
 
         val response = client.delete("/events/$eventId/packs/$packId/options/$optionId") {
@@ -73,18 +62,9 @@ class SponsoringDeleteRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
-            val pack = insertMockSponsoringPack(eventId = eventId)
-            transaction {
-                val option = SponsoringOptionEntity.new(optionId) {
-                    this.eventId = eventId
-                    this.price = 50
-                }
-                PackOptionsTable.insert {
-                    it[this.pack] = pack.id
-                    it[this.option] = option.id
-                    it[this.required] = false
-                }
-            }
+            val pack = insertMockedSponsoringPack(event = eventId)
+            insertMockedSponsoringOption(optionId = optionId, eventId = eventId)
+            insertMockedPackOptions(pack.id.value, optionId)
         }
 
         val response = client.delete("/events/$eventId/options/$optionId") {
@@ -102,12 +82,7 @@ class SponsoringDeleteRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
-            transaction {
-                SponsoringOptionEntity.new(optionId) {
-                    this.eventId = eventId
-                    this.price = 80
-                }
-            }
+            insertMockedSponsoringOption(optionId = optionId, eventId = eventId)
         }
 
         val response = client.delete("/events/$eventId/options/$optionId") {
@@ -124,18 +99,9 @@ class SponsoringDeleteRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
-            val pack = insertMockSponsoringPack(packId, eventId, maxQuantity = null)
-            transaction {
-                val option = SponsoringOptionEntity.new {
-                    this.eventId = eventId
-                    this.price = 60
-                }
-                PackOptionsTable.insert {
-                    it[this.pack] = pack.id
-                    it[this.option] = option.id
-                    it[this.required] = true
-                }
-            }
+            insertMockedSponsoringPack(packId, eventId, maxQuantity = null)
+            val option = insertMockedSponsoringOption(eventId = eventId)
+            insertMockedPackOptions(packId, option.id.value)
         }
 
         val response = client.delete("/events/$eventId/packs/$packId") {
@@ -153,12 +119,46 @@ class SponsoringDeleteRoutesTest {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(eventId)
-            insertMockSponsoringPack(packId, eventId, maxQuantity = null)
+            insertMockedSponsoringPack(packId, eventId, maxQuantity = null)
         }
 
         val response = client.delete("/events/$eventId/packs/$packId") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
         assertEquals(HttpStatusCode.NoContent, response.status)
+    }
+
+    @Test
+    fun `DELETE option - not found`() = testApplication {
+        val eventId = UUID.randomUUID()
+        val optionId = UUID.randomUUID()
+
+        application {
+            moduleMocked()
+            insertMockedEventWithAdminUser(eventId)
+        }
+
+        val response = client.delete("/events/$eventId/options/$optionId") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+        assertEquals(HttpStatusCode.NotFound, response.status)
+        assertTrue(response.bodyAsText().contains("Option not found", ignoreCase = true))
+    }
+
+    @Test
+    fun `DELETE pack - not found`() = testApplication {
+        val eventId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+
+        application {
+            moduleMocked()
+            insertMockedEventWithAdminUser(eventId)
+        }
+
+        val response = client.delete("/events/$eventId/packs/$packId") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+        assertEquals(HttpStatusCode.NotFound, response.status)
+        assertTrue(response.bodyAsText().contains("Pack not found", ignoreCase = true))
     }
 }

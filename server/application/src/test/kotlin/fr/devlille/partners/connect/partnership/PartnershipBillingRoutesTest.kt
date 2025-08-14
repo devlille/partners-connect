@@ -123,7 +123,6 @@ class PartnershipBillingRoutesTest {
             setBody(json.encodeToString(CompanyBillingData.serializer(), sampleBillingInput()))
         }
 
-        println(response.bodyAsText())
         assertEquals(HttpStatusCode.Created, response.status)
         val body = response.bodyAsText()
         assertTrue(body.contains("id"))

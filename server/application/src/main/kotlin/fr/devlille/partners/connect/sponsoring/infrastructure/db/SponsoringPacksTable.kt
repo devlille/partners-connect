@@ -6,7 +6,7 @@ import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import org.jetbrains.exposed.v1.core.dao.id.UUIDTable
 
 object SponsoringPacksTable : UUIDTable("sponsoring_packs") {
-    val eventId = uuid("event_id").references(EventsTable.id)
+    val eventId = reference("event_id", EventsTable)
     val name = varchar("name", 255)
     val basePrice = integer("base_price")
     val withBooth = bool("with_booth").default(false)
