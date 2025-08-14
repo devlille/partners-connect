@@ -10,14 +10,10 @@ import io.ktor.http.headersOf
 import kotlinx.serialization.json.Json
 
 val mockedAdminUser = GoogleUserInfo(
-    sub = "1234567890",
-    name = "John Doe",
     givenName = "John",
     familyName = "Doe",
     picture = "https://example.com/john_doe.jpg",
     email = "john.doe@contact.com",
-    emailVerified = true,
-    hd = "contact.com",
 )
 
 val mockEngine = MockEngine { request ->

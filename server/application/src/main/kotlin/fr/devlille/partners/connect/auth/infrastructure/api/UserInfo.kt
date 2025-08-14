@@ -8,6 +8,6 @@ class UserInfo(
     @SerialName("display_name")
     val displayName: String,
     @SerialName("picture_url")
-    val pictureUrl: String,
+    val pictureUrl: String? = null,
     val email: String,
 )

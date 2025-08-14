@@ -24,8 +24,8 @@ fun insertMockedEventWithAdminUser(
 fun insertMockedAdminUser(
     id: UUID = UUID.randomUUID(),
     email: String = mockedAdminUser.email,
-    name: String = mockedAdminUser.name,
-    pictureUrl: String = mockedAdminUser.picture,
+    name: String = mockedAdminUser.givenName ?: "Admin User",
+    pictureUrl: String? = mockedAdminUser.picture,
 ): UserEntity = transaction {
     UserEntity.new(id) {
         this.email = email

@@ -10,8 +10,8 @@ class AuthRepositoryGoogle(
     override suspend fun getUserInfo(token: String): UserInfo {
         val googleUserInfo = googleProvider.getGoogleUserInfo(token)
         return UserInfo(
-            givenName = googleUserInfo.givenName,
-            firstName = googleUserInfo.familyName,
+            givenName = googleUserInfo.givenName ?: "Unknown",
+            firstName = googleUserInfo.familyName ?: "Unknown",
             pictureUrl = googleUserInfo.picture,
             email = googleUserInfo.email,
         )
