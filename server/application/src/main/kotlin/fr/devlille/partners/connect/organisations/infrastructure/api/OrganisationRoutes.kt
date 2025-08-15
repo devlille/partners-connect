@@ -1,8 +1,8 @@
-package fr.devlille.partners.connect.legaentity.infrastructure.api
+package fr.devlille.partners.connect.organisations.infrastructure.api
 
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
-import fr.devlille.partners.connect.legaentity.domain.LegalEntity
-import fr.devlille.partners.connect.legaentity.domain.LegalEntityRepository
+import fr.devlille.partners.connect.organisations.domain.Organisation
+import fr.devlille.partners.connect.organisations.domain.OrganisationRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receive
@@ -13,12 +13,12 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
-fun Route.legalEntityRoutes() {
-    val repository by inject<LegalEntityRepository>()
+fun Route.organisationRoutes() {
+    val repository by inject<OrganisationRepository>()
 
-    route("/legal-entities") {
+    route("/orgs") {
         post {
-            val input = call.receive<LegalEntity>()
+            val input = call.receive<Organisation>()
             val id = repository.create(input)
             call.respond(HttpStatusCode.Created, mapOf("id" to id.toString()))
         }

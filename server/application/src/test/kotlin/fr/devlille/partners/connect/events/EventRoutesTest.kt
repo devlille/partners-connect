@@ -4,7 +4,7 @@ import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.factories.createEvent
 import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
-import fr.devlille.partners.connect.legalentity.factories.insertLegalEntity
+import fr.devlille.partners.connect.organisations.factories.insertOrganisationEntity
 import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.request.get
@@ -30,16 +30,16 @@ class EventRoutesTest {
 
     @Test
     fun `POST creates an event and grants access to creator`() = testApplication {
-        val legalEntityId = UUID.randomUUID()
+        val organisationId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertLegalEntity(id = legalEntityId, representativeUser = insertMockedAdminUser())
+            insertOrganisationEntity(id = organisationId, representativeUser = insertMockedAdminUser())
         }
 
         val response = client.post("/events") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(Event.serializer(), createEvent(legalEntityId)))
+            setBody(json.encodeToString(Event.serializer(), createEvent(organisationId)))
         }
 
         assertEquals(HttpStatusCode.Created, response.status)
@@ -51,19 +51,19 @@ class EventRoutesTest {
     @Test
     fun `PUT updates an existing event`() = testApplication {
         val eventId = UUID.randomUUID()
-        val legalEntityId = UUID.randomUUID()
+        val organisationId = UUID.randomUUID()
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(
                 eventId = eventId,
-                legalEntity = insertLegalEntity(id = legalEntityId),
+                organisation = insertOrganisationEntity(id = organisationId),
             )
         }
 
         val response = client.put("/events/$eventId") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(Event.serializer(), createEvent(legalEntityId)))
+            setBody(json.encodeToString(Event.serializer(), createEvent(organisationId)))
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
@@ -73,21 +73,24 @@ class EventRoutesTest {
 
     @Test
     fun `PUT returns 401 when user has no access to the event`() = testApplication {
-        val legalEntityId = UUID.randomUUID()
+        val organisationId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
 
         application {
             moduleMocked()
             insertMockedEvent(
                 id = eventId,
-                legalEntity = insertLegalEntity(id = legalEntityId, representativeUser = insertMockedAdminUser()),
+                organisation = insertOrganisationEntity(
+                    id = organisationId,
+                    representativeUser = insertMockedAdminUser()
+                ),
             )
         }
 
         val updateResponse = client.put("/events/$eventId") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(Event.serializer(), createEvent(legalEntityId)))
+            setBody(json.encodeToString(Event.serializer(), createEvent(organisationId)))
         }
 
         assertEquals(HttpStatusCode.Unauthorized, updateResponse.status)
@@ -95,17 +98,16 @@ class EventRoutesTest {
 
     @Test
     fun `GET returns all events`() = testApplication {
-        val legalEntityId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
+        val organisationId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertLegalEntity(id = legalEntityId, representativeUser = insertMockedAdminUser())
+            insertOrganisationEntity(id = organisationId, representativeUser = insertMockedAdminUser())
         }
 
         client.post("/events") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(Event.serializer(), createEvent(legalEntityId)))
+            setBody(json.encodeToString(Event.serializer(), createEvent(organisationId)))
         }
 
         val response = client.get("/events")

@@ -2,10 +2,10 @@
 
 **Between the undersigned :**
 
-The **{{legalEntity.name}}** association -hereafter referred as the Association-, ruled by French law  1901, declared 
-at the prefectural office of {{legalEntity.creationLocation}} on {{legalEntity.createdAt}} and published on the 
-"Journal Officiel" on {{legalEntity.publishedAt}}, with social head-quarters located at {{legalEntity.headOffice}}. 
-Represented by **{{legalEntity.representative.name}}** , in the condition of **{{legalEntity.representative.role}}** 
+The **{{organisation.name}}** association -hereafter referred as the Association-, ruled by French law  1901, declared 
+at the prefectural office of {{organisation.creationLocation}} on {{organisation.createdAt}} and published on the 
+"Journal Officiel" on {{organisation.publishedAt}}, with social head-quarters located at {{organisation.headOffice}}. 
+Represented by **{{organisation.representative.name}}** , in the condition of **{{organisation.representative.role}}** 
 as one of the Parties,
 
 and **{{company.name}}** here referred as the Partner (register number: {{company.siret}}) with head-quarters located 
@@ -54,8 +54,8 @@ the total amount at the Partnership Agreement signature and within a period of 4
 we would be obliged to terminate our partnership.
 
 As indicated in the invoice, here are the Banking Information of the association :
-- IBAN {{legalEntity.iban}}
-- BIC {{legalEntity.bic}}
+- IBAN {{organisation.iban}}
+- BIC {{organisation.bic}}
 
 {{#partnership.hasBooth}}
 The Partner agrees to set up their booth on the afternoon of the day before the first day of the event between 2:00PM 

@@ -1,8 +1,8 @@
-package fr.devlille.partners.connect.legalentity
+package fr.devlille.partners.connect.organisations
 
 import fr.devlille.partners.connect.internal.moduleMocked
-import fr.devlille.partners.connect.legaentity.domain.LegalEntity
-import fr.devlille.partners.connect.legalentity.factories.createLegalEntity
+import fr.devlille.partners.connect.organisations.domain.Organisation
+import fr.devlille.partners.connect.organisations.factories.createOrganisation
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -20,20 +20,20 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class LegalEntityRoutesTest {
+class OrganisationRoutesTest {
     private val json = Json { ignoreUnknownKeys = true }
 
     @Test
-    fun `POST creates a legal entity`() = testApplication {
+    fun `POST creates a organisation`() = testApplication {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(UUID.randomUUID())
         }
 
-        val response = client.post("/legal-entities") {
+        val response = client.post("/orgs") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(LegalEntity.serializer(), createLegalEntity()))
+            setBody(json.encodeToString(Organisation.serializer(), createOrganisation()))
         }
 
         assertEquals(HttpStatusCode.Created, response.status)
@@ -43,52 +43,52 @@ class LegalEntityRoutesTest {
 
     @Test
     fun `POST fails if representative user does not exist`() {
-        val legalEntity = createLegalEntity()
+        val organisation = createOrganisation()
 
         testApplication {
             application {
                 moduleMocked()
             }
 
-            val response = client.post("/legal-entities") {
+            val response = client.post("/orgs") {
                 contentType(ContentType.Application.Json)
                 header(HttpHeaders.Authorization, "Bearer valid")
-                setBody(json.encodeToString(LegalEntity.serializer(), legalEntity))
+                setBody(json.encodeToString(Organisation.serializer(), organisation))
             }
 
             assertEquals(HttpStatusCode.NotFound, response.status)
-            assertEquals("User with email ${legalEntity.representativeUserEmail} not found", response.bodyAsText())
+            assertEquals("User with email ${organisation.representativeUserEmail} not found", response.bodyAsText())
         }
     }
 
     @Test
-    fun `GET returns a legal entity when it exists`() = testApplication {
+    fun `GET returns a organisation when it exists`() = testApplication {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser()
         }
 
-        val postResponse = client.post("/legal-entities") {
+        val postResponse = client.post("/orgs") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(LegalEntity.serializer(), createLegalEntity()))
+            setBody(json.encodeToString(Organisation.serializer(), createOrganisation()))
         }
         val postResponseBody = Json.decodeFromString<Map<String, String>>(postResponse.bodyAsText())
-        val legalEntityId = UUID.fromString(postResponseBody["id"])
+        val organisationId = UUID.fromString(postResponseBody["id"])
 
-        val getResponse = client.get("/legal-entities/$legalEntityId")
+        val getResponse = client.get("/orgs/$organisationId")
 
         assertEquals(HttpStatusCode.OK, getResponse.status)
     }
 
     @Test
-    fun `GET returns 404 when legal entity does not exist`() = testApplication {
+    fun `GET returns 404 when organisation does not exist`() = testApplication {
         application {
             moduleMocked()
             insertMockedEventWithAdminUser(UUID.randomUUID())
         }
 
-        val response = client.get("/legal-entities/${UUID.randomUUID()}")
+        val response = client.get("/orgs/${UUID.randomUUID()}")
 
         assertEquals(HttpStatusCode.NotFound, response.status)
     }

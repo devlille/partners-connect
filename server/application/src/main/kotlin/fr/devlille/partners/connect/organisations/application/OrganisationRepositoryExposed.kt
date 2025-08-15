@@ -1,20 +1,20 @@
-package fr.devlille.partners.connect.legaentity.application
+package fr.devlille.partners.connect.organisations.application
 
-import fr.devlille.partners.connect.legaentity.application.mappers.toDomain
-import fr.devlille.partners.connect.legaentity.domain.LegalEntity
-import fr.devlille.partners.connect.legaentity.domain.LegalEntityRepository
-import fr.devlille.partners.connect.legaentity.infrastructure.db.LegalEntityEntity
+import fr.devlille.partners.connect.organisations.application.mappers.toDomain
+import fr.devlille.partners.connect.organisations.domain.Organisation
+import fr.devlille.partners.connect.organisations.domain.OrganisationRepository
+import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
-class LegalEntityRepositoryExposed : LegalEntityRepository {
-    override fun create(entity: LegalEntity): UUID = transaction {
+class OrganisationRepositoryExposed : OrganisationRepository {
+    override fun create(entity: Organisation): UUID = transaction {
         val user = UserEntity.singleUserByEmail(entity.representativeUserEmail)
             ?: throw NotFoundException("User with email ${entity.representativeUserEmail} not found")
-        val entity = LegalEntityEntity.new {
+        val entity = OrganisationEntity.new {
             this.name = entity.name
             this.headOffice = entity.headOffice
             this.siret = entity.siret
@@ -36,7 +36,7 @@ class LegalEntityRepositoryExposed : LegalEntityRepository {
         entity.id.value
     }
 
-    override fun getById(id: UUID): LegalEntity = transaction {
-        LegalEntityEntity.findById(id)?.toDomain() ?: throw NotFoundException("LegalEntity with id $id not found")
+    override fun getById(id: UUID): Organisation = transaction {
+        OrganisationEntity.findById(id)?.toDomain() ?: throw NotFoundException("Organisation with id $id not found")
     }
 }

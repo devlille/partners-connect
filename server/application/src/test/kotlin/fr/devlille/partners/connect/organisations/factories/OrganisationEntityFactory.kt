@@ -1,6 +1,6 @@
-package fr.devlille.partners.connect.legalentity.factories
+package fr.devlille.partners.connect.organisations.factories
 
-import fr.devlille.partners.connect.legaentity.infrastructure.db.LegalEntityEntity
+import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import fr.devlille.partners.connect.users.factories.insertMockedUser
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import kotlinx.datetime.Clock.System
@@ -11,9 +11,9 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
 @Suppress("LongParameterList")
-fun insertLegalEntity(
+fun insertOrganisationEntity(
     id: UUID = UUID.randomUUID(),
-    name: String = "Test Legal Entity",
+    name: String = "Test Organisation Entity",
     headOffice: String = "123 Test Street, Test City, TC 12345",
     siret: String? = null,
     siren: String? = null,
@@ -24,14 +24,14 @@ fun insertLegalEntity(
     duns: String? = null,
     iban: String = "FR76 1234 5678 9012 3456 7890 1234",
     bic: String = "TESTFRPPXXX",
-    ribUrl: String = "https://example.com/rib/test-legal-entity",
+    ribUrl: String = "https://example.com/rib/test-organisation",
     creationLocation: String = "Test City, TC 12345",
     createdAt: LocalDateTime = System.now().toLocalDateTime(TimeZone.UTC),
     publishedAt: LocalDateTime = System.now().toLocalDateTime(TimeZone.UTC),
     representativeUser: UserEntity = insertMockedUser(),
     representativeRole: String = "Test Representative Role",
-): LegalEntityEntity = transaction {
-    LegalEntityEntity.new(id) {
+): OrganisationEntity = transaction {
+    OrganisationEntity.new(id) {
         this.name = name
         this.headOffice = headOffice
         this.siret = siret

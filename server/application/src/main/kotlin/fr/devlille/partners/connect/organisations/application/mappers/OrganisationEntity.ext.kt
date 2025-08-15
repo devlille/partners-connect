@@ -1,9 +1,9 @@
-package fr.devlille.partners.connect.legaentity.application.mappers
+package fr.devlille.partners.connect.organisations.application.mappers
 
-import fr.devlille.partners.connect.legaentity.domain.LegalEntity
-import fr.devlille.partners.connect.legaentity.infrastructure.db.LegalEntityEntity
+import fr.devlille.partners.connect.organisations.domain.Organisation
+import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 
-fun LegalEntityEntity.toDomain(): LegalEntity = LegalEntity(
+fun OrganisationEntity.toDomain(): Organisation = Organisation(
     name = this.name,
     headOffice = this.headOffice,
     siret = this.siret,

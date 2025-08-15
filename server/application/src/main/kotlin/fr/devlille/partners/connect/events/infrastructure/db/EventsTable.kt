@@ -2,7 +2,7 @@
 
 package fr.devlille.partners.connect.events.infrastructure.db
 
-import fr.devlille.partners.connect.legaentity.infrastructure.db.LegalEntitiesTable
+import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationsTable
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -20,7 +20,7 @@ object EventsTable : UUIDTable("events") {
 
     val contactEmail = varchar("contact_email", 255)
     val contactPhone = varchar("contact_phone", 30).nullable()
-    val legalEntityId = reference("legal_entity_id", LegalEntitiesTable)
+    val organisationId = reference("organisation_id", OrganisationsTable)
     val createdAt = datetime("created_at").clientDefault {
         Clock.System.now().toLocalDateTime(TimeZone.UTC)
     }

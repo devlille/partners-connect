@@ -1,6 +1,6 @@
 package fr.devlille.partners.connect.events.infrastructure.db
 
-import fr.devlille.partners.connect.legaentity.infrastructure.db.LegalEntityEntity
+import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.UUIDEntity
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
@@ -17,5 +17,5 @@ class EventEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var address by EventsTable.address
     var contactPhone by EventsTable.contactPhone
     var contactEmail by EventsTable.contactEmail
-    var legalEntity by LegalEntityEntity referencedOn EventsTable.legalEntityId
+    var organisation by OrganisationEntity referencedOn EventsTable.organisationId
 }

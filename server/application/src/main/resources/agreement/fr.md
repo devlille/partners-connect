@@ -2,10 +2,10 @@
 
 **Entre les soussignés :**
 
-L'association **{{legalEntity.name}}**, régie par la loi 1901, déclarée à la Préfecture de 
-{{legalEntity.creationLocation}} le {{legalEntity.createdAt}} et publiée au Journal Officiel du 
-{{legalEntity.publishedAt}}, dont le siège social est à {{legalEntity.headOffice}}. Représentée par 
-**{{legalEntity.representative.name}}**, en sa qualité de **{{legalEntity.representative.role}}** d'une part,
+L'association **{{organisation.name}}**, régie par la loi 1901, déclarée à la Préfecture de 
+{{organisation.creationLocation}} le {{organisation.createdAt}} et publiée au Journal Officiel du 
+{{organisation.publishedAt}}, dont le siège social est à {{organisation.headOffice}}. Représentée par 
+**{{organisation.representative.name}}**, en sa qualité de **{{organisation.representative.role}}** d'une part,
 
 Ci-après "L'Association".
 
@@ -58,8 +58,8 @@ paiement à la signature de la convention de partenariat et dans un délai de 45
 dans l'obligation de rompre notre partenariat.
 
 Comme indiqué sur le devis, vous trouverez ci-dessous les informations bancaires de l'association :
-- IBAN {{legalEntity.iban}}
-- BIC {{legalEntity.bic}}
+- IBAN {{organisation.iban}}
+- BIC {{organisation.bic}}
 
 {{#partnership.hasBooth}}
 Le partenaire s'engage à installer son stand la veille du premier jour de l'événement dans l'après-midi entre 14h et 18h.

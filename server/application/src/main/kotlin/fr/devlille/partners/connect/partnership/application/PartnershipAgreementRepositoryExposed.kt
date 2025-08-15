@@ -5,7 +5,7 @@ import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.internal.infrastructure.pdf.renderMarkdownToPdf
 import fr.devlille.partners.connect.internal.infrastructure.resources.readResourceFile
 import fr.devlille.partners.connect.internal.infrastructure.templating.templating
-import fr.devlille.partners.connect.legaentity.infrastructure.db.LegalEntityEntity
+import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import fr.devlille.partners.connect.partnership.domain.PartnershipAgreementRepository
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
@@ -36,7 +36,7 @@ class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
         val template = readResourceFile("/agreement/${partnership.language}.md")
         val formatter = LocalDate.Format { byUnicodePattern("yyyy/MM/dd") }
         val agreement = Agreement(
-            legalEntity = event.legalEntity.toAgreementLegalEntity(formatter),
+            organisation = event.organisation.toAgreementOrganisation(formatter),
             event = event.toAgreementEvent(formatter),
             company = partnership.company.toAgreementCompany(),
             partnership = partnership.toAgreementPartnership(),
@@ -66,8 +66,8 @@ class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
     }
 }
 
-internal fun LegalEntityEntity.toAgreementLegalEntity(formatter: DateTimeFormat<LocalDate>): LegalEntity {
-    return LegalEntity(
+internal fun OrganisationEntity.toAgreementOrganisation(formatter: DateTimeFormat<LocalDate>): Organisation {
+    return Organisation(
         name = this.name,
         headOffice = this.headOffice,
         iban = this.iban,
@@ -124,7 +124,7 @@ internal fun PartnershipEntity.toAgreementPartnership(): Partnership {
 }
 
 class Agreement(
-    val legalEntity: LegalEntity,
+    val organisation: Organisation,
     val event: Event,
     val company: Company,
     val partnership: Partnership,
@@ -138,7 +138,7 @@ class Event(
     val endDate: String,
 )
 
-data class LegalEntity(
+data class Organisation(
     val name: String,
     val headOffice: String,
     val iban: String,

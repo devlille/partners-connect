@@ -5,13 +5,13 @@ meta {
 }
 
 get {
-  url: {{scheme}}://{{base_url}}/legal-entities/:legal_entity_id
+  url: {{scheme}}://{{base_url}}/organisations/:organisation_id
   body: json
   auth: none
 }
 
 params:path {
-  legal_entity_id: {{legal_entity_id}}
+  organisation_id: {{organisation_id}}
 }
 
 headers {

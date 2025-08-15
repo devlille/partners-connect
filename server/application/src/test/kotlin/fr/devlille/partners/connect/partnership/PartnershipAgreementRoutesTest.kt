@@ -4,7 +4,7 @@ import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Upload
 import fr.devlille.partners.connect.internal.moduleMocked
-import fr.devlille.partners.connect.legalentity.factories.insertLegalEntity
+import fr.devlille.partners.connect.organisations.factories.insertOrganisationEntity
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndPartnership
@@ -144,7 +144,7 @@ class PartnershipAgreementRoutesTest {
     }
 
     @Test
-    fun `POST returns 404 when legal entity representative is missing`() = testApplication {
+    fun `POST returns 404 when organisation representative is missing`() = testApplication {
         val storage = mockk<Storage>()
         every { storage.upload(any(), any(), any()) } returns Upload("bucket", "file", "https://example.com")
 
@@ -154,8 +154,8 @@ class PartnershipAgreementRoutesTest {
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            val legalEntity = insertLegalEntity(representativeUser = insertMockedUser(name = null))
-            insertMockedEventWithAdminUser(eventId = eventId, legalEntity = legalEntity)
+            val organisation = insertOrganisationEntity(representativeUser = insertMockedUser(name = null))
+            insertMockedEventWithAdminUser(eventId = eventId, organisation = organisation)
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(

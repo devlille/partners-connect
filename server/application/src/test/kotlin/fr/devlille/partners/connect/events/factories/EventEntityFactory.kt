@@ -1,8 +1,8 @@
 package fr.devlille.partners.connect.events.factories
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
-import fr.devlille.partners.connect.legaentity.infrastructure.db.LegalEntityEntity
-import fr.devlille.partners.connect.legalentity.factories.insertLegalEntity
+import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
+import fr.devlille.partners.connect.organisations.factories.insertOrganisationEntity
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
@@ -18,7 +18,7 @@ fun insertMockedEvent(
     address: String = "123 Test St, Test City, TC 12345",
     contactEmail: String = "contact@mail.com",
     contactPhone: String? = null,
-    legalEntity: LegalEntityEntity = insertLegalEntity(),
+    organisation: OrganisationEntity = insertOrganisationEntity(),
 ): EventEntity = transaction {
     EventEntity.new(id) {
         this.name = name
@@ -29,6 +29,6 @@ fun insertMockedEvent(
         this.address = address
         this.contactPhone = contactPhone
         this.contactEmail = contactEmail
-        this.legalEntity = legalEntity
+        this.organisation = organisation
     }
 }
