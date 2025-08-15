@@ -39,4 +39,33 @@ class LegalEntityRepositoryExposed : LegalEntityRepository {
     override fun getById(id: UUID): LegalEntity = transaction {
         LegalEntityEntity.findById(id)?.toDomain() ?: throw NotFoundException("LegalEntity with id $id not found")
     }
+
+    override fun update(id: UUID, entity: LegalEntity): LegalEntity = transaction {
+        val user = UserEntity.singleUserByEmail(entity.representativeUserEmail)
+            ?: throw NotFoundException("User with email ${entity.representativeUserEmail} not found")
+        val existingEntity = LegalEntityEntity.findById(id)
+            ?: throw NotFoundException("LegalEntity with id $id not found")
+        
+        existingEntity.apply {
+            this.name = entity.name
+            this.headOffice = entity.headOffice
+            this.siret = entity.siret
+            this.siren = entity.siren
+            this.tva = entity.tva
+            this.dAndB = entity.dAndB
+            this.nace = entity.nace
+            this.naf = entity.naf
+            this.duns = entity.duns
+            this.iban = entity.iban
+            this.bic = entity.bic
+            this.ribUrl = entity.ribUrl
+            this.creationLocation = entity.creationLocation
+            this.createdAt = entity.createdAt
+            this.publishedAt = entity.publishedAt
+            this.representativeUser = user
+            this.representativeRole = entity.representativeRole
+        }
+        
+        existingEntity.toDomain()
+    }
 }
