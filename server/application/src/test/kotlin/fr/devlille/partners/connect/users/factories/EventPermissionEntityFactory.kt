@@ -1,18 +1,18 @@
 package fr.devlille.partners.connect.users.factories
 
-import fr.devlille.partners.connect.events.factories.insertMockedEvent
-import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
-import fr.devlille.partners.connect.users.infrastructure.db.EventPermissionEntity
+import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
+import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionEntity
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import java.util.UUID
 
-fun insertMockedEventPermission(
-    event: EventEntity = insertMockedEvent(),
+fun insertMockedOrgaPermission(
+    orgId: UUID = UUID.randomUUID(),
     user: UserEntity,
     canEdit: Boolean = true,
-): EventPermissionEntity = transaction {
-    EventPermissionEntity.new {
-        this.event = event
+): OrganisationPermissionEntity = transaction {
+    OrganisationPermissionEntity.new {
+        this.organisation = OrganisationEntity[orgId]
         this.user = user
         this.canEdit = canEdit
     }

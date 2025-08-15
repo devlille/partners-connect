@@ -1,6 +1,6 @@
 package fr.devlille.partners.connect.sponsoring.infrastructure.api
 
-import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedEventPlugin
+import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.sponsoring.domain.AttachOptionsToPack
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
@@ -20,7 +20,7 @@ import org.koin.ktor.ext.inject
 
 @Suppress("ThrowsCount")
 fun Route.sponsoringRoutes() {
-    route("/events/{eventId}") {
+    route("/orgs/{orgSlug}/events/{eventId}") {
         packRoutes()
         optionRoutes()
     }
@@ -32,7 +32,7 @@ private fun Route.packRoutes() {
     val optRepository by inject<OptionRepository>()
 
     route("/packs") {
-        install(AuthorizedEventPlugin)
+        install(AuthorizedOrganisationPlugin)
         get {
             val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
             val acceptLanguage = call.request.headers["Accept-Language"]
@@ -75,7 +75,7 @@ private fun Route.optionRoutes() {
     val repository by inject<OptionRepository>()
 
     route("/options") {
-        install(AuthorizedEventPlugin)
+        install(AuthorizedOrganisationPlugin)
         get {
             val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
             val acceptLanguage = call.request.headers["Accept-Language"]

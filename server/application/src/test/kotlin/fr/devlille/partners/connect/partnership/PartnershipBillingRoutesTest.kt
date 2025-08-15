@@ -2,14 +2,13 @@ package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.companies.domain.CompanyBillingData
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
-import fr.devlille.partners.connect.events.factories.insertMockedEvent
+import fr.devlille.partners.connect.events.factories.insertMockedEventWithOrga
 import fr.devlille.partners.connect.internal.insertQontoIntegration
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.factories.createCompanyBillingData
 import fr.devlille.partners.connect.partnership.factories.insertMockedBilling
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
-import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.put
@@ -36,7 +35,7 @@ class PartnershipBillingRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEvent(eventId)
+            insertMockedEventWithOrga(eventId)
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
             insertMockedBilling(eventId, partnershipId, name = "DevLille SAS", status = InvoiceStatus.SENT)
@@ -57,7 +56,7 @@ class PartnershipBillingRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEvent(eventId)
+            insertMockedEventWithOrga(eventId)
             insertMockedCompany(companyId)
         }
 
@@ -75,7 +74,7 @@ class PartnershipBillingRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedEventWithOrga(eventId)
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
             insertQontoIntegration(eventId)
@@ -99,7 +98,7 @@ class PartnershipBillingRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEvent(eventId)
+            insertMockedEventWithOrga(eventId)
             insertQontoIntegration(eventId)
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
@@ -128,7 +127,7 @@ class PartnershipBillingRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEvent(eventId)
+            insertMockedEventWithOrga(eventId)
         }
 
         val response = client.post("/events/$eventId/partnership/$partnershipId/billing") {
@@ -147,7 +146,7 @@ class PartnershipBillingRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEvent(eventId)
+            insertMockedEventWithOrga(eventId)
         }
 
         val response = client.put("/events/$eventId/partnership/$partnershipId/billing") {

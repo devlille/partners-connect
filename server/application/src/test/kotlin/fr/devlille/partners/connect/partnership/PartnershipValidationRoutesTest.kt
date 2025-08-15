@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.internal.moduleMocked
+import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
@@ -23,6 +24,7 @@ import kotlin.test.assertNotNull
 class PartnershipValidationRoutesTest {
     @Test
     fun `POST validates a partnership`() = testApplication {
+        val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
@@ -30,7 +32,8 @@ class PartnershipValidationRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId)
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(packId, eventId)
             insertMockedPartnership(
@@ -41,7 +44,7 @@ class PartnershipValidationRoutesTest {
             )
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/validate") {
+        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/validate") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -53,15 +56,17 @@ class PartnershipValidationRoutesTest {
 
     @Test
     fun `POST returns 404 if partnership does not exist`() = testApplication {
+        val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId)
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/validate") {
+        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/validate") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -71,18 +76,20 @@ class PartnershipValidationRoutesTest {
 
     @Test
     fun `POST declines a partnership`() = testApplication {
+        val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId)
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/decline") {
+        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/decline") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -94,15 +101,17 @@ class PartnershipValidationRoutesTest {
 
     @Test
     fun `POST returns 404 if partnership not found`() = testApplication {
+        val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId)
         }
 
-        val response = client.delete("/events/$eventId/partnership/$partnershipId/decline") {
+        val response = client.delete("/orgs/$orgId/events/$eventId/partnership/$partnershipId/decline") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
         }

@@ -3,6 +3,8 @@ package fr.devlille.partners.connect.organisations
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.domain.Organisation
 import fr.devlille.partners.connect.organisations.factories.createOrganisation
+import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
+import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -15,7 +17,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
 import kotlinx.serialization.json.Json
-import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -27,7 +28,7 @@ class OrganisationRoutesTest {
     fun `POST creates a organisation`() = testApplication {
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(UUID.randomUUID())
+            insertMockedAdminUser()
         }
 
         val response = client.post("/orgs") {
@@ -65,7 +66,8 @@ class OrganisationRoutesTest {
     fun `GET returns a organisation when it exists`() = testApplication {
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser()
+            val org = insertMockedOrganisationEntity()
+            insertMockedEventWithAdminUser(orgId = org.id.value)
         }
 
         val postResponse = client.post("/orgs") {
@@ -84,7 +86,8 @@ class OrganisationRoutesTest {
     fun `GET returns 404 when organisation does not exist`() = testApplication {
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(UUID.randomUUID())
+            val org = insertMockedOrganisationEntity()
+            insertMockedEventWithAdminUser(orgId = org.id.value)
         }
 
         val response = client.get("/orgs/non-existing-slug")

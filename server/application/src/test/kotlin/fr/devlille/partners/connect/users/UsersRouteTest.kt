@@ -1,9 +1,8 @@
 package fr.devlille.partners.connect.users
 
-import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
-import fr.devlille.partners.connect.users.factories.insertMockedEventPermission
+import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
 import fr.devlille.partners.connect.users.factories.insertMockedUser
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
@@ -18,12 +17,13 @@ import kotlin.test.assertTrue
 class UsersRouteTest {
     @Test
     fun `GET returns empty list when no users exist`() = testApplication {
+        val orgId = UUID.randomUUID()
         application {
             moduleMocked()
+            insertMockedOrganisationEntity(orgId)
         }
 
-        val eventId = UUID.randomUUID()
-        val response = client.get("/events/$eventId/users")
+        val response = client.get("/orgs/$orgId/users")
 
         assertEquals(HttpStatusCode.OK, response.status)
         assertEquals("[]", response.bodyAsText())
@@ -31,26 +31,26 @@ class UsersRouteTest {
 
     @Test
     fun `GET returns only users who can edit`() = testApplication {
-        val eventId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
         val editEmail = "edit@example.com"
         val noEditEmail = "noedit@example.com"
 
         application {
             moduleMocked()
-            val event = insertMockedEvent(eventId)
-            insertMockedEventPermission(
-                event = event,
+            insertMockedOrganisationEntity(orgId)
+            insertMockedOrgaPermission(
+                orgId = orgId,
                 user = insertMockedUser(email = editEmail),
                 canEdit = true,
             )
-            insertMockedEventPermission(
-                event = event,
+            insertMockedOrgaPermission(
+                orgId = orgId,
                 user = insertMockedUser(email = noEditEmail),
                 canEdit = false,
             )
         }
 
-        val response = client.get("/events/$eventId/users")
+        val response = client.get("/orgs/$orgId/users")
         val body = response.bodyAsText()
 
         assertEquals(HttpStatusCode.OK, response.status)
@@ -59,25 +59,26 @@ class UsersRouteTest {
     }
 
     @Test
-    fun `GET returns only users for correct event`() = testApplication {
-        val eventIdA = UUID.randomUUID()
-        val eventIdB = UUID.randomUUID()
+    fun `GET returns only users for correct org`() = testApplication {
+        val orgIdA = UUID.randomUUID()
+        val orgIdB = UUID.randomUUID()
         application {
             moduleMocked()
-            val org = insertMockedOrganisationEntity()
-            insertMockedEventPermission(
-                event = insertMockedEvent(eventIdA, organisation = org),
+            insertMockedOrganisationEntity(id = orgIdA)
+            insertMockedOrganisationEntity(id = orgIdB)
+            insertMockedOrgaPermission(
+                orgId = orgIdA,
                 user = insertMockedUser(email = "a@example.com"),
                 canEdit = true,
             )
-            insertMockedEventPermission(
-                event = insertMockedEvent(eventIdB, organisation = org),
+            insertMockedOrgaPermission(
+                orgId = orgIdB,
                 user = insertMockedUser(email = "b@example.com"),
                 canEdit = true,
             )
         }
 
-        val response = client.get("/events/$eventIdA/users")
+        val response = client.get("/orgs/$orgIdA/users")
         val body = response.bodyAsText()
 
         assertEquals(HttpStatusCode.OK, response.status)

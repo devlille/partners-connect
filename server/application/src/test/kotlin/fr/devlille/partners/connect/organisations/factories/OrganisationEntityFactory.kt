@@ -14,7 +14,7 @@ import java.util.UUID
 @Suppress("LongParameterList")
 fun insertMockedOrganisationEntity(
     id: UUID = UUID.randomUUID(),
-    name: String = "Test Organisation Entity",
+    name: String = id.toString(),
     headOffice: String = "123 Test Street, Test City, TC 12345",
     siret: String? = null,
     siren: String? = null,

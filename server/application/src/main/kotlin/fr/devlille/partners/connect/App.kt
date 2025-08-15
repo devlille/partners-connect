@@ -49,7 +49,7 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPacks
 import fr.devlille.partners.connect.tickets.infrastructure.bindings.ticketingModule
 import fr.devlille.partners.connect.users.infrastructure.api.userRoutes
 import fr.devlille.partners.connect.users.infrastructure.bindings.userModule
-import fr.devlille.partners.connect.users.infrastructure.db.EventPermissionsTable
+import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionsTable
 import fr.devlille.partners.connect.users.infrastructure.db.UsersTable
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
@@ -134,9 +134,7 @@ fun Application.module(
             authRoutes { redirects[it] }
         }
         organisationRoutes()
-        route("events") {
-            eventRoutes()
-        }
+        eventRoutes()
         userRoutes()
         sponsoringRoutes()
         companyRoutes()
@@ -170,7 +168,7 @@ private fun configureDatabase(url: String, driver: String, user: String, passwor
             EventsTable,
             // users
             UsersTable,
-            EventPermissionsTable,
+            OrganisationPermissionsTable,
             // sponsoring
             PackOptionsTable,
             SponsoringOptionsTable,

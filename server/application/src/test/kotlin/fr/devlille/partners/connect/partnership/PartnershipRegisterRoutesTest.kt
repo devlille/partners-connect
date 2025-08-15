@@ -1,7 +1,7 @@
 package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
-import fr.devlille.partners.connect.events.factories.insertMockedEvent
+import fr.devlille.partners.connect.events.factories.insertMockedEventWithOrga
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
@@ -32,7 +32,7 @@ class PartnershipRegisterRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEvent(eventId)
+            insertMockedEventWithOrga(eventId)
             insertMockedCompany(companyId)
             insertMockedSponsoringPack(packId, eventId)
             insertMockedSponsoringOption(optionId, eventId)
@@ -83,7 +83,7 @@ class PartnershipRegisterRoutesTest {
         val eventId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockedEvent(eventId)
+            insertMockedEventWithOrga(eventId)
         }
 
         val body = RegisterPartnership(
@@ -107,7 +107,7 @@ class PartnershipRegisterRoutesTest {
         val companyId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockedEvent(eventId)
+            insertMockedEventWithOrga(eventId)
         }
 
         val body = RegisterPartnership(
@@ -132,7 +132,7 @@ class PartnershipRegisterRoutesTest {
         val packId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockedEvent(eventId)
+            insertMockedEventWithOrga(eventId)
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(packId, eventId)
             insertMockedPartnership(eventId = eventId, companyId = companyId, selectedPackId = selectedPack.id.value)
@@ -162,7 +162,7 @@ class PartnershipRegisterRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEvent(eventId)
+            insertMockedEventWithOrga(eventId)
             insertMockedCompany(companyId)
             insertMockedSponsoringPack(packId, eventId)
             insertMockedSponsoringOption(optionId, eventId)
@@ -194,7 +194,7 @@ class PartnershipRegisterRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEvent(eventId)
+            insertMockedEventWithOrga(eventId)
             insertMockedCompany(companyId)
             insertMockedSponsoringPack(packId, eventId)
             insertMockedSponsoringOption(optionId, eventId)

@@ -5,11 +5,11 @@ meta {
 }
 
 get {
-  url: {{scheme}}://{{base_url}}/events/:event_id/users
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/users
   body: none
   auth: none
 }
 
 params:path {
-  event_id: {{event_id}}
+  org_slug: {{org_slug}}
 }

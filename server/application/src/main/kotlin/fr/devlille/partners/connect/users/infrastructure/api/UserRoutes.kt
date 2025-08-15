@@ -4,7 +4,6 @@ import fr.devlille.partners.connect.auth.domain.AuthRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.token
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
-import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.users.domain.UserRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
@@ -21,24 +20,21 @@ fun Route.userRoutes() {
     val authRepository by inject<AuthRepository>()
     val userRepository by inject<UserRepository>()
 
-    route("/events/{eventId}/users") {
+    route("/orgs/{orgSlug}/users") {
         get {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("event id is required")
-            call.respond(
-                HttpStatusCode.OK,
-                userRepository.findUsersByEventId(eventId),
-            )
+            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Orga slug is required")
+            call.respond(HttpStatusCode.OK, userRepository.findUsersByOrgSlug(orgSlug))
         }
         post("/grant") {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("event id is required")
+            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Orga slug is required")
             val request = call.receive<GrantPermissionRequest>()
             val token = call.token
             val userInfo = authRepository.getUserInfo(token)
-            val hasPerm = userRepository.hasEditPermissionByEmail(userInfo.email, eventId)
+            val hasPerm = userRepository.hasEditPermissionByEmail(userInfo.email, orgSlug)
             if (!hasPerm && SystemVarEnv.owner != userInfo.email) {
                 throw UnauthorizedException("You do not have permission to grant users for this event")
             }
-            userRepository.grantUsers(eventId, request.userEmails)
+            userRepository.grantUsers(orgSlug, request.userEmails)
             call.respond(HttpStatusCode.OK, "Permissions granted")
         }
     }

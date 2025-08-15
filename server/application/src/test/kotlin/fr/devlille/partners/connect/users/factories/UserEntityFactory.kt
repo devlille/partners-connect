@@ -3,21 +3,16 @@ package fr.devlille.partners.connect.users.factories
 import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.internal.mockedAdminUser
-import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
-import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
 fun insertMockedEventWithAdminUser(
     eventId: UUID = UUID.randomUUID(),
-    organisation: OrganisationEntity = insertMockedOrganisationEntity(),
+    orgId: UUID = UUID.randomUUID(),
 ): EventEntity {
-    val mockedEvent = insertMockedEvent(eventId, organisation = organisation)
-    insertMockedEventPermission(
-        event = mockedEvent,
-        user = insertMockedAdminUser(),
-    )
+    val mockedEvent = insertMockedEvent(eventId, orgId = orgId)
+    insertMockedOrgaPermission(orgId = orgId, user = insertMockedAdminUser())
     return mockedEvent
 }
 

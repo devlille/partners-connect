@@ -1,7 +1,7 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.events.domain.EventRepository
-import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedEventPlugin
+import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
@@ -17,7 +17,6 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
-import kotlin.getValue
 
 @Suppress("ThrowsCount")
 fun Route.partnershipSuggestionRoutes() {
@@ -27,24 +26,6 @@ fun Route.partnershipSuggestionRoutes() {
     val notificationRepository by inject<NotificationRepository>()
 
     route("/events/{eventId}/partnership/{partnershipId}") {
-        route("/suggestion") {
-            install(AuthorizedEventPlugin)
-            post {
-                val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
-                val partnershipId = call.parameters["partnershipId"]?.toUUID()
-                    ?: throw BadRequestException("Missing partnership id")
-                val input = call.receive<SuggestPartnership>()
-                val id = suggestionRepository.suggest(eventId, partnershipId, input)
-                val partnership = partnershipRepository.getById(eventId, id)
-                val pack = partnership.suggestionPack
-                    ?: throw NotFoundException("Partnership does not have a suggestion pack")
-                val company = partnershipRepository.getCompanyByPartnershipId(eventId, partnershipId)
-                val event = eventRepository.getById(eventId)
-                val variables = NotificationVariables.NewSuggestion(input.language, event, company, pack)
-                notificationRepository.sendMessage(eventId, variables)
-                call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
-            }
-        }
         post("/suggestion-approve") {
             val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
@@ -67,6 +48,26 @@ fun Route.partnershipSuggestionRoutes() {
             val partnership = partnershipRepository.getById(eventId, partnershipId)
             val event = eventRepository.getById(eventId)
             val variables = NotificationVariables.SuggestionDeclined(partnership.language, event, company)
+            notificationRepository.sendMessage(eventId, variables)
+            call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
+        }
+    }
+
+    route("/orgs/{orgSlug}/events/{eventId}/partnership/{partnershipId}") {
+        install(AuthorizedOrganisationPlugin)
+
+        post("/suggestion") {
+            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val partnershipId = call.parameters["partnershipId"]?.toUUID()
+                ?: throw BadRequestException("Missing partnership id")
+            val input = call.receive<SuggestPartnership>()
+            val id = suggestionRepository.suggest(eventId, partnershipId, input)
+            val partnership = partnershipRepository.getById(eventId, id)
+            val pack = partnership.suggestionPack
+                ?: throw NotFoundException("Partnership does not have a suggestion pack")
+            val company = partnershipRepository.getCompanyByPartnershipId(eventId, partnershipId)
+            val event = eventRepository.getById(eventId)
+            val variables = NotificationVariables.NewSuggestion(input.language, event, company, pack)
             notificationRepository.sendMessage(eventId, variables)
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
         }

@@ -1,21 +1,20 @@
 package fr.devlille.partners.connect.internal.infrastructure.api
 
 import fr.devlille.partners.connect.auth.domain.AuthRepository
-import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.users.domain.UserRepository
 import io.ktor.server.application.createRouteScopedPlugin
 import io.ktor.server.plugins.BadRequestException
 import org.koin.ktor.ext.inject
 
-val AuthorizedEventPlugin = createRouteScopedPlugin(name = "AuthorizedEventPlugin") {
+val AuthorizedOrganisationPlugin = createRouteScopedPlugin(name = "AuthorizedOrganisationPlugin") {
     val authRepository by application.inject<AuthRepository>()
     val userRepository by application.inject<UserRepository>()
 
     onCall { call ->
-        val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing eventId")
+        val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Missing org slug")
         val token = call.token
         val userInfo = authRepository.getUserInfo(token)
-        val canEdit = userRepository.hasEditPermissionByEmail(userInfo.email, eventId)
+        val canEdit = userRepository.hasEditPermissionByEmail(userInfo.email, orgSlug)
         if (!canEdit) throw UnauthorizedException("You are not allowed to edit this event")
     }
 }

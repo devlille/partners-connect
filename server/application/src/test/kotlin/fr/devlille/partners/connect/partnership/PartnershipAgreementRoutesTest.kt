@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
+import fr.devlille.partners.connect.events.factories.insertMockedEventWithOrga
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Upload
 import fr.devlille.partners.connect.internal.moduleMocked
@@ -43,13 +44,15 @@ class PartnershipAgreementRoutesTest {
             url = expectedUrl,
         )
 
+        val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId)
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
@@ -61,7 +64,7 @@ class PartnershipAgreementRoutesTest {
             )
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/agreement") {
+        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -102,15 +105,17 @@ class PartnershipAgreementRoutesTest {
             url = "https://example.com/irrelevant.pdf",
         )
 
+        val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId)
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/agreement") {
+        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -126,17 +131,19 @@ class PartnershipAgreementRoutesTest {
             url = "https://example.com/irrelevant.pdf",
         )
 
+        val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId)
             insertMockedCompany(companyId)
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/agreement") {
+        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -148,14 +155,15 @@ class PartnershipAgreementRoutesTest {
         val storage = mockk<Storage>()
         every { storage.upload(any(), any(), any()) } returns Upload("bucket", "file", "https://example.com")
 
+        val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            val organisation = insertMockedOrganisationEntity(representativeUser = insertMockedUser(name = null))
-            insertMockedEventWithAdminUser(eventId = eventId, organisation = organisation)
+            insertMockedOrganisationEntity(orgId, representativeUser = insertMockedUser(name = null))
+            insertMockedEventWithAdminUser(eventId, orgId)
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
@@ -167,7 +175,7 @@ class PartnershipAgreementRoutesTest {
             )
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/agreement") {
+        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -180,13 +188,15 @@ class PartnershipAgreementRoutesTest {
         val storage = mockk<Storage>()
         every { storage.upload(any(), any(), any()) } returns Upload("bucket", "file", "https://example.com")
 
+        val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId)
             insertMockedCompany(companyId)
             insertMockedPartnership(
                 id = partnershipId,
@@ -196,7 +206,7 @@ class PartnershipAgreementRoutesTest {
             )
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/agreement") {
+        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -209,13 +219,15 @@ class PartnershipAgreementRoutesTest {
         val storage = mockk<Storage>()
         every { storage.upload(any(), any(), any()) } returns Upload("bucket", "file", "https://example.com")
 
+        val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId)
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
@@ -228,7 +240,7 @@ class PartnershipAgreementRoutesTest {
             )
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/agreement") {
+        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -252,7 +264,7 @@ class PartnershipAgreementRoutesTest {
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedEventWithOrga(eventId)
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
@@ -327,7 +339,7 @@ class PartnershipAgreementRoutesTest {
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedEventWithOrga(eventId)
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
@@ -359,7 +371,7 @@ class PartnershipAgreementRoutesTest {
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedEventWithOrga(eventId)
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
