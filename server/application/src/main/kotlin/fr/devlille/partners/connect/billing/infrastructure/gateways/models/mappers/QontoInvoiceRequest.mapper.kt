@@ -24,7 +24,7 @@ internal fun EventEntity.toQontoInvoiceRequest(
         dueDate = "${now.year}-${"%02d".format(now.monthNumber)}-${"%02d".format(now.dayOfMonth)}",
         issueDate = "${startTime.year}-$eventMonth-$eventDay",
         currency = "EUR",
-        paymentMethods = QontoPaymentMethods(iban = legalEntity.iban),
+        paymentMethods = QontoPaymentMethods(iban = organisation.iban),
         purchaseOrder = invoicePo,
         items = invoiceItems,
     )

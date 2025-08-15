@@ -1,14 +1,14 @@
-package fr.devlille.partners.connect.legalentity.factories
+package fr.devlille.partners.connect.organisations.factories
 
 import fr.devlille.partners.connect.internal.mockedAdminUser
-import fr.devlille.partners.connect.legaentity.domain.LegalEntity
+import fr.devlille.partners.connect.organisations.domain.Organisation
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 @Suppress("LongParameterList")
-fun createLegalEntity(
+fun createOrganisation(
     name: String = "DevLille Org",
     headOffice: String = "123 rue de la République, Lille, France",
     siret: String = "12345678900019",
@@ -26,7 +26,7 @@ fun createLegalEntity(
     creationLocation: String = "Lille",
     createdAt: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC),
     publishedAt: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC),
-): LegalEntity = LegalEntity(
+): Organisation = Organisation(
     name = name,
     headOffice = headOffice,
     siret = siret,

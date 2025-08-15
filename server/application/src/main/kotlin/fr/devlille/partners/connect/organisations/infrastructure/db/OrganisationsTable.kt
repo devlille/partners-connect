@@ -1,10 +1,10 @@
-package fr.devlille.partners.connect.legaentity.infrastructure.db
+package fr.devlille.partners.connect.organisations.infrastructure.db
 
 import fr.devlille.partners.connect.users.infrastructure.db.UsersTable
 import org.jetbrains.exposed.v1.core.dao.id.UUIDTable
 import org.jetbrains.exposed.v1.datetime.datetime
 
-object LegalEntitiesTable : UUIDTable("legal_entities") {
+object OrganisationsTable : UUIDTable("organisations") {
     val name = varchar("name", length = 255)
     val headOffice = text("head_office")
     val siret = text("siret").nullable()

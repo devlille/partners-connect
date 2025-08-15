@@ -7,7 +7,7 @@ import java.util.UUID
 
 @Suppress("LongParameterList")
 fun createEvent(
-    legalEntityId: UUID,
+    organisationId: UUID,
     name: String = "DevLille 2025",
     startTime: LocalDateTime = LocalDateTime.parse("2025-06-13T18:00:00"),
     endTime: LocalDateTime = LocalDateTime.parse("2025-06-12T09:00:00"),
@@ -24,5 +24,5 @@ fun createEvent(
     submissionEndTime = submissionEndTime,
     address = address,
     contact = Contact(phone = phone, email = email),
-    legalEntityId = legalEntityId.toString(),
+    organisationId = organisationId.toString(),
 )

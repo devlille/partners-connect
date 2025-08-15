@@ -1,11 +1,11 @@
-package fr.devlille.partners.connect.legaentity.domain
+package fr.devlille.partners.connect.organisations.domain
 
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LegalEntity(
+data class Organisation(
     val name: String,
     @SerialName("head_office")
     val headOffice: String,

@@ -25,9 +25,9 @@ import fr.devlille.partners.connect.internal.infrastructure.bindings.networkClie
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkEngineModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.storageModule
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
-import fr.devlille.partners.connect.legaentity.infrastructure.api.legalEntityRoutes
-import fr.devlille.partners.connect.legaentity.infrastructure.bindings.legalEntityModule
-import fr.devlille.partners.connect.legaentity.infrastructure.db.LegalEntitiesTable
+import fr.devlille.partners.connect.organisations.infrastructure.api.organisationRoutes
+import fr.devlille.partners.connect.organisations.infrastructure.bindings.organisationModule
+import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationsTable
 import fr.devlille.partners.connect.notifications.infrastructure.bindings.notificationModule
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipAgreementRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipBillingRoutes
@@ -97,7 +97,7 @@ fun Application.module(
         networkClientModule,
         storageModule,
         authModule,
-        legalEntityModule,
+        organisationModule,
         eventModule,
         userModule,
         sponsoringModule,
@@ -133,7 +133,7 @@ fun Application.module(
         route("auth") {
             authRoutes { redirects[it] }
         }
-        legalEntityRoutes()
+        organisationRoutes()
         route("events") {
             eventRoutes()
         }
@@ -164,8 +164,8 @@ private fun configureDatabase(url: String, driver: String, user: String, passwor
             MailjetIntegrationsTable,
             QontoIntegrationsTable,
             BilletWebIntegrationsTable,
-            // legal entities
-            LegalEntitiesTable,
+            // organisations
+            OrganisationsTable,
             // events
             EventsTable,
             // users
