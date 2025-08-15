@@ -11,7 +11,7 @@ import org.jetbrains.exposed.v1.datetime.datetime
 object UsersTable : UUIDTable("users") {
     val email = varchar("email", 255).uniqueIndex()
     val name = varchar("name", 255).nullable()
-    val pictureUrl = varchar("pictureUrl", 255).nullable()
+    val pictureUrl = text("pictureUrl").nullable()
     val createdAt = datetime("created_at").clientDefault {
         Clock.System.now().toLocalDateTime(TimeZone.UTC)
     }
