@@ -114,7 +114,7 @@ cd server
   - `companies/` - Company management
   - `events/` - Event management
   - `integrations/` - External service integrations
-  - `legaentity/` - Legal entity handling
+  - `organisations/` - Organisations handling
   - `notifications/` - Slack notifications  
   - `partnership/` - Core partnership workflows
   - `sponsoring/` - Sponsorship packages
