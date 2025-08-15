@@ -5,9 +5,13 @@ meta {
 }
 
 post {
-  url: {{scheme}}://{{base_url}}/events
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events
   body: json
   auth: none
+}
+
+params:path {
+  org_slug: {{org_slug}}
 }
 
 headers {

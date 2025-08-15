@@ -2,7 +2,7 @@ package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.companies.domain.CompanyRepository
 import fr.devlille.partners.connect.events.domain.EventRepository
-import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedEventPlugin
+import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
@@ -39,9 +39,11 @@ fun Route.partnershipRoutes() {
             notificationRepository.sendMessage(eventId, variables)
             call.respond(HttpStatusCode.Created, mapOf("id" to id.toString()))
         }
+    }
 
-        route("/{partnershipId}/validate") {
-            install(AuthorizedEventPlugin)
+    route("/orgs/{orgSlug}/events/{eventId}/partnership/{partnershipId}") {
+        route("/validate") {
+            install(AuthorizedOrganisationPlugin)
 
             post {
                 val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
@@ -59,8 +61,8 @@ fun Route.partnershipRoutes() {
             }
         }
 
-        route("/{partnershipId}/decline") {
-            install(AuthorizedEventPlugin)
+        route("/decline") {
+            install(AuthorizedOrganisationPlugin)
 
             post {
                 val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")

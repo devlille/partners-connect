@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.internal.moduleMocked
+import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.partnership.domain.SuggestPartnership
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
@@ -30,6 +31,7 @@ import kotlin.test.assertTrue
 class PartnershipSuggestionRoutesTest {
     @Test
     fun `PUT suggests a new pack with optional options`() = testApplication {
+        val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
@@ -38,7 +40,8 @@ class PartnershipSuggestionRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId)
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
             insertMockedSponsoringPack(packId, eventId)
@@ -47,7 +50,7 @@ class PartnershipSuggestionRoutesTest {
             insertMockedPackOptions(packId, optionId, required = false)
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/suggestion") {
+        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(
@@ -67,15 +70,17 @@ class PartnershipSuggestionRoutesTest {
 
     @Test
     fun `PUT fails if partnership does not exist`() = testApplication {
+        val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val fakeId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId)
         }
 
-        val response = client.post("/events/$eventId/partnership/$fakeId/suggestion") {
+        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$fakeId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(SuggestPartnership("fake-pack", emptyList(), "en")))
@@ -86,18 +91,20 @@ class PartnershipSuggestionRoutesTest {
 
     @Test
     fun `PUT fails if pack does not exist`() = testApplication {
+        val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId)
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/suggestion") {
+        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(SuggestPartnership(UUID.randomUUID().toString(), emptyList(), "en")))
@@ -108,6 +115,7 @@ class PartnershipSuggestionRoutesTest {
 
     @Test
     fun `PUT fails if option is not optional in pack`() = testApplication {
+        val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
@@ -116,7 +124,8 @@ class PartnershipSuggestionRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId)
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
             insertMockedSponsoringPack(packId, eventId)
@@ -125,7 +134,7 @@ class PartnershipSuggestionRoutesTest {
             insertMockedPackOptions(packId, optionId)
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/suggestion") {
+        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(SuggestPartnership(packId.toString(), listOf(optionId.toString()), "en")))
@@ -137,6 +146,7 @@ class PartnershipSuggestionRoutesTest {
 
     @Test
     fun `PUT fails if option translation missing`() = testApplication {
+        val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
@@ -145,7 +155,8 @@ class PartnershipSuggestionRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId)
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId, language = "fr")
             insertMockedSponsoringPack(packId, eventId)
@@ -153,7 +164,7 @@ class PartnershipSuggestionRoutesTest {
             insertMockedPackOptions(packId, optionId, required = false)
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/suggestion") {
+        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(SuggestPartnership(packId.toString(), listOf(optionId.toString()), "en")))

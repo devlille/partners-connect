@@ -17,8 +17,6 @@ data class Event(
     val submissionEndTime: LocalDateTime,
     val address: String,
     val contact: Contact,
-    @SerialName("organisation_id")
-    val organisationId: String,
 )
 
 @Serializable

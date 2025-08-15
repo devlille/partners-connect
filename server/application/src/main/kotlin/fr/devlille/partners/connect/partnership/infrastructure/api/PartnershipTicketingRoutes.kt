@@ -18,7 +18,7 @@ import org.koin.ktor.ext.inject
 fun Route.partnershipTicketingRoutes() {
     val ticketingRepository by inject<TicketRepository>()
 
-    route("/events/{eventId}/partnerships/{partnershipId}/tickets") {
+    route("/events/{eventId}/partnership/{partnershipId}/tickets") {
         get {
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")

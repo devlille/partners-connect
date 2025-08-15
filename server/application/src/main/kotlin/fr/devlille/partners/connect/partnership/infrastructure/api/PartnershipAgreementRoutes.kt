@@ -1,7 +1,7 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.events.domain.EventRepository
-import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedEventPlugin
+import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
@@ -28,8 +28,8 @@ fun Route.partnershipAgreementRoutes() {
     val storageRepository by inject<PartnershipStorageRepository>()
     val notificationRepository by inject<NotificationRepository>()
 
-    route("/events/{eventId}/partnership/{partnershipId}/agreement") {
-        install(AuthorizedEventPlugin)
+    route("/orgs/{orgSlug}/events/{eventId}/partnership/{partnershipId}/agreement") {
+        install(AuthorizedOrganisationPlugin)
 
         post {
             val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")

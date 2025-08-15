@@ -12,6 +12,7 @@ post {
 
 headers {
   Content-Type: application/json
+  Authorization: Bearer {{token}}
 }
 
 body:json {
@@ -38,5 +39,5 @@ body:json {
 
 script:post-response {
   let data = res.getBody();
-  bru.setEnvVar("org_slug", data.id)
+  bru.setEnvVar("slug", data.id)
 }

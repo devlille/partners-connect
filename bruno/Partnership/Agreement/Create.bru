@@ -5,12 +5,13 @@ meta {
 }
 
 post {
-  url: {{scheme}}://{{base_url}}/events/:event_id/partnership/:partnership_id/agreement
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_id/partnership/:partnership_id/agreement
   body: none
   auth: none
 }
 
 params:path {
+  org_slug: {{org_slug}}
   event_id: {{event_id}}
   partnership_id: {{partnership_id}}
 }

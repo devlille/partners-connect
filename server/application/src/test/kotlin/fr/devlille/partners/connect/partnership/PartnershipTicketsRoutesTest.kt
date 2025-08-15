@@ -1,7 +1,7 @@
 package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
-import fr.devlille.partners.connect.events.factories.insertMockedEvent
+import fr.devlille.partners.connect.events.factories.insertMockedEventWithOrga
 import fr.devlille.partners.connect.internal.insertBilletWebIntegration
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.factories.insertMockedBilling
@@ -15,7 +15,6 @@ import fr.devlille.partners.connect.tickets.domain.TicketData
 import fr.devlille.partners.connect.tickets.domain.TicketOrder
 import fr.devlille.partners.connect.tickets.infrastructure.gateways.models.CreateOrderResponseItem
 import fr.devlille.partners.connect.tickets.infrastructure.gateways.models.ProductDetail
-import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
@@ -52,7 +51,7 @@ class PartnershipTicketsRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedEventWithOrga(eventId)
             val company = insertMockedCompany()
             insertMockedPartnership(
                 id = partnershipId,
@@ -63,7 +62,7 @@ class PartnershipTicketsRoutesTest {
             insertMockedPartnershipTicket(ticketId = ticketId, partnershipId = partnershipId)
         }
 
-        val response = client.get("/events/$eventId/partnerships/$partnershipId/tickets")
+        val response = client.get("/events/$eventId/partnership/$partnershipId/tickets")
         assertEquals(HttpStatusCode.OK, response.status)
         val body = json.decodeFromString<List<Ticket>>(response.bodyAsText())
         assertEquals(1, body.size)
@@ -89,7 +88,7 @@ class PartnershipTicketsRoutesTest {
                     }
                 },
             )
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedEventWithOrga(eventId)
             val company = insertMockedCompany()
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
@@ -104,7 +103,7 @@ class PartnershipTicketsRoutesTest {
         }
 
         val tickets = listOf(TicketData(firstName = "John", lastName = "Doe"))
-        val response = client.post("/events/$eventId/partnerships/$partnershipId/tickets") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/tickets") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(tickets))
         }
@@ -135,7 +134,7 @@ class PartnershipTicketsRoutesTest {
                     }
                 },
             )
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedEventWithOrga(eventId)
             val company = insertMockedCompany()
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = company.id.value)
             insertMockedBilling(eventId, partnershipId)
@@ -143,7 +142,7 @@ class PartnershipTicketsRoutesTest {
         }
 
         val tickets = listOf(TicketData(firstName = "John", lastName = "Doe"))
-        val response = client.post("/events/$eventId/partnerships/$partnershipId/tickets") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/tickets") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(tickets))
         }
@@ -171,7 +170,7 @@ class PartnershipTicketsRoutesTest {
                     }
                 },
             )
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedEventWithOrga(eventId)
             val company = insertMockedCompany()
             val selectedPack = insertMockedSponsoringPack(event = eventId, nbTickets = 0)
             insertMockedPartnership(
@@ -186,7 +185,7 @@ class PartnershipTicketsRoutesTest {
         }
 
         val tickets = listOf(TicketData(firstName = "John", lastName = "Doe"))
-        val response = client.post("/events/$eventId/partnerships/$partnershipId/tickets") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/tickets") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(tickets))
         }
@@ -215,7 +214,7 @@ class PartnershipTicketsRoutesTest {
                     }
                 },
             )
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedEventWithOrga(eventId)
             val company = insertMockedCompany()
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
@@ -230,7 +229,7 @@ class PartnershipTicketsRoutesTest {
         }
 
         val tickets = listOf(TicketData(firstName = "John", lastName = "Doe"))
-        val response = client.post("/events/$eventId/partnerships/$partnershipId/tickets") {
+        val response = client.post("/events/$eventId/partnership/$partnershipId/tickets") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(tickets))
         }
@@ -259,7 +258,7 @@ class PartnershipTicketsRoutesTest {
                     }
                 },
             )
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedEventWithOrga(eventId)
             val company = insertMockedCompany()
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
@@ -274,7 +273,7 @@ class PartnershipTicketsRoutesTest {
             insertBilletWebIntegration(eventId = eventId)
         }
 
-        val response = client.put("/events/$eventId/partnerships/$partnershipId/tickets/$ticketId") {
+        val response = client.put("/events/$eventId/partnership/$partnershipId/tickets/$ticketId") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(TicketData(firstName = "Jeanne", lastName = "Doe")))
         }
@@ -291,10 +290,10 @@ class PartnershipTicketsRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEvent(eventId)
+            insertMockedEventWithOrga(eventId)
         }
 
-        val response = client.get("/events/$eventId/partnerships/$partnershipId/tickets")
+        val response = client.get("/events/$eventId/partnership/$partnershipId/tickets")
         assertEquals(HttpStatusCode.NotFound, response.status)
     }
 
@@ -305,7 +304,7 @@ class PartnershipTicketsRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedEventWithOrga(eventId)
             val company = insertMockedCompany()
             insertMockedPartnership(
                 id = partnershipId,
@@ -315,7 +314,7 @@ class PartnershipTicketsRoutesTest {
             )
         }
 
-        val response = client.put("/events/$eventId/partnerships/$partnershipId/tickets/${UUID.randomUUID()}") {
+        val response = client.put("/events/$eventId/partnership/$partnershipId/tickets/${UUID.randomUUID()}") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(TicketData(firstName = "Jeanne", lastName = "Doe")))
         }

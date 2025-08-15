@@ -5,8 +5,8 @@ import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventSummary
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
-import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
+import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -39,13 +39,12 @@ class EventRepositoryExposed(
             submissionEndTime = event.submissionEndTime,
             address = event.address,
             contact = Contact(phone = event.contactPhone, email = event.contactEmail),
-            organisationId = event.organisation.id.value.toString(),
         )
     }
 
-    override fun createEvent(event: Event): UUID = transaction {
-        val organisation = OrganisationEntity.findById(event.organisationId.toUUID())
-            ?: throw NotFoundException("Organisation with id ${event.organisationId} not found")
+    override fun createEvent(orgSlug: String, event: Event): UUID = transaction {
+        val organisation = OrganisationEntity.findBySlug(orgSlug)
+            ?: throw NotFoundException("Organisation with slug $orgSlug not found")
         entity.new {
             this.name = event.name
             this.startTime = event.startTime
@@ -59,9 +58,7 @@ class EventRepositoryExposed(
         }.id.value
     }
 
-    override fun updateEvent(id: UUID, event: Event): UUID = transaction {
-        val organisation = OrganisationEntity.findById(event.organisationId.toUUID())
-            ?: throw NotFoundException("Organisation with id ${event.organisationId} not found")
+    override fun updateEvent(id: UUID, orgSlug: String, event: Event): UUID = transaction {
         val entity = entity.findById(id) ?: throw IllegalArgumentException("Event not found")
         entity.name = event.name
         entity.startTime = event.startTime
@@ -71,7 +68,6 @@ class EventRepositoryExposed(
         entity.address = event.address
         entity.contactPhone = event.contact.phone
         entity.contactEmail = event.contact.email
-        entity.organisation = organisation
         entity.id.value
     }
 }

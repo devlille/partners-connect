@@ -1,7 +1,7 @@
 package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
-import fr.devlille.partners.connect.events.factories.insertMockedEvent
+import fr.devlille.partners.connect.events.factories.insertMockedEventWithOrga
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
@@ -23,7 +23,7 @@ class PartnershipSuggestionDecisionRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEvent(eventId)
+            insertMockedEventWithOrga(eventId)
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnerId, eventId = eventId, companyId = companyId)
         }
@@ -45,7 +45,7 @@ class PartnershipSuggestionDecisionRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEvent(eventId)
+            insertMockedEventWithOrga(eventId)
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnerId, eventId = eventId, companyId = companyId)
         }

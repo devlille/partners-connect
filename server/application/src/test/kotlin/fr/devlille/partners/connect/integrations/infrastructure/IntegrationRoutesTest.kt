@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.integrations.infrastructure
 
 import fr.devlille.partners.connect.integrations.domain.CreateIntegration
 import fr.devlille.partners.connect.internal.moduleMocked
+import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -21,11 +22,13 @@ import kotlin.test.assertTrue
 class IntegrationRoutesTest {
     @Test
     fun `POST integration - register Slack integration successfully`() = testApplication {
+        val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId)
         }
 
         val requestBody = Json.encodeToString(
@@ -35,7 +38,7 @@ class IntegrationRoutesTest {
             ),
         )
 
-        val response = client.post("/events/$eventId/integrations/slack/notification") {
+        val response = client.post("/orgs/$orgId/events/$eventId/integrations/slack/notification") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(requestBody)
@@ -48,14 +51,16 @@ class IntegrationRoutesTest {
 
     @Test
     fun `POST integration - fails with invalid usage`() = testApplication {
+        val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId)
         }
 
-        val response = client.post("/events/$eventId/integrations/slack/invalid_usage") {
+        val response = client.post("/orgs/$orgId/events/$eventId/integrations/slack/invalid_usage") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody("{}")
@@ -67,14 +72,16 @@ class IntegrationRoutesTest {
 
     @Test
     fun `POST integration - fails with unsupported provider`() = testApplication {
+        val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId)
         }
 
-        val response = client.post("/events/$eventId/integrations/invalid_provider/notification") {
+        val response = client.post("/orgs/$orgId/events/$eventId/integrations/invalid_provider/notification") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody("{}")

@@ -3,7 +3,7 @@ package fr.devlille.partners.connect.integrations.infrastructure.api
 import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.IntegrationRepository
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
-import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedEventPlugin
+import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
@@ -20,8 +20,8 @@ fun Route.integrationRoutes() {
     val integrationRepository by inject<IntegrationRepository>()
     val deserializerRegistry by inject<IntegrationDeserializerRegistry>()
 
-    route("/events/{eventId}/integrations") {
-        install(AuthorizedEventPlugin)
+    route("/orgs/{orgSlug}/events/{eventId}/integrations") {
+        install(AuthorizedOrganisationPlugin)
 
         post("/{provider}/{usage}") {
             val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing eventId")

@@ -7,7 +7,7 @@ interface EventRepository {
 
     fun getById(eventId: UUID): Event
 
-    fun createEvent(event: Event): UUID
+    fun createEvent(orgSlug: String, event: Event): UUID
 
-    fun updateEvent(id: UUID, event: Event): UUID
+    fun updateEvent(id: UUID, orgSlug: String, event: Event): UUID
 }
