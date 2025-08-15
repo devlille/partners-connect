@@ -45,7 +45,7 @@ class LegalEntityRepositoryExposed : LegalEntityRepository {
             ?: throw NotFoundException("User with email ${entity.representativeUserEmail} not found")
         val existingEntity = LegalEntityEntity.findById(id)
             ?: throw NotFoundException("LegalEntity with id $id not found")
-        
+
         existingEntity.apply {
             this.name = entity.name
             this.headOffice = entity.headOffice
@@ -65,7 +65,7 @@ class LegalEntityRepositoryExposed : LegalEntityRepository {
             this.representativeUser = user
             this.representativeRole = entity.representativeRole
         }
-        
+
         existingEntity.toDomain()
     }
 }

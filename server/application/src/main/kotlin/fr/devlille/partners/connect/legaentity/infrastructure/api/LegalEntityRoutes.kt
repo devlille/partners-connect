@@ -7,6 +7,7 @@ import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.legaentity.domain.LegalEntity
 import fr.devlille.partners.connect.legaentity.domain.LegalEntityRepository
 import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.ApplicationCall
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -29,26 +30,36 @@ fun Route.legalEntityRoutes() {
         }
 
         get("/{id}") {
-            val id = call.parameters["id"]?.toUUID() ?: throw BadRequestException("Invalid or missing ID")
+            val id = call.parameters["id"]?.toUUID()
+                ?: throw BadRequestException("Invalid or missing ID")
             call.respond(HttpStatusCode.OK, repository.getById(id))
         }
 
         put("/{id}") {
-            val id = call.parameters["id"]?.toUUID() ?: throw BadRequestException("Invalid or missing ID")
-            val token = call.token
-            val userInfo = authRepository.getUserInfo(token)
-            
-            // Get the existing legal entity to check ownership
-            val existingEntity = repository.getById(id)
-            
-            // Check if the authenticated user is the representative user
-            if (existingEntity.representativeUserEmail != userInfo.email) {
-                throw UnauthorizedException("You are not allowed to edit this legal entity")
-            }
-            
-            val updatedEntity = call.receive<LegalEntity>()
-            val result = repository.update(id, updatedEntity)
-            call.respond(HttpStatusCode.OK, result)
+            updateLegalEntity(call, repository, authRepository)
         }
     }
+}
+
+private suspend fun updateLegalEntity(
+    call: ApplicationCall,
+    repository: LegalEntityRepository,
+    authRepository: AuthRepository,
+) {
+    val id = call.parameters["id"]?.toUUID()
+        ?: throw BadRequestException("Invalid or missing ID")
+    val token = call.token
+    val userInfo = authRepository.getUserInfo(token)
+
+    // Get the existing legal entity to check ownership
+    val existingEntity = repository.getById(id)
+
+    // Check if the authenticated user is the representative user
+    if (existingEntity.representativeUserEmail != userInfo.email) {
+        throw UnauthorizedException("You are not allowed to edit this legal entity")
+    }
+
+    val updatedEntity = call.receive<LegalEntity>()
+    val result = repository.update(id, updatedEntity)
+    call.respond(HttpStatusCode.OK, result)
 }

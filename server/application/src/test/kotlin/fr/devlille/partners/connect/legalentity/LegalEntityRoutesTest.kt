@@ -113,7 +113,10 @@ class LegalEntityRoutesTest {
         val legalEntityId = UUID.fromString(postResponseBody["id"])
 
         // Now update it
-        val updatedEntity = createLegalEntity(name = "Updated DevLille Org", headOffice = "456 rue de la Paix, Lille, France")
+        val updatedEntity = createLegalEntity(
+            name = "Updated DevLille Org",
+            headOffice = "456 rue de la Paix, Lille, France",
+        )
         val putResponse = client.put("/legal-entities/$legalEntityId") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
@@ -174,7 +177,7 @@ class LegalEntityRoutesTest {
         val entityId = UUID.randomUUID()
         application {
             moduleMocked()
-            // Create a legal entity with a different user as representative  
+            // Create a legal entity with a different user as representative
             val differentUser = insertMockedUser(email = "different@user.com", name = "Different User")
             insertLegalEntity(id = entityId, representativeUser = differentUser)
         }
