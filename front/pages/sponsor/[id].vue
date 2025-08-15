@@ -51,28 +51,26 @@
   </div>
 </template>
 
-<script>
-export default {
-  head() {
-    return {
-      script: [
-        {
-          src: "/js/main-nav.js",
-          type: "text/javascript",
-          defer: true,
-        },
-        {
-          src: "/js/autoScroll.js",
-          type: "text/javascript",
-          defer: true,
-        },
-        {
-          src: "/js/tabs.js",
-          type: "text/javascript",
-          defer: true,
-        },
-      ],
-    };
-  },
-};
+<script setup>
+// TODO avoir un titre plus explicite avec le nom du partenaire
+useHead({
+  title: "Page Partenaire | DevLille",
+  script: [
+    {
+      src: "/js/main-nav.js",
+      type: "text/javascript",
+      defer: true,
+    },
+    {
+      src: "/js/autoScroll.js",
+      type: "text/javascript",
+      defer: true,
+    },
+    {
+      src: "/js/tabs.js",
+      type: "text/javascript",
+      defer: true,
+    },
+  ],
+});
 </script>
