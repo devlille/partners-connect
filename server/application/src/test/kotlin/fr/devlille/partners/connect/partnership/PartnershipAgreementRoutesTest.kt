@@ -4,7 +4,7 @@ import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Upload
 import fr.devlille.partners.connect.internal.moduleMocked
-import fr.devlille.partners.connect.organisations.factories.insertOrganisationEntity
+import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndPartnership
@@ -154,7 +154,7 @@ class PartnershipAgreementRoutesTest {
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            val organisation = insertOrganisationEntity(representativeUser = insertMockedUser(name = null))
+            val organisation = insertMockedOrganisationEntity(representativeUser = insertMockedUser(name = null))
             insertMockedEventWithAdminUser(eventId = eventId, organisation = organisation)
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(event = eventId)

@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.users
 
 import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
+import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.users.factories.insertMockedEventPermission
 import fr.devlille.partners.connect.users.factories.insertMockedUser
 import io.ktor.client.request.get
@@ -63,13 +64,14 @@ class UsersRouteTest {
         val eventIdB = UUID.randomUUID()
         application {
             moduleMocked()
+            val org = insertMockedOrganisationEntity()
             insertMockedEventPermission(
-                event = insertMockedEvent(eventIdA),
+                event = insertMockedEvent(eventIdA, organisation = org),
                 user = insertMockedUser(email = "a@example.com"),
                 canEdit = true,
             )
             insertMockedEventPermission(
-                event = insertMockedEvent(eventIdB),
+                event = insertMockedEvent(eventIdB, organisation = org),
                 user = insertMockedUser(email = "b@example.com"),
                 canEdit = true,
             )

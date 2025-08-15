@@ -9,9 +9,9 @@ import fr.devlille.partners.connect.integrations.infrastructure.bindings.integra
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkClientModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.storageModule
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
-import fr.devlille.partners.connect.organisations.infrastructure.bindings.organisationModule
 import fr.devlille.partners.connect.module
 import fr.devlille.partners.connect.notifications.infrastructure.bindings.notificationModule
+import fr.devlille.partners.connect.organisations.infrastructure.bindings.organisationModule
 import fr.devlille.partners.connect.partnership.infrastructure.bindings.partnershipModule
 import fr.devlille.partners.connect.sponsoring.infrastructure.bindings.sponsoringModule
 import fr.devlille.partners.connect.tickets.infrastructure.bindings.ticketingModule

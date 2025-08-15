@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.organisations.factories
 
+import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import fr.devlille.partners.connect.users.factories.insertMockedUser
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
@@ -11,7 +12,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
 @Suppress("LongParameterList")
-fun insertOrganisationEntity(
+fun insertMockedOrganisationEntity(
     id: UUID = UUID.randomUUID(),
     name: String = "Test Organisation Entity",
     headOffice: String = "123 Test Street, Test City, TC 12345",
@@ -33,6 +34,7 @@ fun insertOrganisationEntity(
 ): OrganisationEntity = transaction {
     OrganisationEntity.new(id) {
         this.name = name
+        this.slug = name.slugify()
         this.headOffice = headOffice
         this.siret = siret
         this.siren = siren

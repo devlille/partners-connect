@@ -25,10 +25,10 @@ import fr.devlille.partners.connect.internal.infrastructure.bindings.networkClie
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkEngineModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.storageModule
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
+import fr.devlille.partners.connect.notifications.infrastructure.bindings.notificationModule
 import fr.devlille.partners.connect.organisations.infrastructure.api.organisationRoutes
 import fr.devlille.partners.connect.organisations.infrastructure.bindings.organisationModule
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationsTable
-import fr.devlille.partners.connect.notifications.infrastructure.bindings.notificationModule
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipAgreementRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipBillingRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipRoutes

@@ -4,7 +4,7 @@ import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.factories.createEvent
 import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
-import fr.devlille.partners.connect.organisations.factories.insertOrganisationEntity
+import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.request.get
@@ -33,7 +33,7 @@ class EventRoutesTest {
         val organisationId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertOrganisationEntity(id = organisationId, representativeUser = insertMockedAdminUser())
+            insertMockedOrganisationEntity(id = organisationId, representativeUser = insertMockedAdminUser())
         }
 
         val response = client.post("/events") {
@@ -56,7 +56,7 @@ class EventRoutesTest {
             moduleMocked()
             insertMockedEventWithAdminUser(
                 eventId = eventId,
-                organisation = insertOrganisationEntity(id = organisationId),
+                organisation = insertMockedOrganisationEntity(id = organisationId),
             )
         }
 
@@ -80,9 +80,9 @@ class EventRoutesTest {
             moduleMocked()
             insertMockedEvent(
                 id = eventId,
-                organisation = insertOrganisationEntity(
+                organisation = insertMockedOrganisationEntity(
                     id = organisationId,
-                    representativeUser = insertMockedAdminUser()
+                    representativeUser = insertMockedAdminUser(),
                 ),
             )
         }
@@ -101,7 +101,7 @@ class EventRoutesTest {
         val organisationId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertOrganisationEntity(id = organisationId, representativeUser = insertMockedAdminUser())
+            insertMockedOrganisationEntity(id = organisationId, representativeUser = insertMockedAdminUser())
         }
 
         client.post("/events") {

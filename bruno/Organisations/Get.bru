@@ -5,13 +5,13 @@ meta {
 }
 
 get {
-  url: {{scheme}}://{{base_url}}/organisations/:organisation_id
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug
   body: json
   auth: none
 }
 
 params:path {
-  organisation_id: {{organisation_id}}
+  org_slug: {{org_slug}}
 }
 
 headers {
