@@ -7,7 +7,7 @@
 - **Backend**: Kotlin/Ktor REST API server (Port 8080)
 - **Frontend**: Nuxt.js/Vue.js SPA application (Port 3000) 
 - **Database**: PostgreSQL with Exposed ORM
-- **Integration**: Google Cloud Storage, Slack notifications, billing providers
+- **Integration**: Google Cloud Storage, Slack notifications, BilletWeb for ticketing, Mailjet for mailing, Qonto for billing
 
 **Repository Size**: ~200 files, primarily Kotlin backend (~13 domain modules) and Vue frontend (~15 components/pages)
 **Languages**: Kotlin (JVM 21), TypeScript/Vue.js, Docker
@@ -154,6 +154,9 @@ cd server
 - Google Cloud Storage (for file uploads)
 - Google OAuth (client ID/secret)
 - Optional: Slack webhook for notifications
+- Optional: Mailjet for mailing
+- Optional: Qonto for invoice and quote generation
+- Optional: BilletWeb for ticketing management
 
 **Environment Variables** (see `docker-compose.yml`):
 - `EXPOSED_DB_*` - Database connection
