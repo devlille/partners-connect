@@ -3,10 +3,10 @@ package fr.devlille.partners.connect.partnership
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.internal.insertBilletWebIntegration
-import fr.devlille.partners.connect.internal.insertMockPartnership
-import fr.devlille.partners.connect.internal.insertMockPartnershipTicket
-import fr.devlille.partners.connect.internal.insertMockedBilling
 import fr.devlille.partners.connect.internal.moduleMocked
+import fr.devlille.partners.connect.partnership.factories.insertMockedBilling
+import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
+import fr.devlille.partners.connect.partnership.factories.insertMockedPartnershipTicket
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipTicketEntity
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
@@ -52,15 +52,15 @@ class PartnershipTicketsRoutesTest {
 
         application {
             moduleMocked()
-            insertMockPartnershipTicket(
-                ticketId = ticketId,
-                partnership = insertMockPartnership(
-                    id = partnershipId,
-                    event = insertMockedEventWithAdminUser(eventId),
-                    company = insertMockedCompany(),
-                    validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
-                ),
+            insertMockedEventWithAdminUser(eventId)
+            val company = insertMockedCompany()
+            insertMockedPartnership(
+                id = partnershipId,
+                eventId = eventId,
+                companyId = company.id.value,
+                validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )
+            insertMockedPartnershipTicket(ticketId = ticketId, partnershipId = partnershipId)
         }
 
         val response = client.get("/events/$eventId/partnerships/$partnershipId/tickets")
@@ -89,15 +89,17 @@ class PartnershipTicketsRoutesTest {
                     }
                 },
             )
-            insertMockedBilling(
-                partnership = insertMockPartnership(
-                    id = partnershipId,
-                    event = insertMockedEventWithAdminUser(eventId),
-                    company = insertMockedCompany(),
-                    selectedPack = insertMockedSponsoringPack(event = eventId),
-                    validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
-                ),
+            insertMockedEventWithAdminUser(eventId)
+            val company = insertMockedCompany()
+            val selectedPack = insertMockedSponsoringPack(event = eventId)
+            insertMockedPartnership(
+                id = partnershipId,
+                eventId = eventId,
+                companyId = company.id.value,
+                selectedPackId = selectedPack.id.value,
+                validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )
+            insertMockedBilling(eventId, partnershipId)
             insertBilletWebIntegration(eventId = eventId)
         }
 
@@ -133,13 +135,10 @@ class PartnershipTicketsRoutesTest {
                     }
                 },
             )
-            insertMockedBilling(
-                partnership = insertMockPartnership(
-                    id = partnershipId,
-                    event = insertMockedEventWithAdminUser(eventId),
-                    company = insertMockedCompany(),
-                ),
-            )
+            insertMockedEventWithAdminUser(eventId)
+            val company = insertMockedCompany()
+            insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = company.id.value)
+            insertMockedBilling(eventId, partnershipId)
             insertBilletWebIntegration(eventId = eventId)
         }
 
@@ -172,15 +171,17 @@ class PartnershipTicketsRoutesTest {
                     }
                 },
             )
-            insertMockedBilling(
-                partnership = insertMockPartnership(
-                    id = partnershipId,
-                    event = insertMockedEventWithAdminUser(eventId),
-                    company = insertMockedCompany(),
-                    selectedPack = insertMockedSponsoringPack(event = eventId, nbTickets = 0),
-                    validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
-                ),
+            insertMockedEventWithAdminUser(eventId)
+            val company = insertMockedCompany()
+            val selectedPack = insertMockedSponsoringPack(event = eventId, nbTickets = 0)
+            insertMockedPartnership(
+                id = partnershipId,
+                eventId = eventId,
+                companyId = company.id.value,
+                selectedPackId = selectedPack.id.value,
+                validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )
+            insertMockedBilling(eventId, partnershipId)
             insertBilletWebIntegration(eventId = eventId)
         }
 
@@ -214,16 +215,17 @@ class PartnershipTicketsRoutesTest {
                     }
                 },
             )
-            insertMockedBilling(
-                partnership = insertMockPartnership(
-                    id = partnershipId,
-                    event = insertMockedEventWithAdminUser(eventId),
-                    company = insertMockedCompany(),
-                    selectedPack = insertMockedSponsoringPack(event = eventId),
-                    validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
-                ),
-                status = InvoiceStatus.PENDING,
+            insertMockedEventWithAdminUser(eventId)
+            val company = insertMockedCompany()
+            val selectedPack = insertMockedSponsoringPack(event = eventId)
+            insertMockedPartnership(
+                id = partnershipId,
+                eventId = eventId,
+                companyId = company.id.value,
+                selectedPackId = selectedPack.id.value,
+                validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )
+            insertMockedBilling(eventId, partnershipId, status = InvoiceStatus.PENDING)
             insertBilletWebIntegration(eventId = eventId)
         }
 
@@ -257,15 +259,18 @@ class PartnershipTicketsRoutesTest {
                     }
                 },
             )
-            val partnership = insertMockPartnership(
+            insertMockedEventWithAdminUser(eventId)
+            val company = insertMockedCompany()
+            val selectedPack = insertMockedSponsoringPack(event = eventId)
+            insertMockedPartnership(
                 id = partnershipId,
-                event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockedCompany(),
-                selectedPack = insertMockedSponsoringPack(event = eventId),
+                eventId = eventId,
+                companyId = company.id.value,
+                selectedPackId = selectedPack.id.value,
                 validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )
-            insertMockPartnershipTicket(ticketId = ticketId, partnership = partnership)
-            insertMockedBilling(partnership = partnership)
+            insertMockedPartnershipTicket(ticketId = ticketId, partnershipId = partnershipId)
+            insertMockedBilling(eventId, partnershipId)
             insertBilletWebIntegration(eventId = eventId)
         }
 
@@ -300,10 +305,12 @@ class PartnershipTicketsRoutesTest {
 
         application {
             moduleMocked()
-            insertMockPartnership(
+            insertMockedEventWithAdminUser(eventId)
+            val company = insertMockedCompany()
+            insertMockedPartnership(
                 id = partnershipId,
-                event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockedCompany(),
+                eventId = eventId,
+                companyId = company.id.value,
                 validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )
         }

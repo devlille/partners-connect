@@ -1,8 +1,8 @@
 package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
-import fr.devlille.partners.connect.internal.insertMockPartnership
 import fr.devlille.partners.connect.internal.moduleMocked
+import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
@@ -30,11 +30,14 @@ class PartnershipValidationRoutesTest {
 
         application {
             moduleMocked()
-            insertMockPartnership(
+            insertMockedEventWithAdminUser(eventId)
+            insertMockedCompany(companyId)
+            val selectedPack = insertMockedSponsoringPack(packId, eventId)
+            insertMockedPartnership(
                 id = partnershipId,
-                event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockedCompany(companyId),
-                selectedPack = insertMockedSponsoringPack(packId, eventId),
+                eventId = eventId,
+                companyId = companyId,
+                selectedPackId = selectedPack.id.value,
             )
         }
 
@@ -51,7 +54,6 @@ class PartnershipValidationRoutesTest {
     @Test
     fun `POST returns 404 if partnership does not exist`() = testApplication {
         val eventId = UUID.randomUUID()
-        val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
         application {
@@ -75,11 +77,9 @@ class PartnershipValidationRoutesTest {
 
         application {
             moduleMocked()
-            insertMockPartnership(
-                id = partnershipId,
-                event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockedCompany(companyId),
-            )
+            insertMockedEventWithAdminUser(eventId)
+            insertMockedCompany(companyId)
+            insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
         }
 
         val response = client.post("/events/$eventId/partnership/$partnershipId/decline") {

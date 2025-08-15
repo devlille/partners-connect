@@ -1,9 +1,9 @@
 package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
-import fr.devlille.partners.connect.internal.insertMockPartnership
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.domain.SuggestPartnership
+import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedOptionTranslation
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedPackOptions
@@ -38,12 +38,9 @@ class PartnershipSuggestionRoutesTest {
 
         application {
             moduleMocked()
-            val event = insertMockedEventWithAdminUser(eventId)
-            insertMockPartnership(
-                id = partnershipId,
-                event = event,
-                company = insertMockedCompany(companyId),
-            )
+            insertMockedEventWithAdminUser(eventId)
+            insertMockedCompany(companyId)
+            insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
             insertMockedSponsoringPack(packId, eventId)
             insertMockedSponsoringOption(optionId, eventId)
             insertMockedOptionTranslation(optionId = optionId)
@@ -95,11 +92,9 @@ class PartnershipSuggestionRoutesTest {
 
         application {
             moduleMocked()
-            insertMockPartnership(
-                id = partnershipId,
-                event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockedCompany(companyId),
-            )
+            insertMockedEventWithAdminUser(eventId)
+            insertMockedCompany(companyId)
+            insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
         }
 
         val response = client.post("/events/$eventId/partnership/$partnershipId/suggestion") {
@@ -121,12 +116,9 @@ class PartnershipSuggestionRoutesTest {
 
         application {
             moduleMocked()
-            val event = insertMockedEventWithAdminUser(eventId)
-            insertMockPartnership(
-                id = partnershipId,
-                event = event,
-                company = insertMockedCompany(companyId),
-            )
+            insertMockedEventWithAdminUser(eventId)
+            insertMockedCompany(companyId)
+            insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
             insertMockedSponsoringPack(packId, eventId)
             insertMockedSponsoringOption(optionId, eventId)
             insertMockedOptionTranslation(optionId = optionId)
@@ -153,13 +145,9 @@ class PartnershipSuggestionRoutesTest {
 
         application {
             moduleMocked()
-            val event = insertMockedEventWithAdminUser(eventId)
-            insertMockPartnership(
-                id = partnershipId,
-                event = event,
-                company = insertMockedCompany(companyId),
-                language = "fr",
-            )
+            insertMockedEventWithAdminUser(eventId)
+            insertMockedCompany(companyId)
+            insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId, language = "fr")
             insertMockedSponsoringPack(packId, eventId)
             insertMockedSponsoringOption(optionId, eventId)
             insertMockedPackOptions(packId, optionId, required = false)
