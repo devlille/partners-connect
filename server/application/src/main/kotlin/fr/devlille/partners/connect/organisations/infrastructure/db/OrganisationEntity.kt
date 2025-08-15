@@ -10,6 +10,7 @@ class OrganisationEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     companion object : UUIDEntityClass<OrganisationEntity>(OrganisationsTable)
 
     var name by OrganisationsTable.name
+    var slug by OrganisationsTable.slug
     var headOffice by OrganisationsTable.headOffice
     var siret by OrganisationsTable.siret
     var siren by OrganisationsTable.siren
@@ -28,3 +29,7 @@ class OrganisationEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var representativeUser by UserEntity referencedOn OrganisationsTable.representativeUser
     var representativeRole by OrganisationsTable.representativeRole
 }
+
+fun UUIDEntityClass<OrganisationEntity>.findBySlug(slug: String): OrganisationEntity? = this
+    .find { OrganisationsTable.slug eq slug }
+    .singleOrNull()

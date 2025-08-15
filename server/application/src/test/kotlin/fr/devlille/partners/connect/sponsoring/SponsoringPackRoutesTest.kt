@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.sponsoring
 
 import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
+import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.sponsoring.domain.AttachOptionsToPack
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringPack
 import fr.devlille.partners.connect.sponsoring.factories.createSponsoringPack
@@ -262,8 +263,9 @@ class SponsoringPackRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedEventWithAdminUser(eventId)
-            insertMockedEvent(otherEventId)
+            val org = insertMockedOrganisationEntity()
+            insertMockedEventWithAdminUser(eventId, organisation = org)
+            insertMockedEvent(otherEventId, organisation = org)
             insertMockedSponsoringPack(packId, eventId)
             insertMockedSponsoringOption(optionId = optionValid, eventId = eventId)
             insertMockedOptionTranslation(optionId = optionValid)

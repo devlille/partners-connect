@@ -6,6 +6,7 @@ import org.jetbrains.exposed.v1.datetime.datetime
 
 object OrganisationsTable : UUIDTable("organisations") {
     val name = varchar("name", length = 255)
+    val slug = varchar("slug", length = 255).uniqueIndex()
     val headOffice = text("head_office")
     val siret = text("siret").nullable()
     val siren = text("siren").nullable()

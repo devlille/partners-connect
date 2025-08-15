@@ -1,21 +1,24 @@
 package fr.devlille.partners.connect.organisations.application
 
+import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
 import fr.devlille.partners.connect.organisations.application.mappers.toDomain
 import fr.devlille.partners.connect.organisations.domain.Organisation
 import fr.devlille.partners.connect.organisations.domain.OrganisationRepository
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
+import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import java.util.UUID
 
 class OrganisationRepositoryExposed : OrganisationRepository {
-    override fun create(entity: Organisation): UUID = transaction {
+    override fun create(entity: Organisation): String = transaction {
         val user = UserEntity.singleUserByEmail(entity.representativeUserEmail)
             ?: throw NotFoundException("User with email ${entity.representativeUserEmail} not found")
-        val entity = OrganisationEntity.new {
+        val slug = entity.name.slugify()
+        OrganisationEntity.new {
             this.name = entity.name
+            this.slug = slug
             this.headOffice = entity.headOffice
             this.siret = entity.siret
             this.siren = entity.siren
@@ -33,10 +36,11 @@ class OrganisationRepositoryExposed : OrganisationRepository {
             this.representativeUser = user
             this.representativeRole = entity.representativeRole
         }
-        entity.id.value
+        slug
     }
 
-    override fun getById(id: UUID): Organisation = transaction {
-        OrganisationEntity.findById(id)?.toDomain() ?: throw NotFoundException("Organisation with id $id not found")
+    override fun getById(slug: String): Organisation = transaction {
+        OrganisationEntity.findBySlug(slug)?.toDomain()
+            ?: throw NotFoundException("Organisation with slug $slug not found")
     }
 }

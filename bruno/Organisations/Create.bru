@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{scheme}}://{{base_url}}/organisations
+  url: {{scheme}}://{{base_url}}/orgs
   body: json
   auth: none
 }
@@ -38,5 +38,5 @@ body:json {
 
 script:post-response {
   let data = res.getBody();
-  bru.setEnvVar("organisation_id", data.id)
+  bru.setEnvVar("org_slug", data.id)
 }

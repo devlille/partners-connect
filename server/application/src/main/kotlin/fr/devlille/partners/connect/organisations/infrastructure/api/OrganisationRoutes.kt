@@ -1,6 +1,5 @@
 package fr.devlille.partners.connect.organisations.infrastructure.api
 
-import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.organisations.domain.Organisation
 import fr.devlille.partners.connect.organisations.domain.OrganisationRepository
 import io.ktor.http.HttpStatusCode
@@ -19,13 +18,13 @@ fun Route.organisationRoutes() {
     route("/orgs") {
         post {
             val input = call.receive<Organisation>()
-            val id = repository.create(input)
-            call.respond(HttpStatusCode.Created, mapOf("id" to id.toString()))
+            val slug = repository.create(input)
+            call.respond(HttpStatusCode.Created, mapOf("slug" to slug))
         }
 
-        get("/{id}") {
-            val id = call.parameters["id"]?.toUUID() ?: throw BadRequestException("Invalid or missing ID")
-            call.respond(HttpStatusCode.OK, repository.getById(id))
+        get("/{slug}") {
+            val slug = call.parameters["slug"] ?: throw BadRequestException("Missing slug")
+            call.respond(HttpStatusCode.OK, repository.getById(slug))
         }
     }
 }

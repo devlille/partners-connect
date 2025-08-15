@@ -1,9 +1,7 @@
 package fr.devlille.partners.connect.organisations.domain
 
-import java.util.UUID
-
 interface OrganisationRepository {
-    fun create(entity: Organisation): UUID
+    fun create(entity: Organisation): String
 
-    fun getById(id: UUID): Organisation
+    fun getById(slug: String): Organisation
 }

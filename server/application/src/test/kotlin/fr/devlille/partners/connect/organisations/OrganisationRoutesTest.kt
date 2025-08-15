@@ -38,7 +38,7 @@ class OrganisationRoutesTest {
 
         assertEquals(HttpStatusCode.Created, response.status)
         val responseBody = Json.decodeFromString<Map<String, String>>(response.bodyAsText())
-        assertNotNull(responseBody["id"], "Response should contain an 'id' field")
+        assertNotNull(responseBody["slug"], "Response should contain a 'slug' field")
     }
 
     @Test
@@ -74,9 +74,8 @@ class OrganisationRoutesTest {
             setBody(json.encodeToString(Organisation.serializer(), createOrganisation()))
         }
         val postResponseBody = Json.decodeFromString<Map<String, String>>(postResponse.bodyAsText())
-        val organisationId = UUID.fromString(postResponseBody["id"])
 
-        val getResponse = client.get("/orgs/$organisationId")
+        val getResponse = client.get("/orgs/${postResponseBody["slug"]}")
 
         assertEquals(HttpStatusCode.OK, getResponse.status)
     }
@@ -88,7 +87,7 @@ class OrganisationRoutesTest {
             insertMockedEventWithAdminUser(UUID.randomUUID())
         }
 
-        val response = client.get("/orgs/${UUID.randomUUID()}")
+        val response = client.get("/orgs/non-existing-slug")
 
         assertEquals(HttpStatusCode.NotFound, response.status)
     }
