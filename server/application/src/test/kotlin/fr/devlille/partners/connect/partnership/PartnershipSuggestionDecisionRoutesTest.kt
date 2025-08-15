@@ -2,8 +2,8 @@ package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.events.factories.insertMockedEvent
-import fr.devlille.partners.connect.internal.insertMockPartnership
 import fr.devlille.partners.connect.internal.moduleMocked
+import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import io.ktor.client.request.post
 import io.ktor.http.HttpStatusCode
@@ -23,11 +23,9 @@ class PartnershipSuggestionDecisionRoutesTest {
 
         application {
             moduleMocked()
-            insertMockPartnership(
-                id = partnerId,
-                event = insertMockedEvent(eventId),
-                company = insertMockedCompany(companyId),
-            )
+            insertMockedEvent(eventId)
+            insertMockedCompany(companyId)
+            insertMockedPartnership(id = partnerId, eventId = eventId, companyId = companyId)
         }
 
         val response = client.post("/events/$eventId/partnership/$partnerId/suggestion-approve")
@@ -47,11 +45,9 @@ class PartnershipSuggestionDecisionRoutesTest {
 
         application {
             moduleMocked()
-            insertMockPartnership(
-                id = partnerId,
-                event = insertMockedEvent(eventId),
-                company = insertMockedCompany(companyId),
-            )
+            insertMockedEvent(eventId)
+            insertMockedCompany(companyId)
+            insertMockedPartnership(id = partnerId, eventId = eventId, companyId = companyId)
         }
 
         val response = client.post("/events/$eventId/partnership/$partnerId/suggestion-decline")

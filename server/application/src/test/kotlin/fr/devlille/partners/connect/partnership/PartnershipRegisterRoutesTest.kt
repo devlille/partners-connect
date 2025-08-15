@@ -2,9 +2,9 @@ package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.events.factories.insertMockedEvent
-import fr.devlille.partners.connect.internal.insertMockPartnership
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
+import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedOptionTranslation
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedPackOptions
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringOption
@@ -22,7 +22,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class PartnershipRoutesTest {
+class PartnershipRegisterRoutesTest {
     @Test
     fun `POST registers a valid partnership`() = testApplication {
         val eventId = UUID.randomUUID()
@@ -132,11 +132,10 @@ class PartnershipRoutesTest {
         val packId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockPartnership(
-                event = insertMockedEvent(eventId),
-                company = insertMockedCompany(companyId),
-                selectedPack = insertMockedSponsoringPack(packId, eventId),
-            )
+            insertMockedEvent(eventId)
+            insertMockedCompany(companyId)
+            val selectedPack = insertMockedSponsoringPack(packId, eventId)
+            insertMockedPartnership(eventId = eventId, companyId = companyId, selectedPackId = selectedPack.id.value)
         }
 
         val body = RegisterPartnership(
@@ -195,7 +194,7 @@ class PartnershipRoutesTest {
 
         application {
             moduleMocked()
-            val event = insertMockedEvent(eventId)
+            insertMockedEvent(eventId)
             insertMockedCompany(companyId)
             insertMockedSponsoringPack(packId, eventId)
             insertMockedSponsoringOption(optionId, eventId)

@@ -9,6 +9,16 @@ import org.jetbrains.exposed.v1.jdbc.insertAndGetId
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
+fun insertQontoIntegration(
+    eventId: UUID = UUID.randomUUID(),
+): UUID = transaction {
+    IntegrationsTable.insertAndGetId {
+        it[this.eventId] = eventId
+        it[this.provider] = IntegrationProvider.QONTO
+        it[this.usage] = IntegrationUsage.BILLING
+    }.value
+}
+
 fun insertBilletWebIntegration(
     eventId: UUID = UUID.randomUUID(),
     basic: String = "valid-basic",

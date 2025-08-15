@@ -1,8 +1,6 @@
-package fr.devlille.partners.connect.internal
+package fr.devlille.partners.connect.partnership.factories
 
-import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
-import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
@@ -11,18 +9,18 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
 @Suppress("LongParameterList")
-fun insertMockPartnership(
+fun insertMockedPartnership(
     id: UUID = UUID.randomUUID(),
-    event: EventEntity = insertMockedEvent(),
-    company: CompanyEntity = insertMockedCompany(),
+    eventId: UUID = UUID.randomUUID(),
+    companyId: UUID = UUID.randomUUID(),
     phone: String? = null,
     contactName: String = "John Doe",
     contactRole: String = "Developer",
     language: String = "en",
     agreementUrl: String? = null,
     agreementSignedUrl: String? = null,
-    selectedPack: SponsoringPackEntity? = null,
-    suggestionPack: SponsoringPackEntity? = null,
+    selectedPackId: UUID? = null,
+    suggestionPackId: UUID? = null,
     suggestionSentAt: LocalDateTime? = null,
     suggestionApprovedAt: LocalDateTime? = null,
     suggestionDeclinedAt: LocalDateTime? = null,
@@ -30,16 +28,16 @@ fun insertMockPartnership(
     validatedAt: LocalDateTime? = null,
 ): PartnershipEntity = transaction {
     PartnershipEntity.new(id) {
-        this.event = event
-        this.company = company
+        this.event = EventEntity[eventId]
+        this.company = CompanyEntity[companyId]
         this.phone = phone
         this.contactName = contactName
         this.contactRole = contactRole
         this.language = language
         this.agreementUrl = agreementUrl
         this.agreementSignedUrl = agreementSignedUrl
-        this.selectedPack = selectedPack
-        this.suggestionPack = suggestionPack
+        this.selectedPack = selectedPackId?.let { SponsoringPackEntity[selectedPackId] }
+        this.suggestionPack = suggestionPackId?.let { SponsoringPackEntity[suggestionPackId] }
         this.suggestionSentAt = suggestionSentAt
         this.suggestionApprovedAt = suggestionApprovedAt
         this.suggestionDeclinedAt = suggestionDeclinedAt

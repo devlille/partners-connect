@@ -3,9 +3,9 @@ package fr.devlille.partners.connect.partnership
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Upload
-import fr.devlille.partners.connect.internal.insertMockPartnership
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.legalentity.factories.insertLegalEntity
+import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndPartnership
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
@@ -49,11 +49,14 @@ class PartnershipAgreementRoutesTest {
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            insertMockPartnership(
+            insertMockedEventWithAdminUser(eventId)
+            insertMockedCompany(companyId)
+            val selectedPack = insertMockedSponsoringPack(event = eventId)
+            insertMockedPartnership(
                 id = partnershipId,
-                event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockedCompany(companyId),
-                selectedPack = insertMockedSponsoringPack(event = eventId),
+                eventId = eventId,
+                companyId = companyId,
+                selectedPackId = selectedPack.id.value,
                 validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )
         }
@@ -77,7 +80,6 @@ class PartnershipAgreementRoutesTest {
         )
 
         val eventId = UUID.randomUUID()
-        val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
         application {
@@ -101,7 +103,6 @@ class PartnershipAgreementRoutesTest {
         )
 
         val eventId = UUID.randomUUID()
-        val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
         application {
@@ -154,11 +155,14 @@ class PartnershipAgreementRoutesTest {
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
             val legalEntity = insertLegalEntity(representativeUser = insertMockedUser(name = null))
-            insertMockPartnership(
+            insertMockedEventWithAdminUser(eventId = eventId, legalEntity = legalEntity)
+            insertMockedCompany(companyId)
+            val selectedPack = insertMockedSponsoringPack(event = eventId)
+            insertMockedPartnership(
                 id = partnershipId,
-                event = insertMockedEventWithAdminUser(eventId = eventId, legalEntity = legalEntity),
-                company = insertMockedCompany(companyId),
-                selectedPack = insertMockedSponsoringPack(event = eventId),
+                eventId = eventId,
+                companyId = companyId,
+                selectedPackId = selectedPack.id.value,
                 validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )
         }
@@ -182,10 +186,12 @@ class PartnershipAgreementRoutesTest {
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            insertMockPartnership(
+            insertMockedEventWithAdminUser(eventId)
+            insertMockedCompany(companyId)
+            insertMockedPartnership(
                 id = partnershipId,
-                event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockedCompany(companyId),
+                eventId = eventId,
+                companyId = companyId,
                 validatedAt = null,
             )
         }
@@ -199,7 +205,7 @@ class PartnershipAgreementRoutesTest {
     }
 
     @Test
-    fun `POST returns 500 when agreement template for language is missing`() = testApplication {
+    fun `POST returns 403 when agreement template for language is missing`() = testApplication {
         val storage = mockk<Storage>()
         every { storage.upload(any(), any(), any()) } returns Upload("bucket", "file", "https://example.com")
 
@@ -209,11 +215,14 @@ class PartnershipAgreementRoutesTest {
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            insertMockPartnership(
+            insertMockedEventWithAdminUser(eventId)
+            insertMockedCompany(companyId)
+            val selectedPack = insertMockedSponsoringPack(event = eventId)
+            insertMockedPartnership(
                 id = partnershipId,
-                event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockedCompany(companyId),
-                selectedPack = insertMockedSponsoringPack(event = eventId),
+                eventId = eventId,
+                companyId = companyId,
+                selectedPackId = selectedPack.id.value,
                 validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
                 language = "xx",
             )
@@ -223,7 +232,7 @@ class PartnershipAgreementRoutesTest {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
-        assertEquals(HttpStatusCode.InternalServerError, response.status)
+        assertEquals(HttpStatusCode.Forbidden, response.status)
         assertTrue(response.bodyAsText().contains("Missing resource"))
     }
 
@@ -243,11 +252,14 @@ class PartnershipAgreementRoutesTest {
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            insertMockPartnership(
+            insertMockedEventWithAdminUser(eventId)
+            insertMockedCompany(companyId)
+            val selectedPack = insertMockedSponsoringPack(event = eventId)
+            insertMockedPartnership(
                 id = partnershipId,
-                event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockedCompany(companyId),
-                selectedPack = insertMockedSponsoringPack(event = eventId),
+                eventId = eventId,
+                companyId = companyId,
+                selectedPackId = selectedPack.id.value,
                 validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )
         }
@@ -315,11 +327,14 @@ class PartnershipAgreementRoutesTest {
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            insertMockPartnership(
+            insertMockedEventWithAdminUser(eventId)
+            insertMockedCompany(companyId)
+            val selectedPack = insertMockedSponsoringPack(event = eventId)
+            insertMockedPartnership(
                 id = partnershipId,
-                event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockedCompany(companyId),
-                selectedPack = insertMockedSponsoringPack(event = eventId),
+                eventId = eventId,
+                companyId = companyId,
+                selectedPackId = selectedPack.id.value,
                 validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )
         }
@@ -344,11 +359,14 @@ class PartnershipAgreementRoutesTest {
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            insertMockPartnership(
+            insertMockedEventWithAdminUser(eventId)
+            insertMockedCompany(companyId)
+            val selectedPack = insertMockedSponsoringPack(event = eventId)
+            insertMockedPartnership(
                 id = partnershipId,
-                event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockedCompany(companyId),
-                selectedPack = insertMockedSponsoringPack(event = eventId),
+                eventId = eventId,
+                companyId = companyId,
+                selectedPackId = selectedPack.id.value,
                 validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
             )
         }

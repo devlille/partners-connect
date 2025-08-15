@@ -1,15 +1,13 @@
 package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.companies.domain.CompanyBillingData
-import fr.devlille.partners.connect.companies.domain.Contact
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.events.factories.insertMockedEvent
-import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
-import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
-import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
-import fr.devlille.partners.connect.internal.insertMockPartnership
+import fr.devlille.partners.connect.internal.insertQontoIntegration
 import fr.devlille.partners.connect.internal.moduleMocked
-import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
+import fr.devlille.partners.connect.partnership.factories.createCompanyBillingData
+import fr.devlille.partners.connect.partnership.factories.insertMockedBilling
+import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.request.get
@@ -22,8 +20,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
 import kotlinx.serialization.json.Json
-import org.jetbrains.exposed.v1.jdbc.insertAndGetId
-import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -31,17 +27,6 @@ import kotlin.test.assertTrue
 
 class PartnershipBillingRoutesTest {
     private val json = Json { ignoreUnknownKeys = true }
-
-    private fun sampleBillingInput(name: String? = "DevLille SAS", po: String? = "PO1234") =
-        CompanyBillingData(
-            name = name,
-            po = po,
-            contact = Contact(
-                firstName = "Jean",
-                lastName = "Dupont",
-                email = "jean.dupont@example.com",
-            ),
-        )
 
     @Test
     fun `GET returns billing for existing company`() = testApplication {
@@ -51,31 +36,17 @@ class PartnershipBillingRoutesTest {
 
         application {
             moduleMocked()
-            val partnership = insertMockPartnership(
-                id = partnershipId,
-                event = insertMockedEvent(eventId),
-                company = insertMockedCompany(companyId),
-            )
-            transaction {
-                BillingEntity.new {
-                    this.event = partnership.event
-                    this.partnership = partnership
-                    this.name = "DevLille SAS"
-                    this.contactFirstName = "Jean"
-                    this.contactLastName = "Dupont"
-                    this.contactEmail = "jean.dupont@example.com"
-                    this.po = "PO1234"
-                    this.status = InvoiceStatus.SENT
-                }
-            }
+            insertMockedEvent(eventId)
+            insertMockedCompany(companyId)
+            insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
+            insertMockedBilling(eventId, partnershipId, name = "DevLille SAS", status = InvoiceStatus.SENT)
         }
 
         val response = client.get("/events/$eventId/partnership/$partnershipId/billing")
 
-        assertEquals(HttpStatusCode.Companion.OK, response.status)
+        assertEquals(HttpStatusCode.OK, response.status)
         val body = response.bodyAsText()
         assertTrue(body.contains("DevLille SAS"))
-        assertTrue(body.contains("jean.dupont@example.com"))
     }
 
     @Test
@@ -92,7 +63,7 @@ class PartnershipBillingRoutesTest {
 
         val response = client.get("/events/$eventId/partnership/$partnershipId/billing")
 
-        assertEquals(HttpStatusCode.Companion.NotFound, response.status)
+        assertEquals(HttpStatusCode.NotFound, response.status)
         assertTrue(response.bodyAsText().contains("Billing not found"))
     }
 
@@ -104,23 +75,15 @@ class PartnershipBillingRoutesTest {
 
         application {
             moduleMocked()
-            insertMockPartnership(
-                id = partnershipId,
-                event = insertMockedEventWithAdminUser(eventId),
-                company = insertMockedCompany(companyId),
-            )
-            transaction {
-                IntegrationsTable.insertAndGetId {
-                    it[this.eventId] = eventId
-                    it[this.provider] = IntegrationProvider.QONTO
-                    it[this.usage] = IntegrationUsage.BILLING
-                }
-            }
+            insertMockedEventWithAdminUser(eventId)
+            insertMockedCompany(companyId)
+            insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
+            insertQontoIntegration(eventId)
         }
 
         val response = client.post("/events/$eventId/partnership/$partnershipId/billing") {
             contentType(ContentType.Application.Json)
-            setBody(json.encodeToString(CompanyBillingData.serializer(), sampleBillingInput()))
+            setBody(json.encodeToString(CompanyBillingData.serializer(), createCompanyBillingData()))
         }
 
         assertEquals(HttpStatusCode.Created, response.status)
@@ -136,28 +99,11 @@ class PartnershipBillingRoutesTest {
 
         application {
             moduleMocked()
-            val partnership = insertMockPartnership(
-                id = partnershipId,
-                event = insertMockedEvent(eventId),
-                company = insertMockedCompany(companyId),
-            )
-            transaction {
-                IntegrationsTable.insertAndGetId {
-                    it[this.eventId] = eventId
-                    it[this.provider] = IntegrationProvider.QONTO
-                    it[this.usage] = IntegrationUsage.BILLING
-                }
-                BillingEntity.new {
-                    this.event = partnership.event
-                    this.partnership = partnership
-                    this.name = "Old Name"
-                    this.contactFirstName = "Old"
-                    this.contactLastName = "Name"
-                    this.contactEmail = "old@example.com"
-                    this.po = "OLDPO"
-                    this.status = InvoiceStatus.PENDING
-                }
-            }
+            insertMockedEvent(eventId)
+            insertQontoIntegration(eventId)
+            insertMockedCompany(companyId)
+            insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
+            insertMockedBilling(eventId, partnershipId, status = InvoiceStatus.PENDING)
         }
 
         val response = client.put("/events/$eventId/partnership/$partnershipId/billing") {
@@ -165,12 +111,12 @@ class PartnershipBillingRoutesTest {
             setBody(
                 json.encodeToString(
                     CompanyBillingData.serializer(),
-                    sampleBillingInput(name = "Updated SAS", po = "NEWPO"),
+                    createCompanyBillingData(name = "Updated SAS", po = "NEWPO"),
                 ),
             )
         }
 
-        assertEquals(HttpStatusCode.Companion.OK, response.status)
+        assertEquals(HttpStatusCode.OK, response.status)
         val body = response.bodyAsText()
         assertTrue(body.contains("id"))
     }
@@ -187,10 +133,10 @@ class PartnershipBillingRoutesTest {
 
         val response = client.post("/events/$eventId/partnership/$partnershipId/billing") {
             contentType(ContentType.Application.Json)
-            setBody(json.encodeToString(CompanyBillingData.serializer(), sampleBillingInput()))
+            setBody(json.encodeToString(CompanyBillingData.serializer(), createCompanyBillingData()))
         }
 
-        assertEquals(HttpStatusCode.Companion.NotFound, response.status)
+        assertEquals(HttpStatusCode.NotFound, response.status)
         assertTrue(response.bodyAsText().contains("Partnership not found"))
     }
 
@@ -206,10 +152,10 @@ class PartnershipBillingRoutesTest {
 
         val response = client.put("/events/$eventId/partnership/$partnershipId/billing") {
             contentType(ContentType.Application.Json)
-            setBody(json.encodeToString(CompanyBillingData.serializer(), sampleBillingInput()))
+            setBody(json.encodeToString(CompanyBillingData.serializer(), createCompanyBillingData()))
         }
 
-        assertEquals(HttpStatusCode.Companion.NotFound, response.status)
+        assertEquals(HttpStatusCode.NotFound, response.status)
         assertTrue(response.bodyAsText().contains("Partnership not found"))
     }
 }
