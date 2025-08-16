@@ -2,13 +2,18 @@ package fr.devlille.partners.connect.organisations.application
 
 import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
 import fr.devlille.partners.connect.organisations.application.mappers.toDomain
+import fr.devlille.partners.connect.organisations.application.mappers.toItemDomain
 import fr.devlille.partners.connect.organisations.domain.Organisation
+import fr.devlille.partners.connect.organisations.domain.OrganisationItem
 import fr.devlille.partners.connect.organisations.domain.OrganisationRepository
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionEntity
+import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionsTable
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
 import io.ktor.server.plugins.NotFoundException
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class OrganisationRepositoryExposed : OrganisationRepository {
@@ -71,5 +76,17 @@ class OrganisationRepositoryExposed : OrganisationRepository {
             this.representativeRole = data.representativeRole
         }
         entity.toDomain()
+    }
+
+    override fun findOrganisationListByUserEmail(userEmail: String): List<OrganisationItem> = transaction {
+        val user = UserEntity.singleUserByEmail(userEmail)
+            ?: throw NotFoundException("User with email $userEmail not found")
+
+        OrganisationPermissionEntity
+            .find {
+                (OrganisationPermissionsTable.userId eq user.id.value) and
+                    (OrganisationPermissionsTable.canEdit eq true)
+            }
+            .map { it.organisation.toItemDomain() }
     }
 }
