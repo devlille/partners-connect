@@ -5,6 +5,7 @@ import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventSummary
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug
 import io.ktor.server.plugins.NotFoundException
@@ -17,6 +18,21 @@ class EventRepositoryExposed(
 ) : EventRepository {
     override fun getAllEvents(): List<EventSummary> = transaction {
         entity.all().map {
+            EventSummary(
+                id = it.id.value.toString(),
+                name = it.name,
+                startTime = it.startTime,
+                endTime = it.endTime,
+                submissionStartTime = it.submissionStartTime,
+                submissionEndTime = it.submissionEndTime,
+            )
+        }
+    }
+
+    override fun findByOrgSlug(orgSlug: String): List<EventSummary> = transaction {
+        val organisation = OrganisationEntity.findBySlug(orgSlug)
+            ?: throw NotFoundException("Organisation with slug $orgSlug not found")
+        entity.find { EventsTable.organisationId eq organisation.id }.map {
             EventSummary(
                 id = it.id.value.toString(),
                 name = it.name,
