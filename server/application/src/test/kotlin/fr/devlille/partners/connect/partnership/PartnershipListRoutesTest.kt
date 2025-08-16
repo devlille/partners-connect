@@ -9,6 +9,7 @@ import fr.devlille.partners.connect.partnership.factories.insertMockedPartnershi
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
+import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
@@ -26,6 +27,44 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class PartnershipListRoutesTest {
+    @Test
+    fun `GET returns one partnership when one exists`() = testApplication {
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+
+        application {
+            moduleMocked()
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedCompany(companyId, "Test Company")
+            val pack = insertMockedSponsoringPack(packId, eventId, "Test Pack")
+
+            insertMockedPartnership(
+                eventId = eventId,
+                companyId = companyId,
+                selectedPackId = pack.id.value,
+                contactName = "John Doe",
+                contactRole = "Manager",
+            )
+        }
+
+        val response = client.get("/orgs/$orgId/events/$eventId/partnership") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
+        assertEquals(1, partnerships.size)
+
+        val partnership = partnerships[0]
+        assertEquals("John Doe", partnership.contact.displayName)
+        assertEquals("Manager", partnership.contact.role)
+        assertEquals("Test Company", partnership.companyName)
+        assertEquals("Test Pack", partnership.packName)
+    }
+
     @Test
     fun `GET returns partnerships for event without filters`() = testApplication {
         val orgId = UUID.randomUUID()
@@ -568,6 +607,26 @@ class PartnershipListRoutesTest {
         }
 
         assertEquals(HttpStatusCode.NotFound, response.status)
+    }
+
+    @Test
+    fun `GET partnership route returns 200 with empty array`() = testApplication {
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+
+        application {
+            moduleMocked()
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId)
+        }
+
+        val response = client.get("/orgs/$orgId/events/$eventId/partnership") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        println("Response body: ${response.body<String>()}")
+        println("Content-Type: ${response.headers["Content-Type"]}")
     }
 
     @Test

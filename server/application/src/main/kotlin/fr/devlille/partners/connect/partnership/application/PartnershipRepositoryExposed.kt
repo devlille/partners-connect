@@ -155,92 +155,71 @@ class PartnershipRepositoryExposed(
         sort: String,
         direction: String,
     ): List<PartnershipItem> = transaction {
-        // Get all partnerships for the event first
         val allPartnerships = PartnershipEntity.find { PartnershipsTable.eventId eq eventId }
-
-        // Apply filters using in-memory filtering for now (can optimize later)
         val filteredPartnerships = allPartnerships.filter { partnership ->
-            var matches = true
-
-            // Filter by pack ID
-            filters.packId?.let { packIdStr ->
-                val packId = packIdStr.toUUID()
-                matches = matches && (partnership.selectedPack?.id?.value == packId)
-            }
-
-            // Filter by validation status
-            filters.validated?.let { validated ->
-                matches = matches && if (validated) {
-                    partnership.validatedAt != null
-                } else {
-                    partnership.validatedAt == null
-                }
-            }
-
-            // Filter by suggestion status
-            filters.suggestion?.let { hasSuggestion ->
-                matches = matches && if (hasSuggestion) {
-                    partnership.suggestionPack != null
-                } else {
-                    partnership.suggestionPack == null
-                }
-            }
-
-            // Filter by paid status
-            filters.paid?.let { isPaid ->
-                val billing = BillingEntity.singleByEventAndPartnership(eventId, partnership.id.value)
-                matches = matches && if (isPaid) {
-                    billing?.status == InvoiceStatus.PAID
-                } else {
-                    billing?.status != InvoiceStatus.PAID
-                }
-            }
-
-            // Filter by agreement generated status
-            filters.agreementGenerated?.let { hasAgreement ->
-                matches = matches && if (hasAgreement) {
-                    partnership.agreementUrl != null
-                } else {
-                    partnership.agreementUrl == null
-                }
-            }
-
-            // Filter by agreement signed status
-            filters.agreementSigned?.let { isSigned ->
-                matches = matches && if (isSigned) {
-                    partnership.agreementSignedUrl != null
-                } else {
-                    partnership.agreementSignedUrl == null
-                }
-            }
-
-            matches
+            matchesBasicFilters(partnership, filters) &&
+                matchesAdvancedFilters(partnership, filters, eventId)
         }
+        filteredPartnerships.map { partnership -> mapToPartnershipItem(partnership) }
+    }
 
-        val result = filteredPartnerships.map { partnership ->
-            // Get emails for this partnership
-            val emails = PartnershipEmailEntity
-                .find { PartnershipEmailsTable.partnershipId eq partnership.id }
-                .map { it.email }
+    private fun matchesBasicFilters(partnership: PartnershipEntity, filters: PartnershipFilters): Boolean {
+        val packMatches = filters.packId?.let { 
+            partnership.selectedPack?.id?.value == it.toUUID() 
+        } ?: true
+        
+        val validatedMatches = filters.validated?.let { 
+            if (it) partnership.validatedAt != null else partnership.validatedAt == null 
+        } ?: true
+        
+        val suggestionMatches = filters.suggestion?.let { 
+            if (it) partnership.suggestionPack != null else partnership.suggestionPack == null 
+        } ?: true
+        
+        return packMatches && validatedMatches && suggestionMatches
+    }
 
-            PartnershipItem(
-                id = partnership.id.toString(),
-                contact = ContactInfo(
-                    displayName = partnership.contactName,
-                    role = partnership.contactRole,
-                ),
-                companyName = partnership.company.name,
-                packName = partnership.selectedPack?.name ?: "Unknown",
-                suggestedPackName = partnership.suggestionPack?.name,
-                language = partnership.language,
-                phone = partnership.phone,
-                emails = emails,
-                createdAt = partnership.createdAt.toJavaLocalDateTime()
-                    .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-            )
-        }
+    private fun matchesAdvancedFilters(
+        partnership: PartnershipEntity, 
+        filters: PartnershipFilters, 
+        eventId: UUID
+    ): Boolean {
+        val paidMatches = filters.paid?.let {
+            val billing = BillingEntity.singleByEventAndPartnership(eventId, partnership.id.value)
+            if (it) billing?.status == InvoiceStatus.PAID else billing?.status != InvoiceStatus.PAID
+        } ?: true
+        
+        val agreementGeneratedMatches = filters.agreementGenerated?.let { 
+            if (it) partnership.agreementUrl != null else partnership.agreementUrl == null 
+        } ?: true
+        
+        val agreementSignedMatches = filters.agreementSigned?.let { 
+            if (it) partnership.agreementSignedUrl != null else partnership.agreementSignedUrl == null 
+        } ?: true
+        
+        return paidMatches && agreementGeneratedMatches && agreementSignedMatches
+    }
 
-        result.toList()
+    private fun mapToPartnershipItem(partnership: PartnershipEntity): PartnershipItem {
+        val emails = PartnershipEmailEntity
+            .find { PartnershipEmailsTable.partnershipId eq partnership.id }
+            .map { it.email }
+
+        return PartnershipItem(
+            id = partnership.id.toString(),
+            contact = ContactInfo(
+                displayName = partnership.contactName,
+                role = partnership.contactRole,
+            ),
+            companyName = partnership.company.name,
+            packName = partnership.selectedPack?.name ?: "Unknown",
+            suggestedPackName = partnership.suggestionPack?.name,
+            language = partnership.language,
+            phone = partnership.phone,
+            emails = emails,
+            createdAt = partnership.createdAt.toJavaLocalDateTime()
+                .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+        )
     }
 
     private fun findPartnership(eventId: UUID, partnershipId: UUID): PartnershipEntity = partnershipEntity
