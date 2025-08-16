@@ -54,6 +54,13 @@ private fun Route.packRoutes() {
             repository.deletePack(eventId = eventId, packId = packId)
             call.respond(HttpStatusCode.NoContent)
         }
+        put("/{packId}") {
+            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val packId = call.parameters["packId"]?.toUUID() ?: throw BadRequestException("Missing pack id")
+            val input = call.receive<CreateSponsoringPack>()
+            val updatedId = repository.updatePack(eventId = eventId, packId = packId, input = input)
+            call.respond(HttpStatusCode.OK, mapOf("id" to updatedId.toString()))
+        }
         post("/{packId}/options") {
             val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
             val packId = call.parameters["packId"]?.toUUID() ?: throw BadRequestException("Missing pack id")

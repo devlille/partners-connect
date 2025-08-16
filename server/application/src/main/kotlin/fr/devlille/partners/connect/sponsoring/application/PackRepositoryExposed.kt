@@ -55,6 +55,16 @@ class PackRepositoryExposed : PackRepository {
         }.id.value
     }
 
+    override fun updatePack(eventId: UUID, packId: UUID, input: CreateSponsoringPack): UUID = transaction {
+        val pack = SponsoringPackEntity.singlePackById(eventId, packId)
+        pack.name = input.name
+        pack.basePrice = input.price
+        pack.withBooth = input.withBooth
+        pack.nbTickets = input.nbTickets
+        pack.maxQuantity = input.maxQuantity
+        pack.id.value
+    }
+
     override fun deletePack(eventId: UUID, packId: UUID) = transaction {
         val pack = SponsoringPackEntity.singlePackById(eventId, packId)
         val hasOptions = PackOptionsTable.listOptionsByPack(pack.id.value).any()
