@@ -15,7 +15,6 @@ import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import java.util.UUID
 
 class OrganisationRepositoryExposed : OrganisationRepository {
     override fun create(entity: Organisation): String = transaction {
@@ -77,24 +76,6 @@ class OrganisationRepositoryExposed : OrganisationRepository {
             this.representativeRole = data.representativeRole
         }
         entity.toDomain()
-    }
-
-    override fun findByOrganizerId(userId: UUID): List<Organisation> = transaction {
-        OrganisationPermissionEntity
-            .find {
-                (OrganisationPermissionsTable.userId eq userId) and
-                    (OrganisationPermissionsTable.canEdit eq true)
-            }
-            .map { it.organisation.toDomain() }
-    }
-
-    override fun findOrganisationListByOrganizerId(userId: UUID): List<OrganisationListResponse> = transaction {
-        OrganisationPermissionEntity
-            .find {
-                (OrganisationPermissionsTable.userId eq userId) and
-                    (OrganisationPermissionsTable.canEdit eq true)
-            }
-            .map { it.organisation.toListResponse() }
     }
 
     override fun findOrganisationListByUserEmail(userEmail: String): List<OrganisationListResponse> = transaction {
