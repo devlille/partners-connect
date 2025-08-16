@@ -9,7 +9,7 @@ data class PartnershipItem(
     val contact: Contact,
     @SerialName("company_name")
     val companyName: String,
-    @SerialName("event_name") 
+    @SerialName("event_name")
     val eventName: String,
     @SerialName("pack_name")
     val packName: String? = null,

@@ -7,16 +7,12 @@ import fr.devlille.partners.connect.partnership.domain.Contact
 import fr.devlille.partners.connect.partnership.domain.PartnershipItem
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
-import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
@@ -27,6 +23,7 @@ import kotlin.test.assertTrue
 class PartnershipCompanyListRoutesTest {
     private val json = Json { ignoreUnknownKeys = true }
 
+    @Suppress("LongMethod")
     @Test
     fun `GET returns partnerships for an existing company`() = testApplication {
         val companyId = UUID.randomUUID()
@@ -45,37 +42,37 @@ class PartnershipCompanyListRoutesTest {
             insertMockedCompany(companyId, name = "TestCompany")
             insertMockedSponsoringPack(packId1, eventId1, name = "Gold Pack")
             insertMockedSponsoringPack(packId2, eventId2, name = "Silver Pack")
-            
+
             // Insert three partnerships for the same company
             insertMockedPartnership(
-                id = partnerId1, 
-                eventId = eventId1, 
+                id = partnerId1,
+                eventId = eventId1,
                 companyId = companyId,
                 contactName = "John Doe",
                 contactRole = "Director",
                 selectedPackId = packId1,
                 phone = "0612788709",
-                language = "en"
+                language = "en",
             )
             insertMockedPartnership(
-                id = partnerId2, 
-                eventId = eventId2, 
+                id = partnerId2,
+                eventId = eventId2,
                 companyId = companyId,
                 contactName = "Jane Smith",
                 contactRole = "Manager",
                 suggestionPackId = packId2,
                 phone = null,
-                language = "fr"
+                language = "fr",
             )
             insertMockedPartnership(
-                id = partnerId3, 
-                eventId = eventId1, 
+                id = partnerId3,
+                eventId = eventId1,
                 companyId = companyId,
                 contactName = "Bob Wilson",
                 contactRole = "CEO",
-                language = "en"
+                language = "en",
             )
-            
+
             // Add emails to partnerships
             transaction {
                 PartnershipEmailEntity.new {
@@ -95,15 +92,15 @@ class PartnershipCompanyListRoutesTest {
 
         val response = client.get("/companies/$companyId/partnership")
         assertEquals(HttpStatusCode.OK, response.status)
-        
+
         val partnerships = json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
         assertEquals(3, partnerships.size)
-        
+
         // Find specific partnerships
         val johnPartnership = partnerships.find { it.contact.displayName == "John Doe" }!!
         val janePartnership = partnerships.find { it.contact.displayName == "Jane Smith" }!!
         val bobPartnership = partnerships.find { it.contact.displayName == "Bob Wilson" }!!
-        
+
         // Verify John's partnership
         assertEquals(partnerId1.toString(), johnPartnership.id)
         assertEquals(Contact("John Doe", "Director"), johnPartnership.contact)
@@ -114,7 +111,7 @@ class PartnershipCompanyListRoutesTest {
         assertEquals("0612788709", johnPartnership.phone)
         assertEquals(listOf("john@example.com", "contact@example.com"), johnPartnership.emails)
         assertTrue(johnPartnership.createdAt.isNotEmpty())
-        
+
         // Verify Jane's partnership
         assertEquals(partnerId2.toString(), janePartnership.id)
         assertEquals(Contact("Jane Smith", "Manager"), janePartnership.contact)
@@ -124,7 +121,7 @@ class PartnershipCompanyListRoutesTest {
         assertEquals("fr", janePartnership.language)
         assertEquals(null, janePartnership.phone)
         assertEquals(listOf("jane@example.com"), janePartnership.emails)
-        
+
         // Verify Bob's partnership
         assertEquals(partnerId3.toString(), bobPartnership.id)
         assertEquals(Contact("Bob Wilson", "CEO"), bobPartnership.contact)
@@ -147,7 +144,7 @@ class PartnershipCompanyListRoutesTest {
 
         val response = client.get("/companies/$companyId/partnership")
         assertEquals(HttpStatusCode.OK, response.status)
-        
+
         val partnerships = json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
         assertEquals(0, partnerships.size)
     }
@@ -164,37 +161,37 @@ class PartnershipCompanyListRoutesTest {
             moduleMocked()
             insertMockedEventWithOrga(eventId)
             insertMockedCompany(companyId, name = "TestCompany")
-            
+
             // Insert partnerships - they'll get different creation times by default
             Thread.sleep(1) // Ensure different timestamps
             insertMockedPartnership(
-                id = partnerId1, 
-                eventId = eventId, 
+                id = partnerId1,
+                eventId = eventId,
                 companyId = companyId,
-                contactName = "First"
+                contactName = "First",
             )
             Thread.sleep(1)
             insertMockedPartnership(
-                id = partnerId2, 
-                eventId = eventId, 
+                id = partnerId2,
+                eventId = eventId,
                 companyId = companyId,
-                contactName = "Second"
+                contactName = "Second",
             )
             Thread.sleep(1)
             insertMockedPartnership(
-                id = partnerId3, 
-                eventId = eventId, 
+                id = partnerId3,
+                eventId = eventId,
                 companyId = companyId,
-                contactName = "Third"
+                contactName = "Third",
             )
         }
 
         val response = client.get("/companies/$companyId/partnership")
         assertEquals(HttpStatusCode.OK, response.status)
-        
+
         val partnerships = json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
         assertEquals(3, partnerships.size)
-        
+
         // Should be sorted by created_at desc (most recent first)
         // Since Third was created last, it should be first
         assertEquals("Third", partnerships[0].contact.displayName)

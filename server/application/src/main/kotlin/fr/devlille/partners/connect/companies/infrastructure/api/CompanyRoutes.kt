@@ -10,7 +10,6 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.request.receive
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
@@ -58,11 +57,7 @@ fun Route.companyRoutes() {
         get("/{companyId}/partnership") {
             val companyId = call.parameters["companyId"]?.toUUID() ?: throw BadRequestException("Missing company id")
             // Check if the company exists
-            try {
-                companyRepository.getById(companyId)
-            } catch (e: NotFoundException) {
-                throw NotFoundException("Company not found")
-            }
+            companyRepository.getById(companyId) // This will throw NotFoundException if not found
             val items = partnershipRepository.listByCompany(companyId)
             call.respond(HttpStatusCode.OK, items)
         }
