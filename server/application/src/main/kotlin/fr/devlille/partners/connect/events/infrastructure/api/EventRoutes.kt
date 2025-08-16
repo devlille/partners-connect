@@ -23,6 +23,13 @@ fun Route.eventRoutes() {
         get {
             call.respond(repository.getAllEvents())
         }
+
+        get("/{event_id}") {
+            val eventIdStr = call.parameters["event_id"] ?: throw BadRequestException("Missing event ID")
+            val eventId = eventIdStr.toUUID()
+            val eventWithOrg = repository.getPublicEventById(eventId)
+            call.respond(HttpStatusCode.OK, eventWithOrg)
+        }
     }
 
     route("orgs/{orgSlug}/events") {

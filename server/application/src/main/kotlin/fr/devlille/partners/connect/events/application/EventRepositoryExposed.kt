@@ -4,8 +4,10 @@ import fr.devlille.partners.connect.events.domain.Contact
 import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventSummary
+import fr.devlille.partners.connect.events.domain.EventWithOrganisation
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
+import fr.devlille.partners.connect.organisations.application.mappers.toDomain
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug
 import io.ktor.server.plugins.NotFoundException
@@ -55,6 +57,28 @@ class EventRepositoryExposed(
             submissionEndTime = event.submissionEndTime,
             address = event.address,
             contact = Contact(phone = event.contactPhone, email = event.contactEmail),
+        )
+    }
+
+    override fun getPublicEventById(eventId: UUID): EventWithOrganisation = transaction {
+        val eventEntity = entity.findById(eventId)
+            ?: throw NotFoundException("Event with id $eventId not found")
+
+        val event = Event(
+            name = eventEntity.name,
+            startTime = eventEntity.startTime,
+            endTime = eventEntity.endTime,
+            submissionStartTime = eventEntity.submissionStartTime,
+            submissionEndTime = eventEntity.submissionEndTime,
+            address = eventEntity.address,
+            contact = Contact(phone = eventEntity.contactPhone, email = eventEntity.contactEmail),
+        )
+
+        val organisation = eventEntity.organisation.toDomain()
+
+        EventWithOrganisation(
+            event = event,
+            organisation = organisation,
         )
     }
 

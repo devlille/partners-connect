@@ -21,6 +21,7 @@ import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -202,5 +203,49 @@ class EventRoutesTest {
         val response = client.get("/orgs/$orgId/events")
 
         assertEquals(HttpStatusCode.Unauthorized, response.status)
+    }
+
+    @Test
+    fun `GET events by ID returns event with organization for valid ID`() = testApplication {
+        val eventId = UUID.randomUUID()
+        application {
+            moduleMocked()
+            val admin = insertMockedAdminUser()
+            val org = insertMockedOrganisationEntity(representativeUser = admin)
+            insertMockedEventWithOrga(id = eventId, organisation = org)
+        }
+
+        val response = client.get("/events/$eventId")
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val responseBody = response.bodyAsText()
+        val eventWithOrg = Json.parseToJsonElement(responseBody).jsonObject
+        
+        // Verify response structure
+        assert(eventWithOrg.containsKey("event"))
+        assert(eventWithOrg.containsKey("organisation"))
+    }
+
+    @Test
+    fun `GET events by ID returns 404 for non-existent event`() = testApplication {
+        val nonExistentEventId = UUID.randomUUID()
+        application {
+            moduleMocked()
+        }
+
+        val response = client.get("/events/$nonExistentEventId")
+
+        assertEquals(HttpStatusCode.NotFound, response.status)
+    }
+
+    @Test
+    fun `GET events by ID returns 400 for invalid UUID format`() = testApplication {
+        application {
+            moduleMocked()
+        }
+
+        val response = client.get("/events/invalid-uuid")
+
+        assertEquals(HttpStatusCode.BadRequest, response.status)
     }
 }
