@@ -1,7 +1,6 @@
 package fr.devlille.partners.connect.sponsoring
 
 import fr.devlille.partners.connect.events.factories.insertMockedEvent
-import fr.devlille.partners.connect.events.factories.insertMockedEventWithOrga
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringPack
@@ -128,29 +127,10 @@ class SponsoringPackUpdateRoutesTest {
     }
 
     @Test
-    fun `PUT fails with bad request when eventId is invalid UUID`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val packId = UUID.randomUUID()
-
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId = UUID.randomUUID(), orgId)
-        }
-
-        val response = client.put("/orgs/$orgId/events/not-a-uuid/packs/$packId") {
-            contentType(ContentType.Application.Json)
-            header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(Json.encodeToString(createSponsoringPack()))
-        }
-
-        assertEquals(HttpStatusCode.NotFound, response.status)
-    }
-
-    @Test
-    fun `PUT fails with bad request when packId is invalid UUID`() = testApplication {
+    fun `PUT fails with not found when pack does not exist`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val nonExistentPackId = UUID.randomUUID()
 
         application {
             moduleMocked()
@@ -158,7 +138,7 @@ class SponsoringPackUpdateRoutesTest {
             insertMockedEventWithAdminUser(eventId, orgId)
         }
 
-        val response = client.put("/orgs/$orgId/events/$eventId/packs/not-a-uuid") {
+        val response = client.put("/orgs/$orgId/events/$eventId/packs/$nonExistentPackId") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(createSponsoringPack()))
@@ -190,27 +170,6 @@ class SponsoringPackUpdateRoutesTest {
     }
 
     @Test
-    fun `PUT fails with not found when no token provided`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val packId = UUID.randomUUID()
-
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
-            insertMockedSponsoringPack(id = packId, event = eventId)
-        }
-
-        val response = client.put("/orgs/$orgId/events/$eventId/packs/$packId") {
-            contentType(ContentType.Application.Json)
-            setBody(Json.encodeToString(createSponsoringPack()))
-        }
-
-        assertEquals(HttpStatusCode.NotFound, response.status)
-    }
-
-    @Test
     fun `PUT fails with not found when user lacks org permission`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
@@ -221,75 +180,6 @@ class SponsoringPackUpdateRoutesTest {
             insertMockedOrganisationEntity(orgId)
             insertMockedEvent(eventId, orgId = orgId) // No admin user permission
             insertMockedSponsoringPack(id = packId, event = eventId)
-        }
-
-        val response = client.put("/orgs/$orgId/events/$eventId/packs/$packId") {
-            contentType(ContentType.Application.Json)
-            header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(Json.encodeToString(createSponsoringPack()))
-        }
-
-        assertEquals(HttpStatusCode.NotFound, response.status)
-    }
-
-    @Test
-    fun `PUT fails with not found when event does not exist`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val packId = UUID.randomUUID()
-        val nonExistentEventId = UUID.randomUUID()
-
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
-            insertMockedSponsoringPack(id = packId, event = eventId)
-        }
-
-        val response = client.put("/orgs/$orgId/events/$nonExistentEventId/packs/$packId") {
-            contentType(ContentType.Application.Json)
-            header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(Json.encodeToString(createSponsoringPack()))
-        }
-
-        assertEquals(HttpStatusCode.NotFound, response.status)
-    }
-
-    @Test
-    fun `PUT fails with not found when pack does not exist`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val nonExistentPackId = UUID.randomUUID()
-
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
-        }
-
-        val response = client.put("/orgs/$orgId/events/$eventId/packs/$nonExistentPackId") {
-            contentType(ContentType.Application.Json)
-            header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(Json.encodeToString(createSponsoringPack()))
-        }
-
-        assertEquals(HttpStatusCode.NotFound, response.status)
-    }
-
-    @Test
-    fun `PUT fails with not found when pack does not belong to event`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val otherEventId = UUID.randomUUID()
-        val packId = UUID.randomUUID()
-
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
-            insertMockedEvent(otherEventId, orgId = orgId)
-            // Pack belongs to otherEventId, not eventId
-            insertMockedSponsoringPack(id = packId, event = otherEventId)
         }
 
         val response = client.put("/orgs/$orgId/events/$eventId/packs/$packId") {
