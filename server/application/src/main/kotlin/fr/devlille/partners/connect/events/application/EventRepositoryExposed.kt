@@ -6,6 +6,7 @@ import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventSummary
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
+import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionEntity
@@ -87,6 +88,11 @@ class EventRepositoryExposed(
                 (OrganisationPermissionsTable.userId eq user.id.value) and
                     (OrganisationPermissionsTable.canEdit eq true)
             }
+
+        // Check if user has any organizer permissions
+        if (userPermissions.empty()) {
+            throw UnauthorizedException("You do not have organizer permissions")
+        }
 
         // Get all events from those organizations
         val events = mutableListOf<EventSummary>()

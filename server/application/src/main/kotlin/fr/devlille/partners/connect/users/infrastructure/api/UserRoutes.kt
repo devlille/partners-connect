@@ -27,13 +27,6 @@ fun Route.userRoutes() {
             val token = call.token
             val userInfo = authRepository.getUserInfo(token)
 
-            // Check if user has any organizer permissions
-            val hasOrganizerRole = userRepository.hasAnyOrganizerPermission(userInfo.email)
-
-            if (!hasOrganizerRole) {
-                throw UnauthorizedException("You do not have organizer permissions")
-            }
-
             val events = eventRepository.findByUserEmail(userInfo.email)
             call.respond(HttpStatusCode.OK, events)
         }
