@@ -44,8 +44,9 @@ class OrganisationRepositoryExposed : OrganisationRepository {
             ?: throw NotFoundException("Organisation with slug $slug not found")
     }
 
-    override fun update(orgSlug: String, data: Organisation): Organisation? = transaction {
-        val entity = OrganisationEntity.findBySlug(orgSlug) ?: return@transaction null
+    override fun update(orgSlug: String, data: Organisation): Organisation = transaction {
+        val entity = OrganisationEntity.findBySlug(orgSlug)
+            ?: throw NotFoundException("Organisation with slug $orgSlug not found")
 
         val representativeUser = UserEntity.singleUserByEmail(data.representativeUserEmail)
             ?: throw NotFoundException("User with email ${data.representativeUserEmail} not found")

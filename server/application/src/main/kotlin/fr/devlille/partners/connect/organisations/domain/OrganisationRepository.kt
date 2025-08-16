@@ -5,5 +5,5 @@ interface OrganisationRepository {
 
     fun getById(slug: String): Organisation
 
-    fun update(orgSlug: String, data: Organisation): Organisation?
+    fun update(orgSlug: String, data: Organisation): Organisation
 }

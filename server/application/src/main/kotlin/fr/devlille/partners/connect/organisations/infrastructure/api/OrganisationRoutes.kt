@@ -8,7 +8,6 @@ import fr.devlille.partners.connect.organisations.domain.OrganisationRepository
 import fr.devlille.partners.connect.users.domain.UserRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -47,14 +46,11 @@ fun Route.organisationRoutes() {
             val userInfo = authRepository.getUserInfo(token)
             val canEdit = userRepository.hasEditPermissionByEmail(userInfo.email, orgSlug)
 
-            when {
-                !canEdit -> throw UnauthorizedException("You are not allowed to edit this organisation")
-                else -> {
-                    val updatedOrg = repository.update(orgSlug, input)
-                        ?: throw NotFoundException("Organisation with slug $orgSlug not found")
-                    call.respond(HttpStatusCode.OK, updatedOrg)
-                }
+            if (!canEdit) {
+                throw UnauthorizedException("You are not allowed to edit this organisation")
             }
+            val updatedOrg = repository.update(orgSlug, input)
+            call.respond(HttpStatusCode.OK, updatedOrg)
         }
     }
 }
