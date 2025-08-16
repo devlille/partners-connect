@@ -1,7 +1,8 @@
 package fr.devlille.partners.connect.organisations.application
 
 import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
-import fr.devlille.partners.connect.organisations.application.mappers.*
+import fr.devlille.partners.connect.organisations.application.mappers.toDomain
+import fr.devlille.partners.connect.organisations.application.mappers.toItemDomain
 import fr.devlille.partners.connect.organisations.domain.Organisation
 import fr.devlille.partners.connect.organisations.domain.OrganisationItem
 import fr.devlille.partners.connect.organisations.domain.OrganisationRepository
@@ -44,7 +45,7 @@ class OrganisationRepositoryExposed : OrganisationRepository {
     }
 
     override fun getById(slug: String): Organisation = transaction {
-        OrganisationEntity.findBySlug(slug)?.toFullDomain()
+        OrganisationEntity.findBySlug(slug)?.toDomain()
             ?: throw NotFoundException("Organisation with slug $slug not found")
     }
 
@@ -74,7 +75,7 @@ class OrganisationRepositoryExposed : OrganisationRepository {
             this.representativeUser = representativeUser
             this.representativeRole = data.representativeRole
         }
-        entity.toFullDomain()
+        entity.toDomain()
     }
 
     override fun findOrganisationListByUserEmail(userEmail: String): List<OrganisationItem> = transaction {
@@ -86,6 +87,6 @@ class OrganisationRepositoryExposed : OrganisationRepository {
                 (OrganisationPermissionsTable.userId eq user.id.value) and
                     (OrganisationPermissionsTable.canEdit eq true)
             }
-            .map { it.organisation.toDomain() }
+            .map { it.organisation.toItemDomain() }
     }
 }

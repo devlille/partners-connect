@@ -4,7 +4,7 @@ import fr.devlille.partners.connect.organisations.domain.OrganisationItem
 import fr.devlille.partners.connect.organisations.domain.Owner
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 
-fun OrganisationEntity.toDomain(): OrganisationItem = OrganisationItem(
+fun OrganisationEntity.toItemDomain(): OrganisationItem = OrganisationItem(
     name = this.name,
     slug = this.slug,
     headOffice = this.headOffice,

@@ -3,7 +3,7 @@ package fr.devlille.partners.connect.organisations.application.mappers
 import fr.devlille.partners.connect.organisations.domain.Organisation
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 
-fun OrganisationEntity.toFullDomain(): Organisation = Organisation(
+fun OrganisationEntity.toDomain(): Organisation = Organisation(
     name = this.name,
     headOffice = this.headOffice,
     siret = this.siret,
