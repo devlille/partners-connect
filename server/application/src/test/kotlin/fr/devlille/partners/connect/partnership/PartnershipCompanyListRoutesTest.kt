@@ -18,7 +18,6 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class PartnershipCompanyListRoutesTest {
     private val json = Json { ignoreUnknownKeys = true }
@@ -110,7 +109,6 @@ class PartnershipCompanyListRoutesTest {
         assertEquals("en", johnPartnership.language)
         assertEquals("0612788709", johnPartnership.phone)
         assertEquals(listOf("john@example.com", "contact@example.com"), johnPartnership.emails)
-        assertTrue(johnPartnership.createdAt.isNotEmpty())
 
         // Verify Jane's partnership
         assertEquals(partnerId2.toString(), janePartnership.id)

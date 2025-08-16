@@ -32,12 +32,10 @@ import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 @Suppress("TooManyFunctions") // Required to support both listByEvent and listByCompany methods
@@ -193,7 +191,7 @@ class PartnershipRepositoryExposed(
                     language = partnership.language,
                     phone = partnership.phone,
                     emails = emails,
-                    createdAt = partnership.createdAt.toString(),
+                    createdAt = partnership.createdAt,
                 )
             }
     }
@@ -253,8 +251,7 @@ class PartnershipRepositoryExposed(
             language = partnership.language,
             phone = partnership.phone,
             emails = emails,
-            createdAt = partnership.createdAt.toJavaLocalDateTime()
-                .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+            createdAt = partnership.createdAt,
         )
     }
 

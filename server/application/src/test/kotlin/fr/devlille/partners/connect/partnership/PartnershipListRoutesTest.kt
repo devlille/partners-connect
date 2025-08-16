@@ -675,6 +675,5 @@ class PartnershipListRoutesTest {
         assertEquals("fr", partnership.language)
         assertEquals("0123456789", partnership.phone)
         assertTrue(partnership.emails.isEmpty())
-        assertTrue(partnership.createdAt.isNotEmpty())
     }
 }
