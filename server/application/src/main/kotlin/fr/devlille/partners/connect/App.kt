@@ -6,51 +6,32 @@ import fr.devlille.partners.connect.auth.infrastructure.plugins.configureSecurit
 import fr.devlille.partners.connect.billing.infrastructure.bindings.billingModule
 import fr.devlille.partners.connect.companies.infrastructure.api.companyRoutes
 import fr.devlille.partners.connect.companies.infrastructure.bindings.companyModule
-import fr.devlille.partners.connect.companies.infrastructure.db.CompaniesTable
-import fr.devlille.partners.connect.companies.infrastructure.db.CompanySocialsTable
 import fr.devlille.partners.connect.events.infrastructure.api.eventRoutes
 import fr.devlille.partners.connect.events.infrastructure.bindings.eventModule
-import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import fr.devlille.partners.connect.integrations.infrastructure.api.integrationRoutes
 import fr.devlille.partners.connect.integrations.infrastructure.bindings.integrationModule
-import fr.devlille.partners.connect.integrations.infrastructure.db.BilletWebIntegrationsTable
-import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
-import fr.devlille.partners.connect.integrations.infrastructure.db.MailjetIntegrationsTable
-import fr.devlille.partners.connect.integrations.infrastructure.db.QontoIntegrationsTable
-import fr.devlille.partners.connect.integrations.infrastructure.db.SlackIntegrationsTable
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.UserSession
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkClientModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkEngineModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.storageModule
+import fr.devlille.partners.connect.internal.infrastructure.migrations.MigrationRegistry
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.notifications.infrastructure.bindings.notificationModule
 import fr.devlille.partners.connect.organisations.infrastructure.api.organisationRoutes
 import fr.devlille.partners.connect.organisations.infrastructure.bindings.organisationModule
-import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationsTable
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipAgreementRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipBillingRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipSuggestionRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipTicketingRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.bindings.partnershipModule
-import fr.devlille.partners.connect.partnership.infrastructure.db.BillingsTable
-import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailsTable
-import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionsTable
-import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipTicketsTable
-import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.api.sponsoringRoutes
 import fr.devlille.partners.connect.sponsoring.infrastructure.bindings.sponsoringModule
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationsTable
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionsTable
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPacksTable
 import fr.devlille.partners.connect.tickets.infrastructure.bindings.ticketingModule
 import fr.devlille.partners.connect.users.infrastructure.api.userRoutes
 import fr.devlille.partners.connect.users.infrastructure.bindings.userModule
-import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionsTable
-import fr.devlille.partners.connect.users.infrastructure.db.UsersTable
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -71,8 +52,6 @@ import io.ktor.server.sessions.Sessions
 import io.ktor.server.sessions.cookie
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.jdbc.Database
-import org.jetbrains.exposed.v1.jdbc.SchemaUtils
-import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.koin.core.module.Module
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
@@ -154,37 +133,10 @@ private fun configureDatabase(url: String, driver: String, user: String, passwor
         user = user,
         password = password,
     )
-    transaction(db) {
-        SchemaUtils.create(
-            // integrations
-            IntegrationsTable,
-            SlackIntegrationsTable,
-            MailjetIntegrationsTable,
-            QontoIntegrationsTable,
-            BilletWebIntegrationsTable,
-            // organisations
-            OrganisationsTable,
-            // events
-            EventsTable,
-            // users
-            UsersTable,
-            OrganisationPermissionsTable,
-            // sponsoring
-            PackOptionsTable,
-            SponsoringOptionsTable,
-            SponsoringPacksTable,
-            OptionTranslationsTable,
-            // companies
-            CompaniesTable,
-            CompanySocialsTable,
-            BillingsTable,
-            // partnerships
-            PartnershipsTable,
-            PartnershipOptionsTable,
-            PartnershipEmailsTable,
-            PartnershipTicketsTable,
-        )
-    }
+
+    // Apply all database migrations
+    val migrationManager = MigrationRegistry.createManager()
+    migrationManager.migrate(db)
 }
 
 private fun Application.configureCors() {
