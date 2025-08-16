@@ -60,7 +60,7 @@ class ListUserEventsRouteTest {
     @Test
     fun `return 403 if authenticated user has no organizer permissions`() = testApplication {
         val userId = UUID.randomUUID()
-        val email = "noorganizer@mail.com"
+        val email = "john.doe@contact.com" // Must match the mock auth email
 
         application {
             moduleMocked()
@@ -78,7 +78,7 @@ class ListUserEventsRouteTest {
     fun `return empty array if organizer has no events`() = testApplication {
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
-        val email = "organizer@mail.com"
+        val email = "john.doe@contact.com" // Must match the mock auth email
 
         application {
             moduleMocked()
@@ -100,7 +100,7 @@ class ListUserEventsRouteTest {
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        val email = "organizer@mail.com"
+        val email = "john.doe@contact.com" // Must match the mock auth email
 
         application {
             moduleMocked()
@@ -137,7 +137,7 @@ class ListUserEventsRouteTest {
         val orgId2 = UUID.randomUUID()
         val eventId1 = UUID.randomUUID()
         val eventId2 = UUID.randomUUID()
-        val email = "organizer@mail.com"
+        val email = "john.doe@contact.com" // Must match the mock auth email
 
         application {
             moduleMocked()
