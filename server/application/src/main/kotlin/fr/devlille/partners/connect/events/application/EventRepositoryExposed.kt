@@ -35,6 +35,21 @@ class EventRepositoryExposed(
         }
     }
 
+    override fun findByOrgSlug(orgSlug: String): List<EventSummary> = transaction {
+        val organisation = OrganisationEntity.findBySlug(orgSlug)
+            ?: throw NotFoundException("Organisation with slug $orgSlug not found")
+        entity.find { EventsTable.organisationId eq organisation.id }.map {
+            EventSummary(
+                id = it.id.value.toString(),
+                name = it.name,
+                startTime = it.startTime,
+                endTime = it.endTime,
+                submissionStartTime = it.submissionStartTime,
+                submissionEndTime = it.submissionEndTime,
+            )
+        }
+    }
+
     override fun getById(eventId: UUID): Event = transaction {
         val event = entity.findById(eventId)
             ?: throw NotFoundException("Event with id $eventId not found")
