@@ -15,6 +15,7 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
+import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
@@ -52,6 +53,13 @@ private fun Route.packRoutes() {
             val packId = call.parameters["packId"]?.toUUID() ?: throw BadRequestException("Missing pack id")
             repository.deletePack(eventId = eventId, packId = packId)
             call.respond(HttpStatusCode.NoContent)
+        }
+        put("/{packId}") {
+            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val packId = call.parameters["packId"]?.toUUID() ?: throw BadRequestException("Missing pack id")
+            val input = call.receive<CreateSponsoringPack>()
+            val updatedId = repository.updatePack(eventId = eventId, packId = packId, input = input)
+            call.respond(HttpStatusCode.OK, mapOf("id" to updatedId.toString()))
         }
         post("/{packId}/options") {
             val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")

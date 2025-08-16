@@ -9,5 +9,7 @@ interface PackRepository {
 
     fun createPack(eventId: UUID, input: CreateSponsoringPack): UUID
 
+    fun updatePack(eventId: UUID, packId: UUID, input: CreateSponsoringPack): UUID
+
     fun deletePack(eventId: UUID, packId: UUID)
 }
