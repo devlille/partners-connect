@@ -1,0 +1,45 @@
+meta {
+  name: List
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_id/partnership?sort=created&direction=asc&filter[validated]=false
+  body: none
+  auth: none
+}
+
+params:query {
+  sort: created
+  direction: asc
+  filter[validated]: false
+  ~filter[agreement-generated]: false
+  ~filter[agreement-signed]: false
+  ~filter[pack_id]: {{pack_id}}
+  ~filter[suggestion]: false
+}
+
+params:path {
+  org_slug: {{org_slug}}
+  event_id: {{event_id}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "company_id": "{{company_id}}",
+    "pack_id": "{{pack_id}}",
+    "option_ids": [],
+    "contact_name": "John Doe",
+    "contact_role": "Director",
+    "language": "en",
+    "phone": "0612788709",
+    "emails": [
+      "gerard@devlille.fr"
+    ]
+  }
+}
