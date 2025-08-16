@@ -7,6 +7,8 @@ interface EventRepository {
 
     fun getById(eventId: UUID): Event
 
+    fun getPublicEventById(eventId: UUID): EventWithOrganisation
+
     fun findByOrgSlug(orgSlug: String): List<EventSummary>
 
     fun createEvent(orgSlug: String, event: Event): UUID

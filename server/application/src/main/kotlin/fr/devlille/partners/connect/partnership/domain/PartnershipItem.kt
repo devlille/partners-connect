@@ -6,15 +6,15 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PartnershipItem(
     val id: String,
-    val contact: ContactInfo,
+    val contact: Contact,
     @SerialName("company_name")
     val companyName: String,
-    @SerialName("pack_name")
-    val packName: String,
-    @SerialName("suggested_pack_name")
-    val suggestedPackName: String? = null,
     @SerialName("event_name")
     val eventName: String,
+    @SerialName("pack_name")
+    val packName: String? = null,
+    @SerialName("suggested_pack_name")
+    val suggestedPackName: String? = null,
     val language: String,
     val phone: String? = null,
     val emails: List<String> = emptyList(),
@@ -23,7 +23,7 @@ data class PartnershipItem(
 )
 
 @Serializable
-data class ContactInfo(
+data class Contact(
     @SerialName("display_name")
     val displayName: String,
     val role: String,

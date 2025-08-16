@@ -6,7 +6,7 @@ import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.application.mappers.toDomain
-import fr.devlille.partners.connect.partnership.domain.ContactInfo
+import fr.devlille.partners.connect.partnership.domain.Contact
 import fr.devlille.partners.connect.partnership.domain.Partnership
 import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
 import fr.devlille.partners.connect.partnership.domain.PartnershipItem
@@ -34,6 +34,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.time.format.DateTimeFormatter
@@ -163,6 +164,37 @@ class PartnershipRepositoryExposed(
         filteredPartnerships.map { partnership -> mapToPartnershipItem(partnership) }
     }
 
+    override fun listByCompany(companyId: UUID): List<PartnershipItem> = transaction {
+        // Check if the company exists first
+        CompanyEntity.findById(companyId)
+            ?: throw NotFoundException("Company $companyId not found")
+
+        PartnershipEntity
+            .find { PartnershipsTable.companyId eq companyId }
+            .orderBy(PartnershipsTable.createdAt to SortOrder.DESC)
+            .map { partnership ->
+                val emails = PartnershipEmailEntity
+                    .find { PartnershipEmailsTable.partnershipId eq partnership.id }
+                    .map { it.email }
+
+                PartnershipItem(
+                    id = partnership.id.value.toString(),
+                    contact = Contact(
+                        displayName = partnership.contactName,
+                        role = partnership.contactRole,
+                    ),
+                    companyName = partnership.company.name,
+                    eventName = partnership.event.name,
+                    packName = partnership.selectedPack?.name,
+                    suggestedPackName = partnership.suggestionPack?.name,
+                    language = partnership.language,
+                    phone = partnership.phone,
+                    emails = emails,
+                    createdAt = partnership.createdAt.toString(),
+                )
+            }
+    }
+
     private fun matchesBasicFilters(partnership: PartnershipEntity, filters: PartnershipFilters): Boolean {
         val packMatches = filters.packId?.let {
             partnership.selectedPack?.id?.value == it.toUUID()
@@ -207,12 +239,12 @@ class PartnershipRepositoryExposed(
 
         return PartnershipItem(
             id = partnership.id.toString(),
-            contact = ContactInfo(
+            contact = Contact(
                 displayName = partnership.contactName,
                 role = partnership.contactRole,
             ),
             companyName = partnership.company.name,
-            packName = partnership.selectedPack?.name ?: "Unknown",
+            packName = partnership.selectedPack?.name,
             suggestedPackName = partnership.suggestionPack?.name,
             eventName = partnership.event.name,
             language = partnership.language,
@@ -221,6 +253,7 @@ class PartnershipRepositoryExposed(
             createdAt = partnership.createdAt.toJavaLocalDateTime()
                 .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
         )
+    }
     }
 
     private fun findPartnership(eventId: UUID, partnershipId: UUID): PartnershipEntity = partnershipEntity

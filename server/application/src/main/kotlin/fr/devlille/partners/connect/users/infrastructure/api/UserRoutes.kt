@@ -5,6 +5,7 @@ import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.token
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
+import fr.devlille.partners.connect.organisations.domain.OrganisationRepository
 import fr.devlille.partners.connect.users.domain.UserRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
@@ -21,6 +22,7 @@ fun Route.userRoutes() {
     val authRepository by inject<AuthRepository>()
     val userRepository by inject<UserRepository>()
     val eventRepository by inject<EventRepository>()
+    val organisationRepository by inject<OrganisationRepository>()
 
     route("/users") {
         get("/me/events") {
@@ -29,6 +31,16 @@ fun Route.userRoutes() {
 
             val events = eventRepository.findByUserEmail(userInfo.email)
             call.respond(HttpStatusCode.OK, events)
+        }
+
+        get("/me/orgs") {
+            val token = call.token
+            val userInfo = authRepository.getUserInfo(token)
+
+            // Find organizations where this user is an organizer (has canEdit = true)
+            val organisations = organisationRepository.findOrganisationListByUserEmail(userInfo.email)
+
+            call.respond(HttpStatusCode.OK, organisations)
         }
     }
 

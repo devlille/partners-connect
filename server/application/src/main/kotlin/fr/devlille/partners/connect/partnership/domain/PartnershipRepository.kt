@@ -20,4 +20,6 @@ interface PartnershipRepository {
         sort: String = "created",
         direction: String = "asc",
     ): List<PartnershipItem>
+
+    fun listByCompany(companyId: UUID): List<PartnershipItem>
 }
