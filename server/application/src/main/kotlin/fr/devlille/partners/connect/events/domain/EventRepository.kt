@@ -11,5 +11,5 @@ interface EventRepository {
 
     fun updateEvent(id: UUID, orgSlug: String, event: Event): UUID
 
-    fun findByOrganizerId(userId: UUID): List<EventSummary>
+    fun findByUserEmail(userEmail: String): List<EventSummary>
 }

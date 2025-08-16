@@ -10,4 +10,6 @@ interface UserRepository {
     fun hasAnyOrganizerPermission(email: String): Boolean
 
     fun grantUsers(orgSlug: String, userEmails: List<String>)
+
+    fun getByEmail(email: String): User?
 }

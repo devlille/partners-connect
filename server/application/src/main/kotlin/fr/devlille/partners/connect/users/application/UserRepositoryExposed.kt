@@ -76,4 +76,8 @@ class UserRepositoryExposed : UserRepository {
             }
         }
     }
+
+    override fun getByEmail(email: String): User? = transaction {
+        UserEntity.singleUserByEmail(email)?.toDomain()
+    }
 }

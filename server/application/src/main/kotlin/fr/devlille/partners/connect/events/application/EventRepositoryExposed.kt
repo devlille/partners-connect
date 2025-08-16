@@ -10,6 +10,8 @@ import fr.devlille.partners.connect.organisations.infrastructure.db.Organisation
 import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionEntity
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionsTable
+import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
+import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
@@ -75,11 +77,14 @@ class EventRepositoryExposed(
         entity.id.value
     }
 
-    override fun findByOrganizerId(userId: UUID): List<EventSummary> = transaction {
+    override fun findByUserEmail(userEmail: String): List<EventSummary> = transaction {
+        val user = UserEntity.singleUserByEmail(userEmail)
+            ?: throw NotFoundException("User with email $userEmail not found")
+
         // Find all organizations where the user has edit permissions
         val userPermissions = OrganisationPermissionEntity
             .find {
-                (OrganisationPermissionsTable.userId eq userId) and
+                (OrganisationPermissionsTable.userId eq user.id.value) and
                     (OrganisationPermissionsTable.canEdit eq true)
             }
 
