@@ -6,9 +6,11 @@ import fr.devlille.partners.connect.companies.domain.CompanyRepository
 import fr.devlille.partners.connect.companies.domain.CreateCompany
 import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
+import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
+import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.request.receive
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
@@ -23,6 +25,7 @@ fun Route.companyRoutes() {
     val companyRepository by inject<CompanyRepository>()
     val imageProcessingRepository by inject<CompanyImageProcessingRepository>()
     val mediaRepository by inject<CompanyMediaRepository>()
+    val partnershipRepository by inject<PartnershipRepository>()
 
     route("/companies") {
         get {
@@ -50,6 +53,18 @@ fun Route.companyRoutes() {
             val media = mediaRepository.upload(companyId.toString(), mediaBinaries)
             companyRepository.updateLogoUrls(companyId, media)
             call.respond(HttpStatusCode.OK, media)
+        }
+
+        get("/{companyId}/partnership") {
+            val companyId = call.parameters["companyId"]?.toUUID() ?: throw BadRequestException("Missing company id")
+            // Check if the company exists
+            try {
+                companyRepository.getById(companyId)
+            } catch (e: NotFoundException) {
+                throw NotFoundException("Company not found")
+            }
+            val items = partnershipRepository.listByCompany(companyId)
+            call.respond(HttpStatusCode.OK, items)
         }
     }
 }

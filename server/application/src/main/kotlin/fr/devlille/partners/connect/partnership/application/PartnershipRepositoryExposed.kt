@@ -6,13 +6,16 @@ import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.application.mappers.toDomain
+import fr.devlille.partners.connect.partnership.domain.Contact
 import fr.devlille.partners.connect.partnership.domain.Partnership
+import fr.devlille.partners.connect.partnership.domain.PartnershipItem
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.listByPartnershipAndPack
 import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndCompany
 import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndPartnership
@@ -27,6 +30,7 @@ import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
@@ -139,6 +143,33 @@ class PartnershipRepositoryExposed(
         val partnership = findPartnership(eventId, partnershipId)
         partnership.declinedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
         partnership.id.value
+    }
+
+    override fun listByCompany(companyId: UUID): List<PartnershipItem> = transaction {
+        PartnershipEntity
+            .find { PartnershipsTable.companyId eq companyId }
+            .orderBy(PartnershipsTable.createdAt to SortOrder.DESC)
+            .map { partnership ->
+                val emails = PartnershipEmailEntity
+                    .find { PartnershipEmailsTable.partnershipId eq partnership.id }
+                    .map { it.email }
+
+                PartnershipItem(
+                    id = partnership.id.value.toString(),
+                    contact = Contact(
+                        displayName = partnership.contactName,
+                        role = partnership.contactRole,
+                    ),
+                    companyName = partnership.company.name,
+                    eventName = partnership.event.name,
+                    packName = partnership.selectedPack?.name,
+                    suggestedPackName = partnership.suggestionPack?.name,
+                    language = partnership.language,
+                    phone = partnership.phone,
+                    emails = emails,
+                    createdAt = partnership.createdAt.toString(),
+                )
+            }
     }
 
     private fun findPartnership(eventId: UUID, partnershipId: UUID): PartnershipEntity = partnershipEntity
