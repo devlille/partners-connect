@@ -161,8 +161,33 @@ class PartnershipRepositoryExposed(
         sort: String,
         direction: String,
     ): List<PartnershipItem> = transaction {
-        // For now, return empty list to test basic functionality
-        emptyList()
+        // Get all partnerships for the event using entity approach for now
+        val partnerships = PartnershipEntity.find { PartnershipsTable.eventId eq eventId }
+
+        val result = partnerships.map { partnership ->
+            // Get emails for this partnership
+            val emails = PartnershipEmailEntity
+                .find { PartnershipEmailsTable.partnershipId eq partnership.id }
+                .map { it.email }
+
+            PartnershipItem(
+                id = partnership.id.toString(),
+                contact = ContactInfo(
+                    displayName = partnership.contactName,
+                    role = partnership.contactRole,
+                ),
+                companyName = partnership.company.name,
+                packName = partnership.selectedPack?.name ?: "Unknown",
+                suggestedPackName = partnership.suggestionPack?.name,
+                language = partnership.language,
+                phone = partnership.phone,
+                emails = emails,
+                createdAt = partnership.createdAt.toJavaLocalDateTime()
+                    .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+            )
+        }
+
+        result.toList()
     }
 
     private fun findPartnership(eventId: UUID, partnershipId: UUID): PartnershipEntity = partnershipEntity
