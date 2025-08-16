@@ -12,6 +12,8 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
 import fr.devlille.partners.connect.partnership.domain.PartnershipItem
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
+import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
@@ -181,6 +183,34 @@ class PartnershipRepositoryExposed(
                     partnership.suggestionPack != null
                 } else {
                     partnership.suggestionPack == null
+                }
+            }
+
+            // Filter by paid status
+            filters.paid?.let { isPaid ->
+                val billing = BillingEntity.singleByEventAndPartnership(eventId, partnership.id.value)
+                matches = matches && if (isPaid) {
+                    billing?.status == InvoiceStatus.PAID
+                } else {
+                    billing?.status != InvoiceStatus.PAID
+                }
+            }
+
+            // Filter by agreement generated status
+            filters.agreementGenerated?.let { hasAgreement ->
+                matches = matches && if (hasAgreement) {
+                    partnership.agreementUrl != null
+                } else {
+                    partnership.agreementUrl == null
+                }
+            }
+
+            // Filter by agreement signed status
+            filters.agreementSigned?.let { isSigned ->
+                matches = matches && if (isSigned) {
+                    partnership.agreementSignedUrl != null
+                } else {
+                    partnership.agreementSignedUrl == null
                 }
             }
 
