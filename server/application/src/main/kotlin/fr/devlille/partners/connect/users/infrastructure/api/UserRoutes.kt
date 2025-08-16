@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.users.infrastructure.api
 
 import fr.devlille.partners.connect.auth.domain.AuthRepository
+import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.token
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
@@ -19,6 +20,17 @@ import org.koin.ktor.ext.inject
 fun Route.userRoutes() {
     val authRepository by inject<AuthRepository>()
     val userRepository by inject<UserRepository>()
+    val eventRepository by inject<EventRepository>()
+
+    route("/users") {
+        get("/me/events") {
+            val token = call.token
+            val userInfo = authRepository.getUserInfo(token)
+
+            val events = eventRepository.findByUserEmail(userInfo.email)
+            call.respond(HttpStatusCode.OK, events)
+        }
+    }
 
     route("/orgs/{orgSlug}/users") {
         get {
