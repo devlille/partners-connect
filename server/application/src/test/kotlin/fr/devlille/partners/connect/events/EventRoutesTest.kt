@@ -111,4 +111,96 @@ class EventRoutesTest {
         val responseBody = response.bodyAsText()
         assert(Json.parseToJsonElement(responseBody).jsonArray.isNotEmpty())
     }
+
+    @Test
+    fun `GET orgs events returns events for organization with valid user`() = testApplication {
+        val orgId = UUID.randomUUID()
+        application {
+            moduleMocked()
+            val admin = insertMockedAdminUser()
+            val org = insertMockedOrganisationEntity(id = orgId, representativeUser = admin)
+            insertMockedOrgaPermission(orgId = orgId, user = admin)
+            insertMockedEventWithOrga(organisation = org)
+            insertMockedEventWithOrga(organisation = org)
+        }
+
+        val response = client.get("/orgs/$orgId/events") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val responseBody = response.bodyAsText()
+        val events = Json.parseToJsonElement(responseBody).jsonArray
+        assertEquals(2, events.size)
+    }
+
+    @Test
+    fun `GET orgs events returns empty list when organization has no events`() = testApplication {
+        val orgId = UUID.randomUUID()
+        application {
+            moduleMocked()
+            val admin = insertMockedAdminUser()
+            insertMockedOrganisationEntity(id = orgId, representativeUser = admin)
+            insertMockedOrgaPermission(orgId = orgId, user = admin)
+        }
+
+        val response = client.get("/orgs/$orgId/events") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val responseBody = response.bodyAsText()
+        val events = Json.parseToJsonElement(responseBody).jsonArray
+        assertEquals(0, events.size)
+    }
+
+    @Test
+    fun `GET orgs events returns 404 when organization does not exist`() = testApplication {
+        val nonExistentOrgId = UUID.randomUUID()
+        application {
+            moduleMocked()
+            val admin = insertMockedAdminUser()
+            // Don't create any organization or permissions - just test with non-existent org
+        }
+
+        val response = client.get("/orgs/$nonExistentOrgId/events") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+
+        assertEquals(HttpStatusCode.NotFound, response.status)
+    }
+
+    @Test
+    fun `GET orgs events returns 401 when user has no permissions`() = testApplication {
+        val orgId = UUID.randomUUID()
+        application {
+            moduleMocked()
+            val admin = insertMockedAdminUser()
+            val org = insertMockedOrganisationEntity(id = orgId, representativeUser = admin)
+            insertMockedEventWithOrga(organisation = org)
+            // No organization permission granted to user
+        }
+
+        val response = client.get("/orgs/$orgId/events") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+
+        assertEquals(HttpStatusCode.Unauthorized, response.status)
+    }
+
+    @Test
+    fun `GET orgs events returns 401 when no authorization header provided`() = testApplication {
+        val orgId = UUID.randomUUID()
+        application {
+            moduleMocked()
+            val admin = insertMockedAdminUser()
+            val org = insertMockedOrganisationEntity(id = orgId, representativeUser = admin)
+            insertMockedEventWithOrga(organisation = org)
+            insertMockedOrgaPermission(orgId = orgId, user = admin)
+        }
+
+        val response = client.get("/orgs/$orgId/events")
+
+        assertEquals(HttpStatusCode.Unauthorized, response.status)
+    }
 }

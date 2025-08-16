@@ -28,6 +28,11 @@ fun Route.eventRoutes() {
     route("orgs/{orgSlug}/events") {
         install(AuthorizedOrganisationPlugin)
 
+        get {
+            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Missing organisation slug")
+            call.respond(HttpStatusCode.OK, repository.findByOrgSlug(orgSlug))
+        }
+
         post {
             val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Missing organisation slug")
             val request = call.receive<Event>()
