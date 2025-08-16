@@ -2,7 +2,6 @@ package fr.devlille.partners.connect.partnership.application
 
 import fr.devlille.partners.connect.companies.application.mappers.toDomain
 import fr.devlille.partners.connect.companies.domain.Company
-import fr.devlille.partners.connect.companies.infrastructure.db.CompaniesTable
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
@@ -13,8 +12,6 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
 import fr.devlille.partners.connect.partnership.domain.PartnershipItem
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
-import fr.devlille.partners.connect.partnership.infrastructure.db.BillingsTable
-import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
@@ -27,7 +24,6 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslati
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPacksTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionalOptionsByPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listTranslationsByOptionAndLanguage
 import io.ktor.server.plugins.BadRequestException
@@ -36,11 +32,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toLocalDateTime
-import org.jetbrains.exposed.v1.core.SortOrder
-import org.jetbrains.exposed.v1.core.and
-import org.jetbrains.exposed.v1.core.or
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
-import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.time.format.DateTimeFormatter
 import java.util.UUID

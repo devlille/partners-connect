@@ -447,7 +447,9 @@ class PartnershipListRoutesTest {
             )
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventId/partnership?filter[pack_id]=$goldPackId&filter[suggestion]=true") {
+        val response = client.get(
+            "/orgs/$orgId/events/$eventId/partnership?filter[pack_id]=$goldPackId&filter[suggestion]=true",
+        ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 

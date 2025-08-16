@@ -14,7 +14,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class PartnershipRouteBasicTest {
-
     @Test
     fun `GET partnership route returns 200 with empty array`() = testApplication {
         val orgId = UUID.randomUUID()
