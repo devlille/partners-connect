@@ -502,7 +502,7 @@ class PartnershipListRoutesTest {
     }
 
     @Test
-    fun `GET returns 401 when user lacks organisation permissions`() = testApplication {
+    fun `GET returns 404 when user lacks organisation permissions`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
 
@@ -516,7 +516,7 @@ class PartnershipListRoutesTest {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
-        assertEquals(HttpStatusCode.Unauthorized, response.status)
+        assertEquals(HttpStatusCode.NotFound, response.status)
     }
 
     @Test
@@ -555,7 +555,7 @@ class PartnershipListRoutesTest {
     }
 
     @Test
-    fun `GET returns 400 when eventId is not a valid UUID`() = testApplication {
+    fun `GET returns 404 when eventId is not a valid UUID`() = testApplication {
         val orgId = UUID.randomUUID()
 
         application {
@@ -567,7 +567,7 @@ class PartnershipListRoutesTest {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
-        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals(HttpStatusCode.NotFound, response.status)
     }
 
     @Test
