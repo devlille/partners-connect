@@ -4,4 +4,6 @@ interface OrganisationRepository {
     fun create(entity: Organisation): String
 
     fun getById(slug: String): Organisation
+
+    fun update(orgSlug: String, data: Organisation): Organisation?
 }
