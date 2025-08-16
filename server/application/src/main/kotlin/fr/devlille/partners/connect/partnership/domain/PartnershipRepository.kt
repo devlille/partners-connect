@@ -14,5 +14,12 @@ interface PartnershipRepository {
 
     fun decline(eventId: UUID, partnershipId: UUID): UUID
 
+    fun listByEvent(
+        eventId: UUID,
+        filters: PartnershipFilters = PartnershipFilters(),
+        sort: String = "created",
+        direction: String = "asc",
+    ): List<PartnershipItem>
+
     fun listByCompany(companyId: UUID): List<PartnershipItem>
 }

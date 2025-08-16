@@ -8,9 +8,12 @@ import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.application.mappers.toDomain
 import fr.devlille.partners.connect.partnership.domain.Contact
 import fr.devlille.partners.connect.partnership.domain.Partnership
+import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
 import fr.devlille.partners.connect.partnership.domain.PartnershipItem
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
+import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
@@ -35,6 +38,7 @@ import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
+@Suppress("TooManyFunctions") // Required to support both listByEvent and listByCompany methods
 class PartnershipRepositoryExposed(
     private val partnershipEntity: UUIDEntityClass<PartnershipEntity> = PartnershipEntity,
     private val packEntity: UUIDEntityClass<SponsoringPackEntity> = SponsoringPackEntity,
@@ -145,6 +149,22 @@ class PartnershipRepositoryExposed(
         partnership.id.value
     }
 
+    override fun listByEvent(
+        eventId: UUID,
+        filters: PartnershipFilters,
+        sort: String,
+        direction: String,
+    ): List<PartnershipItem> = transaction {
+        EventEntity.findById(eventId)
+            ?: throw NotFoundException("Event with id $eventId not found")
+        val allPartnerships = PartnershipEntity.find { PartnershipsTable.eventId eq eventId }
+        val filteredPartnerships = allPartnerships.filter { partnership ->
+            matchesBasicFilters(partnership, filters) &&
+                matchesAdvancedFilters(partnership, filters, eventId)
+        }
+        filteredPartnerships.map { partnership -> mapToPartnershipItem(partnership) }
+    }
+
     override fun listByCompany(companyId: UUID): List<PartnershipItem> = transaction {
         // Check if the company exists first
         CompanyEntity.findById(companyId)
@@ -171,9 +191,68 @@ class PartnershipRepositoryExposed(
                     language = partnership.language,
                     phone = partnership.phone,
                     emails = emails,
-                    createdAt = partnership.createdAt.toString(),
+                    createdAt = partnership.createdAt,
                 )
             }
+    }
+
+    private fun matchesBasicFilters(partnership: PartnershipEntity, filters: PartnershipFilters): Boolean {
+        val packMatches = filters.packId?.let {
+            partnership.selectedPack?.id?.value == it.toUUID()
+        } ?: true
+
+        val validatedMatches = filters.validated?.let {
+            if (it) partnership.validatedAt != null else partnership.validatedAt == null
+        } ?: true
+
+        val suggestionMatches = filters.suggestion?.let {
+            if (it) partnership.suggestionPack != null else partnership.suggestionPack == null
+        } ?: true
+
+        return packMatches && validatedMatches && suggestionMatches
+    }
+
+    private fun matchesAdvancedFilters(
+        partnership: PartnershipEntity,
+        filters: PartnershipFilters,
+        eventId: UUID,
+    ): Boolean {
+        val paidMatches = filters.paid?.let {
+            val billing = BillingEntity.singleByEventAndPartnership(eventId, partnership.id.value)
+            if (it) billing?.status == InvoiceStatus.PAID else billing?.status != InvoiceStatus.PAID
+        } ?: true
+
+        val agreementGeneratedMatches = filters.agreementGenerated?.let {
+            if (it) partnership.agreementUrl != null else partnership.agreementUrl == null
+        } ?: true
+
+        val agreementSignedMatches = filters.agreementSigned?.let {
+            if (it) partnership.agreementSignedUrl != null else partnership.agreementSignedUrl == null
+        } ?: true
+
+        return paidMatches && agreementGeneratedMatches && agreementSignedMatches
+    }
+
+    private fun mapToPartnershipItem(partnership: PartnershipEntity): PartnershipItem {
+        val emails = PartnershipEmailEntity
+            .find { PartnershipEmailsTable.partnershipId eq partnership.id }
+            .map { it.email }
+
+        return PartnershipItem(
+            id = partnership.id.toString(),
+            contact = Contact(
+                displayName = partnership.contactName,
+                role = partnership.contactRole,
+            ),
+            companyName = partnership.company.name,
+            packName = partnership.selectedPack?.name,
+            suggestedPackName = partnership.suggestionPack?.name,
+            eventName = partnership.event.name,
+            language = partnership.language,
+            phone = partnership.phone,
+            emails = emails,
+            createdAt = partnership.createdAt,
+        )
     }
 
     private fun findPartnership(eventId: UUID, partnershipId: UUID): PartnershipEntity = partnershipEntity
