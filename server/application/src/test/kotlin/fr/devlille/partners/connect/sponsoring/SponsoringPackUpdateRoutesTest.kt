@@ -135,6 +135,7 @@ class SponsoringPackUpdateRoutesTest {
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId = UUID.randomUUID(), orgId)
         }
 
         val response = client.put("/orgs/$orgId/events/not-a-uuid/packs/$packId") {
@@ -143,7 +144,7 @@ class SponsoringPackUpdateRoutesTest {
             setBody(Json.encodeToString(createSponsoringPack()))
         }
 
-        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals(HttpStatusCode.NotFound, response.status)
     }
 
     @Test
@@ -163,7 +164,7 @@ class SponsoringPackUpdateRoutesTest {
             setBody(Json.encodeToString(createSponsoringPack()))
         }
 
-        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals(HttpStatusCode.NotFound, response.status)
     }
 
     @Test
@@ -189,7 +190,7 @@ class SponsoringPackUpdateRoutesTest {
     }
 
     @Test
-    fun `PUT fails with unauthorized when no token provided`() = testApplication {
+    fun `PUT fails with not found when no token provided`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
@@ -206,11 +207,11 @@ class SponsoringPackUpdateRoutesTest {
             setBody(Json.encodeToString(createSponsoringPack()))
         }
 
-        assertEquals(HttpStatusCode.Unauthorized, response.status)
+        assertEquals(HttpStatusCode.NotFound, response.status)
     }
 
     @Test
-    fun `PUT fails with unauthorized when user lacks org permission`() = testApplication {
+    fun `PUT fails with not found when user lacks org permission`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
@@ -228,7 +229,7 @@ class SponsoringPackUpdateRoutesTest {
             setBody(Json.encodeToString(createSponsoringPack()))
         }
 
-        assertEquals(HttpStatusCode.Unauthorized, response.status)
+        assertEquals(HttpStatusCode.NotFound, response.status)
     }
 
     @Test
@@ -286,7 +287,7 @@ class SponsoringPackUpdateRoutesTest {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
             insertMockedEventWithAdminUser(eventId, orgId)
-            insertMockedEventWithAdminUser(otherEventId, orgId)
+            insertMockedEvent(otherEventId, orgId = orgId)
             // Pack belongs to otherEventId, not eventId
             insertMockedSponsoringPack(id = packId, event = otherEventId)
         }
