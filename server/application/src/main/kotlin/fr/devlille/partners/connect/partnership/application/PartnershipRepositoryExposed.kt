@@ -153,10 +153,41 @@ class PartnershipRepositoryExposed(
         sort: String,
         direction: String,
     ): List<PartnershipItem> = transaction {
-        // Get all partnerships for the event using entity approach for now
-        val partnerships = PartnershipEntity.find { PartnershipsTable.eventId eq eventId }
+        // Get all partnerships for the event first
+        val allPartnerships = PartnershipEntity.find { PartnershipsTable.eventId eq eventId }
 
-        val result = partnerships.map { partnership ->
+        // Apply filters using in-memory filtering for now (can optimize later)
+        val filteredPartnerships = allPartnerships.filter { partnership ->
+            var matches = true
+
+            // Filter by pack ID
+            filters.packId?.let { packIdStr ->
+                val packId = packIdStr.toUUID()
+                matches = matches && (partnership.selectedPack?.id?.value == packId)
+            }
+
+            // Filter by validation status
+            filters.validated?.let { validated ->
+                matches = matches && if (validated) {
+                    partnership.validatedAt != null
+                } else {
+                    partnership.validatedAt == null
+                }
+            }
+
+            // Filter by suggestion status
+            filters.suggestion?.let { hasSuggestion ->
+                matches = matches && if (hasSuggestion) {
+                    partnership.suggestionPack != null
+                } else {
+                    partnership.suggestionPack == null
+                }
+            }
+
+            matches
+        }
+
+        val result = filteredPartnerships.map { partnership ->
             // Get emails for this partnership
             val emails = PartnershipEmailEntity
                 .find { PartnershipEmailsTable.partnershipId eq partnership.id }

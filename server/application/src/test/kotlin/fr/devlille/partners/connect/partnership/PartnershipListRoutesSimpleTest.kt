@@ -7,12 +7,13 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipItem
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
-import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
+import kotlinx.serialization.json.Json
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -34,7 +35,7 @@ class PartnershipListRoutesSimpleTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = response.body<List<PartnershipItem>>()
+        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
         assertEquals(0, partnerships.size)
     }
 
@@ -81,7 +82,7 @@ class PartnershipListRoutesSimpleTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = response.body<List<PartnershipItem>>()
+        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
         assertEquals(1, partnerships.size)
 
         val partnership = partnerships[0]

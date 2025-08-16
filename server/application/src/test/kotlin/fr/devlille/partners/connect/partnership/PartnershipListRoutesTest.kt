@@ -9,15 +9,16 @@ import fr.devlille.partners.connect.partnership.factories.insertMockedPartnershi
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
-import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.json.Json
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -67,7 +68,7 @@ class PartnershipListRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = response.body<List<PartnershipItem>>()
+        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
         assertEquals(2, partnerships.size)
 
         // Verify first partnership
@@ -123,7 +124,7 @@ class PartnershipListRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = response.body<List<PartnershipItem>>()
+        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
         assertEquals(1, partnerships.size)
         assertEquals("John Doe", partnerships[0].contact.displayName)
         assertEquals("Gold Pack", partnerships[0].packName)
@@ -167,7 +168,7 @@ class PartnershipListRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = response.body<List<PartnershipItem>>()
+        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
         assertEquals(1, partnerships.size)
         assertEquals("John Doe", partnerships[0].contact.displayName)
     }
@@ -210,7 +211,7 @@ class PartnershipListRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = response.body<List<PartnershipItem>>()
+        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
         assertEquals(1, partnerships.size)
         assertEquals("Jane Smith", partnerships[0].contact.displayName)
     }
@@ -255,7 +256,7 @@ class PartnershipListRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = response.body<List<PartnershipItem>>()
+        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
         assertEquals(1, partnerships.size)
         val partnership = partnerships[0]
         assertEquals("John Doe", partnership.contact.displayName)
@@ -307,7 +308,7 @@ class PartnershipListRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = response.body<List<PartnershipItem>>()
+        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
         assertEquals(1, partnerships.size)
         assertEquals("John Doe", partnerships[0].contact.displayName)
     }
@@ -350,7 +351,7 @@ class PartnershipListRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = response.body<List<PartnershipItem>>()
+        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
         assertEquals(1, partnerships.size)
         assertEquals("John Doe", partnerships[0].contact.displayName)
     }
@@ -398,8 +399,8 @@ class PartnershipListRoutesTest {
         assertEquals(HttpStatusCode.OK, responseAsc.status)
         assertEquals(HttpStatusCode.OK, responseDesc.status)
 
-        val partnershipsAsc = responseAsc.body<List<PartnershipItem>>()
-        val partnershipsDesc = responseDesc.body<List<PartnershipItem>>()
+        val partnershipsAsc = Json.decodeFromString<List<PartnershipItem>>(responseAsc.bodyAsText())
+        val partnershipsDesc = Json.decodeFromString<List<PartnershipItem>>(responseDesc.bodyAsText())
 
         assertEquals(2, partnershipsAsc.size)
         assertEquals(2, partnershipsDesc.size)
@@ -454,7 +455,7 @@ class PartnershipListRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = response.body<List<PartnershipItem>>()
+        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
         assertEquals(1, partnerships.size)
         assertEquals("John Doe", partnerships[0].contact.displayName)
         assertEquals("Gold Pack", partnerships[0].packName)
@@ -480,7 +481,7 @@ class PartnershipListRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = response.body<List<PartnershipItem>>()
+        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
         assertTrue(partnerships.isEmpty())
     }
 
@@ -601,7 +602,7 @@ class PartnershipListRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = response.body<List<PartnershipItem>>()
+        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
         assertEquals(1, partnerships.size)
 
         val partnership = partnerships[0]
