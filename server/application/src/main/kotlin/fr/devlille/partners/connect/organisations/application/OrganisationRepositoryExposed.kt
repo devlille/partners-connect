@@ -2,14 +2,20 @@ package fr.devlille.partners.connect.organisations.application
 
 import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
 import fr.devlille.partners.connect.organisations.application.mappers.toDomain
+import fr.devlille.partners.connect.organisations.application.mappers.toListResponse
 import fr.devlille.partners.connect.organisations.domain.Organisation
+import fr.devlille.partners.connect.organisations.domain.OrganisationListResponse
 import fr.devlille.partners.connect.organisations.domain.OrganisationRepository
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionEntity
+import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionsTable
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
 import io.ktor.server.plugins.NotFoundException
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import java.util.UUID
 
 class OrganisationRepositoryExposed : OrganisationRepository {
     override fun create(entity: Organisation): String = transaction {
@@ -71,5 +77,35 @@ class OrganisationRepositoryExposed : OrganisationRepository {
             this.representativeRole = data.representativeRole
         }
         entity.toDomain()
+    }
+
+    override fun findByOrganizerId(userId: UUID): List<Organisation> = transaction {
+        OrganisationPermissionEntity
+            .find {
+                (OrganisationPermissionsTable.userId eq userId) and
+                    (OrganisationPermissionsTable.canEdit eq true)
+            }
+            .map { it.organisation.toDomain() }
+    }
+
+    override fun findOrganisationListByOrganizerId(userId: UUID): List<OrganisationListResponse> = transaction {
+        OrganisationPermissionEntity
+            .find {
+                (OrganisationPermissionsTable.userId eq userId) and
+                    (OrganisationPermissionsTable.canEdit eq true)
+            }
+            .map { it.organisation.toListResponse() }
+    }
+
+    override fun findOrganisationListByUserEmail(userEmail: String): List<OrganisationListResponse> = transaction {
+        val user = UserEntity.singleUserByEmail(userEmail)
+            ?: throw NotFoundException("User with email $userEmail not found")
+
+        OrganisationPermissionEntity
+            .find {
+                (OrganisationPermissionsTable.userId eq user.id.value) and
+                    (OrganisationPermissionsTable.canEdit eq true)
+            }
+            .map { it.organisation.toListResponse() }
     }
 }
