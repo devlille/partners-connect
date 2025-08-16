@@ -13,4 +13,11 @@ interface PartnershipRepository {
     fun validate(eventId: UUID, partnershipId: UUID): UUID
 
     fun decline(eventId: UUID, partnershipId: UUID): UUID
+
+    fun listByEvent(
+        eventId: UUID,
+        filters: PartnershipFilters = PartnershipFilters(),
+        sort: String = "created",
+        direction: String = "asc",
+    ): List<PartnershipItem>
 }

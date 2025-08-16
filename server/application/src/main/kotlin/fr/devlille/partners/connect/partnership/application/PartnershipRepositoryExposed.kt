@@ -6,13 +6,17 @@ import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.application.mappers.toDomain
+import fr.devlille.partners.connect.partnership.domain.ContactInfo
 import fr.devlille.partners.connect.partnership.domain.Partnership
+import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
+import fr.devlille.partners.connect.partnership.domain.PartnershipItem
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.listByPartnershipAndPack
 import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndCompany
 import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndPartnership
@@ -26,9 +30,11 @@ import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 class PartnershipRepositoryExposed(
@@ -139,6 +145,72 @@ class PartnershipRepositoryExposed(
         val partnership = findPartnership(eventId, partnershipId)
         partnership.declinedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
         partnership.id.value
+    }
+
+    override fun listByEvent(
+        eventId: UUID,
+        filters: PartnershipFilters,
+        sort: String,
+        direction: String,
+    ): List<PartnershipItem> = transaction {
+        // Get all partnerships for the event first
+        val allPartnerships = PartnershipEntity.find { PartnershipsTable.eventId eq eventId }
+
+        // Apply filters using in-memory filtering for now (can optimize later)
+        val filteredPartnerships = allPartnerships.filter { partnership ->
+            var matches = true
+
+            // Filter by pack ID
+            filters.packId?.let { packIdStr ->
+                val packId = packIdStr.toUUID()
+                matches = matches && (partnership.selectedPack?.id?.value == packId)
+            }
+
+            // Filter by validation status
+            filters.validated?.let { validated ->
+                matches = matches && if (validated) {
+                    partnership.validatedAt != null
+                } else {
+                    partnership.validatedAt == null
+                }
+            }
+
+            // Filter by suggestion status
+            filters.suggestion?.let { hasSuggestion ->
+                matches = matches && if (hasSuggestion) {
+                    partnership.suggestionPack != null
+                } else {
+                    partnership.suggestionPack == null
+                }
+            }
+
+            matches
+        }
+
+        val result = filteredPartnerships.map { partnership ->
+            // Get emails for this partnership
+            val emails = PartnershipEmailEntity
+                .find { PartnershipEmailsTable.partnershipId eq partnership.id }
+                .map { it.email }
+
+            PartnershipItem(
+                id = partnership.id.toString(),
+                contact = ContactInfo(
+                    displayName = partnership.contactName,
+                    role = partnership.contactRole,
+                ),
+                companyName = partnership.company.name,
+                packName = partnership.selectedPack?.name ?: "Unknown",
+                suggestedPackName = partnership.suggestionPack?.name,
+                language = partnership.language,
+                phone = partnership.phone,
+                emails = emails,
+                createdAt = partnership.createdAt.toJavaLocalDateTime()
+                    .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+            )
+        }
+
+        result.toList()
     }
 
     private fun findPartnership(eventId: UUID, partnershipId: UUID): PartnershipEntity = partnershipEntity
