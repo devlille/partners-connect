@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class OrganisationListResponse(
+data class OrganisationItem(
     val name: String,
     val slug: String,
     @SerialName("head_office")

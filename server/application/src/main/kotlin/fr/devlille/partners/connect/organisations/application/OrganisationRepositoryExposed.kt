@@ -1,10 +1,9 @@
 package fr.devlille.partners.connect.organisations.application
 
 import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
-import fr.devlille.partners.connect.organisations.application.mappers.toDomain
-import fr.devlille.partners.connect.organisations.application.mappers.toListResponse
+import fr.devlille.partners.connect.organisations.application.mappers.*
 import fr.devlille.partners.connect.organisations.domain.Organisation
-import fr.devlille.partners.connect.organisations.domain.OrganisationListResponse
+import fr.devlille.partners.connect.organisations.domain.OrganisationItem
 import fr.devlille.partners.connect.organisations.domain.OrganisationRepository
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug
@@ -45,7 +44,7 @@ class OrganisationRepositoryExposed : OrganisationRepository {
     }
 
     override fun getById(slug: String): Organisation = transaction {
-        OrganisationEntity.findBySlug(slug)?.toDomain()
+        OrganisationEntity.findBySlug(slug)?.toFullDomain()
             ?: throw NotFoundException("Organisation with slug $slug not found")
     }
 
@@ -75,10 +74,10 @@ class OrganisationRepositoryExposed : OrganisationRepository {
             this.representativeUser = representativeUser
             this.representativeRole = data.representativeRole
         }
-        entity.toDomain()
+        entity.toFullDomain()
     }
 
-    override fun findOrganisationListByUserEmail(userEmail: String): List<OrganisationListResponse> = transaction {
+    override fun findOrganisationListByUserEmail(userEmail: String): List<OrganisationItem> = transaction {
         val user = UserEntity.singleUserByEmail(userEmail)
             ?: throw NotFoundException("User with email $userEmail not found")
 
@@ -87,6 +86,6 @@ class OrganisationRepositoryExposed : OrganisationRepository {
                 (OrganisationPermissionsTable.userId eq user.id.value) and
                     (OrganisationPermissionsTable.canEdit eq true)
             }
-            .map { it.organisation.toListResponse() }
+            .map { it.organisation.toDomain() }
     }
 }

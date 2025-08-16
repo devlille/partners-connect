@@ -1,10 +1,10 @@
 package fr.devlille.partners.connect.organisations.application.mappers
 
-import fr.devlille.partners.connect.organisations.domain.OrganisationListResponse
+import fr.devlille.partners.connect.organisations.domain.OrganisationItem
 import fr.devlille.partners.connect.organisations.domain.Owner
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 
-fun OrganisationEntity.toListResponse(): OrganisationListResponse = OrganisationListResponse(
+fun OrganisationEntity.toDomain(): OrganisationItem = OrganisationItem(
     name = this.name,
     slug = this.slug,
     headOffice = this.headOffice,
