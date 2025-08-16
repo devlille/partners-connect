@@ -7,6 +7,8 @@ interface OptionRepository {
 
     fun createOption(eventId: UUID, input: CreateSponsoringOption): UUID
 
+    fun updateOption(eventId: UUID, optionId: UUID, input: CreateSponsoringOption): UUID
+
     fun deleteOption(eventId: UUID, optionId: UUID)
 
     fun attachOptionsToPack(eventId: UUID, packId: UUID, options: AttachOptionsToPack)

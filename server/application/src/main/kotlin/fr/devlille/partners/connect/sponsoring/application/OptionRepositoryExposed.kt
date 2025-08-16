@@ -49,6 +49,26 @@ class OptionRepositoryExposed(
         option.id.value
     }
 
+    override fun updateOption(eventId: UUID, optionId: UUID, input: CreateSponsoringOption): UUID = transaction {
+        val option = optionEntity.findById(optionId) ?: throw NotFoundException("Option not found")
+        if (option.event.id.value != eventId) throw NotFoundException("Option not found")
+
+        option.price = input.price
+
+        // Replace translations - delete existing and insert new ones
+        OptionTranslationsTable.deleteWhere { OptionTranslationsTable.option eq optionId }
+        input.translations.forEach { translation ->
+            OptionTranslationEntity.new {
+                this.option = option
+                this.language = translation.language
+                this.name = translation.name
+                this.description = translation.description
+            }
+        }
+
+        option.id.value
+    }
+
     override fun deleteOption(eventId: UUID, optionId: UUID) = transaction {
         val isUsed = PackOptionsTable
             .listOptionsAttachedByEventAndOption(eventId, optionId)

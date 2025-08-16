@@ -15,6 +15,7 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
+import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
@@ -89,6 +90,13 @@ private fun Route.optionRoutes() {
             val request = call.receive<CreateSponsoringOption>()
             val optionId = repository.createOption(eventId = eventId, input = request)
             call.respond(HttpStatusCode.Created, mapOf("id" to optionId.toString()))
+        }
+        put("/{optionId}") {
+            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val optionId = call.parameters["optionId"]?.toUUID() ?: throw BadRequestException("Missing option id")
+            val input = call.receive<CreateSponsoringOption>()
+            val updatedId = repository.updateOption(eventId = eventId, optionId = optionId, input = input)
+            call.respond(HttpStatusCode.OK, mapOf("id" to updatedId.toString()))
         }
         delete("/{optionId}") {
             val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
