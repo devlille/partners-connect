@@ -2,17 +2,24 @@ package fr.devlille.partners.connect.partnership.application
 
 import fr.devlille.partners.connect.companies.application.mappers.toDomain
 import fr.devlille.partners.connect.companies.domain.Company
+import fr.devlille.partners.connect.companies.infrastructure.db.CompaniesTable
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.application.mappers.toDomain
+import fr.devlille.partners.connect.partnership.domain.ContactInfo
 import fr.devlille.partners.connect.partnership.domain.Partnership
+import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
+import fr.devlille.partners.connect.partnership.domain.PartnershipItem
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
+import fr.devlille.partners.connect.partnership.infrastructure.db.BillingsTable
+import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.listByPartnershipAndPack
 import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndCompany
 import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndPartnership
@@ -20,15 +27,22 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslati
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPacksTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionalOptionsByPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listTranslationsByOptionAndLanguage
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.or
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
+import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 class PartnershipRepositoryExposed(
@@ -139,6 +153,96 @@ class PartnershipRepositoryExposed(
         val partnership = findPartnership(eventId, partnershipId)
         partnership.declinedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
         partnership.id.value
+    }
+
+    override fun listByEvent(
+        eventId: UUID,
+        filters: PartnershipFilters,
+        sort: String,
+        direction: String,
+    ): List<PartnershipItem> = transaction {
+        val baseQuery = PartnershipsTable
+            .innerJoin(CompaniesTable)
+            .innerJoin(SponsoringPacksTable)
+            .leftJoin(BillingsTable)
+            .selectAll()
+
+        val filteredQuery = baseQuery.where {
+            var condition = PartnershipsTable.eventId eq eventId
+
+            // Apply filters
+            if (filters.validated == true) {
+                condition = condition and PartnershipsTable.validatedAt.isNotNull()
+            } else if (filters.validated == false) {
+                condition = condition and PartnershipsTable.validatedAt.isNull()
+            }
+
+            if (filters.suggestion == true) {
+                condition = condition and PartnershipsTable.suggestionPackId.isNotNull()
+            } else if (filters.suggestion == false) {
+                condition = condition and PartnershipsTable.suggestionPackId.isNull()
+            }
+
+            filters.packId?.let { packId ->
+                condition = condition and (PartnershipsTable.selectedPackId eq packId.toUUID())
+            }
+
+            if (filters.paid == true) {
+                condition = condition and (BillingsTable.status eq InvoiceStatus.PAID)
+            } else if (filters.paid == false) {
+                condition = condition and ((BillingsTable.status neq InvoiceStatus.PAID) or BillingsTable.status.isNull())
+            }
+
+            if (filters.agreementGenerated == true) {
+                condition = condition and PartnershipsTable.agreementUrl.isNotNull()
+            } else if (filters.agreementGenerated == false) {
+                condition = condition and PartnershipsTable.agreementUrl.isNull()
+            }
+
+            if (filters.agreementSigned == true) {
+                condition = condition and PartnershipsTable.agreementSignedUrl.isNotNull()
+            } else if (filters.agreementSigned == false) {
+                condition = condition and PartnershipsTable.agreementSignedUrl.isNull()
+            }
+
+            condition
+        }
+
+        val sortedQuery = filteredQuery.orderBy(
+            PartnershipsTable.createdAt,
+            if (direction.lowercase() == "desc") SortOrder.DESC else SortOrder.ASC,
+        )
+
+        val partnerships = sortedQuery.map { row ->
+            // Get emails for partnership
+            val partnershipId = row[PartnershipsTable.id]
+            val emails = PartnershipEmailEntity
+                .find { PartnershipEmailsTable.partnershipId eq partnershipId }
+                .map { it.email }
+
+            // Get suggestion pack name if exists
+            val suggestionPackName = row.getOrNull(PartnershipsTable.suggestionPackId)?.let { suggestionPackId ->
+                SponsoringPackEntity.findById(suggestionPackId)?.name
+            }
+
+            PartnershipItem(
+                id = row[PartnershipsTable.id].toString(),
+                contact = ContactInfo(
+                    displayName = row[PartnershipsTable.contactName],
+                    role = row[PartnershipsTable.contactRole],
+                ),
+                companyName = row[CompaniesTable.name],
+                packName = row[SponsoringPacksTable.name],
+                suggestedPackName = suggestionPackName,
+                language = row[PartnershipsTable.language],
+                phone = row[PartnershipsTable.phone],
+                emails = emails,
+                createdAt = row[PartnershipsTable.createdAt].toJavaLocalDateTime()
+                    .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+            )
+        }
+
+        partnerships
     }
 
     private fun findPartnership(eventId: UUID, partnershipId: UUID): PartnershipEntity = partnershipEntity
