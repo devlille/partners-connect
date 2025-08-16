@@ -163,7 +163,7 @@ class PartnershipRepositoryExposed(
     ): List<PartnershipItem> = transaction {
         val baseQuery = PartnershipsTable
             .innerJoin(CompaniesTable)
-            .innerJoin(SponsoringPacksTable)
+            .leftJoin(SponsoringPacksTable)
             .leftJoin(BillingsTable)
             .selectAll()
 
@@ -232,7 +232,7 @@ class PartnershipRepositoryExposed(
                     role = row[PartnershipsTable.contactRole],
                 ),
                 companyName = row[CompaniesTable.name],
-                packName = row[SponsoringPacksTable.name],
+                packName = row.getOrNull(SponsoringPacksTable.name) ?: "Unknown",
                 suggestedPackName = suggestionPackName,
                 language = row[PartnershipsTable.language],
                 phone = row[PartnershipsTable.phone],
