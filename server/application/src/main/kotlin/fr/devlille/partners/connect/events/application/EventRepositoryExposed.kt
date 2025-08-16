@@ -5,11 +5,17 @@ import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventSummary
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
+import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationsTable
 import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionsTable
 import io.ktor.server.plugins.NotFoundException
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.queries.Query
+import org.jetbrains.exposed.v1.queries.innerJoin
 import java.util.UUID
 
 class EventRepositoryExposed(
@@ -69,5 +75,33 @@ class EventRepositoryExposed(
         entity.contactPhone = event.contact.phone
         entity.contactEmail = event.contact.email
         entity.id.value
+    }
+
+    override fun findByOrganizerId(userId: UUID): List<EventSummary> = transaction {
+        EventsTable
+            .innerJoin(OrganisationsTable, { organisationId }, { id })
+            .innerJoin(OrganisationPermissionsTable, { OrganisationsTable.id }, { organisationId })
+            .select(
+                EventsTable.id,
+                EventsTable.name,
+                EventsTable.startTime,
+                EventsTable.endTime,
+                EventsTable.submissionStartTime,
+                EventsTable.submissionEndTime
+            )
+            .where {
+                (OrganisationPermissionsTable.userId eq userId) and
+                    (OrganisationPermissionsTable.canEdit eq true)
+            }
+            .map { row ->
+                EventSummary(
+                    id = row[EventsTable.id].value.toString(),
+                    name = row[EventsTable.name],
+                    startTime = row[EventsTable.startTime],
+                    endTime = row[EventsTable.endTime],
+                    submissionStartTime = row[EventsTable.submissionStartTime],
+                    submissionEndTime = row[EventsTable.submissionEndTime],
+                )
+            }
     }
 }

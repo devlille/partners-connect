@@ -5,12 +5,14 @@ import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.users.domain.User
 import fr.devlille.partners.connect.users.domain.UserRepository
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionEntity
+import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionsTable
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import fr.devlille.partners.connect.users.infrastructure.db.hasPermission
 import fr.devlille.partners.connect.users.infrastructure.db.listUserGrantedByOrgId
 import fr.devlille.partners.connect.users.infrastructure.db.singleEventPermission
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
 import io.ktor.server.plugins.NotFoundException
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class UserRepositoryExposed : UserRepository {
@@ -41,6 +43,14 @@ class UserRepositoryExposed : UserRepository {
             ?: throw NotFoundException("Organisation with slug: $orgSlug not found")
         OrganisationPermissionEntity
             .hasPermission(organisationId = organisation.id.value, userId = user.id.value)
+    }
+
+    override fun hasAnyOrganizerPermission(email: String): Boolean = transaction {
+        val user = UserEntity.singleUserByEmail(email)
+            ?: throw NotFoundException("User with email $email not found")
+        !OrganisationPermissionEntity
+            .find { (OrganisationPermissionsTable.userId eq user.id.value) and (OrganisationPermissionsTable.canEdit eq true) }
+            .empty()
     }
 
     override fun grantUsers(orgSlug: String, userEmails: List<String>) = transaction {
