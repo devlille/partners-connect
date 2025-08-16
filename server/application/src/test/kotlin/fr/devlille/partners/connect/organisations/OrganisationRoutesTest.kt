@@ -108,7 +108,7 @@ class OrganisationRoutesTest {
             insertMockedOrganisationEntity(
                 id = orgId,
                 name = "Original Name",
-                representativeUser = adminUser
+                representativeUser = adminUser,
             )
             insertMockedOrgaPermission(orgId = orgId, user = adminUser)
         }
@@ -151,7 +151,7 @@ class OrganisationRoutesTest {
             insertMockedOrganisationEntity(
                 id = orgId,
                 name = "Test Org",
-                representativeUser = adminUser
+                representativeUser = adminUser,
             )
         }
 
@@ -174,7 +174,7 @@ class OrganisationRoutesTest {
             insertMockedOrganisationEntity(
                 id = orgId,
                 name = "Protected Org",
-                representativeUser = adminUser
+                representativeUser = adminUser,
             )
             // Note: not granting permission to admin user for this org
             insertMockedUser(email = nonOwnerEmail)
@@ -216,7 +216,7 @@ class OrganisationRoutesTest {
             insertMockedOrganisationEntity(
                 id = orgId,
                 name = "Test Org",
-                representativeUser = adminUser
+                representativeUser = adminUser,
             )
             insertMockedOrgaPermission(orgId = orgId, user = adminUser)
         }
