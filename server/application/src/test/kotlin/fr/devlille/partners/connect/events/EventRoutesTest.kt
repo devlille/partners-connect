@@ -220,10 +220,31 @@ class EventRoutesTest {
         assertEquals(HttpStatusCode.OK, response.status)
         val responseBody = response.bodyAsText()
         val eventWithOrg = Json.parseToJsonElement(responseBody).jsonObject
-        
+
         // Verify response structure
         assert(eventWithOrg.containsKey("event"))
         assert(eventWithOrg.containsKey("organisation"))
+
+        // Verify event structure
+        val eventObject = eventWithOrg["event"]?.jsonObject
+        assertNotNull(eventObject)
+        assert(eventObject!!.containsKey("name"))
+        assert(eventObject.containsKey("start_time"))
+        assert(eventObject.containsKey("end_time"))
+        assert(eventObject.containsKey("submission_start_time"))
+        assert(eventObject.containsKey("submission_end_time"))
+        assert(eventObject.containsKey("address"))
+        assert(eventObject.containsKey("contact"))
+
+        // Verify organisation structure
+        val organisationObject = eventWithOrg["organisation"]?.jsonObject
+        assertNotNull(organisationObject)
+        assert(organisationObject!!.containsKey("name"))
+        assert(organisationObject.containsKey("head_office"))
+        assert(organisationObject.containsKey("representative_user_email"))
+        assert(organisationObject.containsKey("representative_role"))
+        assert(organisationObject.containsKey("created_at"))
+        assert(organisationObject.containsKey("published_at"))
     }
 
     @Test
