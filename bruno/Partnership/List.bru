@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_id/partnership?sort=created&direction=asc&filter[validated]=false
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_id/partnership?sort=created&direction=asc
   body: none
   auth: none
 }
@@ -13,7 +13,7 @@ get {
 params:query {
   sort: created
   direction: asc
-  filter[validated]: false
+  ~filter[validated]: false
   ~filter[agreement-generated]: false
   ~filter[agreement-signed]: false
   ~filter[pack_id]: {{pack_id}}

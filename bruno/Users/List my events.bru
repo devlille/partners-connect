@@ -1,0 +1,15 @@
+meta {
+  name: List my events
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{scheme}}://{{base_url}}/users/me/events
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}

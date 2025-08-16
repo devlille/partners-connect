@@ -1,0 +1,39 @@
+meta {
+  name: Update
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_id/options/:option_id
+  body: json
+  auth: none
+}
+
+params:path {
+  option_id: 75ef28bd-08b6-496c-b070-5553fed1c6e8
+  org_slug: {{org_slug}}
+  event_id: {{event_id}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "translations": [
+      {
+        "language": "fr",
+        "name": "Communication vidéo",
+        "description": "Une communication vidéo est mise en avant sur votre espace partenaire sur nos supports de communication"
+      },
+      {
+        "language": "en",
+        "name": "Communication video",
+        "description": "A communication video is published on your partner page in our different digital support"
+      }
+    ],
+    "price": 100
+  }
+}

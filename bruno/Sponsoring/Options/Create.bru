@@ -1,18 +1,17 @@
 meta {
-  name: Delete Option
+  name: Create
   type: http
-  seq: 6
+  seq: 2
 }
 
-delete {
-  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_id/options/:option_id
+post {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_id/options
   body: json
   auth: none
 }
 
 params:path {
   org_slug: {{org_slug}}
-  option_id: df1a72b3-0d8a-42dd-81db-9651260b4254
   event_id: {{event_id}}
 }
 

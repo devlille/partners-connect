@@ -1,10 +1,10 @@
 meta {
-  name: Get
+  name: Update
   type: http
-  seq: 3
+  seq: 2
 }
 
-get {
+put {
   url: {{scheme}}://{{base_url}}/orgs/:org_slug
   body: json
   auth: none
@@ -16,6 +16,7 @@ params:path {
 
 headers {
   Content-Type: application/json
+  Authorization: Bearer {{token}}
 }
 
 body:json {

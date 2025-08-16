@@ -1,12 +1,12 @@
 meta {
-  name: Create Pack
+  name: List
   type: http
-  seq: 2
+  seq: 1
 }
 
-post {
+get {
   url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_id/packs
-  body: json
+  body: none
   auth: none
 }
 
@@ -16,6 +16,7 @@ params:path {
 }
 
 headers {
+  Accept-Language: fr
   Authorization: Bearer {{token}}
 }
 
@@ -23,13 +24,6 @@ body:json {
   {
     "name": "Gold",
     "price": 9000,
-    "with_booth": true,
-    "nb_tickets": 10,
-    "max_quantity": 20
+    "maxQuantity": 20
   }
-}
-
-script:post-response {
-  let data = res.getBody();
-  bru.setEnvVar("pack_id", data.id)
 }
