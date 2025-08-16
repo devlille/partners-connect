@@ -164,39 +164,39 @@ class PartnershipRepositoryExposed(
     }
 
     private fun matchesBasicFilters(partnership: PartnershipEntity, filters: PartnershipFilters): Boolean {
-        val packMatches = filters.packId?.let { 
-            partnership.selectedPack?.id?.value == it.toUUID() 
+        val packMatches = filters.packId?.let {
+            partnership.selectedPack?.id?.value == it.toUUID()
         } ?: true
-        
-        val validatedMatches = filters.validated?.let { 
-            if (it) partnership.validatedAt != null else partnership.validatedAt == null 
+
+        val validatedMatches = filters.validated?.let {
+            if (it) partnership.validatedAt != null else partnership.validatedAt == null
         } ?: true
-        
-        val suggestionMatches = filters.suggestion?.let { 
-            if (it) partnership.suggestionPack != null else partnership.suggestionPack == null 
+
+        val suggestionMatches = filters.suggestion?.let {
+            if (it) partnership.suggestionPack != null else partnership.suggestionPack == null
         } ?: true
-        
+
         return packMatches && validatedMatches && suggestionMatches
     }
 
     private fun matchesAdvancedFilters(
-        partnership: PartnershipEntity, 
-        filters: PartnershipFilters, 
-        eventId: UUID
+        partnership: PartnershipEntity,
+        filters: PartnershipFilters,
+        eventId: UUID,
     ): Boolean {
         val paidMatches = filters.paid?.let {
             val billing = BillingEntity.singleByEventAndPartnership(eventId, partnership.id.value)
             if (it) billing?.status == InvoiceStatus.PAID else billing?.status != InvoiceStatus.PAID
         } ?: true
-        
-        val agreementGeneratedMatches = filters.agreementGenerated?.let { 
-            if (it) partnership.agreementUrl != null else partnership.agreementUrl == null 
+
+        val agreementGeneratedMatches = filters.agreementGenerated?.let {
+            if (it) partnership.agreementUrl != null else partnership.agreementUrl == null
         } ?: true
-        
-        val agreementSignedMatches = filters.agreementSigned?.let { 
-            if (it) partnership.agreementSignedUrl != null else partnership.agreementSignedUrl == null 
+
+        val agreementSignedMatches = filters.agreementSigned?.let {
+            if (it) partnership.agreementSignedUrl != null else partnership.agreementSignedUrl == null
         } ?: true
-        
+
         return paidMatches && agreementGeneratedMatches && agreementSignedMatches
     }
 
