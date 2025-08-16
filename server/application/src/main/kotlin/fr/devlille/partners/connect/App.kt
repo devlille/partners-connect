@@ -195,6 +195,22 @@ private fun Application.configureCors() {
         allowMethod(HttpMethod.Delete)
         allowMethod(HttpMethod.Patch)
         allowHeader(HttpHeaders.Authorization)
+        allowHeader(HttpHeaders.ContentType)
+        allowHeader(HttpHeaders.AcceptLanguage)
+
+        // Allow localhost for development
+        allowHost("localhost:3000")
+        allowHost("localhost:8080")
+        allowHost("127.0.0.1:3000")
+        allowHost("127.0.0.1:8080")
+        allowHost(
+            "localhost:3000",
+            schemes = listOf("http", "https"),
+        )
+        allowHost(
+            "localhost:8080",
+            schemes = listOf("http", "https"),
+        )
     }
 }
 
