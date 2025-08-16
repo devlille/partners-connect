@@ -43,4 +43,33 @@ class OrganisationRepositoryExposed : OrganisationRepository {
         OrganisationEntity.findBySlug(slug)?.toDomain()
             ?: throw NotFoundException("Organisation with slug $slug not found")
     }
+
+    override fun update(orgSlug: String, data: Organisation): Organisation = transaction {
+        val entity = OrganisationEntity.findBySlug(orgSlug)
+            ?: throw NotFoundException("Organisation with slug $orgSlug not found")
+
+        val representativeUser = UserEntity.singleUserByEmail(data.representativeUserEmail)
+            ?: throw NotFoundException("User with email ${data.representativeUserEmail} not found")
+
+        entity.apply {
+            this.name = data.name
+            this.headOffice = data.headOffice
+            this.siret = data.siret
+            this.siren = data.siren
+            this.tva = data.tva
+            this.dAndB = data.dAndB
+            this.nace = data.nace
+            this.naf = data.naf
+            this.duns = data.duns
+            this.iban = data.iban
+            this.bic = data.bic
+            this.ribUrl = data.ribUrl
+            this.creationLocation = data.creationLocation
+            this.createdAt = data.createdAt
+            this.publishedAt = data.publishedAt
+            this.representativeUser = representativeUser
+            this.representativeRole = data.representativeRole
+        }
+        entity.toDomain()
+    }
 }
