@@ -40,6 +40,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
+@Suppress("TooManyFunctions") // Required to support both listByEvent and listByCompany methods
 class PartnershipRepositoryExposed(
     private val partnershipEntity: UUIDEntityClass<PartnershipEntity> = PartnershipEntity,
     private val packEntity: UUIDEntityClass<SponsoringPackEntity> = SponsoringPackEntity,
@@ -253,7 +254,6 @@ class PartnershipRepositoryExposed(
             createdAt = partnership.createdAt.toJavaLocalDateTime()
                 .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
         )
-    }
     }
 
     private fun findPartnership(eventId: UUID, partnershipId: UUID): PartnershipEntity = partnershipEntity
