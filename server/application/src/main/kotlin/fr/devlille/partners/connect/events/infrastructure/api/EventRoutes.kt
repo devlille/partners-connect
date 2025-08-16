@@ -25,8 +25,7 @@ fun Route.eventRoutes() {
         }
 
         get("/{event_id}") {
-            val eventIdStr = call.parameters["event_id"] ?: throw BadRequestException("Missing event ID")
-            val eventId = eventIdStr.toUUID()
+            val eventId = call.parameters["event_id"]?.toUUID() ?: throw BadRequestException("Missing event ID")
             val eventWithOrg = repository.getPublicEventById(eventId)
             call.respond(HttpStatusCode.OK, eventWithOrg)
         }
