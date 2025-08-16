@@ -157,6 +157,8 @@ class PartnershipRepositoryExposed(
         sort: String,
         direction: String,
     ): List<PartnershipItem> = transaction {
+        EventEntity.findById(eventId)
+            ?: throw NotFoundException("Event with id $eventId not found")
         val allPartnerships = PartnershipEntity.find { PartnershipsTable.eventId eq eventId }
         val filteredPartnerships = allPartnerships.filter { partnership ->
             matchesBasicFilters(partnership, filters) &&

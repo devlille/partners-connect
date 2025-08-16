@@ -49,9 +49,6 @@ fun Route.partnershipRoutes() {
         get {
             val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
 
-            // Verify event exists
-            eventRepository.getById(eventId)
-
             // Parse query parameters for filters
             val filters = PartnershipFilters(
                 packId = call.request.queryParameters["filter[pack_id]"],
