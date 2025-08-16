@@ -214,6 +214,7 @@ class PartnershipRepositoryExposed(
             companyName = partnership.company.name,
             packName = partnership.selectedPack?.name ?: "Unknown",
             suggestedPackName = partnership.suggestionPack?.name,
+            eventName = partnership.event.name,
             language = partnership.language,
             phone = partnership.phone,
             emails = emails,

@@ -13,6 +13,8 @@ data class PartnershipItem(
     val packName: String,
     @SerialName("suggested_pack_name")
     val suggestedPackName: String? = null,
+    @SerialName("event_name")
+    val eventName: String,
     val language: String,
     val phone: String? = null,
     val emails: List<String> = emptyList(),

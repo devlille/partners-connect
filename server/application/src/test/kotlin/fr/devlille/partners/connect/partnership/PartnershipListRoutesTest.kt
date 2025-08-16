@@ -671,6 +671,7 @@ class PartnershipListRoutesTest {
         assertEquals("Test Company", partnership.companyName)
         assertEquals("Test Pack", partnership.packName)
         assertNull(partnership.suggestedPackName)
+        assertEquals("Test Event", partnership.eventName)
         assertEquals("fr", partnership.language)
         assertEquals("0123456789", partnership.phone)
         assertTrue(partnership.emails.isEmpty())
