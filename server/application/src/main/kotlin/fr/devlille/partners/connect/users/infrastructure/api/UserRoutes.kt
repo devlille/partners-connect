@@ -30,13 +30,13 @@ fun Route.userRoutes() {
         get("/me/events") {
             val token = call.token
             val userInfo = authRepository.getUserInfo(token)
-            
+
             // Find the user in the database
             val user = transaction {
                 UserEntity.singleUserByEmail(userInfo.email)
                     ?: throw NotFoundException("User not found")
             }
-            
+
             // Check if user has any organizer permissions
             val hasOrganizerRole = userRepository.hasAnyOrganizerPermission(userInfo.email)
 

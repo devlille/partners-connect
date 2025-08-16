@@ -49,7 +49,10 @@ class UserRepositoryExposed : UserRepository {
         val user = UserEntity.singleUserByEmail(email)
             ?: throw NotFoundException("User with email $email not found")
         !OrganisationPermissionEntity
-            .find { (OrganisationPermissionsTable.userId eq user.id.value) and (OrganisationPermissionsTable.canEdit eq true) }
+            .find {
+                (OrganisationPermissionsTable.userId eq user.id.value) and
+                    (OrganisationPermissionsTable.canEdit eq true)
+            }
             .empty()
     }
 

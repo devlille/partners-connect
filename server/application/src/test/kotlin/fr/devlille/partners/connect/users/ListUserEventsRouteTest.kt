@@ -3,7 +3,6 @@ package fr.devlille.partners.connect.users
 import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
-import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
 import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
 import fr.devlille.partners.connect.users.factories.insertMockedUser
 import io.ktor.client.request.get
@@ -21,7 +20,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class ListUserEventsRouteTest {
-
     @Test
     fun `return 401 if no Authorization header`() = testApplication {
         application {
@@ -63,7 +61,7 @@ class ListUserEventsRouteTest {
     fun `return 403 if authenticated user has no organizer permissions`() = testApplication {
         val userId = UUID.randomUUID()
         val email = "noorganizer@mail.com"
-        
+
         application {
             moduleMocked()
             insertMockedUser(userId, email = email)
@@ -81,7 +79,7 @@ class ListUserEventsRouteTest {
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val email = "organizer@mail.com"
-        
+
         application {
             moduleMocked()
             val user = insertMockedUser(userId, email = email)
@@ -103,7 +101,7 @@ class ListUserEventsRouteTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val email = "organizer@mail.com"
-        
+
         application {
             moduleMocked()
             val user = insertMockedUser(userId, email = email)
@@ -117,12 +115,12 @@ class ListUserEventsRouteTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        
+
         val json = Json.parseToJsonElement(response.bodyAsText())
         val eventsArray = json.jsonArray
-        
+
         assertEquals(1, eventsArray.size)
-        
+
         val event = eventsArray[0].jsonObject
         assertEquals(eventId.toString(), event["id"]?.jsonPrimitive?.content)
         assertEquals("Test Event 2025", event["name"]?.jsonPrimitive?.content)
@@ -140,16 +138,16 @@ class ListUserEventsRouteTest {
         val eventId1 = UUID.randomUUID()
         val eventId2 = UUID.randomUUID()
         val email = "organizer@mail.com"
-        
+
         application {
             moduleMocked()
             val user = insertMockedUser(userId, email = email)
-            
+
             // First organization with one event
             insertMockedOrganisationEntity(orgId1)
             insertMockedEvent(eventId1, orgId = orgId1, name = "Event 1")
             insertMockedOrgaPermission(orgId = orgId1, user = user, canEdit = true)
-            
+
             // Second organization with one event
             insertMockedOrganisationEntity(orgId2)
             insertMockedEvent(eventId2, orgId = orgId2, name = "Event 2")
@@ -161,12 +159,12 @@ class ListUserEventsRouteTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        
+
         val json = Json.parseToJsonElement(response.bodyAsText())
         val eventsArray = json.jsonArray
-        
+
         assertEquals(2, eventsArray.size)
-        
+
         val eventIds = eventsArray.map { it.jsonObject["id"]?.jsonPrimitive?.content }
         assertTrue(eventIds.contains(eventId1.toString()))
         assertTrue(eventIds.contains(eventId2.toString()))
