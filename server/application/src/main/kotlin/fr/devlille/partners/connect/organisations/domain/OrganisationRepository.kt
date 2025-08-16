@@ -6,4 +6,6 @@ interface OrganisationRepository {
     fun getById(slug: String): Organisation
 
     fun update(orgSlug: String, data: Organisation): Organisation
+
+    fun findOrganisationListByUserEmail(userEmail: String): List<OrganisationItem>
 }
