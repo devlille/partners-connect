@@ -146,6 +146,10 @@ class PartnershipRepositoryExposed(
     }
 
     override fun listByCompany(companyId: UUID): List<PartnershipItem> = transaction {
+        // Check if the company exists first
+        CompanyEntity.findById(companyId)
+            ?: throw NotFoundException("Company $companyId not found")
+
         PartnershipEntity
             .find { PartnershipsTable.companyId eq companyId }
             .orderBy(PartnershipsTable.createdAt to SortOrder.DESC)

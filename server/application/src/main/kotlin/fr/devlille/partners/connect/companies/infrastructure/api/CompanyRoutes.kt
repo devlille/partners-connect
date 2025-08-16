@@ -56,8 +56,6 @@ fun Route.companyRoutes() {
 
         get("/{companyId}/partnership") {
             val companyId = call.parameters["companyId"]?.toUUID() ?: throw BadRequestException("Missing company id")
-            // Check if the company exists
-            companyRepository.getById(companyId) // This will throw NotFoundException if not found
             val items = partnershipRepository.listByCompany(companyId)
             call.respond(HttpStatusCode.OK, items)
         }
