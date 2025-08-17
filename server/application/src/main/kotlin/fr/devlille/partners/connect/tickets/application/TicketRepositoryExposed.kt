@@ -1,5 +1,7 @@
 package fr.devlille.partners.connect.tickets.application
 
+import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.findByEventIdAndUsage
@@ -43,7 +45,10 @@ class TicketRepositoryExposed(
         }
     }
 
-    override suspend fun createTickets(eventId: UUID, partnershipId: UUID, tickets: List<TicketData>): TicketOrder {
+    override suspend fun createTickets(eventSlug: String, partnershipId: UUID, tickets: List<TicketData>): TicketOrder {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val eventId = event.id.value
         val integration = singleIntegration(eventId)
         val provider = integration[IntegrationsTable.provider]
         val integrationId = integration[IntegrationsTable.id].value
@@ -81,7 +86,10 @@ Not enough tickets in the validated pack: ${validatedPack.nbTickets} available, 
         return order
     }
 
-    override suspend fun updateTicket(eventId: UUID, partnershipId: UUID, ticketId: String, data: TicketData): Ticket {
+    override suspend fun updateTicket(eventSlug: String, partnershipId: UUID, ticketId: String, data: TicketData): Ticket {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val eventId = event.id.value
         val integration = singleIntegration(eventId)
         val provider = integration[IntegrationsTable.provider]
         val integrationId = integration[IntegrationsTable.id].value

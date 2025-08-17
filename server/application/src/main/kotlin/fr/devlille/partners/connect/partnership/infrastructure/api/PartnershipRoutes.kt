@@ -2,6 +2,8 @@ package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.companies.domain.CompanyRepository
 import fr.devlille.partners.connect.events.application.EventRepositoryExposed
+import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
@@ -30,15 +32,17 @@ fun Route.partnershipRoutes() {
     route("/events/{eventSlug}/partnership") {
         post {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-            val eventId = eventRepository.getEventIdBySlug(eventSlug)
             val register = call.receive<RegisterPartnership>()
-            val id = partnershipRepository.register(eventId, register)
+            val id = partnershipRepository.register(eventSlug, register)
             val company = companyRepository.getById(register.companyId.toUUID())
-            val partnership = partnershipRepository.getById(eventId, id)
+            val partnership = partnershipRepository.getById(eventSlug, id)
             val pack = partnership.selectedPack
                 ?: throw NotFoundException("Partnership does not have a selected pack")
             val event = eventRepository.getBySlug(eventSlug).event
             val variables = NotificationVariables.NewPartnership(register.language, event, company, pack)
+            // Note: we need eventId for notification, get it from event  
+            val eventId = EventEntity.findBySlug(eventSlug)?.id?.value
+                ?: throw NotFoundException("Event with slug $eventSlug not found")
             notificationRepository.sendMessage(eventId, variables)
             call.respond(HttpStatusCode.Created, mapOf("id" to id.toString()))
         }
@@ -49,7 +53,6 @@ fun Route.partnershipRoutes() {
 
         get {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-            val eventId = eventRepository.getEventIdBySlug(eventSlug)
 
             // Parse query parameters for filters
             val filters = PartnershipFilters(
@@ -64,7 +67,7 @@ fun Route.partnershipRoutes() {
             val sort = call.request.queryParameters["sort"] ?: "created"
             val direction = call.request.queryParameters["direction"] ?: "asc"
 
-            val partnerships = partnershipRepository.listByEvent(eventId, filters, sort, direction)
+            val partnerships = partnershipRepository.listByEvent(eventSlug, filters, sort, direction)
             call.respond(HttpStatusCode.OK, partnerships)
         }
     }
@@ -75,16 +78,18 @@ fun Route.partnershipRoutes() {
 
             post {
                 val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-                val eventId = eventRepository.getEventIdBySlug(eventSlug)
                 val partnershipId = call.parameters["partnershipId"]?.toUUID()
                     ?: throw BadRequestException("Missing partnership id")
-                val id = partnershipRepository.validate(eventId, partnershipId)
-                val company = partnershipRepository.getCompanyByPartnershipId(eventId, partnershipId)
-                val partnership = partnershipRepository.getById(eventId, partnershipId)
+                val id = partnershipRepository.validate(eventSlug, partnershipId)
+                val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
+                val partnership = partnershipRepository.getById(eventSlug, partnershipId)
                 val pack = partnership.selectedPack
                     ?: throw BadRequestException("Partnership does not have a selected pack")
                 val event = eventRepository.getBySlug(eventSlug).event
                 val variables = NotificationVariables.PartnershipValidated(partnership.language, event, company, pack)
+                // Note: we need eventId for notification, get it from event  
+                val eventId = EventEntity.findBySlug(eventSlug)?.id?.value
+                    ?: throw NotFoundException("Event with slug $eventSlug not found")
                 notificationRepository.sendMessage(eventId, variables)
                 call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
             }
@@ -95,14 +100,16 @@ fun Route.partnershipRoutes() {
 
             post {
                 val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-                val eventId = eventRepository.getEventIdBySlug(eventSlug)
                 val partnershipId = call.parameters["partnershipId"]?.toUUID()
                     ?: throw BadRequestException("Missing partnership id")
-                val id = partnershipRepository.decline(eventId, partnershipId)
-                val company = partnershipRepository.getCompanyByPartnershipId(eventId, partnershipId)
-                val partnership = partnershipRepository.getById(eventId, partnershipId)
+                val id = partnershipRepository.decline(eventSlug, partnershipId)
+                val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
+                val partnership = partnershipRepository.getById(eventSlug, partnershipId)
                 val event = eventRepository.getBySlug(eventSlug).event
                 val variables = NotificationVariables.PartnershipDeclined(partnership.language, event, company)
+                // Note: we need eventId for notification, get it from event  
+                val eventId = EventEntity.findBySlug(eventSlug)?.id?.value
+                    ?: throw NotFoundException("Event with slug $eventSlug not found")
                 notificationRepository.sendMessage(eventId, variables)
                 call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
             }

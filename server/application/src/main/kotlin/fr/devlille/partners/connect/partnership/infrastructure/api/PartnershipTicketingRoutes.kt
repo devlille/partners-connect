@@ -30,12 +30,11 @@ fun Route.partnershipTicketingRoutes() {
 
         post {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-            val eventId = eventRepository.getEventIdBySlug(eventSlug)
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
             val body = call.receive<List<TicketData>>()
             val result = ticketingRepository.createTickets(
-                eventId = eventId,
+                eventSlug = eventSlug,
                 partnershipId = partnershipId,
                 tickets = body,
             )
@@ -44,12 +43,11 @@ fun Route.partnershipTicketingRoutes() {
 
         put("/{ticketId}") {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-            val eventId = eventRepository.getEventIdBySlug(eventSlug)
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
             val ticketId = call.parameters["ticketId"] ?: throw BadRequestException("Missing ticket id")
             val body = call.receive<TicketData>()
-            val ticket = ticketingRepository.updateTicket(eventId, partnershipId, ticketId, body)
+            val ticket = ticketingRepository.updateTicket(eventSlug, partnershipId, ticketId, body)
             call.respond(HttpStatusCode.OK, ticket)
         }
     }

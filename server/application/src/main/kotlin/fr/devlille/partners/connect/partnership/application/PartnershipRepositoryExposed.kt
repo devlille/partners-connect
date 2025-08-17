@@ -4,6 +4,7 @@ import fr.devlille.partners.connect.companies.application.mappers.toDomain
 import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.application.mappers.toDomain
 import fr.devlille.partners.connect.partnership.domain.Contact
@@ -45,9 +46,10 @@ class PartnershipRepositoryExposed(
     private val translationEntity: UUIDEntityClass<OptionTranslationEntity> = OptionTranslationEntity,
     private val packOptionTable: PackOptionsTable = PackOptionsTable,
 ) : PartnershipRepository {
-    override fun register(eventId: UUID, register: RegisterPartnership): UUID = transaction {
-        val event = EventEntity.findById(eventId)
-            ?: throw NotFoundException("Event $eventId not found")
+    override fun register(eventSlug: String, register: RegisterPartnership): UUID = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val eventId = event.id.value
         val companyId = register.companyId.toUUID()
         val company = CompanyEntity.findById(companyId)
             ?: throw NotFoundException("Company $companyId not found")
@@ -107,8 +109,10 @@ class PartnershipRepositoryExposed(
         partnership.id.value
     }
 
-    override fun getById(eventId: UUID, partnershipId: UUID): Partnership = transaction {
-        val partnership = findPartnership(eventId, partnershipId)
+    override fun getById(eventSlug: String, partnershipId: UUID): Partnership = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val partnership = findPartnership(event.id.value, partnershipId)
         Partnership(
             id = partnership.id.value.toString(),
             language = partnership.language,
@@ -133,30 +137,37 @@ class PartnershipRepositoryExposed(
         )
     }
 
-    override fun getCompanyByPartnershipId(eventId: UUID, partnershipId: UUID): Company = transaction {
-        findPartnership(eventId, partnershipId).company.toDomain()
+    override fun getCompanyByPartnershipId(eventSlug: String, partnershipId: UUID): Company = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        findPartnership(event.id.value, partnershipId).company.toDomain()
     }
 
-    override fun validate(eventId: UUID, partnershipId: UUID): UUID = transaction {
-        val partnership = findPartnership(eventId, partnershipId)
+    override fun validate(eventSlug: String, partnershipId: UUID): UUID = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val partnership = findPartnership(event.id.value, partnershipId)
         partnership.validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
         partnership.id.value
     }
 
-    override fun decline(eventId: UUID, partnershipId: UUID): UUID = transaction {
-        val partnership = findPartnership(eventId, partnershipId)
+    override fun decline(eventSlug: String, partnershipId: UUID): UUID = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val partnership = findPartnership(event.id.value, partnershipId)
         partnership.declinedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
         partnership.id.value
     }
 
     override fun listByEvent(
-        eventId: UUID,
+        eventSlug: String,
         filters: PartnershipFilters,
         sort: String,
         direction: String,
     ): List<PartnershipItem> = transaction {
-        EventEntity.findById(eventId)
-            ?: throw NotFoundException("Event with id $eventId not found")
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val eventId = event.id.value
         val allPartnerships = PartnershipEntity.find { PartnershipsTable.eventId eq eventId }
         val filteredPartnerships = allPartnerships.filter { partnership ->
             matchesBasicFilters(partnership, filters) &&

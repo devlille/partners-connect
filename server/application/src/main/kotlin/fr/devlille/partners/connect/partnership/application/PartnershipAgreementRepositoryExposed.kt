@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.partnership.application
 
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.pdf.renderMarkdownToPdf
 import fr.devlille.partners.connect.internal.infrastructure.resources.readResourceFile
 import fr.devlille.partners.connect.internal.infrastructure.templating.templating
@@ -30,8 +31,9 @@ import kotlin.time.Duration.Companion.days
 
 class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
     @OptIn(FormatStringsInDatetimeFormats::class)
-    override fun generateAgreement(eventId: UUID, partnershipId: UUID): ByteArray = transaction {
-        val event = EventEntity.findById(eventId) ?: throw NotFoundException("Event not found")
+    override fun generateAgreement(eventSlug: String, partnershipId: UUID): ByteArray = transaction {
+        val event = EventEntity.findBySlug(eventSlug) 
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
         val partnership = PartnershipEntity.findById(partnershipId) ?: throw NotFoundException("Partnership not found")
         val template = readResourceFile("/agreement/${partnership.language}.md")
         val formatter = LocalDate.Format { byUnicodePattern("yyyy/MM/dd") }
@@ -47,19 +49,23 @@ class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
         renderMarkdownToPdf(markdown)
     }
 
-    override fun updateAgreementUrl(eventId: UUID, partnershipId: UUID, agreementUrl: String): UUID = transaction {
-        val partnership = PartnershipEntity.singleByEventAndPartnership(eventId, partnershipId)
+    override fun updateAgreementUrl(eventSlug: String, partnershipId: UUID, agreementUrl: String): UUID = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val partnership = PartnershipEntity.singleByEventAndPartnership(event.id.value, partnershipId)
             ?: throw NotFoundException("Partnership not found")
         partnership.agreementUrl = agreementUrl
         partnership.id.value
     }
 
     override fun updateAgreementSignedUrl(
-        eventId: UUID,
+        eventSlug: String,
         partnershipId: UUID,
         agreementSignedUrl: String,
     ): UUID = transaction {
-        val partnership = PartnershipEntity.singleByEventAndPartnership(eventId, partnershipId)
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val partnership = PartnershipEntity.singleByEventAndPartnership(event.id.value, partnershipId)
             ?: throw NotFoundException("Partnership not found")
         partnership.agreementSignedUrl = agreementSignedUrl
         partnership.id.value

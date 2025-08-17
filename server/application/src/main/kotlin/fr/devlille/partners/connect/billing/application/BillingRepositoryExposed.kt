@@ -2,6 +2,8 @@ package fr.devlille.partners.connect.billing.application
 
 import fr.devlille.partners.connect.billing.domain.BillingGateway
 import fr.devlille.partners.connect.billing.domain.BillingRepository
+import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.findByEventIdAndUsage
@@ -14,7 +16,10 @@ import java.util.UUID
 class BillingRepositoryExposed(
     private val billingGateways: List<BillingGateway>,
 ) : BillingRepository {
-    override suspend fun createInvoice(eventId: UUID, partnershipId: UUID): String = newSuspendedTransaction {
+    override suspend fun createInvoice(eventSlug: String, partnershipId: UUID): String = newSuspendedTransaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val eventId = event.id.value
         val integration = singleIntegration(eventId)
         val provider = integration[IntegrationsTable.provider]
         val integrationId = integration[IntegrationsTable.id].value
@@ -23,7 +28,10 @@ class BillingRepositoryExposed(
         gateway.createInvoice(integrationId, eventId, partnershipId)
     }
 
-    override suspend fun createQuote(eventId: UUID, partnershipId: UUID): String = newSuspendedTransaction {
+    override suspend fun createQuote(eventSlug: String, partnershipId: UUID): String = newSuspendedTransaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val eventId = event.id.value
         val integration = singleIntegration(eventId)
         val provider = integration[IntegrationsTable.provider]
         val integrationId = integration[IntegrationsTable.id].value

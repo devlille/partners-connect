@@ -1,5 +1,7 @@
 package fr.devlille.partners.connect.partnership.application
 
+import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.domain.PartnershipSuggestionRepository
 import fr.devlille.partners.connect.partnership.domain.SuggestPartnership
@@ -30,11 +32,13 @@ class PartnershipSuggestionRepositoryExposed(
     private val packOptionTable: PackOptionsTable = PackOptionsTable,
 ) : PartnershipSuggestionRepository {
     override fun suggest(
-        eventId: UUID,
+        eventSlug: String,
         partnershipId: UUID,
         input: SuggestPartnership,
     ): UUID = transaction {
-        val partnership = findPartnership(eventId, partnershipId)
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val partnership = findPartnership(event.id.value, partnershipId)
         val suggestedPack = packEntity.findById(input.packId.toUUID())
             ?: throw NotFoundException("Pack ${input.packId} not found")
         val optionalOptionIds = packOptionTable
@@ -73,14 +77,18 @@ class PartnershipSuggestionRepositoryExposed(
         partnership.id.value
     }
 
-    override fun approve(eventId: UUID, partnershipId: UUID): UUID = transaction {
-        val partnership = findPartnership(eventId, partnershipId)
+    override fun approve(eventSlug: String, partnershipId: UUID): UUID = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val partnership = findPartnership(event.id.value, partnershipId)
         partnership.suggestionApprovedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
         partnership.id.value
     }
 
-    override fun decline(eventId: UUID, partnershipId: UUID): UUID = transaction {
-        val partnership = findPartnership(eventId, partnershipId)
+    override fun decline(eventSlug: String, partnershipId: UUID): UUID = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val partnership = findPartnership(event.id.value, partnershipId)
         partnership.suggestionDeclinedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
         partnership.id.value
     }

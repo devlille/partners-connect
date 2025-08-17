@@ -5,13 +5,13 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import java.util.UUID
 
 interface PartnershipBillingRepository {
-    fun getByPartnershipId(eventId: UUID, partnershipId: UUID): CompanyBillingData
+    fun getByPartnershipId(eventSlug: String, partnershipId: UUID): CompanyBillingData
 
-    fun createOrUpdate(eventId: UUID, partnershipId: UUID, input: CompanyBillingData): UUID
+    fun createOrUpdate(eventSlug: String, partnershipId: UUID, input: CompanyBillingData): UUID
 
-    fun updateInvoiceUrl(eventId: UUID, partnershipId: UUID, invoiceUrl: String): UUID
+    fun updateInvoiceUrl(eventSlug: String, partnershipId: UUID, invoiceUrl: String): UUID
 
-    fun updateQuoteUrl(eventId: UUID, partnershipId: UUID, quoteUrl: String): UUID
+    fun updateQuoteUrl(eventSlug: String, partnershipId: UUID, quoteUrl: String): UUID
 
-    fun updateStatus(eventId: UUID, partnershipId: UUID, status: InvoiceStatus): UUID
+    fun updateStatus(eventSlug: String, partnershipId: UUID, status: InvoiceStatus): UUID
 }

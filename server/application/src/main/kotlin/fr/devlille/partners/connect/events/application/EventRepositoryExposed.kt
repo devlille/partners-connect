@@ -76,13 +76,6 @@ class EventRepositoryExposed(
         )
     }
 
-    // Temporary helper method for internal use by route files until all repositories are converted to slugs
-    internal fun getEventIdBySlug(eventSlug: String): UUID = transaction {
-        val event = entity.eventFindBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
-        event.id.value
-    }
-
     override fun createEvent(orgSlug: String, event: Event): String = transaction {
         val organisation = OrganisationEntity.orgFindBySlug(orgSlug)
             ?: throw NotFoundException("Organisation with slug $orgSlug not found")

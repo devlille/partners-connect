@@ -4,18 +4,18 @@ import fr.devlille.partners.connect.companies.domain.Company
 import java.util.UUID
 
 interface PartnershipRepository {
-    fun register(eventId: UUID, register: RegisterPartnership): UUID
+    fun register(eventSlug: String, register: RegisterPartnership): UUID
 
-    fun getById(eventId: UUID, partnershipId: UUID): Partnership
+    fun getById(eventSlug: String, partnershipId: UUID): Partnership
 
-    fun getCompanyByPartnershipId(eventId: UUID, partnershipId: UUID): Company
+    fun getCompanyByPartnershipId(eventSlug: String, partnershipId: UUID): Company
 
-    fun validate(eventId: UUID, partnershipId: UUID): UUID
+    fun validate(eventSlug: String, partnershipId: UUID): UUID
 
-    fun decline(eventId: UUID, partnershipId: UUID): UUID
+    fun decline(eventSlug: String, partnershipId: UUID): UUID
 
     fun listByEvent(
-        eventId: UUID,
+        eventSlug: String,
         filters: PartnershipFilters = PartnershipFilters(),
         sort: String = "created",
         direction: String = "asc",
