@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.sponsoring
 
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
+import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.TranslatedLabel
@@ -191,13 +192,11 @@ class SponsoringOptionUpdateRoutesTest {
     fun `PUT returns error when optionId is invalid UUID`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-3"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
-
-            eventSlug = event.slug
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
         val updateRequest = CreateSponsoringOption(
@@ -226,13 +225,11 @@ class SponsoringOptionUpdateRoutesTest {
     fun `PUT returns 200 when payload has empty translations (consistent with create behavior)`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-4"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
-
-            eventSlug = event.slug
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
         // First create an option with translations
@@ -273,13 +270,11 @@ class SponsoringOptionUpdateRoutesTest {
     fun `PUT returns 401 when no authorization header`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-5"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
-
-            eventSlug = event.slug
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
         val updateRequest = CreateSponsoringOption(
@@ -301,13 +296,11 @@ class SponsoringOptionUpdateRoutesTest {
     fun `PUT returns 401 when user lacks organization permission`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-6"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
-
-            eventSlug = event.slug
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
         val updateRequest = CreateSponsoringOption(
@@ -359,13 +352,11 @@ class SponsoringOptionUpdateRoutesTest {
     fun `PUT returns 404 when option does not exist`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-7"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
-
-            eventSlug = event.slug
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
         val updateRequest = CreateSponsoringOption(
@@ -391,14 +382,15 @@ class SponsoringOptionUpdateRoutesTest {
         val orgId = UUID.randomUUID()
         val event1Id = UUID.randomUUID()
         val event2Id = UUID.randomUUID()
-        lateinit var event1Slug: String
-        val event2Slug = "different-event-slug"
+        val event1Slug = "test-event1-slug"
+        val event2Slug = "test-event2-slug"
         
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event1 = insertMockedEventWithAdminUser(event1Id, orgId)
-            event1Slug = event1.slug
+            insertMockedEventWithAdminUser(event1Id, orgId, event1Slug)
+            // Create second event without admin user (just the event)
+            insertMockedEvent(event2Id, slug = event2Slug, orgId = orgId)
         }
 
         // Create option for event1
