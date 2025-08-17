@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.events.factories
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import kotlinx.datetime.LocalDateTime
@@ -11,6 +12,7 @@ import java.util.UUID
 fun insertMockedEvent(
     id: UUID = UUID.randomUUID(),
     name: String = "Test Event",
+    slug: String? = null,
     startTime: String = "2023-01-01T00:00:00",
     endTime: String = "2023-01-02T00:00:00",
     submissionStartTime: String = "2022-12-01T00:00:00",
@@ -22,6 +24,7 @@ fun insertMockedEvent(
 ): EventEntity = transaction {
     EventEntity.new(id) {
         this.name = name
+        this.slug = slug ?: name.slugify()
         this.startTime = LocalDateTime.parse(startTime)
         this.endTime = LocalDateTime.parse(endTime)
         this.submissionStartTime = LocalDateTime.parse(submissionStartTime)
@@ -37,6 +40,7 @@ fun insertMockedEvent(
 fun insertMockedEventWithOrga(
     id: UUID = UUID.randomUUID(),
     name: String = "Test Event",
+    slug: String? = null,
     startTime: String = "2023-01-01T00:00:00",
     endTime: String = "2023-01-02T00:00:00",
     submissionStartTime: String = "2022-12-01T00:00:00",
@@ -48,6 +52,7 @@ fun insertMockedEventWithOrga(
 ): EventEntity = transaction {
     EventEntity.new(id) {
         this.name = name
+        this.slug = slug ?: name.slugify()
         this.startTime = LocalDateTime.parse(startTime)
         this.endTime = LocalDateTime.parse(endTime)
         this.submissionStartTime = LocalDateTime.parse(submissionStartTime)

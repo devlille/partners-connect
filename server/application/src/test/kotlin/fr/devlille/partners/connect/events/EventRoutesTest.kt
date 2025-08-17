@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.events
 
 import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.factories.createEvent
+import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.events.factories.insertMockedEventWithOrga
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
@@ -50,20 +51,23 @@ class EventRoutesTest {
         assertEquals(HttpStatusCode.Created, response.status)
         val responseText = response.bodyAsText()
         val responseBody = Json.decodeFromString<Map<String, String>>(responseText)
-        assertNotNull(responseBody["id"], "Response should contain an 'id' field")
+        assertNotNull(responseBody["slug"], "Response should contain a 'slug' field")
     }
 
     @Test
     fun `PUT updates an existing event`() = testApplication {
         val eventId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
+        val testSlug = "test-event"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(id = orgId)
-            insertMockedEventWithAdminUser(eventId = eventId, orgId = orgId)
+            // Create event with specific slug using the updated factory
+            insertMockedEvent(id = eventId, orgId = orgId, slug = testSlug)
+            insertMockedOrgaPermission(orgId = orgId, user = insertMockedAdminUser())
         }
 
-        val response = client.put("/orgs/$orgId/events/$eventId") {
+        val response = client.put("/orgs/$orgId/events/$testSlug") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(json.encodeToString(Event.serializer(), createEvent()))
@@ -71,18 +75,20 @@ class EventRoutesTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
         val updateBody = Json.decodeFromString<Map<String, String>>(response.bodyAsText())
-        assertEquals(eventId.toString(), updateBody["id"])
+        assertNotNull(updateBody["slug"])
     }
 
     @Test
     fun `PUT returns 401 when user has no access to the event`() = testApplication {
         val organisationId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val testSlug = "test-event-unauthorized"
 
         application {
             moduleMocked()
             insertMockedEventWithOrga(
                 id = eventId,
+                slug = testSlug,
                 organisation = insertMockedOrganisationEntity(
                     id = organisationId,
                     representativeUser = insertMockedAdminUser(),
@@ -90,7 +96,7 @@ class EventRoutesTest {
             )
         }
 
-        val updateResponse = client.put("/orgs/$organisationId/events/$eventId") {
+        val updateResponse = client.put("/orgs/$organisationId/events/$testSlug") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(json.encodeToString(Event.serializer(), createEvent()))
@@ -122,8 +128,8 @@ class EventRoutesTest {
             val admin = insertMockedAdminUser()
             val org = insertMockedOrganisationEntity(id = orgId, representativeUser = admin)
             insertMockedOrgaPermission(orgId = orgId, user = admin)
-            insertMockedEventWithOrga(organisation = org)
-            insertMockedEventWithOrga(organisation = org)
+            insertMockedEventWithOrga(name = "First Event", slug = "first-event", organisation = org)
+            insertMockedEventWithOrga(name = "Second Event", slug = "second-event", organisation = org)
         }
 
         val response = client.get("/orgs/$orgId/events") {
@@ -207,16 +213,17 @@ class EventRoutesTest {
     }
 
     @Test
-    fun `GET events by ID returns event with organization for valid ID`() = testApplication {
+    fun `GET events by slug returns event with organization for valid slug`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-event"
         application {
             moduleMocked()
             val admin = insertMockedAdminUser()
             val org = insertMockedOrganisationEntity(representativeUser = admin)
-            insertMockedEventWithOrga(id = eventId, organisation = org)
+            insertMockedEventWithOrga(id = eventId, slug = eventSlug, organisation = org)
         }
 
-        val response = client.get("/events/$eventId")
+        val response = client.get("/events/$eventSlug")
 
         assertEquals(HttpStatusCode.OK, response.status)
         val responseBody = response.bodyAsText()
@@ -249,40 +256,43 @@ class EventRoutesTest {
     }
 
     @Test
-    fun `GET events by ID returns 404 for non-existent event`() = testApplication {
-        val nonExistentEventId = UUID.randomUUID()
+    fun `GET events by slug returns 404 for non-existent event`() = testApplication {
+        val nonExistentEventSlug = "non-existent-event"
         application {
             moduleMocked()
         }
 
-        val response = client.get("/events/$nonExistentEventId")
+        val response = client.get("/events/$nonExistentEventSlug")
 
         assertEquals(HttpStatusCode.NotFound, response.status)
     }
 
     @Test
-    fun `GET events by ID returns 400 for invalid UUID format`() = testApplication {
+    fun `GET events by slug accepts various slug formats`() = testApplication {
         application {
             moduleMocked()
         }
 
-        val response = client.get("/events/invalid-uuid")
+        val response = client.get("/events/valid-event-slug")
 
-        assertEquals(HttpStatusCode.BadRequest, response.status)
+        // This should return 404 (not found) rather than 400 (bad request)
+        // since slug format is valid, even if event doesn't exist
+        assertEquals(HttpStatusCode.NotFound, response.status)
     }
 
     @Test
-    fun `GET events by ID is public and returns correct response structure`() = testApplication {
+    fun `GET events by slug is public and returns correct response structure`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "public-test-event"
         application {
             moduleMocked()
             val admin = insertMockedAdminUser()
             val org = insertMockedOrganisationEntity(representativeUser = admin)
-            insertMockedEventWithOrga(id = eventId, organisation = org)
+            insertMockedEventWithOrga(id = eventId, slug = eventSlug, organisation = org)
         }
 
         // No authentication header - this is a public endpoint
-        val response = client.get("/events/$eventId")
+        val response = client.get("/events/$eventSlug")
 
         assertEquals(HttpStatusCode.OK, response.status)
         val responseBody = response.bodyAsText()

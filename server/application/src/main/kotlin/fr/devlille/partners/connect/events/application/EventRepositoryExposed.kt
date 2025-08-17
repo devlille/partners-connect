@@ -29,7 +29,7 @@ class EventRepositoryExposed(
     override fun getAllEvents(): List<EventSummary> = transaction {
         entity.all().map {
             EventSummary(
-                slug = it.slug,
+                slug = it.slug ?: it.name.slugify(),
                 name = it.name,
                 startTime = it.startTime,
                 endTime = it.endTime,
@@ -44,7 +44,7 @@ class EventRepositoryExposed(
             ?: throw NotFoundException("Organisation with slug $orgSlug not found")
         entity.find { EventsTable.organisationId eq organisation.id }.map {
             EventSummary(
-                slug = it.slug,
+                slug = it.slug ?: it.name.slugify(),
                 name = it.name,
                 startTime = it.startTime,
                 endTime = it.endTime,
@@ -151,7 +151,8 @@ class EventRepositoryExposed(
             this.contactPhone = event.contact.phone
             this.contactEmail = event.contact.email
             this.organisation = organisation
-        }.slug
+        }
+        finalSlug
     }
 
     override fun updateEvent(eventSlug: String, orgSlug: String, event: Event): String = transaction {
@@ -210,7 +211,7 @@ class EventRepositoryExposed(
             orgEvents.forEach { event ->
                 events.add(
                     EventSummary(
-                        slug = event.slug,
+                        slug = event.slug ?: event.name.slugify(),
                         name = event.name,
                         startTime = event.startTime,
                         endTime = event.endTime,
