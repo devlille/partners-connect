@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class EventSummary(
-    val id: String,
+    val slug: String,
     val name: String,
     @SerialName("start_time")
     val startTime: LocalDateTime,

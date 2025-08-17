@@ -10,6 +10,7 @@ class EventEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     companion object : UUIDEntityClass<EventEntity>(EventsTable)
 
     var name by EventsTable.name
+    var slug by EventsTable.slug
     var startTime by EventsTable.startTime
     var endTime by EventsTable.endTime
     var submissionStartTime by EventsTable.submissionStartTime
@@ -19,3 +20,6 @@ class EventEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var contactEmail by EventsTable.contactEmail
     var organisation by OrganisationEntity referencedOn EventsTable.organisationId
 }
+
+fun UUIDEntityClass<EventEntity>.findBySlug(slug: String): EventEntity? = 
+    this.find { EventsTable.slug eq slug }.singleOrNull()

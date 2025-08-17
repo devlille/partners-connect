@@ -7,7 +7,9 @@ import fr.devlille.partners.connect.events.domain.EventSummary
 import fr.devlille.partners.connect.events.domain.EventWithOrganisation
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
+import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
+import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
 import fr.devlille.partners.connect.organisations.application.mappers.toDomain
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug
@@ -27,7 +29,7 @@ class EventRepositoryExposed(
     override fun getAllEvents(): List<EventSummary> = transaction {
         entity.all().map {
             EventSummary(
-                id = it.id.value.toString(),
+                slug = it.slug,
                 name = it.name,
                 startTime = it.startTime,
                 endTime = it.endTime,
@@ -42,7 +44,7 @@ class EventRepositoryExposed(
             ?: throw NotFoundException("Organisation with slug $orgSlug not found")
         entity.find { EventsTable.organisationId eq organisation.id }.map {
             EventSummary(
-                id = it.id.value.toString(),
+                slug = it.slug,
                 name = it.name,
                 startTime = it.startTime,
                 endTime = it.endTime,
@@ -50,6 +52,42 @@ class EventRepositoryExposed(
                 submissionEndTime = it.submissionEndTime,
             )
         }
+    }
+
+    override fun getBySlug(eventSlug: String): Event = transaction {
+        val event = entity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        Event(
+            name = event.name,
+            startTime = event.startTime,
+            endTime = event.endTime,
+            submissionStartTime = event.submissionStartTime,
+            submissionEndTime = event.submissionEndTime,
+            address = event.address,
+            contact = Contact(phone = event.contactPhone, email = event.contactEmail),
+        )
+    }
+
+    override fun getPublicEventBySlug(eventSlug: String): EventWithOrganisation = transaction {
+        val eventEntity = entity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+
+        val event = Event(
+            name = eventEntity.name,
+            startTime = eventEntity.startTime,
+            endTime = eventEntity.endTime,
+            submissionStartTime = eventEntity.submissionStartTime,
+            submissionEndTime = eventEntity.submissionEndTime,
+            address = eventEntity.address,
+            contact = Contact(phone = eventEntity.contactPhone, email = eventEntity.contactEmail),
+        )
+
+        val organisation = eventEntity.organisation.toDomain()
+
+        EventWithOrganisation(
+            event = event,
+            organisation = organisation,
+        )
     }
 
     override fun getById(eventId: UUID): Event = transaction {
@@ -88,11 +126,23 @@ class EventRepositoryExposed(
         )
     }
 
-    override fun createEvent(orgSlug: String, event: Event): UUID = transaction {
+    override fun createEvent(orgSlug: String, event: Event): String = transaction {
         val organisation = OrganisationEntity.findBySlug(orgSlug)
             ?: throw NotFoundException("Organisation with slug $orgSlug not found")
+        
+        val baseSlug = event.name.slugify()
+        var finalSlug = baseSlug
+        var counter = 1
+        
+        // Ensure slug uniqueness
+        while (entity.findBySlug(finalSlug) != null) {
+            finalSlug = "$baseSlug-$counter"
+            counter++
+        }
+        
         entity.new {
             this.name = event.name
+            this.slug = finalSlug
             this.startTime = event.startTime
             this.endTime = event.endTime
             this.submissionStartTime = event.submissionStartTime
@@ -101,20 +151,38 @@ class EventRepositoryExposed(
             this.contactPhone = event.contact.phone
             this.contactEmail = event.contact.email
             this.organisation = organisation
-        }.id.value
+        }.slug
     }
 
-    override fun updateEvent(id: UUID, orgSlug: String, event: Event): UUID = transaction {
-        val entity = entity.findById(id) ?: throw IllegalArgumentException("Event not found")
-        entity.name = event.name
-        entity.startTime = event.startTime
-        entity.endTime = event.endTime
-        entity.submissionStartTime = event.submissionStartTime
-        entity.submissionEndTime = event.submissionEndTime
-        entity.address = event.address
-        entity.contactPhone = event.contact.phone
-        entity.contactEmail = event.contact.email
-        entity.id.value
+    override fun updateEvent(eventSlug: String, orgSlug: String, event: Event): String = transaction {
+        val eventEntity = entity.findBySlug(eventSlug) ?: throw NotFoundException("Event with slug $eventSlug not found")
+        
+        // Generate new slug if name changed
+        val newSlug = if (eventEntity.name != event.name) {
+            val baseSlug = event.name.slugify()
+            var finalSlug = baseSlug
+            var counter = 1
+            
+            // Ensure slug uniqueness (but allow current event to keep its slug)
+            while (entity.findBySlug(finalSlug) != null && finalSlug != eventSlug) {
+                finalSlug = "$baseSlug-$counter"
+                counter++
+            }
+            finalSlug
+        } else {
+            eventSlug
+        }
+        
+        eventEntity.name = event.name
+        eventEntity.slug = newSlug
+        eventEntity.startTime = event.startTime
+        eventEntity.endTime = event.endTime
+        eventEntity.submissionStartTime = event.submissionStartTime
+        eventEntity.submissionEndTime = event.submissionEndTime
+        eventEntity.address = event.address
+        eventEntity.contactPhone = event.contact.phone
+        eventEntity.contactEmail = event.contact.email
+        newSlug
     }
 
     override fun findByUserEmail(userEmail: String): List<EventSummary> = transaction {
@@ -142,7 +210,7 @@ class EventRepositoryExposed(
             orgEvents.forEach { event ->
                 events.add(
                     EventSummary(
-                        id = event.id.value.toString(),
+                        slug = event.slug,
                         name = event.name,
                         startTime = event.startTime,
                         endTime = event.endTime,
