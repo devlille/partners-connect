@@ -3,8 +3,6 @@ package fr.devlille.partners.connect.partnership.infrastructure.api
 import fr.devlille.partners.connect.billing.domain.BillingRepository
 import fr.devlille.partners.connect.companies.domain.CompanyBillingData
 import fr.devlille.partners.connect.events.domain.EventRepository
-import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
-import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
@@ -15,7 +13,6 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.install
 import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -68,10 +65,7 @@ fun Route.partnershipBillingRoutes() {
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             val variables = NotificationVariables.NewInvoice(partnership.language, event, company)
-            // Note: we need eventId for notification, get it from event
-            val eventId = EventEntity.findBySlug(eventSlug)?.id?.value
-                ?: throw NotFoundException("Event with slug $eventSlug not found")
-            notificationRepository.sendMessage(eventId, variables)
+            notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.Created, mapOf("url" to invoiceUrl))
         }
         post("quote") {
@@ -84,10 +78,7 @@ fun Route.partnershipBillingRoutes() {
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             val variables = NotificationVariables.NewInvoice(partnership.language, event, company)
-            // Note: we need eventId for notification, get it from event
-            val eventId = EventEntity.findBySlug(eventSlug)?.id?.value
-                ?: throw NotFoundException("Event with slug $eventSlug not found")
-            notificationRepository.sendMessage(eventId, variables)
+            notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.Created, mapOf("url" to quoteUrl))
         }
     }

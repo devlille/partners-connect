@@ -100,10 +100,7 @@ class EventRepositoryExposed(
         val eventEntity = entity.eventFindBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
 
-        val newSlug = event.name.slugify()
-
         eventEntity.name = event.name
-        eventEntity.slug = newSlug
         eventEntity.startTime = event.startTime
         eventEntity.endTime = event.endTime
         eventEntity.submissionStartTime = event.submissionStartTime
@@ -111,7 +108,7 @@ class EventRepositoryExposed(
         eventEntity.address = event.address
         eventEntity.contactPhone = event.contact.phone
         eventEntity.contactEmail = event.contact.email
-        newSlug
+        eventSlug
     }
 
     override fun findByUserEmail(userEmail: String): List<EventSummary> = transaction {

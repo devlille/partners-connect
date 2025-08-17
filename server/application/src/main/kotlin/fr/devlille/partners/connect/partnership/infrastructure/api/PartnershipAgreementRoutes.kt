@@ -1,8 +1,6 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
-import fr.devlille.partners.connect.events.application.EventRepositoryExposed
-import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
-import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
@@ -14,7 +12,6 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipStorageReposit
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -25,7 +22,7 @@ import kotlin.getValue
 
 @Suppress("ThrowsCount")
 fun Route.partnershipAgreementRoutes() {
-    val eventRepository by inject<EventRepositoryExposed>()
+    val eventRepository by inject<EventRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
     val agreementRepository by inject<PartnershipAgreementRepository>()
     val storageRepository by inject<PartnershipStorageRepository>()
@@ -61,10 +58,7 @@ fun Route.partnershipAgreementRoutes() {
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             val variables = NotificationVariables.PartnershipAgreementSigned(partnership.language, event, company)
-            // Note: we need eventId for notification, get it from event
-            val eventId = EventEntity.findBySlug(eventSlug)?.id?.value
-                ?: throw NotFoundException("Event with slug $eventSlug not found")
-            notificationRepository.sendMessage(eventId, variables)
+            notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.OK, mapOf("url" to url))
         }
     }

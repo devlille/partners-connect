@@ -1,8 +1,6 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
-import fr.devlille.partners.connect.events.application.EventRepositoryExposed
-import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
-import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
@@ -22,7 +20,7 @@ import org.koin.ktor.ext.inject
 
 @Suppress("ThrowsCount")
 fun Route.partnershipSuggestionRoutes() {
-    val eventRepository by inject<EventRepositoryExposed>()
+    val eventRepository by inject<EventRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
     val suggestionRepository by inject<PartnershipSuggestionRepository>()
     val notificationRepository by inject<NotificationRepository>()
@@ -37,10 +35,7 @@ fun Route.partnershipSuggestionRoutes() {
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             val event = eventRepository.getBySlug(eventSlug).event
             val variables = NotificationVariables.SuggestionApproved(partnership.language, event, company)
-            // Note: we need eventId for notification, get it from event
-            val eventId = EventEntity.findBySlug(eventSlug)?.id?.value
-                ?: throw NotFoundException("Event with slug $eventSlug not found")
-            notificationRepository.sendMessage(eventId, variables)
+            notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
         }
 
@@ -53,10 +48,7 @@ fun Route.partnershipSuggestionRoutes() {
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             val event = eventRepository.getBySlug(eventSlug).event
             val variables = NotificationVariables.SuggestionDeclined(partnership.language, event, company)
-            // Note: we need eventId for notification, get it from event
-            val eventId = EventEntity.findBySlug(eventSlug)?.id?.value
-                ?: throw NotFoundException("Event with slug $eventSlug not found")
-            notificationRepository.sendMessage(eventId, variables)
+            notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
         }
     }
@@ -76,10 +68,7 @@ fun Route.partnershipSuggestionRoutes() {
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val event = eventRepository.getBySlug(eventSlug).event
             val variables = NotificationVariables.NewSuggestion(input.language, event, company, pack)
-            // Note: we need eventId for notification, get it from event
-            val eventId = EventEntity.findBySlug(eventSlug)?.id?.value
-                ?: throw NotFoundException("Event with slug $eventSlug not found")
-            notificationRepository.sendMessage(eventId, variables)
+            notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
         }
     }
