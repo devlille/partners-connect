@@ -58,4 +58,11 @@ class PartnershipBillingRepositoryExposed : PartnershipBillingRepository {
         existing.quotePdfUrl = quoteUrl
         existing.id.value
     }
+
+    override fun updateStatus(eventId: UUID, partnershipId: UUID, status: InvoiceStatus): UUID = transaction {
+        val existing = BillingEntity.singleByEventAndPartnership(eventId, partnershipId)
+            ?: throw NotFoundException("Billing not found")
+        existing.status = status
+        existing.id.value
+    }
 }
