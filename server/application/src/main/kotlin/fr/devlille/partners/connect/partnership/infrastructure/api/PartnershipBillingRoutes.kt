@@ -103,7 +103,7 @@ private fun Route.organizationProtectedBillingRoutes() {
     val partnershipBillingRepository by inject<PartnershipBillingRepository>()
 
     // Organization-protected routes for organizers
-    route("/orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/billing") {
+    route("/orgs/{orgSlug}/events/{eventId}/partnership/{partnershipId}/billing") {
         install(AuthorizedOrganisationPlugin)
 
         post("/{billingStatus}") {
