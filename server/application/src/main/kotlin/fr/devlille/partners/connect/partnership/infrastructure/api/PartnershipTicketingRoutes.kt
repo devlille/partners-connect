@@ -1,6 +1,6 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
-import fr.devlille.partners.connect.events.domain.EventRepository
+import fr.devlille.partners.connect.events.application.EventRepositoryExposed
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.tickets.domain.TicketData
 import fr.devlille.partners.connect.tickets.domain.TicketRepository
@@ -18,7 +18,7 @@ import org.koin.ktor.ext.inject
 @Suppress("ThrowsCount")
 fun Route.partnershipTicketingRoutes() {
     val ticketingRepository by inject<TicketRepository>()
-    val eventRepository by inject<EventRepository>()
+    val eventRepository by inject<EventRepositoryExposed>()
 
     route("/events/{eventSlug}/partnership/{partnershipId}/tickets") {
         get {
@@ -30,7 +30,7 @@ fun Route.partnershipTicketingRoutes() {
 
         post {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-            val eventId = eventRepository.getIdBySlug(eventSlug)
+            val eventId = eventRepository.getEventIdBySlug(eventSlug)
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
             val body = call.receive<List<TicketData>>()
@@ -44,7 +44,7 @@ fun Route.partnershipTicketingRoutes() {
 
         put("/{ticketId}") {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-            val eventId = eventRepository.getIdBySlug(eventSlug)
+            val eventId = eventRepository.getEventIdBySlug(eventSlug)
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
             val ticketId = call.parameters["ticketId"] ?: throw BadRequestException("Missing ticket id")

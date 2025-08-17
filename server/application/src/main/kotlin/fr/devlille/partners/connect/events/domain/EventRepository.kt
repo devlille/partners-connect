@@ -1,13 +1,9 @@
 package fr.devlille.partners.connect.events.domain
 
-import java.util.UUID
-
 interface EventRepository {
     fun getAllEvents(): List<EventSummary>
 
     fun getBySlug(eventSlug: String): EventWithOrganisation
-
-    fun getIdBySlug(eventSlug: String): UUID
 
     fun findByOrgSlug(orgSlug: String): List<EventSummary>
 

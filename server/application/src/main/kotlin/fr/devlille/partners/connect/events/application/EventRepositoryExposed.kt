@@ -76,7 +76,8 @@ class EventRepositoryExposed(
         )
     }
 
-    override fun getIdBySlug(eventSlug: String): UUID = transaction {
+    // Internal helper method for other repositories that need eventId UUID
+    fun getEventIdBySlug(eventSlug: String): UUID = transaction {
         val event = entity.eventFindBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
         event.id.value

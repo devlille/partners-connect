@@ -1,6 +1,6 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
-import fr.devlille.partners.connect.events.domain.EventRepository
+import fr.devlille.partners.connect.events.application.EventRepositoryExposed
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
@@ -22,7 +22,7 @@ import kotlin.getValue
 
 @Suppress("ThrowsCount")
 fun Route.partnershipAgreementRoutes() {
-    val eventRepository by inject<EventRepository>()
+    val eventRepository by inject<EventRepositoryExposed>()
     val partnershipRepository by inject<PartnershipRepository>()
     val agreementRepository by inject<PartnershipAgreementRepository>()
     val storageRepository by inject<PartnershipStorageRepository>()
@@ -33,7 +33,7 @@ fun Route.partnershipAgreementRoutes() {
 
         post {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-            val eventId = eventRepository.getIdBySlug(eventSlug)
+            val eventId = eventRepository.getEventIdBySlug(eventSlug)
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
             val pdfBinary = agreementRepository.generateAgreement(eventId, partnershipId)
@@ -45,7 +45,7 @@ fun Route.partnershipAgreementRoutes() {
     route("/events/{eventSlug}/partnership/{partnershipId}/signed-agreement") {
         post {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-            val eventId = eventRepository.getIdBySlug(eventSlug)
+            val eventId = eventRepository.getEventIdBySlug(eventSlug)
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
             val multipart = call.receiveMultipart()
