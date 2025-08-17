@@ -7,11 +7,16 @@ interface EventRepository {
 
     // Slug-based methods (new)
     fun getBySlug(eventSlug: String): Event
+
     fun getPublicEventBySlug(eventSlug: String): EventWithOrganisation
 
     // UUID-based methods (for backward compatibility with other modules)
     fun getById(eventId: UUID): Event
+
     fun getPublicEventById(eventId: UUID): EventWithOrganisation
+
+    // Helper method to convert slug to UUID for internal use
+    fun getIdBySlug(eventSlug: String): UUID
 
     fun findByOrgSlug(orgSlug: String): List<EventSummary>
 

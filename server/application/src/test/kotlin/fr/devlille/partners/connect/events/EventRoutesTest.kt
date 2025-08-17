@@ -7,7 +7,6 @@ import fr.devlille.partners.connect.events.factories.insertMockedEventWithOrga
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
-import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
 import io.ktor.client.request.get
 import io.ktor.client.request.header

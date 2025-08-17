@@ -24,7 +24,7 @@ fun insertMockedEvent(
 ): EventEntity = transaction {
     EventEntity.new(id) {
         this.name = name
-        this.slug = slug ?: name.slugify()
+        this.slug = slug ?: "${name.slugify()}-${id.toString().take(8)}"
         this.startTime = LocalDateTime.parse(startTime)
         this.endTime = LocalDateTime.parse(endTime)
         this.submissionStartTime = LocalDateTime.parse(submissionStartTime)
@@ -52,7 +52,7 @@ fun insertMockedEventWithOrga(
 ): EventEntity = transaction {
     EventEntity.new(id) {
         this.name = name
-        this.slug = slug ?: name.slugify()
+        this.slug = slug ?: "${name.slugify()}-${id.toString().take(8)}"
         this.startTime = LocalDateTime.parse(startTime)
         this.endTime = LocalDateTime.parse(endTime)
         this.submissionStartTime = LocalDateTime.parse(submissionStartTime)

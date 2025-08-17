@@ -21,5 +21,5 @@ class EventEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var organisation by OrganisationEntity referencedOn EventsTable.organisationId
 }
 
-fun UUIDEntityClass<EventEntity>.findBySlug(slug: String): EventEntity? = 
+fun UUIDEntityClass<EventEntity>.findBySlug(slug: String): EventEntity? =
     this.find { EventsTable.slug eq slug }.singleOrNull()
