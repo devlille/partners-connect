@@ -28,7 +28,7 @@ import org.jetbrains.exposed.v1.jdbc.SchemaUtils
  * This represents the current state of the database schema.
  */
 object InitialSchemaMigration : Migration {
-    override val id = "20241220_120000_initial_schema"
+    override val id = "20250801_initial_schema"
     override val description = "Create initial database schema with all tables"
 
     override fun up() {

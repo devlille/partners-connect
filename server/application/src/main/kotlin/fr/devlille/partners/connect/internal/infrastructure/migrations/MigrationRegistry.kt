@@ -13,10 +13,6 @@ object MigrationRegistry {
      */
     val allMigrations: List<Migration> = listOf(
         InitialSchemaMigration,
-        // Add new migrations here in chronological order
-        // Example:
-        // AddUserPreferencesMigration,
-        // UpdateCompanyTableMigration,
     )
 
     /**
