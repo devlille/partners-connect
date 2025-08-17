@@ -32,7 +32,7 @@ import kotlin.time.Duration.Companion.days
 class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
     @OptIn(FormatStringsInDatetimeFormats::class)
     override fun generateAgreement(eventSlug: String, partnershipId: UUID): ByteArray = transaction {
-        val event = EventEntity.findBySlug(eventSlug) 
+        val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
         val partnership = PartnershipEntity.findById(partnershipId) ?: throw NotFoundException("Partnership not found")
         val template = readResourceFile("/agreement/${partnership.language}.md")

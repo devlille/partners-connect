@@ -19,7 +19,6 @@ import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import java.util.UUID
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug as eventFindBySlug
 import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug as orgFindBySlug
 

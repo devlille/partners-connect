@@ -37,7 +37,7 @@ fun Route.partnershipSuggestionRoutes() {
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             val event = eventRepository.getBySlug(eventSlug).event
             val variables = NotificationVariables.SuggestionApproved(partnership.language, event, company)
-            // Note: we need eventId for notification, get it from event  
+            // Note: we need eventId for notification, get it from event
             val eventId = EventEntity.findBySlug(eventSlug)?.id?.value
                 ?: throw NotFoundException("Event with slug $eventSlug not found")
             notificationRepository.sendMessage(eventId, variables)
@@ -53,7 +53,7 @@ fun Route.partnershipSuggestionRoutes() {
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             val event = eventRepository.getBySlug(eventSlug).event
             val variables = NotificationVariables.SuggestionDeclined(partnership.language, event, company)
-            // Note: we need eventId for notification, get it from event  
+            // Note: we need eventId for notification, get it from event
             val eventId = EventEntity.findBySlug(eventSlug)?.id?.value
                 ?: throw NotFoundException("Event with slug $eventSlug not found")
             notificationRepository.sendMessage(eventId, variables)
@@ -76,7 +76,7 @@ fun Route.partnershipSuggestionRoutes() {
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val event = eventRepository.getBySlug(eventSlug).event
             val variables = NotificationVariables.NewSuggestion(input.language, event, company, pack)
-            // Note: we need eventId for notification, get it from event  
+            // Note: we need eventId for notification, get it from event
             val eventId = EventEntity.findBySlug(eventSlug)?.id?.value
                 ?: throw NotFoundException("Event with slug $eventSlug not found")
             notificationRepository.sendMessage(eventId, variables)

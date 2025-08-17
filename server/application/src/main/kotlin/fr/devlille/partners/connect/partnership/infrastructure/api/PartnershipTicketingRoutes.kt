@@ -1,6 +1,5 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
-import fr.devlille.partners.connect.events.application.EventRepositoryExposed
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.tickets.domain.TicketData
 import fr.devlille.partners.connect.tickets.domain.TicketRepository
@@ -18,7 +17,6 @@ import org.koin.ktor.ext.inject
 @Suppress("ThrowsCount")
 fun Route.partnershipTicketingRoutes() {
     val ticketingRepository by inject<TicketRepository>()
-    val eventRepository by inject<EventRepositoryExposed>()
 
     route("/events/{eventSlug}/partnership/{partnershipId}/tickets") {
         get {

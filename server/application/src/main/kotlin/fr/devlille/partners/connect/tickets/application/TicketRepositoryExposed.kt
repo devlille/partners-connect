@@ -86,7 +86,12 @@ Not enough tickets in the validated pack: ${validatedPack.nbTickets} available, 
         return order
     }
 
-    override suspend fun updateTicket(eventSlug: String, partnershipId: UUID, ticketId: String, data: TicketData): Ticket {
+    override suspend fun updateTicket(
+        eventSlug: String,
+        partnershipId: UUID,
+        ticketId: String,
+        data: TicketData,
+    ): Ticket {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
         val eventId = event.id.value

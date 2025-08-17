@@ -68,7 +68,7 @@ fun Route.partnershipBillingRoutes() {
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             val variables = NotificationVariables.NewInvoice(partnership.language, event, company)
-            // Note: we need eventId for notification, get it from event  
+            // Note: we need eventId for notification, get it from event
             val eventId = EventEntity.findBySlug(eventSlug)?.id?.value
                 ?: throw NotFoundException("Event with slug $eventSlug not found")
             notificationRepository.sendMessage(eventId, variables)
@@ -84,7 +84,7 @@ fun Route.partnershipBillingRoutes() {
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             val variables = NotificationVariables.NewInvoice(partnership.language, event, company)
-            // Note: we need eventId for notification, get it from event  
+            // Note: we need eventId for notification, get it from event
             val eventId = EventEntity.findBySlug(eventSlug)?.id?.value
                 ?: throw NotFoundException("Event with slug $eventSlug not found")
             notificationRepository.sendMessage(eventId, variables)
