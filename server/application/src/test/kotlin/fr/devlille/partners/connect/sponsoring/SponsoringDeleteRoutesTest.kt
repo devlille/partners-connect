@@ -24,17 +24,20 @@ class SponsoringDeleteRoutesTest {
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
         val optionId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
             insertMockedSponsoringPack(packId, eventId, maxQuantity = null)
             insertMockedSponsoringOption(optionId = optionId, eventId = eventId)
             insertMockedPackOptions(packId, optionId)
         }
 
-        val response = client.delete("/orgs/$orgId/events/$eventId/packs/$packId/options/$optionId") {
+        val response = client.delete("/orgs/$orgId/events/$eventSlug/packs/$packId/options/$optionId") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
         assertEquals(HttpStatusCode.NoContent, response.status)
@@ -46,14 +49,17 @@ class SponsoringDeleteRoutesTest {
         val eventId = UUID.randomUUID()
         val optionId = UUID.randomUUID()
         val packId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
         }
 
-        val response = client.delete("/orgs/$orgId/events/$eventId/packs/$packId/options/$optionId") {
+        val response = client.delete("/orgs/$orgId/events/$eventSlug/packs/$packId/options/$optionId") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
         assertEquals(HttpStatusCode.NotFound, response.status)
@@ -64,17 +70,20 @@ class SponsoringDeleteRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val optionId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
             val pack = insertMockedSponsoringPack(event = eventId)
             insertMockedSponsoringOption(optionId = optionId, eventId = eventId)
             insertMockedPackOptions(pack.id.value, optionId)
         }
 
-        val response = client.delete("/orgs/$orgId/events/$eventId/options/$optionId") {
+        val response = client.delete("/orgs/$orgId/events/$eventSlug/options/$optionId") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
         assertEquals(HttpStatusCode.BadRequest, response.status)
@@ -86,15 +95,18 @@ class SponsoringDeleteRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val optionId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
             insertMockedSponsoringOption(optionId = optionId, eventId = eventId)
         }
 
-        val response = client.delete("/orgs/$orgId/events/$eventId/options/$optionId") {
+        val response = client.delete("/orgs/$orgId/events/$eventSlug/options/$optionId") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
         assertEquals(HttpStatusCode.NoContent, response.status)
@@ -105,17 +117,20 @@ class SponsoringDeleteRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
             insertMockedSponsoringPack(packId, eventId, maxQuantity = null)
             val option = insertMockedSponsoringOption(eventId = eventId)
             insertMockedPackOptions(packId, option.id.value)
         }
 
-        val response = client.delete("/orgs/$orgId/events/$eventId/packs/$packId") {
+        val response = client.delete("/orgs/$orgId/events/$eventSlug/packs/$packId") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
         assertEquals(HttpStatusCode.BadRequest, response.status)
@@ -127,15 +142,18 @@ class SponsoringDeleteRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
             insertMockedSponsoringPack(packId, eventId, maxQuantity = null)
         }
 
-        val response = client.delete("/orgs/$orgId/events/$eventId/packs/$packId") {
+        val response = client.delete("/orgs/$orgId/events/$eventSlug/packs/$packId") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
         assertEquals(HttpStatusCode.NoContent, response.status)
@@ -146,14 +164,17 @@ class SponsoringDeleteRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val optionId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
         }
 
-        val response = client.delete("/orgs/$orgId/events/$eventId/options/$optionId") {
+        val response = client.delete("/orgs/$orgId/events/$eventSlug/options/$optionId") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
         assertEquals(HttpStatusCode.NotFound, response.status)
@@ -165,14 +186,17 @@ class SponsoringDeleteRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
         }
 
-        val response = client.delete("/orgs/$orgId/events/$eventId/packs/$packId") {
+        val response = client.delete("/orgs/$orgId/events/$eventSlug/packs/$packId") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
         assertEquals(HttpStatusCode.NotFound, response.status)

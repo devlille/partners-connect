@@ -33,11 +33,14 @@ class SponsoringPackUpdateRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
             insertMockedSponsoringPack(
                 id = packId,
                 event = eventId,
@@ -57,7 +60,7 @@ class SponsoringPackUpdateRoutesTest {
             withBooth = true,
         )
 
-        val response = client.put("/orgs/$orgId/events/$eventId/packs/$packId") {
+        val response = client.put("/orgs/$orgId/events/$eventSlug/packs/$packId") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(updateRequest))
@@ -85,11 +88,14 @@ class SponsoringPackUpdateRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
             insertMockedSponsoringPack(
                 id = packId,
                 event = eventId,
@@ -106,14 +112,14 @@ class SponsoringPackUpdateRoutesTest {
         )
 
         // Update the pack
-        client.put("/orgs/$orgId/events/$eventId/packs/$packId") {
+        client.put("/orgs/$orgId/events/$eventSlug/packs/$packId") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(updateRequest))
         }
 
         // Verify via GET endpoint
-        val getResponse = client.get("/orgs/$orgId/events/$eventId/packs") {
+        val getResponse = client.get("/orgs/$orgId/events/$eventSlug/packs") {
             header(HttpHeaders.AcceptLanguage, "en")
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -131,14 +137,17 @@ class SponsoringPackUpdateRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val nonExistentPackId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
         }
 
-        val response = client.put("/orgs/$orgId/events/$eventId/packs/$nonExistentPackId") {
+        val response = client.put("/orgs/$orgId/events/$eventSlug/packs/$nonExistentPackId") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(createSponsoringPack()))
@@ -152,15 +161,18 @@ class SponsoringPackUpdateRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
             insertMockedSponsoringPack(id = packId, event = eventId)
         }
 
-        val response = client.put("/orgs/$orgId/events/$eventId/packs/$packId") {
+        val response = client.put("/orgs/$orgId/events/$eventSlug/packs/$packId") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody("""{"invalid": "payload"}""")
@@ -174,15 +186,17 @@ class SponsoringPackUpdateRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEvent(eventId, orgId = orgId) // No admin user permission
+            val event = insertMockedEvent(eventId, orgId = orgId) // No admin user permission
+            eventSlug = event.slug
             insertMockedSponsoringPack(id = packId, event = eventId)
         }
 
-        val response = client.put("/orgs/$orgId/events/$eventId/packs/$packId") {
+        val response = client.put("/orgs/$orgId/events/$eventSlug/packs/$packId") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(createSponsoringPack()))

@@ -31,13 +31,16 @@ class SponsoringOptionRoutesTest {
     fun `GET returns empty list when no options exist`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        lateinit var eventSlug: String
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventId/options") {
+        val response = client.get("/orgs/$orgId/events/$eventSlug/options") {
             header(HttpHeaders.AcceptLanguage, "fr")
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -50,10 +53,13 @@ class SponsoringOptionRoutesTest {
     fun `POST creates an option with translations and GET returns it`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        lateinit var eventSlug: String
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
         }
 
         val request = CreateSponsoringOption(
@@ -64,7 +70,7 @@ class SponsoringOptionRoutesTest {
             price = 100,
         )
 
-        val postResponse = client.post("/orgs/$orgId/events/$eventId/options") {
+        val postResponse = client.post("/orgs/$orgId/events/$eventSlug/options") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(json.encodeToString(request))
@@ -75,7 +81,7 @@ class SponsoringOptionRoutesTest {
         val response = json.decodeFromString<Map<String, String>>(postResponse.bodyAsText())
         assertNotNull(response["id"])
 
-        val responseFr = client.get("/orgs/$orgId/events/$eventId/options") {
+        val responseFr = client.get("/orgs/$orgId/events/$eventSlug/options") {
             header(HttpHeaders.AcceptLanguage, "fr")
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -85,7 +91,7 @@ class SponsoringOptionRoutesTest {
         assertEquals(1, bodyFr.size)
         assertEquals("Option FR", bodyFr.first().name)
 
-        val responseEn = client.get("/orgs/$orgId/events/$eventId/options") {
+        val responseEn = client.get("/orgs/$orgId/events/$eventSlug/options") {
             header(HttpHeaders.AcceptLanguage, "en")
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -100,13 +106,16 @@ class SponsoringOptionRoutesTest {
     fun `GET returns 400 when Accept-Language is missing`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        lateinit var eventSlug: String
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventId/options") {
+        val response = client.get("/orgs/$orgId/events/$eventSlug/options") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
         assertEquals(HttpStatusCode.BadRequest, response.status)
@@ -117,10 +126,13 @@ class SponsoringOptionRoutesTest {
     fun `POST and GET fail if translation for requested language doesn't exist`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        lateinit var eventSlug: String
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
         }
 
         val request = CreateSponsoringOption(
@@ -129,13 +141,13 @@ class SponsoringOptionRoutesTest {
             ),
         )
 
-        client.post("/orgs/$orgId/events/$eventId/options") {
+        client.post("/orgs/$orgId/events/$eventSlug/options") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(json.encodeToString(request))
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventId/options") {
+        val response = client.get("/orgs/$orgId/events/$eventSlug/options") {
             header(HttpHeaders.AcceptLanguage, "de")
             header(HttpHeaders.Authorization, "Bearer valid")
         }

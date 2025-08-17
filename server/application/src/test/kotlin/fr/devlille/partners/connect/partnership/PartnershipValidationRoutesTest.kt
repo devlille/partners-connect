@@ -29,11 +29,14 @@ class PartnershipValidationRoutesTest {
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
         val packId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(packId, eventId)
             insertMockedPartnership(
@@ -44,7 +47,7 @@ class PartnershipValidationRoutesTest {
             )
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/validate") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/validate") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -59,14 +62,17 @@ class PartnershipValidationRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/validate") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/validate") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -80,16 +86,19 @@ class PartnershipValidationRoutesTest {
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/decline") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/decline") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -104,14 +113,17 @@ class PartnershipValidationRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
         }
 
-        val response = client.delete("/orgs/$orgId/events/$eventId/partnership/$partnershipId/decline") {
+        val response = client.delete("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/decline") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
         }

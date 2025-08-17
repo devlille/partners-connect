@@ -48,11 +48,14 @@ class PartnershipAgreementRoutesTest {
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
@@ -64,7 +67,7 @@ class PartnershipAgreementRoutesTest {
             )
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/agreement") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -108,14 +111,17 @@ class PartnershipAgreementRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/agreement") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -135,15 +141,18 @@ class PartnershipAgreementRoutesTest {
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
             insertMockedCompany(companyId)
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/agreement") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -159,11 +168,14 @@ class PartnershipAgreementRoutesTest {
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
             insertMockedOrganisationEntity(orgId, representativeUser = insertMockedUser(name = null))
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
@@ -175,7 +187,7 @@ class PartnershipAgreementRoutesTest {
             )
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/agreement") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -192,11 +204,14 @@ class PartnershipAgreementRoutesTest {
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
             insertMockedCompany(companyId)
             insertMockedPartnership(
                 id = partnershipId,
@@ -206,7 +221,7 @@ class PartnershipAgreementRoutesTest {
             )
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/agreement") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -223,11 +238,14 @@ class PartnershipAgreementRoutesTest {
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
+        lateinit var eventSlug: String
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            val event = insertMockedEventWithAdminUser(eventId, orgId)
+
+            eventSlug = event.slug
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
@@ -240,7 +258,7 @@ class PartnershipAgreementRoutesTest {
             )
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventId/partnership/$partnershipId/agreement") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
