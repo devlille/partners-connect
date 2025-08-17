@@ -20,22 +20,26 @@ import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 import kotlin.getValue
 
-@Suppress("ThrowsCount")
+@Suppress("ThrowsCount", "LongMethod")
 fun Route.partnershipBillingRoutes() {
     val partnershipBillingRepository by inject<PartnershipBillingRepository>()
     val billingRepository by inject<BillingRepository>()
     val eventRepository by inject<EventRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
     val notificationRepository by inject<NotificationRepository>()
-
     route("/events/{eventSlug}/partnership/{partnershipId}/billing") {
         get {
-            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-            val eventId = eventRepository.getIdBySlug(eventSlug)
-            val partnershipId = call.parameters["partnershipId"]?.toUUID()
-                ?: throw BadRequestException("Missing partnership id")
-            val invoice = partnershipBillingRepository.getByPartnershipId(eventId, partnershipId)
-            call.respond(HttpStatusCode.OK, invoice)
+            val eventId = eventRepository.getIdBySlug(
+                call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug"),
+            )
+            call.respond(
+                HttpStatusCode.OK,
+                partnershipBillingRepository.getByPartnershipId(
+                    eventId,
+                    call.parameters["partnershipId"]?.toUUID()
+                        ?: throw BadRequestException("Missing partnership id"),
+                ),
+            )
         }
         post {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
@@ -62,11 +66,15 @@ fun Route.partnershipBillingRoutes() {
                 ?: throw BadRequestException("Missing partnership id")
             val invoiceUrl = billingRepository.createInvoice(eventId, partnershipId)
             partnershipBillingRepository.updateInvoiceUrl(eventId, partnershipId, invoiceUrl)
-            val event = eventRepository.getById(eventId)
-            val company = partnershipRepository.getCompanyByPartnershipId(eventId, partnershipId)
             val partnership = partnershipRepository.getById(eventId, partnershipId)
-            val variables = NotificationVariables.NewInvoice(partnership.language, event, company)
-            notificationRepository.sendMessage(eventId, variables)
+            notificationRepository.sendMessage(
+                eventId,
+                NotificationVariables.NewInvoice(
+                    partnership.language,
+                    eventRepository.getById(eventId),
+                    partnershipRepository.getCompanyByPartnershipId(eventId, partnershipId),
+                ),
+            )
             call.respond(HttpStatusCode.Created, mapOf("url" to invoiceUrl))
         }
         post("quote") {
@@ -76,11 +84,15 @@ fun Route.partnershipBillingRoutes() {
                 ?: throw BadRequestException("Missing partnership id")
             val quoteUrl = billingRepository.createQuote(eventId, partnershipId)
             partnershipBillingRepository.updateQuoteUrl(eventId, partnershipId, quoteUrl)
-            val event = eventRepository.getById(eventId)
-            val company = partnershipRepository.getCompanyByPartnershipId(eventId, partnershipId)
             val partnership = partnershipRepository.getById(eventId, partnershipId)
-            val variables = NotificationVariables.NewInvoice(partnership.language, event, company)
-            notificationRepository.sendMessage(eventId, variables)
+            notificationRepository.sendMessage(
+                eventId,
+                NotificationVariables.NewInvoice(
+                    partnership.language,
+                    eventRepository.getById(eventId),
+                    partnershipRepository.getCompanyByPartnershipId(eventId, partnershipId),
+                ),
+            )
             call.respond(HttpStatusCode.Created, mapOf("url" to quoteUrl))
         }
     }

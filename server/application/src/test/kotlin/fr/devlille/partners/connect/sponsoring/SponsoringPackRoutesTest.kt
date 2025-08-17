@@ -40,7 +40,7 @@ class SponsoringPackRoutesTest {
         val eventId = UUID.randomUUID()
         val testOrgSlug = "test-org-empty"
         val testEventSlug = "test-event-empty"
-        
+
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId, name = testOrgSlug)

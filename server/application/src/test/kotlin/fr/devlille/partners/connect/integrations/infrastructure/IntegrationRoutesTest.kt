@@ -35,7 +35,7 @@ class IntegrationRoutesTest {
             insertMockedEvent(eventId, orgId = orgId, slug = testEventSlug, name = "Test Event 1")
             insertMockedOrgaPermission(orgId = orgId, user = insertMockedAdminUser())
         }
-        
+
         val requestBody = Json.encodeToString(
             CreateIntegration.CreateSlackIntegration(
                 token = "xoxb-test-token",
@@ -67,7 +67,7 @@ class IntegrationRoutesTest {
             insertMockedEvent(eventId, orgId = orgId, slug = testEventSlug, name = "Test Event 2")
             insertMockedOrgaPermission(orgId = orgId, user = insertMockedAdminUser())
         }
-        
+
         val response = client.post("/orgs/$testOrgSlug/events/$testEventSlug/integrations/slack/invalid_usage") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
@@ -91,8 +91,9 @@ class IntegrationRoutesTest {
             insertMockedEvent(eventId, orgId = orgId, slug = testEventSlug, name = "Test Event 3")
             insertMockedOrgaPermission(orgId = orgId, user = insertMockedAdminUser())
         }
-        
-        val response = client.post("/orgs/$testOrgSlug/events/$testEventSlug/integrations/invalid_provider/notification") {
+
+        val integrationPath = "/orgs/$testOrgSlug/events/$testEventSlug/integrations/invalid_provider/notification"
+        val response = client.post(integrationPath) {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody("{}")
