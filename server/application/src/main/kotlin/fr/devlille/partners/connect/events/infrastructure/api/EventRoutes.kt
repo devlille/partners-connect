@@ -25,7 +25,7 @@ fun Route.eventRoutes() {
 
         get("/{event_slug}") {
             val eventSlug = call.parameters["event_slug"] ?: throw BadRequestException("Missing event slug")
-            val eventWithOrg = repository.getPublicEventBySlug(eventSlug)
+            val eventWithOrg = repository.getBySlug(eventSlug)
             call.respond(HttpStatusCode.OK, eventWithOrg)
         }
     }

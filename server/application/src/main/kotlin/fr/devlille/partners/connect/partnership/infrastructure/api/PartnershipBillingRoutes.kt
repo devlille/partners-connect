@@ -71,7 +71,7 @@ fun Route.partnershipBillingRoutes() {
                 eventId,
                 NotificationVariables.NewInvoice(
                     partnership.language,
-                    eventRepository.getById(eventId),
+                    eventRepository.getBySlug(eventSlug).event,
                     partnershipRepository.getCompanyByPartnershipId(eventId, partnershipId),
                 ),
             )
@@ -89,7 +89,7 @@ fun Route.partnershipBillingRoutes() {
                 eventId,
                 NotificationVariables.NewInvoice(
                     partnership.language,
-                    eventRepository.getById(eventId),
+                    eventRepository.getBySlug(eventSlug).event,
                     partnershipRepository.getCompanyByPartnershipId(eventId, partnershipId),
                 ),
             )

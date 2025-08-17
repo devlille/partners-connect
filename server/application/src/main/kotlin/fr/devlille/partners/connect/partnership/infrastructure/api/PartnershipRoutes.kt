@@ -37,7 +37,7 @@ fun Route.partnershipRoutes() {
             val partnership = partnershipRepository.getById(eventId, id)
             val pack = partnership.selectedPack
                 ?: throw NotFoundException("Partnership does not have a selected pack")
-            val event = eventRepository.getById(eventId)
+            val event = eventRepository.getBySlug(eventSlug).event
             val variables = NotificationVariables.NewPartnership(register.language, event, company, pack)
             notificationRepository.sendMessage(eventId, variables)
             call.respond(HttpStatusCode.Created, mapOf("id" to id.toString()))
@@ -83,7 +83,7 @@ fun Route.partnershipRoutes() {
                 val partnership = partnershipRepository.getById(eventId, partnershipId)
                 val pack = partnership.selectedPack
                     ?: throw BadRequestException("Partnership does not have a selected pack")
-                val event = eventRepository.getById(eventId)
+                val event = eventRepository.getBySlug(eventSlug).event
                 val variables = NotificationVariables.PartnershipValidated(partnership.language, event, company, pack)
                 notificationRepository.sendMessage(eventId, variables)
                 call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
@@ -101,7 +101,7 @@ fun Route.partnershipRoutes() {
                 val id = partnershipRepository.decline(eventId, partnershipId)
                 val company = partnershipRepository.getCompanyByPartnershipId(eventId, partnershipId)
                 val partnership = partnershipRepository.getById(eventId, partnershipId)
-                val event = eventRepository.getById(eventId)
+                val event = eventRepository.getBySlug(eventSlug).event
                 val variables = NotificationVariables.PartnershipDeclined(partnership.language, event, company)
                 notificationRepository.sendMessage(eventId, variables)
                 call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))

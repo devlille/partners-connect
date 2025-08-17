@@ -34,7 +34,7 @@ fun Route.partnershipSuggestionRoutes() {
             val id = suggestionRepository.approve(eventId, partnershipId)
             val company = partnershipRepository.getCompanyByPartnershipId(eventId, partnershipId)
             val partnership = partnershipRepository.getById(eventId, partnershipId)
-            val event = eventRepository.getById(eventId)
+            val event = eventRepository.getBySlug(eventSlug).event
             val variables = NotificationVariables.SuggestionApproved(partnership.language, event, company)
             notificationRepository.sendMessage(eventId, variables)
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
@@ -48,7 +48,7 @@ fun Route.partnershipSuggestionRoutes() {
             val id = suggestionRepository.decline(eventId, partnershipId)
             val company = partnershipRepository.getCompanyByPartnershipId(eventId, partnershipId)
             val partnership = partnershipRepository.getById(eventId, partnershipId)
-            val event = eventRepository.getById(eventId)
+            val event = eventRepository.getBySlug(eventSlug).event
             val variables = NotificationVariables.SuggestionDeclined(partnership.language, event, company)
             notificationRepository.sendMessage(eventId, variables)
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
@@ -69,7 +69,7 @@ fun Route.partnershipSuggestionRoutes() {
             val pack = partnership.suggestionPack
                 ?: throw NotFoundException("Partnership does not have a suggestion pack")
             val company = partnershipRepository.getCompanyByPartnershipId(eventId, partnershipId)
-            val event = eventRepository.getById(eventId)
+            val event = eventRepository.getBySlug(eventSlug).event
             val variables = NotificationVariables.NewSuggestion(input.language, event, company, pack)
             notificationRepository.sendMessage(eventId, variables)
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))

@@ -5,17 +5,8 @@ import java.util.UUID
 interface EventRepository {
     fun getAllEvents(): List<EventSummary>
 
-    // Slug-based methods (new)
-    fun getBySlug(eventSlug: String): Event
+    fun getBySlug(eventSlug: String): EventWithOrganisation
 
-    fun getPublicEventBySlug(eventSlug: String): EventWithOrganisation
-
-    // UUID-based methods (for backward compatibility with other modules)
-    fun getById(eventId: UUID): Event
-
-    fun getPublicEventById(eventId: UUID): EventWithOrganisation
-
-    // Helper method to convert slug to UUID for internal use
     fun getIdBySlug(eventSlug: String): UUID
 
     fun findByOrgSlug(orgSlug: String): List<EventSummary>
