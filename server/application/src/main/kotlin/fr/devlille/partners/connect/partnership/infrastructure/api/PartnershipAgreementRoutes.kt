@@ -28,11 +28,12 @@ fun Route.partnershipAgreementRoutes() {
     val storageRepository by inject<PartnershipStorageRepository>()
     val notificationRepository by inject<NotificationRepository>()
 
-    route("/orgs/{orgSlug}/events/{eventId}/partnership/{partnershipId}/agreement") {
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/agreement") {
         install(AuthorizedOrganisationPlugin)
 
         post {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventId = eventRepository.getIdBySlug(eventSlug)
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
             val pdfBinary = agreementRepository.generateAgreement(eventId, partnershipId)
@@ -41,9 +42,10 @@ fun Route.partnershipAgreementRoutes() {
         }
     }
 
-    route("/events/{eventId}/partnership/{partnershipId}/signed-agreement") {
+    route("/events/{eventSlug}/partnership/{partnershipId}/signed-agreement") {
         post {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventId = eventRepository.getIdBySlug(eventSlug)
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
             val multipart = call.receiveMultipart()

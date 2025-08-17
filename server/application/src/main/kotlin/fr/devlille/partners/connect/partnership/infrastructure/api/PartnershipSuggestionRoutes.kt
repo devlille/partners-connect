@@ -25,9 +25,10 @@ fun Route.partnershipSuggestionRoutes() {
     val suggestionRepository by inject<PartnershipSuggestionRepository>()
     val notificationRepository by inject<NotificationRepository>()
 
-    route("/events/{eventId}/partnership/{partnershipId}") {
+    route("/events/{eventSlug}/partnership/{partnershipId}") {
         post("/suggestion-approve") {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventId = eventRepository.getIdBySlug(eventSlug)
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
             val id = suggestionRepository.approve(eventId, partnershipId)
@@ -40,7 +41,8 @@ fun Route.partnershipSuggestionRoutes() {
         }
 
         post("/suggestion-decline") {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventId = eventRepository.getIdBySlug(eventSlug)
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
             val id = suggestionRepository.decline(eventId, partnershipId)
@@ -53,11 +55,12 @@ fun Route.partnershipSuggestionRoutes() {
         }
     }
 
-    route("/orgs/{orgSlug}/events/{eventId}/partnership/{partnershipId}") {
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}") {
         install(AuthorizedOrganisationPlugin)
 
         post("/suggestion") {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventId = eventRepository.getIdBySlug(eventSlug)
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
             val input = call.receive<SuggestPartnership>()

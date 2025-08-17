@@ -27,9 +27,10 @@ fun Route.partnershipRoutes() {
     val partnershipRepository by inject<PartnershipRepository>()
     val notificationRepository by inject<NotificationRepository>()
 
-    route("/events/{eventId}/partnership") {
+    route("/events/{eventSlug}/partnership") {
         post {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventId = eventRepository.getIdBySlug(eventSlug)
             val register = call.receive<RegisterPartnership>()
             val id = partnershipRepository.register(eventId, register)
             val company = companyRepository.getById(register.companyId.toUUID())
@@ -43,11 +44,12 @@ fun Route.partnershipRoutes() {
         }
     }
 
-    route("/orgs/{orgSlug}/events/{eventId}/partnership") {
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnership") {
         install(AuthorizedOrganisationPlugin)
 
         get {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventId = eventRepository.getIdBySlug(eventSlug)
 
             // Parse query parameters for filters
             val filters = PartnershipFilters(
@@ -67,12 +69,13 @@ fun Route.partnershipRoutes() {
         }
     }
 
-    route("/orgs/{orgSlug}/events/{eventId}/partnership/{partnershipId}") {
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}") {
         route("/validate") {
             install(AuthorizedOrganisationPlugin)
 
             post {
-                val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+                val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+                val eventId = eventRepository.getIdBySlug(eventSlug)
                 val partnershipId = call.parameters["partnershipId"]?.toUUID()
                     ?: throw BadRequestException("Missing partnership id")
                 val id = partnershipRepository.validate(eventId, partnershipId)
@@ -91,7 +94,8 @@ fun Route.partnershipRoutes() {
             install(AuthorizedOrganisationPlugin)
 
             post {
-                val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+                val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+                val eventId = eventRepository.getIdBySlug(eventSlug)
                 val partnershipId = call.parameters["partnershipId"]?.toUUID()
                     ?: throw BadRequestException("Missing partnership id")
                 val id = partnershipRepository.decline(eventId, partnershipId)

@@ -28,16 +28,18 @@ fun Route.partnershipBillingRoutes() {
     val partnershipRepository by inject<PartnershipRepository>()
     val notificationRepository by inject<NotificationRepository>()
 
-    route("/events/{eventId}/partnership/{partnershipId}/billing") {
+    route("/events/{eventSlug}/partnership/{partnershipId}/billing") {
         get {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventId = eventRepository.getIdBySlug(eventSlug)
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
             val invoice = partnershipBillingRepository.getByPartnershipId(eventId, partnershipId)
             call.respond(HttpStatusCode.OK, invoice)
         }
         post {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventId = eventRepository.getIdBySlug(eventSlug)
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
             val input = call.receive<CompanyBillingData>()
@@ -45,7 +47,8 @@ fun Route.partnershipBillingRoutes() {
             call.respond(HttpStatusCode.Created, mapOf("id" to billingId.toString()))
         }
         put {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventId = eventRepository.getIdBySlug(eventSlug)
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
             val input = call.receive<CompanyBillingData>()
@@ -53,7 +56,8 @@ fun Route.partnershipBillingRoutes() {
             call.respond(HttpStatusCode.OK, mapOf("id" to billingId.toString()))
         }
         post("invoice") {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventId = eventRepository.getIdBySlug(eventSlug)
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
             val invoiceUrl = billingRepository.createInvoice(eventId, partnershipId)
@@ -66,7 +70,8 @@ fun Route.partnershipBillingRoutes() {
             call.respond(HttpStatusCode.Created, mapOf("url" to invoiceUrl))
         }
         post("quote") {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventId = eventRepository.getIdBySlug(eventSlug)
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
             val quoteUrl = billingRepository.createQuote(eventId, partnershipId)
