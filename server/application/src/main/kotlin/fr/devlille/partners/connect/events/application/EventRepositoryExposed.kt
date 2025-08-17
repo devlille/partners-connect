@@ -19,7 +19,6 @@ import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import java.util.UUID
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug as eventFindBySlug
 import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug as orgFindBySlug
 
@@ -74,13 +73,6 @@ class EventRepositoryExposed(
             event = event,
             organisation = organisation,
         )
-    }
-
-    // Internal helper method for other repositories that need eventId UUID
-    fun getEventIdBySlug(eventSlug: String): UUID = transaction {
-        val event = entity.eventFindBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
-        event.id.value
     }
 
     override fun createEvent(orgSlug: String, event: Event): String = transaction {

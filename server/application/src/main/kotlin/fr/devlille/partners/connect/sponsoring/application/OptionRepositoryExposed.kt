@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.sponsoring.application
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.sponsoring.application.mappers.toDomain
 import fr.devlille.partners.connect.sponsoring.domain.AttachOptionsToPack
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
@@ -29,13 +30,17 @@ import java.util.UUID
 class OptionRepositoryExposed(
     private val optionEntity: UUIDEntityClass<SponsoringOptionEntity> = SponsoringOptionEntity,
 ) : OptionRepository {
-    override fun listOptionsByEvent(eventId: UUID, language: String): List<SponsoringOption> = transaction {
-        optionEntity.allByEvent(eventId).map { option -> option.toDomain(language) }
+    override fun listOptionsByEvent(eventSlug: String, language: String): List<SponsoringOption> = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        optionEntity.allByEvent(event.id.value).map { option -> option.toDomain(language) }
     }
 
-    override fun createOption(eventId: UUID, input: CreateSponsoringOption): UUID = transaction {
+    override fun createOption(eventSlug: String, input: CreateSponsoringOption): UUID = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
         val option = optionEntity.new {
-            this.event = EventEntity.findById(eventId) ?: throw NotFoundException("Event with id $eventId not found")
+            this.event = event
             this.price = input.price
         }
         input.translations.forEach {
@@ -49,9 +54,11 @@ class OptionRepositoryExposed(
         option.id.value
     }
 
-    override fun updateOption(eventId: UUID, optionId: UUID, input: CreateSponsoringOption): UUID = transaction {
+    override fun updateOption(eventSlug: String, optionId: UUID, input: CreateSponsoringOption): UUID = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
         val option = optionEntity.findById(optionId) ?: throw NotFoundException("Option not found")
-        if (option.event.id.value != eventId) throw NotFoundException("Option not found")
+        if (option.event.id.value != event.id.value) throw NotFoundException("Option not found")
 
         option.price = input.price
 
@@ -69,9 +76,11 @@ class OptionRepositoryExposed(
         option.id.value
     }
 
-    override fun deleteOption(eventId: UUID, optionId: UUID) = transaction {
+    override fun deleteOption(eventSlug: String, optionId: UUID) = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
         val isUsed = PackOptionsTable
-            .listOptionsAttachedByEventAndOption(eventId, optionId)
+            .listOptionsAttachedByEventAndOption(event.id.value, optionId)
             .empty().not()
         if (isUsed) throw BadRequestException("Option is used in a pack and cannot be deleted")
 
@@ -80,29 +89,31 @@ class OptionRepositoryExposed(
 
         // Then delete option
         val deleted = SponsoringOptionsTable.deleteWhere {
-            (SponsoringOptionsTable.id eq optionId) and (SponsoringOptionsTable.eventId eq eventId)
+            (SponsoringOptionsTable.id eq optionId) and (SponsoringOptionsTable.eventId eq event.id.value)
         }
 
         if (deleted == 0) throw NotFoundException("Option not found")
     }
 
-    override fun attachOptionsToPack(eventId: UUID, packId: UUID, options: AttachOptionsToPack) = transaction {
+    override fun attachOptionsToPack(eventSlug: String, packId: UUID, options: AttachOptionsToPack) = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
         val intersect = options.required.intersect(options.optional)
         if (intersect.isNotEmpty()) {
             throw BadRequestException("options ${intersect.joinToString(",")} cannot be both required and optional")
         }
 
-        val pack = SponsoringPackEntity.singlePackById(eventId, packId)
+        val pack = SponsoringPackEntity.singlePackById(event.id.value, packId)
 
         val requiredOptions = SponsoringOptionEntity
             .find {
-                (SponsoringOptionsTable.eventId eq eventId) and
+                (SponsoringOptionsTable.eventId eq event.id.value) and
                     (SponsoringOptionsTable.id inList options.required.map(UUID::fromString))
             }
 
         val optionalOptions = SponsoringOptionEntity
             .find {
-                (SponsoringOptionsTable.eventId eq eventId) and
+                (SponsoringOptionsTable.eventId eq event.id.value) and
                     (SponsoringOptionsTable.id inList options.optional.map(UUID::fromString))
             }.toList()
 
@@ -141,8 +152,10 @@ class OptionRepositoryExposed(
         }
     }
 
-    override fun detachOptionFromPack(eventId: UUID, packId: UUID, optionId: UUID) = transaction {
-        val pack = SponsoringPackEntity.singlePackById(eventId, packId)
+    override fun detachOptionFromPack(eventSlug: String, packId: UUID, optionId: UUID) = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val pack = SponsoringPackEntity.singlePackById(event.id.value, packId)
         val deleted = PackOptionsTable.deleteWhere {
             (PackOptionsTable.pack eq pack.id) and (PackOptionsTable.option eq optionId)
         }
