@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.sponsoring
 
+import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.events.factories.insertMockedEventWithOrga
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
@@ -37,13 +38,17 @@ class SponsoringPackRoutesTest {
     fun `GET returns empty list when no packs exist`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val testOrgSlug = "test-org-empty"
+        val testEventSlug = "test-event-empty"
+        
         application {
             moduleMocked()
-            insertMockedOrganisationEntity(orgId)
+            insertMockedOrganisationEntity(orgId, name = testOrgSlug)
             insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEvent(eventId, orgId = orgId, slug = testEventSlug, name = "Test Event Empty")
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventId/packs") {
+        val response = client.get("/orgs/$testOrgSlug/events/$testEventSlug/packs") {
             header(HttpHeaders.AcceptLanguage, "en")
             header(HttpHeaders.Authorization, "Bearer valid")
         }
