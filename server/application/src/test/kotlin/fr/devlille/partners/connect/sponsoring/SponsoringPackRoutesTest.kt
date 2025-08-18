@@ -12,7 +12,9 @@ import fr.devlille.partners.connect.sponsoring.factories.insertMockedPackOptions
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringOption
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
+import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
+import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -44,7 +46,9 @@ class SponsoringPackRoutesTest {
 
         application {
             moduleMocked()
-            insertMockedOrganisationEntity(orgId, name = testOrgSlug)
+            val admin = insertMockedAdminUser()
+            insertMockedOrganisationEntity(orgId, name = testOrgSlug, representativeUser = admin)
+            insertMockedOrgaPermission(orgId = orgId, user = admin)
 
             insertMockedEvent(eventId, orgId = orgId, slug = testEventSlug, name = "Test Event Empty")
         }
@@ -297,6 +301,7 @@ class SponsoringPackRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val eventSlug = "test-post-packs-options-r-864"
+        val orgSlug = orgId.toString()
         val otherEventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
         val optionValid = UUID.randomUUID()
@@ -304,8 +309,8 @@ class SponsoringPackRoutesTest {
 
         application {
             moduleMocked()
-            val org = insertMockedOrganisationEntity(id = orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId = orgId)
+            val org = insertMockedOrganisationEntity(id = orgId, name = orgSlug)
+            val event = insertMockedEventWithAdminUser(eventId, orgId = orgId, eventSlug)
 
             insertMockedEventWithOrga(otherEventId, organisation = org)
             insertMockedSponsoringPack(packId, eventId)
@@ -315,7 +320,7 @@ class SponsoringPackRoutesTest {
             insertMockedOptionTranslation(optionId = optionInvalid)
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/packs/$packId/options") {
+        val response = client.post("/orgs/$orgSlug/events/$eventSlug/packs/$packId/options") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(
