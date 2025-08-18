@@ -31,13 +31,11 @@ class SponsoringOptionRoutesTest {
     fun `GET returns empty list when no options exist`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-1"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
-
-            eventSlug = event.slug
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
         val response = client.get("/orgs/$orgId/events/$eventSlug/options") {
@@ -53,13 +51,11 @@ class SponsoringOptionRoutesTest {
     fun `POST creates an option with translations and GET returns it`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-2"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
-
-            eventSlug = event.slug
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
         val request = CreateSponsoringOption(
@@ -106,13 +102,11 @@ class SponsoringOptionRoutesTest {
     fun `GET returns 400 when Accept-Language is missing`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-3"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
-
-            eventSlug = event.slug
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
         val response = client.get("/orgs/$orgId/events/$eventSlug/options") {
@@ -126,13 +120,11 @@ class SponsoringOptionRoutesTest {
     fun `POST and GET fail if translation for requested language doesn't exist`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-4"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
-
-            eventSlug = event.slug
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
         val request = CreateSponsoringOption(

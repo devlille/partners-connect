@@ -48,14 +48,13 @@ class PartnershipAgreementRoutesTest {
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-1"
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
@@ -111,14 +110,13 @@ class PartnershipAgreementRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-2"
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
         }
 
         val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/agreement") {
@@ -141,14 +139,13 @@ class PartnershipAgreementRoutesTest {
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-3"
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
             insertMockedCompany(companyId)
         }
 
@@ -168,14 +165,12 @@ class PartnershipAgreementRoutesTest {
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-4"
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
             insertMockedOrganisationEntity(orgId, representativeUser = insertMockedUser(name = null))
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
 
-            eventSlug = event.slug
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
@@ -204,14 +199,13 @@ class PartnershipAgreementRoutesTest {
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-5"
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
             insertMockedCompany(companyId)
             insertMockedPartnership(
                 id = partnershipId,
@@ -238,14 +232,13 @@ class PartnershipAgreementRoutesTest {
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-6"
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(

@@ -33,14 +33,13 @@ class SponsoringPackUpdateRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-1"
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
             insertMockedSponsoringPack(
                 id = packId,
                 event = eventId,
@@ -88,14 +87,13 @@ class SponsoringPackUpdateRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-2"
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
             insertMockedSponsoringPack(
                 id = packId,
                 event = eventId,
@@ -137,14 +135,13 @@ class SponsoringPackUpdateRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val nonExistentPackId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-3"
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
         }
 
         val response = client.put("/orgs/$orgId/events/$eventSlug/packs/$nonExistentPackId") {
@@ -161,14 +158,13 @@ class SponsoringPackUpdateRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-4"
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
             insertMockedSponsoringPack(id = packId, event = eventId)
         }
 
@@ -186,13 +182,13 @@ class SponsoringPackUpdateRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-5"
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
             val event = insertMockedEvent(eventId, orgId = orgId) // No admin user permission
-            eventSlug = event.slug
             insertMockedSponsoringPack(id = packId, event = eventId)
         }
 

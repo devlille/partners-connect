@@ -29,14 +29,13 @@ class PartnershipValidationRoutesTest {
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
         val packId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-1"
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(packId, eventId)
             insertMockedPartnership(
@@ -62,14 +61,13 @@ class PartnershipValidationRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-2"
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
         }
 
         val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/validate") {
@@ -86,14 +84,13 @@ class PartnershipValidationRoutesTest {
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-3"
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
         }
@@ -113,14 +110,13 @@ class PartnershipValidationRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-4"
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
         }
 
         val response = client.delete("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/decline") {

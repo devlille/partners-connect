@@ -44,9 +44,7 @@ class SponsoringPackRoutesTest {
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId, name = testOrgSlug)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
 
-            val eventSlug = event.slug
             insertMockedEvent(eventId, orgId = orgId, slug = testEventSlug, name = "Test Event Empty")
         }
 
@@ -63,13 +61,11 @@ class SponsoringPackRoutesTest {
     fun `POST creates a new pack`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-1"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
-
-            eventSlug = event.slug
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
         val response = client.post("/orgs/$orgId/events/$eventSlug/packs") {
@@ -95,14 +91,13 @@ class SponsoringPackRoutesTest {
     fun `GET returns all packs with empty options`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-1"
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
             repeat(2) {
                 insertMockedSponsoringPack(
                     event = eventId,
@@ -128,13 +123,12 @@ class SponsoringPackRoutesTest {
     fun `GET fails if Accept-Language is missing`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-2"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
         }
 
         val response = client.get("/orgs/$orgId/events/$eventSlug/packs") {
@@ -147,13 +141,12 @@ class SponsoringPackRoutesTest {
     fun `GET fails if Accept-Language is not supported`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-3"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
             val pack = insertMockedSponsoringPack(event = eventId)
             val option = insertMockedSponsoringOption(eventId = eventId)
             insertMockedOptionTranslation(optionId = option.id.value)
@@ -175,13 +168,12 @@ class SponsoringPackRoutesTest {
         val packId = UUID.randomUUID()
         val optionId1 = UUID.randomUUID()
         val optionId2 = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-4"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
             insertMockedSponsoringPack(packId, eventId)
             insertMockedSponsoringOption(optionId = optionId1, eventId = eventId)
             insertMockedOptionTranslation(optionId = optionId1, name = "Logo")
@@ -215,13 +207,12 @@ class SponsoringPackRoutesTest {
     fun `POST to attach options returns 404 if pack does not exist`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-5"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
         }
 
         val attachRequest = AttachOptionsToPack(required = emptyList(), optional = emptyList())
@@ -240,14 +231,13 @@ class SponsoringPackRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-6"
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
         }
 
         val response = client.post("/orgs/$orgId/events/$eventSlug/packs/$packId/options") {
@@ -273,13 +263,12 @@ class SponsoringPackRoutesTest {
         val eventId = UUID.randomUUID()
         val optionId = UUID.randomUUID()
         val packId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-7"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
             insertMockedSponsoringPack(packId, eventId)
             insertMockedSponsoringOption(optionId = optionId, eventId = eventId)
             insertMockedOptionTranslation(optionId = optionId)
@@ -310,14 +299,13 @@ class SponsoringPackRoutesTest {
         val packId = UUID.randomUUID()
         val optionValid = UUID.randomUUID()
         val optionInvalid = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-8"
 
         application {
             moduleMocked()
             val org = insertMockedOrganisationEntity(id = orgId)
             val event = insertMockedEventWithAdminUser(eventId, orgId = orgId)
 
-            eventSlug = event.slug
             insertMockedEventWithOrga(otherEventId, organisation = org)
             insertMockedSponsoringPack(packId, eventId)
             insertMockedSponsoringOption(optionId = optionValid, eventId = eventId)
@@ -349,14 +337,13 @@ class SponsoringPackRoutesTest {
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
         val optionId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-9"
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            eventSlug = event.slug
             insertMockedSponsoringPack(packId, eventId)
             insertMockedSponsoringOption(optionId = optionId, eventId = eventId)
             insertMockedOptionTranslation(optionId = optionId)

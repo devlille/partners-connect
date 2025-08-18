@@ -24,14 +24,12 @@ class SponsoringDeleteRoutesTest {
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
         val optionId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-1"
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
-
-            eventSlug = event.slug
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
             insertMockedSponsoringPack(packId, eventId, maxQuantity = null)
             insertMockedSponsoringOption(optionId = optionId, eventId = eventId)
             insertMockedPackOptions(packId, optionId)
@@ -49,14 +47,12 @@ class SponsoringDeleteRoutesTest {
         val eventId = UUID.randomUUID()
         val optionId = UUID.randomUUID()
         val packId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-2"
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
-
-            eventSlug = event.slug
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
         val response = client.delete("/orgs/$orgId/events/$eventSlug/packs/$packId/options/$optionId") {
@@ -70,14 +66,12 @@ class SponsoringDeleteRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val optionId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-3"
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
-
-            eventSlug = event.slug
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
             val pack = insertMockedSponsoringPack(event = eventId)
             insertMockedSponsoringOption(optionId = optionId, eventId = eventId)
             insertMockedPackOptions(pack.id.value, optionId)
@@ -95,14 +89,12 @@ class SponsoringDeleteRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val optionId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-4"
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
-
-            eventSlug = event.slug
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
             insertMockedSponsoringOption(optionId = optionId, eventId = eventId)
         }
 
@@ -117,14 +109,12 @@ class SponsoringDeleteRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-5"
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
-
-            eventSlug = event.slug
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
             insertMockedSponsoringPack(packId, eventId, maxQuantity = null)
             val option = insertMockedSponsoringOption(eventId = eventId)
             insertMockedPackOptions(packId, option.id.value)
@@ -142,14 +132,12 @@ class SponsoringDeleteRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-6"
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
-
-            eventSlug = event.slug
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
             insertMockedSponsoringPack(packId, eventId, maxQuantity = null)
         }
 
@@ -164,14 +152,12 @@ class SponsoringDeleteRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val optionId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-7"
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
-
-            eventSlug = event.slug
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
         val response = client.delete("/orgs/$orgId/events/$eventSlug/options/$optionId") {
@@ -186,14 +172,12 @@ class SponsoringDeleteRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
-        lateinit var eventSlug: String
+        val eventSlug = "test-event-slug-8"
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
-
-            eventSlug = event.slug
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
         val response = client.delete("/orgs/$orgId/events/$eventSlug/packs/$packId") {
