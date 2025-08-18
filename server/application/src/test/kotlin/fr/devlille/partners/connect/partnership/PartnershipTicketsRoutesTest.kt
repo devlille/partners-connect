@@ -46,12 +46,13 @@ class PartnershipTicketsRoutesTest {
     @Test
     fun `GET returns tickets for existing partnership`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-get-returns-tickets--528"
         val partnershipId = UUID.randomUUID()
         val ticketId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
             val company = insertMockedCompany()
             insertMockedPartnership(
                 id = partnershipId,
@@ -62,7 +63,7 @@ class PartnershipTicketsRoutesTest {
             insertMockedPartnershipTicket(ticketId = ticketId, partnershipId = partnershipId)
         }
 
-        val response = client.get("/events/$eventId/partnership/$partnershipId/tickets")
+        val response = client.get("/events/$eventSlug/partnership/$partnershipId/tickets")
         assertEquals(HttpStatusCode.OK, response.status)
         val body = json.decodeFromString<List<Ticket>>(response.bodyAsText())
         assertEquals(1, body.size)
@@ -72,6 +73,7 @@ class PartnershipTicketsRoutesTest {
     @Test
     fun `POST creates tickets for existing partnership`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-creates-tickets-621"
         val partnershipId = UUID.randomUUID()
 
         application {
@@ -88,7 +90,7 @@ class PartnershipTicketsRoutesTest {
                     }
                 },
             )
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
             val company = insertMockedCompany()
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
@@ -103,7 +105,7 @@ class PartnershipTicketsRoutesTest {
         }
 
         val tickets = listOf(TicketData(firstName = "John", lastName = "Doe"))
-        val response = client.post("/events/$eventId/partnership/$partnershipId/tickets") {
+        val response = client.post("/events/$eventSlug/partnership/$partnershipId/tickets") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(tickets))
         }
@@ -118,6 +120,7 @@ class PartnershipTicketsRoutesTest {
     @Test
     fun `POST failed when creating ticket because no pack has been validated`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-failed-when-cre-559"
         val partnershipId = UUID.randomUUID()
 
         application {
@@ -134,7 +137,7 @@ class PartnershipTicketsRoutesTest {
                     }
                 },
             )
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
             val company = insertMockedCompany()
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = company.id.value)
             insertMockedBilling(eventId, partnershipId)
@@ -142,7 +145,7 @@ class PartnershipTicketsRoutesTest {
         }
 
         val tickets = listOf(TicketData(firstName = "John", lastName = "Doe"))
-        val response = client.post("/events/$eventId/partnership/$partnershipId/tickets") {
+        val response = client.post("/events/$eventSlug/partnership/$partnershipId/tickets") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(tickets))
         }
@@ -154,6 +157,7 @@ class PartnershipTicketsRoutesTest {
     @Test
     fun `POST failed when creating ticket when pack has not enough ticket configured`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-failed-when-cre-818"
         val partnershipId = UUID.randomUUID()
 
         application {
@@ -170,7 +174,7 @@ class PartnershipTicketsRoutesTest {
                     }
                 },
             )
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
             val company = insertMockedCompany()
             val selectedPack = insertMockedSponsoringPack(event = eventId, nbTickets = 0)
             insertMockedPartnership(
@@ -185,7 +189,7 @@ class PartnershipTicketsRoutesTest {
         }
 
         val tickets = listOf(TicketData(firstName = "John", lastName = "Doe"))
-        val response = client.post("/events/$eventId/partnership/$partnershipId/tickets") {
+        val response = client.post("/events/$eventSlug/partnership/$partnershipId/tickets") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(tickets))
         }
@@ -198,6 +202,7 @@ class PartnershipTicketsRoutesTest {
     @Test
     fun `POST failed when creating ticket because billing isn't paid`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-failed-when-cre-316"
         val partnershipId = UUID.randomUUID()
 
         application {
@@ -214,7 +219,7 @@ class PartnershipTicketsRoutesTest {
                     }
                 },
             )
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
             val company = insertMockedCompany()
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
@@ -229,7 +234,7 @@ class PartnershipTicketsRoutesTest {
         }
 
         val tickets = listOf(TicketData(firstName = "John", lastName = "Doe"))
-        val response = client.post("/events/$eventId/partnership/$partnershipId/tickets") {
+        val response = client.post("/events/$eventSlug/partnership/$partnershipId/tickets") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(tickets))
         }
@@ -241,6 +246,7 @@ class PartnershipTicketsRoutesTest {
     @Test
     fun `PUT updates an existing ticket`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-put-updates-an-exist-17"
         val partnershipId = UUID.randomUUID()
         val ticketId = UUID.randomUUID()
 
@@ -258,7 +264,7 @@ class PartnershipTicketsRoutesTest {
                     }
                 },
             )
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
             val company = insertMockedCompany()
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
@@ -273,7 +279,7 @@ class PartnershipTicketsRoutesTest {
             insertBilletWebIntegration(eventId = eventId)
         }
 
-        val response = client.put("/events/$eventId/partnership/$partnershipId/tickets/$ticketId") {
+        val response = client.put("/events/$eventSlug/partnership/$partnershipId/tickets/$ticketId") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(TicketData(firstName = "Jeanne", lastName = "Doe")))
         }
@@ -286,25 +292,27 @@ class PartnershipTicketsRoutesTest {
     @Test
     fun `GET returns 404 if partnership does not exist`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-get-returns-404-if-p-518"
         val partnershipId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
         }
 
-        val response = client.get("/events/$eventId/partnership/$partnershipId/tickets")
+        val response = client.get("/events/$eventSlug/partnership/$partnershipId/tickets")
         assertEquals(HttpStatusCode.NotFound, response.status)
     }
 
     @Test
     fun `PUT returns 404 if ticket does not exist`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-put-returns-404-if-t-774"
         val partnershipId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
             val company = insertMockedCompany()
             insertMockedPartnership(
                 id = partnershipId,
@@ -314,7 +322,7 @@ class PartnershipTicketsRoutesTest {
             )
         }
 
-        val response = client.put("/events/$eventId/partnership/$partnershipId/tickets/${UUID.randomUUID()}") {
+        val response = client.put("/events/$eventSlug/partnership/$partnershipId/tickets/${UUID.randomUUID()}") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(TicketData(firstName = "Jeanne", lastName = "Doe")))
         }

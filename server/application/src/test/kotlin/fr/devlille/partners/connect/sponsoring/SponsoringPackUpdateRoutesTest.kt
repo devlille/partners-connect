@@ -32,8 +32,8 @@ class SponsoringPackUpdateRoutesTest {
     fun `PUT updates pack successfully`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-put-updates-pack-suc-53"
         val packId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-1"
 
         application {
             moduleMocked()
@@ -86,8 +86,8 @@ class SponsoringPackUpdateRoutesTest {
     fun `PUT verifies updated pack via GET endpoint`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-put-verifies-updated-565"
         val packId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-2"
 
         application {
             moduleMocked()
@@ -134,8 +134,8 @@ class SponsoringPackUpdateRoutesTest {
     fun `PUT fails with not found when pack does not exist`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-put-fails-with-not-f-24"
         val nonExistentPackId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-3"
 
         application {
             moduleMocked()
@@ -157,8 +157,8 @@ class SponsoringPackUpdateRoutesTest {
     fun `PUT fails with bad request when payload is invalid`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-put-fails-with-bad-r-689"
         val packId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-4"
 
         application {
             moduleMocked()
@@ -181,8 +181,8 @@ class SponsoringPackUpdateRoutesTest {
     fun `PUT fails with not found when user lacks org permission`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-put-fails-with-not-f-135"
         val packId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-5"
 
         application {
             moduleMocked()

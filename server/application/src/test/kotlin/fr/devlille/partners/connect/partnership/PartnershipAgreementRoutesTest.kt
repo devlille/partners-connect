@@ -84,14 +84,14 @@ class PartnershipAgreementRoutesTest {
             url = "https://example.com/irrelevant.pdf",
         )
 
-        val eventId = UUID.randomUUID()
+        val eventSlug = "nonexistent-event"
         val partnershipId = UUID.randomUUID()
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/agreement") {
+        val response = client.post("/events/$eventSlug/partnership/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -170,6 +170,7 @@ class PartnershipAgreementRoutesTest {
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
             insertMockedOrganisationEntity(orgId, representativeUser = insertMockedUser(name = null))
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(event = eventId)
@@ -272,10 +273,11 @@ class PartnershipAgreementRoutesTest {
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
+        val eventSlug = "test-event-slug-7"
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, eventSlug)
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
@@ -288,7 +290,7 @@ class PartnershipAgreementRoutesTest {
         }
 
         val response = client.submitFormWithBinaryData(
-            url = "/events/$eventId/partnership/$partnershipId/signed-agreement",
+            url = "/events/$eventSlug/partnership/$partnershipId/signed-agreement",
             formData = formData {
                 append(
                     "file",
@@ -317,7 +319,7 @@ class PartnershipAgreementRoutesTest {
             url = "https://example.com/signed-generated.pdf",
         )
 
-        val eventId = UUID.randomUUID()
+        val eventSlug = "nonexistent-event"
         val partnershipId = UUID.randomUUID()
 
         application {
@@ -325,7 +327,7 @@ class PartnershipAgreementRoutesTest {
         }
 
         val response = client.submitFormWithBinaryData(
-            url = "/events/$eventId/partnership/$partnershipId/signed-agreement",
+            url = "/events/$eventSlug/partnership/$partnershipId/signed-agreement",
             formData = formData {
                 append(
                     "file",
@@ -347,10 +349,11 @@ class PartnershipAgreementRoutesTest {
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
+        val eventSlug = "test-event-slug-8"
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
@@ -363,7 +366,7 @@ class PartnershipAgreementRoutesTest {
         }
 
         val response = client.submitFormWithBinaryData(
-            url = "/events/$eventId/partnership/$partnershipId/signed-agreement",
+            url = "/events/$eventSlug/partnership/$partnershipId/signed-agreement",
             formData = formData {
                 // Intentionally not appending the file part to simulate the error
             },
@@ -379,10 +382,11 @@ class PartnershipAgreementRoutesTest {
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
+        val eventSlug = "test-event-slug-9"
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
@@ -395,7 +399,7 @@ class PartnershipAgreementRoutesTest {
         }
 
         val response = client.submitFormWithBinaryData(
-            url = "/events/$eventId/partnership/$partnershipId/signed-agreement",
+            url = "/events/$eventSlug/partnership/$partnershipId/signed-agreement",
             formData = formData {
                 append(
                     "file",

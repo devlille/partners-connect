@@ -38,6 +38,7 @@ class SponsoringPackRoutesTest {
     fun `GET returns empty list when no packs exist`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-get-returns-empty-li-466"
         val testOrgSlug = "test-org-empty"
         val testEventSlug = "test-event-empty"
 
@@ -61,7 +62,7 @@ class SponsoringPackRoutesTest {
     fun `POST creates a new pack`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-1"
+        val eventSlug = "test-post-creates-a-new-p-838"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
@@ -91,8 +92,8 @@ class SponsoringPackRoutesTest {
     fun `GET returns all packs with empty options`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-1"
-
+        val eventSlug = "test-get-returns-all-pack-79"
+        
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
@@ -123,8 +124,8 @@ class SponsoringPackRoutesTest {
     fun `GET fails if Accept-Language is missing`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-2"
-        application {
+        val eventSlug = "test-get-fails-if-accept--118"
+                application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
@@ -141,8 +142,8 @@ class SponsoringPackRoutesTest {
     fun `GET fails if Accept-Language is not supported`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-3"
-        application {
+        val eventSlug = "test-get-fails-if-accept--193"
+                application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
@@ -165,10 +166,10 @@ class SponsoringPackRoutesTest {
     fun `POST to attach options adds options to pack`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-to-attach-optio-232"
         val packId = UUID.randomUUID()
         val optionId1 = UUID.randomUUID()
         val optionId2 = UUID.randomUUID()
-        val eventSlug = "test-event-slug-4"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
@@ -207,8 +208,8 @@ class SponsoringPackRoutesTest {
     fun `POST to attach options returns 404 if pack does not exist`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-5"
-        application {
+        val eventSlug = "test-post-to-attach-optio-522"
+                application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
@@ -230,8 +231,8 @@ class SponsoringPackRoutesTest {
     fun `POST packs options returns 404 when pack does not exist for event`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-packs-options-r-341"
         val packId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-6"
 
         application {
             moduleMocked()
@@ -261,9 +262,9 @@ class SponsoringPackRoutesTest {
     fun `POST packs options returns 400 when same option is in required and optional`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-packs-options-r-541"
         val optionId = UUID.randomUUID()
         val packId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-7"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
@@ -295,11 +296,11 @@ class SponsoringPackRoutesTest {
     fun `POST packs options returns 400 if any option is not linked to the event`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-packs-options-r-864"
         val otherEventId = UUID.randomUUID()
         val packId = UUID.randomUUID()
         val optionValid = UUID.randomUUID()
         val optionInvalid = UUID.randomUUID()
-        val eventSlug = "test-event-slug-8"
 
         application {
             moduleMocked()
@@ -335,9 +336,9 @@ class SponsoringPackRoutesTest {
     fun `POST packs options returns 400 if option is already attached to pack`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-packs-options-r-522"
         val packId = UUID.randomUUID()
         val optionId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-9"
 
         application {
             moduleMocked()
