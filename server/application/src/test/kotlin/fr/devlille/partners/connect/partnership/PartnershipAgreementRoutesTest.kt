@@ -277,7 +277,7 @@ class PartnershipAgreementRoutesTest {
 
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
-            insertMockedEventWithOrga(eventId, eventSlug)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
