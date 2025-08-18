@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.internal
 
+import fr.devlille.partners.connect.ApplicationConfig
 import fr.devlille.partners.connect.auth.infrastructure.bindings.authModule
 import fr.devlille.partners.connect.billing.domain.BillingGateway
 import fr.devlille.partners.connect.billing.infrastructure.bindings.billingModule
@@ -39,24 +40,27 @@ fun Application.moduleMocked(
     },
 ) {
     module(
-        databaseUrl = "jdbc:h2:mem:${UUID.randomUUID()};DB_CLOSE_DELAY=-1",
-        modules = listOf(
-            networkClientModule,
-            storageModule,
-            authModule,
-            organisationModule,
-            eventModule,
-            userModule,
-            sponsoringModule,
-            companyModule,
-            partnershipModule,
-            notificationModule,
-            billingModule,
-            ticketingModule,
-            integrationModule,
-            mockNetwork,
-            mockStorage,
-            mockBillingIntegration,
+        ApplicationConfig(
+            databaseUrl = "jdbc:h2:mem:${UUID.randomUUID()};DB_CLOSE_DELAY=-1",
+            enableOpenAPI = false,
+            modules = listOf(
+                networkClientModule,
+                storageModule,
+                authModule,
+                organisationModule,
+                eventModule,
+                userModule,
+                sponsoringModule,
+                companyModule,
+                partnershipModule,
+                notificationModule,
+                billingModule,
+                ticketingModule,
+                integrationModule,
+                mockNetwork,
+                mockStorage,
+                mockBillingIntegration,
+            ),
         ),
     )
 }

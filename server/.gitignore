@@ -44,5 +44,8 @@ bin/
 ### Mac OS ###
 .DS_Store
 
+# Openapi
+application/docs
+
 ### Environment ###
 .env
