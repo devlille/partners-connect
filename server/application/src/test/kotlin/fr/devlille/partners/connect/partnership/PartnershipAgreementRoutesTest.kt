@@ -70,6 +70,11 @@ class PartnershipAgreementRoutesTest {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
+        if (response.status != HttpStatusCode.OK) {
+            val errorBody = response.bodyAsText()
+            throw AssertionError("Expected 200 OK but got ${response.status}. Response body: $errorBody")
+        }
+
         assertEquals(HttpStatusCode.OK, response.status)
         val body = response.bodyAsText()
         assertTrue(body.contains(expectedUrl))

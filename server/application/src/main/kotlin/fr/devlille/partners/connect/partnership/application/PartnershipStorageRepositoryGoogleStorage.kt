@@ -6,6 +6,7 @@ import fr.devlille.partners.connect.internal.infrastructure.bucket.MimeType
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
 import fr.devlille.partners.connect.partnership.domain.PartnershipStorageRepository
 import io.ktor.server.plugins.NotFoundException
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
 class PartnershipStorageRepositoryGoogleStorage(
@@ -15,7 +16,7 @@ class PartnershipStorageRepositoryGoogleStorage(
         eventSlug: String,
         partnershipId: UUID,
         content: ByteArray,
-    ): String {
+    ): String = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
         val eventId = event.id.value
@@ -24,14 +25,14 @@ class PartnershipStorageRepositoryGoogleStorage(
             content = content,
             mimeType = MimeType.PDF,
         )
-        return uploaded.url
+        uploaded.url
     }
 
     override fun uploadSignedAgreement(
         eventSlug: String,
         partnershipId: UUID,
         content: ByteArray,
-    ): String {
+    ): String = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
         val eventId = event.id.value
@@ -40,6 +41,6 @@ class PartnershipStorageRepositoryGoogleStorage(
             content = content,
             mimeType = MimeType.PDF,
         )
-        return uploaded.url
+        uploaded.url
     }
 }
