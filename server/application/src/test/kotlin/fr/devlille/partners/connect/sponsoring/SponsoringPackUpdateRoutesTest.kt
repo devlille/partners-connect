@@ -187,8 +187,8 @@ class SponsoringPackUpdateRoutesTest {
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-            val event = insertMockedEvent(eventId, orgId = orgId) // No admin user permission
+            // Create event without admin user permissions (no permission setup)
+            insertMockedEvent(eventId, slug = eventSlug, orgId = orgId)
             insertMockedSponsoringPack(id = packId, event = eventId)
         }
 
