@@ -1,0 +1,14 @@
+openapi: 3.0.0
+info:
+  title: Partners Connect API
+  description: API for managing partnerships and sponsors for developer events
+  version: 1.0.0
+  contact:
+    name: DevLille
+    url: https://devlille.fr
+servers:
+  - url: http://localhost:8080
+    description: Development server
+paths: {}
+components:
+  schemas: {}

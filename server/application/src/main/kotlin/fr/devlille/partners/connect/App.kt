@@ -44,8 +44,11 @@ import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
+import io.ktor.server.plugins.openapi.openAPI
 import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
+import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.sessions.Sessions
@@ -66,12 +69,13 @@ fun main() {
     ).start(wait = true)
 }
 
-fun Application.module(
-    databaseUrl: String = SystemVarEnv.Exposed.dbUrl,
-    databaseDriver: String = SystemVarEnv.Exposed.dbDriver,
-    databaseUser: String = SystemVarEnv.Exposed.dbUser,
-    databasePassword: String = SystemVarEnv.Exposed.dbPassword,
-    modules: List<Module> = listOf(
+data class ApplicationConfig(
+    val databaseUrl: String = SystemVarEnv.Exposed.dbUrl,
+    val databaseDriver: String = SystemVarEnv.Exposed.dbDriver,
+    val databaseUser: String = SystemVarEnv.Exposed.dbUser,
+    val databasePassword: String = SystemVarEnv.Exposed.dbPassword,
+    val enableOpenAPI: Boolean = true,
+    val modules: List<Module> = listOf(
         networkEngineModule,
         networkClientModule,
         storageModule,
@@ -87,17 +91,19 @@ fun Application.module(
         ticketingModule,
         integrationModule,
     ),
-) {
+)
+
+fun Application.module(config: ApplicationConfig = ApplicationConfig()) {
     configureDatabase(
-        url = databaseUrl,
-        driver = databaseDriver,
-        user = databaseUser,
-        password = databasePassword,
+        url = config.databaseUrl,
+        driver = config.databaseDriver,
+        user = config.databaseUser,
+        password = config.databasePassword,
     )
     configureCors()
     install(Koin) {
         slf4jLogger()
-        modules(modules)
+        modules(config.modules)
     }
     configureContentNegotiation()
     configureStatusPage()
@@ -109,6 +115,9 @@ fun Application.module(
         redirects[state] = redirectUrl
     }
     routing {
+        if (config.enableOpenAPI) {
+            openAPI(path = "openapi", swaggerFile = "openapi/documentation.yaml")
+        }
         route("auth") {
             authRoutes { redirects[it] }
         }
