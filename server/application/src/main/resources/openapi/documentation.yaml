@@ -1,0 +1,1953 @@
+openapi: "3.1.0"
+info:
+  title: "partners_connect API"
+  description: "partners_connect API"
+  version: "1.0.0"
+servers:
+  - url: "https://partners_connect"
+paths:
+  /auth/callback:
+    get:
+      description: ""
+      responses:
+        "404":
+          description: "Not Found"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+        "302":
+          description: "Found <br> Redirect"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserSession"
+  /auth/login:
+    get:
+      description: ""
+  /auth/logout:
+    get:
+      description: ""
+      responses:
+        "204":
+          description: "No Content"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /auth/me:
+    get:
+      description: ""
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserInfo"
+  /companies:
+    get:
+      description: ""
+      parameters:
+        - name: "query"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Company"
+    post:
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCompany"
+        required: true
+      responses:
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /companies/{companyId}/logo:
+    post:
+      description: ""
+      parameters:
+        - name: "companyId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Media"
+  /companies/{companyId}/partnership:
+    get:
+      description: ""
+      parameters:
+        - name: "companyId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/PartnershipItem"
+  /events:
+    get:
+      description: ""
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/EventSummary"
+  /events/{event_slug}:
+    get:
+      description: ""
+      parameters:
+        - name: "event_slug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/EventWithOrganisation"
+  /events/{eventSlug}/partnership:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterPartnership"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /events/{eventSlug}/partnership/{partnershipId}/billing:
+    get:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CompanyBillingData"
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompanyBillingData"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+    put:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompanyBillingData"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /events/{eventSlug}/partnership/{partnershipId}/billing/invoice:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /events/{eventSlug}/partnership/{partnershipId}/billing/quote:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /events/{eventSlug}/partnership/{partnershipId}/signed-agreement:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /events/{eventSlug}/partnership/{partnershipId}/suggestion-approve:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /events/{eventSlug}/partnership/{partnershipId}/suggestion-decline:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /events/{eventSlug}/partnership/{partnershipId}/tickets:
+    get:
+      description: ""
+      parameters:
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Ticket"
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "array"
+              items:
+                $ref: "#/components/schemas/TicketData"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TicketOrder"
+  /events/{eventSlug}/partnership/{partnershipId}/tickets/{ticketId}:
+    put:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "ticketId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketData"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Ticket"
+  /orgs:
+    post:
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Organisation"
+        required: true
+      responses:
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /orgs/{slug}:
+    get:
+      description: ""
+      parameters:
+        - name: "slug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Organisation"
+  /orgs/{orgSlug}:
+    put:
+      description: ""
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Organisation"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Organisation"
+  /orgs/{orgSlug}/events:
+    get:
+      description: ""
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/EventSummary"
+    post:
+      description: ""
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Event"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /orgs/{orgSlug}/events/{eventSlug}:
+    put:
+      description: ""
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Event"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /orgs/{orgSlug}/events/{eventSlug}/integrations/{provider}/{usage}:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "usage"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "provider"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /orgs/{orgSlug}/events/{eventSlug}/options:
+    get:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "Accept-Language"
+          in: "header"
+          required: false
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/SponsoringOption"
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSponsoringOption"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /orgs/{orgSlug}/events/{eventSlug}/options/{optionId}:
+    delete:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "optionId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "204":
+          description: "No Content"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+    put:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "optionId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSponsoringOption"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /orgs/{orgSlug}/events/{eventSlug}/packs:
+    get:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "Accept-Language"
+          in: "header"
+          required: false
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/SponsoringPack"
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSponsoringPack"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}:
+    delete:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "packId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "204":
+          description: "No Content"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+    put:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "packId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSponsoringPack"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}/options:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "packId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AttachOptionsToPack"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}/options/{optionId}:
+    delete:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "packId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "optionId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "204":
+          description: "No Content"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /orgs/{orgSlug}/events/{eventSlug}/partnership:
+    get:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "filter[pack_id]"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+        - name: "filter[validated]"
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+        - name: "filter[suggestion]"
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+        - name: "filter[paid]"
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+        - name: "filter[agreement-generated]"
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+        - name: "filter[agreement-signed]"
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+        - name: "sort"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+        - name: "direction"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/PartnershipItem"
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/agreement:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/billing/{billingStatus}:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "billingStatus"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/decline:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/suggestion:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SuggestPartnership"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/validate:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /orgs/{orgSlug}/users:
+    get:
+      description: ""
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/User"
+  /orgs/{orgSlug}/users/grant:
+    post:
+      description: ""
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GrantPermissionRequest"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "Permissions granted"
+  /users/me/events:
+    get:
+      description: ""
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/EventSummary"
+  /users/me/orgs:
+    get:
+      description: ""
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/OrganisationItem"
+components:
+  schemas:
+    UserSession:
+      type: "object"
+      properties:
+        state:
+          type: "string"
+        token:
+          type: "string"
+      required:
+        - "state"
+        - "token"
+    UserInfo:
+      type: "object"
+      properties:
+        displayName:
+          type: "string"
+        pictureUrl:
+          type: "string"
+          nullable: true
+        email:
+          type: "string"
+      required:
+        - "displayName"
+        - "email"
+    Address:
+      type: "object"
+      properties:
+        address:
+          type: "string"
+        city:
+          type: "string"
+        zipCode:
+          type: "string"
+        country:
+          type: "string"
+      required:
+        - "address"
+        - "city"
+        - "zipCode"
+        - "country"
+    Media:
+      type: "object"
+      properties:
+        original:
+          type: "string"
+        png1000:
+          type: "string"
+        png500:
+          type: "string"
+        png250:
+          type: "string"
+      required:
+        - "original"
+        - "png1000"
+        - "png500"
+        - "png250"
+    Company:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        name:
+          type: "string"
+        headOffice:
+          $ref: "#/components/schemas/Address"
+        siret:
+          type: "string"
+        vat:
+          type: "string"
+        description:
+          type: "string"
+          nullable: true
+        siteUrl:
+          type: "string"
+        medias:
+          nullable: true
+          $ref: "#/components/schemas/Media"
+      required:
+        - "id"
+        - "name"
+        - "headOffice"
+        - "siret"
+        - "vat"
+        - "siteUrl"
+    Social:
+      type: "object"
+      properties:
+        type:
+          type: "string"
+          enum:
+            - "LINKEDIN"
+            - "X"
+            - "BLUESKY"
+            - "MASTODON"
+            - "INSTAGRAM"
+            - "FACEBOOK"
+            - "YOUTUBE"
+        url:
+          type: "string"
+      required:
+        - "type"
+        - "url"
+    CreateCompany:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        siteUrl:
+          type: "string"
+        headOffice:
+          $ref: "#/components/schemas/Address"
+        siret:
+          type: "string"
+        vat:
+          type: "string"
+        description:
+          type: "string"
+          nullable: true
+        socials:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Social"
+      required:
+        - "name"
+        - "siteUrl"
+        - "headOffice"
+        - "siret"
+        - "vat"
+        - "socials"
+    Map:
+      type: "object"
+      properties: { }
+    Map_String:
+      type: "string"
+    Contact:
+      type: "object"
+      properties:
+        displayName:
+          type: "string"
+        role:
+          type: "string"
+      required:
+        - "displayName"
+        - "role"
+    PartnershipItem:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        contact:
+          $ref: "#/components/schemas/Contact"
+        companyName:
+          type: "string"
+        eventName:
+          type: "string"
+        packName:
+          type: "string"
+          nullable: true
+        suggestedPackName:
+          type: "string"
+          nullable: true
+        language:
+          type: "string"
+        phone:
+          type: "string"
+          nullable: true
+        emails:
+          type: "array"
+          items:
+            type: "string"
+        createdAt:
+          type: "string"
+          format: "date-time"
+      required:
+        - "id"
+        - "contact"
+        - "companyName"
+        - "eventName"
+        - "language"
+        - "emails"
+        - "createdAt"
+    EventSummary:
+      type: "object"
+      properties:
+        slug:
+          type: "string"
+        name:
+          type: "string"
+        startTime:
+          type: "string"
+          format: "date-time"
+        endTime:
+          type: "string"
+          format: "date-time"
+        submissionStartTime:
+          type: "string"
+          format: "date-time"
+        submissionEndTime:
+          type: "string"
+          format: "date-time"
+      required:
+        - "slug"
+        - "name"
+        - "startTime"
+        - "endTime"
+        - "submissionStartTime"
+        - "submissionEndTime"
+    Event:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        startTime:
+          type: "string"
+          format: "date-time"
+        endTime:
+          type: "string"
+          format: "date-time"
+        submissionStartTime:
+          type: "string"
+          format: "date-time"
+        submissionEndTime:
+          type: "string"
+          format: "date-time"
+        address:
+          type: "string"
+        contact:
+          $ref: "#/components/schemas/Contact"
+      required:
+        - "name"
+        - "startTime"
+        - "endTime"
+        - "submissionStartTime"
+        - "submissionEndTime"
+        - "address"
+        - "contact"
+    Organisation:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        headOffice:
+          type: "string"
+        siret:
+          type: "string"
+          nullable: true
+        siren:
+          type: "string"
+          nullable: true
+        tva:
+          type: "string"
+          nullable: true
+        dAndB:
+          type: "string"
+          nullable: true
+        nace:
+          type: "string"
+          nullable: true
+        naf:
+          type: "string"
+          nullable: true
+        duns:
+          type: "string"
+          nullable: true
+        iban:
+          type: "string"
+        bic:
+          type: "string"
+        ribUrl:
+          type: "string"
+        representativeUserEmail:
+          type: "string"
+        representativeRole:
+          type: "string"
+        creationLocation:
+          type: "string"
+        createdAt:
+          type: "string"
+          format: "date-time"
+        publishedAt:
+          type: "string"
+          format: "date-time"
+      required:
+        - "name"
+        - "headOffice"
+        - "iban"
+        - "bic"
+        - "ribUrl"
+        - "representativeUserEmail"
+        - "representativeRole"
+        - "creationLocation"
+        - "createdAt"
+        - "publishedAt"
+    EventWithOrganisation:
+      type: "object"
+      properties:
+        event:
+          $ref: "#/components/schemas/Event"
+        organisation:
+          $ref: "#/components/schemas/Organisation"
+      required:
+        - "event"
+        - "organisation"
+    RegisterPartnership:
+      type: "object"
+      properties:
+        companyId:
+          type: "string"
+        packId:
+          type: "string"
+        optionIds:
+          type: "array"
+          items:
+            type: "string"
+        contactName:
+          type: "string"
+        contactRole:
+          type: "string"
+        language:
+          type: "string"
+        phone:
+          type: "string"
+          nullable: true
+        emails:
+          type: "array"
+          items:
+            type: "string"
+      required:
+        - "companyId"
+        - "packId"
+        - "optionIds"
+        - "contactName"
+        - "contactRole"
+        - "language"
+        - "emails"
+    CompanyBillingData:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+          nullable: true
+        po:
+          type: "string"
+          nullable: true
+        contact:
+          $ref: "#/components/schemas/Contact"
+      required:
+        - "contact"
+    TicketData:
+      type: "object"
+      properties:
+        firstName:
+          type: "string"
+        lastName:
+          type: "string"
+      required:
+        - "firstName"
+        - "lastName"
+    Ticket:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        extId:
+          type: "string"
+        url:
+          type: "string"
+        data:
+          $ref: "#/components/schemas/TicketData"
+      required:
+        - "id"
+        - "extId"
+        - "url"
+        - "data"
+    TicketOrder:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        tickets:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Ticket"
+      required:
+        - "id"
+        - "tickets"
+    SponsoringOption:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        name:
+          type: "string"
+        description:
+          type: "string"
+          nullable: true
+        price:
+          type: "integer"
+          format: "int32"
+          nullable: true
+      required:
+        - "id"
+        - "name"
+    TranslatedLabel:
+      type: "object"
+      properties:
+        language:
+          type: "string"
+        name:
+          type: "string"
+        description:
+          type: "string"
+          nullable: true
+      required:
+        - "language"
+        - "name"
+    CreateSponsoringOption:
+      type: "object"
+      properties:
+        translations:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/TranslatedLabel"
+        price:
+          type: "integer"
+          format: "int32"
+          nullable: true
+      required:
+        - "translations"
+    SponsoringPack:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        name:
+          type: "string"
+        basePrice:
+          type: "integer"
+          format: "int32"
+        maxQuantity:
+          type: "integer"
+          format: "int32"
+          nullable: true
+        requiredOptions:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/SponsoringOption"
+        optionalOptions:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/SponsoringOption"
+      required:
+        - "id"
+        - "name"
+        - "basePrice"
+        - "requiredOptions"
+        - "optionalOptions"
+    CreateSponsoringPack:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        price:
+          type: "integer"
+          format: "int32"
+        withBooth:
+          type: "boolean"
+        nbTickets:
+          type: "integer"
+          format: "int32"
+        maxQuantity:
+          type: "integer"
+          format: "int32"
+          nullable: true
+      required:
+        - "name"
+        - "price"
+        - "withBooth"
+        - "nbTickets"
+    AttachOptionsToPack:
+      type: "object"
+      properties:
+        required:
+          type: "array"
+          items:
+            type: "string"
+        optional:
+          type: "array"
+          items:
+            type: "string"
+      required:
+        - "required"
+        - "optional"
+    SuggestPartnership:
+      type: "object"
+      properties:
+        packId:
+          type: "string"
+        optionIds:
+          type: "array"
+          items:
+            type: "string"
+        language:
+          type: "string"
+      required:
+        - "packId"
+        - "optionIds"
+        - "language"
+    User:
+      type: "object"
+      properties:
+        displayName:
+          type: "string"
+          nullable: true
+        pictureUrl:
+          type: "string"
+          nullable: true
+        email:
+          type: "string"
+      required:
+        - "email"
+    GrantPermissionRequest:
+      type: "object"
+      properties:
+        userEmails:
+          type: "array"
+          items:
+            type: "string"
+      required:
+        - "userEmails"
+    Owner:
+      type: "object"
+      properties:
+        displayName:
+          type: "string"
+        email:
+          type: "string"
+      required:
+        - "displayName"
+        - "email"
+    OrganisationItem:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        slug:
+          type: "string"
+        headOffice:
+          type: "string"
+        owner:
+          $ref: "#/components/schemas/Owner"
+      required:
+        - "name"
+        - "slug"
+        - "headOffice"
+        - "owner"

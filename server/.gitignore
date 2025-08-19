@@ -46,3 +46,6 @@ bin/
 
 ### Environment ###
 .env
+
+### Generated documentation ###
+application/docs
