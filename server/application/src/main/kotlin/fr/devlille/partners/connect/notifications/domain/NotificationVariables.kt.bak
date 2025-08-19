@@ -22,10 +22,9 @@ sealed interface NotificationVariables {
     )
 
     companion object {
-        fun buildPartnershipLink(context: PartnershipContext): String =
+        fun buildPartnershipLink(context: PartnershipContext): String = 
             "${SystemVarEnv.frontendBaseUrl}/" +
-                "${context.eventWithOrganisation.organisation.slug}/" +
-                "${context.eventSlug}/${context.partnershipId}"
+                "${context.eventWithOrganisation.organisation.slug}/${context.eventSlug}/${context.partnershipId}"
     }
 
     class NewPartnership(
@@ -53,12 +52,14 @@ sealed interface NotificationVariables {
         override val event: Event,
         override val company: Company,
         val pack: PartnershipPack,
-        val partnershipContext: PartnershipContext,
+        val eventWithOrganisation: EventWithOrganisation,
+        val eventSlug: String,
+        val partnershipId: UUID,
     ) : NotificationVariables {
         override val usageName: String = "new_suggestion"
 
         override fun populate(content: String): String {
-            val partnershipLink = buildPartnershipLink(partnershipContext)
+            val partnershipLink = "${SystemVarEnv.frontendBaseUrl}/${eventWithOrganisation.organisation.slug}/$eventSlug/$partnershipId"
             return content
                 .replace("{{event_name}}", event.name)
                 .replace("{{event_contact}}", event.contact.email)
@@ -72,12 +73,14 @@ sealed interface NotificationVariables {
         override val language: String,
         override val event: Event,
         override val company: Company,
-        val partnershipContext: PartnershipContext,
+        val eventWithOrganisation: EventWithOrganisation,
+        val eventSlug: String,
+        val partnershipId: UUID,
     ) : NotificationVariables {
         override val usageName: String = "suggestion_approved"
 
         override fun populate(content: String): String {
-            val partnershipLink = buildPartnershipLink(partnershipContext)
+            val partnershipLink = "${SystemVarEnv.frontendBaseUrl}/${eventWithOrganisation.organisation.slug}/$eventSlug/$partnershipId"
             return content
                 .replace("{{event_name}}", event.name)
                 .replace("{{event_contact}}", event.contact.email)
@@ -90,12 +93,14 @@ sealed interface NotificationVariables {
         override val language: String,
         override val event: Event,
         override val company: Company,
-        val partnershipContext: PartnershipContext,
+        val eventWithOrganisation: EventWithOrganisation,
+        val eventSlug: String,
+        val partnershipId: UUID,
     ) : NotificationVariables {
         override val usageName: String = "suggestion_declined"
 
         override fun populate(content: String): String {
-            val partnershipLink = buildPartnershipLink(partnershipContext)
+            val partnershipLink = "${SystemVarEnv.frontendBaseUrl}/${eventWithOrganisation.organisation.slug}/$eventSlug/$partnershipId"
             return content
                 .replace("{{event_name}}", event.name)
                 .replace("{{event_contact}}", event.contact.email)
@@ -109,12 +114,14 @@ sealed interface NotificationVariables {
         override val event: Event,
         override val company: Company,
         val pack: PartnershipPack,
-        val partnershipContext: PartnershipContext,
+        val eventWithOrganisation: EventWithOrganisation,
+        val eventSlug: String,
+        val partnershipId: UUID,
     ) : NotificationVariables {
         override val usageName: String = "partnership_validated"
 
         override fun populate(content: String): String {
-            val partnershipLink = buildPartnershipLink(partnershipContext)
+            val partnershipLink = "${SystemVarEnv.frontendBaseUrl}/${eventWithOrganisation.organisation.slug}/$eventSlug/$partnershipId"
             return content
                 .replace("{{event_name}}", event.name)
                 .replace("{{event_contact}}", event.contact.email)
@@ -128,12 +135,14 @@ sealed interface NotificationVariables {
         override val language: String,
         override val event: Event,
         override val company: Company,
-        val partnershipContext: PartnershipContext,
+        val eventWithOrganisation: EventWithOrganisation,
+        val eventSlug: String,
+        val partnershipId: UUID,
     ) : NotificationVariables {
         override val usageName: String = "partnership_declined"
 
         override fun populate(content: String): String {
-            val partnershipLink = buildPartnershipLink(partnershipContext)
+            val partnershipLink = "${SystemVarEnv.frontendBaseUrl}/${eventWithOrganisation.organisation.slug}/$eventSlug/$partnershipId"
             return content
                 .replace("{{event_name}}", event.name)
                 .replace("{{event_contact}}", event.contact.email)
