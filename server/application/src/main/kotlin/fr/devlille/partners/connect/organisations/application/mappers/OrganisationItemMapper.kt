@@ -7,9 +7,14 @@ import fr.devlille.partners.connect.organisations.infrastructure.db.Organisation
 fun OrganisationEntity.toItemDomain(): OrganisationItem = OrganisationItem(
     name = this.name,
     slug = this.slug,
-    headOffice = this.headOffice,
-    owner = Owner(
-        displayName = this.representativeUser.name ?: "",
-        email = this.representativeUser.email,
+    headOffice = this.headOffice ?: "",
+    owner = this.representativeUser?.let { user ->
+        Owner(
+            displayName = user.name ?: "",
+            email = user.email,
+        )
+    } ?: Owner(
+        displayName = "Unknown",
+        email = "unknown@example.com",
     ),
 )

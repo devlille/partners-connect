@@ -10,6 +10,45 @@ import kotlinx.datetime.toLocalDateTime
 @Suppress("LongParameterList")
 fun createOrganisation(
     name: String = "DevLille Org",
+    headOffice: String? = null,
+    siret: String? = null,
+    siren: String? = null,
+    tva: String? = null,
+    dAndB: String? = null,
+    nace: String? = null,
+    naf: String? = null,
+    duns: String? = null,
+    iban: String? = null,
+    bic: String? = null,
+    ribUrl: String? = null,
+    representativeUserEmail: String? = null,
+    representativeRole: String? = null,
+    creationLocation: String? = null,
+    createdAt: LocalDateTime? = null,
+    publishedAt: LocalDateTime? = null,
+): Organisation = Organisation(
+    name = name,
+    headOffice = headOffice,
+    siret = siret,
+    siren = siren,
+    tva = tva,
+    dAndB = dAndB,
+    nace = nace,
+    naf = naf,
+    duns = duns,
+    iban = iban,
+    bic = bic,
+    ribUrl = ribUrl,
+    representativeUserEmail = representativeUserEmail,
+    representativeRole = representativeRole,
+    creationLocation = creationLocation,
+    createdAt = createdAt,
+    publishedAt = publishedAt,
+)
+
+@Suppress("LongParameterList")
+fun createFullOrganisation(
+    name: String = "DevLille Org",
     headOffice: String = "123 rue de la République, Lille, France",
     siret: String = "12345678900019",
     siren: String = "123456789",
@@ -26,7 +65,7 @@ fun createOrganisation(
     creationLocation: String = "Lille",
     createdAt: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC),
     publishedAt: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC),
-): Organisation = Organisation(
+): Organisation = createOrganisation(
     name = name,
     headOffice = headOffice,
     siret = siret,

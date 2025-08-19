@@ -3,6 +3,7 @@ package fr.devlille.partners.connect.partnership.application
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.pdf.renderMarkdownToPdf
 import fr.devlille.partners.connect.internal.infrastructure.resources.readResourceFile
 import fr.devlille.partners.connect.internal.infrastructure.templating.templating
@@ -90,18 +91,37 @@ class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
     }
 }
 
+@Suppress("ThrowsCount")
 internal fun OrganisationEntity.toAgreementOrganisation(formatter: DateTimeFormat<LocalDate>): Organisation {
+    // Validate required fields for agreement generation
+    val requiredHeadOffice = this.headOffice
+        ?: throw ForbiddenException("Field headOffice is required to perform this operation.")
+    val requiredIban = this.iban
+        ?: throw ForbiddenException("Field iban is required to perform this operation.")
+    val requiredBic = this.bic
+        ?: throw ForbiddenException("Field bic is required to perform this operation.")
+    val requiredCreationLocation = this.creationLocation
+        ?: throw ForbiddenException("Field creationLocation is required to perform this operation.")
+    val requiredCreatedAt = this.createdAt
+        ?: throw ForbiddenException("Field createdAt is required to perform this operation.")
+    val requiredPublishedAt = this.publishedAt
+        ?: throw ForbiddenException("Field publishedAt is required to perform this operation.")
+    val requiredRepresentativeUser = this.representativeUser
+        ?: throw ForbiddenException("Field representativeUser is required to perform this operation.")
+    val requiredRepresentativeRole = this.representativeRole
+        ?: throw ForbiddenException("Field representativeRole is required to perform this operation.")
+
     return Organisation(
         name = this.name,
-        headOffice = this.headOffice,
-        iban = this.iban,
-        bic = this.bic,
-        creationLocation = this.creationLocation,
-        createdAt = this.createdAt.date.format(formatter),
-        publishedAt = this.publishedAt.date.format(formatter),
+        headOffice = requiredHeadOffice,
+        iban = requiredIban,
+        bic = requiredBic,
+        creationLocation = requiredCreationLocation,
+        createdAt = requiredCreatedAt.date.format(formatter),
+        publishedAt = requiredPublishedAt.date.format(formatter),
         representative = Contact(
-            name = this.representativeUser.name ?: throw NotFoundException("Representative not found"),
-            role = this.representativeRole,
+            name = requiredRepresentativeUser.name ?: throw NotFoundException("Representative not found"),
+            role = requiredRepresentativeRole,
         ),
     )
 }

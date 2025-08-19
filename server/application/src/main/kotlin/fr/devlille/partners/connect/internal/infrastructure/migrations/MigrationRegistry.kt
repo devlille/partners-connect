@@ -13,6 +13,7 @@ object MigrationRegistry {
      */
     val allMigrations: List<Migration> = listOf(
         InitialSchemaMigration,
+        // NOTE: MakeOrganisationFieldsNullableMigration disabled until db structure issues are resolved
     )
 
     /**

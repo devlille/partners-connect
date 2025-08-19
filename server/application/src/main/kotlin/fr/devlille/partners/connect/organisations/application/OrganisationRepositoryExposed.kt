@@ -18,8 +18,10 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class OrganisationRepositoryExposed : OrganisationRepository {
     override fun create(entity: Organisation): String = transaction {
-        val user = UserEntity.singleUserByEmail(entity.representativeUserEmail)
-            ?: throw NotFoundException("User with email ${entity.representativeUserEmail} not found")
+        val user = entity.representativeUserEmail?.let { email ->
+            UserEntity.singleUserByEmail(email)
+                ?: throw NotFoundException("User with email $email not found")
+        }
         val slug = entity.name.slugify()
         OrganisationEntity.new {
             this.name = entity.name
@@ -53,8 +55,10 @@ class OrganisationRepositoryExposed : OrganisationRepository {
         val entity = OrganisationEntity.findBySlug(orgSlug)
             ?: throw NotFoundException("Organisation with slug $orgSlug not found")
 
-        val representativeUser = UserEntity.singleUserByEmail(data.representativeUserEmail)
-            ?: throw NotFoundException("User with email ${data.representativeUserEmail} not found")
+        val representativeUser = data.representativeUserEmail?.let { email ->
+            UserEntity.singleUserByEmail(email)
+                ?: throw NotFoundException("User with email $email not found")
+        }
 
         entity.apply {
             this.name = data.name
