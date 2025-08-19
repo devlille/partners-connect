@@ -81,7 +81,6 @@ class PartnershipSuggestionRoutesTest {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-
         }
 
         val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$fakeId/suggestion") {

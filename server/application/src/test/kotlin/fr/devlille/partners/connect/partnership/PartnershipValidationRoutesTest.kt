@@ -67,7 +67,6 @@ class PartnershipValidationRoutesTest {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-
         }
 
         val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/validate") {
@@ -116,7 +115,6 @@ class PartnershipValidationRoutesTest {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-
         }
 
         val response = client.delete("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/decline") {

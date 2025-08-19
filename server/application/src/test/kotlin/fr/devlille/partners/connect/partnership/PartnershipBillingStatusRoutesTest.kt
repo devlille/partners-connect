@@ -40,7 +40,9 @@ class PartnershipBillingStatusRoutesTest {
             insertMockedBilling(eventId, partnershipId, status = InvoiceStatus.PENDING)
         }
 
-        val response = client.post("/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/billing/PAID") {
+        val response = client.post(
+            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/billing/PAID",
+        ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -71,7 +73,9 @@ class PartnershipBillingStatusRoutesTest {
             insertMockedBilling(eventId, partnershipId, status = InvoiceStatus.PENDING)
         }
 
-        val response = client.post("/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/billing/sent") {
+        val response = client.post(
+            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/billing/sent",
+        ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -146,7 +150,9 @@ class PartnershipBillingStatusRoutesTest {
             insertMockedBilling(eventId, partnershipId, status = InvoiceStatus.PENDING)
         }
 
-        val response = client.post("/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/billing/PAID") {
+        val response = client.post(
+            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/billing/PAID",
+        ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -171,7 +177,9 @@ class PartnershipBillingStatusRoutesTest {
             // Note: Not creating billing record
         }
 
-        val response = client.post("/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/billing/PAID") {
+        val response = client.post(
+            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/billing/PAID",
+        ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 

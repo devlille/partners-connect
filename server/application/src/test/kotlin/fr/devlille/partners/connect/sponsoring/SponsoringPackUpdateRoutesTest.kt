@@ -141,7 +141,6 @@ class SponsoringPackUpdateRoutesTest {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-
         }
 
         val response = client.put("/orgs/$orgId/events/$eventSlug/packs/$nonExistentPackId") {

@@ -55,7 +55,7 @@ class TicketRepositoryExposed(
             val integrationId = integration[IntegrationsTable.id].value
             Triple(eventId, provider, integrationId)
         }
-        
+
         val gateway = gateways.find { it.provider == provider }
             ?: throw NotFoundException("No gateway for provider $provider")
         val billing = transaction { BillingEntity.singleByEventAndPartnership(eventId, partnershipId) }
@@ -105,7 +105,7 @@ Not enough tickets in the validated pack: ${validatedPack.nbTickets} available, 
             val integrationId = integration[IntegrationsTable.id].value
             Triple(eventId, provider, integrationId)
         }
-        
+
         val gateway = gateways.find { it.provider == provider }
             ?: throw NotFoundException("No gateway for provider $provider")
         val ticket = gateway.updateTicket(integrationId, ticketId, data)

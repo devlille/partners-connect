@@ -97,7 +97,7 @@ class SponsoringPackRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val eventSlug = "test-get-returns-all-pack-79"
-        
+
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
@@ -129,11 +129,10 @@ class SponsoringPackRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val eventSlug = "test-get-fails-if-accept--118"
-                application {
+        application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-
         }
 
         val response = client.get("/orgs/$orgId/events/$eventSlug/packs") {
@@ -147,7 +146,7 @@ class SponsoringPackRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val eventSlug = "test-get-fails-if-accept--193"
-                application {
+        application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
@@ -213,11 +212,10 @@ class SponsoringPackRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val eventSlug = "test-post-to-attach-optio-522"
-                application {
+        application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-
         }
 
         val attachRequest = AttachOptionsToPack(required = emptyList(), optional = emptyList())
@@ -242,7 +240,6 @@ class SponsoringPackRoutesTest {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-
         }
 
         val response = client.post("/orgs/$orgId/events/$eventSlug/packs/$packId/options") {

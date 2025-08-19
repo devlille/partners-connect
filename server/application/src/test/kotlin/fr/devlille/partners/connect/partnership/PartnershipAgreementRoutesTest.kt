@@ -121,7 +121,6 @@ class PartnershipAgreementRoutesTest {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
             insertMockedOrganisationEntity(orgId)
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-
         }
 
         val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/agreement") {

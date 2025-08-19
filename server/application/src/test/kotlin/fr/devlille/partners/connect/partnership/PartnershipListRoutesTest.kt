@@ -556,7 +556,6 @@ class PartnershipListRoutesTest {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-
         }
 
         val response = client.get("/orgs/$orgId/events/$eventSlug/partnership")
@@ -643,7 +642,6 @@ class PartnershipListRoutesTest {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-
         }
 
         val response = client.get("/orgs/$orgId/events/$eventSlug/partnership") {

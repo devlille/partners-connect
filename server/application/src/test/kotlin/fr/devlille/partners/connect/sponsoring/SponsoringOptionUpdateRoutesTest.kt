@@ -1,8 +1,8 @@
 package fr.devlille.partners.connect.sponsoring
 
+import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
-import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.TranslatedLabel
@@ -33,7 +33,7 @@ class SponsoringOptionUpdateRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val eventSlug = "test-event-slug"
-        
+
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
@@ -384,7 +384,7 @@ class SponsoringOptionUpdateRoutesTest {
         val event2Id = UUID.randomUUID()
         val event1Slug = "test-event1-slug"
         val event2Slug = "test-event2-slug"
-        
+
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)

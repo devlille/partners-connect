@@ -13,8 +13,8 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOpt
 import fr.devlille.partners.connect.partnership.infrastructure.db.listByPartnershipAndPack
 import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
@@ -37,7 +37,7 @@ class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
         val partnership = PartnershipEntity.findById(partnershipId) ?: throw NotFoundException("Partnership not found")
-        
+
         // Eager load relationships to avoid lazy loading outside transaction
         val organisation = event.organisation
         val representativeUser = organisation.representativeUser
@@ -45,14 +45,14 @@ class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
         val pack = partnership.validatedPack()
             ?: throw NotFoundException("Validated pack not found for partnership")
         val options = PartnershipOptionEntity.listByPartnershipAndPack(partnership.id.value, pack.id.value)
-        
+
         // Preload option translations to avoid lazy loading
         val optionData = options.map { partnershipOption ->
             val sponsoringOption = partnershipOption.option
             val translations = sponsoringOption.translations.toList() // Force load translations
             Pair(partnershipOption, translations)
         }
-        
+
         val template = readResourceFile("/agreement/${partnership.language}.md")
         val formatter = LocalDate.Format { byUnicodePattern("yyyy/MM/dd") }
         val agreement = Agreement(
@@ -130,25 +130,10 @@ internal fun CompanyEntity.toAgreementCompany(): Company = Company(
 )
 
 @Suppress("ThrowsCount")
-internal fun PartnershipEntity.toAgreementPartnership(): Partnership {
-    val pack = this.validatedPack()
-        ?: throw NotFoundException("Validated pack not found for partnership")
-    val options = PartnershipOptionEntity.listByPartnershipAndPack(this.id.value, pack.id.value)
-    val amount = pack.basePrice + options.filter { it.option.price != null }.sumOf { it.option.price!! }
-    return Partnership(
-        amount = "$amount",
-        options = options.map { option ->
-            val translation = option.option.translations.firstOrNull { it.language == this.language }
-                ?: throw NotFoundException("Translation not found for option ${option.id} in language $language")
-            Option(name = translation.name)
-        },
-        hasBooth = pack.withBooth,
-        contact = Contact(name = this.contactName, role = this.contactRole),
-    )
-}
-
-@Suppress("ThrowsCount")
-internal fun PartnershipEntity.toAgreementPartnership(pack: SponsoringPackEntity, optionData: List<Pair<PartnershipOptionEntity, List<OptionTranslationEntity>>>): Partnership {
+internal fun PartnershipEntity.toAgreementPartnership(
+    pack: SponsoringPackEntity,
+    optionData: List<Pair<PartnershipOptionEntity, List<OptionTranslationEntity>>>,
+): Partnership {
     // Use preloaded option translations to avoid lazy loading outside transaction
     val optionTranslations = optionData.map { (partnershipOption, translations) ->
         val translation = translations.firstOrNull { it.language == this.language }

@@ -74,7 +74,7 @@ class EventRoutesTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
         val updateBody = Json.decodeFromString<Map<String, String>>(response.bodyAsText())
-        assertNotNull(updateBody["slug"])
+        assertEquals(testSlug, updateBody["slug"])
     }
 
     @Test

@@ -30,9 +30,8 @@ class GrantPermissionRouteTest {
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedEventWithAdminUser(eventId, orgId)
 
-            val eventSlug = event.slug
             insertMockedUser(id = targetId, email = "bob@example.com")
         }
 
