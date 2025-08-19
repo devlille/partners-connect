@@ -30,25 +30,30 @@ paths:
                 $ref: "#/components/schemas/UserSession"
   /auth/login:
     get:
-      description: ""
+      description: "Start OAuth login flow - redirects to Google OAuth"
+      responses:
+        "302":
+          description: "Redirect to OAuth provider"
   /auth/logout:
     get:
-      description: ""
+      description: "Logout and clear session"
       responses:
         "204":
-          description: "No Content"
-          content:
-            '*/*':
-              schema:
-                type: "object"
+          description: "No Content - Successfully logged out"
   /auth/me:
     get:
-      description: ""
+      description: "Get current user information"
       responses:
+        "401":
+          description: "Unauthorized - No valid session"
+          content:
+            text/plain:
+              schema:
+                type: "string"
         "200":
           description: "OK"
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/UserInfo"
   /companies:
@@ -722,7 +727,7 @@ paths:
                 $ref: "#/components/schemas/Map_String"
   /orgs/{orgSlug}/events/{eventSlug}/integrations/{provider}/{usage}:
     post:
-      description: ""
+      description: "Register an integration for an event"
       parameters:
         - name: "eventSlug"
           in: "path"
@@ -734,19 +739,36 @@ paths:
           required: true
           schema:
             type: "string"
+            enum: ["BILLING", "MAILING", "TICKETING"]
         - name: "provider"
           in: "path"
           required: true
           schema:
             type: "string"
+            enum: ["QONTO", "MAILJET", "BILLETWEB"]
         - name: "orgSlug"
           in: "path"
           required: true
           schema:
             type: "string"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              description: "Integration configuration data"
+        required: true
       responses:
         "400":
-          description: "Bad Request"
+          description: "Bad Request - Invalid provider, usage, or configuration"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
           content:
             text/plain:
               schema:
@@ -754,12 +776,12 @@ paths:
         "201":
           description: "Created"
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/Map_String"
   /orgs/{orgSlug}/events/{eventSlug}/options:
     get:
-      description: ""
+      description: "List sponsoring options for an event"
       parameters:
         - name: "eventSlug"
           in: "path"
@@ -771,11 +793,14 @@ paths:
           required: false
           schema:
             type: "string"
+            default: "en"
         - name: "orgSlug"
           in: "path"
           required: true
           schema:
             type: "string"
+      security:
+        - bearerAuth: []
       responses:
         "400":
           description: "Bad Request"
@@ -783,16 +808,22 @@ paths:
             text/plain:
               schema:
                 type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
         "200":
           description: "OK"
           content:
-            '*/*':
+            application/json:
               schema:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/SponsoringOption"
     post:
-      description: ""
+      description: "Create a new sponsoring option"
       parameters:
         - name: "eventSlug"
           in: "path"
@@ -804,6 +835,8 @@ paths:
           required: true
           schema:
             type: "string"
+      security:
+        - bearerAuth: []
       requestBody:
         content:
           application/json:
@@ -817,10 +850,16 @@ paths:
             text/plain:
               schema:
                 type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
         "201":
           description: "Created"
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/Map_String"
   /orgs/{orgSlug}/events/{eventSlug}/options/{optionId}:
@@ -894,7 +933,7 @@ paths:
                 $ref: "#/components/schemas/Map_String"
   /orgs/{orgSlug}/events/{eventSlug}/packs:
     get:
-      description: ""
+      description: "List sponsoring packs for an event"
       parameters:
         - name: "eventSlug"
           in: "path"
@@ -906,11 +945,14 @@ paths:
           required: false
           schema:
             type: "string"
+            default: "en"
         - name: "orgSlug"
           in: "path"
           required: true
           schema:
             type: "string"
+      security:
+        - bearerAuth: []
       responses:
         "400":
           description: "Bad Request"
@@ -918,16 +960,22 @@ paths:
             text/plain:
               schema:
                 type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
         "200":
           description: "OK"
           content:
-            '*/*':
+            application/json:
               schema:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/SponsoringPack"
     post:
-      description: ""
+      description: "Create a new sponsoring pack"
       parameters:
         - name: "eventSlug"
           in: "path"
@@ -939,6 +987,8 @@ paths:
           required: true
           schema:
             type: "string"
+      security:
+        - bearerAuth: []
       requestBody:
         content:
           application/json:
@@ -952,10 +1002,16 @@ paths:
             text/plain:
               schema:
                 type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
         "201":
           description: "Created"
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/Map_String"
   /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}:
@@ -1104,7 +1160,7 @@ paths:
                 type: "object"
   /orgs/{orgSlug}/events/{eventSlug}/partnership:
     get:
-      description: ""
+      description: "List partnerships for an event with filtering options"
       parameters:
         - name: "eventSlug"
           in: "path"
@@ -1116,46 +1172,60 @@ paths:
           required: false
           schema:
             type: "string"
+          description: "Filter by sponsoring pack ID"
         - name: "filter[validated]"
           in: "query"
           required: false
           schema:
             type: "boolean"
+          description: "Filter by validation status"
         - name: "filter[suggestion]"
           in: "query"
           required: false
           schema:
             type: "boolean"
+          description: "Filter by suggestion status"
         - name: "filter[paid]"
           in: "query"
           required: false
           schema:
             type: "boolean"
+          description: "Filter by payment status"
         - name: "filter[agreement-generated]"
           in: "query"
           required: false
           schema:
             type: "boolean"
+          description: "Filter by agreement generation status"
         - name: "filter[agreement-signed]"
           in: "query"
           required: false
           schema:
             type: "boolean"
+          description: "Filter by agreement signature status"
         - name: "sort"
           in: "query"
           required: false
           schema:
             type: "string"
+            default: "created"
+            enum: ["created", "updated"]
+          description: "Sort field"
         - name: "direction"
           in: "query"
           required: false
           schema:
             type: "string"
+            default: "asc"
+            enum: ["asc", "desc"]
+          description: "Sort direction"
         - name: "orgSlug"
           in: "path"
           required: true
           schema:
             type: "string"
+      security:
+        - bearerAuth: []
       responses:
         "400":
           description: "Bad Request"
@@ -1163,17 +1233,23 @@ paths:
             text/plain:
               schema:
                 type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
         "200":
           description: "OK"
           content:
-            '*/*':
+            application/json:
               schema:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/PartnershipItem"
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/agreement:
     post:
-      description: ""
+      description: "Generate a partnership agreement PDF"
       parameters:
         - name: "eventSlug"
           in: "path"
@@ -1190,6 +1266,8 @@ paths:
           required: true
           schema:
             type: "string"
+      security:
+        - bearerAuth: []
       responses:
         "400":
           description: "Bad Request"
@@ -1197,12 +1275,24 @@ paths:
             text/plain:
               schema:
                 type: "string"
-        "200":
-          description: "OK"
+        "401":
+          description: "Unauthorized"
           content:
-            '*/*':
+            text/plain:
               schema:
-                $ref: "#/components/schemas/Map_String"
+                type: "string"
+        "200":
+          description: "OK - Agreement generated successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    description: "URL to the generated agreement PDF"
+                required:
+                  - "url"
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/billing/{billingStatus}:
     post:
       description: ""
@@ -1218,38 +1308,6 @@ paths:
           schema:
             type: "string"
         - name: "billingStatus"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "orgSlug"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-      responses:
-        "400":
-          description: "Bad Request"
-          content:
-            text/plain:
-              schema:
-                type: "string"
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Map_String"
-  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/decline:
-    post:
-      description: ""
-      parameters:
-        - name: "eventSlug"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-        - name: "partnershipId"
           in: "path"
           required: true
           schema:
@@ -1313,7 +1371,7 @@ paths:
         "200":
           description: "OK"
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/Map_String"
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/validate:
@@ -1865,13 +1923,13 @@ components:
     TicketData:
       type: "object"
       properties:
-        firstName:
+        first_name:
           type: "string"
-        lastName:
+        last_name:
           type: "string"
       required:
-        - "firstName"
-        - "lastName"
+        - "first_name"
+        - "last_name"
     Ticket:
       type: "object"
       properties:
@@ -2038,12 +2096,13 @@ components:
     GrantPermissionRequest:
       type: "object"
       properties:
-        userEmails:
+        user_emails:
           type: "array"
           items:
             type: "string"
+          description: "List of user emails to grant permissions to"
       required:
-        - "userEmails"
+        - "user_emails"
     Owner:
       type: "object"
       properties:
