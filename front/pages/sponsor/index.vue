@@ -97,39 +97,6 @@
       </form>
     </div>
   </details>
-  <!-- <div class="actions-bar">
-                <p>
-                    <button class="with-icon ic-only">
-                        <svg role="img" width="24" height="24" aria-hidden="true">
-                            <use href="/img/sprite.svg#ic-filter"></use>
-                        </svg>
-                        Filtre
-                    </button>
-                </p>
-
-                <fieldset class="switch display-mode">
-                    <legend>Type d'affichage</legend>
-                        <ul>
-                            <li>
-                                <input 
-                                    type="radio" 
-                                    name="affichage" 
-                                    id="rb-aff-carte"
-                                    class="card-view" 
-                                    checked>
-                                <label for="rb-aff-carte">Affichage par carte</label>
-                            </li>
-                            <li>
-                                <input 
-                                    type="radio" 
-                                    name="affichage"
-                                    id="rb-aff-tab" 
-                                    class="table-view">
-                                <label for="rb-aff-tab">Affichage par tableau</label>
-                            </li>
-                        </ul>
-                    </fieldset>
-            </div> -->
 
   <div class="results-list grid">
     <SponsorTile
