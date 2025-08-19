@@ -18,7 +18,7 @@ import org.koin.ktor.ext.inject
 fun Route.partnershipTicketingRoutes() {
     val ticketingRepository by inject<TicketRepository>()
 
-    route("/events/{eventId}/partnership/{partnershipId}/tickets") {
+    route("/events/{eventSlug}/partnership/{partnershipId}/tickets") {
         get {
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
@@ -27,12 +27,12 @@ fun Route.partnershipTicketingRoutes() {
         }
 
         post {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
             val body = call.receive<List<TicketData>>()
             val result = ticketingRepository.createTickets(
-                eventId = eventId,
+                eventSlug = eventSlug,
                 partnershipId = partnershipId,
                 tickets = body,
             )
@@ -40,12 +40,12 @@ fun Route.partnershipTicketingRoutes() {
         }
 
         put("/{ticketId}") {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
             val ticketId = call.parameters["ticketId"] ?: throw BadRequestException("Missing ticket id")
             val body = call.receive<TicketData>()
-            val ticket = ticketingRepository.updateTicket(eventId, partnershipId, ticketId, body)
+            val ticket = ticketingRepository.updateTicket(eventSlug, partnershipId, ticketId, body)
             call.respond(HttpStatusCode.OK, ticket)
         }
     }

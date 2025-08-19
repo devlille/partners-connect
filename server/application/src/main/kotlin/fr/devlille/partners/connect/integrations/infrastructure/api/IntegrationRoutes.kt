@@ -4,7 +4,6 @@ import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.IntegrationRepository
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
-import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receiveText
@@ -20,11 +19,11 @@ fun Route.integrationRoutes() {
     val integrationRepository by inject<IntegrationRepository>()
     val deserializerRegistry by inject<IntegrationDeserializerRegistry>()
 
-    route("/orgs/{orgSlug}/events/{eventId}/integrations") {
+    route("/orgs/{orgSlug}/events/{eventSlug}/integrations") {
         install(AuthorizedOrganisationPlugin)
 
         post("/{provider}/{usage}") {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing eventId")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing eventSlug")
             val usageParam = call.parameters["usage"] ?: throw BadRequestException("Missing usage")
             val providerParam = call.parameters["provider"] ?: throw BadRequestException("Missing provider")
             val provider = runCatching { IntegrationProvider.valueOf(providerParam.uppercase()) }
@@ -34,7 +33,7 @@ fun Route.integrationRoutes() {
             val serializer = deserializerRegistry.serializerFor(provider)
             val json = Json { ignoreUnknownKeys = true }
             val input = json.decodeFromString(serializer, call.receiveText())
-            val integrationId = integrationRepository.register(eventId, usage, input)
+            val integrationId = integrationRepository.register(eventSlug, usage, input)
             call.respond(HttpStatusCode.Created, mapOf("id" to integrationId.toString()))
         }
     }

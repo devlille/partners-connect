@@ -28,22 +28,22 @@ fun Route.partnershipAgreementRoutes() {
     val storageRepository by inject<PartnershipStorageRepository>()
     val notificationRepository by inject<NotificationRepository>()
 
-    route("/orgs/{orgSlug}/events/{eventId}/partnership/{partnershipId}/agreement") {
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/agreement") {
         install(AuthorizedOrganisationPlugin)
 
         post {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
-            val pdfBinary = agreementRepository.generateAgreement(eventId, partnershipId)
-            val agreementUrl = storageRepository.uploadAgreement(eventId, partnershipId, pdfBinary)
+            val pdfBinary = agreementRepository.generateAgreement(eventSlug, partnershipId)
+            val agreementUrl = storageRepository.uploadAgreement(eventSlug, partnershipId, pdfBinary)
             call.respond(HttpStatusCode.OK, mapOf("url" to agreementUrl))
         }
     }
 
-    route("/events/{eventId}/partnership/{partnershipId}/signed-agreement") {
+    route("/events/{eventSlug}/partnership/{partnershipId}/signed-agreement") {
         post {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
             val multipart = call.receiveMultipart()
@@ -52,13 +52,13 @@ fun Route.partnershipAgreementRoutes() {
             if (part.contentType != ContentType.Application.Pdf) {
                 throw BadRequestException("Invalid file type, expected application/pdf")
             }
-            val url = storageRepository.uploadSignedAgreement(eventId, partnershipId, bytes)
-            agreementRepository.updateAgreementSignedUrl(eventId, partnershipId, url)
-            val event = eventRepository.getById(eventId)
-            val company = partnershipRepository.getCompanyByPartnershipId(eventId, partnershipId)
-            val partnership = partnershipRepository.getById(eventId, partnershipId)
+            val url = storageRepository.uploadSignedAgreement(eventSlug, partnershipId, bytes)
+            agreementRepository.updateAgreementSignedUrl(eventSlug, partnershipId, url)
+            val event = eventRepository.getBySlug(eventSlug).event
+            val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
+            val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             val variables = NotificationVariables.PartnershipAgreementSigned(partnership.language, event, company)
-            notificationRepository.sendMessage(eventId, variables)
+            notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.OK, mapOf("url" to url))
         }
     }

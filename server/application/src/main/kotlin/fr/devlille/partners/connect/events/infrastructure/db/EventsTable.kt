@@ -12,6 +12,7 @@ import org.jetbrains.exposed.v1.datetime.datetime
 
 object EventsTable : UUIDTable("events") {
     val name: Column<String> = varchar("name", 255)
+    val slug: Column<String> = varchar("slug", 255).uniqueIndex()
     val startTime = datetime("start_time")
     val endTime = datetime("end_time")
     val submissionStartTime = datetime("submission_start_time")

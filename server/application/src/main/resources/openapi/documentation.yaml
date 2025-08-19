@@ -142,11 +142,11 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/EventSummary"
-  /events/{event_id}:
+  /events/{event_slug}:
     get:
       description: ""
       parameters:
-        - name: "event_id"
+        - name: "event_slug"
           in: "path"
           required: true
           schema:
@@ -164,11 +164,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/EventWithOrganisation"
-  /events/{eventId}/partnership:
+  /events/{eventSlug}/partnership:
     post:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -198,11 +198,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Map_String"
-  /events/{eventId}/partnership/{partnershipId}/billing:
+  /events/{eventSlug}/partnership/{partnershipId}/billing:
     get:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -228,7 +228,7 @@ paths:
     post:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -260,7 +260,7 @@ paths:
     put:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -289,11 +289,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Map_String"
-  /events/{eventId}/partnership/{partnershipId}/billing/invoice:
+  /events/{eventSlug}/partnership/{partnershipId}/billing/invoice:
     post:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -316,11 +316,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Map_String"
-  /events/{eventId}/partnership/{partnershipId}/billing/quote:
+  /events/{eventSlug}/partnership/{partnershipId}/billing/quote:
     post:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -343,11 +343,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Map_String"
-  /events/{eventId}/partnership/{partnershipId}/signed-agreement:
+  /events/{eventSlug}/partnership/{partnershipId}/signed-agreement:
     post:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -370,11 +370,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Map_String"
-  /events/{eventId}/partnership/{partnershipId}/suggestion-approve:
+  /events/{eventSlug}/partnership/{partnershipId}/suggestion-approve:
     post:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -397,11 +397,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Map_String"
-  /events/{eventId}/partnership/{partnershipId}/suggestion-decline:
+  /events/{eventSlug}/partnership/{partnershipId}/suggestion-decline:
     post:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -424,7 +424,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Map_String"
-  /events/{eventId}/partnership/{partnershipId}/tickets:
+  /events/{eventSlug}/partnership/{partnershipId}/tickets:
     get:
       description: ""
       parameters:
@@ -433,7 +433,7 @@ paths:
           required: true
           schema:
             type: "string"
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -456,7 +456,7 @@ paths:
     post:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -487,11 +487,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/TicketOrder"
-  /events/{eventId}/partnership/{partnershipId}/tickets/{ticketId}:
+  /events/{eventSlug}/partnership/{partnershipId}/tickets/{ticketId}:
     put:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -648,7 +648,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Map_String"
-  /orgs/{orgSlug}/events/{eventId}:
+  /orgs/{orgSlug}/events/{eventSlug}:
     put:
       description: ""
       parameters:
@@ -657,7 +657,7 @@ paths:
           required: true
           schema:
             type: "string"
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -681,11 +681,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Map_String"
-  /orgs/{orgSlug}/events/{eventId}/integrations/{provider}/{usage}:
+  /orgs/{orgSlug}/events/{eventSlug}/integrations/{provider}/{usage}:
     post:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -718,11 +718,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Map_String"
-  /orgs/{orgSlug}/events/{eventId}/options:
+  /orgs/{orgSlug}/events/{eventSlug}/options:
     get:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -755,7 +755,7 @@ paths:
     post:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -784,11 +784,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Map_String"
-  /orgs/{orgSlug}/events/{eventId}/options/{optionId}:
+  /orgs/{orgSlug}/events/{eventSlug}/options/{optionId}:
     delete:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -819,7 +819,7 @@ paths:
     put:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -853,11 +853,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Map_String"
-  /orgs/{orgSlug}/events/{eventId}/packs:
+  /orgs/{orgSlug}/events/{eventSlug}/packs:
     get:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -890,7 +890,7 @@ paths:
     post:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -919,11 +919,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Map_String"
-  /orgs/{orgSlug}/events/{eventId}/packs/{packId}:
+  /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}:
     delete:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -954,7 +954,7 @@ paths:
     put:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -988,11 +988,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Map_String"
-  /orgs/{orgSlug}/events/{eventId}/packs/{packId}/options:
+  /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}/options:
     post:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -1026,11 +1026,11 @@ paths:
             '*/*':
               schema:
                 type: "object"
-  /orgs/{orgSlug}/events/{eventId}/packs/{packId}/options/{optionId}:
+  /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}/options/{optionId}:
     delete:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -1063,11 +1063,11 @@ paths:
             '*/*':
               schema:
                 type: "object"
-  /orgs/{orgSlug}/events/{eventId}/partnership:
+  /orgs/{orgSlug}/events/{eventSlug}/partnership:
     get:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -1132,11 +1132,11 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/PartnershipItem"
-  /orgs/{orgSlug}/events/{eventId}/partnership/{partnershipId}/agreement:
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/agreement:
     post:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -1164,11 +1164,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Map_String"
-  /orgs/{orgSlug}/events/{eventId}/partnership/{partnershipId}/billing/{billingStatus}:
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/billing/{billingStatus}:
     post:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -1201,11 +1201,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Map_String"
-  /orgs/{orgSlug}/events/{eventId}/partnership/{partnershipId}/decline:
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/decline:
     post:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -1233,11 +1233,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Map_String"
-  /orgs/{orgSlug}/events/{eventId}/partnership/{partnershipId}/suggestion:
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/suggestion:
     post:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -1277,11 +1277,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Map_String"
-  /orgs/{orgSlug}/events/{eventId}/partnership/{partnershipId}/validate:
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/validate:
     post:
       description: ""
       parameters:
-        - name: "eventId"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
@@ -1579,7 +1579,7 @@ components:
     EventSummary:
       type: "object"
       properties:
-        id:
+        slug:
           type: "string"
         name:
           type: "string"
@@ -1596,7 +1596,7 @@ components:
           type: "string"
           format: "date-time"
       required:
-        - "id"
+        - "slug"
         - "name"
         - "startTime"
         - "endTime"

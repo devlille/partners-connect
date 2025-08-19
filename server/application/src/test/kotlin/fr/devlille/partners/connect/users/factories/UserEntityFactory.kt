@@ -10,8 +10,9 @@ import java.util.UUID
 fun insertMockedEventWithAdminUser(
     eventId: UUID = UUID.randomUUID(),
     orgId: UUID = UUID.randomUUID(),
+    slug: String? = null,
 ): EventEntity {
-    val mockedEvent = insertMockedEvent(eventId, orgId = orgId)
+    val mockedEvent = insertMockedEvent(eventId, slug = slug, orgId = orgId)
     insertMockedOrgaPermission(orgId = orgId, user = insertMockedAdminUser())
     return mockedEvent
 }

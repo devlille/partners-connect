@@ -32,7 +32,7 @@ object InitialSchemaMigration : Migration {
     override val description = "Create initial database schema with all tables"
 
     override fun up() {
-        SchemaUtils.create(
+        SchemaUtils.createMissingTablesAndColumns(
             // integrations
             IntegrationsTable,
             SlackIntegrationsTable,

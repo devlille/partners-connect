@@ -21,7 +21,7 @@ import org.koin.ktor.ext.inject
 
 @Suppress("ThrowsCount")
 fun Route.sponsoringRoutes() {
-    route("/orgs/{orgSlug}/events/{eventId}") {
+    route("/orgs/{orgSlug}/events/{eventSlug}") {
         packRoutes()
         optionRoutes()
     }
@@ -35,44 +35,44 @@ private fun Route.packRoutes() {
     route("/packs") {
         install(AuthorizedOrganisationPlugin)
         get {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val acceptLanguage = call.request.headers["Accept-Language"]
                 ?.lowercase()
                 ?: throw BadRequestException("Missing accept-language header")
-            val packs = repository.findPacksByEvent(eventId = eventId, language = acceptLanguage)
+            val packs = repository.findPacksByEvent(eventSlug = eventSlug, language = acceptLanguage)
             call.respond(HttpStatusCode.OK, packs)
         }
         post {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val request = call.receive<CreateSponsoringPack>()
-            val packId = repository.createPack(eventId = eventId, input = request)
+            val packId = repository.createPack(eventSlug = eventSlug, input = request)
             call.respond(HttpStatusCode.Created, mapOf("id" to packId.toString()))
         }
         delete("/{packId}") {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val packId = call.parameters["packId"]?.toUUID() ?: throw BadRequestException("Missing pack id")
-            repository.deletePack(eventId = eventId, packId = packId)
+            repository.deletePack(eventSlug = eventSlug, packId = packId)
             call.respond(HttpStatusCode.NoContent)
         }
         put("/{packId}") {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val packId = call.parameters["packId"]?.toUUID() ?: throw BadRequestException("Missing pack id")
             val input = call.receive<CreateSponsoringPack>()
-            val updatedId = repository.updatePack(eventId = eventId, packId = packId, input = input)
+            val updatedId = repository.updatePack(eventSlug = eventSlug, packId = packId, input = input)
             call.respond(HttpStatusCode.OK, mapOf("id" to updatedId.toString()))
         }
         post("/{packId}/options") {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val packId = call.parameters["packId"]?.toUUID() ?: throw BadRequestException("Missing pack id")
             val request = call.receive<AttachOptionsToPack>()
-            optRepository.attachOptionsToPack(eventId = eventId, packId = packId, options = request)
+            optRepository.attachOptionsToPack(eventSlug = eventSlug, packId = packId, options = request)
             call.respond(HttpStatusCode.Created)
         }
         delete("/{packId}/options/{optionId}") {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val packId = call.parameters["packId"]?.toUUID() ?: throw BadRequestException("Missing pack id")
             val optionId = call.parameters["optionId"]?.toUUID() ?: throw BadRequestException("Missing option id")
-            optRepository.detachOptionFromPack(eventId = eventId, packId = packId, optionId = optionId)
+            optRepository.detachOptionFromPack(eventSlug = eventSlug, packId = packId, optionId = optionId)
             call.respond(HttpStatusCode.NoContent)
         }
     }
@@ -85,30 +85,30 @@ private fun Route.optionRoutes() {
     route("/options") {
         install(AuthorizedOrganisationPlugin)
         get {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val acceptLanguage = call.request.headers["Accept-Language"]
                 ?.lowercase()
                 ?: throw BadRequestException("Missing accept-language header")
-            val options = repository.listOptionsByEvent(eventId = eventId, language = acceptLanguage)
+            val options = repository.listOptionsByEvent(eventSlug = eventSlug, language = acceptLanguage)
             call.respond(HttpStatusCode.OK, options)
         }
         post {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val request = call.receive<CreateSponsoringOption>()
-            val optionId = repository.createOption(eventId = eventId, input = request)
+            val optionId = repository.createOption(eventSlug = eventSlug, input = request)
             call.respond(HttpStatusCode.Created, mapOf("id" to optionId.toString()))
         }
         put("/{optionId}") {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val optionId = call.parameters["optionId"]?.toUUID() ?: throw BadRequestException("Missing option id")
             val input = call.receive<CreateSponsoringOption>()
-            val updatedId = repository.updateOption(eventId = eventId, optionId = optionId, input = input)
+            val updatedId = repository.updateOption(eventSlug = eventSlug, optionId = optionId, input = input)
             call.respond(HttpStatusCode.OK, mapOf("id" to updatedId.toString()))
         }
         delete("/{optionId}") {
-            val eventId = call.parameters["eventId"]?.toUUID() ?: throw BadRequestException("Missing event id")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val optionId = call.parameters["optionId"]?.toUUID() ?: throw BadRequestException("Missing option id")
-            repository.deleteOption(eventId = eventId, optionId = optionId)
+            repository.deleteOption(eventSlug = eventSlug, optionId = optionId)
             call.respond(HttpStatusCode.NoContent)
         }
     }

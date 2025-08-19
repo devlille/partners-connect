@@ -1,9 +1,11 @@
 package fr.devlille.partners.connect.integrations.infrastructure
 
+import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.integrations.domain.CreateIntegration
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
-import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
+import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
+import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -24,11 +26,14 @@ class IntegrationRoutesTest {
     fun `POST integration - register Slack integration successfully`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val testOrgSlug = "test-org-1"
+        val testEventSlug = "test-event-1"
 
         application {
             moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedOrganisationEntity(orgId, name = testOrgSlug)
+            insertMockedEvent(eventId, orgId = orgId, slug = testEventSlug, name = "Test Event 1")
+            insertMockedOrgaPermission(orgId = orgId, user = insertMockedAdminUser())
         }
 
         val requestBody = Json.encodeToString(
@@ -38,7 +43,7 @@ class IntegrationRoutesTest {
             ),
         )
 
-        val response = client.post("/orgs/$orgId/events/$eventId/integrations/slack/notification") {
+        val response = client.post("/orgs/$testOrgSlug/events/$testEventSlug/integrations/slack/notification") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(requestBody)
@@ -53,14 +58,17 @@ class IntegrationRoutesTest {
     fun `POST integration - fails with invalid usage`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val testOrgSlug = "test-org-2"
+        val testEventSlug = "test-event-2"
 
         application {
             moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedOrganisationEntity(orgId, name = testOrgSlug)
+            insertMockedEvent(eventId, orgId = orgId, slug = testEventSlug, name = "Test Event 2")
+            insertMockedOrgaPermission(orgId = orgId, user = insertMockedAdminUser())
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventId/integrations/slack/invalid_usage") {
+        val response = client.post("/orgs/$testOrgSlug/events/$testEventSlug/integrations/slack/invalid_usage") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody("{}")
@@ -74,14 +82,18 @@ class IntegrationRoutesTest {
     fun `POST integration - fails with unsupported provider`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val testOrgSlug = "test-org-3"
+        val testEventSlug = "test-event-3"
 
         application {
             moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
+            insertMockedOrganisationEntity(orgId, name = testOrgSlug)
+            insertMockedEvent(eventId, orgId = orgId, slug = testEventSlug, name = "Test Event 3")
+            insertMockedOrgaPermission(orgId = orgId, user = insertMockedAdminUser())
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventId/integrations/invalid_provider/notification") {
+        val integrationPath = "/orgs/$testOrgSlug/events/$testEventSlug/integrations/invalid_provider/notification"
+        val response = client.post(integrationPath) {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody("{}")

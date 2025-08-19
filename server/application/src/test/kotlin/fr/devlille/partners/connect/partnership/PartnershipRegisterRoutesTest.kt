@@ -26,13 +26,14 @@ class PartnershipRegisterRoutesTest {
     @Test
     fun `POST registers a valid partnership`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-registers-a-val-982"
         val companyId = UUID.randomUUID()
         val packId = UUID.randomUUID()
         val optionId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
             insertMockedCompany(companyId)
             insertMockedSponsoringPack(packId, eventId)
             insertMockedSponsoringOption(optionId, eventId)
@@ -51,7 +52,7 @@ class PartnershipRegisterRoutesTest {
             emails = listOf("partner@example.com"),
         )
 
-        val response = client.post("/events/$eventId/partnership") {
+        val response = client.post("/events/$eventSlug/partnership") {
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
@@ -81,9 +82,10 @@ class PartnershipRegisterRoutesTest {
     @Test
     fun `POST returns 404 when company not found`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-returns-404-whe-711"
         application {
             moduleMocked()
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
         }
 
         val body = RegisterPartnership(
@@ -94,7 +96,7 @@ class PartnershipRegisterRoutesTest {
             contactRole = "Marketing Manager",
             language = "en",
         )
-        val response = client.post("/events/$eventId/partnership") {
+        val response = client.post("/events/$eventSlug/partnership") {
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
@@ -104,10 +106,11 @@ class PartnershipRegisterRoutesTest {
     @Test
     fun `POST returns 404 when pack not found`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-returns-404-whe-169"
         val companyId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
         }
 
         val body = RegisterPartnership(
@@ -118,7 +121,7 @@ class PartnershipRegisterRoutesTest {
             contactRole = "Marketing Manager",
             language = "en",
         )
-        val response = client.post("/events/$eventId/partnership") {
+        val response = client.post("/events/$eventSlug/partnership") {
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
@@ -128,11 +131,12 @@ class PartnershipRegisterRoutesTest {
     @Test
     fun `POST returns 400 when partnership already exists`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-returns-400-whe-141"
         val companyId = UUID.randomUUID()
         val packId = UUID.randomUUID()
         application {
             moduleMocked()
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
             insertMockedCompany(companyId)
             val selectedPack = insertMockedSponsoringPack(packId, eventId)
             insertMockedPartnership(eventId = eventId, companyId = companyId, selectedPackId = selectedPack.id.value)
@@ -146,7 +150,7 @@ class PartnershipRegisterRoutesTest {
             contactRole = "Marketing Manager",
             language = "en",
         )
-        val response = client.post("/events/$eventId/partnership") {
+        val response = client.post("/events/$eventSlug/partnership") {
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
@@ -156,13 +160,14 @@ class PartnershipRegisterRoutesTest {
     @Test
     fun `POST returns 400 when option not optional`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-returns-400-whe-15"
         val companyId = UUID.randomUUID()
         val packId = UUID.randomUUID()
         val optionId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
             insertMockedCompany(companyId)
             insertMockedSponsoringPack(packId, eventId)
             insertMockedSponsoringOption(optionId, eventId)
@@ -177,7 +182,7 @@ class PartnershipRegisterRoutesTest {
             contactRole = "Marketing Manager",
             language = "en",
         )
-        val response = client.post("/events/$eventId/partnership") {
+        val response = client.post("/events/$eventSlug/partnership") {
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
@@ -188,13 +193,14 @@ class PartnershipRegisterRoutesTest {
     @Test
     fun `POST returns 400 when option has no translation`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-returns-400-whe-604"
         val companyId = UUID.randomUUID()
         val packId = UUID.randomUUID()
         val optionId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
             insertMockedCompany(companyId)
             insertMockedSponsoringPack(packId, eventId)
             insertMockedSponsoringOption(optionId, eventId)
@@ -209,7 +215,7 @@ class PartnershipRegisterRoutesTest {
             contactRole = "Marketing Manager",
             language = "fr",
         )
-        val response = client.post("/events/$eventId/partnership") {
+        val response = client.post("/events/$eventSlug/partnership") {
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }

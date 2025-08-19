@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.sponsoring.application
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.sponsoring.application.mappers.toDomain
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringPack
 import fr.devlille.partners.connect.sponsoring.domain.PackRepository
@@ -16,8 +17,10 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
 class PackRepositoryExposed : PackRepository {
-    override fun findPacksByEvent(eventId: UUID, language: String): List<SponsoringPack> = transaction {
-        val packs = SponsoringPackEntity.listPacksByEvent(eventId)
+    override fun findPacksByEvent(eventSlug: String, language: String): List<SponsoringPack> = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val packs = SponsoringPackEntity.listPacksByEvent(event.id.value)
         packs.map { pack ->
             pack.toDomain(
                 language = language,
@@ -31,8 +34,10 @@ class PackRepositoryExposed : PackRepository {
         }
     }
 
-    override fun getById(eventId: UUID, packId: UUID, language: String): SponsoringPack = transaction {
-        val pack = SponsoringPackEntity.singlePackById(eventId, packId)
+    override fun getById(eventSlug: String, packId: UUID, language: String): SponsoringPack = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val pack = SponsoringPackEntity.singlePackById(event.id.value, packId)
         pack.toDomain(
             language = language,
             requiredOptionIds = PackOptionsTable.listOptionsByPack(packId)
@@ -44,9 +49,11 @@ class PackRepositoryExposed : PackRepository {
         )
     }
 
-    override fun createPack(eventId: UUID, input: CreateSponsoringPack): UUID = transaction {
+    override fun createPack(eventSlug: String, input: CreateSponsoringPack): UUID = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
         SponsoringPackEntity.new {
-            this.event = EventEntity.findById(eventId) ?: throw NotFoundException("Event with id $eventId not found")
+            this.event = event
             this.name = input.name
             this.basePrice = input.price
             this.withBooth = input.withBooth
@@ -55,8 +62,10 @@ class PackRepositoryExposed : PackRepository {
         }.id.value
     }
 
-    override fun updatePack(eventId: UUID, packId: UUID, input: CreateSponsoringPack): UUID = transaction {
-        val pack = SponsoringPackEntity.singlePackById(eventId, packId)
+    override fun updatePack(eventSlug: String, packId: UUID, input: CreateSponsoringPack): UUID = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val pack = SponsoringPackEntity.singlePackById(event.id.value, packId)
         pack.name = input.name
         pack.basePrice = input.price
         pack.withBooth = input.withBooth
@@ -65,8 +74,10 @@ class PackRepositoryExposed : PackRepository {
         pack.id.value
     }
 
-    override fun deletePack(eventId: UUID, packId: UUID) = transaction {
-        val pack = SponsoringPackEntity.singlePackById(eventId, packId)
+    override fun deletePack(eventSlug: String, packId: UUID) = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val pack = SponsoringPackEntity.singlePackById(event.id.value, packId)
         val hasOptions = PackOptionsTable.listOptionsByPack(pack.id.value).any()
         if (hasOptions) {
             throw BadRequestException("Pack has attached options and cannot be deleted")

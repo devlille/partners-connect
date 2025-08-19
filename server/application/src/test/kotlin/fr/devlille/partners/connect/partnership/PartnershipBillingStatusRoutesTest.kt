@@ -25,6 +25,7 @@ class PartnershipBillingStatusRoutesTest {
     @Test
     fun `POST updates billing status to PAID and returns 200 with billing id`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-updates-billing-819"
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
@@ -32,14 +33,16 @@ class PartnershipBillingStatusRoutesTest {
             moduleMocked()
             val admin = insertMockedAdminUser()
             val org = insertMockedOrganisationEntity(name = "Test Organization", representativeUser = admin)
-            insertMockedEventWithOrga(eventId, organisation = org)
+            insertMockedEventWithOrga(eventId, organisation = org, slug = eventSlug)
             insertMockedOrgaPermission(orgId = org.id.value, user = admin)
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
             insertMockedBilling(eventId, partnershipId, status = InvoiceStatus.PENDING)
         }
 
-        val response = client.post("/orgs/test-organization/events/$eventId/partnership/$partnershipId/billing/PAID") {
+        val response = client.post(
+            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/billing/PAID",
+        ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -55,6 +58,7 @@ class PartnershipBillingStatusRoutesTest {
     @Test
     fun `POST handles case-insensitive billing status`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-handles-case-in-778"
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
@@ -62,14 +66,16 @@ class PartnershipBillingStatusRoutesTest {
             moduleMocked()
             val admin = insertMockedAdminUser()
             val org = insertMockedOrganisationEntity(name = "Test Organization", representativeUser = admin)
-            insertMockedEventWithOrga(eventId, organisation = org)
+            insertMockedEventWithOrga(eventId, organisation = org, slug = eventSlug)
             insertMockedOrgaPermission(orgId = org.id.value, user = admin)
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
             insertMockedBilling(eventId, partnershipId, status = InvoiceStatus.PENDING)
         }
 
-        val response = client.post("/orgs/test-organization/events/$eventId/partnership/$partnershipId/billing/sent") {
+        val response = client.post(
+            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/billing/sent",
+        ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -81,6 +87,7 @@ class PartnershipBillingStatusRoutesTest {
     @Test
     fun `POST returns 400 for invalid billing status`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-returns-400-for-425"
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
@@ -88,7 +95,7 @@ class PartnershipBillingStatusRoutesTest {
             moduleMocked()
             val admin = insertMockedAdminUser()
             val org = insertMockedOrganisationEntity(name = "Test Organization", representativeUser = admin)
-            insertMockedEventWithOrga(eventId, organisation = org)
+            insertMockedEventWithOrga(eventId, organisation = org, slug = eventSlug)
             insertMockedOrgaPermission(orgId = org.id.value, user = admin)
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
@@ -96,7 +103,7 @@ class PartnershipBillingStatusRoutesTest {
         }
 
         val response = client.post(
-            "/orgs/test-organization/events/$eventId/partnership/$partnershipId/billing/UNKNOWN_STATUS",
+            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/billing/UNKNOWN_STATUS",
         ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -109,17 +116,18 @@ class PartnershipBillingStatusRoutesTest {
     @Test
     fun `POST returns 401 when Authorization header is missing`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-returns-401-whe-223"
         val partnershipId = UUID.randomUUID()
 
         application {
             moduleMocked()
             val admin = insertMockedAdminUser()
             val org = insertMockedOrganisationEntity(name = "Test Organization", representativeUser = admin)
-            insertMockedEventWithOrga(eventId, organisation = org)
+            insertMockedEventWithOrga(eventId, organisation = org, slug = eventSlug)
             insertMockedOrgaPermission(orgId = org.id.value, user = admin)
         }
 
-        val response = client.post("/orgs/test-organization/events/$eventId/partnership/$partnershipId/billing/PAID")
+        val response = client.post("/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/billing/PAID")
 
         assertEquals(HttpStatusCode.Unauthorized, response.status)
     }
@@ -127,6 +135,7 @@ class PartnershipBillingStatusRoutesTest {
     @Test
     fun `POST returns 401 when user lacks organization permissions`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-returns-401-whe-886"
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
@@ -134,14 +143,16 @@ class PartnershipBillingStatusRoutesTest {
             moduleMocked()
             val admin = insertMockedAdminUser()
             val org = insertMockedOrganisationEntity(name = "Test Organization", representativeUser = admin)
-            insertMockedEventWithOrga(eventId, organisation = org)
+            insertMockedEventWithOrga(eventId, organisation = org, slug = eventSlug)
             // Note: NOT calling insertMockedOrgaPermission, so user lacks permission
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
             insertMockedBilling(eventId, partnershipId, status = InvoiceStatus.PENDING)
         }
 
-        val response = client.post("/orgs/test-organization/events/$eventId/partnership/$partnershipId/billing/PAID") {
+        val response = client.post(
+            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/billing/PAID",
+        ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -151,6 +162,7 @@ class PartnershipBillingStatusRoutesTest {
     @Test
     fun `POST returns 404 when billing record does not exist`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-returns-404-whe-203"
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
@@ -158,14 +170,16 @@ class PartnershipBillingStatusRoutesTest {
             moduleMocked()
             val admin = insertMockedAdminUser()
             val org = insertMockedOrganisationEntity(name = "Test Organization", representativeUser = admin)
-            insertMockedEventWithOrga(eventId, organisation = org)
+            insertMockedEventWithOrga(eventId, organisation = org, slug = eventSlug)
             insertMockedOrgaPermission(orgId = org.id.value, user = admin)
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
             // Note: Not creating billing record
         }
 
-        val response = client.post("/orgs/test-organization/events/$eventId/partnership/$partnershipId/billing/PAID") {
+        val response = client.post(
+            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/billing/PAID",
+        ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 

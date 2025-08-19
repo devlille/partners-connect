@@ -30,18 +30,19 @@ class PartnershipBillingRoutesTest {
     @Test
     fun `GET returns billing for existing company`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-get-returns-billing--291"
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
             insertMockedBilling(eventId, partnershipId, name = "DevLille SAS", status = InvoiceStatus.SENT)
         }
 
-        val response = client.get("/events/$eventId/partnership/$partnershipId/billing")
+        val response = client.get("/events/$eventSlug/partnership/$partnershipId/billing")
 
         assertEquals(HttpStatusCode.OK, response.status)
         val body = response.bodyAsText()
@@ -51,16 +52,17 @@ class PartnershipBillingRoutesTest {
     @Test
     fun `GET returns 404 if billing does not exist for company`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-get-returns-404-if-b-401"
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
             insertMockedCompany(companyId)
         }
 
-        val response = client.get("/events/$eventId/partnership/$partnershipId/billing")
+        val response = client.get("/events/$eventSlug/partnership/$partnershipId/billing")
 
         assertEquals(HttpStatusCode.NotFound, response.status)
         assertTrue(response.bodyAsText().contains("Billing not found"))
@@ -69,18 +71,19 @@ class PartnershipBillingRoutesTest {
     @Test
     fun `POST creates billing for existing company`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-creates-billing-597"
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
             insertQontoIntegration(eventId)
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/billing") {
+        val response = client.post("/events/$eventSlug/partnership/$partnershipId/billing") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(CompanyBillingData.serializer(), createCompanyBillingData()))
         }
@@ -93,19 +96,20 @@ class PartnershipBillingRoutesTest {
     @Test
     fun `PUT updates billing if it exists`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-put-updates-billing--275"
         val companyId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
             insertQontoIntegration(eventId)
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
             insertMockedBilling(eventId, partnershipId, status = InvoiceStatus.PENDING)
         }
 
-        val response = client.put("/events/$eventId/partnership/$partnershipId/billing") {
+        val response = client.put("/events/$eventSlug/partnership/$partnershipId/billing") {
             contentType(ContentType.Application.Json)
             setBody(
                 json.encodeToString(
@@ -123,14 +127,15 @@ class PartnershipBillingRoutesTest {
     @Test
     fun `POST fails if partnership not found`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-fails-if-partne-215"
         val partnershipId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnershipId/billing") {
+        val response = client.post("/events/$eventSlug/partnership/$partnershipId/billing") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(CompanyBillingData.serializer(), createCompanyBillingData()))
         }
@@ -142,14 +147,15 @@ class PartnershipBillingRoutesTest {
     @Test
     fun `PUT fails if partnership not found`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-put-fails-if-partner-224"
         val partnershipId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
         }
 
-        val response = client.put("/events/$eventId/partnership/$partnershipId/billing") {
+        val response = client.put("/events/$eventSlug/partnership/$partnershipId/billing") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(CompanyBillingData.serializer(), createCompanyBillingData()))
         }

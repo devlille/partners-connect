@@ -2,6 +2,8 @@ package fr.devlille.partners.connect.partnership.application
 
 import fr.devlille.partners.connect.companies.application.mappers.toDomain
 import fr.devlille.partners.connect.companies.domain.CompanyBillingData
+import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.partnership.domain.PartnershipBillingRepository
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
@@ -12,14 +14,19 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
 class PartnershipBillingRepositoryExposed : PartnershipBillingRepository {
-    override fun getByPartnershipId(eventId: UUID, partnershipId: UUID): CompanyBillingData = transaction {
+    override fun getByPartnershipId(eventSlug: String, partnershipId: UUID): CompanyBillingData = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
         BillingEntity
-            .singleByEventAndPartnership(eventId, partnershipId)
+            .singleByEventAndPartnership(event.id.value, partnershipId)
             ?.let(BillingEntity::toDomain)
             ?: throw NotFoundException("Billing not found for partnership ID: $partnershipId")
     }
 
-    override fun createOrUpdate(eventId: UUID, partnershipId: UUID, input: CompanyBillingData): UUID = transaction {
+    override fun createOrUpdate(eventSlug: String, partnershipId: UUID, input: CompanyBillingData): UUID = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val eventId = event.id.value
         val existing = BillingEntity.singleByEventAndPartnership(eventId, partnershipId)
         val partnership = PartnershipEntity.singleByEventAndPartnership(eventId, partnershipId)
             ?: throw NotFoundException("Partnership not found")
@@ -45,22 +52,28 @@ class PartnershipBillingRepositoryExposed : PartnershipBillingRepository {
         }.id.value
     }
 
-    override fun updateInvoiceUrl(eventId: UUID, partnershipId: UUID, invoiceUrl: String): UUID = transaction {
-        val existing = BillingEntity.singleByEventAndPartnership(eventId, partnershipId)
+    override fun updateInvoiceUrl(eventSlug: String, partnershipId: UUID, invoiceUrl: String): UUID = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val existing = BillingEntity.singleByEventAndPartnership(event.id.value, partnershipId)
             ?: throw NotFoundException("Invoice not found for partnership ID: $partnershipId")
         existing.invoicePdfUrl = invoiceUrl
         existing.id.value
     }
 
-    override fun updateQuoteUrl(eventId: UUID, partnershipId: UUID, quoteUrl: String): UUID = transaction {
-        val existing = BillingEntity.singleByEventAndPartnership(eventId, partnershipId)
+    override fun updateQuoteUrl(eventSlug: String, partnershipId: UUID, quoteUrl: String): UUID = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val existing = BillingEntity.singleByEventAndPartnership(event.id.value, partnershipId)
             ?: throw NotFoundException("Invoice not found for partnership ID: $partnershipId")
         existing.quotePdfUrl = quoteUrl
         existing.id.value
     }
 
-    override fun updateStatus(eventId: UUID, partnershipId: UUID, status: InvoiceStatus): UUID = transaction {
-        val existing = BillingEntity.singleByEventAndPartnership(eventId, partnershipId)
+    override fun updateStatus(eventSlug: String, partnershipId: UUID, status: InvoiceStatus): UUID = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val existing = BillingEntity.singleByEventAndPartnership(event.id.value, partnershipId)
             ?: throw NotFoundException("Billing not found")
         existing.status = status
         existing.id.value

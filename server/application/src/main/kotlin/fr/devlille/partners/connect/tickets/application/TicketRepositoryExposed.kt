@@ -1,5 +1,7 @@
 package fr.devlille.partners.connect.tickets.application
 
+import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.findByEventIdAndUsage
@@ -43,10 +45,17 @@ class TicketRepositoryExposed(
         }
     }
 
-    override suspend fun createTickets(eventId: UUID, partnershipId: UUID, tickets: List<TicketData>): TicketOrder {
-        val integration = singleIntegration(eventId)
-        val provider = integration[IntegrationsTable.provider]
-        val integrationId = integration[IntegrationsTable.id].value
+    override suspend fun createTickets(eventSlug: String, partnershipId: UUID, tickets: List<TicketData>): TicketOrder {
+        val (eventId, provider, integrationId) = transaction {
+            val event = EventEntity.findBySlug(eventSlug)
+                ?: throw NotFoundException("Event with slug $eventSlug not found")
+            val eventId = event.id.value
+            val integration = singleIntegrationWithinTransaction(eventId)
+            val provider = integration[IntegrationsTable.provider]
+            val integrationId = integration[IntegrationsTable.id].value
+            Triple(eventId, provider, integrationId)
+        }
+
         val gateway = gateways.find { it.provider == provider }
             ?: throw NotFoundException("No gateway for provider $provider")
         val billing = transaction { BillingEntity.singleByEventAndPartnership(eventId, partnershipId) }
@@ -81,10 +90,22 @@ Not enough tickets in the validated pack: ${validatedPack.nbTickets} available, 
         return order
     }
 
-    override suspend fun updateTicket(eventId: UUID, partnershipId: UUID, ticketId: String, data: TicketData): Ticket {
-        val integration = singleIntegration(eventId)
-        val provider = integration[IntegrationsTable.provider]
-        val integrationId = integration[IntegrationsTable.id].value
+    override suspend fun updateTicket(
+        eventSlug: String,
+        partnershipId: UUID,
+        ticketId: String,
+        data: TicketData,
+    ): Ticket {
+        val (eventId, provider, integrationId) = transaction {
+            val event = EventEntity.findBySlug(eventSlug)
+                ?: throw NotFoundException("Event with slug $eventSlug not found")
+            val eventId = event.id.value
+            val integration = singleIntegrationWithinTransaction(eventId)
+            val provider = integration[IntegrationsTable.provider]
+            val integrationId = integration[IntegrationsTable.id].value
+            Triple(eventId, provider, integrationId)
+        }
+
         val gateway = gateways.find { it.provider == provider }
             ?: throw NotFoundException("No gateway for provider $provider")
         val ticket = gateway.updateTicket(integrationId, ticketId, data)
@@ -100,7 +121,7 @@ Not enough tickets in the validated pack: ${validatedPack.nbTickets} available, 
         return ticket
     }
 
-    private fun singleIntegration(eventId: UUID): ResultRow = transaction {
+    private fun singleIntegrationWithinTransaction(eventId: UUID): ResultRow {
         val integrations = IntegrationsTable
             .findByEventIdAndUsage(eventId, IntegrationUsage.TICKETING)
             .toList()
@@ -110,6 +131,6 @@ Not enough tickets in the validated pack: ${validatedPack.nbTickets} available, 
         if (integrations.size > 1) {
             throw NotFoundException("Multiple ticketing integrations found for event $eventId")
         }
-        integrations.single()
+        return integrations.single()
     }
 }

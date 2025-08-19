@@ -31,6 +31,7 @@ class GrantPermissionRouteTest {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
             insertMockedEventWithAdminUser(eventId, orgId)
+
             insertMockedUser(id = targetId, email = "bob@example.com")
         }
 

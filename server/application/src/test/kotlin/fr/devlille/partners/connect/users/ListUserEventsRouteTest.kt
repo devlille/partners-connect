@@ -100,13 +100,14 @@ class ListUserEventsRouteTest {
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-event-2025"
         val email = "john.doe@contact.com" // Must match the mock auth email
 
         application {
             moduleMocked()
             val user = insertMockedUser(userId, email = email)
             insertMockedOrganisationEntity(orgId)
-            insertMockedEvent(eventId, orgId = orgId, name = "Test Event 2025")
+            insertMockedEvent(eventId, orgId = orgId, name = "Test Event 2025", slug = eventSlug)
             insertMockedOrgaPermission(orgId = orgId, user = user, canEdit = true)
         }
 
@@ -122,7 +123,7 @@ class ListUserEventsRouteTest {
         assertEquals(1, eventsArray.size)
 
         val event = eventsArray[0].jsonObject
-        assertEquals(eventId.toString(), event["id"]?.jsonPrimitive?.content)
+        assertEquals(eventSlug, event["slug"]?.jsonPrimitive?.content)
         assertEquals("Test Event 2025", event["name"]?.jsonPrimitive?.content)
         assertTrue(event.containsKey("start_time"))
         assertTrue(event.containsKey("end_time"))
@@ -137,6 +138,8 @@ class ListUserEventsRouteTest {
         val orgId2 = UUID.randomUUID()
         val eventId1 = UUID.randomUUID()
         val eventId2 = UUID.randomUUID()
+        val eventSlug1 = "event-1"
+        val eventSlug2 = "event-2"
         val email = "john.doe@contact.com" // Must match the mock auth email
 
         application {
@@ -145,12 +148,12 @@ class ListUserEventsRouteTest {
 
             // First organization with one event
             insertMockedOrganisationEntity(orgId1)
-            insertMockedEvent(eventId1, orgId = orgId1, name = "Event 1")
+            insertMockedEvent(eventId1, orgId = orgId1, name = "Event 1", slug = eventSlug1)
             insertMockedOrgaPermission(orgId = orgId1, user = user, canEdit = true)
 
             // Second organization with one event
             insertMockedOrganisationEntity(orgId2)
-            insertMockedEvent(eventId2, orgId = orgId2, name = "Event 2")
+            insertMockedEvent(eventId2, orgId = orgId2, name = "Event 2", slug = eventSlug2)
             insertMockedOrgaPermission(orgId = orgId2, user = user, canEdit = true)
         }
 
@@ -165,8 +168,8 @@ class ListUserEventsRouteTest {
 
         assertEquals(2, eventsArray.size)
 
-        val eventIds = eventsArray.map { it.jsonObject["id"]?.jsonPrimitive?.content }
-        assertTrue(eventIds.contains(eventId1.toString()))
-        assertTrue(eventIds.contains(eventId2.toString()))
+        val eventSlugs = eventsArray.map { it.jsonObject["slug"]?.jsonPrimitive?.content }
+        assertTrue(eventSlugs.contains(eventSlug1))
+        assertTrue(eventSlugs.contains(eventSlug2))
     }
 }

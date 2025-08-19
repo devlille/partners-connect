@@ -49,3 +49,6 @@ application/docs
 
 ### Environment ###
 .env
+
+### Generated documentation ###
+application/docs

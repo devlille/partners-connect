@@ -8,9 +8,9 @@ import fr.devlille.partners.connect.events.domain.EventWithOrganisation
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
+import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
 import fr.devlille.partners.connect.organisations.application.mappers.toDomain
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
-import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionEntity
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionsTable
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
@@ -19,7 +19,8 @@ import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import java.util.UUID
+import fr.devlille.partners.connect.events.infrastructure.db.findBySlug as eventFindBySlug
+import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug as orgFindBySlug
 
 class EventRepositoryExposed(
     private val entity: UUIDEntityClass<EventEntity>,
@@ -27,7 +28,7 @@ class EventRepositoryExposed(
     override fun getAllEvents(): List<EventSummary> = transaction {
         entity.all().map {
             EventSummary(
-                id = it.id.value.toString(),
+                slug = it.slug,
                 name = it.name,
                 startTime = it.startTime,
                 endTime = it.endTime,
@@ -38,11 +39,11 @@ class EventRepositoryExposed(
     }
 
     override fun findByOrgSlug(orgSlug: String): List<EventSummary> = transaction {
-        val organisation = OrganisationEntity.findBySlug(orgSlug)
+        val organisation = OrganisationEntity.orgFindBySlug(orgSlug)
             ?: throw NotFoundException("Organisation with slug $orgSlug not found")
         entity.find { EventsTable.organisationId eq organisation.id }.map {
             EventSummary(
-                id = it.id.value.toString(),
+                slug = it.slug,
                 name = it.name,
                 startTime = it.startTime,
                 endTime = it.endTime,
@@ -52,23 +53,9 @@ class EventRepositoryExposed(
         }
     }
 
-    override fun getById(eventId: UUID): Event = transaction {
-        val event = entity.findById(eventId)
-            ?: throw NotFoundException("Event with id $eventId not found")
-        Event(
-            name = event.name,
-            startTime = event.startTime,
-            endTime = event.endTime,
-            submissionStartTime = event.submissionStartTime,
-            submissionEndTime = event.submissionEndTime,
-            address = event.address,
-            contact = Contact(phone = event.contactPhone, email = event.contactEmail),
-        )
-    }
-
-    override fun getPublicEventById(eventId: UUID): EventWithOrganisation = transaction {
-        val eventEntity = entity.findById(eventId)
-            ?: throw NotFoundException("Event with id $eventId not found")
+    override fun getBySlug(eventSlug: String): EventWithOrganisation = transaction {
+        val eventEntity = entity.eventFindBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
 
         val event = Event(
             name = eventEntity.name,
@@ -88,11 +75,15 @@ class EventRepositoryExposed(
         )
     }
 
-    override fun createEvent(orgSlug: String, event: Event): UUID = transaction {
-        val organisation = OrganisationEntity.findBySlug(orgSlug)
+    override fun createEvent(orgSlug: String, event: Event): String = transaction {
+        val organisation = OrganisationEntity.orgFindBySlug(orgSlug)
             ?: throw NotFoundException("Organisation with slug $orgSlug not found")
+
+        val slug = event.name.slugify()
+
         entity.new {
             this.name = event.name
+            this.slug = slug
             this.startTime = event.startTime
             this.endTime = event.endTime
             this.submissionStartTime = event.submissionStartTime
@@ -101,20 +92,23 @@ class EventRepositoryExposed(
             this.contactPhone = event.contact.phone
             this.contactEmail = event.contact.email
             this.organisation = organisation
-        }.id.value
+        }
+        slug
     }
 
-    override fun updateEvent(id: UUID, orgSlug: String, event: Event): UUID = transaction {
-        val entity = entity.findById(id) ?: throw IllegalArgumentException("Event not found")
-        entity.name = event.name
-        entity.startTime = event.startTime
-        entity.endTime = event.endTime
-        entity.submissionStartTime = event.submissionStartTime
-        entity.submissionEndTime = event.submissionEndTime
-        entity.address = event.address
-        entity.contactPhone = event.contact.phone
-        entity.contactEmail = event.contact.email
-        entity.id.value
+    override fun updateEvent(eventSlug: String, orgSlug: String, event: Event): String = transaction {
+        val eventEntity = entity.eventFindBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+
+        eventEntity.name = event.name
+        eventEntity.startTime = event.startTime
+        eventEntity.endTime = event.endTime
+        eventEntity.submissionStartTime = event.submissionStartTime
+        eventEntity.submissionEndTime = event.submissionEndTime
+        eventEntity.address = event.address
+        eventEntity.contactPhone = event.contact.phone
+        eventEntity.contactEmail = event.contact.email
+        eventSlug
     }
 
     override fun findByUserEmail(userEmail: String): List<EventSummary> = transaction {
@@ -142,7 +136,7 @@ class EventRepositoryExposed(
             orgEvents.forEach { event ->
                 events.add(
                     EventSummary(
-                        id = event.id.value.toString(),
+                        slug = event.slug,
                         name = event.name,
                         startTime = event.startTime,
                         endTime = event.endTime,

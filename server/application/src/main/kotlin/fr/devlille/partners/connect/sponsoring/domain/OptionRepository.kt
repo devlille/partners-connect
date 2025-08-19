@@ -3,15 +3,15 @@ package fr.devlille.partners.connect.sponsoring.domain
 import java.util.UUID
 
 interface OptionRepository {
-    fun listOptionsByEvent(eventId: UUID, language: String): List<SponsoringOption>
+    fun listOptionsByEvent(eventSlug: String, language: String): List<SponsoringOption>
 
-    fun createOption(eventId: UUID, input: CreateSponsoringOption): UUID
+    fun createOption(eventSlug: String, input: CreateSponsoringOption): UUID
 
-    fun updateOption(eventId: UUID, optionId: UUID, input: CreateSponsoringOption): UUID
+    fun updateOption(eventSlug: String, optionId: UUID, input: CreateSponsoringOption): UUID
 
-    fun deleteOption(eventId: UUID, optionId: UUID)
+    fun deleteOption(eventSlug: String, optionId: UUID)
 
-    fun attachOptionsToPack(eventId: UUID, packId: UUID, options: AttachOptionsToPack)
+    fun attachOptionsToPack(eventSlug: String, packId: UUID, options: AttachOptionsToPack)
 
-    fun detachOptionFromPack(eventId: UUID, packId: UUID, optionId: UUID)
+    fun detachOptionFromPack(eventSlug: String, packId: UUID, optionId: UUID)
 }

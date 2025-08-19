@@ -18,17 +18,18 @@ class PartnershipSuggestionDecisionRoutesTest {
     @Test
     fun `POST approves a suggestion`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-approves-a-sugg-213"
         val companyId = UUID.randomUUID()
         val partnerId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnerId, eventId = eventId, companyId = companyId)
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnerId/suggestion-approve")
+        val response = client.post("/events/$eventSlug/partnership/$partnerId/suggestion-approve")
         assertEquals(HttpStatusCode.OK, response.status)
 
         transaction {
@@ -40,17 +41,18 @@ class PartnershipSuggestionDecisionRoutesTest {
     @Test
     fun `POST declines a suggestion`() = testApplication {
         val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-declines-a-sugg-979"
         val companyId = UUID.randomUUID()
         val partnerId = UUID.randomUUID()
 
         application {
             moduleMocked()
-            insertMockedEventWithOrga(eventId)
+            insertMockedEventWithOrga(eventId, slug = eventSlug)
             insertMockedCompany(companyId)
             insertMockedPartnership(id = partnerId, eventId = eventId, companyId = companyId)
         }
 
-        val response = client.post("/events/$eventId/partnership/$partnerId/suggestion-decline")
+        val response = client.post("/events/$eventSlug/partnership/$partnerId/suggestion-decline")
         assertEquals(HttpStatusCode.OK, response.status)
 
         transaction {
