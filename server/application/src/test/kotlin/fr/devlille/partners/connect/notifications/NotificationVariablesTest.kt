@@ -16,7 +16,6 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import java.util.UUID
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
@@ -28,7 +27,7 @@ class NotificationVariablesTest {
     private lateinit var company: Company
     private lateinit var pack: PartnershipPack
     private lateinit var partnership: Partnership
-    private lateinit var partnershipId: UUID
+    private lateinit var partnershipId: String
 
     @BeforeTest
     fun setUp() {
@@ -42,7 +41,7 @@ class NotificationVariablesTest {
         )
         company = createCompany()
         pack = createPack()
-        partnershipId = UUID.randomUUID()
+        partnershipId = "test-partnership-123"
         partnership = createPartnership()
     }
 
@@ -101,7 +100,7 @@ class NotificationVariablesTest {
     )
 
     private fun createPartnership() = Partnership(
-        id = partnershipId.toString(),
+        id = partnershipId,
         phone = null,
         emails = emptyList(),
         language = "en",

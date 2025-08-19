@@ -5,7 +5,6 @@ import fr.devlille.partners.connect.events.domain.EventWithOrganisationDisplay
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.partnership.domain.Partnership
 import fr.devlille.partners.connect.partnership.domain.PartnershipPack
-import java.util.UUID
 
 sealed interface NotificationVariables {
     val usageName: String
@@ -19,7 +18,7 @@ sealed interface NotificationVariables {
     companion object {
         fun buildPartnershipLink(
             event: EventWithOrganisationDisplay,
-            partnershipId: UUID,
+            partnershipId: String,
         ): String =
             "${SystemVarEnv.frontendBaseUrl}/" +
                 "${event.organisation.slug}/" +
@@ -38,7 +37,7 @@ sealed interface NotificationVariables {
         override fun populate(content: String): String {
             val partnershipLink = buildPartnershipLink(
                 event,
-                UUID.fromString(partnership.id),
+                partnership.id,
             )
             return content
                 .replace("{{event_name}}", event.event.name)
@@ -61,7 +60,7 @@ sealed interface NotificationVariables {
         override fun populate(content: String): String {
             val partnershipLink = buildPartnershipLink(
                 event,
-                UUID.fromString(partnership.id),
+                partnership.id,
             )
             return content
                 .replace("{{event_name}}", event.event.name)
@@ -83,7 +82,7 @@ sealed interface NotificationVariables {
         override fun populate(content: String): String {
             val partnershipLink = buildPartnershipLink(
                 event,
-                UUID.fromString(partnership.id),
+                partnership.id,
             )
             return content
                 .replace("{{event_name}}", event.event.name)
@@ -104,7 +103,7 @@ sealed interface NotificationVariables {
         override fun populate(content: String): String {
             val partnershipLink = buildPartnershipLink(
                 event,
-                UUID.fromString(partnership.id),
+                partnership.id,
             )
             return content
                 .replace("{{event_name}}", event.event.name)
@@ -126,7 +125,7 @@ sealed interface NotificationVariables {
         override fun populate(content: String): String {
             val partnershipLink = buildPartnershipLink(
                 event,
-                UUID.fromString(partnership.id),
+                partnership.id,
             )
             return content
                 .replace("{{event_name}}", event.event.name)
@@ -148,7 +147,7 @@ sealed interface NotificationVariables {
         override fun populate(content: String): String {
             val partnershipLink = buildPartnershipLink(
                 event,
-                UUID.fromString(partnership.id),
+                partnership.id,
             )
             return content
                 .replace("{{event_name}}", event.event.name)
