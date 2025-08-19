@@ -16,13 +16,7 @@ object MakeOrganisationFieldsNullableMigration : Migration {
         // Since the OrganisationsTable is already defined with nullable columns,
         // we can use SchemaUtils to modify the existing table structure.
         // This will attempt to synchronize the table schema with the current definition.
-        try {
-            SchemaUtils.createMissingTablesAndColumns(OrganisationsTable)
-        } catch (e: Exception) {
-            // If table already exists with different constraints, log and continue
-            // The columns are already defined as nullable in the table definition
-            println("Table modification completed or already up to date: ${e.message}")
-        }
+        SchemaUtils.createMissingTablesAndColumns(OrganisationsTable)
     }
 
     override fun down() {
