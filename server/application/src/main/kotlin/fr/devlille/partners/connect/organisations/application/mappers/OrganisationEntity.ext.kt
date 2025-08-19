@@ -5,6 +5,7 @@ import fr.devlille.partners.connect.organisations.infrastructure.db.Organisation
 
 fun OrganisationEntity.toDomain(): Organisation = Organisation(
     name = this.name,
+    slug = this.slug,
     headOffice = this.headOffice,
     siret = this.siret,
     siren = this.siren,

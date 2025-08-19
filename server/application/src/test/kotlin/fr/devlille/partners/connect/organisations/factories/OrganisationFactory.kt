@@ -10,6 +10,7 @@ import kotlinx.datetime.toLocalDateTime
 @Suppress("LongParameterList")
 fun createOrganisation(
     name: String = "DevLille Org",
+    slug: String = "devlille-org",
     headOffice: String = "123 rue de la République, Lille, France",
     siret: String = "12345678900019",
     siren: String = "123456789",
@@ -28,6 +29,7 @@ fun createOrganisation(
     publishedAt: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC),
 ): Organisation = Organisation(
     name = name,
+    slug = slug,
     headOffice = headOffice,
     siret = siret,
     siren = siren,

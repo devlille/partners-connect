@@ -14,6 +14,7 @@ services:
       CRYPTO_KEY: ${CRYPTO_KEY}
       CRYPTO_SALT: ${CRYPTO_SALT}
       OWNER: ${OWNER}
+      FRONTEND_BASE_URL: ${FRONTEND_BASE_URL:-http://localhost:80}
     ports:
       - "8080:8080"
 

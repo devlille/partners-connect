@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Organisation(
     val name: String,
+    val slug: String,
     @SerialName("head_office")
     val headOffice: String,
     val siret: String? = null,
