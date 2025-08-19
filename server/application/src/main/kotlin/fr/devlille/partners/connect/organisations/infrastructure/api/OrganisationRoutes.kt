@@ -28,11 +28,6 @@ fun Route.organisationRoutes() {
         post {
             val input = call.receive<Organisation>()
 
-            // Validate that name is present and not blank
-            if (input.name.isBlank()) {
-                throw BadRequestException("Organisation name is required and cannot be empty")
-            }
-
             val token = call.token
             val slug = repository.create(input)
             val userInfo = authRepository.getUserInfo(token)
@@ -48,11 +43,6 @@ fun Route.organisationRoutes() {
         put("/{orgSlug}") {
             val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Missing org slug")
             val input = call.receive<Organisation>()
-
-            // Validate that name is present and not blank
-            if (input.name.isBlank()) {
-                throw BadRequestException("Organisation name is required and cannot be empty")
-            }
 
             val token = call.token
             val userInfo = authRepository.getUserInfo(token)

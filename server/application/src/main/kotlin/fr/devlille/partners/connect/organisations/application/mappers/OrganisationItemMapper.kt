@@ -13,8 +13,5 @@ fun OrganisationEntity.toItemDomain(): OrganisationItem = OrganisationItem(
             displayName = user.name ?: "",
             email = user.email,
         )
-    } ?: Owner(
-        displayName = "Unknown",
-        email = "unknown@example.com",
-    ),
+    },
 )

@@ -93,35 +93,34 @@ class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
 
 @Suppress("ThrowsCount")
 internal fun OrganisationEntity.toAgreementOrganisation(formatter: DateTimeFormat<LocalDate>): Organisation {
-    // Validate required fields for agreement generation
-    val requiredHeadOffice = this.headOffice
-        ?: throw ForbiddenException("Field headOffice is required to perform this operation.")
-    val requiredIban = this.iban
-        ?: throw ForbiddenException("Field iban is required to perform this operation.")
-    val requiredBic = this.bic
-        ?: throw ForbiddenException("Field bic is required to perform this operation.")
-    val requiredCreationLocation = this.creationLocation
-        ?: throw ForbiddenException("Field creationLocation is required to perform this operation.")
-    val requiredCreatedAt = this.createdAt
-        ?: throw ForbiddenException("Field createdAt is required to perform this operation.")
-    val requiredPublishedAt = this.publishedAt
-        ?: throw ForbiddenException("Field publishedAt is required to perform this operation.")
-    val requiredRepresentativeUser = this.representativeUser
-        ?: throw ForbiddenException("Field representativeUser is required to perform this operation.")
-    val requiredRepresentativeRole = this.representativeRole
-        ?: throw ForbiddenException("Field representativeRole is required to perform this operation.")
+    // Collect all missing required fields
+    val missingFields = mutableListOf<String>()
+
+    if (this.headOffice == null) missingFields.add("headOffice")
+    if (this.iban == null) missingFields.add("iban")
+    if (this.bic == null) missingFields.add("bic")
+    if (this.creationLocation == null) missingFields.add("creationLocation")
+    if (this.createdAt == null) missingFields.add("createdAt")
+    if (this.publishedAt == null) missingFields.add("publishedAt")
+    if (this.representativeUser == null) missingFields.add("representativeUser")
+    if (this.representativeRole == null) missingFields.add("representativeRole")
+
+    // Throw single exception with all missing fields if any
+    if (missingFields.isNotEmpty()) {
+        throw ForbiddenException("Fields ${missingFields.joinToString(", ")} are required to perform this operation.")
+    }
 
     return Organisation(
         name = this.name,
-        headOffice = requiredHeadOffice,
-        iban = requiredIban,
-        bic = requiredBic,
-        creationLocation = requiredCreationLocation,
-        createdAt = requiredCreatedAt.date.format(formatter),
-        publishedAt = requiredPublishedAt.date.format(formatter),
+        headOffice = this.headOffice!!,
+        iban = this.iban!!,
+        bic = this.bic!!,
+        creationLocation = this.creationLocation!!,
+        createdAt = this.createdAt!!.date.format(formatter),
+        publishedAt = this.publishedAt!!.date.format(formatter),
         representative = Contact(
-            name = requiredRepresentativeUser.name ?: throw NotFoundException("Representative not found"),
-            role = requiredRepresentativeRole,
+            name = this.representativeUser!!.name ?: throw NotFoundException("Representative not found"),
+            role = this.representativeRole!!,
         ),
     )
 }
