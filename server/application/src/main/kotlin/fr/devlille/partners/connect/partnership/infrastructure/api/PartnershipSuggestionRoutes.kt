@@ -18,7 +18,7 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
-@Suppress("ThrowsCount")
+@Suppress("ThrowsCount", "LongMethod")
 fun Route.partnershipSuggestionRoutes() {
     val eventRepository by inject<EventRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
@@ -35,13 +35,13 @@ fun Route.partnershipSuggestionRoutes() {
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             val eventWithOrganisation = eventRepository.getBySlug(eventSlug)
             val eventWithOrganisationDisplay = eventRepository.getDisplayBySlug(eventSlug)
+            val linkContext = NotificationVariables.LinkContext(eventWithOrganisationDisplay, eventSlug)
             val variables = NotificationVariables.SuggestionApproved(
                 partnership.language,
                 eventWithOrganisation,
                 company,
                 partnership,
-                eventWithOrganisationDisplay,
-                eventSlug,
+                linkContext,
             )
             notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
@@ -56,13 +56,13 @@ fun Route.partnershipSuggestionRoutes() {
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             val eventWithOrganisation = eventRepository.getBySlug(eventSlug)
             val eventWithOrganisationDisplay = eventRepository.getDisplayBySlug(eventSlug)
+            val linkContext = NotificationVariables.LinkContext(eventWithOrganisationDisplay, eventSlug)
             val variables = NotificationVariables.SuggestionDeclined(
                 partnership.language,
                 eventWithOrganisation,
                 company,
                 partnership,
-                eventWithOrganisationDisplay,
-                eventSlug,
+                linkContext,
             )
             notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
@@ -85,14 +85,14 @@ fun Route.partnershipSuggestionRoutes() {
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val eventWithOrganisation = eventRepository.getBySlug(eventSlug)
             val eventWithOrganisationDisplay = eventRepository.getDisplayBySlug(eventSlug)
+            val linkContext = NotificationVariables.LinkContext(eventWithOrganisationDisplay, eventSlug)
             val variables = NotificationVariables.NewSuggestion(
                 input.language,
                 eventWithOrganisation,
                 company,
-                pack,
                 partnership,
-                eventWithOrganisationDisplay,
-                eventSlug,
+                pack,
+                linkContext,
             )
             notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
