@@ -5,6 +5,8 @@ interface EventRepository {
 
     fun getBySlug(eventSlug: String): EventWithOrganisation
 
+    fun getDisplayBySlug(eventSlug: String): EventWithOrganisationDisplay
+
     fun findByOrgSlug(orgSlug: String): List<EventSummary>
 
     fun createEvent(orgSlug: String, event: Event): String

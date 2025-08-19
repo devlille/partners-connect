@@ -37,17 +37,15 @@ fun Route.partnershipRoutes() {
             val pack = partnership.selectedPack
                 ?: throw NotFoundException("Partnership does not have a selected pack")
             val eventWithOrganisation = eventRepository.getBySlug(eventSlug)
-            val partnershipContext = NotificationVariables.PartnershipContext(
-                eventWithOrganisation,
-                eventSlug,
-                id,
-            )
+            val eventWithOrganisationDisplay = eventRepository.getDisplayBySlug(eventSlug)
             val variables = NotificationVariables.NewPartnership(
                 register.language,
-                eventWithOrganisation.event,
+                eventWithOrganisation,
                 company,
                 pack,
-                partnershipContext,
+                partnership,
+                eventWithOrganisationDisplay,
+                eventSlug,
             )
             notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.Created, mapOf("id" to id.toString()))
@@ -92,17 +90,15 @@ fun Route.partnershipRoutes() {
                 val pack = partnership.selectedPack
                     ?: throw BadRequestException("Partnership does not have a selected pack")
                 val eventWithOrganisation = eventRepository.getBySlug(eventSlug)
-                val partnershipContext = NotificationVariables.PartnershipContext(
-                    eventWithOrganisation,
-                    eventSlug,
-                    partnershipId,
-                )
+                val eventWithOrganisationDisplay = eventRepository.getDisplayBySlug(eventSlug)
                 val variables = NotificationVariables.PartnershipValidated(
                     partnership.language,
-                    eventWithOrganisation.event,
+                    eventWithOrganisation,
                     company,
                     pack,
-                    partnershipContext,
+                    partnership,
+                    eventWithOrganisationDisplay,
+                    eventSlug,
                 )
                 notificationRepository.sendMessage(eventSlug, variables)
                 call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
@@ -120,16 +116,14 @@ fun Route.partnershipRoutes() {
                 val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
                 val partnership = partnershipRepository.getById(eventSlug, partnershipId)
                 val eventWithOrganisation = eventRepository.getBySlug(eventSlug)
-                val partnershipContext = NotificationVariables.PartnershipContext(
-                    eventWithOrganisation,
-                    eventSlug,
-                    partnershipId,
-                )
+                val eventWithOrganisationDisplay = eventRepository.getDisplayBySlug(eventSlug)
                 val variables = NotificationVariables.PartnershipDeclined(
                     partnership.language,
-                    eventWithOrganisation.event,
+                    eventWithOrganisation,
                     company,
-                    partnershipContext,
+                    partnership,
+                    eventWithOrganisationDisplay,
+                    eventSlug,
                 )
                 notificationRepository.sendMessage(eventSlug, variables)
                 call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))

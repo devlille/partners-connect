@@ -5,9 +5,13 @@ import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.events.domain.Contact
 import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.domain.EventWithOrganisation
+import fr.devlille.partners.connect.events.domain.EventWithOrganisationDisplay
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
 import fr.devlille.partners.connect.organisations.domain.Organisation
+import fr.devlille.partners.connect.organisations.domain.OrganisationItem
+import fr.devlille.partners.connect.organisations.domain.Owner
+import fr.devlille.partners.connect.partnership.domain.Partnership
 import fr.devlille.partners.connect.partnership.domain.PartnershipPack
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -20,8 +24,10 @@ import kotlin.test.assertTrue
 class NotificationVariablesTest {
     private lateinit var event: Event
     private lateinit var eventWithOrganisation: EventWithOrganisation
+    private lateinit var eventWithOrganisationDisplay: EventWithOrganisationDisplay
     private lateinit var company: Company
     private lateinit var pack: PartnershipPack
+    private lateinit var partnership: Partnership
     private lateinit var partnershipId: UUID
 
     @BeforeTest
@@ -40,7 +46,6 @@ class NotificationVariablesTest {
 
         val organisation = Organisation(
             name = "Test Org",
-            slug = "test-org",
             headOffice = "Test HQ",
             siret = null,
             siren = null,
@@ -60,6 +65,21 @@ class NotificationVariablesTest {
         )
 
         eventWithOrganisation = EventWithOrganisation(event = event, organisation = organisation)
+
+        val organisationItem = OrganisationItem(
+            name = "Test Org",
+            slug = "test-org",
+            headOffice = "Test HQ",
+            owner = Owner(
+                displayName = "Test User",
+                email = "test@example.com",
+            ),
+        )
+
+        eventWithOrganisationDisplay = EventWithOrganisationDisplay(
+            event = event,
+            organisation = organisationItem,
+        )
 
         company = Company(
             id = "test-company-id",
@@ -85,23 +105,29 @@ class NotificationVariablesTest {
         )
 
         partnershipId = UUID.randomUUID()
+
+        partnership = Partnership(
+            id = partnershipId.toString(),
+            phone = null,
+            emails = emptyList(),
+            language = "en",
+            selectedPack = pack,
+            suggestionPack = null,
+        )
     }
 
     @Test
     fun `NewPartnership should include partnership link in populated content`() {
         val eventSlug = "test-event"
-        val partnershipContext = NotificationVariables.PartnershipContext(
-            eventWithOrganisation,
-            eventSlug,
-            partnershipId,
-        )
 
         val variables = NotificationVariables.NewPartnership(
             language = "en",
-            event = event,
+            event = eventWithOrganisation,
             company = company,
             pack = pack,
-            partnershipContext = partnershipContext,
+            partnership = partnership,
+            eventWithOrganisationDisplay = eventWithOrganisationDisplay,
+            eventSlug = eventSlug,
         )
 
         val content = "Test content with {{partnership_link}} placeholder."
@@ -115,18 +141,15 @@ class NotificationVariablesTest {
     @Test
     fun `PartnershipValidated should include partnership link in populated content`() {
         val eventSlug = "test-event"
-        val partnershipContext = NotificationVariables.PartnershipContext(
-            eventWithOrganisation,
-            eventSlug,
-            partnershipId,
-        )
 
         val variables = NotificationVariables.PartnershipValidated(
             language = "en",
-            event = event,
+            event = eventWithOrganisation,
             company = company,
             pack = pack,
-            partnershipContext = partnershipContext,
+            partnership = partnership,
+            eventWithOrganisationDisplay = eventWithOrganisationDisplay,
+            eventSlug = eventSlug,
         )
 
         val content = "Partnership validated. View: {{partnership_link}}"
@@ -139,17 +162,14 @@ class NotificationVariablesTest {
     @Test
     fun `SuggestionApproved should include partnership link in populated content`() {
         val eventSlug = "test-event"
-        val partnershipContext = NotificationVariables.PartnershipContext(
-            eventWithOrganisation,
-            eventSlug,
-            partnershipId,
-        )
 
         val variables = NotificationVariables.SuggestionApproved(
             language = "en",
-            event = event,
+            event = eventWithOrganisation,
             company = company,
-            partnershipContext = partnershipContext,
+            partnership = partnership,
+            eventWithOrganisationDisplay = eventWithOrganisationDisplay,
+            eventSlug = eventSlug,
         )
 
         val content = "Suggestion approved! Check: {{partnership_link}}"
