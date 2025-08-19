@@ -4,11 +4,10 @@ import fr.devlille.partners.connect.companies.domain.Address
 import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.events.domain.Contact
 import fr.devlille.partners.connect.events.domain.Event
-import fr.devlille.partners.connect.events.domain.EventWithOrganisation
+import fr.devlille.partners.connect.events.domain.EventDisplay
 import fr.devlille.partners.connect.events.domain.EventWithOrganisationDisplay
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
-import fr.devlille.partners.connect.organisations.domain.Organisation
 import fr.devlille.partners.connect.organisations.domain.OrganisationItem
 import fr.devlille.partners.connect.organisations.domain.Owner
 import fr.devlille.partners.connect.partnership.domain.Partnership
@@ -24,7 +23,7 @@ import kotlin.test.assertTrue
 
 class NotificationVariablesTest {
     private lateinit var event: Event
-    private lateinit var eventWithOrganisation: EventWithOrganisation
+    private lateinit var eventDisplay: EventDisplay
     private lateinit var eventWithOrganisationDisplay: EventWithOrganisationDisplay
     private lateinit var company: Company
     private lateinit var pack: PartnershipPack
@@ -35,10 +34,12 @@ class NotificationVariablesTest {
     fun setUp() {
         val now = Clock.System.now().toLocalDateTime(TimeZone.UTC)
         event = createEvent(now)
-        val organisation = createOrganisation(now)
-        eventWithOrganisation = EventWithOrganisation(event = event, organisation = organisation)
+        eventDisplay = createEventDisplay(now)
         val organisationItem = createOrganisationItem()
-        eventWithOrganisationDisplay = EventWithOrganisationDisplay(event = event, organisation = organisationItem)
+        eventWithOrganisationDisplay = EventWithOrganisationDisplay(
+            event = eventDisplay,
+            organisation = organisationItem,
+        )
         company = createCompany()
         pack = createPack()
         partnershipId = UUID.randomUUID()
@@ -55,24 +56,15 @@ class NotificationVariablesTest {
         contact = Contact(email = "test@example.com", phone = null),
     )
 
-    private fun createOrganisation(now: LocalDateTime) = Organisation(
-        name = "Test Org",
-        headOffice = "Test HQ",
-        siret = null,
-        siren = null,
-        tva = null,
-        dAndB = null,
-        nace = null,
-        naf = null,
-        duns = null,
-        iban = "FR123456789",
-        bic = "TESTFRPPXXX",
-        ribUrl = "https://example.com/rib",
-        representativeUserEmail = "rep@example.com",
-        representativeRole = "President",
-        creationLocation = "Paris",
-        createdAt = now,
-        publishedAt = now,
+    private fun createEventDisplay(now: LocalDateTime) = EventDisplay(
+        slug = "test-event",
+        name = "Test Event",
+        startTime = now,
+        endTime = now,
+        submissionStartTime = now,
+        submissionEndTime = now,
+        address = "Test Address",
+        contact = Contact(email = "test@example.com", phone = null),
     )
 
     private fun createOrganisationItem() = OrganisationItem(
@@ -119,64 +111,52 @@ class NotificationVariablesTest {
 
     @Test
     fun `NewPartnership should include partnership link in populated content`() {
-        val eventSlug = "test-event"
-        val linkContext = NotificationVariables.LinkContext(eventWithOrganisationDisplay, eventSlug)
-
         val variables = NotificationVariables.NewPartnership(
             language = "en",
-            event = eventWithOrganisation,
+            event = eventWithOrganisationDisplay,
             company = company,
             partnership = partnership,
             pack = pack,
-            linkContext = linkContext,
         )
 
         val content = "Test content with {{partnership_link}} placeholder."
         val populated = variables.populate(content)
 
-        val expectedLink = "${SystemVarEnv.frontendBaseUrl}/test-org/$eventSlug/$partnershipId"
+        val expectedLink = "${SystemVarEnv.frontendBaseUrl}/test-org/test-event/$partnershipId"
         assertTrue(populated.contains(expectedLink), "Partnership link should be replaced in content. Got: $populated")
         assertTrue(!populated.contains("{{partnership_link}}"), "Placeholder should be replaced")
     }
 
     @Test
     fun `PartnershipValidated should include partnership link in populated content`() {
-        val eventSlug = "test-event"
-        val linkContext = NotificationVariables.LinkContext(eventWithOrganisationDisplay, eventSlug)
-
         val variables = NotificationVariables.PartnershipValidated(
             language = "en",
-            event = eventWithOrganisation,
+            event = eventWithOrganisationDisplay,
             company = company,
             partnership = partnership,
             pack = pack,
-            linkContext = linkContext,
         )
 
         val content = "Partnership validated. View: {{partnership_link}}"
         val populated = variables.populate(content)
 
-        val expectedLink = "${SystemVarEnv.frontendBaseUrl}/test-org/$eventSlug/$partnershipId"
+        val expectedLink = "${SystemVarEnv.frontendBaseUrl}/test-org/test-event/$partnershipId"
         assertTrue(populated.contains(expectedLink), "Partnership link should be replaced in content")
     }
 
     @Test
     fun `SuggestionApproved should include partnership link in populated content`() {
-        val eventSlug = "test-event"
-        val linkContext = NotificationVariables.LinkContext(eventWithOrganisationDisplay, eventSlug)
-
         val variables = NotificationVariables.SuggestionApproved(
             language = "en",
-            event = eventWithOrganisation,
+            event = eventWithOrganisationDisplay,
             company = company,
             partnership = partnership,
-            linkContext = linkContext,
         )
 
         val content = "Suggestion approved! Check: {{partnership_link}}"
         val populated = variables.populate(content)
 
-        val expectedLink = "${SystemVarEnv.frontendBaseUrl}/test-org/$eventSlug/$partnershipId"
+        val expectedLink = "${SystemVarEnv.frontendBaseUrl}/test-org/test-event/$partnershipId"
         assertTrue(populated.contains(expectedLink), "Partnership link should be replaced in content")
     }
 }

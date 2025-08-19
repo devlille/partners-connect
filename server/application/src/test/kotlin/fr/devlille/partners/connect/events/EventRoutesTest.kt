@@ -235,7 +235,8 @@ class EventRoutesTest {
         // Verify event structure
         val eventObject = eventWithOrg["event"]?.jsonObject
         assertNotNull(eventObject)
-        assert(eventObject!!.containsKey("name"))
+        assert(eventObject!!.containsKey("slug"))
+        assert(eventObject.containsKey("name"))
         assert(eventObject.containsKey("start_time"))
         assert(eventObject.containsKey("end_time"))
         assert(eventObject.containsKey("submission_start_time"))
@@ -247,11 +248,9 @@ class EventRoutesTest {
         val organisationObject = eventWithOrg["organisation"]?.jsonObject
         assertNotNull(organisationObject)
         assert(organisationObject!!.containsKey("name"))
+        assert(organisationObject.containsKey("slug"))
         assert(organisationObject.containsKey("head_office"))
-        assert(organisationObject.containsKey("representative_user_email"))
-        assert(organisationObject.containsKey("representative_role"))
-        assert(organisationObject.containsKey("created_at"))
-        assert(organisationObject.containsKey("published_at"))
+        assert(organisationObject.containsKey("owner"))
     }
 
     @Test
@@ -303,6 +302,7 @@ class EventRoutesTest {
 
         // Verify event structure has required fields
         val event = responseJson["event"]!!.jsonObject
+        assertTrue(event.containsKey("slug"))
         assertTrue(event.containsKey("name"))
         assertTrue(event.containsKey("start_time"))
         assertTrue(event.containsKey("end_time"))
@@ -314,8 +314,8 @@ class EventRoutesTest {
         // Verify organization structure has required fields
         val organisation = responseJson["organisation"]!!.jsonObject
         assertTrue(organisation.containsKey("name"))
+        assertTrue(organisation.containsKey("slug"))
         assertTrue(organisation.containsKey("head_office"))
-        assertTrue(organisation.containsKey("representative_user_email"))
-        assertTrue(organisation.containsKey("representative_role"))
+        assertTrue(organisation.containsKey("owner"))
     }
 }

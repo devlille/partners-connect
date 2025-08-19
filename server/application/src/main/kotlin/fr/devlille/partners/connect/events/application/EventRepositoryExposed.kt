@@ -2,15 +2,14 @@ package fr.devlille.partners.connect.events.application
 
 import fr.devlille.partners.connect.events.domain.Contact
 import fr.devlille.partners.connect.events.domain.Event
+import fr.devlille.partners.connect.events.domain.EventDisplay
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventSummary
-import fr.devlille.partners.connect.events.domain.EventWithOrganisation
 import fr.devlille.partners.connect.events.domain.EventWithOrganisationDisplay
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
-import fr.devlille.partners.connect.organisations.application.mappers.toDomain
 import fr.devlille.partners.connect.organisations.application.mappers.toItemDomain
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionEntity
@@ -55,33 +54,12 @@ class EventRepositoryExposed(
         }
     }
 
-    override fun getBySlug(eventSlug: String): EventWithOrganisation = transaction {
+    override fun getBySlug(eventSlug: String): EventWithOrganisationDisplay = transaction {
         val eventEntity = entity.eventFindBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
 
-        val event = Event(
-            name = eventEntity.name,
-            startTime = eventEntity.startTime,
-            endTime = eventEntity.endTime,
-            submissionStartTime = eventEntity.submissionStartTime,
-            submissionEndTime = eventEntity.submissionEndTime,
-            address = eventEntity.address,
-            contact = Contact(phone = eventEntity.contactPhone, email = eventEntity.contactEmail),
-        )
-
-        val organisation = eventEntity.organisation.toDomain()
-
-        EventWithOrganisation(
-            event = event,
-            organisation = organisation,
-        )
-    }
-
-    override fun getDisplayBySlug(eventSlug: String): EventWithOrganisationDisplay = transaction {
-        val eventEntity = entity.eventFindBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
-
-        val event = Event(
+        val event = EventDisplay(
+            slug = eventEntity.slug,
             name = eventEntity.name,
             startTime = eventEntity.startTime,
             endTime = eventEntity.endTime,

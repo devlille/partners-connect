@@ -1,7 +1,6 @@
 package fr.devlille.partners.connect.notifications.domain
 
 import fr.devlille.partners.connect.companies.domain.Company
-import fr.devlille.partners.connect.events.domain.EventWithOrganisation
 import fr.devlille.partners.connect.events.domain.EventWithOrganisationDisplay
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.partnership.domain.Partnership
@@ -11,40 +10,34 @@ import java.util.UUID
 sealed interface NotificationVariables {
     val usageName: String
     val language: String
-    val event: EventWithOrganisation
+    val event: EventWithOrganisationDisplay
     val company: Company
     val partnership: Partnership?
 
     fun populate(content: String): String
 
-    data class LinkContext(
-        val eventWithOrganisationDisplay: EventWithOrganisationDisplay,
-        val eventSlug: String,
-    )
-
     companion object {
         fun buildPartnershipLink(
-            context: LinkContext,
+            event: EventWithOrganisationDisplay,
             partnershipId: UUID,
         ): String =
             "${SystemVarEnv.frontendBaseUrl}/" +
-                "${context.eventWithOrganisationDisplay.organisation.slug}/" +
-                "${context.eventSlug}/$partnershipId"
+                "${event.organisation.slug}/" +
+                "${event.event.slug}/$partnershipId"
     }
 
     class NewPartnership(
         override val language: String,
-        override val event: EventWithOrganisation,
+        override val event: EventWithOrganisationDisplay,
         override val company: Company,
         override val partnership: Partnership,
         val pack: PartnershipPack,
-        val linkContext: LinkContext,
     ) : NotificationVariables {
         override val usageName: String = "new_partnership"
 
         override fun populate(content: String): String {
             val partnershipLink = buildPartnershipLink(
-                linkContext,
+                event,
                 UUID.fromString(partnership.id),
             )
             return content
@@ -58,17 +51,16 @@ sealed interface NotificationVariables {
 
     class NewSuggestion(
         override val language: String,
-        override val event: EventWithOrganisation,
+        override val event: EventWithOrganisationDisplay,
         override val company: Company,
         override val partnership: Partnership,
         val pack: PartnershipPack,
-        val linkContext: LinkContext,
     ) : NotificationVariables {
         override val usageName: String = "new_suggestion"
 
         override fun populate(content: String): String {
             val partnershipLink = buildPartnershipLink(
-                linkContext,
+                event,
                 UUID.fromString(partnership.id),
             )
             return content
@@ -82,16 +74,15 @@ sealed interface NotificationVariables {
 
     data class SuggestionApproved(
         override val language: String,
-        override val event: EventWithOrganisation,
+        override val event: EventWithOrganisationDisplay,
         override val company: Company,
         override val partnership: Partnership,
-        val linkContext: LinkContext,
     ) : NotificationVariables {
         override val usageName: String = "suggestion_approved"
 
         override fun populate(content: String): String {
             val partnershipLink = buildPartnershipLink(
-                linkContext,
+                event,
                 UUID.fromString(partnership.id),
             )
             return content
@@ -104,16 +95,15 @@ sealed interface NotificationVariables {
 
     data class SuggestionDeclined(
         override val language: String,
-        override val event: EventWithOrganisation,
+        override val event: EventWithOrganisationDisplay,
         override val company: Company,
         override val partnership: Partnership,
-        val linkContext: LinkContext,
     ) : NotificationVariables {
         override val usageName: String = "suggestion_declined"
 
         override fun populate(content: String): String {
             val partnershipLink = buildPartnershipLink(
-                linkContext,
+                event,
                 UUID.fromString(partnership.id),
             )
             return content
@@ -126,17 +116,16 @@ sealed interface NotificationVariables {
 
     data class PartnershipValidated(
         override val language: String,
-        override val event: EventWithOrganisation,
+        override val event: EventWithOrganisationDisplay,
         override val company: Company,
         override val partnership: Partnership,
         val pack: PartnershipPack,
-        val linkContext: LinkContext,
     ) : NotificationVariables {
         override val usageName: String = "partnership_validated"
 
         override fun populate(content: String): String {
             val partnershipLink = buildPartnershipLink(
-                linkContext,
+                event,
                 UUID.fromString(partnership.id),
             )
             return content
@@ -150,16 +139,15 @@ sealed interface NotificationVariables {
 
     data class PartnershipDeclined(
         override val language: String,
-        override val event: EventWithOrganisation,
+        override val event: EventWithOrganisationDisplay,
         override val company: Company,
         override val partnership: Partnership,
-        val linkContext: LinkContext,
     ) : NotificationVariables {
         override val usageName: String = "partnership_declined"
 
         override fun populate(content: String): String {
             val partnershipLink = buildPartnershipLink(
-                linkContext,
+                event,
                 UUID.fromString(partnership.id),
             )
             return content
@@ -172,7 +160,7 @@ sealed interface NotificationVariables {
 
     data class PartnershipAgreementSigned(
         override val language: String,
-        override val event: EventWithOrganisation,
+        override val event: EventWithOrganisationDisplay,
         override val company: Company,
     ) : NotificationVariables {
         override val usageName: String = "partnership_agreement_signed"
@@ -184,7 +172,7 @@ sealed interface NotificationVariables {
 
     data class NewInvoice(
         override val language: String,
-        override val event: EventWithOrganisation,
+        override val event: EventWithOrganisationDisplay,
         override val company: Company,
     ) : NotificationVariables {
         override val usageName: String = "new_invoice"
@@ -198,7 +186,7 @@ sealed interface NotificationVariables {
 
     data class NewQuote(
         override val language: String,
-        override val event: EventWithOrganisation,
+        override val event: EventWithOrganisationDisplay,
         override val company: Company,
     ) : NotificationVariables {
         override val usageName: String = "new_quote"

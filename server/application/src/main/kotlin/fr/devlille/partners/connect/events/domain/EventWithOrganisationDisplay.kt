@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class EventWithOrganisationDisplay(
-    val event: Event,
+    val event: EventDisplay,
     val organisation: OrganisationItem,
 )

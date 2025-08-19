@@ -33,15 +33,12 @@ fun Route.partnershipSuggestionRoutes() {
             val id = suggestionRepository.approve(eventSlug, partnershipId)
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
-            val eventWithOrganisation = eventRepository.getBySlug(eventSlug)
-            val eventWithOrganisationDisplay = eventRepository.getDisplayBySlug(eventSlug)
-            val linkContext = NotificationVariables.LinkContext(eventWithOrganisationDisplay, eventSlug)
+            val event = eventRepository.getBySlug(eventSlug)
             val variables = NotificationVariables.SuggestionApproved(
                 partnership.language,
-                eventWithOrganisation,
+                event,
                 company,
                 partnership,
-                linkContext,
             )
             notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
@@ -54,15 +51,12 @@ fun Route.partnershipSuggestionRoutes() {
             val id = suggestionRepository.decline(eventSlug, partnershipId)
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
-            val eventWithOrganisation = eventRepository.getBySlug(eventSlug)
-            val eventWithOrganisationDisplay = eventRepository.getDisplayBySlug(eventSlug)
-            val linkContext = NotificationVariables.LinkContext(eventWithOrganisationDisplay, eventSlug)
+            val event = eventRepository.getBySlug(eventSlug)
             val variables = NotificationVariables.SuggestionDeclined(
                 partnership.language,
-                eventWithOrganisation,
+                event,
                 company,
                 partnership,
-                linkContext,
             )
             notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
@@ -83,16 +77,13 @@ fun Route.partnershipSuggestionRoutes() {
             val pack = partnership.suggestionPack
                 ?: throw NotFoundException("Partnership does not have a suggestion pack")
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
-            val eventWithOrganisation = eventRepository.getBySlug(eventSlug)
-            val eventWithOrganisationDisplay = eventRepository.getDisplayBySlug(eventSlug)
-            val linkContext = NotificationVariables.LinkContext(eventWithOrganisationDisplay, eventSlug)
+            val event = eventRepository.getBySlug(eventSlug)
             val variables = NotificationVariables.NewSuggestion(
                 input.language,
-                eventWithOrganisation,
+                event,
                 company,
                 partnership,
                 pack,
-                linkContext,
             )
             notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
