@@ -8,24 +8,24 @@ servers:
 paths:
   /auth/callback:
     get:
-      description: ""
+      description: "OAuth callback endpoint"
       responses:
         "404":
-          description: "Not Found"
+          description: "Not Found - Invalid OAuth state"
           content:
-            '*/*':
+            application/json:
               schema:
                 type: "object"
         "302":
-          description: "Found <br> Redirect"
+          description: "Found - Redirect after successful authentication"
           content:
             text/plain:
               schema:
                 type: "string"
         "200":
-          description: "OK"
+          description: "OK - Authentication successful, returns session"
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/UserSession"
   /auth/login:
@@ -86,24 +86,35 @@ paths:
                 $ref: "#/components/schemas/Map_String"
   /companies/{companyId}/logo:
     post:
-      description: ""
+      description: "Upload a logo for a company"
       parameters:
         - name: "companyId"
           in: "path"
           required: true
           schema:
             type: "string"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: "Logo file (SVG, PNG, or JPEG)"
+        required: true
       responses:
         "400":
-          description: "Bad Request"
+          description: "Bad Request - Invalid company ID or unsupported file type"
           content:
             text/plain:
               schema:
                 type: "string"
         "200":
-          description: "OK"
+          description: "OK - Logo uploaded successfully"
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/Media"
   /companies/{companyId}/partnership:
@@ -142,15 +153,16 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/EventSummary"
-  /events/{event_slug}:
+  /events/{eventSlug}:
     get:
-      description: ""
+      description: "Get event details with organization information"
       parameters:
-        - name: "event_slug"
+        - name: "eventSlug"
           in: "path"
           required: true
           schema:
             type: "string"
+          description: "The slug identifier of the event"
       responses:
         "400":
           description: "Bad Request"
@@ -161,7 +173,7 @@ paths:
         "200":
           description: "OK"
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/EventWithOrganisation"
   /events/{eventSlug}/partnership:
@@ -345,7 +357,7 @@ paths:
                 $ref: "#/components/schemas/Map_String"
   /events/{eventSlug}/partnership/{partnershipId}/signed-agreement:
     post:
-      description: ""
+      description: "Upload a signed partnership agreement"
       parameters:
         - name: "eventSlug"
           in: "path"
@@ -357,17 +369,28 @@ paths:
           required: true
           schema:
             type: "string"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: "Signed agreement PDF file"
+        required: true
       responses:
         "400":
-          description: "Bad Request"
+          description: "Bad Request - Invalid file type or missing parameters"
           content:
             text/plain:
               schema:
                 type: "string"
         "200":
-          description: "OK"
+          description: "OK - Signed agreement uploaded successfully"
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/Map_String"
   /events/{eventSlug}/partnership/{partnershipId}/suggestion-approve:
@@ -599,13 +622,15 @@ paths:
                 $ref: "#/components/schemas/Organisation"
   /orgs/{orgSlug}/events:
     get:
-      description: ""
+      description: "List events for an organization"
       parameters:
         - name: "orgSlug"
           in: "path"
           required: true
           schema:
             type: "string"
+      security:
+        - bearerAuth: []
       responses:
         "400":
           description: "Bad Request"
@@ -613,22 +638,30 @@ paths:
             text/plain:
               schema:
                 type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
         "200":
           description: "OK"
           content:
-            '*/*':
+            application/json:
               schema:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/EventSummary"
     post:
-      description: ""
+      description: "Create a new event for an organization"
       parameters:
         - name: "orgSlug"
           in: "path"
           required: true
           schema:
             type: "string"
+      security:
+        - bearerAuth: []
       requestBody:
         content:
           application/json:
@@ -642,10 +675,16 @@ paths:
             text/plain:
               schema:
                 type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
         "201":
           description: "Created"
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/Map_String"
   /orgs/{orgSlug}/events/{eventSlug}:
@@ -1279,7 +1318,7 @@ paths:
                 $ref: "#/components/schemas/Map_String"
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/validate:
     post:
-      description: ""
+      description: "Validate a partnership request"
       parameters:
         - name: "eventSlug"
           in: "path"
@@ -1296,6 +1335,8 @@ paths:
           required: true
           schema:
             type: "string"
+      security:
+        - bearerAuth: []
       responses:
         "400":
           description: "Bad Request"
@@ -1303,10 +1344,56 @@ paths:
             text/plain:
               schema:
                 type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
         "200":
           description: "OK"
           content:
-            '*/*':
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Map_String"
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/decline:
+    post:
+      description: "Decline a partnership request"
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      security:
+        - bearerAuth: []
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            application/json:
               schema:
                 $ref: "#/components/schemas/Map_String"
   /orgs/{orgSlug}/users:
@@ -1395,6 +1482,12 @@ paths:
                 items:
                   $ref: "#/components/schemas/OrganisationItem"
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Authentication token obtained through OAuth flow"
   schemas:
     UserSession:
       type: "object"
@@ -1426,14 +1519,14 @@ components:
           type: "string"
         city:
           type: "string"
-        zipCode:
+        zip_code:
           type: "string"
         country:
           type: "string"
       required:
         - "address"
         - "city"
-        - "zipCode"
+        - "zip_code"
         - "country"
     Media:
       type: "object"
@@ -1458,7 +1551,7 @@ components:
           type: "string"
         name:
           type: "string"
-        headOffice:
+        head_office:
           $ref: "#/components/schemas/Address"
         siret:
           type: "string"
@@ -1467,7 +1560,7 @@ components:
         description:
           type: "string"
           nullable: true
-        siteUrl:
+        site_url:
           type: "string"
         medias:
           nullable: true
@@ -1475,10 +1568,10 @@ components:
       required:
         - "id"
         - "name"
-        - "headOffice"
+        - "head_office"
         - "siret"
         - "vat"
-        - "siteUrl"
+        - "site_url"
     Social:
       type: "object"
       properties:
@@ -1502,9 +1595,9 @@ components:
       properties:
         name:
           type: "string"
-        siteUrl:
+        site_url:
           type: "string"
-        headOffice:
+        head_office:
           $ref: "#/components/schemas/Address"
         siret:
           type: "string"
@@ -1519,8 +1612,8 @@ components:
             $ref: "#/components/schemas/Social"
       required:
         - "name"
-        - "siteUrl"
-        - "headOffice"
+        - "site_url"
+        - "head_office"
         - "siret"
         - "vat"
         - "socials"
@@ -1583,52 +1676,64 @@ components:
           type: "string"
         name:
           type: "string"
-        startTime:
+        start_time:
           type: "string"
           format: "date-time"
-        endTime:
+        end_time:
           type: "string"
           format: "date-time"
-        submissionStartTime:
+        submission_start_time:
           type: "string"
           format: "date-time"
-        submissionEndTime:
+        submission_end_time:
           type: "string"
           format: "date-time"
       required:
         - "slug"
         - "name"
-        - "startTime"
-        - "endTime"
-        - "submissionStartTime"
-        - "submissionEndTime"
+        - "start_time"
+        - "end_time"
+        - "submission_start_time"
+        - "submission_end_time"
     Event:
       type: "object"
       properties:
         name:
           type: "string"
-        startTime:
+        start_time:
           type: "string"
           format: "date-time"
-        endTime:
+        end_time:
           type: "string"
           format: "date-time"
-        submissionStartTime:
+        submission_start_time:
           type: "string"
           format: "date-time"
-        submissionEndTime:
+        submission_end_time:
           type: "string"
           format: "date-time"
         address:
           type: "string"
         contact:
-          $ref: "#/components/schemas/Contact"
+          $ref: "#/components/schemas/EventContact"
       required:
         - "name"
-        - "startTime"
-        - "endTime"
-        - "submissionStartTime"
-        - "submissionEndTime"
+        - "start_time"
+        - "end_time"
+        - "submission_start_time"
+        - "submission_end_time"
+        - "address"
+        - "contact"
+    EventContact:
+      type: "object"
+      properties:
+        email:
+          type: "string"
+        phone:
+          type: "string"
+          nullable: true
+      required:
+        - "email"
         - "address"
         - "contact"
     Organisation:
@@ -1636,7 +1741,7 @@ components:
       properties:
         name:
           type: "string"
-        headOffice:
+        head_office:
           type: "string"
         siret:
           type: "string"
@@ -1647,7 +1752,7 @@ components:
         tva:
           type: "string"
           nullable: true
-        dAndB:
+        d_and_b:
           type: "string"
           nullable: true
         nace:
@@ -1663,31 +1768,31 @@ components:
           type: "string"
         bic:
           type: "string"
-        ribUrl:
+        rib_url:
           type: "string"
-        representativeUserEmail:
+        representative_user_email:
           type: "string"
-        representativeRole:
+        representative_role:
           type: "string"
-        creationLocation:
+        creation_location:
           type: "string"
-        createdAt:
+        created_at:
           type: "string"
           format: "date-time"
-        publishedAt:
+        published_at:
           type: "string"
           format: "date-time"
       required:
         - "name"
-        - "headOffice"
+        - "head_office"
         - "iban"
         - "bic"
-        - "ribUrl"
-        - "representativeUserEmail"
-        - "representativeRole"
-        - "creationLocation"
-        - "createdAt"
-        - "publishedAt"
+        - "rib_url"
+        - "representative_user_email"
+        - "representative_role"
+        - "creation_location"
+        - "created_at"
+        - "published_at"
     EventWithOrganisation:
       type: "object"
       properties:
@@ -1701,17 +1806,17 @@ components:
     RegisterPartnership:
       type: "object"
       properties:
-        companyId:
+        company_id:
           type: "string"
-        packId:
+        pack_id:
           type: "string"
-        optionIds:
+        option_ids:
           type: "array"
           items:
             type: "string"
-        contactName:
+        contact_name:
           type: "string"
-        contactRole:
+        contact_role:
           type: "string"
         language:
           type: "string"
@@ -1723,12 +1828,13 @@ components:
           items:
             type: "string"
       required:
-        - "companyId"
-        - "packId"
-        - "optionIds"
-        - "contactName"
-        - "contactRole"
+        - "company_id"
+        - "pack_id"
+        - "option_ids"
+        - "contact_name"
+        - "contact_role"
         - "language"
+        - "emails"
         - "emails"
     CompanyBillingData:
       type: "object"
@@ -1740,9 +1846,22 @@ components:
           type: "string"
           nullable: true
         contact:
-          $ref: "#/components/schemas/Contact"
+          $ref: "#/components/schemas/BillingContact"
       required:
         - "contact"
+    BillingContact:
+      type: "object"
+      properties:
+        first_name:
+          type: "string"
+        last_name:
+          type: "string"
+        email:
+          type: "string"
+      required:
+        - "first_name"
+        - "last_name"
+        - "email"
     TicketData:
       type: "object"
       properties:
@@ -1891,17 +2010,17 @@ components:
     SuggestPartnership:
       type: "object"
       properties:
-        packId:
+        pack_id:
           type: "string"
-        optionIds:
+        option_ids:
           type: "array"
           items:
             type: "string"
         language:
           type: "string"
       required:
-        - "packId"
-        - "optionIds"
+        - "pack_id"
+        - "option_ids"
         - "language"
     User:
       type: "object"
