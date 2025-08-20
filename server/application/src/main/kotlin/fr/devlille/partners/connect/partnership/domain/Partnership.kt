@@ -1,5 +1,7 @@
 package fr.devlille.partners.connect.partnership.domain
 
+import fr.devlille.partners.connect.events.domain.EventWithOrganisationDisplay
+import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringOption
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -24,3 +26,7 @@ class PartnershipPack(
     val basePrice: Int,
     val options: List<SponsoringOption>,
 )
+
+fun Partnership.link(
+    event: EventWithOrganisationDisplay,
+) = "${SystemVarEnv.frontendBaseUrl}/${event.organisation.slug}/${event.event.slug}/$id"

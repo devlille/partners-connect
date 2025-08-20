@@ -235,14 +235,14 @@ class EventRoutesTest {
         // Verify event structure
         val eventObject = eventWithOrg["event"]?.jsonObject
         assertNotNull(eventObject)
-        assert(eventObject!!.containsKey("slug"))
-        assert(eventObject.containsKey("name"))
-        assert(eventObject.containsKey("start_time"))
-        assert(eventObject.containsKey("end_time"))
-        assert(eventObject.containsKey("submission_start_time"))
-        assert(eventObject.containsKey("submission_end_time"))
-        assert(eventObject.containsKey("address"))
-        assert(eventObject.containsKey("contact"))
+        assertTrue(eventObject!!.containsKey("slug"))
+        assertTrue(eventObject.containsKey("name"))
+        assertTrue(eventObject.containsKey("start_time"))
+        assertTrue(eventObject.containsKey("end_time"))
+        assertTrue(eventObject.containsKey("submission_start_time"))
+        assertTrue(eventObject.containsKey("submission_end_time"))
+        assertTrue(eventObject.containsKey("address"))
+        assertTrue(eventObject.containsKey("contact"))
 
         // Verify organisation structure
         val organisationObject = eventWithOrg["organisation"]?.jsonObject
