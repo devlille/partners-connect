@@ -5,7 +5,7 @@ import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.domain.EventDisplay
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventSummary
-import fr.devlille.partners.connect.events.domain.EventWithOrganisationDisplay
+import fr.devlille.partners.connect.events.domain.EventWithOrganisation
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
@@ -54,7 +54,7 @@ class EventRepositoryExposed(
         }
     }
 
-    override fun getBySlug(eventSlug: String): EventWithOrganisationDisplay = transaction {
+    override fun getBySlug(eventSlug: String): EventWithOrganisation = transaction {
         val eventEntity = entity.eventFindBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
 
@@ -71,7 +71,7 @@ class EventRepositoryExposed(
 
         val organisation = eventEntity.organisation.toItemDomain()
 
-        EventWithOrganisationDisplay(
+        EventWithOrganisation(
             event = event,
             organisation = organisation,
         )

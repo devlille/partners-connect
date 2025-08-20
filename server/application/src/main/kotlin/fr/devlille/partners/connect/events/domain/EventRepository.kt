@@ -3,7 +3,7 @@ package fr.devlille.partners.connect.events.domain
 interface EventRepository {
     fun getAllEvents(): List<EventSummary>
 
-    fun getBySlug(eventSlug: String): EventWithOrganisationDisplay
+    fun getBySlug(eventSlug: String): EventWithOrganisation
 
     fun findByOrgSlug(orgSlug: String): List<EventSummary>
 

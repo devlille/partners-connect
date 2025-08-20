@@ -5,7 +5,7 @@ import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.events.domain.Contact
 import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.domain.EventDisplay
-import fr.devlille.partners.connect.events.domain.EventWithOrganisationDisplay
+import fr.devlille.partners.connect.events.domain.EventWithOrganisation
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
 import fr.devlille.partners.connect.organisations.domain.OrganisationItem
@@ -23,7 +23,7 @@ import kotlin.test.assertTrue
 class NotificationVariablesTest {
     private lateinit var event: Event
     private lateinit var eventDisplay: EventDisplay
-    private lateinit var eventWithOrganisationDisplay: EventWithOrganisationDisplay
+    private lateinit var eventWithOrganisation: EventWithOrganisation
     private lateinit var company: Company
     private lateinit var pack: PartnershipPack
     private lateinit var partnership: Partnership
@@ -35,7 +35,7 @@ class NotificationVariablesTest {
         event = createEvent(now)
         eventDisplay = createEventDisplay(now)
         val organisationItem = createOrganisationItem()
-        eventWithOrganisationDisplay = EventWithOrganisationDisplay(
+        eventWithOrganisation = EventWithOrganisation(
             event = eventDisplay,
             organisation = organisationItem,
         )
@@ -112,7 +112,7 @@ class NotificationVariablesTest {
     fun `NewPartnership should include partnership link in populated content`() {
         val variables = NotificationVariables.NewPartnership(
             language = "en",
-            event = eventWithOrganisationDisplay,
+            event = eventWithOrganisation,
             company = company,
             partnership = partnership,
             pack = pack,
@@ -130,7 +130,7 @@ class NotificationVariablesTest {
     fun `PartnershipValidated should include partnership link in populated content`() {
         val variables = NotificationVariables.PartnershipValidated(
             language = "en",
-            event = eventWithOrganisationDisplay,
+            event = eventWithOrganisation,
             company = company,
             partnership = partnership,
             pack = pack,
@@ -147,7 +147,7 @@ class NotificationVariablesTest {
     fun `SuggestionApproved should include partnership link in populated content`() {
         val variables = NotificationVariables.SuggestionApproved(
             language = "en",
-            event = eventWithOrganisationDisplay,
+            event = eventWithOrganisation,
             company = company,
             partnership = partnership,
         )
