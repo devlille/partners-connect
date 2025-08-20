@@ -54,7 +54,7 @@ fun Route.partnershipAgreementRoutes() {
             }
             val url = storageRepository.uploadSignedAgreement(eventSlug, partnershipId, bytes)
             agreementRepository.updateAgreementSignedUrl(eventSlug, partnershipId, url)
-            val event = eventRepository.getBySlug(eventSlug).event
+            val event = eventRepository.getBySlug(eventSlug)
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             val variables = NotificationVariables.PartnershipAgreementSigned(partnership.language, event, company)
