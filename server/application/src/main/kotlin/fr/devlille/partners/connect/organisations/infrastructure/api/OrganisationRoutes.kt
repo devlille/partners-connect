@@ -27,6 +27,7 @@ fun Route.organisationRoutes() {
     route("/orgs") {
         post {
             val input = call.receive<Organisation>()
+
             val token = call.token
             val slug = repository.create(input)
             val userInfo = authRepository.getUserInfo(token)
@@ -42,6 +43,7 @@ fun Route.organisationRoutes() {
         put("/{orgSlug}") {
             val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Missing org slug")
             val input = call.receive<Organisation>()
+
             val token = call.token
             val userInfo = authRepository.getUserInfo(token)
             val canEdit = userRepository.hasEditPermissionByEmail(userInfo.email, orgSlug)

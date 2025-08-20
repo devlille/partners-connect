@@ -48,7 +48,7 @@ class OrganisationRoutesTest {
 
     @Test
     fun `POST fails if representative user does not exist`() {
-        val organisation = createOrganisation()
+        val organisation = createOrganisation(representativeUserEmail = "nonexistent@example.com")
 
         testApplication {
             application {
@@ -230,5 +230,142 @@ class OrganisationRoutesTest {
 
         assertEquals(HttpStatusCode.NotFound, response.status)
         assertEquals("User with email nonexistent@example.com not found", response.bodyAsText())
+    }
+
+    @Test
+    fun `POST creates organisation with only name provided`() = testApplication {
+        application {
+            moduleMocked()
+            insertMockedAdminUser()
+        }
+
+        val minimalOrganisation = createOrganisation(name = "Minimal Org")
+        val response = client.post("/orgs") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(json.encodeToString(Organisation.serializer(), minimalOrganisation))
+        }
+
+        assertEquals(HttpStatusCode.Created, response.status)
+        val responseBody = Json.decodeFromString<Map<String, String>>(response.bodyAsText())
+        assertNotNull(responseBody["slug"], "Response should contain a 'slug' field")
+    }
+
+    @Test
+    fun `POST returns 400 when name is empty`() = testApplication {
+        application {
+            moduleMocked()
+            insertMockedAdminUser()
+        }
+
+        val orgWithEmptyName = createOrganisation(name = "")
+        val response = client.post("/orgs") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(json.encodeToString(Organisation.serializer(), orgWithEmptyName))
+        }
+
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals("Organisation name is required and cannot be empty", response.bodyAsText())
+    }
+
+    @Test
+    fun `POST returns 400 when name is blank`() = testApplication {
+        application {
+            moduleMocked()
+            insertMockedAdminUser()
+        }
+
+        val orgWithBlankName = createOrganisation(name = "   ")
+        val response = client.post("/orgs") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(json.encodeToString(Organisation.serializer(), orgWithBlankName))
+        }
+
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals("Organisation name is required and cannot be empty", response.bodyAsText())
+    }
+
+    @Test
+    fun `PUT updates organisation with only name provided`() = testApplication {
+        val orgId = UUID.randomUUID()
+        application {
+            moduleMocked()
+            val adminUser = insertMockedAdminUser()
+            insertMockedOrganisationEntity(
+                id = orgId,
+                name = "Original Name",
+                representativeUser = adminUser,
+            )
+            insertMockedOrgaPermission(orgId = orgId, user = adminUser)
+        }
+
+        val minimalUpdatedOrg = createOrganisation(name = "Updated Minimal Name")
+        val response = client.put("/orgs/original-name") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(json.encodeToString(Organisation.serializer(), minimalUpdatedOrg))
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val responseBody = Json.decodeFromString<Organisation>(response.bodyAsText())
+        assertEquals("Updated Minimal Name", responseBody.name)
+        // All other fields should be null in the response
+        assertEquals(null, responseBody.headOffice)
+        assertEquals(null, responseBody.iban)
+        assertEquals(null, responseBody.representativeUserEmail)
+    }
+
+    @Test
+    fun `PUT returns 400 when name is empty`() = testApplication {
+        val orgId = UUID.randomUUID()
+        application {
+            moduleMocked()
+            val adminUser = insertMockedAdminUser()
+            insertMockedOrganisationEntity(
+                id = orgId,
+                name = "Test Org",
+                representativeUser = adminUser,
+            )
+            insertMockedOrgaPermission(orgId = orgId, user = adminUser)
+        }
+
+        val orgWithEmptyName = createOrganisation(name = "")
+        val response = client.put("/orgs/test-org") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(json.encodeToString(Organisation.serializer(), orgWithEmptyName))
+        }
+
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals("Organisation name is required and cannot be empty", response.bodyAsText())
+    }
+
+    @Test
+    fun `GET returns organisation with null fields when minimal data`() = testApplication {
+        application {
+            moduleMocked()
+            insertMockedAdminUser()
+        }
+
+        // Create a minimal organisation
+        val postResponse = client.post("/orgs") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(json.encodeToString(Organisation.serializer(), createOrganisation(name = "Minimal Test Org")))
+        }
+        val postResponseBody = Json.decodeFromString<Map<String, String>>(postResponse.bodyAsText())
+        val slug = postResponseBody["slug"]!!
+
+        val getResponse = client.get("/orgs/$slug")
+
+        assertEquals(HttpStatusCode.OK, getResponse.status)
+        val organisation = Json.decodeFromString<Organisation>(getResponse.bodyAsText())
+        assertEquals("Minimal Test Org", organisation.name)
+        assertEquals(null, organisation.headOffice)
+        assertEquals(null, organisation.iban)
+        assertEquals(null, organisation.bic)
+        assertEquals(null, organisation.representativeUserEmail)
     }
 }

@@ -3,6 +3,7 @@ package fr.devlille.partners.connect.partnership.application
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.pdf.renderMarkdownToPdf
 import fr.devlille.partners.connect.internal.infrastructure.resources.readResourceFile
 import fr.devlille.partners.connect.internal.infrastructure.templating.templating
@@ -90,18 +91,36 @@ class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
     }
 }
 
+@Suppress("ThrowsCount")
 internal fun OrganisationEntity.toAgreementOrganisation(formatter: DateTimeFormat<LocalDate>): Organisation {
+    // Collect all missing required fields
+    val missingFields = mutableListOf<String>()
+
+    if (this.headOffice == null) missingFields.add("headOffice")
+    if (this.iban == null) missingFields.add("iban")
+    if (this.bic == null) missingFields.add("bic")
+    if (this.creationLocation == null) missingFields.add("creationLocation")
+    if (this.createdAt == null) missingFields.add("createdAt")
+    if (this.publishedAt == null) missingFields.add("publishedAt")
+    if (this.representativeUser == null) missingFields.add("representativeUser")
+    if (this.representativeRole == null) missingFields.add("representativeRole")
+
+    // Throw single exception with all missing fields if any
+    if (missingFields.isNotEmpty()) {
+        throw ForbiddenException("Fields ${missingFields.joinToString(", ")} are required to perform this operation.")
+    }
+
     return Organisation(
         name = this.name,
-        headOffice = this.headOffice,
-        iban = this.iban,
-        bic = this.bic,
-        creationLocation = this.creationLocation,
-        createdAt = this.createdAt.date.format(formatter),
-        publishedAt = this.publishedAt.date.format(formatter),
+        headOffice = this.headOffice!!,
+        iban = this.iban!!,
+        bic = this.bic!!,
+        creationLocation = this.creationLocation!!,
+        createdAt = this.createdAt!!.date.format(formatter),
+        publishedAt = this.publishedAt!!.date.format(formatter),
         representative = Contact(
-            name = this.representativeUser.name ?: throw NotFoundException("Representative not found"),
-            role = this.representativeRole,
+            name = this.representativeUser!!.name ?: throw NotFoundException("Representative not found"),
+            role = this.representativeRole!!,
         ),
     )
 }
