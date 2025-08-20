@@ -59,7 +59,9 @@ class PartnershipCommunicationRoutesTest {
 
         val requestBody = """{"publication_date": "2025-09-15T10:30:00"}"""
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/communication/publication") {
+        val response = client.post(
+            "/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/communication/publication",
+        ) {
             header(HttpHeaders.Authorization, "Bearer valid")
             header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             setBody(requestBody)
@@ -107,7 +109,9 @@ class PartnershipCommunicationRoutesTest {
 
         val requestBody = """{"publication_date": "invalid-date"}"""
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/communication/publication") {
+        val response = client.post(
+            "/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/communication/publication",
+        ) {
             header(HttpHeaders.Authorization, "Bearer valid")
             header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             setBody(requestBody)
@@ -128,7 +132,9 @@ class PartnershipCommunicationRoutesTest {
 
         val requestBody = """{"publication_date": "2025-09-15T10:30:00"}"""
 
-        val response = client.post("/orgs/test-org/events/$eventSlug/partnership/$partnershipId/communication/publication") {
+        val response = client.post(
+            "/orgs/test-org/events/$eventSlug/partnership/$partnershipId/communication/publication",
+        ) {
             header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             setBody(requestBody)
         }
@@ -151,7 +157,9 @@ class PartnershipCommunicationRoutesTest {
 
         val requestBody = """{"publication_date": "2025-09-15T10:30:00"}"""
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/communication/publication") {
+        val response = client.post(
+            "/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/communication/publication",
+        ) {
             header(HttpHeaders.Authorization, "Bearer valid")
             header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             setBody(requestBody)
@@ -196,9 +204,11 @@ class PartnershipCommunicationRoutesTest {
         }
 
         val imageBytes = byteArrayOf(
-            0x89.toByte(), 0x50, 0x4E, 0x47, // PNG signature
+            // PNG signature
+            0x89.toByte(), 0x50, 0x4E, 0x47,
             0x0D, 0x0A, 0x1A, 0x0A,
-            0x00, 0x00, 0x00, 0x0D, // IHDR chunk
+            // IHDR chunk
+            0x00, 0x00, 0x00, 0x0D,
         )
 
         val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/communication/support") {
@@ -303,7 +313,9 @@ class PartnershipCommunicationRoutesTest {
 
         val imageBytes = byteArrayOf(0x89.toByte(), 0x50, 0x4E, 0x47)
 
-        val response = client.post("/orgs/test-org/events/$eventSlug/partnership/$partnershipId/communication/support") {
+        val response = client.post(
+            "/orgs/test-org/events/$eventSlug/partnership/$partnershipId/communication/support",
+        ) {
             header(HttpHeaders.ContentType, ContentType.Image.PNG.toString())
             setBody(imageBytes)
         }
@@ -347,7 +359,10 @@ class PartnershipCommunicationRoutesTest {
 
         // JPEG signature
         val imageBytes = byteArrayOf(
-            0xFF.toByte(), 0xD8.toByte(), 0xFF.toByte(), 0xE0.toByte(),
+            0xFF.toByte(),
+            0xD8.toByte(),
+            0xFF.toByte(),
+            0xE0.toByte(),
         )
 
         val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/communication/support") {
