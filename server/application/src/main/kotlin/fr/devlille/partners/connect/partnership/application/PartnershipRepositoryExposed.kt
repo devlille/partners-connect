@@ -5,6 +5,7 @@ import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.application.mappers.toDomain
 import fr.devlille.partners.connect.partnership.domain.Contact
@@ -29,7 +30,6 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptio
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionalOptionsByPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listTranslationsByOptionAndLanguage
-import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
@@ -286,9 +286,13 @@ class PartnershipRepositoryExposed(
                 (PartnershipsTable.boothLocation eq location) and
                 (PartnershipsTable.id neq partnershipId)
         }.firstOrNull()
-        
+
         if (existingPartnership != null) {
-            throw ForbiddenException("Location '$location' is already assigned to another partnership for this event")
+            val companyName = existingPartnership.company.name
+            throw ForbiddenException(
+                "Location '$location' is already assigned to another partnership " +
+                    "for this event by company '$companyName'",
+            )
         }
 
         val partnership = findPartnership(event.id.value, partnershipId)

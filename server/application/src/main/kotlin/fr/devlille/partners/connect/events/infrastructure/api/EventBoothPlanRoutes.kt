@@ -1,10 +1,9 @@
 package fr.devlille.partners.connect.events.infrastructure.api
 
 import fr.devlille.partners.connect.events.domain.EventRepository
+import fr.devlille.partners.connect.events.domain.EventStorageRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
-import fr.devlille.partners.connect.events.domain.EventStorageRepository
-import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receiveMultipart
@@ -36,15 +35,10 @@ fun Route.eventBoothPlanRoutes() {
                 throw BadRequestException("Invalid file type, expected an image")
             }
 
-            // Validate specific supported image types
-            if (part.contentType !in listOf(ContentType.Image.PNG, ContentType.Image.JPEG, ContentType.Image.GIF)) {
-                throw BadRequestException("Unsupported image type: ${part.contentType}")
-            }
-
             val imageUrl = storageRepository.uploadBoothPlanImage(eventSlug, bytes, contentType)
             eventRepository.updateBoothPlanImageUrl(eventSlug, imageUrl)
 
-            call.respond(HttpStatusCode.OK, mapOf("url" to imageUrl))
+            call.respond(HttpStatusCode.Created, mapOf("url" to imageUrl))
         }
     }
 }

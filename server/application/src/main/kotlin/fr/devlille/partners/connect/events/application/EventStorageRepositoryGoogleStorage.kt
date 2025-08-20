@@ -3,6 +3,7 @@ package fr.devlille.partners.connect.events.application
 import fr.devlille.partners.connect.events.domain.EventStorageRepository
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.internal.infrastructure.api.UnsupportedMediaTypeException
 import fr.devlille.partners.connect.internal.infrastructure.bucket.MimeType
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
 import io.ktor.server.plugins.NotFoundException
@@ -26,7 +27,7 @@ class EventStorageRepositoryGoogleStorage(
             "image/jpeg", "image/jpg" -> MimeType.JPEG
             "image/gif" -> MimeType.GIF
             "image/webp" -> MimeType.WEBP
-            else -> MimeType.JPEG // default fallback
+            else -> throw UnsupportedMediaTypeException("Unsupported media type: $mimeType")
         }
 
         val uploaded = storage.upload(

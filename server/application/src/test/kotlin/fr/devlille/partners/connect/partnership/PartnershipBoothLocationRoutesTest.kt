@@ -140,6 +140,7 @@ class PartnershipBoothLocationRoutesTest {
         assertEquals(HttpStatusCode.Forbidden, response2.status)
         val body = response2.bodyAsText()
         assertTrue(body.contains("already assigned"))
+        assertTrue(body.contains("Mock Company"))
     }
 
     @Test

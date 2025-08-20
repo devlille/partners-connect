@@ -60,7 +60,7 @@ class EventBoothPlanRoutesTest {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
-        assertEquals(HttpStatusCode.OK, response.status)
+        assertEquals(HttpStatusCode.Created, response.status)
         val body = response.bodyAsText()
         assertTrue(body.contains("https://example.com/booth-plan.png"))
     }
@@ -128,9 +128,9 @@ class EventBoothPlanRoutesTest {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
-        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals(HttpStatusCode.UnsupportedMediaType, response.status)
         val body = response.bodyAsText()
-        assertTrue(body.contains("Unsupported image type"))
+        assertTrue(body.contains("Unsupported media type"))
     }
 
     @Test
