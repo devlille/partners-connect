@@ -28,12 +28,8 @@ fun Route.eventBoothPlanRoutes() {
             val multipart = call.receiveMultipart()
             val part = multipart.readPart() ?: throw BadRequestException("Missing file part")
             val bytes = part.asByteArray()
-
-            // Validate that it's an image MIME type
             val contentType = part.contentType?.toString()?.lowercase()
-            if (contentType == null || !contentType.startsWith("image/")) {
-                throw BadRequestException("Invalid file type, expected an image")
-            }
+                ?: throw BadRequestException("Content type is required")
 
             val imageUrl = storageRepository.uploadBoothPlanImage(eventSlug, bytes, contentType)
             eventRepository.updateBoothPlanImageUrl(eventSlug, imageUrl)

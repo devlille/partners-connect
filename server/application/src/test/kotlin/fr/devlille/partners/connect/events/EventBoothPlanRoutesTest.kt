@@ -94,9 +94,9 @@ class EventBoothPlanRoutesTest {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
-        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals(HttpStatusCode.UnsupportedMediaType, response.status)
         val body = response.bodyAsText()
-        assertTrue(body.contains("Invalid file type"))
+        assertTrue(body.contains("Unsupported media type"))
     }
 
     @Test
