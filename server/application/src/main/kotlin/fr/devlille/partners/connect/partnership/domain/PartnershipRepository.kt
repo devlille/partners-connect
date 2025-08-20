@@ -24,7 +24,5 @@ interface PartnershipRepository {
     fun listByCompany(companyId: UUID): List<PartnershipItem>
 
     // Booth management methods
-    fun updateBoothLocation(eventSlug: String, partnershipId: UUID, location: String): Partnership
-
-    fun isBoothLocationTaken(eventSlug: String, location: String, excludePartnershipId: UUID? = null): Boolean
+    fun updateBoothLocation(eventSlug: String, partnershipId: UUID, location: String)
 }

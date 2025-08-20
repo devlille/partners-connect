@@ -3,7 +3,7 @@ package fr.devlille.partners.connect.events.infrastructure.api
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
-import fr.devlille.partners.connect.partnership.domain.PartnershipStorageRepository
+import fr.devlille.partners.connect.events.domain.EventStorageRepository
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
@@ -18,7 +18,7 @@ import kotlin.getValue
 @Suppress("ThrowsCount")
 fun Route.eventBoothPlanRoutes() {
     val eventRepository by inject<EventRepository>()
-    val storageRepository by inject<PartnershipStorageRepository>()
+    val storageRepository by inject<EventStorageRepository>()
 
     route("/orgs/{orgSlug}/events/{eventSlug}/booth-plan") {
         install(AuthorizedOrganisationPlugin)
@@ -37,14 +37,8 @@ fun Route.eventBoothPlanRoutes() {
             }
 
             // Validate specific supported image types
-            when (part.contentType) {
-                ContentType.Image.PNG,
-                ContentType.Image.JPEG,
-                ContentType.Image.GIF,
-                -> {
-                    // Valid image types
-                }
-                else -> throw BadRequestException("Unsupported image type: ${part.contentType}")
+            if (part.contentType !in listOf(ContentType.Image.PNG, ContentType.Image.JPEG, ContentType.Image.GIF)) {
+                throw BadRequestException("Unsupported image type: ${part.contentType}")
             }
 
             val imageUrl = storageRepository.uploadBoothPlanImage(eventSlug, bytes, contentType)

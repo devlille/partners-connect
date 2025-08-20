@@ -13,6 +13,5 @@ interface EventRepository {
 
     fun findByUserEmail(userEmail: String): List<EventSummary>
 
-    // Booth management methods
     fun updateBoothPlanImageUrl(eventSlug: String, imageUrl: String)
 }

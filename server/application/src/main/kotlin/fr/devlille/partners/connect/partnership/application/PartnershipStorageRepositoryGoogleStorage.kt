@@ -43,39 +43,4 @@ class PartnershipStorageRepositoryGoogleStorage(
         )
         uploaded.url
     }
-
-    override fun uploadBoothPlanImage(
-        eventSlug: String,
-        content: ByteArray,
-        mimeType: String,
-    ): String = transaction {
-        val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
-        val eventId = event.id.value
-
-        // Determine file extension from MIME type
-        val extension = when (mimeType.lowercase()) {
-            "image/png" -> "png"
-            "image/jpeg", "image/jpg" -> "jpg"
-            "image/gif" -> "gif"
-            "image/webp" -> "webp"
-            else -> "jpg" // default fallback
-        }
-
-        // Determine MimeType enum from MIME type string
-        val mimeTypeEnum = when (mimeType.lowercase()) {
-            "image/png" -> MimeType.PNG
-            "image/jpeg", "image/jpg" -> MimeType.JPEG
-            "image/gif" -> MimeType.GIF
-            "image/webp" -> MimeType.WEBP
-            else -> MimeType.JPEG // default fallback
-        }
-
-        val uploaded = storage.upload(
-            filename = "events/$eventId/booth-plan.$extension",
-            content = content,
-            mimeType = mimeTypeEnum,
-        )
-        uploaded.url
-    }
 }

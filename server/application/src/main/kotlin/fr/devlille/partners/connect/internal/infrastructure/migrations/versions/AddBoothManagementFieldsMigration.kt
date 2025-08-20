@@ -10,7 +10,7 @@ import org.jetbrains.exposed.v1.jdbc.SchemaUtils
  * Adds booth_plan_image_url to events table and booth_location to partnerships table.
  */
 object AddBoothManagementFieldsMigration : Migration {
-    override val id = "20250115_add_booth_management_fields"
+    override val id = "20250803_add_booth_management_fields"
     override val description =
         "Add booth management fields (booth_plan_image_url to events, booth_location to partnerships)"
 

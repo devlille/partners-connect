@@ -8,7 +8,7 @@ import fr.devlille.partners.connect.partnership.factories.insertMockedPartnershi
 import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
 import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
 import io.ktor.client.request.header
-import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
@@ -40,7 +40,7 @@ class PartnershipBoothLocationRoutesTest {
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
         }
 
-        val response = client.post(
+        val response = client.put(
             "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/booth-location",
         ) {
             contentType(ContentType.Application.Json)
@@ -72,7 +72,7 @@ class PartnershipBoothLocationRoutesTest {
         }
 
         // First assignment
-        val response1 = client.post(
+        val response1 = client.put(
             "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/booth-location",
         ) {
             contentType(ContentType.Application.Json)
@@ -83,7 +83,7 @@ class PartnershipBoothLocationRoutesTest {
         assertEquals(HttpStatusCode.OK, response1.status)
 
         // Reassign to different location
-        val response2 = client.post(
+        val response2 = client.put(
             "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/booth-location",
         ) {
             contentType(ContentType.Application.Json)
@@ -118,7 +118,7 @@ class PartnershipBoothLocationRoutesTest {
         }
 
         // Assign location to first partnership
-        val response1 = client.post(
+        val response1 = client.put(
             "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId1/booth-location",
         ) {
             contentType(ContentType.Application.Json)
@@ -129,7 +129,7 @@ class PartnershipBoothLocationRoutesTest {
         assertEquals(HttpStatusCode.OK, response1.status)
 
         // Try to assign same location to second partnership
-        val response2 = client.post(
+        val response2 = client.put(
             "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId2/booth-location",
         ) {
             contentType(ContentType.Application.Json)
@@ -167,7 +167,7 @@ class PartnershipBoothLocationRoutesTest {
         }
 
         // Assign location to partnership in first event
-        val response1 = client.post(
+        val response1 = client.put(
             "/orgs/test-organization/events/$eventSlug1/partnership/$partnershipId1/booth-location",
         ) {
             contentType(ContentType.Application.Json)
@@ -178,7 +178,7 @@ class PartnershipBoothLocationRoutesTest {
         assertEquals(HttpStatusCode.OK, response1.status)
 
         // Assign same location to partnership in second event (should succeed)
-        val response2 = client.post(
+        val response2 = client.put(
             "/orgs/test-organization/events/$eventSlug2/partnership/$partnershipId2/booth-location",
         ) {
             contentType(ContentType.Application.Json)
@@ -208,7 +208,7 @@ class PartnershipBoothLocationRoutesTest {
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
         }
 
-        val response = client.post(
+        val response = client.put(
             "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/booth-location",
         ) {
             contentType(ContentType.Application.Json)
@@ -238,7 +238,7 @@ class PartnershipBoothLocationRoutesTest {
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
         }
 
-        val response = client.post(
+        val response = client.put(
             "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/booth-location",
         ) {
             contentType(ContentType.Application.Json)
@@ -266,7 +266,7 @@ class PartnershipBoothLocationRoutesTest {
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
         }
 
-        val response = client.post(
+        val response = client.put(
             "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/booth-location",
         ) {
             contentType(ContentType.Application.Json)
@@ -289,7 +289,7 @@ class PartnershipBoothLocationRoutesTest {
             insertMockedCompany(companyId)
         }
 
-        val response = client.post(
+        val response = client.put(
             "/orgs/test-organization/events/non-existent-event/partnership/$partnershipId/booth-location",
         ) {
             contentType(ContentType.Application.Json)
@@ -314,7 +314,7 @@ class PartnershipBoothLocationRoutesTest {
             insertMockedOrgaPermission(orgId = org.id.value, user = admin)
         }
 
-        val response = client.post(
+        val response = client.put(
             "/orgs/test-organization/events/$eventSlug/partnership/$nonExistentPartnershipId/booth-location",
         ) {
             contentType(ContentType.Application.Json)

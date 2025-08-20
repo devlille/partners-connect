@@ -14,10 +14,4 @@ interface PartnershipStorageRepository {
         partnershipId: UUID,
         content: ByteArray,
     ): String
-
-    fun uploadBoothPlanImage(
-        eventSlug: String,
-        content: ByteArray,
-        mimeType: String,
-    ): String
 }

@@ -29,6 +29,7 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptio
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionalOptionsByPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listTranslationsByOptionAndLanguage
+import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
@@ -275,37 +276,22 @@ class PartnershipRepositoryExposed(
         eventSlug: String,
         partnershipId: UUID,
         location: String,
-    ): Partnership = transaction {
+    ): Unit = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
+
+        // Check if location is already taken by another partnership for this event
+        val existingPartnership = partnershipEntity.find {
+            (PartnershipsTable.eventId eq event.id) and
+                (PartnershipsTable.boothLocation eq location) and
+                (PartnershipsTable.id neq partnershipId)
+        }.firstOrNull()
+        
+        if (existingPartnership != null) {
+            throw ForbiddenException("Location '$location' is already assigned to another partnership for this event")
+        }
 
         val partnership = findPartnership(event.id.value, partnershipId)
         partnership.boothLocation = location
-
-        getById(eventSlug, partnershipId)
-    }
-
-    override fun isBoothLocationTaken(
-        eventSlug: String,
-        location: String,
-        excludePartnershipId: UUID?,
-    ): Boolean = transaction {
-        val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
-
-        val query = if (excludePartnershipId != null) {
-            partnershipEntity.find {
-                (PartnershipsTable.eventId eq event.id) and
-                    (PartnershipsTable.boothLocation eq location) and
-                    (PartnershipsTable.id neq excludePartnershipId)
-            }
-        } else {
-            partnershipEntity.find {
-                (PartnershipsTable.eventId eq event.id) and
-                    (PartnershipsTable.boothLocation eq location)
-            }
-        }
-
-        query.empty().not()
     }
 }
