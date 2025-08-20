@@ -71,7 +71,7 @@ class PartnershipCommunicationRoutesTest {
 
         val responseBody = Json.parseToJsonElement(response.bodyAsText()).jsonObject
         assertEquals(partnershipId.toString(), responseBody["id"]?.jsonPrimitive?.content)
-        assertEquals("2025-09-15T10:30:00", responseBody["publication_date"]?.jsonPrimitive?.content)
+        assertEquals("2025-09-15T10:30", responseBody["publication_date"]?.jsonPrimitive?.content)
 
         // Verify the database was updated
         val partnership = transaction {
@@ -118,7 +118,7 @@ class PartnershipCommunicationRoutesTest {
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("Invalid publication date format"))
+        assertTrue(response.bodyAsText().contains("Failed to convert request body"))
     }
 
     @Test

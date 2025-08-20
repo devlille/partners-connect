@@ -206,7 +206,7 @@ private fun Application.configureStatusPage() {
         }
         exception<UnsupportedMediaTypeException> { call, cause ->
             call.respondText(
-                text = cause.message ?: "415 Unsupported Media Type", 
+                text = cause.message ?: "415 Unsupported Media Type",
                 status = HttpStatusCode.UnsupportedMediaType,
             )
         }
