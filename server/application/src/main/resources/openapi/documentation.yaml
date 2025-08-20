@@ -1801,6 +1801,7 @@ components:
           type: "string"
         head_office:
           type: "string"
+          nullable: true
         siret:
           type: "string"
           nullable: true
@@ -1824,33 +1825,32 @@ components:
           nullable: true
         iban:
           type: "string"
+          nullable: true
         bic:
           type: "string"
+          nullable: true
         rib_url:
           type: "string"
+          nullable: true
         representative_user_email:
           type: "string"
+          nullable: true
         representative_role:
           type: "string"
+          nullable: true
         creation_location:
           type: "string"
+          nullable: true
         created_at:
           type: "string"
           format: "date-time"
+          nullable: true
         published_at:
           type: "string"
           format: "date-time"
+          nullable: true
       required:
         - "name"
-        - "head_office"
-        - "iban"
-        - "bic"
-        - "rib_url"
-        - "representative_user_email"
-        - "representative_role"
-        - "creation_location"
-        - "created_at"
-        - "published_at"
     EventWithOrganisation:
       type: "object"
       properties:
