@@ -12,14 +12,22 @@ import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissi
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionsTable
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
+import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class OrganisationRepositoryExposed : OrganisationRepository {
     override fun create(entity: Organisation): String = transaction {
-        val user = UserEntity.singleUserByEmail(entity.representativeUserEmail)
-            ?: throw NotFoundException("User with email ${entity.representativeUserEmail} not found")
+        // Validate that name is present and not blank
+        if (entity.name.isBlank()) {
+            throw BadRequestException("Organisation name is required and cannot be empty")
+        }
+
+        val user = entity.representativeUserEmail?.let { email ->
+            UserEntity.singleUserByEmail(email)
+                ?: throw NotFoundException("User with email $email not found")
+        }
         val slug = entity.name.slugify()
         OrganisationEntity.new {
             this.name = entity.name
@@ -50,11 +58,18 @@ class OrganisationRepositoryExposed : OrganisationRepository {
     }
 
     override fun update(orgSlug: String, data: Organisation): Organisation = transaction {
+        // Validate that name is present and not blank
+        if (data.name.isBlank()) {
+            throw BadRequestException("Organisation name is required and cannot be empty")
+        }
+
         val entity = OrganisationEntity.findBySlug(orgSlug)
             ?: throw NotFoundException("Organisation with slug $orgSlug not found")
 
-        val representativeUser = UserEntity.singleUserByEmail(data.representativeUserEmail)
-            ?: throw NotFoundException("User with email ${data.representativeUserEmail} not found")
+        val representativeUser = data.representativeUserEmail?.let { email ->
+            UserEntity.singleUserByEmail(email)
+                ?: throw NotFoundException("User with email $email not found")
+        }
 
         entity.apply {
             this.name = data.name

@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.internal.infrastructure.migrations
 
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.InitialSchemaMigration
+import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.MakeOrganisationFieldsNullableMigration
 
 /**
  * Registry that contains all database migrations in the system.
@@ -13,6 +14,7 @@ object MigrationRegistry {
      */
     val allMigrations: List<Migration> = listOf(
         InitialSchemaMigration,
+        MakeOrganisationFieldsNullableMigration,
     )
 
     /**

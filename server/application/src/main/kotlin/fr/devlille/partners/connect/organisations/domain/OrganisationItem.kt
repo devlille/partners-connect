@@ -9,7 +9,7 @@ data class OrganisationItem(
     val slug: String,
     @SerialName("head_office")
     val headOffice: String,
-    val owner: Owner,
+    val owner: Owner?,
 )
 
 @Serializable

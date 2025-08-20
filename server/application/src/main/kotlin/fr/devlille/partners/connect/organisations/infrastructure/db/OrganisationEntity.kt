@@ -26,7 +26,7 @@ class OrganisationEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var createdAt by OrganisationsTable.createdAt
     var publishedAt by OrganisationsTable.publishedAt
 
-    var representativeUser by UserEntity referencedOn OrganisationsTable.representativeUser
+    var representativeUser by UserEntity optionalReferencedOn OrganisationsTable.representativeUser
     var representativeRole by OrganisationsTable.representativeRole
 }
 
