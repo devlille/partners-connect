@@ -12,6 +12,7 @@ import fr.devlille.partners.connect.integrations.infrastructure.api.integrationR
 import fr.devlille.partners.connect.integrations.infrastructure.bindings.integrationModule
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
+import fr.devlille.partners.connect.internal.infrastructure.api.UnsupportedMediaTypeException
 import fr.devlille.partners.connect.internal.infrastructure.api.UserSession
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkClientModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkEngineModule
@@ -202,6 +203,12 @@ private fun Application.configureStatusPage() {
         }
         exception<NotFoundException> { call, cause ->
             call.respondText(text = cause.message ?: "404 Not Found", status = HttpStatusCode.NotFound)
+        }
+        exception<UnsupportedMediaTypeException> { call, cause ->
+            call.respondText(
+                text = cause.message ?: "415 Unsupported Media Type", 
+                status = HttpStatusCode.UnsupportedMediaType,
+            )
         }
         exception<Throwable> { call, cause ->
             call.respondText(text = "500: $cause", status = HttpStatusCode.InternalServerError)

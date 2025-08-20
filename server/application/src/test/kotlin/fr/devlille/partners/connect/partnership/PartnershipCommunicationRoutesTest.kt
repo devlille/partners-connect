@@ -11,7 +11,7 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventA
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.request.header
-import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
@@ -35,7 +35,7 @@ import kotlin.test.assertTrue
 
 class PartnershipCommunicationRoutesTest {
     @Test
-    fun `POST publication date sets communication publication date and returns success`() = testApplication {
+    fun `PUT publication date sets communication publication date and returns success`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
@@ -59,7 +59,7 @@ class PartnershipCommunicationRoutesTest {
 
         val requestBody = """{"publication_date": "2025-09-15T10:30:00"}"""
 
-        val response = client.post(
+        val response = client.put(
             "/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/communication/publication",
         ) {
             header(HttpHeaders.Authorization, "Bearer valid")
@@ -85,7 +85,7 @@ class PartnershipCommunicationRoutesTest {
     }
 
     @Test
-    fun `POST publication date returns 400 for invalid date format`() = testApplication {
+    fun `PUT publication date returns 400 for invalid date format`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
@@ -109,7 +109,7 @@ class PartnershipCommunicationRoutesTest {
 
         val requestBody = """{"publication_date": "invalid-date"}"""
 
-        val response = client.post(
+        val response = client.put(
             "/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/communication/publication",
         ) {
             header(HttpHeaders.Authorization, "Bearer valid")
@@ -122,7 +122,7 @@ class PartnershipCommunicationRoutesTest {
     }
 
     @Test
-    fun `POST publication date returns 401 when unauthorized`() = testApplication {
+    fun `PUT publication date returns 401 when unauthorized`() = testApplication {
         val eventSlug = "test-event-communication-unauth"
         val partnershipId = UUID.randomUUID()
 
@@ -132,7 +132,7 @@ class PartnershipCommunicationRoutesTest {
 
         val requestBody = """{"publication_date": "2025-09-15T10:30:00"}"""
 
-        val response = client.post(
+        val response = client.put(
             "/orgs/test-org/events/$eventSlug/partnership/$partnershipId/communication/publication",
         ) {
             header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
@@ -143,7 +143,7 @@ class PartnershipCommunicationRoutesTest {
     }
 
     @Test
-    fun `POST publication date returns 404 for non-existent partnership`() = testApplication {
+    fun `PUT publication date returns 404 for non-existent partnership`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val partnershipId = UUID.randomUUID()
@@ -157,7 +157,7 @@ class PartnershipCommunicationRoutesTest {
 
         val requestBody = """{"publication_date": "2025-09-15T10:30:00"}"""
 
-        val response = client.post(
+        val response = client.put(
             "/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/communication/publication",
         ) {
             header(HttpHeaders.Authorization, "Bearer valid")
@@ -169,7 +169,7 @@ class PartnershipCommunicationRoutesTest {
     }
 
     @Test
-    fun `POST support upload uploads image and returns support URL`() = testApplication {
+    fun `PUT support upload uploads image and returns support URL`() = testApplication {
         val storage = mockk<Storage>()
         val expectedUrl = "https://storage.googleapis.com/bucket/partnership/support.png"
         every { storage.upload(any(), any(), any()) } returns Upload(
@@ -211,7 +211,7 @@ class PartnershipCommunicationRoutesTest {
             0x00, 0x00, 0x00, 0x0D,
         )
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/communication/support") {
+        val response = client.put("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/communication/support") {
             header(HttpHeaders.Authorization, "Bearer valid")
             header(HttpHeaders.ContentType, ContentType.Image.PNG.toString())
             setBody(imageBytes)
@@ -221,7 +221,7 @@ class PartnershipCommunicationRoutesTest {
 
         val responseBody = Json.parseToJsonElement(response.bodyAsText()).jsonObject
         assertEquals(partnershipId.toString(), responseBody["id"]?.jsonPrimitive?.content)
-        assertEquals(expectedUrl, responseBody["support_url"]?.jsonPrimitive?.content)
+        assertEquals(expectedUrl, responseBody["url"]?.jsonPrimitive?.content)
 
         // Verify the database was updated
         val partnership = transaction {
@@ -235,7 +235,7 @@ class PartnershipCommunicationRoutesTest {
     }
 
     @Test
-    fun `POST support upload returns 400 for invalid image type`() = testApplication {
+    fun `PUT support upload returns 415 for invalid image type`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
@@ -259,18 +259,18 @@ class PartnershipCommunicationRoutesTest {
 
         val textContent = "This is not an image".toByteArray()
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/communication/support") {
+        val response = client.put("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/communication/support") {
             header(HttpHeaders.Authorization, "Bearer valid")
             header(HttpHeaders.ContentType, ContentType.Text.Plain.toString())
             setBody(textContent)
         }
 
-        assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("Invalid file type"))
+        assertEquals(HttpStatusCode.UnsupportedMediaType, response.status)
+        assertTrue(response.bodyAsText().contains("Unsupported image type"))
     }
 
     @Test
-    fun `POST support upload returns 400 for empty content`() = testApplication {
+    fun `PUT support upload returns 400 for empty content`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
@@ -292,7 +292,7 @@ class PartnershipCommunicationRoutesTest {
             )
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/communication/support") {
+        val response = client.put("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/communication/support") {
             header(HttpHeaders.Authorization, "Bearer valid")
             header(HttpHeaders.ContentType, ContentType.Image.PNG.toString())
             setBody(byteArrayOf())
@@ -303,7 +303,7 @@ class PartnershipCommunicationRoutesTest {
     }
 
     @Test
-    fun `POST support upload returns 401 when unauthorized`() = testApplication {
+    fun `PUT support upload returns 401 when unauthorized`() = testApplication {
         val eventSlug = "test-event-communication-support-unauth"
         val partnershipId = UUID.randomUUID()
 
@@ -313,7 +313,7 @@ class PartnershipCommunicationRoutesTest {
 
         val imageBytes = byteArrayOf(0x89.toByte(), 0x50, 0x4E, 0x47)
 
-        val response = client.post(
+        val response = client.put(
             "/orgs/test-org/events/$eventSlug/partnership/$partnershipId/communication/support",
         ) {
             header(HttpHeaders.ContentType, ContentType.Image.PNG.toString())
@@ -324,7 +324,7 @@ class PartnershipCommunicationRoutesTest {
     }
 
     @Test
-    fun `POST support upload supports different image formats`() = testApplication {
+    fun `PUT support upload supports different image formats`() = testApplication {
         val storage = mockk<Storage>()
         every { storage.upload(any(), any(), any()) } returns Upload(
             bucketName = "bucket",
@@ -365,7 +365,7 @@ class PartnershipCommunicationRoutesTest {
             0xE0.toByte(),
         )
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/communication/support") {
+        val response = client.put("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/communication/support") {
             header(HttpHeaders.Authorization, "Bearer valid")
             header(HttpHeaders.ContentType, ContentType.Image.JPEG.toString())
             setBody(imageBytes)

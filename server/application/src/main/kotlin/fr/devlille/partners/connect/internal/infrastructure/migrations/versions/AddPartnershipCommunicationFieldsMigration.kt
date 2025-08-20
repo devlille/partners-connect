@@ -9,7 +9,7 @@ import org.jetbrains.exposed.v1.jdbc.SchemaUtils
  * Adds nullable columns for publication date and support URL.
  */
 object AddPartnershipCommunicationFieldsMigration : Migration {
-    override val id = "20250820_add_partnership_communication_fields"
+    override val id = "20250804_add_partnership_communication_fields"
     override val description = "Add communication_publication_date and communication_support_url to partnerships"
 
     override fun up() {
