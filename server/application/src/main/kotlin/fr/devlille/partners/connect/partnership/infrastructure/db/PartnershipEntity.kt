@@ -28,6 +28,8 @@ class PartnershipEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var suggestionDeclinedAt by PartnershipsTable.suggestionDeclinedAt
     var declinedAt by PartnershipsTable.declinedAt
     var validatedAt by PartnershipsTable.validatedAt
+    var communicationPublicationDate by PartnershipsTable.communicationPublicationDate
+    var communicationSupportUrl by PartnershipsTable.communicationSupportUrl
     var createdAt by PartnershipsTable.createdAt
 }
 

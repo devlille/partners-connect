@@ -14,4 +14,11 @@ interface PartnershipStorageRepository {
         partnershipId: UUID,
         content: ByteArray,
     ): String
+
+    fun uploadCommunicationSupport(
+        eventSlug: String,
+        partnershipId: UUID,
+        content: ByteArray,
+        mimeType: String,
+    ): String
 }

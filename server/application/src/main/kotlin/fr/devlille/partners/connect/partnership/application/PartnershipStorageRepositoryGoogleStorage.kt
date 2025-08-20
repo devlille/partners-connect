@@ -43,4 +43,33 @@ class PartnershipStorageRepositoryGoogleStorage(
         )
         uploaded.url
     }
+
+    override fun uploadCommunicationSupport(
+        eventSlug: String,
+        partnershipId: UUID,
+        content: ByteArray,
+        mimeType: String,
+    ): String = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val eventId = event.id.value
+
+        // Convert mimeType string to MimeType enum
+        val supportMimeType = when (mimeType) {
+            "image/png" -> MimeType.PNG
+            "image/jpeg" -> MimeType.JPEG
+            "image/jpg" -> MimeType.JPG
+            "image/gif" -> MimeType.GIF
+            "image/svg+xml" -> MimeType.SVG
+            "image/webp" -> MimeType.WEBP
+            else -> throw IllegalArgumentException("Unsupported image type: $mimeType")
+        }
+
+        val uploaded = storage.upload(
+            filename = "events/$eventId/partnerships/$partnershipId/communication-support.${supportMimeType.extension}",
+            content = content,
+            mimeType = supportMimeType,
+        )
+        uploaded.url
+    }
 }

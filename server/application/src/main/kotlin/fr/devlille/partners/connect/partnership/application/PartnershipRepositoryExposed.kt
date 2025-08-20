@@ -32,6 +32,7 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.listTranslation
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.v1.core.SortOrder
@@ -269,4 +270,28 @@ class PartnershipRepositoryExposed(
     private fun findPartnership(eventId: UUID, partnershipId: UUID): PartnershipEntity = partnershipEntity
         .singleByEventAndPartnership(eventId, partnershipId)
         ?: throw NotFoundException("Partnership not found")
+
+    override fun updateCommunicationPublicationDate(
+        eventSlug: String,
+        partnershipId: UUID,
+        publicationDate: LocalDateTime,
+    ): UUID = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val partnership = findPartnership(event.id.value, partnershipId)
+        partnership.communicationPublicationDate = publicationDate
+        partnership.id.value
+    }
+
+    override fun updateCommunicationSupportUrl(
+        eventSlug: String,
+        partnershipId: UUID,
+        supportUrl: String,
+    ): UUID = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val partnership = findPartnership(event.id.value, partnershipId)
+        partnership.communicationSupportUrl = supportUrl
+        partnership.id.value
+    }
 }
