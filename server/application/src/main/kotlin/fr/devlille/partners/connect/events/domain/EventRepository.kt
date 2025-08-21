@@ -15,7 +15,7 @@ interface EventRepository {
 
     fun updateBoothPlanImageUrl(eventSlug: String, imageUrl: String)
 
-    fun createExternalLink(eventSlug: String, request: CreateEventExternalLinkRequest): EventExternalLink
+    fun createExternalLink(eventSlug: String, request: CreateEventExternalLinkRequest): String
 
-    fun findExternalLinksByEventSlug(eventSlug: String): List<EventExternalLink>
+    fun deleteExternalLink(externalLinkId: String)
 }

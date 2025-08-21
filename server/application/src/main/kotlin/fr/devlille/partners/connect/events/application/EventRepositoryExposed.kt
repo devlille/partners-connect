@@ -177,7 +177,21 @@ class EventRepositoryExposed(
     override fun createExternalLink(
         eventSlug: String,
         request: CreateEventExternalLinkRequest,
-    ): EventExternalLink = transaction {
+    ): String = transaction {
+        // Basic validation
+        if (request.name.isBlank()) {
+            throw io.ktor.server.plugins.BadRequestException("External link name cannot be empty")
+        }
+        if (request.url.isBlank()) {
+            throw io.ktor.server.plugins.BadRequestException("External link URL cannot be empty")
+        }
+
+        // Basic URL validation
+        val urlPattern = Regex("^https?://.*")
+        if (!urlPattern.matches(request.url)) {
+            throw io.ktor.server.plugins.BadRequestException("Invalid URL format - must start with http:// or https://")
+        }
+
         val eventEntity = entity.eventFindBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
 
@@ -187,25 +201,13 @@ class EventRepositoryExposed(
             this.url = request.url
         }
 
-        EventExternalLink(
-            id = externalLinkEntity.id.value.toString(),
-            name = externalLinkEntity.name,
-            url = externalLinkEntity.url,
-        )
+        externalLinkEntity.id.value.toString()
     }
 
-    override fun findExternalLinksByEventSlug(eventSlug: String): List<EventExternalLink> = transaction {
-        val eventEntity = entity.eventFindBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
-
-        EventExternalLinkEntity.find {
-            EventExternalLinksTable.eventId eq eventEntity.id
-        }.map { linkEntity ->
-            EventExternalLink(
-                id = linkEntity.id.value.toString(),
-                name = linkEntity.name,
-                url = linkEntity.url,
-            )
-        }
+    override fun deleteExternalLink(externalLinkId: String): Unit = transaction {
+        val linkEntity = EventExternalLinkEntity.findById(java.util.UUID.fromString(externalLinkId))
+            ?: throw NotFoundException("External link with id $externalLinkId not found")
+        
+        linkEntity.delete()
     }
 }

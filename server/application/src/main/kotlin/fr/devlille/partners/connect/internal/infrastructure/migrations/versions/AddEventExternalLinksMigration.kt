@@ -8,7 +8,7 @@ import org.jetbrains.exposed.v1.jdbc.SchemaUtils
  * Migration to add the event_external_links table for storing external links attached to events.
  */
 object AddEventExternalLinksMigration : Migration {
-    override val id = "20250107_120000_add_event_external_links"
+    override val id = "20250806_add_event_external_links"
     override val description = "Add event_external_links table for storing external links attached to events"
 
     override fun up() {
