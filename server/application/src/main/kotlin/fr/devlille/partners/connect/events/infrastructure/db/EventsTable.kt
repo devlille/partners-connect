@@ -22,6 +22,7 @@ object EventsTable : UUIDTable("events") {
     val contactEmail = varchar("contact_email", 255)
     val contactPhone = varchar("contact_phone", 30).nullable()
     val organisationId = reference("organisation_id", OrganisationsTable)
+    val boothPlanImageUrl = text("booth_plan_image_url").nullable()
     val createdAt = datetime("created_at").clientDefault {
         Clock.System.now().toLocalDateTime(TimeZone.UTC)
     }

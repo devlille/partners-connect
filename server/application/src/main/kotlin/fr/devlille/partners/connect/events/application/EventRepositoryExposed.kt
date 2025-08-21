@@ -150,4 +150,11 @@ class EventRepositoryExposed(
         }
         events
     }
+
+    override fun updateBoothPlanImageUrl(eventSlug: String, imageUrl: String): Unit = transaction {
+        val eventEntity = entity.eventFindBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+
+        eventEntity.boothPlanImageUrl = imageUrl
+    }
 }
