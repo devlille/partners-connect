@@ -4,6 +4,7 @@ import fr.devlille.partners.connect.companies.domain.Company
 import kotlinx.datetime.LocalDateTime
 import java.util.UUID
 
+@Suppress("TooManyFunctions") // Required for comprehensive partnership management operations
 interface PartnershipRepository {
     fun register(eventSlug: String, register: RegisterPartnership): UUID
 
@@ -37,4 +38,6 @@ interface PartnershipRepository {
         partnershipId: UUID,
         supportUrl: String,
     ): UUID
+
+    fun listCommunicationPlan(eventSlug: String): CommunicationPlan
 }

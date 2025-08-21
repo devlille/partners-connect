@@ -26,6 +26,8 @@ fun insertMockedPartnership(
     suggestionDeclinedAt: LocalDateTime? = null,
     declinedAt: LocalDateTime? = null,
     validatedAt: LocalDateTime? = null,
+    communicationPublicationDate: LocalDateTime? = null,
+    communicationSupportUrl: String? = null,
 ): PartnershipEntity = transaction {
     PartnershipEntity.new(id) {
         this.event = EventEntity[eventId]
@@ -43,5 +45,7 @@ fun insertMockedPartnership(
         this.suggestionDeclinedAt = suggestionDeclinedAt
         this.declinedAt = declinedAt
         this.validatedAt = validatedAt
+        this.communicationPublicationDate = communicationPublicationDate
+        this.communicationSupportUrl = communicationSupportUrl
     }
 }

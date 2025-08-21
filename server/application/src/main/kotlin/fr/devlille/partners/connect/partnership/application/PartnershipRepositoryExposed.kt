@@ -8,6 +8,8 @@ import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.application.mappers.toDomain
+import fr.devlille.partners.connect.partnership.domain.CommunicationItem
+import fr.devlille.partners.connect.partnership.domain.CommunicationPlan
 import fr.devlille.partners.connect.partnership.domain.Contact
 import fr.devlille.partners.connect.partnership.domain.Partnership
 import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
@@ -322,5 +324,37 @@ class PartnershipRepositoryExposed(
         val partnership = findPartnership(event.id.value, partnershipId)
         partnership.communicationSupportUrl = supportUrl
         partnership.id.value
+    }
+
+    override fun listCommunicationPlan(eventSlug: String): CommunicationPlan = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+
+        val eventId = event.id.value
+        val partnerships = PartnershipEntity.find { PartnershipsTable.eventId eq eventId }
+
+        val communicationItems = partnerships.map { partnership ->
+            CommunicationItem(
+                partnershipId = partnership.id.value.toString(),
+                companyName = partnership.company.name,
+                publicationDate = partnership.communicationPublicationDate,
+                supportUrl = partnership.communicationSupportUrl,
+            )
+        }
+
+        val now = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+        val done = communicationItems
+            .filter { it.publicationDate != null && it.publicationDate < now }
+            .sortedByDescending { it.publicationDate }
+
+        val planned = communicationItems
+            .filter { it.publicationDate != null && it.publicationDate >= now }
+            .sortedBy { it.publicationDate }
+
+        val unplanned = communicationItems
+            .filter { it.publicationDate == null }
+            .sortedBy { it.companyName }
+
+        CommunicationPlan(done = done, planned = planned, unplanned = unplanned)
     }
 }
