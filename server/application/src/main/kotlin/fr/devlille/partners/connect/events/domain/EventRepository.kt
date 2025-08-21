@@ -14,4 +14,8 @@ interface EventRepository {
     fun findByUserEmail(userEmail: String): List<EventSummary>
 
     fun updateBoothPlanImageUrl(eventSlug: String, imageUrl: String)
+
+    fun createExternalLink(eventSlug: String, request: CreateEventExternalLinkRequest): EventExternalLink
+
+    fun findExternalLinksByEventSlug(eventSlug: String): List<EventExternalLink>
 }

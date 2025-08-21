@@ -310,6 +310,11 @@ class EventRoutesTest {
         assertTrue(event.containsKey("submission_end_time"))
         assertTrue(event.containsKey("address"))
         assertTrue(event.containsKey("contact"))
+        assertTrue(event.containsKey("external_links"))
+
+        // Verify external_links is an array (should be empty for this test)
+        val externalLinks = event["external_links"]!!.jsonArray
+        assertEquals(0, externalLinks.size)
 
         // Verify organization structure has required fields
         val organisation = responseJson["organisation"]!!.jsonObject
@@ -317,5 +322,53 @@ class EventRoutesTest {
         assertTrue(organisation.containsKey("slug"))
         assertTrue(organisation.containsKey("head_office"))
         assertTrue(organisation.containsKey("owner"))
+    }
+
+    @Test
+    fun `GET events by slug includes external links in response`() = testApplication {
+        val eventId = UUID.randomUUID()
+        val eventSlug = "event-with-external-links"
+        val orgId = UUID.randomUUID()
+        val orgSlug = "test-org"
+
+        application {
+            moduleMocked()
+            val admin = insertMockedAdminUser()
+            val org = insertMockedOrganisationEntity(id = orgId, name = orgSlug, representativeUser = admin)
+            insertMockedEventWithOrga(id = eventId, slug = eventSlug, organisation = org)
+            insertMockedOrgaPermission(orgId = orgId, user = admin)
+        }
+
+        // First, create an external link
+        val createRequest = fr.devlille.partners.connect.events.domain.CreateEventExternalLinkRequest(
+            name = "Call for Papers",
+            url = "https://sessionize.com/devlille2025",
+        )
+
+        val createResponse = client.post("/orgs/$orgSlug/events/$eventSlug/external-link") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(Json.encodeToString(createRequest))
+        }
+
+        assertEquals(HttpStatusCode.Created, createResponse.status)
+
+        // Now get the event and verify the external link is included
+        val getResponse = client.get("/events/$eventSlug")
+
+        assertEquals(HttpStatusCode.OK, getResponse.status)
+        val responseBody = getResponse.bodyAsText()
+        val responseJson = Json.parseToJsonElement(responseBody).jsonObject
+
+        val event = responseJson["event"]!!.jsonObject
+        assertTrue(event.containsKey("external_links"))
+
+        val externalLinks = event["external_links"]!!.jsonArray
+        assertEquals(1, externalLinks.size)
+
+        val externalLink = externalLinks[0].jsonObject
+        assertTrue(externalLink.containsKey("id"))
+        assertEquals("Call for Papers", externalLink["name"]!!.toString().removeSurrounding("\""))
+        assertEquals("https://sessionize.com/devlille2025", externalLink["url"]!!.toString().removeSurrounding("\""))
     }
 }

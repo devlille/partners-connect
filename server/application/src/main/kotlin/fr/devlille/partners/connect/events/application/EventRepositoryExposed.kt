@@ -1,12 +1,16 @@
 package fr.devlille.partners.connect.events.application
 
 import fr.devlille.partners.connect.events.domain.Contact
+import fr.devlille.partners.connect.events.domain.CreateEventExternalLinkRequest
 import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.domain.EventDisplay
+import fr.devlille.partners.connect.events.domain.EventExternalLink
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventSummary
 import fr.devlille.partners.connect.events.domain.EventWithOrganisation
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinkEntity
+import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinksTable
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
@@ -58,6 +62,17 @@ class EventRepositoryExposed(
         val eventEntity = entity.eventFindBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
 
+        // Fetch external links directly in the same transaction
+        val externalLinks = EventExternalLinkEntity.find {
+            EventExternalLinksTable.eventId eq eventEntity.id
+        }.map { linkEntity ->
+            EventExternalLink(
+                id = linkEntity.id.value.toString(),
+                name = linkEntity.name,
+                url = linkEntity.url,
+            )
+        }
+
         val event = EventDisplay(
             slug = eventEntity.slug,
             name = eventEntity.name,
@@ -67,6 +82,7 @@ class EventRepositoryExposed(
             submissionEndTime = eventEntity.submissionEndTime,
             address = eventEntity.address,
             contact = Contact(phone = eventEntity.contactPhone, email = eventEntity.contactEmail),
+            externalLinks = externalLinks,
         )
 
         val organisation = eventEntity.organisation.toItemDomain()
@@ -156,5 +172,40 @@ class EventRepositoryExposed(
             ?: throw NotFoundException("Event with slug $eventSlug not found")
 
         eventEntity.boothPlanImageUrl = imageUrl
+    }
+
+    override fun createExternalLink(
+        eventSlug: String,
+        request: CreateEventExternalLinkRequest,
+    ): EventExternalLink = transaction {
+        val eventEntity = entity.eventFindBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+
+        val externalLinkEntity = EventExternalLinkEntity.new {
+            this.event = eventEntity
+            this.name = request.name
+            this.url = request.url
+        }
+
+        EventExternalLink(
+            id = externalLinkEntity.id.value.toString(),
+            name = externalLinkEntity.name,
+            url = externalLinkEntity.url,
+        )
+    }
+
+    override fun findExternalLinksByEventSlug(eventSlug: String): List<EventExternalLink> = transaction {
+        val eventEntity = entity.eventFindBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+
+        EventExternalLinkEntity.find {
+            EventExternalLinksTable.eventId eq eventEntity.id
+        }.map { linkEntity ->
+            EventExternalLink(
+                id = linkEntity.id.value.toString(),
+                name = linkEntity.name,
+                url = linkEntity.url,
+            )
+        }
     }
 }
