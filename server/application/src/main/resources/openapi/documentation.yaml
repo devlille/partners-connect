@@ -1570,6 +1570,133 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Map_String"
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/communication/publication:
+    put:
+      description: "Schedule publication date for partnership communication"
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublicationDateRequest"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request - Invalid date format or missing parameters"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found - Partnership not found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK - Publication date scheduled successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicationDateResponse"
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/communication/support:
+    put:
+      description: "Upload visual support material for partnership communication"
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+          image/gif:
+            schema:
+              type: string
+              format: binary
+          image/svg+xml:
+            schema:
+              type: string
+              format: binary
+          image/webp:
+            schema:
+              type: string
+              format: binary
+        required: true
+      responses:
+        "400":
+          description: "Bad Request - Missing parameters or empty content"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found - Partnership not found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "415":
+          description: "Unsupported Media Type - Invalid image format"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK - Visual support uploaded successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupportUploadResponse"
   /orgs/{orgSlug}/users:
     get:
       description: ""
@@ -2297,3 +2424,37 @@ components:
       required:
         - "id"
         - "location"
+    PublicationDateRequest:
+      type: "object"
+      properties:
+        publication_date:
+          type: "string"
+          format: "date-time"
+          description: "Publication date in ISO 8601 format"
+      required:
+        - "publication_date"
+    PublicationDateResponse:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          description: "Partnership ID"
+        publication_date:
+          type: "string"
+          format: "date-time"
+          description: "Scheduled publication date in ISO 8601 format"
+      required:
+        - "id"
+        - "publication_date"
+    SupportUploadResponse:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          description: "Partnership ID"
+        url:
+          type: "string"
+          description: "URL of the uploaded visual support material"
+      required:
+        - "id"
+        - "url"

@@ -26,6 +26,8 @@ object PartnershipsTable : UUIDTable("partnerships") {
     val declinedAt = datetime("declined_at").nullable()
     val validatedAt = datetime("validated_at").nullable()
     val boothLocation = text("booth_location").nullable()
+    val communicationPublicationDate = datetime("communication_publication_date").nullable()
+    val communicationSupportUrl = text("communication_support_url").nullable()
     val createdAt = datetime("created_at").clientDefault {
         Clock.System.now().toLocalDateTime(TimeZone.UTC)
     }

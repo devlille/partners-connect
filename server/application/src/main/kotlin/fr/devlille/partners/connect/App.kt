@@ -26,6 +26,7 @@ import fr.devlille.partners.connect.organisations.infrastructure.bindings.organi
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipAgreementRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipBillingRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipBoothLocationRoutes
+import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipCommunicationRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipSuggestionRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipTicketingRoutes
@@ -134,6 +135,7 @@ fun Application.module(config: ApplicationConfig = ApplicationConfig()) {
         partnershipAgreementRoutes()
         partnershipBillingRoutes()
         partnershipBoothLocationRoutes()
+        partnershipCommunicationRoutes()
         partnershipRoutes()
         partnershipSuggestionRoutes()
         partnershipTicketingRoutes()
