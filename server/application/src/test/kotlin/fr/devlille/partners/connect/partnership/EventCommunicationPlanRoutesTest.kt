@@ -27,18 +27,18 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class EventCommunicationPlanRoutesTest {
-
     @Test
+    @Suppress("LongMethod") // Comprehensive test covering main functionality
     fun `GET communication plan returns grouped and sorted communications`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val eventSlug = "test-event-communication-plan"
-        
+
         val company1Id = UUID.randomUUID()
         val company2Id = UUID.randomUUID()
         val company3Id = UUID.randomUUID()
         val packId = UUID.randomUUID()
-        
+
         val partnership1Id = UUID.randomUUID()
         val partnership2Id = UUID.randomUUID()
         val partnership3Id = UUID.randomUUID()
@@ -53,10 +53,10 @@ class EventCommunicationPlanRoutesTest {
             insertMockedOrganisationEntity(orgId)
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
             insertMockedCompany(company1Id, "Alpha Company")
-            insertMockedCompany(company2Id, "Beta Company") 
+            insertMockedCompany(company2Id, "Beta Company")
             insertMockedCompany(company3Id, "Charlie Company")
             insertMockedSponsoringPack(packId, eventId, "Gold Pack")
-            
+
             // Partnership with past publication date (done)
             insertMockedPartnership(
                 id = partnership1Id,
@@ -64,9 +64,9 @@ class EventCommunicationPlanRoutesTest {
                 companyId = company1Id,
                 selectedPackId = packId,
                 communicationPublicationDate = pastDate,
-                communicationSupportUrl = "https://example.com/support1.png"
+                communicationSupportUrl = "https://example.com/support1.png",
             )
-            
+
             // Partnership with future publication date (planned)
             insertMockedPartnership(
                 id = partnership2Id,
@@ -74,9 +74,9 @@ class EventCommunicationPlanRoutesTest {
                 companyId = company2Id,
                 selectedPackId = packId,
                 communicationPublicationDate = futureDate,
-                communicationSupportUrl = "https://example.com/support2.jpg"
+                communicationSupportUrl = "https://example.com/support2.jpg",
             )
-            
+
             // Partnership with no publication date (unplanned)
             insertMockedPartnership(
                 id = partnership3Id,
@@ -84,7 +84,7 @@ class EventCommunicationPlanRoutesTest {
                 companyId = company3Id,
                 selectedPackId = packId,
                 communicationPublicationDate = null,
-                communicationSupportUrl = null
+                communicationSupportUrl = null,
             )
         }
 
@@ -95,7 +95,7 @@ class EventCommunicationPlanRoutesTest {
         assertEquals(HttpStatusCode.OK, response.status)
 
         val responseBody = Json.parseToJsonElement(response.bodyAsText()).jsonObject
-        
+
         // Check done group (past publications)
         val done = responseBody["done"]!!.jsonArray
         assertEquals(1, done.size)
@@ -104,16 +104,16 @@ class EventCommunicationPlanRoutesTest {
         assertEquals("Alpha Company", doneItem["company_name"]!!.jsonPrimitive.content)
         assertEquals("2023-05-15T10:30", doneItem["publication_date"]!!.jsonPrimitive.content)
         assertEquals("https://example.com/support1.png", doneItem["support_url"]!!.jsonPrimitive.content)
-        
+
         // Check planned group (future publications)
         val planned = responseBody["planned"]!!.jsonArray
         assertEquals(1, planned.size)
         val plannedItem = planned[0].jsonObject
         assertEquals(partnership2Id.toString(), plannedItem["partnership_id"]!!.jsonPrimitive.content)
         assertEquals("Beta Company", plannedItem["company_name"]!!.jsonPrimitive.content)
-        assertEquals("2025-12-25T15:45", plannedItem["publication_date"]!!.jsonPrimitive.content)
+        assertEquals("2030-12-25T15:45", plannedItem["publication_date"]!!.jsonPrimitive.content)
         assertEquals("https://example.com/support2.jpg", plannedItem["support_url"]!!.jsonPrimitive.content)
-        
+
         // Check unplanned group (no publication date)
         val unplanned = responseBody["unplanned"]!!.jsonArray
         assertEquals(1, unplanned.size)
@@ -129,7 +129,7 @@ class EventCommunicationPlanRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val eventSlug = "test-event-done-sorting"
-        
+
         val company1Id = UUID.randomUUID()
         val company2Id = UUID.randomUUID()
         val packId = UUID.randomUUID()
@@ -146,21 +146,21 @@ class EventCommunicationPlanRoutesTest {
             insertMockedCompany(company1Id, "Older Company")
             insertMockedCompany(company2Id, "Newer Company")
             insertMockedSponsoringPack(packId, eventId, "Pack")
-            
+
             insertMockedPartnership(
                 id = partnership1Id,
                 eventId = eventId,
                 companyId = company1Id,
                 selectedPackId = packId,
-                communicationPublicationDate = olderDate
+                communicationPublicationDate = olderDate,
             )
-            
+
             insertMockedPartnership(
                 id = partnership2Id,
                 eventId = eventId,
                 companyId = company2Id,
                 selectedPackId = packId,
-                communicationPublicationDate = newerDate
+                communicationPublicationDate = newerDate,
             )
         }
 
@@ -173,7 +173,7 @@ class EventCommunicationPlanRoutesTest {
         val responseBody = Json.parseToJsonElement(response.bodyAsText()).jsonObject
         val done = responseBody["done"]!!.jsonArray
         assertEquals(2, done.size)
-        
+
         // Should be sorted by publication date descending (newest first)
         assertEquals("Newer Company", done[0].jsonObject["company_name"]!!.jsonPrimitive.content)
         assertEquals("Older Company", done[1].jsonObject["company_name"]!!.jsonPrimitive.content)
@@ -184,7 +184,7 @@ class EventCommunicationPlanRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val eventSlug = "test-event-planned-sorting"
-        
+
         val company1Id = UUID.randomUUID()
         val company2Id = UUID.randomUUID()
         val packId = UUID.randomUUID()
@@ -201,21 +201,21 @@ class EventCommunicationPlanRoutesTest {
             insertMockedCompany(company1Id, "Later Company")
             insertMockedCompany(company2Id, "Earlier Company")
             insertMockedSponsoringPack(packId, eventId, "Pack")
-            
+
             insertMockedPartnership(
                 id = partnership1Id,
                 eventId = eventId,
                 companyId = company1Id,
                 selectedPackId = packId,
-                communicationPublicationDate = laterDate
+                communicationPublicationDate = laterDate,
             )
-            
+
             insertMockedPartnership(
                 id = partnership2Id,
                 eventId = eventId,
                 companyId = company2Id,
                 selectedPackId = packId,
-                communicationPublicationDate = earlierDate
+                communicationPublicationDate = earlierDate,
             )
         }
 
@@ -228,7 +228,7 @@ class EventCommunicationPlanRoutesTest {
         val responseBody = Json.parseToJsonElement(response.bodyAsText()).jsonObject
         val planned = responseBody["planned"]!!.jsonArray
         assertEquals(2, planned.size)
-        
+
         // Should be sorted by publication date ascending (earliest first)
         assertEquals("Earlier Company", planned[0].jsonObject["company_name"]!!.jsonPrimitive.content)
         assertEquals("Later Company", planned[1].jsonObject["company_name"]!!.jsonPrimitive.content)
@@ -239,7 +239,7 @@ class EventCommunicationPlanRoutesTest {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val eventSlug = "test-event-unplanned-sorting"
-        
+
         val company1Id = UUID.randomUUID()
         val company2Id = UUID.randomUUID()
         val packId = UUID.randomUUID()
@@ -253,21 +253,21 @@ class EventCommunicationPlanRoutesTest {
             insertMockedCompany(company1Id, "Zebra Company")
             insertMockedCompany(company2Id, "Alpha Company")
             insertMockedSponsoringPack(packId, eventId, "Pack")
-            
+
             insertMockedPartnership(
                 id = partnership1Id,
                 eventId = eventId,
                 companyId = company1Id,
                 selectedPackId = packId,
-                communicationPublicationDate = null
+                communicationPublicationDate = null,
             )
-            
+
             insertMockedPartnership(
                 id = partnership2Id,
                 eventId = eventId,
                 companyId = company2Id,
                 selectedPackId = packId,
-                communicationPublicationDate = null
+                communicationPublicationDate = null,
             )
         }
 
@@ -280,7 +280,7 @@ class EventCommunicationPlanRoutesTest {
         val responseBody = Json.parseToJsonElement(response.bodyAsText()).jsonObject
         val unplanned = responseBody["unplanned"]!!.jsonArray
         assertEquals(2, unplanned.size)
-        
+
         // Should be sorted by company name ascending (alphabetically)
         assertEquals("Alpha Company", unplanned[0].jsonObject["company_name"]!!.jsonPrimitive.content)
         assertEquals("Zebra Company", unplanned[1].jsonObject["company_name"]!!.jsonPrimitive.content)
@@ -327,10 +327,14 @@ class EventCommunicationPlanRoutesTest {
     @Test
     fun `GET communication plan returns 404 for non-existent event`() = testApplication {
         val orgId = UUID.randomUUID()
+        val validEventId = UUID.randomUUID()
         val eventSlug = "non-existent-event"
 
         application {
             moduleMocked()
+            // Set up organization and user with proper permissions, but with a different event
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(validEventId, orgId, "existing-event")
         }
 
         val response = client.get("/orgs/$orgId/events/$eventSlug/communication") {
