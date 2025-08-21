@@ -8,6 +8,7 @@ import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
+import io.ktor.server.routing.delete
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
@@ -26,12 +27,19 @@ fun Route.eventProviderRoutes() {
             // Validate and convert provider IDs
             val providerIds = providerIdStrings.map { it.toUUID() }
 
-            if (providerIds.isEmpty()) {
-                throw BadRequestException("Provider IDs list cannot be empty")
-            }
-
             val attachedIds = providerRepository.attachToEvent(eventSlug, providerIds)
             call.respond(HttpStatusCode.OK, attachedIds.map { it.toString() })
+        }
+
+        delete {
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val providerIdStrings = call.receive<List<String>>()
+
+            // Validate and convert provider IDs
+            val providerIds = providerIdStrings.map { it.toUUID() }
+
+            val detachedIds = providerRepository.detachFromEvent(eventSlug, providerIds)
+            call.respond(HttpStatusCode.OK, detachedIds.map { it.toString() })
         }
     }
 }

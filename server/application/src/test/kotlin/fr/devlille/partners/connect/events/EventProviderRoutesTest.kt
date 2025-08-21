@@ -39,14 +39,14 @@ class EventProviderRoutesTest {
             insertMockedOrganisationEntity(id = orgId, name = testOrgSlug, representativeUser = admin)
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug, name = "Test Event")
             insertMockedOrgaPermission(orgId = orgId, user = admin)
-            
+
             val provider1 = insertMockedProvider(name = "Provider 1")
             val provider2 = insertMockedProvider(name = "Provider 2")
         }
 
         val providerIds = listOf(
             insertMockedProvider(name = "Provider A").id.value.toString(),
-            insertMockedProvider(name = "Provider B").id.value.toString()
+            insertMockedProvider(name = "Provider B").id.value.toString(),
         )
 
         val response = client.post("/orgs/$testOrgSlug/events/$testEventSlug/providers") {
@@ -65,7 +65,7 @@ class EventProviderRoutesTest {
     fun `POST fails with 401 when not authenticated`() = testApplication {
         val testOrgSlug = "test-org"
         val testEventSlug = "test-event"
-        
+
         application { moduleMocked() }
 
         val response = client.post("/orgs/$testOrgSlug/events/$testEventSlug/providers") {
@@ -141,7 +141,7 @@ class EventProviderRoutesTest {
 
         val nonExistentIds = listOf(
             UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
+            UUID.randomUUID().toString(),
         )
 
         val response = client.post("/orgs/$testOrgSlug/events/$testEventSlug/providers") {
@@ -217,7 +217,7 @@ class EventProviderRoutesTest {
             insertMockedOrganisationEntity(id = orgId, name = testOrgSlug, representativeUser = admin)
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug, name = "Test Event")
             insertMockedOrgaPermission(orgId = orgId, user = admin)
-            
+
             val provider = insertMockedProvider(name = "Provider")
         }
 

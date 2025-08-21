@@ -3,7 +3,6 @@ package fr.devlille.partners.connect.provider
 import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
-import fr.devlille.partners.connect.provider.domain.CreateProvider
 import fr.devlille.partners.connect.provider.factories.createMockedProviderInput
 import fr.devlille.partners.connect.provider.factories.insertMockedProvider
 import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
@@ -64,7 +63,7 @@ class ProviderRoutesTest {
     fun `POST providers creates provider successfully when user is organizer`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        
+
         application {
             moduleMocked()
             val admin = insertMockedAdminUser()
@@ -78,7 +77,7 @@ class ProviderRoutesTest {
             type = "Technology",
             website = "https://newprovider.com",
             phone = "+33987654321",
-            email = "contact@newprovider.com"
+            email = "contact@newprovider.com",
         )
 
         val response = client.post("/providers") {
@@ -133,7 +132,7 @@ class ProviderRoutesTest {
     fun `POST providers fails with 400 for invalid request body`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        
+
         application {
             moduleMocked()
             val admin = insertMockedAdminUser()

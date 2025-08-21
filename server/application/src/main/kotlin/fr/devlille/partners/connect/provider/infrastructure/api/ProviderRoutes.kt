@@ -23,8 +23,11 @@ fun Route.providerRoutes() {
 
     route("/providers") {
         get {
-            // Public endpoint - no authentication required
-            val providers = providerRepository.list()
+            val sort = call.request.queryParameters["sort"]
+            val direction = call.request.queryParameters["direction"]
+            val query = call.request.queryParameters["query"]
+
+            val providers = providerRepository.list(sort, direction, query)
             call.respond(HttpStatusCode.OK, providers)
         }
 
@@ -40,8 +43,8 @@ fun Route.providerRoutes() {
             }
 
             val input = call.receive<CreateProvider>()
-            val provider = providerRepository.create(input)
-            call.respond(HttpStatusCode.Created, provider)
+            val providerId = providerRepository.create(input)
+            call.respond(HttpStatusCode.Created, mapOf("id" to providerId))
         }
     }
 }
