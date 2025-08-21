@@ -6,6 +6,7 @@ import fr.devlille.partners.connect.auth.infrastructure.plugins.configureSecurit
 import fr.devlille.partners.connect.billing.infrastructure.bindings.billingModule
 import fr.devlille.partners.connect.companies.infrastructure.api.companyRoutes
 import fr.devlille.partners.connect.companies.infrastructure.bindings.companyModule
+import fr.devlille.partners.connect.events.infrastructure.api.eventBoothPlanRoutes
 import fr.devlille.partners.connect.events.infrastructure.api.eventRoutes
 import fr.devlille.partners.connect.events.infrastructure.bindings.eventModule
 import fr.devlille.partners.connect.integrations.infrastructure.api.integrationRoutes
@@ -24,6 +25,7 @@ import fr.devlille.partners.connect.organisations.infrastructure.api.organisatio
 import fr.devlille.partners.connect.organisations.infrastructure.bindings.organisationModule
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipAgreementRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipBillingRoutes
+import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipBoothLocationRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipCommunicationRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipSuggestionRoutes
@@ -126,11 +128,13 @@ fun Application.module(config: ApplicationConfig = ApplicationConfig()) {
         }
         organisationRoutes()
         eventRoutes()
+        eventBoothPlanRoutes()
         userRoutes()
         sponsoringRoutes()
         companyRoutes()
         partnershipAgreementRoutes()
         partnershipBillingRoutes()
+        partnershipBoothLocationRoutes()
         partnershipCommunicationRoutes()
         partnershipRoutes()
         partnershipSuggestionRoutes()

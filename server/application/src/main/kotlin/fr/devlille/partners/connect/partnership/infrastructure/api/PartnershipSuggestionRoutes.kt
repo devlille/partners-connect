@@ -18,7 +18,7 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
-@Suppress("ThrowsCount")
+@Suppress("ThrowsCount", "LongMethod")
 fun Route.partnershipSuggestionRoutes() {
     val eventRepository by inject<EventRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
@@ -33,8 +33,13 @@ fun Route.partnershipSuggestionRoutes() {
             val id = suggestionRepository.approve(eventSlug, partnershipId)
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
-            val event = eventRepository.getBySlug(eventSlug).event
-            val variables = NotificationVariables.SuggestionApproved(partnership.language, event, company)
+            val event = eventRepository.getBySlug(eventSlug)
+            val variables = NotificationVariables.SuggestionApproved(
+                partnership.language,
+                event,
+                company,
+                partnership,
+            )
             notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
         }
@@ -46,8 +51,13 @@ fun Route.partnershipSuggestionRoutes() {
             val id = suggestionRepository.decline(eventSlug, partnershipId)
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
-            val event = eventRepository.getBySlug(eventSlug).event
-            val variables = NotificationVariables.SuggestionDeclined(partnership.language, event, company)
+            val event = eventRepository.getBySlug(eventSlug)
+            val variables = NotificationVariables.SuggestionDeclined(
+                partnership.language,
+                event,
+                company,
+                partnership,
+            )
             notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
         }
@@ -56,6 +66,7 @@ fun Route.partnershipSuggestionRoutes() {
     route("/orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}") {
         install(AuthorizedOrganisationPlugin)
 
+        @Suppress("ThrowsCount")
         post("/suggestion") {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
@@ -66,8 +77,14 @@ fun Route.partnershipSuggestionRoutes() {
             val pack = partnership.suggestionPack
                 ?: throw NotFoundException("Partnership does not have a suggestion pack")
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
-            val event = eventRepository.getBySlug(eventSlug).event
-            val variables = NotificationVariables.NewSuggestion(input.language, event, company, pack)
+            val event = eventRepository.getBySlug(eventSlug)
+            val variables = NotificationVariables.NewSuggestion(
+                input.language,
+                event,
+                company,
+                partnership,
+                pack,
+            )
             notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
         }

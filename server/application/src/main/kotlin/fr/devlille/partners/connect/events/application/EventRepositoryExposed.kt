@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.events.application
 
 import fr.devlille.partners.connect.events.domain.Contact
 import fr.devlille.partners.connect.events.domain.Event
+import fr.devlille.partners.connect.events.domain.EventDisplay
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventSummary
 import fr.devlille.partners.connect.events.domain.EventWithOrganisation
@@ -9,7 +10,7 @@ import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
-import fr.devlille.partners.connect.organisations.application.mappers.toDomain
+import fr.devlille.partners.connect.organisations.application.mappers.toItemDomain
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionEntity
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionsTable
@@ -57,7 +58,8 @@ class EventRepositoryExposed(
         val eventEntity = entity.eventFindBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
 
-        val event = Event(
+        val event = EventDisplay(
+            slug = eventEntity.slug,
             name = eventEntity.name,
             startTime = eventEntity.startTime,
             endTime = eventEntity.endTime,
@@ -67,7 +69,7 @@ class EventRepositoryExposed(
             contact = Contact(phone = eventEntity.contactPhone, email = eventEntity.contactEmail),
         )
 
-        val organisation = eventEntity.organisation.toDomain()
+        val organisation = eventEntity.organisation.toItemDomain()
 
         EventWithOrganisation(
             event = event,
@@ -147,5 +149,12 @@ class EventRepositoryExposed(
             }
         }
         events
+    }
+
+    override fun updateBoothPlanImageUrl(eventSlug: String, imageUrl: String): Unit = transaction {
+        val eventEntity = entity.eventFindBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+
+        eventEntity.boothPlanImageUrl = imageUrl
     }
 }

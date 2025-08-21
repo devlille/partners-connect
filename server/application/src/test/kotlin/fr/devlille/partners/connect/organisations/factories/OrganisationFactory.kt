@@ -2,6 +2,8 @@ package fr.devlille.partners.connect.organisations.factories
 
 import fr.devlille.partners.connect.internal.mockedAdminUser
 import fr.devlille.partners.connect.organisations.domain.Organisation
+import fr.devlille.partners.connect.organisations.domain.OrganisationItem
+import fr.devlille.partners.connect.organisations.domain.Owner
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -67,4 +69,20 @@ fun createFullOrganisation(
     creationLocation = "Lille",
     createdAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
     publishedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
+)
+
+fun createOrganisationItem(
+    name: String = "DevLille Org",
+    slug: String = "devlille-org",
+    headOffice: String = "123 rue de la République, Lille, France",
+    displayName: String = "Test User",
+    email: String = mockedAdminUser.email,
+): OrganisationItem = OrganisationItem(
+    name = name,
+    slug = slug,
+    headOffice = headOffice,
+    owner = Owner(
+        displayName = displayName,
+        email = email,
+    ),
 )

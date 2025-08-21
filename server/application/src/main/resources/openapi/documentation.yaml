@@ -725,6 +725,64 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Map_String"
+  /orgs/{orgSlug}/events/{eventSlug}/booth-plan:
+    post:
+      description: "Upload booth plan image for an event"
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: "Booth plan image file (PNG, JPEG, GIF)"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request - Invalid event slug or missing file"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "415":
+          description: "Unsupported Media Type - Invalid file format"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created - Booth plan image uploaded successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    description: "URL of the uploaded booth plan image"
+                required:
+                  - "url"
   /orgs/{orgSlug}/events/{eventSlug}/integrations/{provider}/{usage}:
     post:
       description: "Register an integration for an event"
@@ -1330,6 +1388,64 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Map_String"
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/booth-location:
+    put:
+      description: "Assign booth location to a partnership"
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BoothLocationRequest"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request - Invalid parameters or empty location"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "403":
+          description: "Forbidden - Booth location already assigned to another partnership"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found - Partnership or event not found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK - Booth location assigned successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoothLocationResponse"
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/suggestion:
     post:
       description: ""
@@ -1909,6 +2025,38 @@ components:
         - "submission_end_time"
         - "address"
         - "contact"
+    EventDisplay:
+      type: "object"
+      properties:
+        slug:
+          type: "string"
+        name:
+          type: "string"
+        start_time:
+          type: "string"
+          format: "date-time"
+        end_time:
+          type: "string"
+          format: "date-time"
+        submission_start_time:
+          type: "string"
+          format: "date-time"
+        submission_end_time:
+          type: "string"
+          format: "date-time"
+        address:
+          type: "string"
+        contact:
+          $ref: "#/components/schemas/EventContact"
+      required:
+        - "slug"
+        - "name"
+        - "start_time"
+        - "end_time"
+        - "submission_start_time"
+        - "submission_end_time"
+        - "address"
+        - "contact"
     EventContact:
       type: "object"
       properties:
@@ -1982,9 +2130,9 @@ components:
       type: "object"
       properties:
         event:
-          $ref: "#/components/schemas/Event"
+          $ref: "#/components/schemas/EventDisplay"
         organisation:
-          $ref: "#/components/schemas/Organisation"
+          $ref: "#/components/schemas/OrganisationItem"
       required:
         - "event"
         - "organisation"
@@ -2256,6 +2404,26 @@ components:
         - "slug"
         - "headOffice"
         - "owner"
+    BoothLocationRequest:
+      type: "object"
+      properties:
+        location:
+          type: "string"
+          description: "The booth location identifier or name"
+      required:
+        - "location"
+    BoothLocationResponse:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          description: "The partnership ID"
+        location:
+          type: "string"
+          description: "The assigned booth location"
+      required:
+        - "id"
+        - "location"
     PublicationDateRequest:
       type: "object"
       properties:

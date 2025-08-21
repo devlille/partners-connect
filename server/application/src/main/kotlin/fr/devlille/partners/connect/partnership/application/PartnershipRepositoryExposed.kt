@@ -5,6 +5,7 @@ import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.application.mappers.toDomain
 import fr.devlille.partners.connect.partnership.domain.Contact
@@ -36,6 +37,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
@@ -270,6 +272,33 @@ class PartnershipRepositoryExposed(
     private fun findPartnership(eventId: UUID, partnershipId: UUID): PartnershipEntity = partnershipEntity
         .singleByEventAndPartnership(eventId, partnershipId)
         ?: throw NotFoundException("Partnership not found")
+
+    override fun updateBoothLocation(
+        eventSlug: String,
+        partnershipId: UUID,
+        location: String,
+    ): Unit = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+
+        // Check if location is already taken by another partnership for this event
+        val existingPartnership = partnershipEntity.find {
+            (PartnershipsTable.eventId eq event.id) and
+                (PartnershipsTable.boothLocation eq location) and
+                (PartnershipsTable.id neq partnershipId)
+        }.firstOrNull()
+
+        if (existingPartnership != null) {
+            val companyName = existingPartnership.company.name
+            throw ForbiddenException(
+                "Location '$location' is already assigned to another partnership " +
+                    "for this event by company '$companyName'",
+            )
+        }
+
+        val partnership = findPartnership(event.id.value, partnershipId)
+        partnership.boothLocation = location
+    }
 
     override fun updateCommunicationPublicationDate(
         eventSlug: String,

@@ -24,6 +24,8 @@ interface PartnershipRepository {
 
     fun listByCompany(companyId: UUID): List<PartnershipItem>
 
+    fun updateBoothLocation(eventSlug: String, partnershipId: UUID, location: String)
+
     fun updateCommunicationPublicationDate(
         eventSlug: String,
         partnershipId: UUID,

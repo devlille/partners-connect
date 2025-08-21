@@ -12,4 +12,6 @@ interface EventRepository {
     fun updateEvent(eventSlug: String, orgSlug: String, event: Event): String
 
     fun findByUserEmail(userEmail: String): List<EventSummary>
+
+    fun updateBoothPlanImageUrl(eventSlug: String, imageUrl: String)
 }

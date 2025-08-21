@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.internal.infrastructure.migrations
 
+import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddBoothManagementFieldsMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPartnershipCommunicationFieldsMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.InitialSchemaMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.MakeOrganisationFieldsNullableMigration
@@ -16,6 +17,7 @@ object MigrationRegistry {
     val allMigrations: List<Migration> = listOf(
         InitialSchemaMigration,
         MakeOrganisationFieldsNullableMigration,
+        AddBoothManagementFieldsMigration,
         AddPartnershipCommunicationFieldsMigration,
     )
 

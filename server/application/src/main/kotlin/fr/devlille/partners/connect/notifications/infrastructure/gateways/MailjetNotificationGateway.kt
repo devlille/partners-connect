@@ -55,9 +55,9 @@ class MailjetNotificationGateway(
         val body = MailjetBody(
             messages = listOf(
                 Message(
-                    from = Contact(email = variables.event.contact.email, name = variables.event.name),
+                    from = Contact(email = variables.event.event.contact.email, name = variables.event.event.name),
                     to = emails.map { Contact(email = it.email) },
-                    subject = "[${variables.event.name}] $subject",
+                    subject = "[${variables.event.event.name}] $subject",
                     htmlPart = htmlPart,
                 ),
             ),

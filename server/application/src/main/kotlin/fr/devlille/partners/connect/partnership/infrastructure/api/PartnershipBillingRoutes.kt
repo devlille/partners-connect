@@ -61,7 +61,7 @@ fun Route.partnershipBillingRoutes() {
                 ?: throw BadRequestException("Missing partnership id")
             val invoiceUrl = billingRepository.createInvoice(eventSlug, partnershipId)
             partnershipBillingRepository.updateInvoiceUrl(eventSlug, partnershipId, invoiceUrl)
-            val event = eventRepository.getBySlug(eventSlug).event
+            val event = eventRepository.getBySlug(eventSlug)
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             val variables = NotificationVariables.NewInvoice(partnership.language, event, company)
@@ -74,7 +74,7 @@ fun Route.partnershipBillingRoutes() {
                 ?: throw BadRequestException("Missing partnership id")
             val quoteUrl = billingRepository.createQuote(eventSlug, partnershipId)
             partnershipBillingRepository.updateQuoteUrl(eventSlug, partnershipId, quoteUrl)
-            val event = eventRepository.getBySlug(eventSlug).event
+            val event = eventRepository.getBySlug(eventSlug)
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             val variables = NotificationVariables.NewInvoice(partnership.language, event, company)
