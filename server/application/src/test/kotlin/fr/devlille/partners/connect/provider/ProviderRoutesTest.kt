@@ -6,7 +6,6 @@ import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisa
 import fr.devlille.partners.connect.provider.domain.CreateProvider
 import fr.devlille.partners.connect.provider.factories.createMockedProviderInput
 import fr.devlille.partners.connect.provider.factories.insertMockedProvider
-import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
 import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
 import fr.devlille.partners.connect.users.factories.insertMockedUser
 import io.ktor.client.request.get
@@ -112,7 +111,7 @@ class ProviderRoutesTest {
     }
 
     @Test
-    fun `POST providers fails with 403 when user is not organizer`() = testApplication {
+    fun `POST providers fails with 401 when user has no organizer permissions`() = testApplication {
         val userId = UUID.randomUUID()
         val email = "john.doe@contact.com" // Must match the mock auth email
 
@@ -129,8 +128,8 @@ class ProviderRoutesTest {
             setBody(Json.encodeToString(CreateProvider.serializer(), providerInput))
         }
 
-        assertEquals(HttpStatusCode.Forbidden, response.status)
-        assertTrue(response.bodyAsText().contains("organizer"))
+        assertEquals(HttpStatusCode.Unauthorized, response.status)
+        assertTrue(response.bodyAsText().contains("organizer permissions"))
     }
 
     @Test

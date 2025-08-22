@@ -4,7 +4,6 @@ import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.provider.factories.insertMockedProvider
-import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
 import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
 import fr.devlille.partners.connect.users.factories.insertMockedUser
 import io.ktor.client.request.header
@@ -34,7 +33,7 @@ class EventProviderRoutesTest {
         val testOrgSlug = "test-org"
         val testEventSlug = "test-event"
         val email = "john.doe@contact.com" // Must match the mock auth email
-        
+
         // Use fixed provider IDs to avoid scoping issues
         val provider1Id = UUID.randomUUID()
         val provider2Id = UUID.randomUUID()
@@ -226,7 +225,7 @@ class EventProviderRoutesTest {
         val testOrgSlug = "test-org"
         val testEventSlug = "test-event"
         val email = "john.doe@contact.com" // Must match the mock auth email
-        
+
         // Use fixed provider ID to avoid scoping issues
         val providerId = UUID.randomUUID()
 
@@ -239,7 +238,7 @@ class EventProviderRoutesTest {
 
             insertMockedProvider(id = providerId, name = "Test Provider")
         }
-        
+
         val providerIds = listOf(providerId.toString())
 
         // First attachment
