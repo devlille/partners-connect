@@ -9,7 +9,7 @@ import org.koin.dsl.module
 
 val eventModule = module {
     single<EventRepository> {
-        EventRepositoryExposed(EventEntity)
+        EventRepositoryExposed(EventEntity, get())
     }
     single<EventStorageRepository> {
         EventStorageRepositoryGoogleStorage(get())

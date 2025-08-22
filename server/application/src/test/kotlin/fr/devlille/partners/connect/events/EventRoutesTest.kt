@@ -4,10 +4,14 @@ import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.factories.createEvent
 import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.events.factories.insertMockedEventWithOrga
+import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
+import fr.devlille.partners.connect.provider.factories.insertMockedProvider
 import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
 import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
+import fr.devlille.partners.connect.users.factories.insertMockedUser
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -370,5 +374,96 @@ class EventRoutesTest {
         assertTrue(externalLink.containsKey("id"))
         assertEquals("Call for Papers", externalLink["name"]!!.toString().removeSurrounding("\""))
         assertEquals("https://sessionize.com/devlille2025", externalLink["url"]!!.toString().removeSurrounding("\""))
+    }
+
+    @Test
+    fun `GET event by slug returns empty providers array when no providers attached`() = testApplication {
+        val eventId = UUID.randomUUID()
+        val eventSlug = "test-event-no-providers"
+        application {
+            moduleMocked()
+            val admin = insertMockedAdminUser()
+            val org = insertMockedOrganisationEntity(representativeUser = admin)
+            insertMockedEventWithOrga(id = eventId, slug = eventSlug, organisation = org)
+        }
+
+        val response = client.get("/events/$eventSlug")
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val responseBody = response.bodyAsText()
+        val responseJson = Json.parseToJsonElement(responseBody).jsonObject
+
+        // Verify top-level structure
+        assertTrue(responseJson.containsKey("event"))
+        val event = responseJson["event"]!!.jsonObject
+
+        // Verify providers field exists and is empty
+        assertTrue(event.containsKey("providers"))
+        val providers = event["providers"]!!.jsonArray
+        assertEquals(0, providers.size)
+    }
+
+    @Test
+    fun `GET event by slug returns providers array when providers attached`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val testOrgSlug = "test-org"
+        val eventSlug = "test-event-with-providers"
+        val provider1Id = UUID.randomUUID()
+        val provider2Id = UUID.randomUUID()
+        val email = "john.doe@contact.com" // Must match the mock auth email
+
+        application {
+            moduleMocked()
+            val user = insertMockedUser(userId, email = email)
+            insertMockedOrganisationEntity(id = orgId, name = testOrgSlug)
+            insertMockedEventWithOrga(id = eventId, slug = eventSlug, organisation = insertMockedOrganisationEntity(id = orgId, name = testOrgSlug))
+            insertMockedOrgaPermission(orgId = orgId, user = user, canEdit = true)
+            
+            // Create providers
+            insertMockedProvider(id = provider1Id, name = "Provider A", type = "Technology")
+            insertMockedProvider(id = provider2Id, name = "Provider B", type = "Consulting")
+        }
+
+        // Attach providers to event using the API endpoint
+        val providerIds = listOf(provider1Id.toString(), provider2Id.toString())
+        val attachResponse = client.post("/orgs/$testOrgSlug/events/$eventSlug/providers") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(json.encodeToString(providerIds))
+        }
+
+        // The attachment should succeed
+        assertEquals(HttpStatusCode.OK, attachResponse.status)
+
+        // Now test that GET returns the providers
+        val response = client.get("/events/$eventSlug")
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val responseBody = response.bodyAsText()
+        val responseJson = Json.parseToJsonElement(responseBody).jsonObject
+
+        // Verify top-level structure
+        assertTrue(responseJson.containsKey("event"))
+        val event = responseJson["event"]!!.jsonObject
+
+        // Verify providers field exists and has correct data
+        assertTrue(event.containsKey("providers"))
+        val providers = event["providers"]!!.jsonArray
+        assertEquals(2, providers.size)
+
+        // Verify provider structure
+        val provider1 = providers.find { 
+            it.jsonObject["name"]!!.toString().removeSurrounding("\"") == "Provider A" 
+        }?.jsonObject
+        assertNotNull(provider1)
+        assertEquals("Technology", provider1["type"]!!.toString().removeSurrounding("\""))
+
+        val provider2 = providers.find { 
+            it.jsonObject["name"]!!.toString().removeSurrounding("\"") == "Provider B" 
+        }?.jsonObject
+        assertNotNull(provider2)
+        assertEquals("Consulting", provider2["type"]!!.toString().removeSurrounding("\""))
     }
 }

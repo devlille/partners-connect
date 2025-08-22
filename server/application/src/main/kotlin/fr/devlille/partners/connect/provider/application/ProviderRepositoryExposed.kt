@@ -136,4 +136,29 @@ class ProviderRepositoryExposed : ProviderRepository {
 
         detachedIds
     }
+
+    override fun findProvidersByEventSlug(eventSlug: String): List<Provider> = transaction {
+        val eventEntity = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+
+        val providerEntities = EventProviderEntity.find {
+            EventProvidersTable.eventId eq eventEntity.id
+        }.map { it.providerId }.let { providerIds ->
+            ProviderEntity.find {
+                ProvidersTable.id inList providerIds
+            }
+        }.toList()
+
+        providerEntities.map { entity ->
+            Provider(
+                id = entity.id.value.toString(),
+                name = entity.name,
+                type = entity.type,
+                website = entity.website,
+                phone = entity.phone,
+                email = entity.email,
+                createdAt = entity.createdAt,
+            )
+        }
+    }
 }

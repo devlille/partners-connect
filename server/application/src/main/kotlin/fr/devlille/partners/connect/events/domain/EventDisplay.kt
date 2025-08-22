@@ -20,4 +20,5 @@ data class EventDisplay(
     val contact: Contact,
     @SerialName("external_links")
     val externalLinks: List<EventExternalLink>,
+    val providers: List<fr.devlille.partners.connect.provider.domain.Provider>,
 )

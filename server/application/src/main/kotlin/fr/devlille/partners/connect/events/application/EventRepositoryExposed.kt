@@ -31,6 +31,7 @@ import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug a
 
 class EventRepositoryExposed(
     private val entity: UUIDEntityClass<EventEntity>,
+    private val providerRepository: fr.devlille.partners.connect.provider.domain.ProviderRepository,
 ) : EventRepository {
     override fun getAllEvents(): List<EventSummary> = transaction {
         entity.all().map {
@@ -75,6 +76,9 @@ class EventRepositoryExposed(
             )
         }
 
+        // Fetch providers attached to this event
+        val providers = providerRepository.findProvidersByEventSlug(eventSlug)
+
         val event = EventDisplay(
             slug = eventEntity.slug,
             name = eventEntity.name,
@@ -85,6 +89,7 @@ class EventRepositoryExposed(
             address = eventEntity.address,
             contact = Contact(phone = eventEntity.contactPhone, email = eventEntity.contactEmail),
             externalLinks = externalLinks,
+            providers = providers,
         )
 
         val organisation = eventEntity.organisation.toItemDomain()
