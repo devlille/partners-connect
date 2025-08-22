@@ -19,5 +19,5 @@ data class EventDisplay(
     val address: String,
     val contact: Contact,
     @SerialName("external_links")
-    val externalLinks: List<EventExternalLink> = emptyList(),
+    val externalLinks: List<EventExternalLink>,
 )

@@ -193,7 +193,6 @@ private fun Application.configureContentNegotiation() {
             Json {
                 ignoreUnknownKeys = true
                 prettyPrint = true
-                encodeDefaults = true
             },
         )
     }
