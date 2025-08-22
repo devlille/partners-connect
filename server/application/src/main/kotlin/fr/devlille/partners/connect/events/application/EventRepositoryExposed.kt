@@ -66,11 +66,17 @@ class EventRepositoryExposed(
         }
     }
 
-    override fun findByOrgSlugPaginated(orgSlug: String, page: Int, pageSize: Int): PaginatedResponse<EventSummary> = transaction {
+    override fun findByOrgSlugPaginated(
+        orgSlug: String,
+        page: Int,
+        pageSize: Int
+    ): PaginatedResponse<EventSummary> = transaction {
         val organisation = OrganisationEntity.orgFindBySlug(orgSlug)
             ?: throw NotFoundException("Organisation with slug $orgSlug not found")
         val orgId = organisation.id
-        val eventQuery = EventsTable.selectAll().where { EventsTable.organisationId eq orgId }
+        val eventQuery = EventsTable.selectAll().where {
+            EventsTable.organisationId eq orgId
+        }
         val total = eventQuery.count()
         val offset = (page - 1) * pageSize
         val rows = eventQuery
@@ -86,7 +92,7 @@ class EventRepositoryExposed(
                 startTime = eventEntity.startTime,
                 endTime = eventEntity.endTime,
                 submissionStartTime = eventEntity.submissionStartTime,
-                submissionEndTime = eventEntity.submissionEndTime,
+                submissionEndTime = eventEntity.submissionEndTime
             )
         }
         PaginatedResponse(
