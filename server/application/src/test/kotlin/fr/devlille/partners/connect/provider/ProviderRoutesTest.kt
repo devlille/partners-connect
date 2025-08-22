@@ -43,11 +43,9 @@ class ProviderRoutesTest {
     fun `GET providers returns all providers`() = testApplication {
         application {
             moduleMocked()
-            @Suppress("UnusedPrivateProperty")
-            val provider1 = insertMockedProvider(name = "Provider 1", type = "Tech")
+            insertMockedProvider(name = "Provider 1", type = "Tech")
 
-            @Suppress("UnusedPrivateProperty")
-            val provider2 = insertMockedProvider(name = "Provider 2", type = "Catering")
+            insertMockedProvider(name = "Provider 2", type = "Catering")
         }
 
         val response = client.get("/providers")

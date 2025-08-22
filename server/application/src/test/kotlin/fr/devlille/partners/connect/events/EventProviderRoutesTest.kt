@@ -40,11 +40,9 @@ class EventProviderRoutesTest {
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug, name = "Test Event")
             insertMockedOrgaPermission(orgId = orgId, user = admin)
 
-            @Suppress("UnusedPrivateProperty")
-            val provider1 = insertMockedProvider(name = "Provider 1")
+            insertMockedProvider(name = "Provider 1")
 
-            @Suppress("UnusedPrivateProperty")
-            val provider2 = insertMockedProvider(name = "Provider 2")
+            insertMockedProvider(name = "Provider 2")
         }
 
         val providerIds = listOf(
@@ -88,8 +86,7 @@ class EventProviderRoutesTest {
 
         application {
             moduleMocked()
-            @Suppress("UnusedPrivateProperty")
-            val regularUser = insertMockedUser()
+            insertMockedUser()
             insertMockedOrganisationEntity(id = orgId, name = testOrgSlug)
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug)
             // No permission granted to regular user
@@ -222,8 +219,7 @@ class EventProviderRoutesTest {
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug, name = "Test Event")
             insertMockedOrgaPermission(orgId = orgId, user = admin)
 
-            @Suppress("UnusedPrivateProperty")
-            val provider = insertMockedProvider(name = "Provider")
+            insertMockedProvider(name = "Provider")
         }
 
         val providerId = insertMockedProvider(name = "Test Provider").id.value.toString()
