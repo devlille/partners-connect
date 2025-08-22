@@ -1,5 +1,7 @@
 package fr.devlille.partners.connect.events.domain
 
+import java.util.UUID
+
 interface EventRepository {
     fun getAllEvents(): List<EventSummary>
 
@@ -14,4 +16,8 @@ interface EventRepository {
     fun findByUserEmail(userEmail: String): List<EventSummary>
 
     fun updateBoothPlanImageUrl(eventSlug: String, imageUrl: String)
+
+    fun createExternalLink(eventSlug: String, request: CreateEventExternalLinkRequest): UUID
+
+    fun deleteExternalLink(externalLinkId: UUID)
 }

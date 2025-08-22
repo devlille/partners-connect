@@ -7,6 +7,7 @@ import fr.devlille.partners.connect.billing.infrastructure.bindings.billingModul
 import fr.devlille.partners.connect.companies.infrastructure.api.companyRoutes
 import fr.devlille.partners.connect.companies.infrastructure.bindings.companyModule
 import fr.devlille.partners.connect.events.infrastructure.api.eventBoothPlanRoutes
+import fr.devlille.partners.connect.events.infrastructure.api.eventExternalLinkRoutes
 import fr.devlille.partners.connect.events.infrastructure.api.eventRoutes
 import fr.devlille.partners.connect.events.infrastructure.bindings.eventModule
 import fr.devlille.partners.connect.integrations.infrastructure.api.integrationRoutes
@@ -130,6 +131,7 @@ fun Application.module(config: ApplicationConfig = ApplicationConfig()) {
         organisationRoutes()
         eventRoutes()
         eventBoothPlanRoutes()
+        eventExternalLinkRoutes()
         userRoutes()
         sponsoringRoutes()
         companyRoutes()

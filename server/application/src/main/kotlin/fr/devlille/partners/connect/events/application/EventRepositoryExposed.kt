@@ -1,12 +1,16 @@
 package fr.devlille.partners.connect.events.application
 
 import fr.devlille.partners.connect.events.domain.Contact
+import fr.devlille.partners.connect.events.domain.CreateEventExternalLinkRequest
 import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.domain.EventDisplay
+import fr.devlille.partners.connect.events.domain.EventExternalLink
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventSummary
 import fr.devlille.partners.connect.events.domain.EventWithOrganisation
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinkEntity
+import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinksTable
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
@@ -16,10 +20,12 @@ import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissi
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionsTable
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
+import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import java.util.UUID
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug as eventFindBySlug
 import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug as orgFindBySlug
 
@@ -58,6 +64,17 @@ class EventRepositoryExposed(
         val eventEntity = entity.eventFindBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
 
+        // Fetch external links directly in the same transaction
+        val externalLinks = EventExternalLinkEntity.find {
+            EventExternalLinksTable.eventId eq eventEntity.id
+        }.map { linkEntity ->
+            EventExternalLink(
+                id = linkEntity.id.value.toString(),
+                name = linkEntity.name,
+                url = linkEntity.url,
+            )
+        }
+
         val event = EventDisplay(
             slug = eventEntity.slug,
             name = eventEntity.name,
@@ -67,6 +84,7 @@ class EventRepositoryExposed(
             submissionEndTime = eventEntity.submissionEndTime,
             address = eventEntity.address,
             contact = Contact(phone = eventEntity.contactPhone, email = eventEntity.contactEmail),
+            externalLinks = externalLinks,
         )
 
         val organisation = eventEntity.organisation.toItemDomain()
@@ -156,5 +174,42 @@ class EventRepositoryExposed(
             ?: throw NotFoundException("Event with slug $eventSlug not found")
 
         eventEntity.boothPlanImageUrl = imageUrl
+    }
+
+    override fun createExternalLink(
+        eventSlug: String,
+        request: CreateEventExternalLinkRequest,
+    ): UUID = transaction {
+        // Basic validation
+        if (request.name.isBlank()) {
+            throw BadRequestException("External link name cannot be empty")
+        }
+        if (request.url.isBlank()) {
+            throw BadRequestException("External link URL cannot be empty")
+        }
+
+        // Basic URL validation
+        val urlPattern = Regex("^https?://.*")
+        if (!urlPattern.matches(request.url)) {
+            throw BadRequestException("Invalid URL format - must start with http:// or https://")
+        }
+
+        val eventEntity = entity.eventFindBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+
+        val externalLinkEntity = EventExternalLinkEntity.new {
+            this.event = eventEntity
+            this.name = request.name
+            this.url = request.url
+        }
+
+        externalLinkEntity.id.value
+    }
+
+    override fun deleteExternalLink(externalLinkId: UUID): Unit = transaction {
+        val linkEntity = EventExternalLinkEntity.findById(externalLinkId)
+            ?: throw NotFoundException("External link with id $externalLinkId not found")
+
+        linkEntity.delete()
     }
 }
