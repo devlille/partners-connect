@@ -16,6 +16,10 @@ import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedExce
 import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
 import fr.devlille.partners.connect.organisations.application.mappers.toItemDomain
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
+import fr.devlille.partners.connect.provider.domain.Provider
+import fr.devlille.partners.connect.provider.infrastructure.db.EventProviderEntity
+import fr.devlille.partners.connect.provider.infrastructure.db.EventProvidersTable
+import fr.devlille.partners.connect.provider.infrastructure.db.ProviderEntity
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionEntity
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionsTable
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
@@ -31,7 +35,6 @@ import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug a
 
 class EventRepositoryExposed(
     private val entity: UUIDEntityClass<EventEntity>,
-    private val providerRepository: fr.devlille.partners.connect.provider.domain.ProviderRepository,
 ) : EventRepository {
     override fun getAllEvents(): List<EventSummary> = transaction {
         entity.all().map {
@@ -77,7 +80,20 @@ class EventRepositoryExposed(
         }
 
         // Fetch providers attached to this event
-        val providers = providerRepository.findProvidersByEventSlug(eventSlug)
+        val providers = EventProviderEntity.find {
+            EventProvidersTable.eventId eq eventEntity.id
+        }.map { eventProvider ->
+            val provider = ProviderEntity.findById(eventProvider.providerId)!!
+            Provider(
+                id = provider.id.value.toString(),
+                name = provider.name,
+                type = provider.type,
+                website = provider.website,
+                phone = provider.phone,
+                email = provider.email,
+                createdAt = provider.createdAt,
+            )
+        }
 
         val event = EventDisplay(
             slug = eventEntity.slug,

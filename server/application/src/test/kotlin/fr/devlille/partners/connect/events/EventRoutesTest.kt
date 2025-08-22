@@ -4,12 +4,9 @@ import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.factories.createEvent
 import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.events.factories.insertMockedEventWithOrga
-import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
-import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.provider.factories.insertMockedProvider
-import fr.devlille.partners.connect.provider.infrastructure.db.EventProviderEntity
 import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
 import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
 import fr.devlille.partners.connect.users.factories.insertMockedUser
@@ -27,7 +24,6 @@ import io.ktor.server.testing.testApplication
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
-import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -405,11 +401,58 @@ class EventRoutesTest {
         assertEquals(0, providers.size)
     }
 
-    // @Test // TODO: Fix entity relationship assignment in test  
-    // Temporarily disabled - the basic functionality works as verified by the empty providers test
-    fun `GET event by slug returns providers array when providers attached via direct DB insertion`() {
-        // Test implementation temporarily disabled due to database entity assignment complexity
-        // The core functionality is working as confirmed by existing tests
-        // Future implementation would create providers, attach them to events, then verify they appear in the API response
+    @Test
+    fun `GET event by slug returns providers array when providers are attached`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val providerId1 = UUID.randomUUID()
+        val providerId2 = UUID.randomUUID()
+        val testOrgSlug = "test-org"
+        val testEventSlug = "test-event"
+        val email = "john.doe@contact.com" // Must match the mock auth email
+
+        application {
+            moduleMocked()
+            val user = insertMockedUser(userId, email = email)
+            insertMockedOrganisationEntity(id = orgId, name = testOrgSlug)
+            insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug, name = "Test Event")
+            insertMockedOrgaPermission(orgId = orgId, user = user, canEdit = true)
+
+            // Create providers
+            insertMockedProvider(id = providerId1, name = "Provider A", type = "Technology")
+            insertMockedProvider(id = providerId2, name = "Provider B", type = "Consulting")
+        }
+
+        // Attach providers to event using the API
+        val providerIds = listOf(providerId1.toString(), providerId2.toString())
+        val attachResponse = client.post("/orgs/$testOrgSlug/events/$testEventSlug/providers") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(json.encodeToString(providerIds))
+        }
+        assertEquals(HttpStatusCode.OK, attachResponse.status)
+
+        // Now test that GET event returns the providers
+        val response = client.get("/events/$testEventSlug")
+        assertEquals(HttpStatusCode.OK, response.status)
+
+        val responseText = response.bodyAsText()
+        val responseJson = json.parseToJsonElement(responseText).jsonObject
+        val event = responseJson["event"]!!.jsonObject
+
+        // Verify providers field exists and contains our providers
+        assertTrue(event.containsKey("providers"))
+        val providers = event["providers"]!!.jsonArray
+        assertEquals(2, providers.size)
+
+        // Verify provider details
+        val providerNames = providers.map { it.jsonObject["name"]!!.toString().removeSurrounding("\"") }
+        assertTrue(providerNames.contains("Provider A"))
+        assertTrue(providerNames.contains("Provider B"))
+
+        val providerTypes = providers.map { it.jsonObject["type"]!!.toString().removeSurrounding("\"") }
+        assertTrue(providerTypes.contains("Technology"))
+        assertTrue(providerTypes.contains("Consulting"))
     }
 }
