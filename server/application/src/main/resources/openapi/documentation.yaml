@@ -2399,6 +2399,16 @@ components:
           type: "string"
         contact:
           $ref: "#/components/schemas/EventContact"
+        external_links:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/EventExternalLink"
+          description: "List of external links associated with the event"
+        providers:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Provider"
+          description: "List of providers (partners) associated with the event"
       required:
         - "slug"
         - "name"
@@ -2408,6 +2418,8 @@ components:
         - "submission_end_time"
         - "address"
         - "contact"
+        - "external_links"
+        - "providers"
     EventContact:
       type: "object"
       properties:
@@ -2420,6 +2432,23 @@ components:
         - "email"
         - "address"
         - "contact"
+    EventExternalLink:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          description: "Unique identifier of the external link"
+        name:
+          type: "string"
+          description: "Display name for the external link"
+        url:
+          type: "string"
+          format: "uri"
+          description: "URL of the external resource"
+      required:
+        - "id"
+        - "name"
+        - "url"
     Organisation:
       type: "object"
       properties:
