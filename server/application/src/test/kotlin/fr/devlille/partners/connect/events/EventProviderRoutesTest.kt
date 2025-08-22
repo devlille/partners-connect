@@ -34,6 +34,8 @@ class EventProviderRoutesTest {
         val testOrgSlug = "test-org"
         val testEventSlug = "test-event"
         val email = "john.doe@contact.com" // Must match the mock auth email
+        
+        val providerIds = mutableListOf<String>()
 
         application {
             moduleMocked()
@@ -42,20 +44,17 @@ class EventProviderRoutesTest {
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug, name = "Test Event")
             insertMockedOrgaPermission(orgId = orgId, user = user, canEdit = true)
 
-            insertMockedProvider(name = "Provider 1")
-
-            insertMockedProvider(name = "Provider 2")
+            // Create providers and store their IDs
+            val provider1 = insertMockedProvider(name = "Provider A")
+            val provider2 = insertMockedProvider(name = "Provider B")
+            providerIds.add(provider1.id.value.toString())
+            providerIds.add(provider2.id.value.toString())
         }
-
-        val providerIds = listOf(
-            insertMockedProvider(name = "Provider A").id.value.toString(),
-            insertMockedProvider(name = "Provider B").id.value.toString(),
-        )
 
         val response = client.post("/orgs/$testOrgSlug/events/$testEventSlug/providers") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(providerIds))
+            setBody(json.encodeToString(providerIds.toList()))
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
@@ -225,6 +224,8 @@ class EventProviderRoutesTest {
         val testOrgSlug = "test-org"
         val testEventSlug = "test-event"
         val email = "john.doe@contact.com" // Must match the mock auth email
+        
+        var providerId = ""
 
         application {
             moduleMocked()
@@ -233,10 +234,10 @@ class EventProviderRoutesTest {
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug, name = "Test Event")
             insertMockedOrgaPermission(orgId = orgId, user = user, canEdit = true)
 
-            insertMockedProvider(name = "Provider")
+            val provider = insertMockedProvider(name = "Test Provider")
+            providerId = provider.id.value.toString()
         }
-
-        val providerId = insertMockedProvider(name = "Test Provider").id.value.toString()
+        
         val providerIds = listOf(providerId)
 
         // First attachment
