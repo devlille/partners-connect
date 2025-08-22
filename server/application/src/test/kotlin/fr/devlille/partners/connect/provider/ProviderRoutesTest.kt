@@ -61,15 +61,17 @@ class ProviderRoutesTest {
 
     @Test
     fun `POST providers creates provider successfully when user is organizer`() = testApplication {
+        val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val email = "john.doe@contact.com" // Must match the mock auth email
 
         application {
             moduleMocked()
-            val admin = insertMockedAdminUser()
-            insertMockedOrganisationEntity(id = orgId, representativeUser = admin)
+            val user = insertMockedUser(userId, email = email)
+            insertMockedOrganisationEntity(id = orgId)
             insertMockedEvent(id = eventId, orgId = orgId, slug = "test-event")
-            insertMockedOrgaPermission(orgId = orgId, user = admin)
+            insertMockedOrgaPermission(orgId = orgId, user = user, canEdit = true)
         }
 
         val providerInput = createMockedProviderInput(
@@ -111,9 +113,12 @@ class ProviderRoutesTest {
 
     @Test
     fun `POST providers fails with 403 when user is not organizer`() = testApplication {
+        val userId = UUID.randomUUID()
+        val email = "john.doe@contact.com" // Must match the mock auth email
+
         application {
             moduleMocked()
-            insertMockedUser() // User without organizer permissions
+            insertMockedUser(userId, email = email) // User without organizer permissions
         }
 
         val providerInput = createMockedProviderInput()
@@ -130,15 +135,17 @@ class ProviderRoutesTest {
 
     @Test
     fun `POST providers fails with 400 for invalid request body`() = testApplication {
+        val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val email = "john.doe@contact.com" // Must match the mock auth email
 
         application {
             moduleMocked()
-            val admin = insertMockedAdminUser()
-            insertMockedOrganisationEntity(id = orgId, representativeUser = admin)
+            val user = insertMockedUser(userId, email = email)
+            insertMockedOrganisationEntity(id = orgId)
             insertMockedEvent(id = eventId, orgId = orgId, slug = "test-event")
-            insertMockedOrgaPermission(orgId = orgId, user = admin)
+            insertMockedOrgaPermission(orgId = orgId, user = user, canEdit = true)
         }
 
         val response = client.post("/providers") {

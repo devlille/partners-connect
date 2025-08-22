@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.provider.factories
 
 import fr.devlille.partners.connect.provider.domain.CreateProvider
 import fr.devlille.partners.connect.provider.infrastructure.db.ProviderEntity
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
 fun createMockedProviderInput(
@@ -26,10 +27,12 @@ fun insertMockedProvider(
     website: String? = "https://testprovider.com",
     phone: String? = "+33123456789",
     email: String? = "contact@testprovider.com",
-): ProviderEntity = ProviderEntity.new(id) {
-    this.name = name
-    this.type = type
-    this.website = website
-    this.phone = phone
-    this.email = email
+): ProviderEntity = transaction {
+    ProviderEntity.new(id) {
+        this.name = name
+        this.type = type
+        this.website = website
+        this.phone = phone
+        this.email = email
+    }
 }

@@ -14,6 +14,7 @@ import fr.devlille.partners.connect.module
 import fr.devlille.partners.connect.notifications.infrastructure.bindings.notificationModule
 import fr.devlille.partners.connect.organisations.infrastructure.bindings.organisationModule
 import fr.devlille.partners.connect.partnership.infrastructure.bindings.partnershipModule
+import fr.devlille.partners.connect.provider.infrastructure.bindings.providerModule
 import fr.devlille.partners.connect.sponsoring.infrastructure.bindings.sponsoringModule
 import fr.devlille.partners.connect.tickets.infrastructure.bindings.ticketingModule
 import fr.devlille.partners.connect.users.infrastructure.bindings.userModule
@@ -53,6 +54,7 @@ fun Application.moduleMocked(
                 sponsoringModule,
                 companyModule,
                 partnershipModule,
+                providerModule,
                 notificationModule,
                 billingModule,
                 ticketingModule,

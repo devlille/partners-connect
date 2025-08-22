@@ -28,17 +28,19 @@ class EventProviderRoutesTest {
 
     @Test
     fun `POST attaches providers to event successfully`() = testApplication {
+        val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val testOrgSlug = "test-org"
         val testEventSlug = "test-event"
+        val email = "john.doe@contact.com" // Must match the mock auth email
 
         application {
             moduleMocked()
-            val admin = insertMockedAdminUser()
-            insertMockedOrganisationEntity(id = orgId, name = testOrgSlug, representativeUser = admin)
+            val user = insertMockedUser(userId, email = email)
+            insertMockedOrganisationEntity(id = orgId, name = testOrgSlug)
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug, name = "Test Event")
-            insertMockedOrgaPermission(orgId = orgId, user = admin)
+            insertMockedOrgaPermission(orgId = orgId, user = user, canEdit = true)
 
             insertMockedProvider(name = "Provider 1")
 
@@ -79,17 +81,19 @@ class EventProviderRoutesTest {
 
     @Test
     fun `POST fails with 403 when user doesn't have write access to event`() = testApplication {
+        val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val testOrgSlug = "test-org"
         val testEventSlug = "test-event"
+        val email = "john.doe@contact.com" // Must match the mock auth email
 
         application {
             moduleMocked()
-            insertMockedUser()
+            val user = insertMockedUser(userId, email = email)
             insertMockedOrganisationEntity(id = orgId, name = testOrgSlug)
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug)
-            // No permission granted to regular user
+            // No permission granted to regular user - this should cause 401/403
         }
 
         val response = client.post("/orgs/$testOrgSlug/events/$testEventSlug/providers") {
@@ -104,15 +108,17 @@ class EventProviderRoutesTest {
 
     @Test
     fun `POST fails with 404 when event doesn't exist`() = testApplication {
+        val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val testOrgSlug = "test-org"
         val testEventSlug = "nonexistent-event"
+        val email = "john.doe@contact.com" // Must match the mock auth email
 
         application {
             moduleMocked()
-            val admin = insertMockedAdminUser()
-            insertMockedOrganisationEntity(id = orgId, name = testOrgSlug, representativeUser = admin)
-            insertMockedOrgaPermission(orgId = orgId, user = admin)
+            val user = insertMockedUser(userId, email = email)
+            insertMockedOrganisationEntity(id = orgId, name = testOrgSlug)
+            insertMockedOrgaPermission(orgId = orgId, user = user, canEdit = true)
         }
 
         val response = client.post("/orgs/$testOrgSlug/events/$testEventSlug/providers") {
@@ -127,17 +133,19 @@ class EventProviderRoutesTest {
 
     @Test
     fun `POST fails with 400 when provider IDs don't exist`() = testApplication {
+        val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val testOrgSlug = "test-org"
         val testEventSlug = "test-event"
+        val email = "john.doe@contact.com" // Must match the mock auth email
 
         application {
             moduleMocked()
-            val admin = insertMockedAdminUser()
-            insertMockedOrganisationEntity(id = orgId, name = testOrgSlug, representativeUser = admin)
+            val user = insertMockedUser(userId, email = email)
+            insertMockedOrganisationEntity(id = orgId, name = testOrgSlug)
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug)
-            insertMockedOrgaPermission(orgId = orgId, user = admin)
+            insertMockedOrgaPermission(orgId = orgId, user = user, canEdit = true)
         }
 
         val nonExistentIds = listOf(
@@ -157,17 +165,19 @@ class EventProviderRoutesTest {
 
     @Test
     fun `POST fails with 400 for empty provider IDs list`() = testApplication {
+        val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val testOrgSlug = "test-org"
         val testEventSlug = "test-event"
+        val email = "john.doe@contact.com" // Must match the mock auth email
 
         application {
             moduleMocked()
-            val admin = insertMockedAdminUser()
-            insertMockedOrganisationEntity(id = orgId, name = testOrgSlug, representativeUser = admin)
+            val user = insertMockedUser(userId, email = email)
+            insertMockedOrganisationEntity(id = orgId, name = testOrgSlug)
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug)
-            insertMockedOrgaPermission(orgId = orgId, user = admin)
+            insertMockedOrgaPermission(orgId = orgId, user = user, canEdit = true)
         }
 
         val response = client.post("/orgs/$testOrgSlug/events/$testEventSlug/providers") {
@@ -182,17 +192,19 @@ class EventProviderRoutesTest {
 
     @Test
     fun `POST fails with 400 for invalid UUID format`() = testApplication {
+        val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val testOrgSlug = "test-org"
         val testEventSlug = "test-event"
+        val email = "john.doe@contact.com" // Must match the mock auth email
 
         application {
             moduleMocked()
-            val admin = insertMockedAdminUser()
-            insertMockedOrganisationEntity(id = orgId, name = testOrgSlug, representativeUser = admin)
+            val user = insertMockedUser(userId, email = email)
+            insertMockedOrganisationEntity(id = orgId, name = testOrgSlug)
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug)
-            insertMockedOrgaPermission(orgId = orgId, user = admin)
+            insertMockedOrgaPermission(orgId = orgId, user = user, canEdit = true)
         }
 
         val response = client.post("/orgs/$testOrgSlug/events/$testEventSlug/providers") {
@@ -207,17 +219,19 @@ class EventProviderRoutesTest {
 
     @Test
     fun `POST is idempotent - attaching same providers twice doesn't cause errors`() = testApplication {
+        val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val testOrgSlug = "test-org"
         val testEventSlug = "test-event"
+        val email = "john.doe@contact.com" // Must match the mock auth email
 
         application {
             moduleMocked()
-            val admin = insertMockedAdminUser()
-            insertMockedOrganisationEntity(id = orgId, name = testOrgSlug, representativeUser = admin)
+            val user = insertMockedUser(userId, email = email)
+            insertMockedOrganisationEntity(id = orgId, name = testOrgSlug)
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug, name = "Test Event")
-            insertMockedOrgaPermission(orgId = orgId, user = admin)
+            insertMockedOrgaPermission(orgId = orgId, user = user, canEdit = true)
 
             insertMockedProvider(name = "Provider")
         }

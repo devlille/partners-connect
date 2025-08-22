@@ -3,9 +3,11 @@ package fr.devlille.partners.connect.provider.infrastructure.api
 import fr.devlille.partners.connect.auth.domain.AuthRepository
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
+import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.token
 import fr.devlille.partners.connect.provider.domain.CreateProvider
 import fr.devlille.partners.connect.provider.domain.ProviderRepository
+import io.ktor.server.plugins.NotFoundException
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -37,8 +39,16 @@ fun Route.providerRoutes() {
             val userInfo = authRepository.getUserInfo(token)
 
             // Check if user is organizer (has at least one event)
-            val userEvents = eventRepository.findByUserEmail(userInfo.email)
-            if (userEvents.isEmpty()) {
+            try {
+                val userEvents = eventRepository.findByUserEmail(userInfo.email)
+                if (userEvents.isEmpty()) {
+                    throw ForbiddenException("You must be an organizer of at least one event to create providers")
+                }
+            } catch (e: NotFoundException) {
+                // User not found in database
+                throw ForbiddenException("You must be an organizer of at least one event to create providers")
+            } catch (e: UnauthorizedException) {
+                // User has no organizer permissions
                 throw ForbiddenException("You must be an organizer of at least one event to create providers")
             }
 
