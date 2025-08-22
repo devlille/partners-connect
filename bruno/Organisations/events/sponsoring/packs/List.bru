@@ -1,0 +1,29 @@
+meta {
+  name: List
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/packs
+  body: none
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  org_slug: {{org_slug}}
+}
+
+headers {
+  Accept-Language: fr
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "name": "Gold",
+    "price": 9000,
+    "maxQuantity": 20
+  }
+}

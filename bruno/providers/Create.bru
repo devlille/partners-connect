@@ -1,0 +1,30 @@
+meta {
+  name: Create
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/providers
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "name": "MVD location",
+    "type": "mobilier",
+    "website": "https://www.mvd-location.com/",
+    "phone": "0609553611",
+    "email": "mvd.location@icloud.com"
+  }
+}
+
+script:post-response {
+  let data = res.getBody();
+  bru.setEnvVar("provider_id", data.id)
+}

@@ -1,0 +1,29 @@
+meta {
+  name: Delete
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/packs/:pack_id
+  body: none
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  org_slug: {{org_slug}}
+  pack_id: {{pack_id}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "name": "Gold",
+    "price": 9000,
+    "max_quantity": 20
+  }
+}

@@ -1,0 +1,29 @@
+meta {
+  name: Billing status
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/partnership/:partnership_id/billing/:paid_status
+  body: none
+  auth: none
+}
+
+params:path {
+  paid_status: paid
+  event_slug: {{event_slug}}
+  org_slug: {{org_slug}}
+  partnership_id: {{partnership_id}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "pack_id": "{{pack_id}}",
+    "option_ids": []
+  }
+}

@@ -1,0 +1,21 @@
+meta {
+  name: List
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{scheme}}://{{base_url}}/providers
+  body: none
+  auth: none
+}
+
+body:json {
+  {
+    "name": "MVD location",
+    "type": "mobilier",
+    "website": "https://www.mvd-location.com/",
+    "phone": "0609553611",
+    "email": "mvd.location@icloud.com"
+  }
+}

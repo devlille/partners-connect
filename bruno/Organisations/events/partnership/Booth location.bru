@@ -1,0 +1,27 @@
+meta {
+  name: Booth location
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/partnership/:partnership_id/booth-location
+  body: json
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  org_slug: {{org_slug}}
+  partnership_id: {{partnership_id}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "location": "G2"
+  }
+}

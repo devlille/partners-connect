@@ -1,0 +1,33 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/external-link
+  body: json
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  org_slug: {{org_slug}}
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "name": "Call for Papers",
+    "url": "https://sessionize.com/devlille2025"
+  }
+}
+
+script:post-response {
+  let data = res.getBody();
+  bru.setEnvVar("link_id", data.id)
+}

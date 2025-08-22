@@ -1,0 +1,35 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/events/:event_slug/partnership
+  body: json
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+}
+
+body:json {
+  {
+    "company_id": "{{company_id}}",
+    "pack_id": "{{pack_id}}",
+    "option_ids": [],
+    "contact_name": "John Doe",
+    "contact_role": "Director",
+    "language": "en",
+    "phone": "0612788709",
+    "emails": [
+      "gerard@devlille.fr"
+    ]
+  }
+}
+
+script:post-response {
+  let data = res.getBody();
+  bru.setEnvVar("partnership_id", data.id)
+}

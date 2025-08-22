@@ -1,0 +1,29 @@
+meta {
+  name: Detach Option to Pack
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/packs/:pack_id/options/:option_id
+  body: json
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  org_slug: {{org_slug}}
+  option_id: {{option_id}}
+  pack_id: {{pack_id}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "required": ["df1a72b3-0d8a-42dd-81db-9651260b4254"],
+    "optional": []
+  }
+}

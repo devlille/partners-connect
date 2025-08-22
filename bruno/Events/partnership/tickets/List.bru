@@ -1,0 +1,29 @@
+meta {
+  name: List
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{scheme}}://{{base_url}}/events/:event_slug/partnership/:partnership_id/tickets
+  body: none
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  partnership_id: {{partnership_id}}
+}
+
+body:json {
+  [
+    {
+      "first_name": "John",
+      "last_name": "Doe"
+    },
+    {
+      "first_name": "Jeanne",
+      "last_name": "Doe"
+    }
+  ]
+}

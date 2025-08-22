@@ -1,0 +1,27 @@
+meta {
+  name: Publication date
+  type: http
+  seq: 1
+}
+
+put {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/partnership/:partnership_id/communication/publication
+  body: json
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  org_slug: {{org_slug}}
+  partnership_id: {{partnership_id}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "publication_date": "2025-08-22T12:26:53"
+  }
+}

@@ -1,0 +1,20 @@
+meta {
+  name: Communication
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/communication
+  body: none
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  org_slug: {{org_slug}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}

@@ -26,7 +26,7 @@ fun Route.eventExternalLinkRoutes() {
             val request = call.receive<CreateEventExternalLinkRequest>()
 
             val externalLinkId = repository.createExternalLink(eventSlug, request)
-            call.respond(HttpStatusCode.Created, externalLinkId.toString())
+            call.respond(HttpStatusCode.Created, mapOf("id" to externalLinkId.toString()))
         }
     }
 

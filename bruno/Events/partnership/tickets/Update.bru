@@ -1,0 +1,24 @@
+meta {
+  name: Update
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{scheme}}://{{base_url}}/events/:event_slug/partnership/:partnership_id/tickets/:ticket_id
+  body: json
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  ticket_id: {{ticket_id}}
+  partnership_id: {{partnership_id}}
+}
+
+body:json {
+  {
+    "first_name": "John",
+    "last_name": "Doe"
+  }
+}

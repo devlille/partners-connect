@@ -1,0 +1,31 @@
+meta {
+  name: Update
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/packs/:pack_id
+  body: json
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  pack_id: {{pack_id}}
+  org_slug: {{org_slug}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "name": "Gold",
+    "price": 9000,
+    "with_booth": true,
+    "nb_tickets": 10,
+    "max_quantity": 20
+  }
+}

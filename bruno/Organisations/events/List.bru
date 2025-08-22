@@ -1,0 +1,19 @@
+meta {
+  name: List
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events
+  body: none
+  auth: none
+}
+
+params:path {
+  org_slug: {{org_slug}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}

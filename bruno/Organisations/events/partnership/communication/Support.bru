@@ -1,0 +1,25 @@
+meta {
+  name: Support
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/partnership/:partnership_id/communication/support
+  body: multipartForm
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  org_slug: {{org_slug}}
+  partnership_id: {{partnership_id}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:multipart-form {
+  : @file()
+}

@@ -1,0 +1,41 @@
+meta {
+  name: Agreement
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/partnership/:partnership_id/agreement
+  body: none
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  org_slug: {{org_slug}}
+  partnership_id: {{partnership_id}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "name": "DuckDuckGo",
+    "po": "P07654",
+    "vat": "FR65827999616",
+    "siret": "32878178601143",
+    "address": {
+      "address": "74 rue des Arts",
+      "city": "Lille",
+      "zip_code": "59800",
+      "country": "FR"
+    },
+    "contact": {
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john.doe@mail.fr"
+    }
+  }
+}

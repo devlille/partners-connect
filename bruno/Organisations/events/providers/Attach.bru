@@ -1,0 +1,26 @@
+meta {
+  name: Attach
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/providers
+  body: json
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  org_slug: {{org_slug}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  [
+    "{{provider_id}}"
+  ]
+}

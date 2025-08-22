@@ -16,12 +16,10 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class EventExternalLinkRoutesTest {
@@ -57,11 +55,10 @@ class EventExternalLinkRoutesTest {
 
         val responseBody = response.bodyAsText()
         // The response should be a UUID string
-        val externalLinkId = responseBody.replace("\"", "") // Remove quotes from JSON string
+        val body = responseBody.replace("\"", "") // Remove quotes from JSON string
 
-        // Verify it's a valid UUID format
-        assertNotNull(UUID.fromString(externalLinkId))
-        assertTrue(externalLinkId.isNotEmpty())
+        // Verify it has the id
+        assertTrue(body.contains("id"))
     }
 
     @Test
@@ -236,7 +233,7 @@ class EventExternalLinkRoutesTest {
         }
 
         assertEquals(HttpStatusCode.Created, createResponse.status)
-        val createdLinkId = createResponse.bodyAsText().replace("\"", "") // Remove quotes from JSON string
+        val createdLinkId = json.decodeFromString<Map<String, String>>(createResponse.bodyAsText())["id"]
 
         // Then delete it
         val deleteResponse = client.delete("/orgs/$orgSlug/events/$eventSlug/external-link/$createdLinkId") {

@@ -1,0 +1,23 @@
+meta {
+  name: Decline
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/events/:event_slug/partnership/:partnership_id/suggestion-decline
+  body: none
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  partnership_id: {{partnership_id}}
+}
+
+body:json {
+  {
+    "pack_id": "{{pack_id}}",
+    "option_ids": []
+  }
+}

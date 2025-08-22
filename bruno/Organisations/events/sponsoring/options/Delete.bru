@@ -1,0 +1,39 @@
+meta {
+  name: Delete
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/options/:option_id
+  body: json
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  org_slug: {{org_slug}}
+  option_id: {{option_id}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "translations": [
+      {
+        "language": "fr",
+        "name": "Communication vidéo",
+        "description": "Une communication vidéo est mise en avant sur votre espace partenaire sur nos supports de communication"
+      },
+      {
+        "language": "en",
+        "name": "Communication video",
+        "description": "A communication video is published on your partner page in our different digital support"
+      }
+    ],
+    "price": 100
+  }
+}

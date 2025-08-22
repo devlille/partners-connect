@@ -1,0 +1,28 @@
+meta {
+  name: Update
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{scheme}}://{{base_url}}/events/:event_slug/partnership/:partnership_id/billing
+  body: json
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  partnership_id: {{partnership_id}}
+}
+
+body:json {
+  {
+    "name": "DuckDuckGo",
+    "po": "P07654",
+    "contact": {
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john.doe@mail.fr"
+    }
+  }
+}

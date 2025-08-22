@@ -1,0 +1,40 @@
+meta {
+  name: Create
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events
+  body: json
+  auth: none
+}
+
+params:path {
+  org_slug: {{org_slug}}
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "name": "DevLille 2025",
+    "start_time": "2025-06-12T09:00:00",
+    "end_time": "2025-06-13T18:00:00",
+    "submission_start_time": "2025-01-01T00:00:00",
+    "submission_end_time": "2025-03-01T23:59:59",
+    "address": "Lille Grand Palais, Lille, France",
+    "contact": {
+      "phone": "+33 6 12 34 56 78",
+      "email": "contact@devlille.fr"
+    }
+  }
+}
+
+script:post-response {
+  let data = res.getBody();
+  bru.setEnvVar("event_slug", data.slug)
+}

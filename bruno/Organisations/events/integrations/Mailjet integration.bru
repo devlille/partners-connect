@@ -1,0 +1,27 @@
+meta {
+  name: Mailjet integration
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/integrations/mailjet/notification
+  body: json
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  org_slug: {{org_slug}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "api_key": "{{mailjet_api_key}}",
+    "secret": "{{mailjet_secret}}"
+  }
+}

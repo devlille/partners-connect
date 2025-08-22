@@ -1,0 +1,28 @@
+meta {
+  name: Attach Option to Pack
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/packs/:pack_id/options
+  body: json
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  org_slug: {{org_slug}}
+  pack_id: {{pack_id}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "required": [],
+    "optional": ["299ae07f-2e99-4b9a-933d-b46871313893"]
+  }
+}
