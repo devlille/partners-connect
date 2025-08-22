@@ -65,6 +65,7 @@ class NotificationVariablesTest {
         address = "Test Address",
         contact = Contact(email = "test@example.com", phone = null),
         externalLinks = emptyList(),
+        providers = emptyList(),
     )
 
     private fun createOrganisationItem() = OrganisationItem(

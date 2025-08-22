@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.events.domain
 
+import fr.devlille.partners.connect.provider.domain.Provider
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -20,4 +21,5 @@ data class EventDisplay(
     val contact: Contact,
     @SerialName("external_links")
     val externalLinks: List<EventExternalLink>,
+    val providers: List<Provider>,
 )
