@@ -4,7 +4,7 @@
     <summary>
       <h3>
         <svg role="img" width="24" height="24" aria-hidden="true">
-          <use href="/img/sprite.svg#ic-filter"></use>
+          <use href="/img/sprite.svg#ic-filter"/>
         </svg>
         Filtres
       </h3>
@@ -17,56 +17,56 @@
             <ul>
               <li>
                 <input
-                  type="checkbox"
                   id="in-gold"
+                  type="checkbox"
                   name="pack"
                   value="in-gold"
-                />
+                >
                 <label for="in-gold">Gold</label>
               </li>
               <li>
                 <input
-                  type="checkbox"
                   id="in-silver"
+                  type="checkbox"
                   name="pack"
                   value="in-silver"
-                />
+                >
                 <label for="in-silver">Silver</label>
               </li>
               <li>
                 <input
-                  type="checkbox"
                   id="in-bronze"
+                  type="checkbox"
                   name="pack"
                   value="in-bronze"
-                />
+                >
                 <label for="in-bronze">Bronze</label>
               </li>
               <li>
                 <input
-                  type="checkbox"
                   id="in-free"
+                  type="checkbox"
                   name="pack"
                   value="in-free"
-                />
+                >
                 <label for="in-free">Freelance</label>
               </li>
               <li>
                 <input
-                  type="checkbox"
                   id="in-community"
+                  type="checkbox"
                   name="pack"
                   value="in-community"
-                />
+                >
                 <label for="in-community">Communauté</label>
               </li>
               <li>
                 <input
-                  type="checkbox"
                   id="in-media"
+                  type="checkbox"
                   name="pack"
                   value="in-media"
-                />
+                >
                 <label for="in-media">Média</label>
               </li>
             </ul>
@@ -75,24 +75,24 @@
             <legend>Type:</legend>
             <ul>
               <li>
-                <input type="checkbox" id="in-esn" name="type" value="in-esn" />
+                <input id="in-esn" type="checkbox" name="type" value="in-esn" >
                 <label for="in-esn">ESN</label>
               </li>
               <li>
                 <input
-                  type="checkbox"
                   id="in-notesn"
+                  type="checkbox"
                   name="type"
                   value="in-notesn"
-                />
+                >
                 <label for="in-notesn">Pas ESN</label>
               </li>
             </ul>
           </fieldset>
         </div>
         <p class="buttons-bar">
-          <input type="submit" value="Appliquer" />
-          <input type="reset" value="Annuler" />
+          <input type="submit" value="Appliquer" >
+          <input type="reset" value="Annuler" >
         </p>
       </form>
     </div>
@@ -113,23 +113,6 @@
 
 <script setup>
 useHead({
-  title: "Liste de Sponsors | DevLille",
-  script: [
-    {
-      src: "/js/main-nav.js",
-      type: "text/javascript",
-      defer: true,
-    },
-    {
-      src: "/js/autoScroll.js",
-      type: "text/javascript",
-      defer: true,
-    },
-    {
-      src: "/js/tabs.js",
-      type: "text/javascript",
-      defer: true,
-    },
-  ],
+  title: "Liste de Sponsors | DevLille"
 });
 </script>

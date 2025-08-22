@@ -4,23 +4,6 @@
 
 <script setup>
 useHead({
-  title: "Paramètres | DevLille",
-  script: [
-    {
-      src: "/js/main-nav.js",
-      type: "text/javascript",
-      defer: true,
-    },
-    {
-      src: "/js/autoScroll.js",
-      type: "text/javascript",
-      defer: true,
-    },
-    {
-      src: "/js/tabs.js",
-      type: "text/javascript",
-      defer: true,
-    },
-  ],
+  title: "Paramètres | DevLille"
 });
 </script>

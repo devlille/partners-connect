@@ -2,7 +2,7 @@
   <h2>Liste de Organisations</h2>
 
   <div class="results-list grid">
-    <div class="card" v-for="evt in data" :key="evt.id">
+    <div v-for="evt in data" :key="evt.id" class="card">
       <h3>
         <NuxtLink
           :to="{ name: 'orgs-slug-settings', params: { slug: evt.slug } }"
@@ -16,6 +16,7 @@
       </dl>
     </div>
   </div>
+  <NuxtLink to="/orgs/create">Créer une nouvelle organisation</NuxtLink>
 </template>
 
 <script setup lang="ts">
@@ -24,23 +25,6 @@ import { getUsersMeOrgs } from "~/utils/api";
 const data = await getUsersMeOrgs().then((r) => r.data);
 
 useHead({
-  title: "Liste de Organisations | DevLille",
-  script: [
-    {
-      src: "/js/main-nav.js",
-      type: "text/javascript",
-      defer: true,
-    },
-    {
-      src: "/js/autoScroll.js",
-      type: "text/javascript",
-      defer: true,
-    },
-    {
-      src: "/js/tabs.js",
-      type: "text/javascript",
-      defer: true,
-    },
-  ],
+  title: "Liste de Organisations | DevLille"
 });
 </script>

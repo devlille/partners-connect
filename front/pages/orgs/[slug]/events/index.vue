@@ -21,6 +21,8 @@
       </dl>
     </div>
   </div>
+  <NuxtLink :to="`/orgs/${route.params.slug}/events/create`">Créer une nouvelle organisation</NuxtLink>
+
 </template>
 
 <script setup lang="ts">
@@ -32,22 +34,5 @@ const data = await getOrgsOrgSlugEvents(route.params.slug as string).then(
 
 useHead({
   title: "Liste de Organisations | DevLille",
-  script: [
-    {
-      src: "/js/main-nav.js",
-      type: "text/javascript",
-      defer: true,
-    },
-    {
-      src: "/js/autoScroll.js",
-      type: "text/javascript",
-      defer: true,
-    },
-    {
-      src: "/js/tabs.js",
-      type: "text/javascript",
-      defer: true,
-    },
-  ],
 });
 </script>

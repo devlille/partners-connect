@@ -119,6 +119,17 @@ export interface Event {
   contact: EventContact;
 }
 
+export interface EventDisplay {
+  slug: string;
+  name: string;
+  start_time: string;
+  end_time: string;
+  submission_start_time: string;
+  submission_end_time: string;
+  address: string;
+  contact: EventContact;
+}
+
 export interface EventContact {
   email: string;
   /** @nullable */
@@ -127,7 +138,8 @@ export interface EventContact {
 
 export interface Organisation {
   name: string;
-  head_office: string;
+  /** @nullable */
+  head_office?: string | null;
   /** @nullable */
   siret?: string | null;
   /** @nullable */
@@ -142,19 +154,27 @@ export interface Organisation {
   naf?: string | null;
   /** @nullable */
   duns?: string | null;
-  iban: string;
-  bic: string;
-  rib_url: string;
-  representative_user_email: string;
-  representative_role: string;
-  creation_location: string;
-  created_at: string;
-  published_at: string;
+  /** @nullable */
+  iban?: string | null;
+  /** @nullable */
+  bic?: string | null;
+  /** @nullable */
+  rib_url?: string | null;
+  /** @nullable */
+  representative_user_email?: string | null;
+  /** @nullable */
+  representative_role?: string | null;
+  /** @nullable */
+  creation_location?: string | null;
+  /** @nullable */
+  created_at?: string | null;
+  /** @nullable */
+  published_at?: string | null;
 }
 
 export interface EventWithOrganisation {
-  event: Event;
-  organisation: Organisation;
+  event: EventDisplay;
+  organisation: OrganisationItem;
 }
 
 export interface RegisterPartnership {
@@ -277,6 +297,111 @@ export interface OrganisationItem {
   owner: Owner;
 }
 
+export interface Provider {
+  /** Unique identifier of the provider */
+  id: string;
+  /** Name of the provider */
+  name: string;
+  /** Type/category of the provider */
+  type: string;
+  /**
+   * Website URL of the provider
+   * @nullable
+   */
+  website?: string | null;
+  /**
+   * Phone number of the provider
+   * @nullable
+   */
+  phone?: string | null;
+  /**
+   * Email address of the provider
+   * @nullable
+   */
+  email?: string | null;
+  /** Creation timestamp of the provider */
+  created_at: string;
+}
+
+export interface CreateProvider {
+  /** Name of the provider */
+  name: string;
+  /** Type/category of the provider */
+  type: string;
+  /**
+   * Website URL of the provider
+   * @nullable
+   */
+  website?: string | null;
+  /**
+   * Phone number of the provider
+   * @nullable
+   */
+  phone?: string | null;
+  /**
+   * Email address of the provider
+   * @nullable
+   */
+  email?: string | null;
+}
+
+export interface BoothLocationRequest {
+  /** The booth location identifier or name */
+  location: string;
+}
+
+export interface BoothLocationResponse {
+  /** The partnership ID */
+  id: string;
+  /** The assigned booth location */
+  location: string;
+}
+
+export interface PublicationDateRequest {
+  /** Publication date in ISO 8601 format */
+  publication_date: string;
+}
+
+export interface PublicationDateResponse {
+  /** Partnership ID */
+  id: string;
+  /** Scheduled publication date in ISO 8601 format */
+  publication_date: string;
+}
+
+export interface SupportUploadResponse {
+  /** Partnership ID */
+  id: string;
+  /** URL of the uploaded visual support material */
+  url: string;
+}
+
+export interface CommunicationItem {
+  /** Partnership unique identifier */
+  partnership_id: string;
+  /** Company name */
+  company_name: string;
+  /**
+   * Publication date in ISO 8601 format (null for unplanned)
+   * @nullable
+   */
+  publication_date?: string | null;
+  /**
+   * URL to the communication support material (null if not uploaded)
+   * @nullable
+   */
+  support_url?: string | null;
+}
+
+export interface CommunicationPlan {
+  /** Communications with past publication dates (sorted newest first) */
+  done: CommunicationItem[];
+  /** Communications with future publication dates (sorted earliest first) */
+  planned: CommunicationItem[];
+  /** Communications without publication date (sorted alphabetically by company name) */
+  unplanned: CommunicationItem[];
+}
+
 export type GetAuthCallback404 = { [key: string]: unknown };
 
 export type GetCompaniesParams = {
@@ -293,6 +418,56 @@ export type PostEventsEventSlugPartnershipPartnershipIdSignedAgreementBody = {
   file?: Blob;
 };
 
+export type GetProvidersParams = {
+/**
+ * Search providers by name (case-insensitive)
+ */
+query?: string;
+/**
+ * Sort by field (default: createdAt)
+ */
+sort?: GetProvidersSort;
+/**
+ * Sort direction (default: asc)
+ */
+direction?: GetProvidersDirection;
+};
+
+export type GetProvidersSort = typeof GetProvidersSort[keyof typeof GetProvidersSort];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GetProvidersSort = {
+  name: 'name',
+  createdAt: 'createdAt',
+  creation: 'creation',
+  created: 'created',
+} as const;
+
+export type GetProvidersDirection = typeof GetProvidersDirection[keyof typeof GetProvidersDirection];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GetProvidersDirection = {
+  asc: 'asc',
+  desc: 'desc',
+} as const;
+
+export type PostProviders201 = {
+  /** UUID of the created provider */
+  id: string;
+};
+
+export type PostOrgsOrgSlugEventsEventSlugBoothPlanBody = {
+  /** Booth plan image file (PNG, JPEG, GIF) */
+  file?: Blob;
+};
+
+export type PostOrgsOrgSlugEventsEventSlugBoothPlan201 = {
+  /** URL of the uploaded booth plan image */
+  url: string;
+};
+
 /**
  * Integration configuration data
  */
@@ -305,6 +480,13 @@ export type DeleteOrgsOrgSlugEventsEventSlugPacksPackId204 = { [key: string]: un
 export type PostOrgsOrgSlugEventsEventSlugPacksPackIdOptions201 = { [key: string]: unknown };
 
 export type DeleteOrgsOrgSlugEventsEventSlugPacksPackIdOptionsOptionId204 = { [key: string]: unknown };
+
+export type PostOrgsOrgSlugEventsEventSlugExternalLinkBody = {
+  /** Display name for the external link */
+  name: string;
+  /** URL of the external resource (must start with http:// or https://) */
+  url: string;
+};
 
 export type GetOrgsOrgSlugEventsEventSlugPartnershipParams = {
 /**
@@ -630,6 +812,33 @@ export const putEventsEventSlugPartnershipPartnershipIdTicketsTicketId = (
       options);
     }
   
+/**
+ * List all providers with optional filtering and sorting
+ */
+export const getProviders = (
+    params?: GetProvidersParams,
+ options?: SecondParameter<typeof customFetch>,) => {
+      return customFetch<Provider[]>(
+      {url: `/providers`, method: 'GET',
+        params
+    },
+      options);
+    }
+  
+/**
+ * Create a new provider (requires authentication and organizer status)
+ */
+export const postProviders = (
+    createProvider: CreateProvider,
+ options?: SecondParameter<typeof customFetch>,) => {
+      return customFetch<PostProviders201>(
+      {url: `/providers`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createProvider
+    },
+      options);
+    }
+  
 export const postOrgs = (
     organisation: Organisation,
  options?: SecondParameter<typeof customFetch>,) => {
@@ -698,6 +907,26 @@ export const putOrgsOrgSlugEventsEventSlug = (
       {url: `/orgs/${orgSlug}/events/${eventSlug}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: event
+    },
+      options);
+    }
+  
+/**
+ * Upload booth plan image for an event
+ */
+export const postOrgsOrgSlugEventsEventSlugBoothPlan = (
+    orgSlug: string,
+    eventSlug: string,
+    postOrgsOrgSlugEventsEventSlugBoothPlanBody: PostOrgsOrgSlugEventsEventSlugBoothPlanBody,
+ options?: SecondParameter<typeof customFetch>,) => {const formData = new FormData();
+if(postOrgsOrgSlugEventsEventSlugBoothPlanBody.file !== undefined) {
+ formData.append(`file`, postOrgsOrgSlugEventsEventSlugBoothPlanBody.file)
+ }
+
+      return customFetch<PostOrgsOrgSlugEventsEventSlugBoothPlan201>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/booth-plan`, method: 'POST',
+      headers: {'Content-Type': 'multipart/form-data', },
+       data: formData
     },
       options);
     }
@@ -855,6 +1084,49 @@ export const deleteOrgsOrgSlugEventsEventSlugPacksPackIdOptionsOptionId = (
     }
   
 /**
+ * Get communication plan for all partnerships of an event, grouped by status
+ */
+export const getOrgsOrgSlugEventsEventSlugCommunication = (
+    orgSlug: string,
+    eventSlug: string,
+ options?: SecondParameter<typeof customFetch>,) => {
+      return customFetch<CommunicationPlan>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/communication`, method: 'GET'
+    },
+      options);
+    }
+  
+/**
+ * Attach a new external link to an event
+ */
+export const postOrgsOrgSlugEventsEventSlugExternalLink = (
+    orgSlug: string,
+    eventSlug: string,
+    postOrgsOrgSlugEventsEventSlugExternalLinkBody: PostOrgsOrgSlugEventsEventSlugExternalLinkBody,
+ options?: SecondParameter<typeof customFetch>,) => {
+      return customFetch<string>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/external-link`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: postOrgsOrgSlugEventsEventSlugExternalLinkBody
+    },
+      options);
+    }
+  
+/**
+ * Remove an external link by its ID
+ */
+export const deleteOrgsOrgSlugEventsEventSlugExternalLinkLinkId = (
+    orgSlug: string,
+    eventSlug: string,
+    linkId: string,
+ options?: SecondParameter<typeof customFetch>,) => {
+      return customFetch<null>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/external-link/${linkId}`, method: 'DELETE'
+    },
+      options);
+    }
+  
+/**
  * List partnerships for an event with filtering options
  */
 export const getOrgsOrgSlugEventsEventSlugPartnership = (
@@ -891,6 +1163,23 @@ export const postOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdBillingBillin
  options?: SecondParameter<typeof customFetch>,) => {
       return customFetch<MapString>(
       {url: `/orgs/${orgSlug}/events/${eventSlug}/partnership/${partnershipId}/billing/${billingStatus}`, method: 'POST'
+    },
+      options);
+    }
+  
+/**
+ * Assign booth location to a partnership
+ */
+export const putOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdBoothLocation = (
+    orgSlug: string,
+    eventSlug: string,
+    partnershipId: string,
+    boothLocationRequest: BoothLocationRequest,
+ options?: SecondParameter<typeof customFetch>,) => {
+      return customFetch<BoothLocationResponse>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnership/${partnershipId}/booth-location`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: boothLocationRequest
     },
       options);
     }
@@ -933,6 +1222,72 @@ export const postOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdDecline = (
  options?: SecondParameter<typeof customFetch>,) => {
       return customFetch<MapString>(
       {url: `/orgs/${orgSlug}/events/${eventSlug}/partnership/${partnershipId}/decline`, method: 'POST'
+    },
+      options);
+    }
+  
+/**
+ * Schedule publication date for partnership communication
+ */
+export const putOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdCommunicationPublication = (
+    orgSlug: string,
+    eventSlug: string,
+    partnershipId: string,
+    publicationDateRequest: PublicationDateRequest,
+ options?: SecondParameter<typeof customFetch>,) => {
+      return customFetch<PublicationDateResponse>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnership/${partnershipId}/communication/publication`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: publicationDateRequest
+    },
+      options);
+    }
+  
+/**
+ * Upload visual support material for partnership communication
+ */
+export const putOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdCommunicationSupport = (
+    orgSlug: string,
+    eventSlug: string,
+    partnershipId: string,
+    putOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdCommunicationSupportBody: Blob,
+ options?: SecondParameter<typeof customFetch>,) => {
+      return customFetch<SupportUploadResponse>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnership/${partnershipId}/communication/support`, method: 'PUT',
+      headers: {'Content-Type': 'image/png', },
+      data: putOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdCommunicationSupportBody
+    },
+      options);
+    }
+  
+/**
+ * Attach providers to an event (requires event write access)
+ */
+export const postOrgsOrgSlugEventsEventSlugProviders = (
+    orgSlug: string,
+    eventSlug: string,
+    postOrgsOrgSlugEventsEventSlugProvidersBody: string[],
+ options?: SecondParameter<typeof customFetch>,) => {
+      return customFetch<string[]>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/providers`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: postOrgsOrgSlugEventsEventSlugProvidersBody
+    },
+      options);
+    }
+  
+/**
+ * Remove providers from an event (requires event write access)
+ */
+export const deleteOrgsOrgSlugEventsEventSlugProviders = (
+    orgSlug: string,
+    eventSlug: string,
+    deleteOrgsOrgSlugEventsEventSlugProvidersBody: string[],
+ options?: SecondParameter<typeof customFetch>,) => {
+      return customFetch<string[]>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/providers`, method: 'DELETE',
+      headers: {'Content-Type': 'application/json', },
+      data: deleteOrgsOrgSlugEventsEventSlugProvidersBody
     },
       options);
     }
@@ -998,12 +1353,15 @@ export type PostEventsEventSlugPartnershipPartnershipIdSuggestionDeclineResult =
 export type GetEventsEventSlugPartnershipPartnershipIdTicketsResult = NonNullable<Awaited<ReturnType<typeof getEventsEventSlugPartnershipPartnershipIdTickets>>>
 export type PostEventsEventSlugPartnershipPartnershipIdTicketsResult = NonNullable<Awaited<ReturnType<typeof postEventsEventSlugPartnershipPartnershipIdTickets>>>
 export type PutEventsEventSlugPartnershipPartnershipIdTicketsTicketIdResult = NonNullable<Awaited<ReturnType<typeof putEventsEventSlugPartnershipPartnershipIdTicketsTicketId>>>
+export type GetProvidersResult = NonNullable<Awaited<ReturnType<typeof getProviders>>>
+export type PostProvidersResult = NonNullable<Awaited<ReturnType<typeof postProviders>>>
 export type PostOrgsResult = NonNullable<Awaited<ReturnType<typeof postOrgs>>>
 export type GetOrgsSlugResult = NonNullable<Awaited<ReturnType<typeof getOrgsSlug>>>
 export type PutOrgsOrgSlugResult = NonNullable<Awaited<ReturnType<typeof putOrgsOrgSlug>>>
 export type GetOrgsOrgSlugEventsResult = NonNullable<Awaited<ReturnType<typeof getOrgsOrgSlugEvents>>>
 export type PostOrgsOrgSlugEventsResult = NonNullable<Awaited<ReturnType<typeof postOrgsOrgSlugEvents>>>
 export type PutOrgsOrgSlugEventsEventSlugResult = NonNullable<Awaited<ReturnType<typeof putOrgsOrgSlugEventsEventSlug>>>
+export type PostOrgsOrgSlugEventsEventSlugBoothPlanResult = NonNullable<Awaited<ReturnType<typeof postOrgsOrgSlugEventsEventSlugBoothPlan>>>
 export type PostOrgsOrgSlugEventsEventSlugIntegrationsProviderUsageResult = NonNullable<Awaited<ReturnType<typeof postOrgsOrgSlugEventsEventSlugIntegrationsProviderUsage>>>
 export type GetOrgsOrgSlugEventsEventSlugOptionsResult = NonNullable<Awaited<ReturnType<typeof getOrgsOrgSlugEventsEventSlugOptions>>>
 export type PostOrgsOrgSlugEventsEventSlugOptionsResult = NonNullable<Awaited<ReturnType<typeof postOrgsOrgSlugEventsEventSlugOptions>>>
@@ -1015,12 +1373,20 @@ export type DeleteOrgsOrgSlugEventsEventSlugPacksPackIdResult = NonNullable<Awai
 export type PutOrgsOrgSlugEventsEventSlugPacksPackIdResult = NonNullable<Awaited<ReturnType<typeof putOrgsOrgSlugEventsEventSlugPacksPackId>>>
 export type PostOrgsOrgSlugEventsEventSlugPacksPackIdOptionsResult = NonNullable<Awaited<ReturnType<typeof postOrgsOrgSlugEventsEventSlugPacksPackIdOptions>>>
 export type DeleteOrgsOrgSlugEventsEventSlugPacksPackIdOptionsOptionIdResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsOrgSlugEventsEventSlugPacksPackIdOptionsOptionId>>>
+export type GetOrgsOrgSlugEventsEventSlugCommunicationResult = NonNullable<Awaited<ReturnType<typeof getOrgsOrgSlugEventsEventSlugCommunication>>>
+export type PostOrgsOrgSlugEventsEventSlugExternalLinkResult = NonNullable<Awaited<ReturnType<typeof postOrgsOrgSlugEventsEventSlugExternalLink>>>
+export type DeleteOrgsOrgSlugEventsEventSlugExternalLinkLinkIdResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsOrgSlugEventsEventSlugExternalLinkLinkId>>>
 export type GetOrgsOrgSlugEventsEventSlugPartnershipResult = NonNullable<Awaited<ReturnType<typeof getOrgsOrgSlugEventsEventSlugPartnership>>>
 export type PostOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdAgreementResult = NonNullable<Awaited<ReturnType<typeof postOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdAgreement>>>
 export type PostOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdBillingBillingStatusResult = NonNullable<Awaited<ReturnType<typeof postOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdBillingBillingStatus>>>
+export type PutOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdBoothLocationResult = NonNullable<Awaited<ReturnType<typeof putOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdBoothLocation>>>
 export type PostOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdSuggestionResult = NonNullable<Awaited<ReturnType<typeof postOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdSuggestion>>>
 export type PostOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdValidateResult = NonNullable<Awaited<ReturnType<typeof postOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdValidate>>>
 export type PostOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdDeclineResult = NonNullable<Awaited<ReturnType<typeof postOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdDecline>>>
+export type PutOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdCommunicationPublicationResult = NonNullable<Awaited<ReturnType<typeof putOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdCommunicationPublication>>>
+export type PutOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdCommunicationSupportResult = NonNullable<Awaited<ReturnType<typeof putOrgsOrgSlugEventsEventSlugPartnershipPartnershipIdCommunicationSupport>>>
+export type PostOrgsOrgSlugEventsEventSlugProvidersResult = NonNullable<Awaited<ReturnType<typeof postOrgsOrgSlugEventsEventSlugProviders>>>
+export type DeleteOrgsOrgSlugEventsEventSlugProvidersResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsOrgSlugEventsEventSlugProviders>>>
 export type GetOrgsOrgSlugUsersResult = NonNullable<Awaited<ReturnType<typeof getOrgsOrgSlugUsers>>>
 export type PostOrgsOrgSlugUsersGrantResult = NonNullable<Awaited<ReturnType<typeof postOrgsOrgSlugUsersGrant>>>
 export type GetUsersMeEventsResult = NonNullable<Awaited<ReturnType<typeof getUsersMeEvents>>>

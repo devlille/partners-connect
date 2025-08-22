@@ -45,7 +45,6 @@
 
 <script lang="ts" setup>
 const route = useRoute();
-console.log(route, "yo");
 </script>
 
 <style></style>
