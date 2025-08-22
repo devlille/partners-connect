@@ -1,27 +1,34 @@
 <template>
-  <h2>Liste de Organisations</h2>
+  <h2>Liste de Evenements</h2>
 
   <div class="results-list grid">
-    <div class="card" v-for="evt in data" :key="evt.id">
+    <div v-for="evt in data" :key="evt.slug" class="card">
       <h3>
         <NuxtLink
-          :to="{ name: 'orgs-slug-settings', params: { slug: evt.slug } }"
+          :to="{
+            name: 'orgs-slug-events-id-settings',
+            params: { slug: route.params.slug, id: evt.slug },
+          }"
           >{{ evt.name }}</NuxtLink
         >
       </h3>
 
       <dl>
-        <dt>Owner</dt>
-        <dd>{{ evt.owner.display_name }}</dd>
+        <dt>start Date</dt>
+        <dd>{{ evt.start_time }}</dd>
+        <dt>end Date</dt>
+        <dd>{{ evt.end_time }}</dd>
       </dl>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { getUsersMeOrgs } from "~/utils/api";
+const route = useRoute();
 
-const data = await getUsersMeOrgs().then((r) => r.data);
+const data = await getOrgsOrgSlugEvents(route.params.slug as string).then(
+  (r) => r.data
+);
 
 useHead({
   title: "Liste de Organisations | DevLille",

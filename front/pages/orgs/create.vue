@@ -1,6 +1,4 @@
 <template>
-  <h2>{{ org.name }}</h2>
-
   <form @submit.prevent="submitForm">
     <p>
       <label for="name">Nom</label>
@@ -10,7 +8,6 @@
         id="name"
         name="name"
         autocomplete="organization"
-        disabled
       />
     </p>
 
@@ -169,34 +166,29 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-// Nuxt: useRoute, definePageMeta, useHead sont auto-importés
-
-const route = useRoute();
-const org = await getOrgsSlug(route.params.slug as string).then((r) => r.data);
 
 const form = ref<Organisation>({
-  name: org?.name ?? "",
-  head_office: org?.head_office ?? "",
-  siret: org?.siret ?? "",
-  siren: org?.siren ?? "",
-  tva: org?.tva ?? "",
-  d_and_b: org?.d_and_b ?? org?.d_and_b ?? "",
-  nace: org?.nace ?? "",
-  naf: org?.naf ?? "",
-  duns: org?.duns ?? "",
-  iban: org?.iban ?? "",
-  bic: org?.bic ?? "",
-  rib_url: org?.rib_url ?? "",
-  representative_user_email: org?.representative_user_email ?? "",
-  representative_role: org?.representative_role ?? "",
-  created_at: org.created_at,
-  creation_location: org.creation_location,
-  published_at: org.published_at,
+  name: "",
+  head_office: "",
+  siret: "",
+  siren: "",
+  tva: "",
+  d_and_b: "",
+  nace: "",
+  naf: "",
+  duns: "",
+  iban: "",
+  bic: "",
+  rib_url: "",
+  representative_user_email: "",
+  representative_role: "",
+  created_at: new Date().toString(),
+  creation_location: new Date().toString(),
+  published_at: "Lille",
 });
 
 async function submitForm() {
-  await putOrgsOrgSlug(route.params.slug as string, {
-    ...org,
+  await postOrgs({
     ...form.value,
   });
 }

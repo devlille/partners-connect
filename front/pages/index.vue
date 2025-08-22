@@ -8,7 +8,7 @@
       <form>
         <p>
           <label for="ip-name">Nom</label>
-          <input type="text" id="ip-name" name="ip-name" autocomplete="name" />
+          <input id="ip-name" type="text" name="ip-name" autocomplete="name" />
         </p>
         <p>
           <label for="sel-pack">Pack de sponsoring</label>
@@ -22,15 +22,15 @@
         <p>
           <label for="ip-email">Email</label>
           <input
-            type="emailtext"
             id="ip-email"
+            type="emailtext"
             name="ip-email"
             autocomplete="email"
           />
         </p>
         <p>
           <label for="ip-phone">Tél.</label>
-          <input type="tel" id="ip-phone" name="ip-phone" autocomplete="tel" />
+          <input id="ip-phone" type="tel" name="ip-phone" autocomplete="tel" />
         </p>
 
         <p class="buttons-bar">
