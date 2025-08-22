@@ -35,7 +35,9 @@ class EventProviderRoutesTest {
         val testEventSlug = "test-event"
         val email = "john.doe@contact.com" // Must match the mock auth email
         
-        val providerIds = mutableListOf<String>()
+        // Use fixed provider IDs to avoid scoping issues
+        val provider1Id = UUID.randomUUID()
+        val provider2Id = UUID.randomUUID()
 
         application {
             moduleMocked()
@@ -44,17 +46,17 @@ class EventProviderRoutesTest {
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug, name = "Test Event")
             insertMockedOrgaPermission(orgId = orgId, user = user, canEdit = true)
 
-            // Create providers and store their IDs
-            val provider1 = insertMockedProvider(name = "Provider A")
-            val provider2 = insertMockedProvider(name = "Provider B")
-            providerIds.add(provider1.id.value.toString())
-            providerIds.add(provider2.id.value.toString())
+            // Create providers with fixed IDs
+            insertMockedProvider(id = provider1Id, name = "Provider A")
+            insertMockedProvider(id = provider2Id, name = "Provider B")
         }
+
+        val providerIds = listOf(provider1Id.toString(), provider2Id.toString())
 
         val response = client.post("/orgs/$testOrgSlug/events/$testEventSlug/providers") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(providerIds.toList()))
+            setBody(json.encodeToString(providerIds))
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
@@ -123,7 +125,7 @@ class EventProviderRoutesTest {
         val response = client.post("/orgs/$testOrgSlug/events/$testEventSlug/providers") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody("[\"some-uuid\"]")
+            setBody("[\"${UUID.randomUUID()}\"]")
         }
 
         assertEquals(HttpStatusCode.NotFound, response.status)
@@ -225,7 +227,8 @@ class EventProviderRoutesTest {
         val testEventSlug = "test-event"
         val email = "john.doe@contact.com" // Must match the mock auth email
         
-        var providerId = ""
+        // Use fixed provider ID to avoid scoping issues
+        val providerId = UUID.randomUUID()
 
         application {
             moduleMocked()
@@ -234,11 +237,10 @@ class EventProviderRoutesTest {
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug, name = "Test Event")
             insertMockedOrgaPermission(orgId = orgId, user = user, canEdit = true)
 
-            val provider = insertMockedProvider(name = "Test Provider")
-            providerId = provider.id.value.toString()
+            insertMockedProvider(id = providerId, name = "Test Provider")
         }
         
-        val providerIds = listOf(providerId)
+        val providerIds = listOf(providerId.toString())
 
         // First attachment
         val response1 = client.post("/orgs/$testOrgSlug/events/$testEventSlug/providers") {

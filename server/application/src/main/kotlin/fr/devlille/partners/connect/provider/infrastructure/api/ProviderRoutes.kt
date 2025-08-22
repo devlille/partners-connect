@@ -54,7 +54,7 @@ fun Route.providerRoutes() {
 
             val input = call.receive<CreateProvider>()
             val providerId = providerRepository.create(input)
-            call.respond(HttpStatusCode.Created, mapOf("id" to providerId))
+            call.respond(HttpStatusCode.Created, mapOf("id" to providerId.toString()))
         }
     }
 }
