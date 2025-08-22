@@ -8,6 +8,7 @@ import fr.devlille.partners.connect.companies.infrastructure.api.companyRoutes
 import fr.devlille.partners.connect.companies.infrastructure.bindings.companyModule
 import fr.devlille.partners.connect.events.infrastructure.api.eventBoothPlanRoutes
 import fr.devlille.partners.connect.events.infrastructure.api.eventExternalLinkRoutes
+import fr.devlille.partners.connect.events.infrastructure.api.eventProviderRoutes
 import fr.devlille.partners.connect.events.infrastructure.api.eventRoutes
 import fr.devlille.partners.connect.events.infrastructure.bindings.eventModule
 import fr.devlille.partners.connect.integrations.infrastructure.api.integrationRoutes
@@ -33,6 +34,8 @@ import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipRo
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipSuggestionRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipTicketingRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.bindings.partnershipModule
+import fr.devlille.partners.connect.provider.infrastructure.api.providerRoutes
+import fr.devlille.partners.connect.provider.infrastructure.bindings.providerModule
 import fr.devlille.partners.connect.sponsoring.infrastructure.api.sponsoringRoutes
 import fr.devlille.partners.connect.sponsoring.infrastructure.bindings.sponsoringModule
 import fr.devlille.partners.connect.tickets.infrastructure.bindings.ticketingModule
@@ -96,6 +99,7 @@ data class ApplicationConfig(
         billingModule,
         ticketingModule,
         integrationModule,
+        providerModule,
     ),
 )
 
@@ -131,6 +135,7 @@ fun Application.module(config: ApplicationConfig = ApplicationConfig()) {
         organisationRoutes()
         eventRoutes()
         eventBoothPlanRoutes()
+        eventProviderRoutes()
         eventExternalLinkRoutes()
         userRoutes()
         sponsoringRoutes()
@@ -144,6 +149,7 @@ fun Application.module(config: ApplicationConfig = ApplicationConfig()) {
         partnershipSuggestionRoutes()
         partnershipTicketingRoutes()
         integrationRoutes()
+        providerRoutes()
     }
 }
 

@@ -553,6 +553,83 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Ticket"
+  /providers:
+    get:
+      description: "List all providers with optional filtering and sorting"
+      parameters:
+        - name: "query"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+          description: "Search providers by name (case-insensitive)"
+        - name: "sort"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            enum: ["name", "createdAt", "creation", "created"]
+            default: "createdAt"
+          description: "Sort by field (default: createdAt)"
+        - name: "direction"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            enum: ["asc", "desc"]
+            default: "asc"
+          description: "Sort direction (default: asc)"
+      responses:
+        "200":
+          description: "OK - List of providers"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Provider"
+    post:
+      description: "Create a new provider (requires authentication and organizer status)"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProvider"
+        required: true
+      responses:
+        "201":
+          description: "Created - Provider created successfully"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "string"
+                    format: "uuid"
+                    description: "UUID of the created provider"
+                required:
+                  - "id"
+        "400":
+          description: "Bad Request - Invalid input data"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized - Missing or invalid authentication"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "403":
+          description: "Forbidden - User is not an organizer of any event"
+          content:
+            text/plain:
+              schema:
+                type: "string"
   /orgs:
     post:
       description: ""
@@ -1846,6 +1923,131 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SupportUploadResponse"
+  /orgs/{orgSlug}/events/{eventSlug}/providers:
+    post:
+      description: "Attach providers to an event (requires event write access)"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organization slug"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "array"
+              items:
+                type: "string"
+                format: "uuid"
+              description: "List of provider UUIDs to attach"
+        required: true
+      responses:
+        "200":
+          description: "OK - Providers attached successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "string"
+                  format: "uuid"
+                description: "List of successfully attached provider UUIDs"
+        "400":
+          description: "Bad Request - Invalid provider IDs or empty list"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized - Missing or invalid authentication"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "403":
+          description: "Forbidden - No write access to the event"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found - Event or organization not found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+    delete:
+      description: "Remove providers from an event (requires event write access)"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organization slug"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "array"
+              items:
+                type: "string"
+                format: "uuid"
+              description: "List of provider UUIDs to remove"
+        required: true
+      responses:
+        "200":
+          description: "OK - Providers detached successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "string"
+                  format: "uuid"
+                description: "List of successfully detached provider UUIDs"
+        "400":
+          description: "Bad Request - Invalid provider IDs or empty list"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized - Missing or invalid authentication"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "403":
+          description: "Forbidden - No write access to the event"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found - Event or organization not found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
   /orgs/{orgSlug}/users:
     get:
       description: ""
@@ -2553,6 +2755,64 @@ components:
         - "slug"
         - "headOffice"
         - "owner"
+    Provider:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+          description: "Unique identifier of the provider"
+        name:
+          type: "string"
+          description: "Name of the provider"
+        type:
+          type: "string"
+          description: "Type/category of the provider"
+        website:
+          type: "string"
+          nullable: true
+          description: "Website URL of the provider"
+        phone:
+          type: "string"
+          nullable: true
+          description: "Phone number of the provider"
+        email:
+          type: "string"
+          nullable: true
+          description: "Email address of the provider"
+        created_at:
+          type: "string"
+          format: "date-time"
+          description: "Creation timestamp of the provider"
+      required:
+        - "id"
+        - "name"
+        - "type"
+        - "created_at"
+    CreateProvider:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+          description: "Name of the provider"
+        type:
+          type: "string"
+          description: "Type/category of the provider"
+        website:
+          type: "string"
+          nullable: true
+          description: "Website URL of the provider"
+        phone:
+          type: "string"
+          nullable: true
+          description: "Phone number of the provider"
+        email:
+          type: "string"
+          nullable: true
+          description: "Email address of the provider"
+      required:
+        - "name"
+        - "type"
     BoothLocationRequest:
       type: "object"
       properties:
