@@ -10,6 +10,4 @@ interface ProviderRepository {
     fun attachToEvent(eventSlug: String, providerIds: List<UUID>): List<UUID>
 
     fun detachFromEvent(eventSlug: String, providerIds: List<UUID>): List<UUID>
-
-    fun findProvidersByEventSlug(eventSlug: String): List<Provider>
 }
