@@ -71,6 +71,13 @@ class EventRepositoryExposed(
         page: Int,
         pageSize: Int
     ): PaginatedResponse<EventSummary> = transaction {
+        if (page < 1) {
+            throw BadRequestException("Page number must be greater than 0")
+        }
+        if (pageSize < 1) {
+            throw BadRequestException("Page size must be greater than 0")
+        }
+
         val organisation = OrganisationEntity.orgFindBySlug(orgSlug)
             ?: throw NotFoundException("Organisation with slug $orgSlug not found")
         val orgId = organisation.id

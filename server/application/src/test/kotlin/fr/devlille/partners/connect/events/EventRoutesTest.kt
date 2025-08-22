@@ -457,4 +457,30 @@ class EventRoutesTest {
         assertTrue(providerTypes.contains("Technology"))
         assertTrue(providerTypes.contains("Consulting"))
     }
+
+    @Test
+    fun `GET orgs events returns 400 for invalid page or pageSize`() = testApplication {
+        val orgId = UUID.randomUUID()
+        application {
+            moduleMocked()
+            val admin = insertMockedAdminUser()
+            val org = insertMockedOrganisationEntity(id = orgId, representativeUser = admin)
+            insertMockedOrgaPermission(orgId = orgId, user = admin)
+            insertMockedEventWithOrga(name = "Event", slug = "event", organisation = org)
+        }
+
+        val invalidParams = listOf(
+            "page=0", // invalid page
+            "page=-1", // invalid page
+            "pageSize=0", // invalid pageSize
+            "pageSize=-5" // invalid pageSize
+        )
+
+        for (param in invalidParams) {
+            val response = client.get("/orgs/$orgId/events?$param") {
+                header(HttpHeaders.Authorization, "Bearer valid")
+            }
+            assertEquals(HttpStatusCode.BadRequest, response.status, "Should return 400 for param: $param")
+        }
+    }
 }
