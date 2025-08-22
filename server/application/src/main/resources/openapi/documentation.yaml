@@ -1216,6 +1216,49 @@ paths:
             '*/*':
               schema:
                 type: "object"
+  /orgs/{orgSlug}/events/{eventSlug}/communication:
+    get:
+      description: "Get communication plan for all partnerships of an event, grouped by status"
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organization slug"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug"
+      security:
+        - bearerAuth: []
+      responses:
+        "400":
+          description: "Bad Request - Missing or invalid parameters"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found - Event not found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommunicationPlan"
   /orgs/{orgSlug}/events/{eventSlug}/external-link:
     post:
       description: "Attach a new external link to an event"
@@ -2564,3 +2607,46 @@ components:
       required:
         - "id"
         - "url"
+    CommunicationItem:
+      type: "object"
+      properties:
+        partnership_id:
+          type: "string"
+          description: "Partnership unique identifier"
+        company_name:
+          type: "string"
+          description: "Company name"
+        publication_date:
+          type: "string"
+          format: "date-time"
+          nullable: true
+          description: "Publication date in ISO 8601 format (null for unplanned)"
+        support_url:
+          type: "string"
+          nullable: true
+          description: "URL to the communication support material (null if not uploaded)"
+      required:
+        - "partnership_id"
+        - "company_name"
+    CommunicationPlan:
+      type: "object"
+      properties:
+        done:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/CommunicationItem"
+          description: "Communications with past publication dates (sorted newest first)"
+        planned:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/CommunicationItem"
+          description: "Communications with future publication dates (sorted earliest first)"
+        unplanned:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/CommunicationItem"
+          description: "Communications without publication date (sorted alphabetically by company name)"
+      required:
+        - "done"
+        - "planned"
+        - "unplanned"

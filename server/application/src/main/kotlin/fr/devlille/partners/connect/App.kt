@@ -24,6 +24,7 @@ import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.notifications.infrastructure.bindings.notificationModule
 import fr.devlille.partners.connect.organisations.infrastructure.api.organisationRoutes
 import fr.devlille.partners.connect.organisations.infrastructure.bindings.organisationModule
+import fr.devlille.partners.connect.partnership.infrastructure.api.eventCommunicationPlanRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipAgreementRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipBillingRoutes
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipBoothLocationRoutes
@@ -134,6 +135,7 @@ fun Application.module(config: ApplicationConfig = ApplicationConfig()) {
         userRoutes()
         sponsoringRoutes()
         companyRoutes()
+        eventCommunicationPlanRoutes()
         partnershipAgreementRoutes()
         partnershipBillingRoutes()
         partnershipBoothLocationRoutes()
