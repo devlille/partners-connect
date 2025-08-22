@@ -23,11 +23,11 @@ fun Route.providerRoutes() {
 
     route("/providers") {
         get {
+            val query = call.request.queryParameters["query"]
             val sort = call.request.queryParameters["sort"]
             val direction = call.request.queryParameters["direction"]
-            val query = call.request.queryParameters["query"]
 
-            val providers = providerRepository.list(sort, direction, query)
+            val providers = providerRepository.list(query, sort, direction)
             call.respond(HttpStatusCode.OK, providers)
         }
 

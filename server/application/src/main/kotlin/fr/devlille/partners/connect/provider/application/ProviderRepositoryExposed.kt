@@ -18,7 +18,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
 class ProviderRepositoryExposed : ProviderRepository {
-    override fun list(sort: String?, direction: String?, query: String?): List<Provider> = transaction {
+    override fun list(query: String?, sort: String?, direction: String?): List<Provider> = transaction {
         var queryBuilder = ProviderEntity.all()
 
         // Apply search filter if query is provided
@@ -35,8 +35,9 @@ class ProviderRepositoryExposed : ProviderRepository {
         }
 
         val sortedQuery = when (sort?.lowercase()) {
-            "creation", "created" -> queryBuilder.orderBy(ProvidersTable.createdAt to sortOrder)
-            else -> queryBuilder.orderBy(ProvidersTable.name to sortOrder) // default to name
+            "creation", "created", "createdat" -> queryBuilder.orderBy(ProvidersTable.createdAt to sortOrder)
+            "name" -> queryBuilder.orderBy(ProvidersTable.name to sortOrder)
+            else -> queryBuilder.orderBy(ProvidersTable.createdAt to sortOrder) // default to createdAt
         }
 
         sortedQuery.map { entity ->
@@ -47,6 +48,7 @@ class ProviderRepositoryExposed : ProviderRepository {
                 website = entity.website,
                 phone = entity.phone,
                 email = entity.email,
+                createdAt = entity.createdAt,
             )
         }
     }

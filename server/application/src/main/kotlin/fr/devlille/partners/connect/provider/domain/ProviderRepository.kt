@@ -3,7 +3,7 @@ package fr.devlille.partners.connect.provider.domain
 import java.util.UUID
 
 interface ProviderRepository {
-    fun list(sort: String? = null, direction: String? = null, query: String? = null): List<Provider>
+    fun list(query: String? = null, sort: String? = "createdAt", direction: String? = "asc"): List<Provider>
 
     fun create(input: CreateProvider): UUID
 

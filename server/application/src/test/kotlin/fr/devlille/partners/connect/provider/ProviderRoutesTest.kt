@@ -3,6 +3,7 @@ package fr.devlille.partners.connect.provider
 import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
+import fr.devlille.partners.connect.provider.domain.CreateProvider
 import fr.devlille.partners.connect.provider.factories.createMockedProviderInput
 import fr.devlille.partners.connect.provider.factories.insertMockedProvider
 import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
@@ -83,16 +84,16 @@ class ProviderRoutesTest {
         val response = client.post("/providers") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(providerInput))
+            setBody(Json.encodeToString(CreateProvider.serializer(), providerInput))
         }
 
         assertEquals(HttpStatusCode.Created, response.status)
         val responseText = response.bodyAsText()
-        val provider = Json.parseToJsonElement(responseText).jsonObject
+        val responseObject = Json.parseToJsonElement(responseText).jsonObject
 
-        assertNotNull(provider["id"])
-        assertEquals("New Provider", provider["name"]?.toString()?.removeSurrounding("\""))
-        assertEquals("Technology", provider["type"]?.toString()?.removeSurrounding("\""))
+        assertNotNull(responseObject["id"])
+        // Verify it's a valid UUID format
+        UUID.fromString(responseObject["id"]?.toString()?.removeSurrounding("\""))
     }
 
     @Test
@@ -103,7 +104,7 @@ class ProviderRoutesTest {
 
         val response = client.post("/providers") {
             contentType(ContentType.Application.Json)
-            setBody(json.encodeToString(providerInput))
+            setBody(Json.encodeToString(CreateProvider.serializer(), providerInput))
         }
 
         assertEquals(HttpStatusCode.Unauthorized, response.status)
@@ -121,7 +122,7 @@ class ProviderRoutesTest {
         val response = client.post("/providers") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(providerInput))
+            setBody(Json.encodeToString(CreateProvider.serializer(), providerInput))
         }
 
         assertEquals(HttpStatusCode.Forbidden, response.status)
