@@ -1,7 +1,6 @@
 package fr.devlille.partners.connect.events
 
 import fr.devlille.partners.connect.events.domain.CreateEventExternalLinkRequest
-import fr.devlille.partners.connect.events.domain.EventExternalLink
 import fr.devlille.partners.connect.events.factories.insertMockedEventWithOrga
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
@@ -57,11 +56,12 @@ class EventExternalLinkRoutesTest {
         assertEquals(HttpStatusCode.Created, response.status)
 
         val responseBody = response.bodyAsText()
-        val externalLink = json.decodeFromString<EventExternalLink>(responseBody)
+        // The response should be a UUID string
+        val externalLinkId = responseBody.replace("\"", "") // Remove quotes from JSON string
 
-        assertNotNull(externalLink.id)
-        assertEquals("Call for Papers", externalLink.name)
-        assertEquals("https://sessionize.com/devlille2025", externalLink.url)
+        // Verify it's a valid UUID format
+        assertNotNull(UUID.fromString(externalLinkId))
+        assertTrue(externalLinkId.isNotEmpty())
     }
 
     @Test
@@ -236,10 +236,10 @@ class EventExternalLinkRoutesTest {
         }
 
         assertEquals(HttpStatusCode.Created, createResponse.status)
-        val createdLink = json.decodeFromString<EventExternalLink>(createResponse.bodyAsText())
+        val createdLinkId = createResponse.bodyAsText().replace("\"", "") // Remove quotes from JSON string
 
         // Then delete it
-        val deleteResponse = client.delete("/orgs/$orgSlug/events/$eventSlug/external-link/${createdLink.id}") {
+        val deleteResponse = client.delete("/orgs/$orgSlug/events/$eventSlug/external-link/$createdLinkId") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 

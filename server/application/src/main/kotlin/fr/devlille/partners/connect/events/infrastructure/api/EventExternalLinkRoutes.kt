@@ -1,9 +1,9 @@
 package fr.devlille.partners.connect.events.infrastructure.api
 
 import fr.devlille.partners.connect.events.domain.CreateEventExternalLinkRequest
-import fr.devlille.partners.connect.events.domain.EventExternalLink
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receive
@@ -26,12 +26,7 @@ fun Route.eventExternalLinkRoutes() {
             val request = call.receive<CreateEventExternalLinkRequest>()
 
             val externalLinkId = repository.createExternalLink(eventSlug, request)
-            val externalLink = EventExternalLink(
-                id = externalLinkId,
-                name = request.name,
-                url = request.url,
-            )
-            call.respond(HttpStatusCode.Created, externalLink)
+            call.respond(HttpStatusCode.Created, externalLinkId.toString())
         }
     }
 
@@ -40,8 +35,8 @@ fun Route.eventExternalLinkRoutes() {
 
         delete {
             val linkId = call.parameters["linkId"] ?: throw BadRequestException("Missing link ID")
-            
-            repository.deleteExternalLink(linkId)
+
+            repository.deleteExternalLink(linkId.toUUID())
             call.respond(HttpStatusCode.NoContent)
         }
     }

@@ -20,10 +20,12 @@ import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissi
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionsTable
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
+import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import java.util.UUID
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug as eventFindBySlug
 import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug as orgFindBySlug
 
@@ -177,19 +179,19 @@ class EventRepositoryExposed(
     override fun createExternalLink(
         eventSlug: String,
         request: CreateEventExternalLinkRequest,
-    ): String = transaction {
+    ): UUID = transaction {
         // Basic validation
         if (request.name.isBlank()) {
-            throw io.ktor.server.plugins.BadRequestException("External link name cannot be empty")
+            throw BadRequestException("External link name cannot be empty")
         }
         if (request.url.isBlank()) {
-            throw io.ktor.server.plugins.BadRequestException("External link URL cannot be empty")
+            throw BadRequestException("External link URL cannot be empty")
         }
 
         // Basic URL validation
         val urlPattern = Regex("^https?://.*")
         if (!urlPattern.matches(request.url)) {
-            throw io.ktor.server.plugins.BadRequestException("Invalid URL format - must start with http:// or https://")
+            throw BadRequestException("Invalid URL format - must start with http:// or https://")
         }
 
         val eventEntity = entity.eventFindBySlug(eventSlug)
@@ -201,13 +203,13 @@ class EventRepositoryExposed(
             this.url = request.url
         }
 
-        externalLinkEntity.id.value.toString()
+        externalLinkEntity.id.value
     }
 
-    override fun deleteExternalLink(externalLinkId: String): Unit = transaction {
-        val linkEntity = EventExternalLinkEntity.findById(java.util.UUID.fromString(externalLinkId))
+    override fun deleteExternalLink(externalLinkId: UUID): Unit = transaction {
+        val linkEntity = EventExternalLinkEntity.findById(externalLinkId)
             ?: throw NotFoundException("External link with id $externalLinkId not found")
-        
+
         linkEntity.delete()
     }
 }

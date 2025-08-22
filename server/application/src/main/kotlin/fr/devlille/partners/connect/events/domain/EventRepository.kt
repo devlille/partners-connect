@@ -1,5 +1,7 @@
 package fr.devlille.partners.connect.events.domain
 
+import java.util.UUID
+
 interface EventRepository {
     fun getAllEvents(): List<EventSummary>
 
@@ -15,7 +17,7 @@ interface EventRepository {
 
     fun updateBoothPlanImageUrl(eventSlug: String, imageUrl: String)
 
-    fun createExternalLink(eventSlug: String, request: CreateEventExternalLinkRequest): String
+    fun createExternalLink(eventSlug: String, request: CreateEventExternalLinkRequest): UUID
 
-    fun deleteExternalLink(externalLinkId: String)
+    fun deleteExternalLink(externalLinkId: UUID)
 }
