@@ -35,7 +35,10 @@ fun Route.eventRoutes() {
 
         get {
             val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Missing organisation slug")
-            call.respond(HttpStatusCode.OK, repository.findByOrgSlug(orgSlug))
+            val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 1
+            val pageSize = call.request.queryParameters["pageSize"]?.toIntOrNull() ?: 20
+            val paginated = repository.findByOrgSlugPaginated(orgSlug, page, pageSize)
+            call.respond(HttpStatusCode.OK, paginated)
         }
 
         post {

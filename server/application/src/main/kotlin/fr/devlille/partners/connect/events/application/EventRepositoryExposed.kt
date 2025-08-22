@@ -8,6 +8,7 @@ import fr.devlille.partners.connect.events.domain.EventExternalLink
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventSummary
 import fr.devlille.partners.connect.events.domain.EventWithOrganisation
+import fr.devlille.partners.connect.events.domain.PaginatedResponse
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinkEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinksTable
@@ -28,6 +29,7 @@ import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
+import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug as eventFindBySlug
@@ -62,6 +64,37 @@ class EventRepositoryExposed(
                 submissionEndTime = it.submissionEndTime,
             )
         }
+    }
+
+    override fun findByOrgSlugPaginated(orgSlug: String, page: Int, pageSize: Int): PaginatedResponse<EventSummary> = transaction {
+        val organisation = OrganisationEntity.orgFindBySlug(orgSlug)
+            ?: throw NotFoundException("Organisation with slug $orgSlug not found")
+        val orgId = organisation.id
+        val eventQuery = EventsTable.selectAll().where { EventsTable.organisationId eq orgId }
+        val total = eventQuery.count()
+        val offset = (page - 1) * pageSize
+        val rows = eventQuery
+            .orderBy(EventsTable.startTime)
+            .limit(pageSize)
+            .offset(offset.toLong())
+            .toList()
+        val items = rows.map { row ->
+            val eventEntity = EventEntity[row[EventsTable.id]]
+            EventSummary(
+                slug = eventEntity.slug,
+                name = eventEntity.name,
+                startTime = eventEntity.startTime,
+                endTime = eventEntity.endTime,
+                submissionStartTime = eventEntity.submissionStartTime,
+                submissionEndTime = eventEntity.submissionEndTime,
+            )
+        }
+        PaginatedResponse(
+            items = items,
+            page = page,
+            pageSize = pageSize,
+            total = total
+        )
     }
 
     override fun getBySlug(eventSlug: String): EventWithOrganisation = transaction {

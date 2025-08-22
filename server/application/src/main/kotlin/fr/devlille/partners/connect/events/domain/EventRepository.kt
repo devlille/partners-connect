@@ -9,6 +9,8 @@ interface EventRepository {
 
     fun findByOrgSlug(orgSlug: String): List<EventSummary>
 
+    fun findByOrgSlugPaginated(orgSlug: String, page: Int, pageSize: Int): PaginatedResponse<EventSummary>
+
     fun createEvent(orgSlug: String, event: Event): String
 
     fun updateEvent(eventSlug: String, orgSlug: String, event: Event): String

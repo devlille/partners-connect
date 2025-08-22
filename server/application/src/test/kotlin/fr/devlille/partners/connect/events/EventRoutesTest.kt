@@ -139,8 +139,9 @@ class EventRoutesTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
         val responseBody = response.bodyAsText()
-        val events = Json.parseToJsonElement(responseBody).jsonArray
-        assertEquals(2, events.size)
+        val paginated = Json.parseToJsonElement(responseBody).jsonObject
+        val items = paginated["items"]!!.jsonArray
+        assertEquals(2, items.size)
     }
 
     @Test
@@ -159,8 +160,9 @@ class EventRoutesTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
         val responseBody = response.bodyAsText()
-        val events = Json.parseToJsonElement(responseBody).jsonArray
-        assertEquals(0, events.size)
+        val paginated = Json.parseToJsonElement(responseBody).jsonObject
+        val items = paginated["items"]!!.jsonArray
+        assertEquals(0, items.size)
     }
 
     @Test
