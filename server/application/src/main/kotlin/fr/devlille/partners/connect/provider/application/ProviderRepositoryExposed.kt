@@ -11,8 +11,8 @@ import fr.devlille.partners.connect.provider.infrastructure.db.ProviderEntity
 import fr.devlille.partners.connect.provider.infrastructure.db.ProvidersTable
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
-import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.lowerCase
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID

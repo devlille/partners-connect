@@ -18,6 +18,7 @@ fun createMockedProviderInput(
     email = email,
 )
 
+@Suppress("LongParameterList")
 fun insertMockedProvider(
     id: UUID = UUID.randomUUID(),
     name: String = "Test Provider",

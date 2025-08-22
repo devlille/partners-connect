@@ -40,7 +40,10 @@ class EventProviderRoutesTest {
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug, name = "Test Event")
             insertMockedOrgaPermission(orgId = orgId, user = admin)
 
+            @Suppress("UnusedPrivateProperty")
             val provider1 = insertMockedProvider(name = "Provider 1")
+
+            @Suppress("UnusedPrivateProperty")
             val provider2 = insertMockedProvider(name = "Provider 2")
         }
 
@@ -85,6 +88,7 @@ class EventProviderRoutesTest {
 
         application {
             moduleMocked()
+            @Suppress("UnusedPrivateProperty")
             val regularUser = insertMockedUser()
             insertMockedOrganisationEntity(id = orgId, name = testOrgSlug)
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug)
@@ -218,6 +222,7 @@ class EventProviderRoutesTest {
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug, name = "Test Event")
             insertMockedOrgaPermission(orgId = orgId, user = admin)
 
+            @Suppress("UnusedPrivateProperty")
             val provider = insertMockedProvider(name = "Provider")
         }
 

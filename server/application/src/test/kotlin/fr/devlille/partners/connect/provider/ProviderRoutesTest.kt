@@ -29,8 +29,6 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class ProviderRoutesTest {
-    private val json = Json { ignoreUnknownKeys = true }
-
     @Test
     fun `GET providers returns empty list when no providers exist`() = testApplication {
         application { moduleMocked() }
@@ -45,7 +43,10 @@ class ProviderRoutesTest {
     fun `GET providers returns all providers`() = testApplication {
         application {
             moduleMocked()
+            @Suppress("UnusedPrivateProperty")
             val provider1 = insertMockedProvider(name = "Provider 1", type = "Tech")
+
+            @Suppress("UnusedPrivateProperty")
             val provider2 = insertMockedProvider(name = "Provider 2", type = "Catering")
         }
 
