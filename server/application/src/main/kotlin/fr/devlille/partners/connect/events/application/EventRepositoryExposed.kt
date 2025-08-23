@@ -27,7 +27,7 @@ import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissi
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
 import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.plugins.NotFoundException
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -53,7 +53,11 @@ class EventRepositoryExposed(
 
     override fun findByOrgSlug(orgSlug: String): List<EventSummary> = transaction {
         val organisation = OrganisationEntity.orgFindBySlug(orgSlug)
-            ?: throw NotFoundException("Organisation with slug $orgSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ORGANISATION_NOT_FOUND,
+                message = "Organisation with slug $orgSlug not found",
+                meta = mapOf(MetaKeys.ORGANISATION to orgSlug)
+            )
         entity.find { EventsTable.organisationId eq organisation.id }.map {
             EventSummary(
                 slug = it.slug,

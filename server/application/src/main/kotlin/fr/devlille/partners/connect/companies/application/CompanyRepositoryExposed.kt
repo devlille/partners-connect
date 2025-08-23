@@ -9,7 +9,9 @@ import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanySocialEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.deleteAllByCompanyId
 import fr.devlille.partners.connect.companies.infrastructure.db.listByQuery
-import io.ktor.server.plugins.NotFoundException
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
@@ -22,7 +24,11 @@ class CompanyRepositoryExposed : CompanyRepository {
 
     override fun getById(id: UUID): Company = transaction {
         CompanyEntity.findById(id)?.toDomain()
-            ?: throw NotFoundException("Company with id $id not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.COMPANY_NOT_FOUND,
+                message = "Company with id $id not found",
+                meta = mapOf(MetaKeys.ID to id.toString())
+            )
     }
 
     override fun createOrUpdate(input: CreateCompany): UUID = transaction {
