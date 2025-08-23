@@ -10,5 +10,5 @@ interface WebhookRepository {
         eventSlug: String,
         partnershipId: UUID,
         eventType: WebhookEventType,
-    ): Int
+    )
 }

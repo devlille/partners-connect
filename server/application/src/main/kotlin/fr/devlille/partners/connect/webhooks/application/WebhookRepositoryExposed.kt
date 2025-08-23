@@ -19,11 +19,15 @@ class WebhookRepositoryExposed(
         eventSlug: String,
         partnershipId: UUID,
         eventType: WebhookEventType,
-    ): Int {
-        val integrations = transaction {
-            val eventId = EventEntity.findBySlug(eventSlug)?.id?.value
+    ) {
+        // Separate transaction to get event entity
+        val eventId = transaction {
+            EventEntity.findBySlug(eventSlug)?.id?.value
                 ?: throw NotFoundException("Event with slug $eventSlug not found")
+        }
 
+        // Separate transaction to get integration list
+        val integrations = transaction {
             IntegrationsTable
                 .findByEventIdAndUsage(eventId, IntegrationUsage.WEBHOOK)
                 .map { row ->
@@ -36,21 +40,9 @@ class WebhookRepositoryExposed(
                 }
         }
 
-        var successCount = 0
+        // Simple iteration without try-catch or success counting
         for ((gateway, integrationId, eventId) in integrations) {
-            try {
-                if (gateway.sendWebhook(integrationId, eventId, partnershipId, eventType)) {
-                    successCount++
-                }
-            } catch (_: IllegalArgumentException) {
-                // Invalid webhook configuration
-            } catch (_: java.net.ConnectException) {
-                // Network connection failed
-            } catch (_: java.io.IOException) {
-                // IO error during HTTP call
-            }
+            gateway.sendWebhook(integrationId, eventId, partnershipId, eventType)
         }
-
-        return successCount
     }
 }
