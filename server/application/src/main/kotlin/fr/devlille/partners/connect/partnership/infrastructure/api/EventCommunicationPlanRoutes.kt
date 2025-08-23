@@ -1,11 +1,13 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.application.install
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -20,7 +22,11 @@ fun Route.eventCommunicationPlanRoutes() {
         install(AuthorizedOrganisationPlugin)
 
         get {
-            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
+                code = ErrorCode.MISSING_REQUIRED_PARAMETER,
+                message = "Missing event slug",
+                meta = mapOf(MetaKeys.FIELD to "eventSlug"),
+            )
 
             val communicationPlan = partnershipRepository.listCommunicationPlan(eventSlug)
             call.respond(HttpStatusCode.OK, communicationPlan)

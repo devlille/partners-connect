@@ -1,7 +1,9 @@
 package fr.devlille.partners.connect.integrations.infrastructure.db
 
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
-import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.Table
 import org.jetbrains.exposed.v1.crypt.encryptedVarchar
 import org.jetbrains.exposed.v1.jdbc.selectAll
@@ -43,5 +45,9 @@ operator fun QontoIntegrationsTable.get(integrationId: UUID): QontoConfig = tran
             )
         }
         .singleOrNull()
-        ?: throw NotFoundException("Qonto config not found")
+        ?: throw NotFoundException(
+            code = ErrorCode.INTEGRATION_NOT_FOUND,
+            message = "Qonto config not found",
+            meta = mapOf(MetaKeys.ID to integrationId.toString()),
+        )
 }

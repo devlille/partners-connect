@@ -5,19 +5,24 @@ import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.findByEventIdAndUsage
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.notifications.domain.NotificationGateway
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
-import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class NotificationRepositoryExposed(
     private val notificationGateways: List<NotificationGateway>,
 ) : NotificationRepository {
-    override fun sendMessage(eventSlug: String, variables: NotificationVariables): Unit = transaction {
-        val eventEntity = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
-        val eventId = eventEntity.id.value
+    override fun sendMessage(eventSlug: String, variables: NotificationVariables) = transaction {
+        val eventId = EventEntity.findBySlug(eventSlug)?.id?.value
+            ?: throw NotFoundException(
+                code = ErrorCode.EVENT_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+                meta = mapOf(MetaKeys.EVENT to eventSlug),
+            )
 
         IntegrationsTable
             .findByEventIdAndUsage(eventId, IntegrationUsage.NOTIFICATION)
@@ -25,7 +30,11 @@ class NotificationRepositoryExposed(
                 val provider = row[IntegrationsTable.provider]
                 val integrationId = row[IntegrationsTable.id].value
                 val gateway = notificationGateways.find { it.provider == provider }
-                    ?: throw NotFoundException("No gateway for provider $provider")
+                    ?: throw NotFoundException(
+                        code = ErrorCode.PROVIDER_NOT_FOUND,
+                        message = "No gateway for provider $provider",
+                        meta = mapOf(MetaKeys.PROVIDER to provider.name),
+                    )
                 gateway.send(integrationId, variables)
             }
     }

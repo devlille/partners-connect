@@ -1,13 +1,15 @@
 package fr.devlille.partners.connect.organisations.infrastructure.api
 
 import fr.devlille.partners.connect.auth.domain.AuthRepository
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.token
 import fr.devlille.partners.connect.organisations.domain.Organisation
 import fr.devlille.partners.connect.organisations.domain.OrganisationRepository
 import fr.devlille.partners.connect.users.domain.UserRepository
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -36,12 +38,16 @@ fun Route.organisationRoutes() {
         }
 
         get("/{slug}") {
-            val slug = call.parameters["slug"] ?: throw BadRequestException("Missing slug")
+            val slug = call.parameters["slug"] ?: throw BadRequestException(
+                message = "Missing slug",
+            )
             call.respond(HttpStatusCode.OK, repository.getById(slug))
         }
 
         put("/{orgSlug}") {
-            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Missing org slug")
+            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException(
+                message = "Missing org slug",
+            )
             val input = call.receive<Organisation>()
 
             val token = call.token
@@ -49,7 +55,15 @@ fun Route.organisationRoutes() {
             val canEdit = userRepository.hasEditPermissionByEmail(userInfo.email, orgSlug)
 
             if (!canEdit) {
-                throw UnauthorizedException("You are not allowed to edit this organisation")
+                throw UnauthorizedException(
+                    code = ErrorCode.NO_EDIT_PERMISSION,
+                    message = "You are not allowed to edit this organisation",
+                    meta = mapOf(
+                        MetaKeys.EMAIL to userInfo.email,
+                        MetaKeys.ORGANISATION to orgSlug,
+                        MetaKeys.REQUIRED_ROLE to "organizer",
+                    ),
+                )
             }
             val updatedOrg = repository.update(orgSlug, input)
             call.respond(HttpStatusCode.OK, updatedOrg)

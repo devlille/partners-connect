@@ -2,7 +2,9 @@ package fr.devlille.partners.connect.integrations.infrastructure.api
 
 import fr.devlille.partners.connect.integrations.domain.CreateIntegration
 import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
-import io.ktor.server.plugins.NotFoundException
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import kotlinx.serialization.KSerializer
 
 interface IntegrationDeserializerRegistry {
@@ -20,6 +22,10 @@ class DefaultIntegrationDeserializerRegistry : IntegrationDeserializerRegistry {
 
     override fun serializerFor(provider: IntegrationProvider): KSerializer<out CreateIntegration> {
         return serializers[provider]
-            ?: throw NotFoundException("No serializer found for provider: $provider")
+            ?: throw NotFoundException(
+                code = ErrorCode.PROVIDER_NOT_FOUND,
+                message = "No serializer found for provider: $provider",
+                meta = mapOf(MetaKeys.PROVIDER to provider.toString()),
+            )
     }
 }

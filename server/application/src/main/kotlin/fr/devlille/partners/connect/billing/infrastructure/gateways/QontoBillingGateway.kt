@@ -18,6 +18,9 @@ import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.infrastructure.db.QontoConfig
 import fr.devlille.partners.connect.integrations.infrastructure.db.QontoIntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.get
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndPartnership
@@ -32,7 +35,6 @@ import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpHeaders
-import io.ktor.server.plugins.NotFoundException
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.transactions.experimental.suspendedTransactionAsync
@@ -47,7 +49,11 @@ class QontoBillingGateway(
         suspendedTransactionAsync {
             val config = QontoIntegrationsTable[integrationId]
             val billing = BillingEntity.singleByEventAndPartnership(eventId, partnershipId)
-                ?: throw NotFoundException("No billing found for company $partnershipId")
+                ?: throw NotFoundException(
+                    code = ErrorCode.BILLING_NOT_FOUND,
+                    message = "No billing found for partnership $partnershipId",
+                    meta = mapOf(MetaKeys.PARTNERSHIP_ID to partnershipId.toString()),
+                )
             val items = invoiceItems(eventId, billing)
             val client = getClient(billing, config)
             val request = billing.event.toQontoInvoiceRequest(
@@ -62,7 +68,14 @@ class QontoBillingGateway(
         suspendedTransactionAsync {
             val config = QontoIntegrationsTable[integrationId]
             val billing = BillingEntity.singleByEventAndPartnership(eventId, partnershipId)
-                ?: throw NotFoundException("No billing found for company $partnershipId")
+                ?: throw NotFoundException(
+                    code = ErrorCode.BILLING_NOT_FOUND,
+                    message = "No billing found for company $partnershipId",
+                    meta = mapOf(
+                        MetaKeys.EVENT_ID to eventId.toString(),
+                        MetaKeys.PARTNERSHIP_ID to partnershipId.toString(),
+                    ),
+                )
             val items = invoiceItems(eventId, billing)
             val client = getClient(billing, config)
             val request = billing.event.toQontoQuoteRequest(clientId = client.id, invoiceItems = items)
@@ -80,7 +93,10 @@ class QontoBillingGateway(
 
     private fun invoiceItems(eventId: UUID, billing: BillingEntity): List<QontoInvoiceItem> {
         val pack = billing.partnership.validatedPack()
-            ?: throw NotFoundException("No sponsoring pack found for partnership ${billing.partnership.id}")
+            ?: throw NotFoundException(
+                code = ErrorCode.EVENT_NOT_FOUND,
+                message = "No sponsoring pack found for partnership ${billing.partnership.id}",
+            )
         val optionIds = PackOptionsTable.listOptionalOptionsByPack(pack.id.value)
             .map { it[PackOptionsTable.option].value }
         val optionalOptions = SponsoringOptionEntity

@@ -1,5 +1,9 @@
 package fr.devlille.partners.connect.organisations.application
 
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
 import fr.devlille.partners.connect.organisations.application.mappers.toDomain
 import fr.devlille.partners.connect.organisations.application.mappers.toItemDomain
@@ -12,8 +16,6 @@ import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissi
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionsTable
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
-import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
@@ -21,12 +23,18 @@ class OrganisationRepositoryExposed : OrganisationRepository {
     override fun create(entity: Organisation): String = transaction {
         // Validate that name is present and not blank
         if (entity.name.isBlank()) {
-            throw BadRequestException("Organisation name is required and cannot be empty")
+            throw BadRequestException(
+                message = "Organisation name is required and cannot be empty",
+            )
         }
 
         val user = entity.representativeUserEmail?.let { email ->
             UserEntity.singleUserByEmail(email)
-                ?: throw NotFoundException("User with email $email not found")
+                ?: throw NotFoundException(
+                    code = ErrorCode.USER_NOT_FOUND,
+                    message = "User with email $email not found",
+                    meta = mapOf(MetaKeys.EMAIL to email),
+                )
         }
         val slug = entity.name.slugify()
         OrganisationEntity.new {
@@ -54,21 +62,35 @@ class OrganisationRepositoryExposed : OrganisationRepository {
 
     override fun getById(slug: String): Organisation = transaction {
         OrganisationEntity.findBySlug(slug)?.toDomain()
-            ?: throw NotFoundException("Organisation with slug $slug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ORGANISATION_NOT_FOUND,
+                message = "Organisation with slug $slug not found",
+                meta = mapOf(MetaKeys.ORGANISATION to slug),
+            )
     }
 
     override fun update(orgSlug: String, data: Organisation): Organisation = transaction {
         // Validate that name is present and not blank
         if (data.name.isBlank()) {
-            throw BadRequestException("Organisation name is required and cannot be empty")
+            throw BadRequestException(
+                message = "Organisation name is required and cannot be empty",
+            )
         }
 
         val entity = OrganisationEntity.findBySlug(orgSlug)
-            ?: throw NotFoundException("Organisation with slug $orgSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ORGANISATION_NOT_FOUND,
+                message = "Organisation with slug $orgSlug not found",
+                meta = mapOf(MetaKeys.ORGANISATION to orgSlug),
+            )
 
         val representativeUser = data.representativeUserEmail?.let { email ->
             UserEntity.singleUserByEmail(email)
-                ?: throw NotFoundException("User with email $email not found")
+                ?: throw NotFoundException(
+                    code = ErrorCode.USER_NOT_FOUND,
+                    message = "User with email $email not found",
+                    meta = mapOf(MetaKeys.EMAIL to email),
+                )
         }
 
         entity.apply {
@@ -95,7 +117,11 @@ class OrganisationRepositoryExposed : OrganisationRepository {
 
     override fun findOrganisationListByUserEmail(userEmail: String): List<OrganisationItem> = transaction {
         val user = UserEntity.singleUserByEmail(userEmail)
-            ?: throw NotFoundException("User with email $userEmail not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.USER_NOT_FOUND,
+                message = "User with email $userEmail not found",
+                meta = mapOf(MetaKeys.EMAIL to userEmail),
+            )
 
         OrganisationPermissionEntity
             .find {

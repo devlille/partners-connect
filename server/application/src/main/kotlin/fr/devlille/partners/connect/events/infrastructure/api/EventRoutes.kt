@@ -3,8 +3,8 @@ package fr.devlille.partners.connect.events.infrastructure.api
 import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -24,7 +24,9 @@ fun Route.eventRoutes() {
         }
 
         get("/{event_slug}") {
-            val eventSlug = call.parameters["event_slug"] ?: throw BadRequestException("Missing event slug")
+            val eventSlug = call.parameters["event_slug"] ?: throw BadRequestException(
+                message = "Missing event slug",
+            )
             val eventWithOrg = repository.getBySlug(eventSlug)
             call.respond(HttpStatusCode.OK, eventWithOrg)
         }
@@ -34,12 +36,16 @@ fun Route.eventRoutes() {
         install(AuthorizedOrganisationPlugin)
 
         get {
-            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Missing organisation slug")
+            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException(
+                message = "Missing organisation slug",
+            )
             call.respond(HttpStatusCode.OK, repository.findByOrgSlug(orgSlug))
         }
 
         post {
-            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Missing organisation slug")
+            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException(
+                message = "Missing organisation slug",
+            )
             val request = call.receive<Event>()
             val slug = repository.createEvent(orgSlug, request)
             call.respond(
@@ -49,8 +55,12 @@ fun Route.eventRoutes() {
         }
 
         put("/{eventSlug}") {
-            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Missing organisation slug")
-            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException(
+                message = "Missing organisation slug",
+            )
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
+                message = "Missing event slug",
+            )
             val updatedSlug = repository.updateEvent(eventSlug, orgSlug, call.receive<Event>())
             call.respond(
                 status = HttpStatusCode.OK,

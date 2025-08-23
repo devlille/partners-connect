@@ -13,7 +13,13 @@ import fr.devlille.partners.connect.events.infrastructure.api.eventRoutes
 import fr.devlille.partners.connect.events.infrastructure.bindings.eventModule
 import fr.devlille.partners.connect.integrations.infrastructure.api.integrationRoutes
 import fr.devlille.partners.connect.integrations.infrastructure.bindings.integrationModule
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
+import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorResponse
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKey
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnsupportedMediaTypeException
 import fr.devlille.partners.connect.internal.infrastructure.api.UserSession
@@ -45,24 +51,25 @@ import fr.devlille.partners.connect.webhooks.infrastructure.bindings.webhookModu
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.serialization.JsonConvertException
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.openapi.openAPI
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.plugins.swagger.swaggerUI
-import io.ktor.server.response.respondText
+import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.sessions.Sessions
 import io.ktor.server.sessions.cookie
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.koin.core.module.Module
@@ -208,26 +215,80 @@ private fun Application.configureContentNegotiation() {
 
 private fun Application.configureStatusPage() {
     install(StatusPages) {
-        exception<BadRequestException> { call, cause ->
-            call.respondText(text = cause.message ?: "400 Bad Request", status = HttpStatusCode.BadRequest)
-        }
-        exception<UnauthorizedException> { call, cause ->
-            call.respondText(text = cause.message ?: "401 Unauthorized", status = HttpStatusCode.Unauthorized)
-        }
-        exception<ForbiddenException> { call, cause ->
-            call.respondText(text = cause.message ?: "403 Forbidden", status = HttpStatusCode.Forbidden)
-        }
-        exception<NotFoundException> { call, cause ->
-            call.respondText(text = cause.message ?: "404 Not Found", status = HttpStatusCode.NotFound)
-        }
-        exception<UnsupportedMediaTypeException> { call, cause ->
-            call.respondText(
-                text = cause.message ?: "415 Unsupported Media Type",
-                status = HttpStatusCode.UnsupportedMediaType,
+        // JSON deserialization errors - handle these first before generic exceptions
+        exception<SerializationException> { call, cause ->
+            call.respondWithStructuredError(
+                ErrorCode.BAD_REQUEST,
+                "Invalid JSON payload: ${cause.message}",
+                HttpStatusCode.BadRequest,
+                emptyMap(),
             )
         }
-        exception<Throwable> { call, cause ->
-            call.respondText(text = "500: $cause", status = HttpStatusCode.InternalServerError)
+        exception<JsonConvertException> { call, cause ->
+            call.respondWithStructuredError(
+                ErrorCode.BAD_REQUEST,
+                "JSON conversion error: ${cause.message}",
+                HttpStatusCode.BadRequest,
+                emptyMap(),
+            )
+        }
+        // Ktor-generated exceptions
+        exception<io.ktor.server.plugins.BadRequestException> { call, cause ->
+            call.respondWithStructuredError(
+                ErrorCode.BAD_REQUEST,
+                cause.message ?: "Bad request",
+                HttpStatusCode.BadRequest,
+                emptyMap(),
+            )
+        }
+        // Custom application exceptions
+        exception<BadRequestException> { call, cause ->
+            call.respondWithStructuredError(cause.code, cause.message, cause.status, cause.meta.toStringMap())
+        }
+        exception<UnauthorizedException> { call, cause ->
+            call.respondWithStructuredError(cause.code, cause.message, cause.status, cause.meta.toStringMap())
+        }
+        exception<ForbiddenException> { call, cause ->
+            call.respondWithStructuredError(cause.code, cause.message, cause.status, cause.meta.toStringMap())
+        }
+        exception<NotFoundException> { call, cause ->
+            call.respondWithStructuredError(cause.code, cause.message, cause.status, cause.meta.toStringMap())
+        }
+        exception<UnsupportedMediaTypeException> { call, cause ->
+            call.respondWithStructuredError(cause.code, cause.message, cause.status, cause.meta.toStringMap())
+        }
+        exception<ConflictException> { call, cause ->
+            call.respondWithStructuredError(cause.code, cause.message, cause.status, cause.meta.toStringMap())
+        }
+        // Catch-all for any remaining exceptions
+        exception<Throwable> { call, _ ->
+            call.respondWithStructuredError(
+                ErrorCode.INTERNAL_SERVER_ERROR,
+                "Internal server error",
+                HttpStatusCode.InternalServerError,
+                emptyMap(),
+            )
         }
     }
 }
+
+private suspend fun ApplicationCall.respondWithStructuredError(
+    code: ErrorCode,
+    message: String,
+    status: HttpStatusCode,
+    meta: Map<String, String>,
+) {
+    val errorResponse = ErrorResponse(
+        code = code.name,
+        message = message,
+        status = status.value,
+        meta = meta,
+    )
+    respond(status, errorResponse)
+}
+
+/**
+ * Extension function to convert Map<MetaKey, String> to Map<String, String> for JSON serialization.
+ */
+private fun Map<MetaKey, String>.toStringMap(): Map<String, String> =
+    this.mapKeys { it.key.key }

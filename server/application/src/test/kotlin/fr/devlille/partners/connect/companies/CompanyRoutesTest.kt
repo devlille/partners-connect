@@ -147,7 +147,8 @@ class CompanyRoutesTest {
         )
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("Unsupported file type"))
+        val responseBody = response.bodyAsText()
+        assertTrue(responseBody.contains("BAD_REQUEST"))
     }
 
     @Test

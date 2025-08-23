@@ -1,7 +1,9 @@
 package fr.devlille.partners.connect.sponsoring.infrastructure.db
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
-import io.ktor.server.plugins.NotFoundException
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.UUIDEntity
@@ -27,4 +29,8 @@ fun UUIDEntityClass<SponsoringPackEntity>.listPacksByEvent(eventId: UUID): List<
 fun UUIDEntityClass<SponsoringPackEntity>.singlePackById(eventId: UUID, packId: UUID): SponsoringPackEntity = this
     .find { (SponsoringPacksTable.id eq packId) and (SponsoringPacksTable.eventId eq eventId) }
     .singleOrNull()
-    ?: throw NotFoundException("Pack not found")
+    ?: throw NotFoundException(
+        code = ErrorCode.INTEGRATION_NOT_FOUND,
+        message = "Pack not found",
+        meta = mapOf(MetaKeys.ID to packId.toString()),
+    )

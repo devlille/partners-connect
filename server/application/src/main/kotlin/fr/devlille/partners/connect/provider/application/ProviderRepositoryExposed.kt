@@ -2,6 +2,10 @@ package fr.devlille.partners.connect.provider.application
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.provider.domain.CreateProvider
 import fr.devlille.partners.connect.provider.domain.Provider
 import fr.devlille.partners.connect.provider.domain.ProviderRepository
@@ -9,8 +13,6 @@ import fr.devlille.partners.connect.provider.infrastructure.db.EventProviderEnti
 import fr.devlille.partners.connect.provider.infrastructure.db.EventProvidersTable
 import fr.devlille.partners.connect.provider.infrastructure.db.ProviderEntity
 import fr.devlille.partners.connect.provider.infrastructure.db.ProvidersTable
-import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.lowerCase
@@ -67,11 +69,17 @@ class ProviderRepositoryExposed : ProviderRepository {
 
     override fun attachToEvent(eventSlug: String, providerIds: List<UUID>): List<UUID> = transaction {
         if (providerIds.isEmpty()) {
-            throw BadRequestException("Provider IDs list cannot be empty")
+            throw BadRequestException(
+                message = "Provider IDs list cannot be empty",
+            )
         }
 
         val eventEntity = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.EVENT_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+                meta = mapOf(MetaKeys.EVENT to eventSlug),
+            )
 
         // Validate that all provider IDs exist and get provider entities
         val providerEntities = ProviderEntity.find {
@@ -79,7 +87,9 @@ class ProviderRepositoryExposed : ProviderRepository {
         }.toList()
 
         if (providerEntities.size != providerIds.size) {
-            throw BadRequestException("One or more provider IDs do not exist")
+            throw BadRequestException(
+                message = "One or more provider IDs do not exist",
+            )
         }
 
         val attachedIds = mutableListOf<UUID>()
@@ -105,11 +115,17 @@ class ProviderRepositoryExposed : ProviderRepository {
 
     override fun detachFromEvent(eventSlug: String, providerIds: List<UUID>): List<UUID> = transaction {
         if (providerIds.isEmpty()) {
-            throw BadRequestException("Provider IDs list cannot be empty")
+            throw BadRequestException(
+                message = "Provider IDs list cannot be empty",
+            )
         }
 
         val eventEntity = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.EVENT_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+                meta = mapOf(MetaKeys.EVENT to eventSlug),
+            )
 
         // Validate that all provider IDs exist
         val providerEntities = ProviderEntity.find {
@@ -117,7 +133,9 @@ class ProviderRepositoryExposed : ProviderRepository {
         }.toList()
 
         if (providerEntities.size != providerIds.size) {
-            throw BadRequestException("One or more provider IDs do not exist")
+            throw BadRequestException(
+                message = "One or more provider IDs do not exist",
+            )
         }
 
         val detachedIds = mutableListOf<UUID>()
