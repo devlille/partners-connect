@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.webhooks.domain
 
+import fr.devlille.partners.connect.integrations.domain.WebhookType
 import java.util.UUID
 
 enum class WebhookEventType {
@@ -10,24 +11,18 @@ enum class WebhookEventType {
 
 interface WebhookGateway {
     /**
-     * Get the integration configuration from an integration id
+     * Send webhook notification by merging configuration retrieval, permission check, and HTTP call
      */
-    fun getIntegrationConfiguration(integrationId: UUID): WebhookConfig?
-
-    /**
-     * From the event id, be sure that we can send a webhook to the webhook consumer
-     */
-    suspend fun canSendWebhook(eventId: UUID, integrationId: UUID): Boolean
-
-    /**
-     * Send a http call with the configuration in the integration table to send the data to external service
-     */
-    suspend fun sendHttpCall(integrationId: UUID, payload: WebhookPayload): Boolean
+    suspend fun sendWebhook(
+        integrationId: UUID,
+        eventId: UUID,
+        partnershipId: UUID,
+    ): Boolean
 }
 
 data class WebhookConfig(
     val url: String,
     val headerAuth: String?,
-    val type: String,
+    val type: WebhookType,
     val partnershipId: UUID?,
 )

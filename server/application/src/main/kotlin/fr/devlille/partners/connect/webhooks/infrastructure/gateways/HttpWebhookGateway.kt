@@ -2,7 +2,10 @@ package fr.devlille.partners.connect.webhooks.infrastructure.gateways
 
 import fr.devlille.partners.connect.integrations.infrastructure.db.WebhookIntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.get
+import fr.devlille.partners.connect.webhooks.domain.EventWebhookData
+import fr.devlille.partners.connect.webhooks.domain.PartnershipWebhookData
 import fr.devlille.partners.connect.webhooks.domain.WebhookConfig
+import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
 import fr.devlille.partners.connect.webhooks.domain.WebhookGateway
 import fr.devlille.partners.connect.webhooks.domain.WebhookPayload
 import io.ktor.client.HttpClient
@@ -24,7 +27,26 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 class HttpWebhookGateway(
     private val httpClient: HttpClient,
 ) : WebhookGateway {
-    override fun getIntegrationConfiguration(integrationId: UUID): WebhookConfig? {
+    override suspend fun sendWebhook(
+        integrationId: UUID,
+        eventId: UUID,
+        partnershipId: UUID,
+    ): Boolean {
+        // Get integration configuration
+        val config = getIntegrationConfiguration(integrationId) ?: return false
+        
+        // Check if we can send webhook
+        if (!canSendWebhook(eventId, integrationId, config)) return false
+        
+        // Create webhook payload - for now just a basic payload
+        // This would need to be enhanced based on specific requirements
+        val payload = createBasicWebhookPayload(eventId, partnershipId)
+        
+        // Send HTTP call
+        return sendHttpCall(config, payload)
+    }
+
+    private fun getIntegrationConfiguration(integrationId: UUID): WebhookConfig? {
         @Suppress("TooGenericExceptionCaught", "SwallowedException")
         return try {
             val config = WebhookIntegrationsTable[integrationId]
@@ -39,13 +61,12 @@ class HttpWebhookGateway(
         }
     }
 
-    override suspend fun canSendWebhook(eventId: UUID, integrationId: UUID): Boolean {
+    private suspend fun canSendWebhook(eventId: UUID, integrationId: UUID, config: WebhookConfig): Boolean {
         // For now, always allow webhook sending if the configuration exists
-        return getIntegrationConfiguration(integrationId) != null
+        return true
     }
 
-    override suspend fun sendHttpCall(integrationId: UUID, payload: WebhookPayload): Boolean = runBlocking {
-        val config = getIntegrationConfiguration(integrationId) ?: return@runBlocking false
+    private suspend fun sendHttpCall(config: WebhookConfig, payload: WebhookPayload): Boolean = runBlocking {
 
         @Suppress("TooGenericExceptionCaught", "SwallowedException")
         try {
@@ -67,6 +88,26 @@ class HttpWebhookGateway(
         } catch (e: Exception) {
             false
         }
+    }
+
+    private fun createBasicWebhookPayload(eventId: UUID, partnershipId: UUID): WebhookPayload {
+        // This is a placeholder implementation
+        // In a real implementation, you would fetch the actual event and partnership data
+        return WebhookPayload(
+            eventType = WebhookEventType.CREATED,
+            partnership = PartnershipWebhookData(
+                id = partnershipId.toString(),
+                companyId = null, // Would need to be fetched
+                packId = null,    // Would need to be fetched  
+                status = "pending",
+            ),
+            event = EventWebhookData(
+                id = eventId.toString(),
+                slug = eventId.toString(), // Would need to be fetched
+                name = "Event Name",       // Would need to be fetched
+            ),
+            timestamp = kotlinx.datetime.Clock.System.now().toString(),
+        )
     }
 
     @OptIn(ExperimentalEncodingApi::class)

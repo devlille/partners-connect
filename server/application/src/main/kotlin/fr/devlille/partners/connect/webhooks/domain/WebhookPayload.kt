@@ -13,7 +13,7 @@ data class WebhookPayload(
 @Serializable
 data class PartnershipWebhookData(
     val id: String,
-    val companyId: String,
+    val companyId: String?,
     val packId: String?,
     val status: String,
 )

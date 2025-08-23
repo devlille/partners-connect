@@ -4,6 +4,7 @@ import fr.devlille.partners.connect.integrations.domain.CreateIntegration
 import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.IntegrationRegistrar
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
+import fr.devlille.partners.connect.integrations.domain.WebhookType
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import io.ktor.server.plugins.BadRequestException
@@ -26,26 +27,16 @@ class WebhookRegistrar : IntegrationRegistrar<CreateIntegration.CreateWebhookInt
             throw BadRequestException("Webhook URL cannot be empty")
         }
 
-        // Validate webhook type
-        if (input.type !in listOf("ALL", "PARTNERSHIP")) {
-            throw BadRequestException("Invalid webhook type: ${input.type}")
-        }
-
         // If type is PARTNERSHIP, validate partnershipId is provided and exists
         var partnershipUuid: UUID? = null
-        if (input.type == "PARTNERSHIP") {
+        if (input.type == WebhookType.PARTNERSHIP) {
             if (input.partnershipId.isNullOrBlank()) {
                 throw BadRequestException("Partnership ID is required for PARTNERSHIP type webhook")
             }
-            @Suppress("SwallowedException")
-            try {
-                partnershipUuid = input.partnershipId.toUUID()
-                // Verify partnership exists
-                PartnershipEntity.findById(partnershipUuid)
-                    ?: throw NotFoundException("Partnership not found: ${input.partnershipId}")
-            } catch (e: IllegalArgumentException) {
-                throw BadRequestException("Invalid partnership ID format: ${input.partnershipId}")
-            }
+            partnershipUuid = input.partnershipId.toUUID()
+            // Verify partnership exists
+            PartnershipEntity.findById(partnershipUuid)
+                ?: throw NotFoundException("Partnership not found: ${input.partnershipId}")
         }
 
         val integrationId = IntegrationsTable.insertAndGetId {

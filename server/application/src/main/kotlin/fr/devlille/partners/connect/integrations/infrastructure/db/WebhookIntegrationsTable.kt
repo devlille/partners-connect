@@ -1,6 +1,8 @@
 package fr.devlille.partners.connect.integrations.infrastructure.db
 
+import fr.devlille.partners.connect.integrations.domain.WebhookType
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
 import fr.devlille.partners.connect.webhooks.domain.WebhookConfig
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.Table
@@ -17,8 +19,8 @@ object WebhookIntegrationsTable : Table("webhook_integrations") {
         cipherTextLength = 1000,
         encryptor = SystemVarEnv.Crypto.algorithm,
     ).nullable()
-    val type = text("type") // ALL or PARTNERSHIP
-    val partnershipId = uuid("partnership_id").nullable()
+    val type = enumeration("type", WebhookType::class)
+    val partnershipId = reference("partnership_id", PartnershipsTable).nullable()
 
     override val primaryKey = PrimaryKey(integrationId)
 }
@@ -32,7 +34,7 @@ operator fun WebhookIntegrationsTable.get(integrationId: UUID): WebhookConfig = 
                 url = it[WebhookIntegrationsTable.url],
                 headerAuth = it[WebhookIntegrationsTable.headerAuth],
                 type = it[WebhookIntegrationsTable.type],
-                partnershipId = it[WebhookIntegrationsTable.partnershipId],
+                partnershipId = it[WebhookIntegrationsTable.partnershipId]?.value,
             )
         }
         .singleOrNull()
