@@ -109,7 +109,19 @@ class TicketRepositoryExposed(
         val partnership = transaction { billing.partnership }
 
         val order = gateway.createTickets(integrationId, eventId, partnershipId, tickets)
-        persistTicketsToDatabase(order, partnership, billing.contactEmail)
+        transaction {
+            order.tickets.forEach { ticket ->
+                PartnershipTicketEntity.new(ticket.id) {
+                    this.partnership = partnership
+                    this.orderId = order.id
+                    this.externalId = ticket.extId
+                    this.url = ticket.url
+                    this.firstname = ticket.data.firstName
+                    this.lastname = ticket.data.lastName
+                    this.email = billing.contactEmail
+                }
+            }
+        }
         return order
     }
 
@@ -126,26 +138,6 @@ class TicketRepositoryExposed(
             val provider = integration[IntegrationsTable.provider]
             val integrationId = integration[IntegrationsTable.id].value
             Triple(eventId, provider, integrationId)
-        }
-    }
-
-    private fun persistTicketsToDatabase(
-        order: TicketOrder,
-        partnership: fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity,
-        contactEmail: String,
-    ) {
-        transaction {
-            order.tickets.forEach { ticket ->
-                PartnershipTicketEntity.new(ticket.id) {
-                    this.partnership = partnership
-                    this.orderId = order.id
-                    this.externalId = ticket.extId
-                    this.url = ticket.url
-                    this.firstname = ticket.data.firstName
-                    this.lastname = ticket.data.lastName
-                    this.email = contactEmail
-                }
-            }
         }
     }
 
