@@ -2,7 +2,6 @@ package fr.devlille.partners.connect.tickets.application
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
-import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.findByEventIdAndUsage
@@ -27,12 +26,6 @@ import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.upsert
 import java.util.UUID
-
-private typealias BillingPartnershipPack = Triple<
-    BillingEntity,
-    fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity,
-    fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity,
-    >
 
 class TicketRepositoryExposed(
     private val gateways: List<TicketGateway>,
@@ -60,17 +53,24 @@ class TicketRepositoryExposed(
     }
 
     override suspend fun createTickets(eventSlug: String, partnershipId: UUID, tickets: List<TicketData>): TicketOrder {
-        val (eventId, provider, integrationId) = getEventAndIntegrationData(eventSlug)
-        val gateway = getGatewayForProvider(provider)
-        val billingResult = validateBillingAndPartnership(eventSlug, partnershipId, eventId, tickets.size)
-        val (billing, partnership, validatedPack) = billingResult
+        val (eventId, provider, integrationId) = getEventAndIntegration(eventSlug)
+        val gateway = gateways.find { it.provider == provider }
+            ?: throw NotFoundException(
+                code = ErrorCode.PROVIDER_NOT_FOUND,
+                message = "No gateway for provider $provider",
+                meta = mapOf(MetaKeys.PROVIDER to provider.name),
+            )
+        
+        validateBillingAndPack(eventSlug, partnershipId, eventId, tickets.size)
+        val billing = transaction { BillingEntity.singleByEventAndPartnership(eventId, partnershipId)!! }
+        val partnership = transaction { billing.partnership }
 
         val order = gateway.createTickets(integrationId, eventId, partnershipId, tickets)
-        saveTicketsToDatabase(order, partnership, billing.contactEmail)
+        persistTicketsToDatabase(order, partnership, billing.contactEmail)
         return order
     }
 
-    private fun getEventAndIntegrationData(eventSlug: String): Triple<UUID, IntegrationProvider, UUID> {
+    private fun getEventAndIntegration(eventSlug: String): Triple<UUID, IntegrationProvider, UUID> {
         return transaction {
             val event = EventEntity.findBySlug(eventSlug)
                 ?: throw NotFoundException(
@@ -86,28 +86,7 @@ class TicketRepositoryExposed(
         }
     }
 
-    private fun getGatewayForProvider(provider: IntegrationProvider): TicketGateway {
-        return gateways.find { it.provider == provider }
-            ?: throw NotFoundException(
-                code = ErrorCode.PROVIDER_NOT_FOUND,
-                message = "No gateway for provider $provider",
-                meta = mapOf(MetaKeys.PROVIDER to provider.name),
-            )
-    }
-
-    private fun validateBillingAndPartnership(
-        eventSlug: String,
-        partnershipId: UUID,
-        eventId: UUID,
-        requestedTicketCount: Int,
-    ): BillingPartnershipPack {
-        val billing = validateBillingExists(eventSlug, partnershipId, eventId)
-        val partnership = transaction { billing.partnership }
-        val validatedPack = validatePartnershipPack(partnership, requestedTicketCount)
-        return Triple(billing, partnership, validatedPack)
-    }
-
-    private fun validateBillingExists(eventSlug: String, partnershipId: UUID, eventId: UUID): BillingEntity {
+    private fun validateBillingAndPack(eventSlug: String, partnershipId: UUID, eventId: UUID, requestedTickets: Int) {
         val billing = transaction { BillingEntity.singleByEventAndPartnership(eventId, partnershipId) }
             ?: throw NotFoundException(
                 code = ErrorCode.BILLING_NOT_FOUND,
@@ -117,7 +96,6 @@ class TicketRepositoryExposed(
                     MetaKeys.PARTNERSHIP_ID to partnershipId.toString(),
                 ),
             )
-
         if (billing.status != InvoiceStatus.PAID) {
             throw ForbiddenException(
                 code = ErrorCode.BILLING_PROCESSING_ERROR,
@@ -130,38 +108,30 @@ class TicketRepositoryExposed(
                 ),
             )
         }
-        return billing
-    }
-
-    private fun validatePartnershipPack(
-        partnership: fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity,
-        requestedTicketCount: Int,
-    ): fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity {
-        val validatedPack = transaction { partnership.validatedPack() }
-            ?: throw NotFoundException(
+        val validatedPack = transaction { billing.partnership.validatedPack() }
+        if (validatedPack == null) {
+            throw NotFoundException(
                 code = ErrorCode.VALIDATED_PACK_NOT_FOUND,
-                message = "No validated pack found for partnership ${partnership.id}",
-                meta = mapOf(MetaKeys.PARTNERSHIP_ID to partnership.id.value.toString()),
+                message = "No validated pack found for partnership $partnershipId",
+                meta = mapOf(MetaKeys.PARTNERSHIP_ID to partnershipId.toString()),
             )
-
-        if (validatedPack.nbTickets < requestedTicketCount) {
+        }
+        if (validatedPack.nbTickets < requestedTickets) {
             val message = "Not enough tickets in the validated pack: " +
-                "${validatedPack.nbTickets} available, $requestedTicketCount requested"
+                "${validatedPack.nbTickets} available, $requestedTickets requested"
             throw ForbiddenException(
                 code = ErrorCode.TICKET_GENERATION_ERROR,
                 message = message,
                 meta = mapOf(
                     MetaKeys.AVAILABLE_TICKETS to validatedPack.nbTickets.toString(),
-                    MetaKeys.REQUESTED_TICKETS to requestedTicketCount.toString(),
-                    MetaKeys.PARTNERSHIP_ID to partnership.id.toString(),
+                    MetaKeys.REQUESTED_TICKETS to requestedTickets.toString(),
+                    MetaKeys.PARTNERSHIP_ID to partnershipId.toString(),
                 ),
             )
         }
-
-        return validatedPack
     }
 
-    private fun saveTicketsToDatabase(
+    private fun persistTicketsToDatabase(
         order: TicketOrder,
         partnership: fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity,
         contactEmail: String,
