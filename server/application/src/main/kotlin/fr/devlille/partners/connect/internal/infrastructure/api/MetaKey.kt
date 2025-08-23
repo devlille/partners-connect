@@ -27,9 +27,11 @@ object MetaKeys {
     
     // Business Entities
     val EVENT = MetaKey("event")
+    val EVENT_ID = MetaKey("event_id")
     val COMPANY = MetaKey("company")
     val PARTNERSHIP_ID = MetaKey("partnership_id")
     val LOCATION = MetaKey("location")
+    val PROVIDER = MetaKey("provider")
     
     // System & Resources
     val RESOURCE_PATH = MetaKey("resource_path")
