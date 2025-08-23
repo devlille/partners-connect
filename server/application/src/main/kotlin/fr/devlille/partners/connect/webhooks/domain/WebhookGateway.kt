@@ -1,6 +1,5 @@
 package fr.devlille.partners.connect.webhooks.domain
 
-import fr.devlille.partners.connect.integrations.domain.WebhookType
 import java.util.UUID
 
 enum class WebhookEventType {
@@ -19,10 +18,3 @@ interface WebhookGateway {
         partnershipId: UUID,
     ): Boolean
 }
-
-data class WebhookConfig(
-    val url: String,
-    val headerAuth: String?,
-    val type: WebhookType,
-    val partnershipId: UUID?,
-)
