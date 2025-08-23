@@ -17,7 +17,7 @@ val notificationModule = module {
                 SlackNotificationGateway(Slack.getInstance(SlackConfig())),
                 MailjetNotificationGateway(httpClient = get()),
             ),
-            webhookNotificationService = get(),
+            webhookGateway = get(),
         )
     }
 }

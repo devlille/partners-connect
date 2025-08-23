@@ -31,4 +31,14 @@ sealed interface CreateIntegration {
         @SerialName("rate_id")
         val rateId: String,
     ) : CreateIntegration
+
+    @Serializable
+    class CreateWebhookIntegration(
+        val url: String,
+        @SerialName("header_auth")
+        val headerAuth: String? = null,
+        val type: String,
+        @SerialName("partnership_id")
+        val partnershipId: String? = null,
+    ) : CreateIntegration
 }

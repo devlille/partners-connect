@@ -8,6 +8,7 @@ import fr.devlille.partners.connect.integrations.infrastructure.db.BilletWebRegi
 import fr.devlille.partners.connect.integrations.infrastructure.db.MailjetRegistrar
 import fr.devlille.partners.connect.integrations.infrastructure.db.QontoRegistrar
 import fr.devlille.partners.connect.integrations.infrastructure.db.SlackRegistrar
+import fr.devlille.partners.connect.integrations.infrastructure.db.WebhookRegistrar
 import org.koin.dsl.module
 
 val integrationModule = module {
@@ -20,6 +21,7 @@ val integrationModule = module {
                 MailjetRegistrar(),
                 QontoRegistrar(),
                 BilletWebRegistrar(),
+                WebhookRegistrar(),
             ),
         )
     }
