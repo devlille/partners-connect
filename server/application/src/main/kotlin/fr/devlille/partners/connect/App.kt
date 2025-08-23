@@ -51,6 +51,7 @@ import fr.devlille.partners.connect.webhooks.infrastructure.bindings.webhookModu
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.serialization.JsonConvertException
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCall
@@ -68,6 +69,7 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.sessions.Sessions
 import io.ktor.server.sessions.cookie
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.koin.core.module.Module
@@ -213,6 +215,33 @@ private fun Application.configureContentNegotiation() {
 
 private fun Application.configureStatusPage() {
     install(StatusPages) {
+        // JSON deserialization errors - handle these first before generic exceptions
+        exception<SerializationException> { call, cause ->
+            call.respondWithStructuredError(
+                ErrorCode.BAD_REQUEST,
+                "Invalid JSON payload: ${cause.message}",
+                HttpStatusCode.BadRequest,
+                emptyMap(),
+            )
+        }
+        exception<JsonConvertException> { call, cause ->
+            call.respondWithStructuredError(
+                ErrorCode.BAD_REQUEST,
+                "JSON conversion error: ${cause.message}",
+                HttpStatusCode.BadRequest,
+                emptyMap(),
+            )
+        }
+        // Ktor-generated exceptions
+        exception<io.ktor.server.plugins.BadRequestException> { call, cause ->
+            call.respondWithStructuredError(
+                ErrorCode.BAD_REQUEST,
+                cause.message ?: "Bad request",
+                HttpStatusCode.BadRequest,
+                emptyMap(),
+            )
+        }
+        // Custom application exceptions
         exception<BadRequestException> { call, cause ->
             call.respondWithStructuredError(cause.code, cause.message, cause.status, cause.meta.toStringMap())
         }
@@ -231,6 +260,7 @@ private fun Application.configureStatusPage() {
         exception<ConflictException> { call, cause ->
             call.respondWithStructuredError(cause.code, cause.message, cause.status, cause.meta.toStringMap())
         }
+        // Catch-all for any remaining exceptions
         exception<Throwable> { call, _ ->
             call.respondWithStructuredError(
                 ErrorCode.INTERNAL_SERVER_ERROR,

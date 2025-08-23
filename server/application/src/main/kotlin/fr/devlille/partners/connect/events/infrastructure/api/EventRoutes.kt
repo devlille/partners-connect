@@ -26,7 +26,6 @@ fun Route.eventRoutes() {
 
         get("/{event_slug}") {
             val eventSlug = call.parameters["event_slug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val eventWithOrg = repository.getBySlug(eventSlug)
@@ -39,7 +38,6 @@ fun Route.eventRoutes() {
 
         get {
             val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing organisation slug",
             )
             call.respond(HttpStatusCode.OK, repository.findByOrgSlug(orgSlug))
@@ -47,7 +45,6 @@ fun Route.eventRoutes() {
 
         post {
             val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing organisation slug",
             )
             val request = call.receive<Event>()
@@ -60,11 +57,9 @@ fun Route.eventRoutes() {
 
         put("/{eventSlug}") {
             val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing organisation slug",
             )
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val updatedSlug = repository.updateEvent(eventSlug, orgSlug, call.receive<Event>())

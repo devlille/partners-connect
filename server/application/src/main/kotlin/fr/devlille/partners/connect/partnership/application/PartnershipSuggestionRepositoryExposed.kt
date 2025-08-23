@@ -56,7 +56,6 @@ class PartnershipSuggestionRepositoryExposed(
         val unknownOptions = optionsUUID.filterNot { it in optionalOptionIds }
         if (unknownOptions.isNotEmpty()) {
             throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Some options are not optional in the suggested pack: $unknownOptions",
             )
         }
@@ -74,7 +73,6 @@ class PartnershipSuggestionRepositoryExposed(
                 .isEmpty()
             if (noTranslation) {
                 throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Option $it does not have a translation for language ${partnership.language}",
                 )
             }

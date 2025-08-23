@@ -70,7 +70,6 @@ class ProviderRepositoryExposed : ProviderRepository {
     override fun attachToEvent(eventSlug: String, providerIds: List<UUID>): List<UUID> = transaction {
         if (providerIds.isEmpty()) {
             throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Provider IDs list cannot be empty",
             )
         }
@@ -89,7 +88,6 @@ class ProviderRepositoryExposed : ProviderRepository {
 
         if (providerEntities.size != providerIds.size) {
             throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "One or more provider IDs do not exist",
             )
         }
@@ -118,7 +116,6 @@ class ProviderRepositoryExposed : ProviderRepository {
     override fun detachFromEvent(eventSlug: String, providerIds: List<UUID>): List<UUID> = transaction {
         if (providerIds.isEmpty()) {
             throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Provider IDs list cannot be empty",
             )
         }
@@ -137,7 +134,6 @@ class ProviderRepositoryExposed : ProviderRepository {
 
         if (providerEntities.size != providerIds.size) {
             throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "One or more provider IDs do not exist",
             )
         }

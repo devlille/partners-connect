@@ -35,12 +35,10 @@ fun Route.partnershipBoothLocationRoutes() {
 
         put {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing partnership id",
                 )
 
@@ -49,7 +47,6 @@ fun Route.partnershipBoothLocationRoutes() {
 
             if (location.isBlank()) {
                 throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Location cannot be empty",
                 )
             }

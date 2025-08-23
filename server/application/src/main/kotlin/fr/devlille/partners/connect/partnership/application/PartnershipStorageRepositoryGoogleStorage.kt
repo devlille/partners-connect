@@ -70,7 +70,6 @@ class PartnershipStorageRepositoryGoogleStorage(
         // Check for empty content
         if (content.isEmpty()) {
             throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Empty file content",
             )
         }

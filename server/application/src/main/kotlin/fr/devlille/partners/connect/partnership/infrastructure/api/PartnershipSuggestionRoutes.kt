@@ -32,12 +32,10 @@ fun Route.partnershipSuggestionRoutes() {
     route("/events/{eventSlug}/partnership/{partnershipId}") {
         post("/suggestion-approve") {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing partnership id",
                 )
             val id = suggestionRepository.approve(eventSlug, partnershipId)
@@ -60,12 +58,10 @@ fun Route.partnershipSuggestionRoutes() {
 
         post("/suggestion-decline") {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing partnership id",
                 )
             val id = suggestionRepository.decline(eventSlug, partnershipId)
@@ -93,12 +89,10 @@ fun Route.partnershipSuggestionRoutes() {
         @Suppress("ThrowsCount")
         post("/suggestion") {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing partnership id",
                 )
             val input = call.receive<SuggestPartnership>()

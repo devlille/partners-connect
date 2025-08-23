@@ -23,7 +23,6 @@ fun Route.eventProviderRoutes() {
 
         post {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val providerIdStrings = call.receive<List<String>>()
@@ -37,7 +36,6 @@ fun Route.eventProviderRoutes() {
 
         delete {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val providerIdStrings = call.receive<List<String>>()

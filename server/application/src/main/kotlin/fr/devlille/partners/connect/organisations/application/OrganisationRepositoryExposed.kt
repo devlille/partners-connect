@@ -24,7 +24,6 @@ class OrganisationRepositoryExposed : OrganisationRepository {
         // Validate that name is present and not blank
         if (entity.name.isBlank()) {
             throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Organisation name is required and cannot be empty",
             )
         }
@@ -74,7 +73,6 @@ class OrganisationRepositoryExposed : OrganisationRepository {
         // Validate that name is present and not blank
         if (data.name.isBlank()) {
             throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Organisation name is required and cannot be empty",
             )
         }

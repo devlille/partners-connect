@@ -23,7 +23,6 @@ fun Route.partnershipTicketingRoutes() {
         get {
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing partnership id",
                 )
             val tickets = ticketingRepository.listTickets(partnershipId)
@@ -32,12 +31,10 @@ fun Route.partnershipTicketingRoutes() {
 
         post {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing partnership id",
                 )
             val body = call.receive<List<TicketData>>()
@@ -51,16 +48,13 @@ fun Route.partnershipTicketingRoutes() {
 
         put("/{ticketId}") {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing partnership id",
                 )
             val ticketId = call.parameters["ticketId"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing ticket id",
             )
             val body = call.receive<TicketData>()

@@ -32,12 +32,10 @@ fun Route.partnershipCommunicationRoutes() {
         route("/publication") {
             put {
                 val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing event slug",
                 )
                 val partnershipId = call.parameters["partnershipId"]?.toUUID()
                     ?: throw BadRequestException(
-                        code = ErrorCode.BAD_REQUEST,
                         message = "Missing partnership id",
                     )
 
@@ -63,12 +61,10 @@ fun Route.partnershipCommunicationRoutes() {
         route("/support") {
             put {
                 val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing event slug",
                 )
                 val partnershipId = call.parameters["partnershipId"]?.toUUID()
                     ?: throw BadRequestException(
-                        code = ErrorCode.BAD_REQUEST,
                         message = "Missing partnership id",
                     )
 

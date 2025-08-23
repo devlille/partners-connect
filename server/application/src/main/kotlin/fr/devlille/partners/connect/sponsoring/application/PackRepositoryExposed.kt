@@ -103,7 +103,6 @@ class PackRepositoryExposed : PackRepository {
         val hasOptions = PackOptionsTable.listOptionsByPack(pack.id.value).any()
         if (hasOptions) {
             throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Pack has attached options and cannot be deleted",
             )
         }

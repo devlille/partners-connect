@@ -37,13 +37,11 @@ private fun Route.packRoutes() {
         install(AuthorizedOrganisationPlugin)
         get {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val acceptLanguage = call.request.headers["Accept-Language"]
                 ?.lowercase()
                 ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing accept-language header",
                 )
             val packs = repository.findPacksByEvent(eventSlug = eventSlug, language = acceptLanguage)
@@ -51,7 +49,6 @@ private fun Route.packRoutes() {
         }
         post {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val request = call.receive<CreateSponsoringPack>()
@@ -60,11 +57,9 @@ private fun Route.packRoutes() {
         }
         delete("/{packId}") {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val packId = call.parameters["packId"]?.toUUID() ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing pack id",
             )
             repository.deletePack(eventSlug = eventSlug, packId = packId)
@@ -72,11 +67,9 @@ private fun Route.packRoutes() {
         }
         put("/{packId}") {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val packId = call.parameters["packId"]?.toUUID() ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing pack id",
             )
             val input = call.receive<CreateSponsoringPack>()
@@ -85,11 +78,9 @@ private fun Route.packRoutes() {
         }
         post("/{packId}/options") {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val packId = call.parameters["packId"]?.toUUID() ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing pack id",
             )
             val request = call.receive<AttachOptionsToPack>()
@@ -98,15 +89,12 @@ private fun Route.packRoutes() {
         }
         delete("/{packId}/options/{optionId}") {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val packId = call.parameters["packId"]?.toUUID() ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing pack id",
             )
             val optionId = call.parameters["optionId"]?.toUUID() ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing option id",
             )
             optRepository.detachOptionFromPack(eventSlug = eventSlug, packId = packId, optionId = optionId)
@@ -123,13 +111,11 @@ private fun Route.optionRoutes() {
         install(AuthorizedOrganisationPlugin)
         get {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val acceptLanguage = call.request.headers["Accept-Language"]
                 ?.lowercase()
                 ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing accept-language header",
                 )
             val options = repository.listOptionsByEvent(eventSlug = eventSlug, language = acceptLanguage)
@@ -137,7 +123,6 @@ private fun Route.optionRoutes() {
         }
         post {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val request = call.receive<CreateSponsoringOption>()
@@ -146,11 +131,9 @@ private fun Route.optionRoutes() {
         }
         put("/{optionId}") {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val optionId = call.parameters["optionId"]?.toUUID() ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing option id",
             )
             val input = call.receive<CreateSponsoringOption>()
@@ -159,11 +142,9 @@ private fun Route.optionRoutes() {
         }
         delete("/{optionId}") {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val optionId = call.parameters["optionId"]?.toUUID() ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing option id",
             )
             repository.deleteOption(eventSlug = eventSlug, optionId = optionId)

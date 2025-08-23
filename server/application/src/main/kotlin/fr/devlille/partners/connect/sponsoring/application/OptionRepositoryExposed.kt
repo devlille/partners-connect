@@ -113,7 +113,6 @@ class OptionRepositoryExposed(
             .empty().not()
         if (isUsed) {
             throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Option is used in a pack and cannot be deleted",
             )
         }
@@ -146,7 +145,6 @@ class OptionRepositoryExposed(
         val intersect = options.required.intersect(options.optional)
         if (intersect.isNotEmpty()) {
             throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "options ${intersect.joinToString(",")} cannot be both required and optional",
             )
         }
@@ -173,7 +171,6 @@ class OptionRepositoryExposed(
 
         if (existingOptions.size != allOptionIds.size) {
             throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Some options do not belong to the event",
             )
         }
@@ -185,7 +182,6 @@ class OptionRepositoryExposed(
 
         if (alreadyAttached.isNotEmpty()) {
             throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Option already attached to pack: ${alreadyAttached.joinToString()}",
             )
         }

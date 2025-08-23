@@ -34,12 +34,10 @@ fun Route.partnershipAgreementRoutes() {
 
         post {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing partnership id",
                 )
             val pdfBinary = agreementRepository.generateAgreement(eventSlug, partnershipId)
@@ -51,23 +49,19 @@ fun Route.partnershipAgreementRoutes() {
     route("/events/{eventSlug}/partnership/{partnershipId}/signed-agreement") {
         post {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing partnership id",
                 )
             val multipart = call.receiveMultipart()
             val part = multipart.readPart() ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing file part",
             )
             val bytes = part.asByteArray()
             if (part.contentType != ContentType.Application.Pdf) {
                 throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Invalid file type, expected application/pdf",
                 )
             }

@@ -25,19 +25,16 @@ fun Route.eventBoothPlanRoutes() {
 
         post {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
 
             val multipart = call.receiveMultipart()
             val part = multipart.readPart() ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing file part",
             )
             val bytes = part.asByteArray()
             val contentType = part.contentType?.toString()?.lowercase()
                 ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Content type is required",
                 )
 

@@ -35,12 +35,10 @@ fun Route.partnershipBillingRoutes() {
     route("/events/{eventSlug}/partnership/{partnershipId}/billing") {
         get {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing partnership id",
                 )
             val invoice = partnershipBillingRepository.getByPartnershipId(eventSlug, partnershipId)
@@ -48,12 +46,10 @@ fun Route.partnershipBillingRoutes() {
         }
         post {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing partnership id",
                 )
             val input = call.receive<CompanyBillingData>()
@@ -62,12 +58,10 @@ fun Route.partnershipBillingRoutes() {
         }
         put {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing partnership id",
                 )
             val input = call.receive<CompanyBillingData>()
@@ -76,12 +70,10 @@ fun Route.partnershipBillingRoutes() {
         }
         post("invoice") {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing partnership id",
                 )
             val invoiceUrl = billingRepository.createInvoice(eventSlug, partnershipId)
@@ -95,12 +87,10 @@ fun Route.partnershipBillingRoutes() {
         }
         post("quote") {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing partnership id",
                 )
             val quoteUrl = billingRepository.createQuote(eventSlug, partnershipId)
@@ -127,22 +117,18 @@ private fun Route.organizationProtectedBillingRoutes() {
 
         post("/{billingStatus}") {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing partnership id",
                 )
             val statusParam = call.parameters["billingStatus"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing billing status",
             )
             val status = runCatching { InvoiceStatus.valueOf(statusParam.uppercase()) }
                 .getOrElse {
                     throw BadRequestException(
-                        code = ErrorCode.BAD_REQUEST,
                         message = "Invalid billing status: $statusParam",
                     )
                 }

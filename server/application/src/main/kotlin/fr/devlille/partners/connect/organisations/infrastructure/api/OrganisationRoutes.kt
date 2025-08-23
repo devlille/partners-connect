@@ -39,7 +39,6 @@ fun Route.organisationRoutes() {
 
         get("/{slug}") {
             val slug = call.parameters["slug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing slug",
             )
             call.respond(HttpStatusCode.OK, repository.getById(slug))
@@ -47,7 +46,6 @@ fun Route.organisationRoutes() {
 
         put("/{orgSlug}") {
             val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing org slug",
             )
             val input = call.receive<Organisation>()

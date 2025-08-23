@@ -24,7 +24,6 @@ fun Route.eventExternalLinkRoutes() {
 
         post {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val request = call.receive<CreateEventExternalLinkRequest>()
@@ -39,7 +38,6 @@ fun Route.eventExternalLinkRoutes() {
 
         delete {
             val linkId = call.parameters["linkId"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing link ID",
             )
 

@@ -237,13 +237,11 @@ class EventRepositoryExposed(
         // Basic validation
         if (request.name.isBlank()) {
             throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "External link name cannot be empty",
             )
         }
         if (request.url.isBlank()) {
             throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "External link URL cannot be empty",
             )
         }
@@ -252,7 +250,6 @@ class EventRepositoryExposed(
         val urlPattern = Regex("^https?://.*")
         if (!urlPattern.matches(request.url)) {
             throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Invalid URL format - must start with http:// or https://",
             )
         }

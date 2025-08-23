@@ -34,7 +34,6 @@ fun Route.partnershipRoutes() {
     route("/events/{eventSlug}/partnership") {
         post {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
             val register = call.receive<RegisterPartnership>()
@@ -68,7 +67,6 @@ fun Route.partnershipRoutes() {
 
         get {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing event slug",
             )
 
@@ -96,12 +94,10 @@ fun Route.partnershipRoutes() {
 
             post {
                 val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing event slug",
                 )
                 val partnershipId = call.parameters["partnershipId"]?.toUUID()
                     ?: throw BadRequestException(
-                        code = ErrorCode.BAD_REQUEST,
                         message = "Missing partnership id",
                     )
                 val id = partnershipRepository.validate(eventSlug, partnershipId)
@@ -109,7 +105,6 @@ fun Route.partnershipRoutes() {
                 val partnership = partnershipRepository.getById(eventSlug, partnershipId)
                 val pack = partnership.selectedPack
                     ?: throw BadRequestException(
-                        code = ErrorCode.BAD_REQUEST,
                         message = "Partnership does not have a selected pack",
                     )
                 val event = eventRepository.getBySlug(eventSlug)
@@ -134,12 +129,10 @@ fun Route.partnershipRoutes() {
 
             post {
                 val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Missing event slug",
                 )
                 val partnershipId = call.parameters["partnershipId"]?.toUUID()
                     ?: throw BadRequestException(
-                        code = ErrorCode.BAD_REQUEST,
                         message = "Missing partnership id",
                     )
                 val id = partnershipRepository.decline(eventSlug, partnershipId)

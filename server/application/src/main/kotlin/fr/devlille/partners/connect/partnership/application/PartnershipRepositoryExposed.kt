@@ -76,7 +76,6 @@ class PartnershipRepositoryExposed(
         val existing = partnershipEntity.singleByEventAndCompany(eventId, companyId)
         if (existing != null) {
             throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Company already subscribed to this event",
             )
         }
@@ -107,7 +106,6 @@ class PartnershipRepositoryExposed(
 
         if (unknownOptions.isNotEmpty()) {
             throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Some options are not optional in the selected pack: $unknownOptions",
             )
         }
@@ -124,7 +122,6 @@ class PartnershipRepositoryExposed(
 
             if (noTranslations) {
                 throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Option $it does not have a translation for language ${register.language}",
                 )
             }
