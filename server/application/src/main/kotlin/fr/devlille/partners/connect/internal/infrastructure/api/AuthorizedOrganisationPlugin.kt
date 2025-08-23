@@ -22,6 +22,7 @@ val AuthorizedOrganisationPlugin = createRouteScopedPlugin(name = "AuthorizedOrg
                 meta = mapOf(
                     MetaKeys.EMAIL to userInfo.email,
                     MetaKeys.ORGANISATION to orgSlug,
+                    MetaKeys.REQUIRED_ROLE to "organizer",
                 ),
             )
         }

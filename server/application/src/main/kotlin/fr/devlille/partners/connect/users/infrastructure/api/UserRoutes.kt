@@ -64,6 +64,7 @@ fun Route.userRoutes() {
                     meta = mapOf(
                         MetaKeys.EMAIL to userInfo.email,
                         MetaKeys.ORGANISATION to orgSlug,
+                        MetaKeys.REQUIRED_ROLE to "organizer",
                     ),
                 )
             }
