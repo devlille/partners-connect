@@ -1,7 +1,48 @@
 openapi: "3.1.0"
 info:
   title: "partners_connect API"
-  description: "partners_connect API"
+  description: |
+    Partners Connect API for managing developer event partnerships and sponsorships.
+    
+    ## Error Handling
+    
+    This API implements a structured error response system that provides consistent error information for better client-side handling and internationalization support.
+    
+    ### Response Format
+    
+    The API supports two response formats based on the client's Accept header:
+    
+    - **JSON Response** (when `Accept: application/json`): Returns structured error objects with error codes, HTTP status, and metadata
+    - **Text Response** (default): Returns plain text error messages for backward compatibility
+    
+    ### JSON Error Response Structure
+    
+    ```json
+    {
+      "code": "ERROR_CODE_NAME",
+      "status": 400,
+      "meta": {
+        "field": "additional_info",
+        "context": "more_details"
+      }
+    }
+    ```
+    
+    ### Error Code Categories
+    
+    - **Authentication/Authorization**: `UNAUTHORIZED`, `TOKEN_MISSING`, `FORBIDDEN`, `NO_EDIT_PERMISSION`
+    - **Validation**: `BAD_REQUEST`, `INVALID_UUID_FORMAT`, `MISSING_REQUIRED_PARAMETER`
+    - **Not Found**: `NOT_FOUND`, `EVENT_NOT_FOUND`, `PARTNERSHIP_NOT_FOUND`, `COMPANY_NOT_FOUND`, etc.
+    - **Business Logic**: `PARTNERSHIP_ALREADY_EXISTS`, `INVALID_PARTNERSHIP_STATUS`
+    - **System**: `INTERNAL_SERVER_ERROR`, `UNSUPPORTED_MEDIA_TYPE`
+    
+    ### Client Implementation Guide
+    
+    API consumers are responsible for mapping error codes to user-facing messages and implementing internationalization. The structured error codes enable:
+    
+    1. **Granular Error Handling**: Different client behaviors based on specific error types
+    2. **Internationalization**: Map error codes to localized messages
+    3. **Enhanced UX**: Use metadata for contextual error information
   version: "1.0.0"
 servers:
   - url: "https://partners_connect"
@@ -15,7 +56,19 @@ paths:
           content:
             application/json:
               schema:
-                type: "object"
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalid_state:
+                  summary: "Invalid OAuth state"
+                  value:
+                    code: "NOT_FOUND"
+                    status: 404
+                    meta:
+                      state: "invalid_state_value"
+            text/plain:
+              schema:
+                type: "string"
+              example: "404 Not Found"
         "302":
           description: "Found - Redirect after successful authentication"
           content:
@@ -47,9 +100,22 @@ paths:
         "401":
           description: "Unauthorized - No valid session"
           content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                missing_token:
+                  summary: "Missing authentication token"
+                  value:
+                    code: "UNAUTHORIZED"
+                    status: 401
+                    meta:
+                      header: "Authorization"
+                      method: "Bearer token or session"
             text/plain:
               schema:
                 type: "string"
+              example: "401 Unauthorized"
         "200":
           description: "OK"
           content:
@@ -2141,6 +2207,68 @@ components:
       bearerFormat: JWT
       description: "Authentication token obtained through OAuth flow"
   schemas:
+    ErrorResponse:
+      type: "object"
+      description: "Structured error response object returned when Accept: application/json"
+      properties:
+        code:
+          type: "string"
+          description: "Specific error code for programmatic handling and internationalization"
+          enum:
+            - "BAD_REQUEST"
+            - "INVALID_UUID_FORMAT"
+            - "MISSING_REQUIRED_PARAMETER"
+            - "UNSUPPORTED_MEDIA_TYPE"
+            - "UNAUTHORIZED"
+            - "TOKEN_MISSING"
+            - "FORBIDDEN"
+            - "NO_EDIT_PERMISSION"
+            - "NOT_FOUND"
+            - "USER_NOT_FOUND"
+            - "ORGANISATION_NOT_FOUND"
+            - "EVENT_NOT_FOUND"
+            - "COMPANY_NOT_FOUND"
+            - "PARTNERSHIP_NOT_FOUND"
+            - "SPONSORING_PACK_NOT_FOUND"
+            - "SPONSORING_OPTION_NOT_FOUND"
+            - "INTEGRATION_NOT_FOUND"
+            - "PROVIDER_NOT_FOUND"
+            - "PARTNERSHIP_ALREADY_EXISTS"
+            - "INVALID_PARTNERSHIP_STATUS"
+            - "BILLING_PROCESSING_ERROR"
+            - "NOTIFICATION_DELIVERY_ERROR"
+            - "TICKET_GENERATION_ERROR"
+            - "FILE_UPLOAD_ERROR"
+            - "FILE_NOT_FOUND"
+            - "STORAGE_ERROR"
+            - "EXTERNAL_SERVICE_ERROR"
+            - "INTEGRATION_NOT_CONFIGURED"
+            - "INTERNAL_SERVER_ERROR"
+            - "DATABASE_ERROR"
+            - "MIGRATION_ERROR"
+        status:
+          type: "integer"
+          description: "HTTP status code"
+          example: 400
+        meta:
+          type: "object"
+          description: "Additional contextual information about the error"
+          additionalProperties:
+            type: "string"
+          example:
+            resource: "event"
+            field: "title"
+            action: "create"
+      required:
+        - "code"
+        - "status"
+        - "meta"
+      example:
+        code: "EVENT_NOT_FOUND"
+        status: 404
+        meta:
+          eventId: "12345"
+          slug: "nonexistent-event"
     UserSession:
       type: "object"
       properties:

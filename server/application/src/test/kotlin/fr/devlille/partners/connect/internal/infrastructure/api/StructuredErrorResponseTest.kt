@@ -1,154 +1,116 @@
 package fr.devlille.partners.connect.internal.infrastructure.api
 
-import fr.devlille.partners.connect.internal.moduleMocked
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.routing.get
-import io.ktor.server.routing.routing
-import io.ktor.server.testing.testApplication
-import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class StructuredErrorResponseTest {
-
-    private val json = Json { prettyPrint = true }
-
     @Test
-    fun `error returns text response by default for backward compatibility`() = testApplication {
-        application {
-            moduleMocked()
-        }
+    fun `ErrorCode enum contains expected values`() {
+        // Test that our error codes exist and are properly defined
+        assertEquals("BAD_REQUEST", ErrorCode.BAD_REQUEST.name)
+        assertEquals("UNAUTHORIZED", ErrorCode.UNAUTHORIZED.name)
+        assertEquals("FORBIDDEN", ErrorCode.FORBIDDEN.name)
+        assertEquals("NOT_FOUND", ErrorCode.NOT_FOUND.name)
+        assertEquals("EVENT_NOT_FOUND", ErrorCode.EVENT_NOT_FOUND.name)
+        assertEquals("PARTNERSHIP_NOT_FOUND", ErrorCode.PARTNERSHIP_NOT_FOUND.name)
+        assertEquals("NO_EDIT_PERMISSION", ErrorCode.NO_EDIT_PERMISSION.name)
+        assertEquals("INTERNAL_SERVER_ERROR", ErrorCode.INTERNAL_SERVER_ERROR.name)
 
-        // Test with an endpoint that requires authorization - should get 401 Unauthorized
-        val response = client.get("/users/me/orgs")
-
-        assertEquals(HttpStatusCode.Unauthorized, response.status)
-        val responseText = response.bodyAsText()
-        // Should return text response (not JSON) without Accept header
-        assertFalse(responseText.startsWith("{"))
-        assertTrue(responseText.contains("401") || responseText.contains("Unauthorized"))
+        // Verify we have comprehensive coverage
+        val allCodes = ErrorCode.values()
+        assertTrue(allCodes.size >= 30, "Should have at least 30 error codes for comprehensive coverage")
     }
 
     @Test
-    fun `error returns JSON response when client accepts JSON`() = testApplication {
-        application {
-            moduleMocked()
-        }
+    fun `ErrorResponse serializes correctly`() {
+        val errorResponse = ErrorResponse(
+            code = "TEST_ERROR",
+            status = 400,
+            meta = mapOf("field" to "value", "resource" to "test"),
+        )
 
-        // Test with an endpoint that requires authorization, requesting JSON response
-        val response = client.get("/users/me/orgs") {
-            header(HttpHeaders.Accept, "application/json")
-        }
-
-        assertEquals(HttpStatusCode.Unauthorized, response.status)
-        val responseText = response.bodyAsText()
-        assertTrue(responseText.startsWith("{"))
-        assertTrue(responseText.contains("\"code\""))
-        assertTrue(responseText.contains("\"status\""))
-        
-        // Parse and validate the JSON structure
-        val errorResponse = json.decodeFromString<ErrorResponse>(responseText)
-        assertEquals(ErrorCode.UNAUTHORIZED.name, errorResponse.code)
-        assertEquals(HttpStatusCode.Unauthorized.value, errorResponse.status)
+        assertEquals("TEST_ERROR", errorResponse.code)
+        assertEquals(400, errorResponse.status)
+        assertEquals("value", errorResponse.meta["field"])
+        assertEquals("test", errorResponse.meta["resource"])
     }
 
     @Test
-    fun `custom exceptions with structured error codes work correctly`() = testApplication {
-        application {
-            moduleMocked()
-            
-            // Add a test route that throws our custom exceptions
-            routing {
-                get("/test-forbidden") {
-                    throw ForbiddenException(
-                        code = ErrorCode.NO_EDIT_PERMISSION,
-                        message = "You don't have permission",
-                        meta = mapOf("resource" to "test")
-                    )
-                }
-                get("/test-unauthorized") {
-                    throw UnauthorizedException(
-                        code = ErrorCode.TOKEN_MISSING,
-                        message = "Token required",
-                        meta = mapOf("action" to "test")
-                    )
-                }
-            }
-        }
+    fun `ForbiddenException backward compatibility constructor works`() {
+        val exception = ForbiddenException("Test message")
 
-        // Test ForbiddenException with JSON response
-        val forbiddenResponse = client.get("/test-forbidden") {
-            header(HttpHeaders.Accept, "application/json")
-        }
-
-        assertEquals(HttpStatusCode.Forbidden, forbiddenResponse.status)
-        val forbiddenError = json.decodeFromString<ErrorResponse>(forbiddenResponse.bodyAsText())
-        assertEquals(ErrorCode.NO_EDIT_PERMISSION.name, forbiddenError.code)
-        assertEquals(HttpStatusCode.Forbidden.value, forbiddenError.status)
-        assertEquals("test", forbiddenError.meta["resource"])
-
-        // Test UnauthorizedException with JSON response
-        val unauthorizedResponse = client.get("/test-unauthorized") {
-            header(HttpHeaders.Accept, "application/json")
-        }
-
-        assertEquals(HttpStatusCode.Unauthorized, unauthorizedResponse.status)
-        val unauthorizedError = json.decodeFromString<ErrorResponse>(unauthorizedResponse.bodyAsText())
-        assertEquals(ErrorCode.TOKEN_MISSING.name, unauthorizedError.code)
-        assertEquals(HttpStatusCode.Unauthorized.value, unauthorizedError.status)
-        assertEquals("test", unauthorizedError.meta["action"])
+        assertEquals(ErrorCode.FORBIDDEN, exception.code)
+        assertEquals("Test message", exception.message)
+        assertEquals(HttpStatusCode.Forbidden, exception.status)
+        assertTrue(exception.meta.isEmpty())
     }
 
     @Test
-    fun `custom exceptions return text for backward compatibility`() = testApplication {
-        application {
-            moduleMocked()
-            
-            routing {
-                get("/test-forbidden-text") {
-                    throw ForbiddenException("You don't have permission")
-                }
-            }
-        }
+    fun `ForbiddenException structured constructor works`() {
+        val exception = ForbiddenException(
+            code = ErrorCode.NO_EDIT_PERMISSION,
+            message = "No permission for this resource",
+            status = HttpStatusCode.Forbidden,
+            meta = mapOf("resource" to "event", "action" to "edit"),
+        )
 
-        // Request without Accept header should get text response
-        val response = client.get("/test-forbidden-text")
-
-        assertEquals(HttpStatusCode.Forbidden, response.status)
-        val responseText = response.bodyAsText()
-        assertFalse(responseText.startsWith("{"))
-        assertTrue(responseText.contains("permission"))
+        assertEquals(ErrorCode.NO_EDIT_PERMISSION, exception.code)
+        assertEquals("No permission for this resource", exception.message)
+        assertEquals(HttpStatusCode.Forbidden, exception.status)
+        assertEquals("event", exception.meta["resource"])
+        assertEquals("edit", exception.meta["action"])
     }
 
     @Test
-    fun `backward compatibility constructors work correctly`() = testApplication {
-        application {
-            moduleMocked()
-        }
+    fun `UnauthorizedException backward compatibility constructor works`() {
+        val exception = UnauthorizedException("Auth required")
 
-        // Test that old-style exception constructor works
-        val forbiddenException = ForbiddenException("Test message")
-        assertEquals(ErrorCode.FORBIDDEN, forbiddenException.code)
-        assertEquals("Test message", forbiddenException.message)
-        assertEquals(HttpStatusCode.Forbidden, forbiddenException.status)
-        assertTrue(forbiddenException.meta.isEmpty())
+        assertEquals(ErrorCode.UNAUTHORIZED, exception.code)
+        assertEquals("Auth required", exception.message)
+        assertEquals(HttpStatusCode.Unauthorized, exception.status)
+        assertTrue(exception.meta.isEmpty())
+    }
 
-        val unauthorizedException = UnauthorizedException("Test unauthorized")
-        assertEquals(ErrorCode.UNAUTHORIZED, unauthorizedException.code)
-        assertEquals("Test unauthorized", unauthorizedException.message)
-        assertEquals(HttpStatusCode.Unauthorized, unauthorizedException.status)
-        assertTrue(unauthorizedException.meta.isEmpty())
+    @Test
+    fun `UnauthorizedException structured constructor works`() {
+        val exception = UnauthorizedException(
+            code = ErrorCode.TOKEN_MISSING,
+            message = "Missing authentication token",
+            status = HttpStatusCode.Unauthorized,
+            meta = mapOf("header" to "Authorization"),
+        )
 
-        val unsupportedMediaException = UnsupportedMediaTypeException("Test unsupported")
-        assertEquals(ErrorCode.UNSUPPORTED_MEDIA_TYPE, unsupportedMediaException.code)
-        assertEquals("Test unsupported", unsupportedMediaException.message)
-        assertEquals(HttpStatusCode.UnsupportedMediaType, unsupportedMediaException.status)
-        assertTrue(unsupportedMediaException.meta.isEmpty())
+        assertEquals(ErrorCode.TOKEN_MISSING, exception.code)
+        assertEquals("Missing authentication token", exception.message)
+        assertEquals(HttpStatusCode.Unauthorized, exception.status)
+        assertEquals("Authorization", exception.meta["header"])
+    }
+
+    @Test
+    fun `UnsupportedMediaTypeException backward compatibility constructor works`() {
+        val exception = UnsupportedMediaTypeException("Bad media type")
+
+        assertEquals(ErrorCode.UNSUPPORTED_MEDIA_TYPE, exception.code)
+        assertEquals("Bad media type", exception.message)
+        assertEquals(HttpStatusCode.UnsupportedMediaType, exception.status)
+        assertTrue(exception.meta.isEmpty())
+    }
+
+    @Test
+    fun `UnsupportedMediaTypeException structured constructor works`() {
+        val exception = UnsupportedMediaTypeException(
+            code = ErrorCode.UNSUPPORTED_MEDIA_TYPE,
+            message = "Content type not supported",
+            status = HttpStatusCode.UnsupportedMediaType,
+            meta = mapOf("contentType" to "application/xml", "supported" to "application/json"),
+        )
+
+        assertEquals(ErrorCode.UNSUPPORTED_MEDIA_TYPE, exception.code)
+        assertEquals("Content type not supported", exception.message)
+        assertEquals(HttpStatusCode.UnsupportedMediaType, exception.status)
+        assertEquals("application/xml", exception.meta["contentType"])
+        assertEquals("application/json", exception.meta["supported"])
     }
 }

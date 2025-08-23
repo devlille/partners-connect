@@ -212,7 +212,7 @@ private fun Application.configureStatusPage() {
         exception<BadRequestException> { call, cause ->
             // Only return JSON if client explicitly accepts it via Accept header
             val acceptsJson = call.request.headers[HttpHeaders.Accept]?.contains("application/json") == true
-            
+
             if (acceptsJson) {
                 val errorResponse = ErrorResponse(
                     code = ErrorCode.BAD_REQUEST.name,
