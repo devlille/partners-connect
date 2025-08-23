@@ -11,12 +11,4 @@ class ForbiddenException(
     override val message: String = "Access forbidden",
     val status: HttpStatusCode = HttpStatusCode.Forbidden,
     val meta: Map<String, String> = emptyMap(),
-) : Throwable(message) {
-    // Backward compatibility constructor
-    constructor(message: String) : this(
-        code = ErrorCode.FORBIDDEN,
-        message = message,
-        status = HttpStatusCode.Forbidden,
-        meta = emptyMap(),
-    )
-}
+) : Throwable(message)

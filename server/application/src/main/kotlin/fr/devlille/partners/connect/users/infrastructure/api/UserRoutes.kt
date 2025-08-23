@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.users.infrastructure.api
 
 import fr.devlille.partners.connect.auth.domain.AuthRepository
 import fr.devlille.partners.connect.events.domain.EventRepository
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.token
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
@@ -56,7 +57,15 @@ fun Route.userRoutes() {
             val userInfo = authRepository.getUserInfo(token)
             val hasPerm = userRepository.hasEditPermissionByEmail(userInfo.email, orgSlug)
             if (!hasPerm && SystemVarEnv.owner != userInfo.email) {
-                throw UnauthorizedException("You do not have permission to grant users for this event")
+                throw UnauthorizedException(
+                    code = ErrorCode.NO_EDIT_PERMISSION,
+                    message = "You do not have permission to grant users for this event",
+                    meta = mapOf(
+                        "email" to userInfo.email,
+                        "organisation" to orgSlug,
+                        "action" to "grant_users",
+                    ),
+                )
             }
             userRepository.grantUsers(orgSlug, request.userEmails)
             call.respond(HttpStatusCode.OK, "Permissions granted")

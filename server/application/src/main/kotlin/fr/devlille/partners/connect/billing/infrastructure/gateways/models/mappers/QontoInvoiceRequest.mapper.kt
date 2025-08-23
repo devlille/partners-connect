@@ -6,6 +6,7 @@ import fr.devlille.partners.connect.billing.infrastructure.gateways.models.Qonto
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoLegalCapitalShare
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoPaymentMethods
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -22,7 +23,15 @@ internal fun EventEntity.toQontoInvoiceRequest(
 
     // Validate required fields for invoice generation
     val requiredIban = organisation.iban
-        ?: throw ForbiddenException("Field iban is required to perform this operation.")
+        ?: throw ForbiddenException(
+            code = ErrorCode.MISSING_REQUIRED_PARAMETER,
+            message = "Field iban is required to perform this operation.",
+            meta = mapOf(
+                "field" to "iban",
+                "organisation" to organisation.slug,
+                "operation" to "invoice_generation",
+            ),
+        )
 
     return QontoInvoiceRequest(
         settings = QontoInvoiceSettings(legalCapitalShare = QontoLegalCapitalShare(currency = "EUR")),

@@ -5,6 +5,7 @@ import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.findByEventIdAndUsage
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
@@ -61,7 +62,16 @@ class TicketRepositoryExposed(
         val billing = transaction { BillingEntity.singleByEventAndPartnership(eventId, partnershipId) }
             ?: throw NotFoundException("Billing entity not found for event $eventId and partnership $partnershipId")
         if (billing.status != InvoiceStatus.PAID) {
-            throw ForbiddenException("Invoice status ${billing.status} is not PAID")
+            throw ForbiddenException(
+                code = ErrorCode.BILLING_PROCESSING_ERROR,
+                message = "Invoice status ${billing.status} is not PAID",
+                meta = mapOf(
+                    "invoiceStatus" to billing.status.name,
+                    "requiredStatus" to "PAID",
+                    "eventId" to eventId.toString(),
+                    "partnershipId" to partnershipId.toString(),
+                ),
+            )
         }
         val validatedPack = transaction { billing.partnership.validatedPack() }
         val partnership = transaction { billing.partnership }
@@ -71,7 +81,15 @@ class TicketRepositoryExposed(
             val message = """
 Not enough tickets in the validated pack: ${validatedPack.nbTickets} available, ${tickets.size} requested
             """.trimIndent()
-            throw ForbiddenException(message)
+            throw ForbiddenException(
+                code = ErrorCode.TICKET_GENERATION_ERROR,
+                message = message,
+                meta = mapOf(
+                    "availableTickets" to validatedPack.nbTickets.toString(),
+                    "requestedTickets" to tickets.size.toString(),
+                    "partnershipId" to partnership.id.toString(),
+                ),
+            )
         }
         val order = gateway.createTickets(integrationId, eventId, partnershipId, tickets)
         transaction {

@@ -15,6 +15,16 @@ val AuthorizedOrganisationPlugin = createRouteScopedPlugin(name = "AuthorizedOrg
         val token = call.token
         val userInfo = authRepository.getUserInfo(token)
         val canEdit = userRepository.hasEditPermissionByEmail(userInfo.email, orgSlug)
-        if (!canEdit) throw UnauthorizedException("You are not allowed to edit this event")
+        if (!canEdit) {
+            throw UnauthorizedException(
+                code = ErrorCode.NO_EDIT_PERMISSION,
+                message = "You are not allowed to edit this event",
+                meta = mapOf(
+                    "email" to userInfo.email,
+                    "organisation" to orgSlug,
+                    "action" to "edit",
+                ),
+            )
+        }
     }
 }

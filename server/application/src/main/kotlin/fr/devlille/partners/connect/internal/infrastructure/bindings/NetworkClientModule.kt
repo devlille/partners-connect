@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.internal.infrastructure.bindings
 
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.ClientRequestException
@@ -24,7 +25,14 @@ val networkClientModule = module {
                         ?: return@handleResponseExceptionWithRequest
                     val exceptionResponse = clientException.response
                     if (exceptionResponse.status == HttpStatusCode.Unauthorized) {
-                        throw UnauthorizedException("Unauthorized: ${exception.message}")
+                        throw UnauthorizedException(
+                            code = ErrorCode.UNAUTHORIZED,
+                            message = "Unauthorized: ${exception.message}",
+                            meta = mapOf(
+                                "httpStatus" to exceptionResponse.status.value.toString(),
+                                "url" to request.url.toString(),
+                            ),
+                        )
                     }
                 }
             }

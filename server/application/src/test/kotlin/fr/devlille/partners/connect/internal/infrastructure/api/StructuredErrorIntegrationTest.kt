@@ -12,7 +12,6 @@ import io.ktor.server.testing.testApplication
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
@@ -53,7 +52,10 @@ class StructuredErrorIntegrationTest {
                             ),
                         )
                         "not-found" -> throw io.ktor.server.plugins.NotFoundException("Resource not found")
-                        else -> throw ForbiddenException("Default error")
+                        else -> throw ForbiddenException(
+                            code = ErrorCode.FORBIDDEN,
+                            message = "Default error",
+                        )
                     }
                 }
             }
@@ -105,37 +107,50 @@ class StructuredErrorIntegrationTest {
     }
 
     @Test
-    fun `test backward compatibility with text responses`() = testApplication {
+    fun `test JSON responses are returned for all errors`() = testApplication {
         application {
             moduleMocked()
 
             routing {
-                get("/demo/text-errors") {
+                get("/demo/json-errors") {
                     val errorType = call.parameters["error"] ?: "forbidden"
 
                     when (errorType) {
-                        "forbidden" -> throw ForbiddenException("Access denied")
-                        "unauthorized" -> throw UnauthorizedException("Login required")
-                        else -> throw ForbiddenException("Default error")
+                        "forbidden" -> throw ForbiddenException(
+                            code = ErrorCode.FORBIDDEN,
+                            message = "Access denied",
+                        )
+                        "unauthorized" -> throw UnauthorizedException(
+                            code = ErrorCode.UNAUTHORIZED,
+                            message = "Login required",
+                        )
+                        else -> throw ForbiddenException(
+                            code = ErrorCode.FORBIDDEN,
+                            message = "Default error",
+                        )
                     }
                 }
             }
         }
 
-        // Test without Accept header - should get text response
-        val forbiddenResponse = client.get("/demo/text-errors?error=forbidden")
+        // Test without Accept header - should now get JSON response
+        val forbiddenResponse = client.get("/demo/json-errors?error=forbidden")
 
         assertEquals(HttpStatusCode.Forbidden, forbiddenResponse.status)
         val forbiddenResponseText = forbiddenResponse.bodyAsText()
-        assertFalse(forbiddenResponseText.startsWith("{"))
-        assertTrue(forbiddenResponseText.contains("Access denied"))
+        assertTrue(forbiddenResponseText.startsWith("{"))
+        val forbiddenError = json.decodeFromString<ErrorResponse>(forbiddenResponseText)
+        assertEquals(ErrorCode.FORBIDDEN.name, forbiddenError.code)
+        assertEquals(HttpStatusCode.Forbidden.value, forbiddenError.status)
 
-        // Test unauthorized without Accept header - should get text response
-        val unauthorizedResponse = client.get("/demo/text-errors?error=unauthorized")
+        // Test unauthorized without Accept header - should now get JSON response
+        val unauthorizedResponse = client.get("/demo/json-errors?error=unauthorized")
 
         assertEquals(HttpStatusCode.Unauthorized, unauthorizedResponse.status)
         val unauthorizedResponseText = unauthorizedResponse.bodyAsText()
-        assertFalse(unauthorizedResponseText.startsWith("{"))
-        assertTrue(unauthorizedResponseText.contains("Login required"))
+        assertTrue(unauthorizedResponseText.startsWith("{"))
+        val unauthorizedError = json.decodeFromString<ErrorResponse>(unauthorizedResponseText)
+        assertEquals(ErrorCode.UNAUTHORIZED.name, unauthorizedError.code)
+        assertEquals(HttpStatusCode.Unauthorized.value, unauthorizedError.status)
     }
 }

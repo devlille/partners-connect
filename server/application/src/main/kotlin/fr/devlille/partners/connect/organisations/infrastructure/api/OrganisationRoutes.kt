@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.organisations.infrastructure.api
 
 import fr.devlille.partners.connect.auth.domain.AuthRepository
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.token
 import fr.devlille.partners.connect.organisations.domain.Organisation
@@ -49,7 +50,15 @@ fun Route.organisationRoutes() {
             val canEdit = userRepository.hasEditPermissionByEmail(userInfo.email, orgSlug)
 
             if (!canEdit) {
-                throw UnauthorizedException("You are not allowed to edit this organisation")
+                throw UnauthorizedException(
+                    code = ErrorCode.NO_EDIT_PERMISSION,
+                    message = "You are not allowed to edit this organisation",
+                    meta = mapOf(
+                        "email" to userInfo.email,
+                        "organisation" to orgSlug,
+                        "action" to "edit",
+                    ),
+                )
             }
             val updatedOrg = repository.update(orgSlug, input)
             call.respond(HttpStatusCode.OK, updatedOrg)

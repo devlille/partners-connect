@@ -59,7 +59,6 @@ import io.ktor.server.plugins.openapi.openAPI
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.response.respond
-import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
@@ -210,90 +209,52 @@ private fun Application.configureContentNegotiation() {
 private fun Application.configureStatusPage() {
     install(StatusPages) {
         exception<BadRequestException> { call, cause ->
-            // Only return JSON if client explicitly accepts it via Accept header
-            val acceptsJson = call.request.headers[HttpHeaders.Accept]?.contains("application/json") == true
-
-            if (acceptsJson) {
-                val errorResponse = ErrorResponse(
-                    code = ErrorCode.BAD_REQUEST.name,
-                    status = HttpStatusCode.BadRequest.value,
-                    meta = emptyMap(),
-                )
-                call.respond(HttpStatusCode.BadRequest, errorResponse)
-            } else {
-                // Backward compatibility: return text response
-                call.respondText(text = cause.message ?: "400 Bad Request", status = HttpStatusCode.BadRequest)
-            }
+            val errorResponse = ErrorResponse(
+                code = ErrorCode.BAD_REQUEST.name,
+                status = HttpStatusCode.BadRequest.value,
+                meta = emptyMap(),
+            )
+            call.respond(HttpStatusCode.BadRequest, errorResponse)
         }
         exception<UnauthorizedException> { call, cause ->
-            val acceptsJson = call.request.headers[HttpHeaders.Accept]?.contains("application/json") == true
-
-            if (acceptsJson) {
-                val errorResponse = ErrorResponse(
-                    code = cause.code.name,
-                    status = cause.status.value,
-                    meta = cause.meta,
-                )
-                call.respond(cause.status, errorResponse)
-            } else {
-                call.respondText(text = cause.message, status = cause.status)
-            }
+            val errorResponse = ErrorResponse(
+                code = cause.code.name,
+                status = cause.status.value,
+                meta = cause.meta,
+            )
+            call.respond(cause.status, errorResponse)
         }
         exception<ForbiddenException> { call, cause ->
-            val acceptsJson = call.request.headers[HttpHeaders.Accept]?.contains("application/json") == true
-
-            if (acceptsJson) {
-                val errorResponse = ErrorResponse(
-                    code = cause.code.name,
-                    status = cause.status.value,
-                    meta = cause.meta,
-                )
-                call.respond(cause.status, errorResponse)
-            } else {
-                call.respondText(text = cause.message, status = cause.status)
-            }
+            val errorResponse = ErrorResponse(
+                code = cause.code.name,
+                status = cause.status.value,
+                meta = cause.meta,
+            )
+            call.respond(cause.status, errorResponse)
         }
         exception<NotFoundException> { call, cause ->
-            val acceptsJson = call.request.headers[HttpHeaders.Accept]?.contains("application/json") == true
-
-            if (acceptsJson) {
-                val errorResponse = ErrorResponse(
-                    code = ErrorCode.NOT_FOUND.name,
-                    status = HttpStatusCode.NotFound.value,
-                    meta = emptyMap(),
-                )
-                call.respond(HttpStatusCode.NotFound, errorResponse)
-            } else {
-                call.respondText(text = cause.message ?: "404 Not Found", status = HttpStatusCode.NotFound)
-            }
+            val errorResponse = ErrorResponse(
+                code = ErrorCode.NOT_FOUND.name,
+                status = HttpStatusCode.NotFound.value,
+                meta = emptyMap(),
+            )
+            call.respond(HttpStatusCode.NotFound, errorResponse)
         }
         exception<UnsupportedMediaTypeException> { call, cause ->
-            val acceptsJson = call.request.headers[HttpHeaders.Accept]?.contains("application/json") == true
-
-            if (acceptsJson) {
-                val errorResponse = ErrorResponse(
-                    code = cause.code.name,
-                    status = cause.status.value,
-                    meta = cause.meta,
-                )
-                call.respond(cause.status, errorResponse)
-            } else {
-                call.respondText(text = cause.message, status = cause.status)
-            }
+            val errorResponse = ErrorResponse(
+                code = cause.code.name,
+                status = cause.status.value,
+                meta = cause.meta,
+            )
+            call.respond(cause.status, errorResponse)
         }
         exception<Throwable> { call, cause ->
-            val acceptsJson = call.request.headers[HttpHeaders.Accept]?.contains("application/json") == true
-
-            if (acceptsJson) {
-                val errorResponse = ErrorResponse(
-                    code = ErrorCode.INTERNAL_SERVER_ERROR.name,
-                    status = HttpStatusCode.InternalServerError.value,
-                    meta = emptyMap(),
-                )
-                call.respond(HttpStatusCode.InternalServerError, errorResponse)
-            } else {
-                call.respondText(text = "500: $cause", status = HttpStatusCode.InternalServerError)
-            }
+            val errorResponse = ErrorResponse(
+                code = ErrorCode.INTERNAL_SERVER_ERROR.name,
+                status = HttpStatusCode.InternalServerError.value,
+                meta = emptyMap(),
+            )
+            call.respond(HttpStatusCode.InternalServerError, errorResponse)
         }
     }
 }

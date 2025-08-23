@@ -12,6 +12,7 @@ import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinkEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinksTable
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
 import fr.devlille.partners.connect.organisations.application.mappers.toItemDomain
@@ -165,7 +166,15 @@ class EventRepositoryExposed(
 
         // Check if user has any organizer permissions
         if (userPermissions.empty()) {
-            throw UnauthorizedException("You do not have organizer permissions")
+            throw UnauthorizedException(
+                code = ErrorCode.NO_EDIT_PERMISSION,
+                message = "You do not have organizer permissions",
+                meta = mapOf(
+                    "email" to userEmail,
+                    "action" to "view_events",
+                    "requiredRole" to "organizer",
+                ),
+            )
         }
 
         // Get all events from those organizations

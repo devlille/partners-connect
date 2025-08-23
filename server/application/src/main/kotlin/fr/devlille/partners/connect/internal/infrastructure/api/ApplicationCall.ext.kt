@@ -7,4 +7,11 @@ import io.ktor.server.sessions.sessions
 val ApplicationCall.token: String
     get() = request.headers["Authorization"]
         ?: sessions.get<UserSession>()?.let { "Bearer ${it.token}" }
-        ?: throw UnauthorizedException("Token is missing from session or headers")
+        ?: throw UnauthorizedException(
+            code = ErrorCode.TOKEN_MISSING,
+            message = "Token is missing from session or headers",
+            meta = mapOf(
+                "header" to "Authorization",
+                "sessionAvailable" to (sessions.get<UserSession>() != null).toString(),
+            ),
+        )

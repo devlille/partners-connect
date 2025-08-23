@@ -11,12 +11,4 @@ class UnsupportedMediaTypeException(
     override val message: String = "Unsupported media type",
     val status: HttpStatusCode = HttpStatusCode.UnsupportedMediaType,
     val meta: Map<String, String> = emptyMap(),
-) : Throwable(message) {
-    // Backward compatibility constructor
-    constructor(message: String) : this(
-        code = ErrorCode.UNSUPPORTED_MEDIA_TYPE,
-        message = message,
-        status = HttpStatusCode.UnsupportedMediaType,
-        meta = emptyMap(),
-    )
-}
+) : Throwable(message)

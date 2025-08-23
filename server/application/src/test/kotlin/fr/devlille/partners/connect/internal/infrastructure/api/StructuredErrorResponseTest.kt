@@ -38,8 +38,11 @@ class StructuredErrorResponseTest {
     }
 
     @Test
-    fun `ForbiddenException backward compatibility constructor works`() {
-        val exception = ForbiddenException("Test message")
+    fun `ForbiddenException default constructor works`() {
+        val exception = ForbiddenException(
+            code = ErrorCode.FORBIDDEN,
+            message = "Test message",
+        )
 
         assertEquals(ErrorCode.FORBIDDEN, exception.code)
         assertEquals("Test message", exception.message)
@@ -48,7 +51,7 @@ class StructuredErrorResponseTest {
     }
 
     @Test
-    fun `ForbiddenException structured constructor works`() {
+    fun `ForbiddenException structured constructor with metadata works`() {
         val exception = ForbiddenException(
             code = ErrorCode.NO_EDIT_PERMISSION,
             message = "No permission for this resource",
@@ -64,8 +67,11 @@ class StructuredErrorResponseTest {
     }
 
     @Test
-    fun `UnauthorizedException backward compatibility constructor works`() {
-        val exception = UnauthorizedException("Auth required")
+    fun `UnauthorizedException default constructor works`() {
+        val exception = UnauthorizedException(
+            code = ErrorCode.UNAUTHORIZED,
+            message = "Auth required",
+        )
 
         assertEquals(ErrorCode.UNAUTHORIZED, exception.code)
         assertEquals("Auth required", exception.message)
@@ -74,7 +80,7 @@ class StructuredErrorResponseTest {
     }
 
     @Test
-    fun `UnauthorizedException structured constructor works`() {
+    fun `UnauthorizedException structured constructor with metadata works`() {
         val exception = UnauthorizedException(
             code = ErrorCode.TOKEN_MISSING,
             message = "Missing authentication token",
@@ -89,8 +95,11 @@ class StructuredErrorResponseTest {
     }
 
     @Test
-    fun `UnsupportedMediaTypeException backward compatibility constructor works`() {
-        val exception = UnsupportedMediaTypeException("Bad media type")
+    fun `UnsupportedMediaTypeException default constructor works`() {
+        val exception = UnsupportedMediaTypeException(
+            code = ErrorCode.UNSUPPORTED_MEDIA_TYPE,
+            message = "Bad media type",
+        )
 
         assertEquals(ErrorCode.UNSUPPORTED_MEDIA_TYPE, exception.code)
         assertEquals("Bad media type", exception.message)
@@ -99,7 +108,7 @@ class StructuredErrorResponseTest {
     }
 
     @Test
-    fun `UnsupportedMediaTypeException structured constructor works`() {
+    fun `UnsupportedMediaTypeException structured constructor with metadata works`() {
         val exception = UnsupportedMediaTypeException(
             code = ErrorCode.UNSUPPORTED_MEDIA_TYPE,
             message = "Content type not supported",

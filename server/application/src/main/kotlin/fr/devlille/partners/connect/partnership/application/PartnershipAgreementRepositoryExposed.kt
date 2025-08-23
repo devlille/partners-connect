@@ -3,6 +3,7 @@ package fr.devlille.partners.connect.partnership.application
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.pdf.renderMarkdownToPdf
 import fr.devlille.partners.connect.internal.infrastructure.resources.readResourceFile
@@ -107,7 +108,14 @@ internal fun OrganisationEntity.toAgreementOrganisation(formatter: DateTimeForma
 
     // Throw single exception with all missing fields if any
     if (missingFields.isNotEmpty()) {
-        throw ForbiddenException("Fields ${missingFields.joinToString(", ")} are required to perform this operation.")
+        throw ForbiddenException(
+            code = ErrorCode.MISSING_REQUIRED_PARAMETER,
+            message = "Fields ${missingFields.joinToString(", ")} are required to perform this operation.",
+            meta = mapOf(
+                "missingFields" to missingFields.joinToString(", "),
+                "operation" to "partnership_agreement_validation",
+            ),
+        )
     }
 
     return Organisation(

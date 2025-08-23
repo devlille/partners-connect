@@ -5,6 +5,7 @@ import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.application.mappers.toDomain
@@ -293,8 +294,15 @@ class PartnershipRepositoryExposed(
         if (existingPartnership != null) {
             val companyName = existingPartnership.company.name
             throw ForbiddenException(
-                "Location '$location' is already assigned to another partnership " +
+                code = ErrorCode.PARTNERSHIP_ALREADY_EXISTS,
+                message = "Location '$location' is already assigned to another partnership " +
                     "for this event by company '$companyName'",
+                meta = mapOf(
+                    "location" to location,
+                    "existingCompany" to companyName,
+                    "eventId" to event.id.value.toString(),
+                    "partnershipId" to partnershipId.toString(),
+                ),
             )
         }
 
