@@ -14,9 +14,10 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 class NotificationRepositoryExposed(
     private val notificationGateways: List<NotificationGateway>,
 ) : NotificationRepository {
-    override fun sendMessage(eventSlug: String, variables: NotificationVariables) = transaction {
-        val eventId = EventEntity.findBySlug(eventSlug)?.id?.value
+    override fun sendMessage(eventSlug: String, variables: NotificationVariables): Unit = transaction {
+        val eventEntity = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val eventId = eventEntity.id.value
 
         IntegrationsTable
             .findByEventIdAndUsage(eventId, IntegrationUsage.NOTIFICATION)
