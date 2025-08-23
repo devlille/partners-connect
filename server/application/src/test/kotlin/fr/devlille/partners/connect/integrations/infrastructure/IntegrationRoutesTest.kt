@@ -2,7 +2,6 @@ package fr.devlille.partners.connect.integrations.infrastructure
 
 import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.integrations.domain.CreateIntegration
-import fr.devlille.partners.connect.integrations.domain.Integration
 import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.integrations.factories.insertMockedIntegration
@@ -11,7 +10,6 @@ import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisa
 import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
 import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
 import fr.devlille.partners.connect.users.factories.insertMockedUser
-import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -171,7 +169,7 @@ class IntegrationRoutesTest {
         val responseBody = response.bodyAsText()
         val integrations = Json.parseToJsonElement(responseBody).jsonArray
         assertEquals(2, integrations.size, "Expected 2 integrations")
-        
+
         val integrationsData = integrations.map { it.jsonObject }
         assertTrue(integrationsData.any { it["provider"]?.toString()?.contains("SLACK") == true })
         assertTrue(integrationsData.any { it["provider"]?.toString()?.contains("MAILJET") == true })
@@ -292,7 +290,7 @@ class IntegrationRoutesTest {
     }
 
     @Test
-    fun `DELETE integration - returns 404 for invalid integration ID format`() = testApplication {
+    fun `DELETE integration - returns 400 for invalid integration ID format`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val testOrgSlug = "test-org-11"
@@ -310,8 +308,8 @@ class IntegrationRoutesTest {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
-        assertEquals(HttpStatusCode.NotFound, response.status)
-        assertTrue(response.bodyAsText().contains("not found"), "Expected not found error")
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertTrue(response.bodyAsText().contains("Invalid UUID format"), "Expected invalid UUID format error")
     }
 
     @Test

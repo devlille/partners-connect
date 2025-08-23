@@ -4,6 +4,7 @@ import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.IntegrationRepository
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receiveText
@@ -49,7 +50,8 @@ fun Route.integrationRoutes() {
         delete("/{integrationId}") {
             val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Missing orgSlug")
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing eventSlug")
-            val integrationId = call.parameters["integrationId"] ?: throw BadRequestException("Missing integrationId")
+            val integrationId = call.parameters["integrationId"]?.toUUID()
+                ?: throw BadRequestException("Missing integrationId")
             val deleted = integrationRepository.deleteById(orgSlug, eventSlug, integrationId)
             if (deleted) {
                 call.respond(HttpStatusCode.NoContent)

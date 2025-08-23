@@ -9,5 +9,4 @@ data class Integration(
     val provider: IntegrationProvider,
     val usage: IntegrationUsage,
     val createdAt: LocalDateTime,
-    val details: Map<String, String> = emptyMap(),
 )

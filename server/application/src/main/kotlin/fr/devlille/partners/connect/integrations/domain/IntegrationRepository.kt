@@ -7,5 +7,5 @@ interface IntegrationRepository {
 
     fun findByEvent(orgSlug: String, eventSlug: String): List<Integration>
 
-    fun deleteById(orgSlug: String, eventSlug: String, integrationId: String): Boolean
+    fun deleteById(orgSlug: String, eventSlug: String, integrationId: UUID): Boolean
 }

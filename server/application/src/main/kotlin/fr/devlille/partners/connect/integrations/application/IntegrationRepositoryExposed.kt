@@ -7,12 +7,12 @@ import fr.devlille.partners.connect.integrations.domain.Integration
 import fr.devlille.partners.connect.integrations.domain.IntegrationRegistrar
 import fr.devlille.partners.connect.integrations.domain.IntegrationRepository
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
+import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationEntity
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.v1.core.and
-import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
@@ -57,13 +57,11 @@ class IntegrationRepositoryExposed(
                     provider = row[IntegrationsTable.provider],
                     usage = row[IntegrationsTable.usage],
                     createdAt = row[IntegrationsTable.createdAt],
-                    // For now, we don't expose sensitive integration details
-                    details = emptyMap(),
                 )
             }
     }
 
-    override fun deleteById(orgSlug: String, eventSlug: String, integrationId: String): Boolean = transaction {
+    override fun deleteById(orgSlug: String, eventSlug: String, integrationId: UUID): Boolean = transaction {
         // Verify organization exists
         val organisation = OrganisationEntity.orgFindBySlug(orgSlug)
             ?: throw NotFoundException("Organisation with slug $orgSlug not found")
@@ -76,32 +74,17 @@ class IntegrationRepositoryExposed(
             throw NotFoundException("Event with slug $eventSlug not found in organisation $orgSlug")
         }
 
-        // Parse the integration ID
-        val integrationUuid = runCatching {
-            UUID.fromString(integrationId)
-        }.getOrElse {
-            throw NotFoundException("Integration with id $integrationId not found")
-        }
-
-        // Verify integration exists and belongs to this event
-        val integrationExists = IntegrationsTable
-            .selectAll()
-            .where {
-                (IntegrationsTable.id eq integrationUuid) and
-                    (IntegrationsTable.eventId eq event.id.value)
-            }
-            .singleOrNull() != null
-
-        if (!integrationExists) {
-            throw NotFoundException("Integration with id $integrationId not found")
-        }
-
-        // Delete the integration
-        val deletedRows = IntegrationsTable.deleteWhere {
-            (IntegrationsTable.id eq integrationUuid) and
+        // Find and delete the integration if it exists and belongs to this event
+        val integrationEntity = IntegrationEntity.find {
+            (IntegrationsTable.id eq integrationId) and
                 (IntegrationsTable.eventId eq event.id.value)
+        }.firstOrNull()
+
+        if (integrationEntity == null) {
+            throw NotFoundException("Integration with id $integrationId not found")
         }
 
-        deletedRows > 0
+        integrationEntity.delete()
+        true
     }
 }
