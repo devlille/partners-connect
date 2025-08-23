@@ -13,7 +13,7 @@ import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
-import io.ktor.server.plugins.NotFoundException
+
 import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.selectAll
@@ -51,14 +51,29 @@ class IntegrationRepositoryExposed(
     override fun findByEvent(orgSlug: String, eventSlug: String): List<Integration> = transaction {
         // Verify organization exists
         val organisation = OrganisationEntity.orgFindBySlug(orgSlug)
-            ?: throw NotFoundException("Organisation with slug $orgSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ORGANISATION_NOT_FOUND,
+                message = "Organisation with slug $orgSlug not found",
+                meta = mapOf(MetaKeys.ORGANISATION to orgSlug),
+            )
 
         // Verify event exists and belongs to the organization
         val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.EVENT_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+                meta = mapOf(MetaKeys.EVENT to eventSlug),
+            )
 
         if (event.organisation.id != organisation.id) {
-            throw NotFoundException("Event with slug $eventSlug not found in organisation $orgSlug")
+            throw NotFoundException(
+                code = ErrorCode.EVENT_NOT_FOUND,
+                message = "Event with slug $eventSlug not found in organisation $orgSlug",
+                meta = mapOf(
+                    MetaKeys.EVENT to eventSlug,
+                    MetaKeys.ORGANISATION to orgSlug,
+                ),
+            )
         }
 
         // Query integrations for this event
@@ -78,14 +93,29 @@ class IntegrationRepositoryExposed(
     override fun deleteById(orgSlug: String, eventSlug: String, integrationId: UUID) = transaction {
         // Verify organization exists
         val organisation = OrganisationEntity.orgFindBySlug(orgSlug)
-            ?: throw NotFoundException("Organisation with slug $orgSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ORGANISATION_NOT_FOUND,
+                message = "Organisation with slug $orgSlug not found",
+                meta = mapOf(MetaKeys.ORGANISATION to orgSlug),
+            )
 
         // Verify event exists and belongs to the organization
         val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.EVENT_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+                meta = mapOf(MetaKeys.EVENT to eventSlug),
+            )
 
         if (event.organisation.id != organisation.id) {
-            throw NotFoundException("Event with slug $eventSlug not found in organisation $orgSlug")
+            throw NotFoundException(
+                code = ErrorCode.EVENT_NOT_FOUND,
+                message = "Event with slug $eventSlug not found in organisation $orgSlug",
+                meta = mapOf(
+                    MetaKeys.EVENT to eventSlug,
+                    MetaKeys.ORGANISATION to orgSlug,
+                ),
+            )
         }
 
         // Find and delete the integration if it exists and belongs to this event
@@ -95,7 +125,11 @@ class IntegrationRepositoryExposed(
         }.firstOrNull()
 
         if (integrationEntity == null) {
-            throw NotFoundException("Integration with id $integrationId not found")
+            throw NotFoundException(
+                code = ErrorCode.INTEGRATION_NOT_FOUND,
+                message = "Integration with id $integrationId not found",
+                meta = mapOf(MetaKeys.ID to integrationId.toString()),
+            )
         }
 
         integrationEntity.delete()
