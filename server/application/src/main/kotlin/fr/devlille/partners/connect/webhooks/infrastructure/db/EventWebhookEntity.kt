@@ -1,5 +1,6 @@
-package fr.devlille.partners.connect.events.infrastructure.db
+package fr.devlille.partners.connect.webhooks.infrastructure.db
 
+import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone

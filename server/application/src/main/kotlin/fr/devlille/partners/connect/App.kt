@@ -10,7 +10,6 @@ import fr.devlille.partners.connect.events.infrastructure.api.eventBoothPlanRout
 import fr.devlille.partners.connect.events.infrastructure.api.eventExternalLinkRoutes
 import fr.devlille.partners.connect.events.infrastructure.api.eventProviderRoutes
 import fr.devlille.partners.connect.events.infrastructure.api.eventRoutes
-import fr.devlille.partners.connect.events.infrastructure.api.eventWebhookRoutes
 import fr.devlille.partners.connect.events.infrastructure.bindings.eventModule
 import fr.devlille.partners.connect.integrations.infrastructure.api.integrationRoutes
 import fr.devlille.partners.connect.integrations.infrastructure.bindings.integrationModule
@@ -42,6 +41,8 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.bindings.sponsorin
 import fr.devlille.partners.connect.tickets.infrastructure.bindings.ticketingModule
 import fr.devlille.partners.connect.users.infrastructure.api.userRoutes
 import fr.devlille.partners.connect.users.infrastructure.bindings.userModule
+import fr.devlille.partners.connect.webhooks.infrastructure.api.webhookRoutes
+import fr.devlille.partners.connect.webhooks.infrastructure.bindings.webhookModule
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -101,6 +102,7 @@ data class ApplicationConfig(
         ticketingModule,
         integrationModule,
         providerModule,
+        webhookModule,
     ),
 )
 
@@ -138,7 +140,7 @@ fun Application.module(config: ApplicationConfig = ApplicationConfig()) {
         eventBoothPlanRoutes()
         eventProviderRoutes()
         eventExternalLinkRoutes()
-        eventWebhookRoutes()
+        webhookRoutes()
         userRoutes()
         sponsoringRoutes()
         companyRoutes()

@@ -8,13 +8,13 @@ import fr.devlille.partners.connect.integrations.infrastructure.db.findByEventId
 import fr.devlille.partners.connect.notifications.domain.NotificationGateway
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
-import fr.devlille.partners.connect.notifications.infrastructure.gateways.WebhookService
+import fr.devlille.partners.connect.webhooks.application.WebhookNotificationService
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class NotificationRepositoryExposed(
     private val notificationGateways: List<NotificationGateway>,
-    private val webhookService: WebhookService,
+    private val webhookNotificationService: WebhookNotificationService,
 ) : NotificationRepository {
     override fun sendMessage(eventSlug: String, variables: NotificationVariables): Unit = transaction {
         val eventEntity = EventEntity.findBySlug(eventSlug)
@@ -33,6 +33,6 @@ class NotificationRepositoryExposed(
             }
 
         // Send through webhooks
-        webhookService.sendWebhooks(eventId, variables)
+        webhookNotificationService.sendWebhooks(eventId, variables)
     }
 }

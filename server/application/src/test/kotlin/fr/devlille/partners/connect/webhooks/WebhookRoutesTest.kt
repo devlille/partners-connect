@@ -1,15 +1,15 @@
-package fr.devlille.partners.connect.events
+package fr.devlille.partners.connect.webhooks
 
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
-import fr.devlille.partners.connect.events.domain.CreateEventWebhookRequest
-import fr.devlille.partners.connect.events.domain.EventWebhook
-import fr.devlille.partners.connect.events.domain.WebhookType
 import fr.devlille.partners.connect.events.factories.insertMockedEventWithOrga
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
 import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
+import fr.devlille.partners.connect.webhooks.domain.CreateEventWebhookRequest
+import fr.devlille.partners.connect.webhooks.domain.EventWebhook
+import fr.devlille.partners.connect.webhooks.domain.WebhookType
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
@@ -30,7 +30,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class EventWebhookRoutesTest {
+class WebhookRoutesTest {
     private val json = Json { ignoreUnknownKeys = true }
 
     @Test
