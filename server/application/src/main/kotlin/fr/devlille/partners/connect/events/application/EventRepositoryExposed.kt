@@ -33,7 +33,6 @@ import java.util.UUID
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug as eventFindBySlug
 import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug as orgFindBySlug
 
-@Suppress("TooManyFunctions")
 class EventRepositoryExposed(
     private val entity: UUIDEntityClass<EventEntity>,
 ) : EventRepository {

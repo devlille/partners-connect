@@ -3,7 +3,7 @@ package fr.devlille.partners.connect.webhooks.infrastructure.api
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.webhooks.domain.CreateEventWebhookRequest
-import fr.devlille.partners.connect.webhooks.domain.WebHookRepository
+import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receive
@@ -17,7 +17,7 @@ import org.koin.ktor.ext.inject
 
 @Suppress("ThrowsCount")
 fun Route.webhookRoutes() {
-    val repository by inject<WebHookRepository>()
+    val repository by inject<WebhookRepository>()
 
     route("/orgs/{orgSlug}/events/{eventSlug}/webhooks") {
         install(AuthorizedOrganisationPlugin)

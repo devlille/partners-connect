@@ -6,7 +6,7 @@ import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.webhooks.domain.CreateEventWebhookRequest
 import fr.devlille.partners.connect.webhooks.domain.EventWebhook
-import fr.devlille.partners.connect.webhooks.domain.WebHookRepository
+import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
 import fr.devlille.partners.connect.webhooks.domain.WebhookType
 import fr.devlille.partners.connect.webhooks.infrastructure.db.EventWebhookEntity
 import fr.devlille.partners.connect.webhooks.infrastructure.db.EventWebhooksTable
@@ -16,7 +16,7 @@ import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
-class WebHookRepositoryExposed : WebHookRepository {
+class WebHookRepositoryExposed : WebhookRepository {
     override fun createWebhook(eventSlug: String, request: CreateEventWebhookRequest): UUID = transaction {
         // Validate URL is not empty
         if (request.url.isBlank()) {

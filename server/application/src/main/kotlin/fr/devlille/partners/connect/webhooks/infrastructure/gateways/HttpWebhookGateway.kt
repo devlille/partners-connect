@@ -22,7 +22,7 @@ import javax.crypto.spec.SecretKeySpec
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-class WebhookGatewayImpl(
+class HttpWebhookGateway(
     private val httpClient: HttpClient,
 ) : WebhookGateway {
     override suspend fun sendWebhooks(eventId: UUID, payload: WebhookPayload): Boolean = runBlocking {

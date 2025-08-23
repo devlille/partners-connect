@@ -2,7 +2,6 @@ package fr.devlille.partners.connect.events.domain
 
 import java.util.UUID
 
-@Suppress("TooManyFunctions")
 interface EventRepository {
     fun getAllEvents(): List<EventSummary>
 
