@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.webhooks.domain
 
+import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import java.util.UUID
 
 enum class WebhookEventType {
@@ -9,6 +10,8 @@ enum class WebhookEventType {
 }
 
 interface WebhookGateway {
+    val provider: IntegrationProvider
+
     /**
      * Send webhook notification by merging configuration retrieval, permission check, and HTTP call
      */

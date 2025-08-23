@@ -7,7 +7,7 @@ interface WebhookRepository {
      * Send webhook notifications for a partnership event to all configured webhook gateways
      */
     suspend fun sendWebhooks(
-        eventId: UUID,
+        eventSlug: String,
         partnershipId: UUID,
         eventType: WebhookEventType,
     ): Int

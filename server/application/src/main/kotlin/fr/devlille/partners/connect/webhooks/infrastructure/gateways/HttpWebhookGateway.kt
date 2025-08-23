@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.webhooks.infrastructure.gateways
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.WebhookType
 import fr.devlille.partners.connect.integrations.infrastructure.db.WebhookIntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.get
@@ -27,6 +28,8 @@ import java.util.UUID
 class HttpWebhookGateway(
     private val httpClient: HttpClient,
 ) : WebhookGateway {
+    override val provider = IntegrationProvider.WEBHOOK
+
     override suspend fun sendWebhook(
         integrationId: UUID,
         eventId: UUID,
