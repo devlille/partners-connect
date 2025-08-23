@@ -6,6 +6,7 @@ import fr.devlille.partners.connect.companies.domain.CompanyRepository
 import fr.devlille.partners.connect.companies.domain.CreateCompany
 import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
@@ -55,8 +56,8 @@ fun Route.companyRoutes() {
                 ContentType.Image.SVG -> imageProcessingRepository.processSvg(bytes)
                 ContentType.Image.PNG, ContentType.Image.JPEG -> imageProcessingRepository.processImage(bytes)
                 else -> throw BadRequestException(
-                    code = ErrorCode.BAD_REQUEST,
                     message = "Unsupported file type: ${part.contentType}",
+                    meta = mapOf(MetaKeys.CONTENT_TYPE to (part.contentType?.toString() ?: "unknown")),
                 )
             }
             val media = mediaRepository.upload(companyId.toString(), mediaBinaries)

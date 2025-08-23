@@ -4,6 +4,7 @@ import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.infrastructure.db.MailjetIntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.get
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.internal.infrastructure.resources.readResourceFile
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
@@ -50,8 +51,9 @@ class MailjetNotificationGateway(
             .find { PartnershipsTable.companyId eq variables.company.id.toUUID() }
             .singleOrNull()
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.PARTNERSHIP_NOT_FOUND,
                 message = "No partnership found for company ${variables.company.id}",
+                meta = mapOf(MetaKeys.COMPANY to variables.company.id.toString()),
             )
         val emails = PartnershipEmailEntity
             .find { PartnershipEmailsTable.partnershipId eq partnership.id }

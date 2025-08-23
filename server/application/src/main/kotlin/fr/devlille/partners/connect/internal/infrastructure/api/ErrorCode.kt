@@ -30,6 +30,7 @@ enum class ErrorCode {
     EXTERNAL_LINK_NOT_FOUND,
     INTEGRATION_NOT_FOUND,
     TRANSLATION_NOT_FOUND,
+    OPTION_NOT_FOUND,
 
     // Business logic errors
     PARTNERSHIP_ALREADY_EXISTS,
@@ -42,5 +43,4 @@ enum class ErrorCode {
 
     // System errors
     INTERNAL_SERVER_ERROR,
-    ENTITY_NOT_FOUND,
 }

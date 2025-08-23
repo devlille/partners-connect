@@ -95,7 +95,7 @@ fun Route.partnershipSuggestionRoutes() {
             val partnership = partnershipRepository.getById(eventSlug, id)
             val pack = partnership.suggestionPack
                 ?: throw NotFoundException(
-                    code = ErrorCode.ENTITY_NOT_FOUND,
+                    code = ErrorCode.EVENT_NOT_FOUND,
                     message = "Partnership does not have a suggestion pack",
                 )
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)

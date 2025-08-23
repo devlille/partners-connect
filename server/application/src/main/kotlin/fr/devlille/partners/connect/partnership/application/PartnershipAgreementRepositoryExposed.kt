@@ -39,11 +39,11 @@ class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
     override fun generateAgreement(eventSlug: String, partnershipId: UUID): ByteArray = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         val partnership = PartnershipEntity.findById(partnershipId) ?: throw NotFoundException(
-            code = ErrorCode.ENTITY_NOT_FOUND,
+            code = ErrorCode.EVENT_NOT_FOUND,
             message = "Partnership not found",
         )
 
@@ -53,7 +53,7 @@ class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
         val company = partnership.company
         val pack = partnership.validatedPack()
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Validated pack not found for partnership",
             )
         val options = PartnershipOptionEntity.listByPartnershipAndPack(partnership.id.value, pack.id.value)
@@ -82,12 +82,12 @@ class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
     override fun updateAgreementUrl(eventSlug: String, partnershipId: UUID, agreementUrl: String): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         val partnership = PartnershipEntity.singleByEventAndPartnership(event.id.value, partnershipId)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Partnership not found",
             )
         partnership.agreementUrl = agreementUrl
@@ -101,12 +101,12 @@ class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
     ): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         val partnership = PartnershipEntity.singleByEventAndPartnership(event.id.value, partnershipId)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Partnership not found",
             )
         partnership.agreementSignedUrl = agreementSignedUrl
@@ -150,7 +150,7 @@ internal fun OrganisationEntity.toAgreementOrganisation(formatter: DateTimeForma
         publishedAt = this.publishedAt!!.date.format(formatter),
         representative = Contact(
             name = this.representativeUser!!.name ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Representative not found",
             ),
             role = this.representativeRole!!,
@@ -190,7 +190,7 @@ internal fun PartnershipEntity.toAgreementPartnership(
     val optionTranslations = optionData.map { (partnershipOption, translations) ->
         val translation = translations.firstOrNull { it.language == this.language }
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Translation not found for option ${partnershipOption.id} in language $language",
             )
         Option(name = translation.name)

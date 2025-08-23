@@ -40,7 +40,7 @@ fun Route.partnershipRoutes() {
             val partnership = partnershipRepository.getById(eventSlug, id)
             val pack = partnership.selectedPack
                 ?: throw NotFoundException(
-                    code = ErrorCode.ENTITY_NOT_FOUND,
+                    code = ErrorCode.EVENT_NOT_FOUND,
                     message = "Partnership does not have a selected pack",
                 )
             val event = eventRepository.getBySlug(eventSlug)

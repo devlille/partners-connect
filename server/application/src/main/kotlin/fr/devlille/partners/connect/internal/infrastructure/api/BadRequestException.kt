@@ -7,7 +7,7 @@ import io.ktor.http.HttpStatusCode
  * Includes structured error code and metadata for better error handling.
  */
 class BadRequestException(
-    val code: ErrorCode,
+    val code: ErrorCode = ErrorCode.BAD_REQUEST,
     override val message: String = "Bad request",
     val status: HttpStatusCode = HttpStatusCode.BadRequest,
     val meta: Map<MetaKey, String> = emptyMap(),

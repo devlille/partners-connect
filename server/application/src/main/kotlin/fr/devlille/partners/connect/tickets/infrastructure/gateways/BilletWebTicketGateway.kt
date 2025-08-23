@@ -43,7 +43,7 @@ class BilletWebTicketGateway(
         val config = transaction { BilletWebIntegrationsTable[integrationId] }
         val billing = transaction { BillingEntity.singleByEventAndPartnership(eventId, partnershipId) }
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Billing entity not found for event $eventId and partnership $partnershipId",
             )
         val order = createOrder(billing.toOrderRequest(tickets, config), config)
@@ -54,7 +54,7 @@ class BilletWebTicketGateway(
         val config = transaction { BilletWebIntegrationsTable[integrationId] }
         val ticket = transaction { PartnershipTicketEntity.findById(ticketId) }
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Ticket with id $ticketId not found",
             )
         updateProduct(ticket.toCreateOrderProduct(config), config)

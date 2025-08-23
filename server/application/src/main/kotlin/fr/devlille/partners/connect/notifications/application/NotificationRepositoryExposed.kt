@@ -6,6 +6,7 @@ import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.findByEventIdAndUsage
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.notifications.domain.NotificationGateway
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
@@ -18,8 +19,9 @@ class NotificationRepositoryExposed(
     override fun sendMessage(eventSlug: String, variables: NotificationVariables) = transaction {
         val eventId = EventEntity.findBySlug(eventSlug)?.id?.value
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
+                meta = mapOf(MetaKeys.EVENT to eventSlug),
             )
 
         IntegrationsTable
@@ -29,8 +31,9 @@ class NotificationRepositoryExposed(
                 val integrationId = row[IntegrationsTable.id].value
                 val gateway = notificationGateways.find { it.provider == provider }
                     ?: throw NotFoundException(
-                        code = ErrorCode.ENTITY_NOT_FOUND,
+                        code = ErrorCode.PROVIDER_NOT_FOUND,
                         message = "No gateway for provider $provider",
+                        meta = mapOf(MetaKeys.PROVIDER to provider.name),
                     )
                 gateway.send(integrationId, variables)
             }

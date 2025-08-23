@@ -57,19 +57,19 @@ class PartnershipRepositoryExposed(
     override fun register(eventSlug: String, register: RegisterPartnership): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         val eventId = event.id.value
         val companyId = register.companyId.toUUID()
         val company = CompanyEntity.findById(companyId)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Company $companyId not found",
             )
         val pack = packEntity.findById(register.packId.toUUID())
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Pack ${register.packId} not found",
             )
 
@@ -114,7 +114,7 @@ class PartnershipRepositoryExposed(
 
         optionsUUID.forEach {
             val option = SponsoringOptionEntity.findById(it) ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Option $it not found",
             )
 
@@ -141,7 +141,7 @@ class PartnershipRepositoryExposed(
     override fun getById(eventSlug: String, partnershipId: UUID): Partnership = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         val partnership = findPartnership(event.id.value, partnershipId)
@@ -172,7 +172,7 @@ class PartnershipRepositoryExposed(
     override fun getCompanyByPartnershipId(eventSlug: String, partnershipId: UUID): Company = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         findPartnership(event.id.value, partnershipId).company.toDomain()
@@ -181,7 +181,7 @@ class PartnershipRepositoryExposed(
     override fun validate(eventSlug: String, partnershipId: UUID): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         val partnership = findPartnership(event.id.value, partnershipId)
@@ -192,7 +192,7 @@ class PartnershipRepositoryExposed(
     override fun decline(eventSlug: String, partnershipId: UUID): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         val partnership = findPartnership(event.id.value, partnershipId)
@@ -208,7 +208,7 @@ class PartnershipRepositoryExposed(
     ): List<PartnershipItem> = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         val eventId = event.id.value
@@ -224,7 +224,7 @@ class PartnershipRepositoryExposed(
         // Check if the company exists first
         CompanyEntity.findById(companyId)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Company $companyId not found",
             )
 
@@ -316,7 +316,7 @@ class PartnershipRepositoryExposed(
     private fun findPartnership(eventId: UUID, partnershipId: UUID): PartnershipEntity = partnershipEntity
         .singleByEventAndPartnership(eventId, partnershipId)
         ?: throw NotFoundException(
-            code = ErrorCode.ENTITY_NOT_FOUND,
+            code = ErrorCode.EVENT_NOT_FOUND,
             message = "Partnership not found",
         )
 
@@ -327,7 +327,7 @@ class PartnershipRepositoryExposed(
     ): Unit = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
 
@@ -364,7 +364,7 @@ class PartnershipRepositoryExposed(
     ): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         val partnership = findPartnership(event.id.value, partnershipId)
@@ -379,7 +379,7 @@ class PartnershipRepositoryExposed(
     ): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         val partnership = findPartnership(event.id.value, partnershipId)
@@ -390,7 +390,7 @@ class PartnershipRepositoryExposed(
     override fun listCommunicationPlan(eventSlug: String): CommunicationPlan = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
 

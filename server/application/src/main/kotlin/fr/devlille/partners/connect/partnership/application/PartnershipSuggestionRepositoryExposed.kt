@@ -39,13 +39,13 @@ class PartnershipSuggestionRepositoryExposed(
     ): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         val partnership = findPartnership(event.id.value, partnershipId)
         val suggestedPack = packEntity.findById(input.packId.toUUID())
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Pack ${input.packId} not found",
             )
         val optionalOptionIds = packOptionTable
@@ -66,7 +66,7 @@ class PartnershipSuggestionRepositoryExposed(
 
         optionsUUID.forEach {
             val option = SponsoringOptionEntity.findById(it) ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Option $it not found",
             )
             val noTranslation = translationEntity
@@ -96,7 +96,7 @@ class PartnershipSuggestionRepositoryExposed(
     override fun approve(eventSlug: String, partnershipId: UUID): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         val partnership = findPartnership(event.id.value, partnershipId)
@@ -107,7 +107,7 @@ class PartnershipSuggestionRepositoryExposed(
     override fun decline(eventSlug: String, partnershipId: UUID): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         val partnership = findPartnership(event.id.value, partnershipId)
@@ -119,7 +119,7 @@ class PartnershipSuggestionRepositoryExposed(
         partnershipEntity
             .singleByEventAndPartnership(eventId, partnershipId)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Partnership not found",
             )
 }

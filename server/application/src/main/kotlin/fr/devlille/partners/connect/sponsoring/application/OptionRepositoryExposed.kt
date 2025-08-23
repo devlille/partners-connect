@@ -73,13 +73,13 @@ class OptionRepositoryExposed(
             )
         val option = optionEntity.findById(optionId)
             ?: throw NotFoundException(
-                code = ErrorCode.INTEGRATION_NOT_FOUND,
+                code = ErrorCode.OPTION_NOT_FOUND,
                 message = "Option not found",
                 meta = mapOf(MetaKeys.ID to optionId.toString()),
             )
         if (option.event.id.value != event.id.value) {
             throw NotFoundException(
-                code = ErrorCode.INTEGRATION_NOT_FOUND,
+                code = ErrorCode.OPTION_NOT_FOUND,
                 message = "Option not found",
                 meta = mapOf(MetaKeys.ID to optionId.toString()),
             )

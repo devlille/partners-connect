@@ -23,7 +23,7 @@ class PartnershipStorageRepositoryGoogleStorage(
     ): String = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         val eventId = event.id.value
@@ -42,7 +42,7 @@ class PartnershipStorageRepositoryGoogleStorage(
     ): String = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         val eventId = event.id.value
@@ -62,7 +62,7 @@ class PartnershipStorageRepositoryGoogleStorage(
     ): String = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         val eventId = event.id.value

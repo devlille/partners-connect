@@ -19,6 +19,7 @@ import fr.devlille.partners.connect.integrations.infrastructure.db.QontoConfig
 import fr.devlille.partners.connect.integrations.infrastructure.db.QontoIntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.get
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
@@ -49,8 +50,9 @@ class QontoBillingGateway(
             val config = QontoIntegrationsTable[integrationId]
             val billing = BillingEntity.singleByEventAndPartnership(eventId, partnershipId)
                 ?: throw NotFoundException(
-                    code = ErrorCode.ENTITY_NOT_FOUND,
-                    message = "No billing found for company $partnershipId",
+                    code = ErrorCode.BILLING_NOT_FOUND,
+                    message = "No billing found for partnership $partnershipId",
+                    meta = mapOf(MetaKeys.PARTNERSHIP_ID to partnershipId.toString()),
                 )
             val items = invoiceItems(eventId, billing)
             val client = getClient(billing, config)
@@ -67,7 +69,7 @@ class QontoBillingGateway(
             val config = QontoIntegrationsTable[integrationId]
             val billing = BillingEntity.singleByEventAndPartnership(eventId, partnershipId)
                 ?: throw NotFoundException(
-                    code = ErrorCode.ENTITY_NOT_FOUND,
+                    code = ErrorCode.EVENT_NOT_FOUND,
                     message = "No billing found for company $partnershipId",
                 )
             val items = invoiceItems(eventId, billing)
@@ -88,7 +90,7 @@ class QontoBillingGateway(
     private fun invoiceItems(eventId: UUID, billing: BillingEntity): List<QontoInvoiceItem> {
         val pack = billing.partnership.validatedPack()
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "No sponsoring pack found for partnership ${billing.partnership.id}",
             )
         val optionIds = PackOptionsTable.listOptionalOptionsByPack(pack.id.value)

@@ -18,14 +18,14 @@ class PartnershipBillingRepositoryExposed : PartnershipBillingRepository {
     override fun getByPartnershipId(eventSlug: String, partnershipId: UUID): CompanyBillingData = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         BillingEntity
             .singleByEventAndPartnership(event.id.value, partnershipId)
             ?.let(BillingEntity::toDomain)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Billing not found for partnership ID: $partnershipId",
             )
     }
@@ -33,14 +33,14 @@ class PartnershipBillingRepositoryExposed : PartnershipBillingRepository {
     override fun createOrUpdate(eventSlug: String, partnershipId: UUID, input: CompanyBillingData): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         val eventId = event.id.value
         val existing = BillingEntity.singleByEventAndPartnership(eventId, partnershipId)
         val partnership = PartnershipEntity.singleByEventAndPartnership(eventId, partnershipId)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Partnership not found",
             )
         if (existing == null) {
@@ -68,12 +68,12 @@ class PartnershipBillingRepositoryExposed : PartnershipBillingRepository {
     override fun updateInvoiceUrl(eventSlug: String, partnershipId: UUID, invoiceUrl: String): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         val existing = BillingEntity.singleByEventAndPartnership(event.id.value, partnershipId)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Invoice not found for partnership ID: $partnershipId",
             )
         existing.invoicePdfUrl = invoiceUrl
@@ -83,12 +83,12 @@ class PartnershipBillingRepositoryExposed : PartnershipBillingRepository {
     override fun updateQuoteUrl(eventSlug: String, partnershipId: UUID, quoteUrl: String): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         val existing = BillingEntity.singleByEventAndPartnership(event.id.value, partnershipId)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Invoice not found for partnership ID: $partnershipId",
             )
         existing.quotePdfUrl = quoteUrl
@@ -98,12 +98,12 @@ class PartnershipBillingRepositoryExposed : PartnershipBillingRepository {
     override fun updateStatus(eventSlug: String, partnershipId: UUID, status: InvoiceStatus): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
             )
         val existing = BillingEntity.singleByEventAndPartnership(event.id.value, partnershipId)
             ?: throw NotFoundException(
-                code = ErrorCode.ENTITY_NOT_FOUND,
+                code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Billing not found",
             )
         existing.status = status
