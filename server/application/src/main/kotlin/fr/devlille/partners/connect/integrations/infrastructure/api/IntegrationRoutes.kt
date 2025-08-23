@@ -9,6 +9,8 @@ import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receiveText
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
+import io.ktor.server.routing.delete
+import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import kotlinx.serialization.json.Json
@@ -21,6 +23,13 @@ fun Route.integrationRoutes() {
 
     route("/orgs/{orgSlug}/events/{eventSlug}/integrations") {
         install(AuthorizedOrganisationPlugin)
+
+        get {
+            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Missing orgSlug")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing eventSlug")
+            val integrations = integrationRepository.findByEvent(orgSlug, eventSlug)
+            call.respond(HttpStatusCode.OK, integrations)
+        }
 
         post("/{provider}/{usage}") {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing eventSlug")
@@ -35,6 +44,18 @@ fun Route.integrationRoutes() {
             val input = json.decodeFromString(serializer, call.receiveText())
             val integrationId = integrationRepository.register(eventSlug, usage, input)
             call.respond(HttpStatusCode.Created, mapOf("id" to integrationId.toString()))
+        }
+
+        delete("/{integrationId}") {
+            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Missing orgSlug")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing eventSlug")
+            val integrationId = call.parameters["integrationId"] ?: throw BadRequestException("Missing integrationId")
+            val deleted = integrationRepository.deleteById(orgSlug, eventSlug, integrationId)
+            if (deleted) {
+                call.respond(HttpStatusCode.NoContent)
+            } else {
+                call.respond(HttpStatusCode.NotFound, "Integration not found")
+            }
         }
     }
 }
