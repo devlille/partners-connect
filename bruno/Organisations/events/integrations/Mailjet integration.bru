@@ -25,3 +25,8 @@ body:json {
     "secret": "{{mailjet_secret}}"
   }
 }
+
+script:post-response {
+  let data = res.getBody();
+  bru.setEnvVar("integration_id", data.id)
+}

@@ -1,11 +1,11 @@
 meta {
-  name: BilletWeb integration
+  name: Webhook integration
   type: http
-  seq: 4
+  seq: 5
 }
 
 post {
-  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/integrations/billetweb/ticketing
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/integrations/webhook/webhook
   body: json
   auth: none
 }
@@ -21,9 +21,10 @@ headers {
 
 body:json {
   {
-    "basic": "{{billetweb_basic}}",
-    "event_id": "123455",
-    "rate_id": "1299342"
+    "url": "http://localhost:80/webhook",
+    "type": "ALL",
+    "header_auth": null,
+    "partnership_id": null
   }
 }
 

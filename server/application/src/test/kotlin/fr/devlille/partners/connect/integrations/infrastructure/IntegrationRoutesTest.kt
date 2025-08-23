@@ -258,7 +258,9 @@ class IntegrationRoutesTest {
             )
         }
 
-        val response = client.delete("/orgs/$testOrgSlug/events/$testEventSlug/integrations/$integrationId") {
+        val response = client.delete(
+            "/orgs/$testOrgSlug/events/$testEventSlug/integrations/slack/notification/$integrationId",
+        ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -281,7 +283,9 @@ class IntegrationRoutesTest {
             insertMockedOrgaPermission(orgId = orgId, user = insertMockedAdminUser())
         }
 
-        val response = client.delete("/orgs/$testOrgSlug/events/$testEventSlug/integrations/$nonExistentId") {
+        val response = client.delete(
+            "/orgs/$testOrgSlug/events/$testEventSlug/integrations/slack/notification/$nonExistentId",
+        ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -304,7 +308,9 @@ class IntegrationRoutesTest {
             insertMockedOrgaPermission(orgId = orgId, user = insertMockedAdminUser())
         }
 
-        val response = client.delete("/orgs/$testOrgSlug/events/$testEventSlug/integrations/$invalidId") {
+        val response = client.delete(
+            "/orgs/$testOrgSlug/events/$testEventSlug/integrations/slack/notification/$invalidId",
+        ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -322,7 +328,9 @@ class IntegrationRoutesTest {
             moduleMocked()
         }
 
-        val response = client.delete("/orgs/$testOrgSlug/events/$testEventSlug/integrations/$integrationId") {
+        val response = client.delete(
+            "/orgs/$testOrgSlug/events/$testEventSlug/integrations/slack/notification/$integrationId",
+        ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -354,7 +362,9 @@ class IntegrationRoutesTest {
             )
         }
 
-        val response = client.delete("/orgs/$testOrgSlug/events/$testEventSlug/integrations/$integrationId") {
+        val response = client.delete(
+            "/orgs/$testOrgSlug/events/$testEventSlug/integrations/slack/notification/$integrationId",
+        ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -387,7 +397,9 @@ class IntegrationRoutesTest {
             )
         }
 
-        val response = client.delete("/orgs/$testOrgSlug/events/$testEventSlug1/integrations/$integrationId") {
+        val response = client.delete(
+            "/orgs/$testOrgSlug/events/$testEventSlug1/integrations/slack/notification/$integrationId",
+        ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 

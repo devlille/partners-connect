@@ -9,6 +9,8 @@ import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
+import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.insertAndGetId
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -54,6 +56,11 @@ class WebhookRegistrar : IntegrationRegistrar<CreateIntegration.CreateWebhookInt
         }
 
         integrationId.value
+    }
+
+    override fun unregister(integrationId: UUID): Unit = transaction {
+        WebhookIntegrationsTable.deleteWhere { WebhookIntegrationsTable.integrationId eq integrationId }
+        IntegrationsTable.deleteWhere { IntegrationsTable.id eq integrationId }
     }
 
     override fun supports(input: CreateIntegration): Boolean = input is CreateIntegration.CreateWebhookIntegration

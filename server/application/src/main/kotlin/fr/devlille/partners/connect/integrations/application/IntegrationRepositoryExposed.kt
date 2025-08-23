@@ -11,7 +11,6 @@ import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationEn
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import io.ktor.server.plugins.NotFoundException
-import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -61,7 +60,12 @@ class IntegrationRepositoryExposed(
             }
     }
 
-    override fun deleteById(orgSlug: String, eventSlug: String, integrationId: UUID) = transaction {
+    override fun deleteById(
+        orgSlug: String,
+        eventSlug: String,
+        usage: IntegrationUsage,
+        integrationId: UUID,
+    ) = transaction {
         // Verify organization exists
         val organisation = OrganisationEntity.orgFindBySlug(orgSlug)
             ?: throw NotFoundException("Organisation with slug $orgSlug not found")
@@ -84,6 +88,14 @@ class IntegrationRepositoryExposed(
             throw NotFoundException("Integration with id $integrationId not found")
         }
 
-        integrationEntity.delete()
+        val registrars = registrars.filter { usage in it.supportedUsages }
+        for (registrar in registrars) {
+            try {
+                @Suppress("UNCHECKED_CAST")
+                (registrar as IntegrationRegistrar<CreateIntegration>).unregister(integrationId)
+            } catch (_: Exception) {
+                // Log and continue to the next registrar
+            }
+        }
     }
 }

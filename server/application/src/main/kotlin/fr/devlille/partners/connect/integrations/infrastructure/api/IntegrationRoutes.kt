@@ -47,12 +47,15 @@ fun Route.integrationRoutes() {
             call.respond(HttpStatusCode.Created, mapOf("id" to integrationId.toString()))
         }
 
-        delete("/{integrationId}") {
+        delete("/{provider}/{usage}/{integrationId}") {
             val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Missing orgSlug")
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing eventSlug")
+            val usageParam = call.parameters["usage"] ?: throw BadRequestException("Missing usage")
+            val usage = runCatching { IntegrationUsage.valueOf(usageParam.uppercase()) }
+                .getOrElse { throw BadRequestException("Invalid usage: $usageParam") }
             val integrationId = call.parameters["integrationId"]?.toUUID()
                 ?: throw BadRequestException("Missing integrationId")
-            integrationRepository.deleteById(orgSlug, eventSlug, integrationId)
+            integrationRepository.deleteById(orgSlug, eventSlug, usage, integrationId)
             call.respond(HttpStatusCode.NoContent)
         }
     }

@@ -6,6 +6,7 @@ import fr.devlille.partners.connect.integrations.domain.WebhookType
 import fr.devlille.partners.connect.integrations.infrastructure.db.WebhookIntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.get
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 import fr.devlille.partners.connect.webhooks.domain.EventWebhookData
 import fr.devlille.partners.connect.webhooks.domain.PartnershipWebhookData
 import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
@@ -62,13 +63,16 @@ class HttpWebhookGateway(
         // If we can't send webhook, return false
         if (config == null) return false
 
+        val company = transaction { partnershipEntity.company }
+        val pack = transaction { partnershipEntity.validatedPack() }
+
         // Create webhook payload with actual entity data
         val payload = WebhookPayload(
             eventType = eventType,
             partnership = PartnershipWebhookData(
                 id = partnershipId.toString(),
-                companyId = partnershipEntity.company.id.value.toString(),
-                packId = partnershipEntity.selectedPack?.id?.value?.toString(),
+                companyId = company.id.value.toString(),
+                packId = pack?.id?.value?.toString(),
                 status = when {
                     partnershipEntity.validatedAt != null -> "validated"
                     partnershipEntity.declinedAt != null -> "declined"

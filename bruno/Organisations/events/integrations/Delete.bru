@@ -1,0 +1,23 @@
+meta {
+  name: Delete
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/integrations/:provider/:usage/:integration_id
+  body: none
+  auth: none
+}
+
+params:path {
+  usage: notification
+  provider: slack
+  integration_id: {{integration_id}}
+  event_slug: {{event_slug}}
+  org_slug: {{org_slug}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}

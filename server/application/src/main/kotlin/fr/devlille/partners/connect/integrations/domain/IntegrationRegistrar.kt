@@ -7,5 +7,7 @@ interface IntegrationRegistrar<T : CreateIntegration> {
 
     fun register(eventId: UUID, usage: IntegrationUsage, input: T): UUID
 
+    fun unregister(integrationId: UUID)
+
     fun supports(input: CreateIntegration): Boolean
 }

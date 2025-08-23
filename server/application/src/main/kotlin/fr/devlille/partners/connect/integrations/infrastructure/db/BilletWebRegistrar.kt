@@ -4,6 +4,8 @@ import fr.devlille.partners.connect.integrations.domain.CreateIntegration
 import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.IntegrationRegistrar
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
+import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.insertAndGetId
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -29,6 +31,11 @@ class BilletWebRegistrar : IntegrationRegistrar<CreateIntegration.CreateBilletWe
             it[this.rateId] = input.rateId
         }
         integrationId.value
+    }
+
+    override fun unregister(integrationId: UUID): Unit = transaction {
+        BilletWebIntegrationsTable.deleteWhere { BilletWebIntegrationsTable.integrationId eq integrationId }
+        IntegrationsTable.deleteWhere { IntegrationsTable.id eq integrationId }
     }
 
     override fun supports(input: CreateIntegration): Boolean = input is CreateIntegration.CreateBilletWebIntegration
