@@ -25,7 +25,7 @@ object WebhookIntegrationsTable : Table("webhook_integrations") {
         cipherTextLength = 1000,
         encryptor = SystemVarEnv.Crypto.algorithm,
     ).nullable()
-    val type = enumeration("type", WebhookType::class)
+    val type = enumeration<WebhookType>("type")
     val partnershipId = reference("partnership_id", PartnershipsTable).nullable()
 
     override val primaryKey = PrimaryKey(integrationId)
