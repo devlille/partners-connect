@@ -20,9 +20,8 @@ val AuthorizedOrganisationPlugin = createRouteScopedPlugin(name = "AuthorizedOrg
                 code = ErrorCode.NO_EDIT_PERMISSION,
                 message = "You are not allowed to edit this event",
                 meta = mapOf(
-                    "email" to userInfo.email,
-                    "organisation" to orgSlug,
-                    "action" to "edit",
+                    MetaKey.EMAIL to userInfo.email,
+                    MetaKey.ORGANISATION to orgSlug,
                 ),
             )
         }

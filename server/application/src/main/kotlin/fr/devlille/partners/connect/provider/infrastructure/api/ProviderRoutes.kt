@@ -4,6 +4,7 @@ import fr.devlille.partners.connect.auth.domain.AuthRepository
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKey
 import fr.devlille.partners.connect.internal.infrastructure.api.token
 import fr.devlille.partners.connect.provider.domain.CreateProvider
 import fr.devlille.partners.connect.provider.domain.ProviderRepository
@@ -44,9 +45,8 @@ fun Route.providerRoutes() {
                     code = ErrorCode.NO_EDIT_PERMISSION,
                     message = "You must be an organizer of at least one event to create providers",
                     meta = mapOf(
-                        "email" to userInfo.email,
-                        "action" to "create_provider",
-                        "requiredRole" to "event_organizer",
+                        MetaKey.EMAIL to userInfo.email,
+                        MetaKey.REQUIRED_ROLE to "event_organizer",
                     ),
                 )
             }

@@ -4,6 +4,7 @@ import fr.devlille.partners.connect.events.domain.EventStorageRepository
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKey
 import fr.devlille.partners.connect.internal.infrastructure.api.UnsupportedMediaTypeException
 import fr.devlille.partners.connect.internal.infrastructure.bucket.MimeType
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
@@ -32,9 +33,9 @@ class EventStorageRepositoryGoogleStorage(
                 code = ErrorCode.UNSUPPORTED_MEDIA_TYPE,
                 message = "Unsupported media type: $mimeType",
                 meta = mapOf(
-                    "mediaType" to mimeType,
-                    "supportedTypes" to "image/png, image/jpeg, image/jpg, image/gif, image/webp",
-                    "eventId" to eventId.toString(),
+                    MetaKey.MEDIA_TYPE to mimeType,
+                    MetaKey.SUPPORTED_TYPES to "image/png, image/jpeg, image/jpg, image/gif, image/webp",
+                    MetaKey.EVENT to event.slug,
                 ),
             )
         }

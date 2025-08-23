@@ -7,6 +7,7 @@ import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsT
 import fr.devlille.partners.connect.integrations.infrastructure.db.findByEventIdAndUsage
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKey
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipTicketEntity
@@ -66,10 +67,10 @@ class TicketRepositoryExposed(
                 code = ErrorCode.BILLING_PROCESSING_ERROR,
                 message = "Invoice status ${billing.status} is not PAID",
                 meta = mapOf(
-                    "invoiceStatus" to billing.status.name,
-                    "requiredStatus" to "PAID",
-                    "eventId" to eventId.toString(),
-                    "partnershipId" to partnershipId.toString(),
+                    "invoice_status" to billing.status.name,
+                    "required_status" to "PAID",
+                    MetaKey.EVENT to eventSlug,
+                    MetaKey.PARTNERSHIP_ID to partnershipId.toString(),
                 ),
             )
         }

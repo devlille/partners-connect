@@ -13,6 +13,7 @@ import fr.devlille.partners.connect.events.infrastructure.api.eventRoutes
 import fr.devlille.partners.connect.events.infrastructure.bindings.eventModule
 import fr.devlille.partners.connect.integrations.infrastructure.api.integrationRoutes
 import fr.devlille.partners.connect.integrations.infrastructure.bindings.integrationModule
+import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorResponse
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
@@ -241,6 +242,14 @@ private fun Application.configureStatusPage() {
             call.respond(HttpStatusCode.NotFound, errorResponse)
         }
         exception<UnsupportedMediaTypeException> { call, cause ->
+            val errorResponse = ErrorResponse(
+                code = cause.code.name,
+                status = cause.status.value,
+                meta = cause.meta,
+            )
+            call.respond(cause.status, errorResponse)
+        }
+        exception<ConflictException> { call, cause ->
             val errorResponse = ErrorResponse(
                 code = cause.code.name,
                 status = cause.status.value,

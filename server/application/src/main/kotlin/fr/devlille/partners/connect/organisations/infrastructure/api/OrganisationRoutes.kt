@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.organisations.infrastructure.api
 
 import fr.devlille.partners.connect.auth.domain.AuthRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKey
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.token
 import fr.devlille.partners.connect.organisations.domain.Organisation
@@ -54,9 +55,8 @@ fun Route.organisationRoutes() {
                     code = ErrorCode.NO_EDIT_PERMISSION,
                     message = "You are not allowed to edit this organisation",
                     meta = mapOf(
-                        "email" to userInfo.email,
-                        "organisation" to orgSlug,
-                        "action" to "edit",
+                        MetaKey.EMAIL to userInfo.email,
+                        MetaKey.ORGANISATION to orgSlug,
                     ),
                 )
             }

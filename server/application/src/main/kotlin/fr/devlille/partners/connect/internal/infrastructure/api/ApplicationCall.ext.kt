@@ -11,7 +11,6 @@ val ApplicationCall.token: String
             code = ErrorCode.TOKEN_MISSING,
             message = "Token is missing from session or headers",
             meta = mapOf(
-                "header" to "Authorization",
-                "sessionAvailable" to (sessions.get<UserSession>() != null).toString(),
+                MetaKey.HEADER to "Authorization",
             ),
         )
