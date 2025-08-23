@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.events.domain
 
 import java.util.UUID
 
+@Suppress("TooManyFunctions")
 interface EventRepository {
     fun getAllEvents(): List<EventSummary>
 
@@ -20,4 +21,11 @@ interface EventRepository {
     fun createExternalLink(eventSlug: String, request: CreateEventExternalLinkRequest): UUID
 
     fun deleteExternalLink(externalLinkId: UUID)
+
+    // Webhook management methods
+    fun createWebhook(eventSlug: String, request: CreateEventWebhookRequest): UUID
+
+    fun getWebhooks(eventSlug: String): List<EventWebhook>
+
+    fun deleteWebhook(eventSlug: String, webhookId: UUID)
 }

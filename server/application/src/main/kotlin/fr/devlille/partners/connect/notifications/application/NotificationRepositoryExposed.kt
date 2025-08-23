@@ -8,16 +8,20 @@ import fr.devlille.partners.connect.integrations.infrastructure.db.findByEventId
 import fr.devlille.partners.connect.notifications.domain.NotificationGateway
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
+import fr.devlille.partners.connect.notifications.infrastructure.gateways.WebhookService
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class NotificationRepositoryExposed(
     private val notificationGateways: List<NotificationGateway>,
+    private val webhookService: WebhookService,
 ) : NotificationRepository {
-    override fun sendMessage(eventSlug: String, variables: NotificationVariables) = transaction {
-        val eventId = EventEntity.findBySlug(eventSlug)?.id?.value
+    override fun sendMessage(eventSlug: String, variables: NotificationVariables): Unit = transaction {
+        val eventEntity = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val eventId = eventEntity.id.value
 
+        // Send through integration gateways (Slack, Mailjet, etc.)
         IntegrationsTable
             .findByEventIdAndUsage(eventId, IntegrationUsage.NOTIFICATION)
             .forEach { row ->
@@ -27,5 +31,8 @@ class NotificationRepositoryExposed(
                     ?: throw NotFoundException("No gateway for provider $provider")
                 gateway.send(integrationId, variables)
             }
+
+        // Send through webhooks
+        webhookService.sendWebhooks(eventId, variables)
     }
 }

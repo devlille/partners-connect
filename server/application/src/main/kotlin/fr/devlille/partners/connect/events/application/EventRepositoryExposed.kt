@@ -2,20 +2,27 @@ package fr.devlille.partners.connect.events.application
 
 import fr.devlille.partners.connect.events.domain.Contact
 import fr.devlille.partners.connect.events.domain.CreateEventExternalLinkRequest
+import fr.devlille.partners.connect.events.domain.CreateEventWebhookRequest
 import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.domain.EventDisplay
 import fr.devlille.partners.connect.events.domain.EventExternalLink
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventSummary
+import fr.devlille.partners.connect.events.domain.EventWebhook
 import fr.devlille.partners.connect.events.domain.EventWithOrganisation
+import fr.devlille.partners.connect.events.domain.WebhookType
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinkEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinksTable
+import fr.devlille.partners.connect.events.infrastructure.db.EventWebhookEntity
+import fr.devlille.partners.connect.events.infrastructure.db.EventWebhooksTable
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
+import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.organisations.application.mappers.toItemDomain
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.provider.domain.Provider
 import fr.devlille.partners.connect.provider.infrastructure.db.EventProviderEntity
 import fr.devlille.partners.connect.provider.infrastructure.db.EventProvidersTable
@@ -26,6 +33,8 @@ import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -33,6 +42,7 @@ import java.util.UUID
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug as eventFindBySlug
 import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug as orgFindBySlug
 
+@Suppress("TooManyFunctions")
 class EventRepositoryExposed(
     private val entity: UUIDEntityClass<EventEntity>,
 ) : EventRepository {
@@ -232,5 +242,74 @@ class EventRepositoryExposed(
             ?: throw NotFoundException("External link with id $externalLinkId not found")
 
         linkEntity.delete()
+    }
+
+    override fun createWebhook(eventSlug: String, request: CreateEventWebhookRequest): UUID = transaction {
+        // Basic validation
+        if (request.url.isBlank()) {
+            throw BadRequestException("Webhook URL cannot be empty")
+        }
+
+        // Basic URL validation
+        val urlPattern = Regex("^https?://.*")
+        if (!urlPattern.matches(request.url)) {
+            throw BadRequestException("Invalid URL format - must start with http:// or https://")
+        }
+
+        // Validate partnership ID if type is PARTNERSHIP
+        if (request.type == WebhookType.PARTNERSHIP) {
+            if (request.partnershipId.isNullOrBlank()) {
+                throw BadRequestException("Partnership ID is required when type is 'partnership'")
+            }
+        }
+
+        val eventEntity = entity.eventFindBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+
+        val webhookEntity = EventWebhookEntity.new {
+            this.event = eventEntity
+            this.url = request.url
+            this.type = request.type.name.lowercase()
+            this.partnership = request.partnershipId?.let { partnershipId ->
+                PartnershipEntity.findById(partnershipId.toUUID())
+                    ?: throw NotFoundException("Partnership with id $partnershipId not found")
+            }
+            this.headerAuth = request.headerAuth
+        }
+
+        webhookEntity.id.value
+    }
+
+    override fun getWebhooks(eventSlug: String): List<EventWebhook> = transaction {
+        val eventEntity = entity.eventFindBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+
+        EventWebhookEntity.find {
+            EventWebhooksTable.eventId eq eventEntity.id
+        }.map { webhookEntity ->
+            EventWebhook(
+                id = webhookEntity.id.value.toString(),
+                url = webhookEntity.url,
+                type = WebhookType.valueOf(webhookEntity.type.uppercase()),
+                partnershipId = webhookEntity.partnership?.id?.value?.toString(),
+                createdAt = webhookEntity.createdAt.toInstant(TimeZone.UTC),
+                updatedAt = webhookEntity.updatedAt.toInstant(TimeZone.UTC),
+            )
+        }
+    }
+
+    override fun deleteWebhook(eventSlug: String, webhookId: UUID): Unit = transaction {
+        val eventEntity = entity.eventFindBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+
+        val webhookEntity = EventWebhookEntity.findById(webhookId)
+            ?: throw NotFoundException("Webhook with id $webhookId not found")
+
+        // Verify the webhook belongs to the event
+        if (webhookEntity.event.id != eventEntity.id) {
+            throw NotFoundException("Webhook with id $webhookId not found for event $eventSlug")
+        }
+
+        webhookEntity.delete()
     }
 }
