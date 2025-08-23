@@ -8,6 +8,7 @@ import fr.devlille.partners.connect.integrations.infrastructure.db.findByEventId
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipTicketEntity
@@ -20,7 +21,6 @@ import fr.devlille.partners.connect.tickets.domain.TicketData
 import fr.devlille.partners.connect.tickets.domain.TicketGateway
 import fr.devlille.partners.connect.tickets.domain.TicketOrder
 import fr.devlille.partners.connect.tickets.domain.TicketRepository
-import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.upsert
