@@ -51,6 +51,7 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
@@ -210,63 +211,49 @@ private fun Application.configureContentNegotiation() {
 
 private fun Application.configureStatusPage() {
     install(StatusPages) {
-        exception<BadRequestException> { call, cause ->
-            val errorResponse = ErrorResponse(
-                code = ErrorCode.BAD_REQUEST.name,
-                status = HttpStatusCode.BadRequest.value,
-                meta = emptyMap(),
+        exception<BadRequestException> { call, _ ->
+            call.respondWithStructuredError(
+                ErrorCode.BAD_REQUEST,
+                HttpStatusCode.BadRequest,
+                emptyMap(),
             )
-            call.respond(HttpStatusCode.BadRequest, errorResponse)
         }
         exception<UnauthorizedException> { call, cause ->
-            val errorResponse = ErrorResponse(
-                code = cause.code.name,
-                status = cause.status.value,
-                meta = cause.meta.toStringMap(),
-            )
-            call.respond(cause.status, errorResponse)
+            call.respondWithStructuredError(cause.code, cause.status, cause.meta.toStringMap())
         }
         exception<ForbiddenException> { call, cause ->
-            val errorResponse = ErrorResponse(
-                code = cause.code.name,
-                status = cause.status.value,
-                meta = cause.meta.toStringMap(),
-            )
-            call.respond(cause.status, errorResponse)
+            call.respondWithStructuredError(cause.code, cause.status, cause.meta.toStringMap())
         }
         exception<NotFoundException> { call, cause ->
-            val errorResponse = ErrorResponse(
-                code = cause.code.name,
-                status = cause.status.value,
-                meta = cause.meta.toStringMap(),
-            )
-            call.respond(cause.status, errorResponse)
+            call.respondWithStructuredError(cause.code, cause.status, cause.meta.toStringMap())
         }
         exception<UnsupportedMediaTypeException> { call, cause ->
-            val errorResponse = ErrorResponse(
-                code = cause.code.name,
-                status = cause.status.value,
-                meta = cause.meta.toStringMap(),
-            )
-            call.respond(cause.status, errorResponse)
+            call.respondWithStructuredError(cause.code, cause.status, cause.meta.toStringMap())
         }
         exception<ConflictException> { call, cause ->
-            val errorResponse = ErrorResponse(
-                code = cause.code.name,
-                status = cause.status.value,
-                meta = cause.meta.toStringMap(),
-            )
-            call.respond(cause.status, errorResponse)
+            call.respondWithStructuredError(cause.code, cause.status, cause.meta.toStringMap())
         }
-        exception<Throwable> { call, cause ->
-            val errorResponse = ErrorResponse(
-                code = ErrorCode.INTERNAL_SERVER_ERROR.name,
-                status = HttpStatusCode.InternalServerError.value,
-                meta = emptyMap(),
+        exception<Throwable> { call, _ ->
+            call.respondWithStructuredError(
+                ErrorCode.INTERNAL_SERVER_ERROR,
+                HttpStatusCode.InternalServerError,
+                emptyMap(),
             )
-            call.respond(HttpStatusCode.InternalServerError, errorResponse)
         }
     }
+}
+
+private suspend fun ApplicationCall.respondWithStructuredError(
+    code: ErrorCode,
+    status: HttpStatusCode,
+    meta: Map<String, String>,
+) {
+    val errorResponse = ErrorResponse(
+        code = code.name,
+        status = status.value,
+        meta = meta,
+    )
+    respond(status, errorResponse)
 }
 
 /**

@@ -76,7 +76,8 @@ class PartnershipStorageRepositoryGoogleStorage(
                 message = "Unsupported image type: $mimeType",
                 meta = mapOf(
                     MetaKeys.MEDIA_TYPE to mimeType,
-                    MetaKeys.SUPPORTED_TYPES to "image/png, image/jpeg, image/jpg, image/gif, image/svg+xml, image/webp",
+                    MetaKeys.SUPPORTED_TYPES to "image/png, image/jpeg, image/jpg, image/gif, " +
+                        "image/svg+xml, image/webp",
                     MetaKeys.EVENT to event.slug,
                     MetaKeys.PARTNERSHIP_ID to partnershipId.toString(),
                 ),
