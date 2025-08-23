@@ -16,5 +16,6 @@ interface WebhookGateway {
         integrationId: UUID,
         eventId: UUID,
         partnershipId: UUID,
+        eventType: WebhookEventType,
     ): Boolean
 }

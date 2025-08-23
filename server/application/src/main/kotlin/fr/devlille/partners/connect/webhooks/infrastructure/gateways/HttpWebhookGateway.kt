@@ -18,6 +18,8 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import io.ktor.server.plugins.NotFoundException
+import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
@@ -29,36 +31,37 @@ class HttpWebhookGateway(
         integrationId: UUID,
         eventId: UUID,
         partnershipId: UUID,
+        eventType: WebhookEventType,
     ): Boolean {
-        // Get integration configuration and check permissions in transaction
-        val webhookData = transaction {
-            val config = WebhookIntegrationsTable[integrationId]
-
-            // Check if we can send webhook based on config type
-            val canSend = when (config.type) {
-                WebhookType.ALL -> true
-                WebhookType.PARTNERSHIP -> config.partnershipId == partnershipId
-            }
-
-            if (!canSend) return@transaction null
-
-            // Get event entity and partnership entity from identifiers
-            val eventEntity = EventEntity.findById(eventId)
-                ?: return@transaction null
-
-            val partnershipEntity = PartnershipEntity.findById(partnershipId)
-                ?: return@transaction null
-
-            // Return data needed for webhook
-            Triple(config, eventEntity, partnershipEntity)
+        // Get event entity and throw NotFoundException if it doesn't exist
+        val eventEntity = transaction {
+            EventEntity.findById(eventId) ?: throw NotFoundException("Event not found")
         }
 
-        // If we can't send webhook or data is missing, return false
-        val (config, eventEntity, partnershipEntity) = webhookData ?: return false
+        // Get partnership entity and throw NotFoundException if it doesn't exist
+        val partnershipEntity = transaction {
+            PartnershipEntity.findById(partnershipId) ?: throw NotFoundException("Partnership not found")
+        }
+
+        // Get integration configuration and check permissions in transaction
+        val config = transaction {
+            val webhookConfig = WebhookIntegrationsTable[integrationId]
+
+            // Check if we can send webhook based on config type
+            val canSend = when (webhookConfig.type) {
+                WebhookType.ALL -> true
+                WebhookType.PARTNERSHIP -> webhookConfig.partnershipId == partnershipId
+            }
+
+            if (!canSend) null else webhookConfig
+        }
+
+        // If we can't send webhook, return false
+        if (config == null) return false
 
         // Create webhook payload with actual entity data
         val payload = WebhookPayload(
-            eventType = WebhookEventType.CREATED,
+            eventType = eventType,
             partnership = PartnershipWebhookData(
                 id = partnershipId.toString(),
                 companyId = partnershipEntity.company.id.value.toString(),
@@ -66,7 +69,7 @@ class HttpWebhookGateway(
                 status = when {
                     partnershipEntity.validatedAt != null -> "validated"
                     partnershipEntity.declinedAt != null -> "declined"
-                    partnershipEntity.suggestionApprovedAt != null -> "approved"
+                    partnershipEntity.suggestionApprovedAt != null -> "suggestion_approved"
                     partnershipEntity.suggestionDeclinedAt != null -> "suggestion_declined"
                     else -> "pending"
                 },
@@ -76,7 +79,7 @@ class HttpWebhookGateway(
                 slug = eventEntity.slug,
                 name = eventEntity.name,
             ),
-            timestamp = kotlinx.datetime.Clock.System.now().toString(),
+            timestamp = Clock.System.now().toString(),
         )
 
         // Send HTTP call
