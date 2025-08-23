@@ -45,7 +45,6 @@ object MetaKeys {
     val MISSING_FIELDS = MetaKey("missing_fields")
     val AVAILABLE_TICKETS = MetaKey("available_tickets")
     val REQUESTED_TICKETS = MetaKey("requested_tickets")
-    val ACTION = MetaKey("action")
     val CONTENT_TYPE = MetaKey("content_type")
     val VALUE = MetaKey("value")
     val EXPECTED_FORMAT = MetaKey("expected_format")

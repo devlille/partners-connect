@@ -55,7 +55,7 @@ import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.plugins.NotFoundException
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.openapi.openAPI
@@ -237,11 +237,11 @@ private fun Application.configureStatusPage() {
         }
         exception<NotFoundException> { call, cause ->
             val errorResponse = ErrorResponse(
-                code = ErrorCode.NOT_FOUND.name,
-                status = HttpStatusCode.NotFound.value,
-                meta = emptyMap(),
+                code = cause.code.name,
+                status = cause.status.value,
+                meta = cause.meta.toStringMap(),
             )
-            call.respond(HttpStatusCode.NotFound, errorResponse)
+            call.respond(cause.status, errorResponse)
         }
         exception<UnsupportedMediaTypeException> { call, cause ->
             val errorResponse = ErrorResponse(

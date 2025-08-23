@@ -56,14 +56,14 @@ class StructuredErrorResponseTest {
             code = ErrorCode.NO_EDIT_PERMISSION,
             message = "No permission for this resource",
             status = HttpStatusCode.Forbidden,
-            meta = mapOf(MetaKeys.RESOURCE to "event", MetaKeys.ACTION to "edit"),
+            meta = mapOf(MetaKeys.RESOURCE to "event", MetaKeys.REQUIRED_ROLE to "admin"),
         )
 
         assertEquals(ErrorCode.NO_EDIT_PERMISSION, exception.code)
         assertEquals("No permission for this resource", exception.message)
         assertEquals(HttpStatusCode.Forbidden, exception.status)
         assertEquals("event", exception.meta[MetaKeys.RESOURCE])
-        assertEquals("edit", exception.meta[MetaKeys.ACTION])
+        assertEquals("admin", exception.meta[MetaKeys.REQUIRED_ROLE])
     }
 
     @Test

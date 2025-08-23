@@ -7,7 +7,7 @@ import io.ktor.http.HttpStatusCode
  * Includes structured error code and metadata for better error handling.
  */
 class ConflictException(
-    val code: ErrorCode = ErrorCode.PARTNERSHIP_ALREADY_EXISTS,
+    val code: ErrorCode,
     override val message: String = "Conflict with current resource state",
     val status: HttpStatusCode = HttpStatusCode.Conflict,
     val meta: Map<MetaKey, String> = emptyMap(),

@@ -10,7 +10,9 @@ import fr.devlille.partners.connect.users.infrastructure.db.hasPermission
 import fr.devlille.partners.connect.users.infrastructure.db.listUserGrantedByOrgId
 import fr.devlille.partners.connect.users.infrastructure.db.singleEventPermission
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
-import io.ktor.server.plugins.NotFoundException
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class UserRepositoryExposed : UserRepository {
@@ -28,7 +30,11 @@ class UserRepositoryExposed : UserRepository {
 
     override fun findUsersByOrgSlug(orgSlug: String): List<User> = transaction {
         val organisation = OrganisationEntity.findBySlug(orgSlug)
-            ?: throw NotFoundException("Organisation with slug: $orgSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ORGANISATION_NOT_FOUND,
+                message = "Organisation with slug: $orgSlug not found",
+                meta = mapOf(MetaKeys.ORGANISATION to orgSlug)
+            )
         OrganisationPermissionEntity
             .listUserGrantedByOrgId(organisation.id.value)
             .map { it.user.toDomain() }
@@ -36,20 +42,36 @@ class UserRepositoryExposed : UserRepository {
 
     override fun hasEditPermissionByEmail(email: String, orgSlug: String): Boolean = transaction {
         val user = UserEntity.singleUserByEmail(email)
-            ?: throw NotFoundException("User with email $email not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.USER_NOT_FOUND,
+                message = "User with email $email not found",
+                meta = mapOf(MetaKeys.EMAIL to email)
+            )
         val organisation = OrganisationEntity.findBySlug(orgSlug)
-            ?: throw NotFoundException("Organisation with slug: $orgSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ORGANISATION_NOT_FOUND,
+                message = "Organisation with slug: $orgSlug not found",
+                meta = mapOf(MetaKeys.ORGANISATION to orgSlug)
+            )
         OrganisationPermissionEntity
             .hasPermission(organisationId = organisation.id.value, userId = user.id.value)
     }
 
     override fun grantUsers(orgSlug: String, userEmails: List<String>) = transaction {
         val org = OrganisationEntity.findBySlug(orgSlug)
-            ?: throw NotFoundException("Organisation with slug: $orgSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ORGANISATION_NOT_FOUND,
+                message = "Organisation with slug: $orgSlug not found",
+                meta = mapOf(MetaKeys.ORGANISATION to orgSlug)
+            )
         userEmails.forEach { userEmail ->
             val userEntity = UserEntity
                 .singleUserByEmail(userEmail)
-                ?: throw NotFoundException("User with email: $userEmail not found")
+                ?: throw NotFoundException(
+                    code = ErrorCode.USER_NOT_FOUND,
+                    message = "User with email: $userEmail not found",
+                    meta = mapOf(MetaKeys.EMAIL to userEmail)
+                )
             val existing = OrganisationPermissionEntity
                 .singleEventPermission(organisationId = org.id.value, userId = userEntity.id.value)
             if (existing != null) {

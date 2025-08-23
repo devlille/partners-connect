@@ -7,7 +7,7 @@ import io.ktor.http.HttpStatusCode
  * Includes structured error code and metadata for better error handling.
  */
 class UnsupportedMediaTypeException(
-    val code: ErrorCode = ErrorCode.UNSUPPORTED_MEDIA_TYPE,
+    val code: ErrorCode,
     override val message: String = "Unsupported media type",
     val status: HttpStatusCode = HttpStatusCode.UnsupportedMediaType,
     val meta: Map<MetaKey, String> = emptyMap(),

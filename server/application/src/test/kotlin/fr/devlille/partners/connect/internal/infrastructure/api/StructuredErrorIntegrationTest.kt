@@ -39,7 +39,6 @@ class StructuredErrorIntegrationTest {
                             message = "You don't have permission to access this resource",
                             meta = mapOf(
                                 MetaKeys.RESOURCE to "demo-resource",
-                                MetaKeys.ACTION to "read",
                                 MetaKeys.REQUIRED_ROLE to "admin",
                             ),
                         )
@@ -51,7 +50,10 @@ class StructuredErrorIntegrationTest {
                                 MetaKeys.EXPECTED_FORMAT to "Bearer <token>",
                             ),
                         )
-                        "not-found" -> throw io.ktor.server.plugins.NotFoundException("Resource not found")
+                        "not-found" -> throw NotFoundException(
+                            code = ErrorCode.NOT_FOUND,
+                            message = "Resource not found"
+                        )
                         else -> throw ForbiddenException(
                             code = ErrorCode.FORBIDDEN,
                             message = "Default error",

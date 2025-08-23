@@ -7,7 +7,7 @@ import io.ktor.http.HttpStatusCode
  * Includes structured error code and metadata for better error handling.
  */
 class UnauthorizedException(
-    val code: ErrorCode = ErrorCode.UNAUTHORIZED,
+    val code: ErrorCode,
     override val message: String = "Unauthorized access",
     val status: HttpStatusCode = HttpStatusCode.Unauthorized,
     val meta: Map<MetaKey, String> = emptyMap(),
