@@ -52,12 +52,8 @@ fun Route.integrationRoutes() {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing eventSlug")
             val integrationId = call.parameters["integrationId"]?.toUUID()
                 ?: throw BadRequestException("Missing integrationId")
-            val deleted = integrationRepository.deleteById(orgSlug, eventSlug, integrationId)
-            if (deleted) {
-                call.respond(HttpStatusCode.NoContent)
-            } else {
-                call.respond(HttpStatusCode.NotFound, "Integration not found")
-            }
+            integrationRepository.deleteById(orgSlug, eventSlug, integrationId)
+            call.respond(HttpStatusCode.NoContent)
         }
     }
 }

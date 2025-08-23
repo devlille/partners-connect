@@ -8,7 +8,7 @@ import org.jetbrains.exposed.v1.jdbc.SchemaUtils
  * Migration to add the created_at column to integrations table for audit tracking.
  */
 object AddIntegrationCreatedAtMigration : Migration {
-    override val id = "20250123_add_integration_created_at"
+    override val id = "20250808_add_integration_created_at"
     override val description = "Add created_at column to integrations table for audit tracking"
 
     override fun up() {

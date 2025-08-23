@@ -61,7 +61,7 @@ class IntegrationRepositoryExposed(
             }
     }
 
-    override fun deleteById(orgSlug: String, eventSlug: String, integrationId: UUID): Boolean = transaction {
+    override fun deleteById(orgSlug: String, eventSlug: String, integrationId: UUID) = transaction {
         // Verify organization exists
         val organisation = OrganisationEntity.orgFindBySlug(orgSlug)
             ?: throw NotFoundException("Organisation with slug $orgSlug not found")
@@ -85,6 +85,5 @@ class IntegrationRepositoryExposed(
         }
 
         integrationEntity.delete()
-        true
     }
 }
