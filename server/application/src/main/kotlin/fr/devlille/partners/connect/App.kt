@@ -212,26 +212,27 @@ private fun Application.configureContentNegotiation() {
 private fun Application.configureStatusPage() {
     install(StatusPages) {
         exception<BadRequestException> { call, cause ->
-            call.respondWithStructuredError(cause.code, cause.status, cause.meta.toStringMap())
+            call.respondWithStructuredError(cause.code, cause.message, cause.status, cause.meta.toStringMap())
         }
         exception<UnauthorizedException> { call, cause ->
-            call.respondWithStructuredError(cause.code, cause.status, cause.meta.toStringMap())
+            call.respondWithStructuredError(cause.code, cause.message, cause.status, cause.meta.toStringMap())
         }
         exception<ForbiddenException> { call, cause ->
-            call.respondWithStructuredError(cause.code, cause.status, cause.meta.toStringMap())
+            call.respondWithStructuredError(cause.code, cause.message, cause.status, cause.meta.toStringMap())
         }
         exception<NotFoundException> { call, cause ->
-            call.respondWithStructuredError(cause.code, cause.status, cause.meta.toStringMap())
+            call.respondWithStructuredError(cause.code, cause.message, cause.status, cause.meta.toStringMap())
         }
         exception<UnsupportedMediaTypeException> { call, cause ->
-            call.respondWithStructuredError(cause.code, cause.status, cause.meta.toStringMap())
+            call.respondWithStructuredError(cause.code, cause.message, cause.status, cause.meta.toStringMap())
         }
         exception<ConflictException> { call, cause ->
-            call.respondWithStructuredError(cause.code, cause.status, cause.meta.toStringMap())
+            call.respondWithStructuredError(cause.code, cause.message, cause.status, cause.meta.toStringMap())
         }
         exception<Throwable> { call, _ ->
             call.respondWithStructuredError(
                 ErrorCode.INTERNAL_SERVER_ERROR,
+                "Internal server error",
                 HttpStatusCode.InternalServerError,
                 emptyMap(),
             )
@@ -241,11 +242,13 @@ private fun Application.configureStatusPage() {
 
 private suspend fun ApplicationCall.respondWithStructuredError(
     code: ErrorCode,
+    message: String,
     status: HttpStatusCode,
     meta: Map<String, String>,
 ) {
     val errorResponse = ErrorResponse(
         code = code.name,
+        message = message,
         status = status.value,
         meta = meta,
     )

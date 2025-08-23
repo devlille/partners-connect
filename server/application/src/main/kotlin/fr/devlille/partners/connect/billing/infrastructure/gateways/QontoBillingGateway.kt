@@ -69,8 +69,12 @@ class QontoBillingGateway(
             val config = QontoIntegrationsTable[integrationId]
             val billing = BillingEntity.singleByEventAndPartnership(eventId, partnershipId)
                 ?: throw NotFoundException(
-                    code = ErrorCode.EVENT_NOT_FOUND,
+                    code = ErrorCode.BILLING_NOT_FOUND,
                     message = "No billing found for company $partnershipId",
+                    meta = mapOf(
+                        MetaKeys.EVENT_ID to eventId.toString(),
+                        MetaKeys.PARTNERSHIP_ID to partnershipId.toString(),
+                    ),
                 )
             val items = invoiceItems(eventId, billing)
             val client = getClient(billing, config)

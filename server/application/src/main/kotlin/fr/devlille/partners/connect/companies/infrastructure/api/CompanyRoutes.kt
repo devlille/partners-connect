@@ -43,12 +43,10 @@ fun Route.companyRoutes() {
 
         post("/{companyId}/logo") {
             val companyId = call.parameters["companyId"]?.toUUID() ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing company id",
             )
             val multipart = call.receiveMultipart()
             val part = multipart.readPart() ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing file part",
             )
             val bytes = part.asByteArray()
@@ -67,7 +65,6 @@ fun Route.companyRoutes() {
 
         get("/{companyId}/partnership") {
             val companyId = call.parameters["companyId"]?.toUUID() ?: throw BadRequestException(
-                code = ErrorCode.BAD_REQUEST,
                 message = "Missing company id",
             )
             val items = partnershipRepository.listByCompany(companyId)

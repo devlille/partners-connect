@@ -43,8 +43,9 @@ class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
                 message = "Event with slug $eventSlug not found",
             )
         val partnership = PartnershipEntity.findById(partnershipId) ?: throw NotFoundException(
-            code = ErrorCode.EVENT_NOT_FOUND,
+            code = ErrorCode.PARTNERSHIP_NOT_FOUND,
             message = "Partnership not found",
+            meta = mapOf(MetaKeys.PARTNERSHIP_ID to partnershipId.toString()),
         )
 
         // Eager load relationships to avoid lazy loading outside transaction

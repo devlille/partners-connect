@@ -8,12 +8,14 @@ import kotlinx.serialization.Serializable
  * for internationalization and specific error handling.
  *
  * @param code The structured error code from ErrorCode enum
+ * @param message The human-readable error message
  * @param status The HTTP status code
  * @param meta Optional metadata providing additional context about the error
  */
 @Serializable
 data class ErrorResponse(
     val code: String,
+    val message: String,
     val status: Int,
     val meta: Map<String, String> = emptyMap(),
 )
