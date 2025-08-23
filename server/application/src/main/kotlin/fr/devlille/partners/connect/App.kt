@@ -18,7 +18,7 @@ import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorResponse
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.api.MetaKey
-import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnsupportedMediaTypeException
 import fr.devlille.partners.connect.internal.infrastructure.api.UserSession
@@ -55,7 +55,6 @@ import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.BadRequestException
-import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.openapi.openAPI
@@ -273,5 +272,5 @@ private fun Application.configureStatusPage() {
 /**
  * Extension function to convert Map<MetaKey, String> to Map<String, String> for JSON serialization.
  */
-private fun Map<MetaKey, String>.toStringMap(): Map<String, String> = 
+private fun Map<MetaKey, String>.toStringMap(): Map<String, String> =
     this.mapKeys { it.key.key }

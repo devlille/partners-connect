@@ -27,7 +27,7 @@ class CompanyRepositoryExposed : CompanyRepository {
             ?: throw NotFoundException(
                 code = ErrorCode.COMPANY_NOT_FOUND,
                 message = "Company with id $id not found",
-                meta = mapOf(MetaKeys.ID to id.toString())
+                meta = mapOf(MetaKeys.ID to id.toString()),
             )
     }
 

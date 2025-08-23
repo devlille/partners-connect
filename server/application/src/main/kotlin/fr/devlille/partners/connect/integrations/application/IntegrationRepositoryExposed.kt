@@ -21,18 +21,18 @@ class IntegrationRepositoryExposed(
                 ?: throw NotFoundException(
                     code = ErrorCode.EVENT_NOT_FOUND,
                     message = "Event with slug $eventSlug not found",
-                    meta = mapOf(MetaKeys.EVENT to eventSlug)
+                    meta = mapOf(MetaKeys.EVENT to eventSlug),
                 )
             event.id.value
         }
         val registrar = registrars.find { it.supports(input) && usage in it.supportedUsages }
             ?: throw NotFoundException(
-                code = ErrorCode.NOT_FOUND,
+                code = ErrorCode.INTEGRATION_NOT_FOUND,
                 message = "No registrar found for input ${input::class.simpleName} and usage $usage",
                 meta = mapOf(
                     MetaKeys.RESOURCE to "registrar",
-                    MetaKeys.OPERATION to usage.toString()
-                )
+                    MetaKeys.OPERATION to usage.toString(),
+                ),
             )
         @Suppress("UNCHECKED_CAST")
         return (registrar as IntegrationRegistrar<CreateIntegration>)

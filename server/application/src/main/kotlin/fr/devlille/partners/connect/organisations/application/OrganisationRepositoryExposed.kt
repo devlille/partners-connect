@@ -1,5 +1,8 @@
 package fr.devlille.partners.connect.organisations.application
 
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
 import fr.devlille.partners.connect.organisations.application.mappers.toDomain
 import fr.devlille.partners.connect.organisations.application.mappers.toItemDomain
@@ -13,9 +16,6 @@ import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissi
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
 import io.ktor.server.plugins.BadRequestException
-import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
-import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
-import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
@@ -31,7 +31,7 @@ class OrganisationRepositoryExposed : OrganisationRepository {
                 ?: throw NotFoundException(
                     code = ErrorCode.USER_NOT_FOUND,
                     message = "User with email $email not found",
-                    meta = mapOf(MetaKeys.EMAIL to email)
+                    meta = mapOf(MetaKeys.EMAIL to email),
                 )
         }
         val slug = entity.name.slugify()
@@ -63,7 +63,7 @@ class OrganisationRepositoryExposed : OrganisationRepository {
             ?: throw NotFoundException(
                 code = ErrorCode.ORGANISATION_NOT_FOUND,
                 message = "Organisation with slug $slug not found",
-                meta = mapOf(MetaKeys.ORGANISATION to slug)
+                meta = mapOf(MetaKeys.ORGANISATION to slug),
             )
     }
 
@@ -77,7 +77,7 @@ class OrganisationRepositoryExposed : OrganisationRepository {
             ?: throw NotFoundException(
                 code = ErrorCode.ORGANISATION_NOT_FOUND,
                 message = "Organisation with slug $orgSlug not found",
-                meta = mapOf(MetaKeys.ORGANISATION to orgSlug)
+                meta = mapOf(MetaKeys.ORGANISATION to orgSlug),
             )
 
         val representativeUser = data.representativeUserEmail?.let { email ->
@@ -85,7 +85,7 @@ class OrganisationRepositoryExposed : OrganisationRepository {
                 ?: throw NotFoundException(
                     code = ErrorCode.USER_NOT_FOUND,
                     message = "User with email $email not found",
-                    meta = mapOf(MetaKeys.EMAIL to email)
+                    meta = mapOf(MetaKeys.EMAIL to email),
                 )
         }
 
@@ -116,7 +116,7 @@ class OrganisationRepositoryExposed : OrganisationRepository {
             ?: throw NotFoundException(
                 code = ErrorCode.USER_NOT_FOUND,
                 message = "User with email $userEmail not found",
-                meta = mapOf(MetaKeys.EMAIL to userEmail)
+                meta = mapOf(MetaKeys.EMAIL to userEmail),
             )
 
         OrganisationPermissionEntity

@@ -5,6 +5,7 @@ import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.findByEventIdAndUsage
+import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
@@ -33,9 +34,9 @@ class TicketRepositoryExposed(
         val tickets = PartnershipTicketEntity.listByPartnership(partnershipId)
         if (tickets.isEmpty()) {
             throw NotFoundException(
-                code = ErrorCode.NOT_FOUND,
+                code = ErrorCode.TICKETS_NOT_FOUND,
                 message = "No tickets found for partnership $partnershipId",
-                meta = mapOf(MetaKeys.PARTNERSHIP_ID to partnershipId.toString())
+                meta = mapOf(MetaKeys.PARTNERSHIP_ID to partnershipId.toString()),
             )
         }
         tickets.map { ticket ->
@@ -57,7 +58,7 @@ class TicketRepositoryExposed(
                 ?: throw NotFoundException(
                     code = ErrorCode.EVENT_NOT_FOUND,
                     message = "Event with slug $eventSlug not found",
-                    meta = mapOf(MetaKeys.EVENT to eventSlug)
+                    meta = mapOf(MetaKeys.EVENT to eventSlug),
                 )
             val eventId = event.id.value
             val integration = singleIntegrationWithinTransaction(eventId)
@@ -68,18 +69,18 @@ class TicketRepositoryExposed(
 
         val gateway = gateways.find { it.provider == provider }
             ?: throw NotFoundException(
-                code = ErrorCode.NOT_FOUND,
+                code = ErrorCode.PROVIDER_NOT_FOUND,
                 message = "No gateway for provider $provider",
-                meta = mapOf(MetaKeys.PROVIDER to provider.name)
+                meta = mapOf(MetaKeys.PROVIDER to provider.name),
             )
         val billing = transaction { BillingEntity.singleByEventAndPartnership(eventId, partnershipId) }
             ?: throw NotFoundException(
-                code = ErrorCode.NOT_FOUND,
+                code = ErrorCode.BILLING_NOT_FOUND,
                 message = "Billing entity not found for event $eventId and partnership $partnershipId",
                 meta = mapOf(
                     MetaKeys.EVENT to eventSlug,
-                    MetaKeys.PARTNERSHIP_ID to partnershipId.toString()
-                )
+                    MetaKeys.PARTNERSHIP_ID to partnershipId.toString(),
+                ),
             )
         if (billing.status != InvoiceStatus.PAID) {
             throw ForbiddenException(
@@ -97,9 +98,9 @@ class TicketRepositoryExposed(
         val partnership = transaction { billing.partnership }
         if (validatedPack == null) {
             throw NotFoundException(
-                code = ErrorCode.NOT_FOUND,
+                code = ErrorCode.VALIDATED_PACK_NOT_FOUND,
                 message = "No validated pack found for partnership ${partnership.id}",
-                meta = mapOf(MetaKeys.PARTNERSHIP_ID to partnership.id.value.toString())
+                meta = mapOf(MetaKeys.PARTNERSHIP_ID to partnership.id.value.toString()),
             )
         } else if (validatedPack.nbTickets < tickets.size) {
             val message = """
@@ -143,7 +144,7 @@ Not enough tickets in the validated pack: ${validatedPack.nbTickets} available, 
                 ?: throw NotFoundException(
                     code = ErrorCode.EVENT_NOT_FOUND,
                     message = "Event with slug $eventSlug not found",
-                    meta = mapOf(MetaKeys.EVENT to eventSlug)
+                    meta = mapOf(MetaKeys.EVENT to eventSlug),
                 )
             val eventId = event.id.value
             val integration = singleIntegrationWithinTransaction(eventId)
@@ -154,9 +155,9 @@ Not enough tickets in the validated pack: ${validatedPack.nbTickets} available, 
 
         val gateway = gateways.find { it.provider == provider }
             ?: throw NotFoundException(
-                code = ErrorCode.NOT_FOUND,
+                code = ErrorCode.PROVIDER_NOT_FOUND,
                 message = "No gateway for provider $provider",
-                meta = mapOf(MetaKeys.PROVIDER to provider.name)
+                meta = mapOf(MetaKeys.PROVIDER to provider.name),
             )
         val ticket = gateway.updateTicket(integrationId, ticketId, data)
         transaction {
@@ -177,16 +178,16 @@ Not enough tickets in the validated pack: ${validatedPack.nbTickets} available, 
             .toList()
         if (integrations.isEmpty()) {
             throw NotFoundException(
-                code = ErrorCode.NOT_FOUND,
+                code = ErrorCode.TICKETS_NOT_FOUND,
                 message = "No ticketing integration found for event $eventId",
-                meta = mapOf(MetaKeys.EVENT_ID to eventId.toString())
+                meta = mapOf(MetaKeys.EVENT_ID to eventId.toString()),
             )
         }
         if (integrations.size > 1) {
-            throw NotFoundException(
-                code = ErrorCode.NOT_FOUND,
+            throw ConflictException(
+                code = ErrorCode.MULTIPLE_INTEGRATIONS_FOUND,
                 message = "Multiple ticketing integrations found for event $eventId",
-                meta = mapOf(MetaKeys.EVENT_ID to eventId.toString())
+                meta = mapOf(MetaKeys.EVENT_ID to eventId.toString()),
             )
         }
         return integrations.single()

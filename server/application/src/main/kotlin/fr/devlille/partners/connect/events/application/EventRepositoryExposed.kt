@@ -14,6 +14,7 @@ import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinksT
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
 import fr.devlille.partners.connect.organisations.application.mappers.toItemDomain
@@ -27,7 +28,6 @@ import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissi
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
 import io.ktor.server.plugins.BadRequestException
-import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -56,7 +56,7 @@ class EventRepositoryExposed(
             ?: throw NotFoundException(
                 code = ErrorCode.ORGANISATION_NOT_FOUND,
                 message = "Organisation with slug $orgSlug not found",
-                meta = mapOf(MetaKeys.ORGANISATION to orgSlug)
+                meta = mapOf(MetaKeys.ORGANISATION to orgSlug),
             )
         entity.find { EventsTable.organisationId eq organisation.id }.map {
             EventSummary(
@@ -75,7 +75,7 @@ class EventRepositoryExposed(
             ?: throw NotFoundException(
                 code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
-                meta = mapOf(MetaKeys.EVENT to eventSlug)
+                meta = mapOf(MetaKeys.EVENT to eventSlug),
             )
 
         // Fetch external links directly in the same transaction
@@ -131,7 +131,7 @@ class EventRepositoryExposed(
             ?: throw NotFoundException(
                 code = ErrorCode.ORGANISATION_NOT_FOUND,
                 message = "Organisation with slug $orgSlug not found",
-                meta = mapOf(MetaKeys.ORGANISATION to orgSlug)
+                meta = mapOf(MetaKeys.ORGANISATION to orgSlug),
             )
 
         val slug = event.name.slugify()
@@ -156,7 +156,7 @@ class EventRepositoryExposed(
             ?: throw NotFoundException(
                 code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
-                meta = mapOf(MetaKeys.EVENT to eventSlug)
+                meta = mapOf(MetaKeys.EVENT to eventSlug),
             )
 
         eventEntity.name = event.name
@@ -175,7 +175,7 @@ class EventRepositoryExposed(
             ?: throw NotFoundException(
                 code = ErrorCode.USER_NOT_FOUND,
                 message = "User with email $userEmail not found",
-                meta = mapOf(MetaKeys.EMAIL to userEmail)
+                meta = mapOf(MetaKeys.EMAIL to userEmail),
             )
 
         // Find all organizations where the user has edit permissions
@@ -224,7 +224,7 @@ class EventRepositoryExposed(
             ?: throw NotFoundException(
                 code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
-                meta = mapOf(MetaKeys.EVENT to eventSlug)
+                meta = mapOf(MetaKeys.EVENT to eventSlug),
             )
 
         eventEntity.boothPlanImageUrl = imageUrl
@@ -252,7 +252,7 @@ class EventRepositoryExposed(
             ?: throw NotFoundException(
                 code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
-                meta = mapOf(MetaKeys.EVENT to eventSlug)
+                meta = mapOf(MetaKeys.EVENT to eventSlug),
             )
 
         val externalLinkEntity = EventExternalLinkEntity.new {
@@ -267,9 +267,9 @@ class EventRepositoryExposed(
     override fun deleteExternalLink(externalLinkId: UUID): Unit = transaction {
         val linkEntity = EventExternalLinkEntity.findById(externalLinkId)
             ?: throw NotFoundException(
-                code = ErrorCode.NOT_FOUND,
+                code = ErrorCode.EXTERNAL_LINK_NOT_FOUND,
                 message = "External link with id $externalLinkId not found",
-                meta = mapOf(MetaKeys.ID to externalLinkId.toString())
+                meta = mapOf(MetaKeys.ID to externalLinkId.toString()),
             )
 
         linkEntity.delete()

@@ -2,6 +2,9 @@ package fr.devlille.partners.connect.provider.application
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.provider.domain.CreateProvider
 import fr.devlille.partners.connect.provider.domain.Provider
 import fr.devlille.partners.connect.provider.domain.ProviderRepository
@@ -9,9 +12,6 @@ import fr.devlille.partners.connect.provider.infrastructure.db.EventProviderEnti
 import fr.devlille.partners.connect.provider.infrastructure.db.EventProvidersTable
 import fr.devlille.partners.connect.provider.infrastructure.db.ProviderEntity
 import fr.devlille.partners.connect.provider.infrastructure.db.ProvidersTable
-import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
-import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
-import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import io.ktor.server.plugins.BadRequestException
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.and
@@ -76,7 +76,7 @@ class ProviderRepositoryExposed : ProviderRepository {
             ?: throw NotFoundException(
                 code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
-                meta = mapOf(MetaKeys.EVENT to eventSlug)
+                meta = mapOf(MetaKeys.EVENT to eventSlug),
             )
 
         // Validate that all provider IDs exist and get provider entities
@@ -118,7 +118,7 @@ class ProviderRepositoryExposed : ProviderRepository {
             ?: throw NotFoundException(
                 code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
-                meta = mapOf(MetaKeys.EVENT to eventSlug)
+                meta = mapOf(MetaKeys.EVENT to eventSlug),
             )
 
         // Validate that all provider IDs exist

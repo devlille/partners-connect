@@ -23,7 +23,7 @@ class EventStorageRepositoryGoogleStorage(
             ?: throw NotFoundException(
                 code = ErrorCode.EVENT_NOT_FOUND,
                 message = "Event with slug $eventSlug not found",
-                meta = mapOf(MetaKeys.EVENT to eventSlug)
+                meta = mapOf(MetaKeys.EVENT to eventSlug),
             )
         val eventId = event.id.value
 

@@ -16,7 +16,7 @@ object MetaKeys {
     val EMAIL = MetaKey("email")
     val ORGANISATION = MetaKey("organisation")
     val REQUIRED_ROLE = MetaKey("required_role")
-    
+
     // HTTP & Media Related
     val HEADER = MetaKey("header")
     val MEDIA_TYPE = MetaKey("media_type")
@@ -24,7 +24,7 @@ object MetaKeys {
     val HTTP_STATUS = MetaKey("http_status")
     val URL = MetaKey("url")
     val CONTENT_TYPE = MetaKey("content_type")
-    
+
     // Business Entities
     val EVENT = MetaKey("event")
     val EVENT_ID = MetaKey("event_id")
@@ -32,7 +32,7 @@ object MetaKeys {
     val PARTNERSHIP_ID = MetaKey("partnership_id")
     val LOCATION = MetaKey("location")
     val PROVIDER = MetaKey("provider")
-    
+
     // System & Resources
     val RESOURCE_PATH = MetaKey("resource_path")
     val FIELD = MetaKey("field")
