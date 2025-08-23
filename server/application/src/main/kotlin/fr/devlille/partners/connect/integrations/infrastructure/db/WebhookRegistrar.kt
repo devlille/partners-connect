@@ -15,7 +15,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
 class WebhookRegistrar : IntegrationRegistrar<CreateIntegration.CreateWebhookIntegration> {
-    override val supportedUsages = setOf(IntegrationUsage.NOTIFICATION)
+    override val supportedUsages = setOf(IntegrationUsage.WEBHOOK)
 
     override fun register(
         eventId: UUID,
