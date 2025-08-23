@@ -27,21 +27,16 @@ class WebhookRepositoryExposed(
         }
 
         // Separate transaction to get integration list
-        val integrations = transaction {
-            IntegrationsTable
-                .findByEventIdAndUsage(eventId, IntegrationUsage.WEBHOOK)
-                .map { row ->
-                    val provider = row[IntegrationsTable.provider]
-                    val integrationId = row[IntegrationsTable.id].value
-                    val gateway = webhookGateways.find { it.provider == provider }
-                        ?: throw NotFoundException("No gateway for provider $provider")
-
-                    Triple(gateway, integrationId, eventId)
-                }
+        val integrationRows = transaction {
+            IntegrationsTable.findByEventIdAndUsage(eventId, IntegrationUsage.WEBHOOK)
         }
 
-        // Simple iteration without try-catch or success counting
-        for ((gateway, integrationId, eventId) in integrations) {
+        for (row in integrationRows) {
+            val provider = row[IntegrationsTable.provider]
+            val integrationId = row[IntegrationsTable.id].value
+            val gateway = webhookGateways.find { it.provider == provider }
+                ?: throw NotFoundException("No gateway for provider $provider")
+
             gateway.sendWebhook(integrationId, eventId, partnershipId, eventType)
         }
     }
