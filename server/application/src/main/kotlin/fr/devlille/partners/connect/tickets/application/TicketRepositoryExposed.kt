@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.tickets.application
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.findByEventIdAndUsage
@@ -52,6 +53,7 @@ class TicketRepositoryExposed(
         }
     }
 
+    @Suppress("LongMethod")
     override suspend fun createTickets(eventSlug: String, partnershipId: UUID, tickets: List<TicketData>): TicketOrder {
         val (eventId, provider, integrationId) = getEventAndIntegration(eventSlug)
         val gateway = gateways.find { it.provider == provider }
@@ -60,33 +62,8 @@ class TicketRepositoryExposed(
                 message = "No gateway for provider $provider",
                 meta = mapOf(MetaKeys.PROVIDER to provider.name),
             )
-        
-        validateBillingAndPack(eventSlug, partnershipId, eventId, tickets.size)
-        val billing = transaction { BillingEntity.singleByEventAndPartnership(eventId, partnershipId)!! }
-        val partnership = transaction { billing.partnership }
 
-        val order = gateway.createTickets(integrationId, eventId, partnershipId, tickets)
-        persistTicketsToDatabase(order, partnership, billing.contactEmail)
-        return order
-    }
-
-    private fun getEventAndIntegration(eventSlug: String): Triple<UUID, IntegrationProvider, UUID> {
-        return transaction {
-            val event = EventEntity.findBySlug(eventSlug)
-                ?: throw NotFoundException(
-                    code = ErrorCode.EVENT_NOT_FOUND,
-                    message = "Event with slug $eventSlug not found",
-                    meta = mapOf(MetaKeys.EVENT to eventSlug),
-                )
-            val eventId = event.id.value
-            val integration = singleIntegrationWithinTransaction(eventId)
-            val provider = integration[IntegrationsTable.provider]
-            val integrationId = integration[IntegrationsTable.id].value
-            Triple(eventId, provider, integrationId)
-        }
-    }
-
-    private fun validateBillingAndPack(eventSlug: String, partnershipId: UUID, eventId: UUID, requestedTickets: Int) {
+        // Validate billing entity exists and is paid
         val billing = transaction { BillingEntity.singleByEventAndPartnership(eventId, partnershipId) }
             ?: throw NotFoundException(
                 code = ErrorCode.BILLING_NOT_FOUND,
@@ -116,18 +93,39 @@ class TicketRepositoryExposed(
                 meta = mapOf(MetaKeys.PARTNERSHIP_ID to partnershipId.toString()),
             )
         }
-        if (validatedPack.nbTickets < requestedTickets) {
+        if (validatedPack.nbTickets < tickets.size) {
             val message = "Not enough tickets in the validated pack: " +
-                "${validatedPack.nbTickets} available, $requestedTickets requested"
+                "${validatedPack.nbTickets} available, ${tickets.size} requested"
             throw ForbiddenException(
                 code = ErrorCode.TICKET_GENERATION_ERROR,
                 message = message,
                 meta = mapOf(
                     MetaKeys.AVAILABLE_TICKETS to validatedPack.nbTickets.toString(),
-                    MetaKeys.REQUESTED_TICKETS to requestedTickets.toString(),
+                    MetaKeys.REQUESTED_TICKETS to tickets.size.toString(),
                     MetaKeys.PARTNERSHIP_ID to partnershipId.toString(),
                 ),
             )
+        }
+        val partnership = transaction { billing.partnership }
+
+        val order = gateway.createTickets(integrationId, eventId, partnershipId, tickets)
+        persistTicketsToDatabase(order, partnership, billing.contactEmail)
+        return order
+    }
+
+    private fun getEventAndIntegration(eventSlug: String): Triple<UUID, IntegrationProvider, UUID> {
+        return transaction {
+            val event = EventEntity.findBySlug(eventSlug)
+                ?: throw NotFoundException(
+                    code = ErrorCode.EVENT_NOT_FOUND,
+                    message = "Event with slug $eventSlug not found",
+                    meta = mapOf(MetaKeys.EVENT to eventSlug),
+                )
+            val eventId = event.id.value
+            val integration = singleIntegrationWithinTransaction(eventId)
+            val provider = integration[IntegrationsTable.provider]
+            val integrationId = integration[IntegrationsTable.id].value
+            Triple(eventId, provider, integrationId)
         }
     }
 

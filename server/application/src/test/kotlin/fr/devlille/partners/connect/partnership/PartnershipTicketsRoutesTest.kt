@@ -39,6 +39,7 @@ import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class PartnershipTicketsRoutesTest {
     private val json = Json { ignoreUnknownKeys = true }
@@ -152,8 +153,8 @@ class PartnershipTicketsRoutesTest {
 
         assertEquals(HttpStatusCode.NotFound, response.status)
         val responseBody = response.bodyAsText()
-        assert(responseBody.contains("VALIDATED_PACK_NOT_FOUND"))
-        assert(responseBody.contains("\"partnership_id\": \"$partnershipId\""))
+        assertTrue(responseBody.contains("VALIDATED_PACK_NOT_FOUND"))
+        assertTrue(responseBody.contains("\"partnership_id\": \"$partnershipId\""))
     }
 
     @Test
@@ -198,9 +199,9 @@ class PartnershipTicketsRoutesTest {
 
         assertEquals(HttpStatusCode.Forbidden, response.status)
         val responseBody = response.bodyAsText()
-        assert(responseBody.contains("TICKET_GENERATION_ERROR"))
-        assert(responseBody.contains("\"available_tickets\": \"0\""))
-        assert(responseBody.contains("\"requested_tickets\": \"1\""))
+        assertTrue(responseBody.contains("TICKET_GENERATION_ERROR"))
+        assertTrue(responseBody.contains("\"available_tickets\": \"0\""))
+        assertTrue(responseBody.contains("\"requested_tickets\": \"1\""))
     }
 
     @Test
@@ -245,9 +246,9 @@ class PartnershipTicketsRoutesTest {
 
         assertEquals(HttpStatusCode.Forbidden, response.status)
         val responseBody = response.bodyAsText()
-        assert(responseBody.contains("BILLING_PROCESSING_ERROR"))
-        assert(responseBody.contains("\"invoice_status\": \"PENDING\""))
-        assert(responseBody.contains("\"required_status\": \"PAID\""))
+        assertTrue(responseBody.contains("BILLING_PROCESSING_ERROR"))
+        assertTrue(responseBody.contains("\"invoice_status\": \"PENDING\""))
+        assertTrue(responseBody.contains("\"required_status\": \"PAID\""))
     }
 
     @Test
