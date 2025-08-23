@@ -5,7 +5,6 @@ import fr.devlille.partners.connect.integrations.domain.IntegrationRepository
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
-import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receiveText

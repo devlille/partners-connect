@@ -1,7 +1,6 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
-import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.tickets.domain.TicketData
 import fr.devlille.partners.connect.tickets.domain.TicketRepository

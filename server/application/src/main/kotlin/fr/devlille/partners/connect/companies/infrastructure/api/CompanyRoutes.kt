@@ -5,7 +5,6 @@ import fr.devlille.partners.connect.companies.domain.CompanyMediaRepository
 import fr.devlille.partners.connect.companies.domain.CompanyRepository
 import fr.devlille.partners.connect.companies.domain.CreateCompany
 import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
-import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
