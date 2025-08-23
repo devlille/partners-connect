@@ -3,7 +3,7 @@ package fr.devlille.partners.connect.users.infrastructure.api
 import fr.devlille.partners.connect.auth.domain.AuthRepository
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
-import fr.devlille.partners.connect.internal.infrastructure.api.MetaKey
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.token
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
@@ -62,8 +62,8 @@ fun Route.userRoutes() {
                     code = ErrorCode.NO_EDIT_PERMISSION,
                     message = "You do not have permission to grant users for this event",
                     meta = mapOf(
-                        MetaKey.EMAIL to userInfo.email,
-                        MetaKey.ORGANISATION to orgSlug,
+                        MetaKeys.EMAIL to userInfo.email,
+                        MetaKeys.ORGANISATION to orgSlug,
                     ),
                 )
             }

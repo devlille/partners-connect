@@ -10,5 +10,5 @@ class ConflictException(
     val code: ErrorCode = ErrorCode.PARTNERSHIP_ALREADY_EXISTS,
     override val message: String = "Conflict with current resource state",
     val status: HttpStatusCode = HttpStatusCode.Conflict,
-    val meta: Map<String, String> = emptyMap(),
+    val meta: Map<MetaKey, String> = emptyMap(),
 ) : Throwable(message)

@@ -10,5 +10,5 @@ class UnauthorizedException(
     val code: ErrorCode = ErrorCode.UNAUTHORIZED,
     override val message: String = "Unauthorized access",
     val status: HttpStatusCode = HttpStatusCode.Unauthorized,
-    val meta: Map<String, String> = emptyMap(),
+    val meta: Map<MetaKey, String> = emptyMap(),
 ) : Throwable(message)

@@ -38,17 +38,17 @@ class StructuredErrorIntegrationTest {
                             code = ErrorCode.NO_EDIT_PERMISSION,
                             message = "You don't have permission to access this resource",
                             meta = mapOf(
-                                "resource" to "demo-resource",
-                                "action" to "read",
-                                "requiredRole" to "admin",
+                                MetaKeys.RESOURCE to "demo-resource",
+                                MetaKeys.ACTION to "read",
+                                MetaKeys.REQUIRED_ROLE to "admin",
                             ),
                         )
                         "unauthorized" -> throw UnauthorizedException(
                             code = ErrorCode.TOKEN_MISSING,
                             message = "Authentication token is missing",
                             meta = mapOf(
-                                "header" to "Authorization",
-                                "expectedFormat" to "Bearer <token>",
+                                MetaKeys.HEADER to "Authorization",
+                                MetaKeys.EXPECTED_FORMAT to "Bearer <token>",
                             ),
                         )
                         "not-found" -> throw io.ktor.server.plugins.NotFoundException("Resource not found")
@@ -75,7 +75,7 @@ class StructuredErrorIntegrationTest {
         assertEquals(HttpStatusCode.Forbidden.value, forbiddenError.status)
         assertEquals("demo-resource", forbiddenError.meta["resource"])
         assertEquals("read", forbiddenError.meta["action"])
-        assertEquals("admin", forbiddenError.meta["requiredRole"])
+        assertEquals("admin", forbiddenError.meta["required_role"])
 
         // Test structured unauthorized error with JSON response
         val unauthorizedResponse = client.get("/demo/structured-errors?error=unauthorized") {
@@ -90,7 +90,7 @@ class StructuredErrorIntegrationTest {
         assertEquals(ErrorCode.TOKEN_MISSING.name, unauthorizedError.code)
         assertEquals(HttpStatusCode.Unauthorized.value, unauthorizedError.status)
         assertEquals("Authorization", unauthorizedError.meta["header"])
-        assertEquals("Bearer <token>", unauthorizedError.meta["expectedFormat"])
+        assertEquals("Bearer <token>", unauthorizedError.meta["expected_format"])
 
         // Test NotFoundException (Ktor exception) with JSON response
         val notFoundResponse = client.get("/demo/structured-errors?error=not-found") {

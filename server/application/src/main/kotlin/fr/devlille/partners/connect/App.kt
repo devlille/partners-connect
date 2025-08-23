@@ -17,6 +17,8 @@ import fr.devlille.partners.connect.internal.infrastructure.api.ConflictExceptio
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorResponse
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKey
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnsupportedMediaTypeException
 import fr.devlille.partners.connect.internal.infrastructure.api.UserSession
@@ -221,7 +223,7 @@ private fun Application.configureStatusPage() {
             val errorResponse = ErrorResponse(
                 code = cause.code.name,
                 status = cause.status.value,
-                meta = cause.meta,
+                meta = cause.meta.toStringMap(),
             )
             call.respond(cause.status, errorResponse)
         }
@@ -229,7 +231,7 @@ private fun Application.configureStatusPage() {
             val errorResponse = ErrorResponse(
                 code = cause.code.name,
                 status = cause.status.value,
-                meta = cause.meta,
+                meta = cause.meta.toStringMap(),
             )
             call.respond(cause.status, errorResponse)
         }
@@ -245,7 +247,7 @@ private fun Application.configureStatusPage() {
             val errorResponse = ErrorResponse(
                 code = cause.code.name,
                 status = cause.status.value,
-                meta = cause.meta,
+                meta = cause.meta.toStringMap(),
             )
             call.respond(cause.status, errorResponse)
         }
@@ -253,7 +255,7 @@ private fun Application.configureStatusPage() {
             val errorResponse = ErrorResponse(
                 code = cause.code.name,
                 status = cause.status.value,
-                meta = cause.meta,
+                meta = cause.meta.toStringMap(),
             )
             call.respond(cause.status, errorResponse)
         }
@@ -267,3 +269,9 @@ private fun Application.configureStatusPage() {
         }
     }
 }
+
+/**
+ * Extension function to convert Map<MetaKey, String> to Map<String, String> for JSON serialization.
+ */
+private fun Map<MetaKey, String>.toStringMap(): Map<String, String> = 
+    this.mapKeys { it.key.key }

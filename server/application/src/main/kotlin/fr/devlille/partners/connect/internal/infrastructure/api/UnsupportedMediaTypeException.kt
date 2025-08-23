@@ -10,5 +10,5 @@ class UnsupportedMediaTypeException(
     val code: ErrorCode = ErrorCode.UNSUPPORTED_MEDIA_TYPE,
     override val message: String = "Unsupported media type",
     val status: HttpStatusCode = HttpStatusCode.UnsupportedMediaType,
-    val meta: Map<String, String> = emptyMap(),
+    val meta: Map<MetaKey, String> = emptyMap(),
 ) : Throwable(message)

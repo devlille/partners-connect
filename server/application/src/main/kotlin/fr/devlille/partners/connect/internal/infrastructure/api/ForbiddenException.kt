@@ -10,5 +10,5 @@ class ForbiddenException(
     val code: ErrorCode = ErrorCode.FORBIDDEN,
     override val message: String = "Access forbidden",
     val status: HttpStatusCode = HttpStatusCode.Forbidden,
-    val meta: Map<String, String> = emptyMap(),
+    val meta: Map<MetaKey, String> = emptyMap(),
 ) : Throwable(message)

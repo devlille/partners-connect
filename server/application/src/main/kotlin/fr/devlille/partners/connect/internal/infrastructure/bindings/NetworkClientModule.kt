@@ -1,7 +1,7 @@
 package fr.devlille.partners.connect.internal.infrastructure.bindings
 
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
-import fr.devlille.partners.connect.internal.infrastructure.api.MetaKey
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.ClientRequestException
@@ -30,8 +30,8 @@ val networkClientModule = module {
                             code = ErrorCode.UNAUTHORIZED,
                             message = "Unauthorized: ${exception.message}",
                             meta = mapOf(
-                                MetaKey.HTTP_STATUS to exceptionResponse.status.value.toString(),
-                                MetaKey.URL to request.url.toString(),
+                                MetaKeys.HTTP_STATUS to exceptionResponse.status.value.toString(),
+                                MetaKeys.URL to request.url.toString(),
                             ),
                         )
                     }

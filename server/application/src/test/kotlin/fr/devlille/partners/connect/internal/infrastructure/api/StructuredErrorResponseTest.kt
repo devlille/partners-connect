@@ -56,14 +56,14 @@ class StructuredErrorResponseTest {
             code = ErrorCode.NO_EDIT_PERMISSION,
             message = "No permission for this resource",
             status = HttpStatusCode.Forbidden,
-            meta = mapOf("resource" to "event", "action" to "edit"),
+            meta = mapOf(MetaKeys.RESOURCE to "event", MetaKeys.ACTION to "edit"),
         )
 
         assertEquals(ErrorCode.NO_EDIT_PERMISSION, exception.code)
         assertEquals("No permission for this resource", exception.message)
         assertEquals(HttpStatusCode.Forbidden, exception.status)
-        assertEquals("event", exception.meta["resource"])
-        assertEquals("edit", exception.meta["action"])
+        assertEquals("event", exception.meta[MetaKeys.RESOURCE])
+        assertEquals("edit", exception.meta[MetaKeys.ACTION])
     }
 
     @Test
@@ -85,13 +85,13 @@ class StructuredErrorResponseTest {
             code = ErrorCode.TOKEN_MISSING,
             message = "Missing authentication token",
             status = HttpStatusCode.Unauthorized,
-            meta = mapOf("header" to "Authorization"),
+            meta = mapOf(MetaKeys.HEADER to "Authorization"),
         )
 
         assertEquals(ErrorCode.TOKEN_MISSING, exception.code)
         assertEquals("Missing authentication token", exception.message)
         assertEquals(HttpStatusCode.Unauthorized, exception.status)
-        assertEquals("Authorization", exception.meta["header"])
+        assertEquals("Authorization", exception.meta[MetaKeys.HEADER])
     }
 
     @Test
@@ -113,13 +113,13 @@ class StructuredErrorResponseTest {
             code = ErrorCode.UNSUPPORTED_MEDIA_TYPE,
             message = "Content type not supported",
             status = HttpStatusCode.UnsupportedMediaType,
-            meta = mapOf("contentType" to "application/xml", "supported" to "application/json"),
+            meta = mapOf(MetaKeys.CONTENT_TYPE to "application/xml", MetaKeys.SUPPORTED to "application/json"),
         )
 
         assertEquals(ErrorCode.UNSUPPORTED_MEDIA_TYPE, exception.code)
         assertEquals("Content type not supported", exception.message)
         assertEquals(HttpStatusCode.UnsupportedMediaType, exception.status)
-        assertEquals("application/xml", exception.meta["contentType"])
-        assertEquals("application/json", exception.meta["supported"])
+        assertEquals("application/xml", exception.meta[MetaKeys.CONTENT_TYPE])
+        assertEquals("application/json", exception.meta[MetaKeys.SUPPORTED])
     }
 }

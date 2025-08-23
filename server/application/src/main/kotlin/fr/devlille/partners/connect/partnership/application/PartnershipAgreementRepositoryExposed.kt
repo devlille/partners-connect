@@ -5,6 +5,7 @@ import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import fr.devlille.partners.connect.internal.infrastructure.pdf.renderMarkdownToPdf
 import fr.devlille.partners.connect.internal.infrastructure.resources.readResourceFile
 import fr.devlille.partners.connect.internal.infrastructure.templating.templating
@@ -112,8 +113,8 @@ internal fun OrganisationEntity.toAgreementOrganisation(formatter: DateTimeForma
             code = ErrorCode.MISSING_REQUIRED_PARAMETER,
             message = "Fields ${missingFields.joinToString(", ")} are required to perform this operation.",
             meta = mapOf(
-                "missingFields" to missingFields.joinToString(", "),
-                "operation" to "partnership_agreement_validation",
+                MetaKeys.MISSING_FIELDS to missingFields.joinToString(", "),
+                MetaKeys.OPERATION to "partnership_agreement_validation",
             ),
         )
     }

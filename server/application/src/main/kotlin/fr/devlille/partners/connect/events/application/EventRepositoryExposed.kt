@@ -13,7 +13,7 @@ import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinkEn
 import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinksTable
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
-import fr.devlille.partners.connect.internal.infrastructure.api.MetaKey
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
 import fr.devlille.partners.connect.organisations.application.mappers.toItemDomain
@@ -171,8 +171,8 @@ class EventRepositoryExposed(
                 code = ErrorCode.NO_EDIT_PERMISSION,
                 message = "You do not have organizer permissions",
                 meta = mapOf(
-                    MetaKey.EMAIL to userEmail,
-                    MetaKey.REQUIRED_ROLE to "organizer",
+                    MetaKeys.EMAIL to userEmail,
+                    MetaKeys.REQUIRED_ROLE to "organizer",
                 ),
             )
         }

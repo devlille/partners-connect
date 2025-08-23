@@ -8,6 +8,7 @@ import fr.devlille.partners.connect.billing.infrastructure.gateways.models.Qonto
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -27,9 +28,9 @@ internal fun EventEntity.toQontoInvoiceRequest(
             code = ErrorCode.MISSING_REQUIRED_PARAMETER,
             message = "Field iban is required to perform this operation.",
             meta = mapOf(
-                "field" to "iban",
-                "organisation" to organisation.slug,
-                "operation" to "invoice_generation",
+                MetaKeys.FIELD to "iban",
+                MetaKeys.ORGANISATION to organisation.slug,
+                MetaKeys.OPERATION to "invoice_generation",
             ),
         )
 

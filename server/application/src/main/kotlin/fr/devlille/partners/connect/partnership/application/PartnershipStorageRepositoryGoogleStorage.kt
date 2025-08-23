@@ -3,7 +3,7 @@ package fr.devlille.partners.connect.partnership.application
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
-import fr.devlille.partners.connect.internal.infrastructure.api.MetaKey
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import fr.devlille.partners.connect.internal.infrastructure.api.UnsupportedMediaTypeException
 import fr.devlille.partners.connect.internal.infrastructure.bucket.MimeType
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
@@ -75,10 +75,10 @@ class PartnershipStorageRepositoryGoogleStorage(
                 code = ErrorCode.UNSUPPORTED_MEDIA_TYPE,
                 message = "Unsupported image type: $mimeType",
                 meta = mapOf(
-                    MetaKey.MEDIA_TYPE to mimeType,
-                    MetaKey.SUPPORTED_TYPES to "image/png, image/jpeg, image/jpg, image/gif, image/svg+xml, image/webp",
-                    MetaKey.EVENT to event.slug,
-                    MetaKey.PARTNERSHIP_ID to partnershipId.toString(),
+                    MetaKeys.MEDIA_TYPE to mimeType,
+                    MetaKeys.SUPPORTED_TYPES to "image/png, image/jpeg, image/jpg, image/gif, image/svg+xml, image/webp",
+                    MetaKeys.EVENT to event.slug,
+                    MetaKeys.PARTNERSHIP_ID to partnershipId.toString(),
                 ),
             )
         }

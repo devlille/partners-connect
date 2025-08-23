@@ -7,7 +7,7 @@ import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsT
 import fr.devlille.partners.connect.integrations.infrastructure.db.findByEventIdAndUsage
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
-import fr.devlille.partners.connect.internal.infrastructure.api.MetaKey
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipTicketEntity
@@ -67,10 +67,10 @@ class TicketRepositoryExposed(
                 code = ErrorCode.BILLING_PROCESSING_ERROR,
                 message = "Invoice status ${billing.status} is not PAID",
                 meta = mapOf(
-                    "invoice_status" to billing.status.name,
-                    "required_status" to "PAID",
-                    MetaKey.EVENT to eventSlug,
-                    MetaKey.PARTNERSHIP_ID to partnershipId.toString(),
+                    MetaKeys.INVOICE_STATUS to billing.status.name,
+                    MetaKeys.REQUIRED_STATUS to "PAID",
+                    MetaKeys.EVENT to eventSlug,
+                    MetaKeys.PARTNERSHIP_ID to partnershipId.toString(),
                 ),
             )
         }
@@ -86,9 +86,9 @@ Not enough tickets in the validated pack: ${validatedPack.nbTickets} available, 
                 code = ErrorCode.TICKET_GENERATION_ERROR,
                 message = message,
                 meta = mapOf(
-                    "availableTickets" to validatedPack.nbTickets.toString(),
-                    "requestedTickets" to tickets.size.toString(),
-                    "partnershipId" to partnership.id.toString(),
+                    MetaKeys.AVAILABLE_TICKETS to validatedPack.nbTickets.toString(),
+                    MetaKeys.REQUESTED_TICKETS to tickets.size.toString(),
+                    MetaKeys.PARTNERSHIP_ID to partnership.id.toString(),
                 ),
             )
         }
