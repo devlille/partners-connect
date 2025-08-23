@@ -80,7 +80,7 @@ class EventWebhookRoutesTest {
             moduleMocked()
             val admin = insertMockedAdminUser()
             val org = insertMockedOrganisationEntity(id = orgId, name = orgSlug, representativeUser = admin)
-            val event = insertMockedEventWithOrga(id = eventId, slug = eventSlug, organisation = org)
+            insertMockedEventWithOrga(id = eventId, slug = eventSlug, organisation = org)
             insertMockedCompany(id = companyId)
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
             insertMockedOrgaPermission(orgId = orgId, user = admin)
