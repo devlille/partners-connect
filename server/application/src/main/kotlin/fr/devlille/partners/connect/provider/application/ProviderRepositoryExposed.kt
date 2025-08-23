@@ -9,8 +9,10 @@ import fr.devlille.partners.connect.provider.infrastructure.db.EventProviderEnti
 import fr.devlille.partners.connect.provider.infrastructure.db.EventProvidersTable
 import fr.devlille.partners.connect.provider.infrastructure.db.ProviderEntity
 import fr.devlille.partners.connect.provider.infrastructure.db.ProvidersTable
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.lowerCase
@@ -71,7 +73,11 @@ class ProviderRepositoryExposed : ProviderRepository {
         }
 
         val eventEntity = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.EVENT_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+                meta = mapOf(MetaKeys.EVENT to eventSlug)
+            )
 
         // Validate that all provider IDs exist and get provider entities
         val providerEntities = ProviderEntity.find {
@@ -109,7 +115,11 @@ class ProviderRepositoryExposed : ProviderRepository {
         }
 
         val eventEntity = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.EVENT_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+                meta = mapOf(MetaKeys.EVENT to eventSlug)
+            )
 
         // Validate that all provider IDs exist
         val providerEntities = ProviderEntity.find {

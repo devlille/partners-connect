@@ -5,10 +5,10 @@ import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnsupportedMediaTypeException
 import fr.devlille.partners.connect.internal.infrastructure.bucket.MimeType
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
-import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class EventStorageRepositoryGoogleStorage(
@@ -20,7 +20,11 @@ class EventStorageRepositoryGoogleStorage(
         mimeType: String,
     ): String = transaction {
         val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.EVENT_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+                meta = mapOf(MetaKeys.EVENT to eventSlug)
+            )
         val eventId = event.id.value
 
         // Determine MimeType enum from MIME type string

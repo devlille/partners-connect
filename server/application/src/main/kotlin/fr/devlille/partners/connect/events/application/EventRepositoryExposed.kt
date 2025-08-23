@@ -72,7 +72,11 @@ class EventRepositoryExposed(
 
     override fun getBySlug(eventSlug: String): EventWithOrganisation = transaction {
         val eventEntity = entity.eventFindBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.EVENT_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+                meta = mapOf(MetaKeys.EVENT to eventSlug)
+            )
 
         // Fetch external links directly in the same transaction
         val externalLinks = EventExternalLinkEntity.find {
@@ -124,7 +128,11 @@ class EventRepositoryExposed(
 
     override fun createEvent(orgSlug: String, event: Event): String = transaction {
         val organisation = OrganisationEntity.orgFindBySlug(orgSlug)
-            ?: throw NotFoundException("Organisation with slug $orgSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ORGANISATION_NOT_FOUND,
+                message = "Organisation with slug $orgSlug not found",
+                meta = mapOf(MetaKeys.ORGANISATION to orgSlug)
+            )
 
         val slug = event.name.slugify()
 
@@ -145,7 +153,11 @@ class EventRepositoryExposed(
 
     override fun updateEvent(eventSlug: String, orgSlug: String, event: Event): String = transaction {
         val eventEntity = entity.eventFindBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.EVENT_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+                meta = mapOf(MetaKeys.EVENT to eventSlug)
+            )
 
         eventEntity.name = event.name
         eventEntity.startTime = event.startTime
@@ -160,7 +172,11 @@ class EventRepositoryExposed(
 
     override fun findByUserEmail(userEmail: String): List<EventSummary> = transaction {
         val user = UserEntity.singleUserByEmail(userEmail)
-            ?: throw NotFoundException("User with email $userEmail not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.USER_NOT_FOUND,
+                message = "User with email $userEmail not found",
+                meta = mapOf(MetaKeys.EMAIL to userEmail)
+            )
 
         // Find all organizations where the user has edit permissions
         val userPermissions = OrganisationPermissionEntity
@@ -205,7 +221,11 @@ class EventRepositoryExposed(
 
     override fun updateBoothPlanImageUrl(eventSlug: String, imageUrl: String): Unit = transaction {
         val eventEntity = entity.eventFindBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.EVENT_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+                meta = mapOf(MetaKeys.EVENT to eventSlug)
+            )
 
         eventEntity.boothPlanImageUrl = imageUrl
     }
@@ -229,7 +249,11 @@ class EventRepositoryExposed(
         }
 
         val eventEntity = entity.eventFindBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.EVENT_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+                meta = mapOf(MetaKeys.EVENT to eventSlug)
+            )
 
         val externalLinkEntity = EventExternalLinkEntity.new {
             this.event = eventEntity
@@ -242,7 +266,11 @@ class EventRepositoryExposed(
 
     override fun deleteExternalLink(externalLinkId: UUID): Unit = transaction {
         val linkEntity = EventExternalLinkEntity.findById(externalLinkId)
-            ?: throw NotFoundException("External link with id $externalLinkId not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.NOT_FOUND,
+                message = "External link with id $externalLinkId not found",
+                meta = mapOf(MetaKeys.ID to externalLinkId.toString())
+            )
 
         linkEntity.delete()
     }

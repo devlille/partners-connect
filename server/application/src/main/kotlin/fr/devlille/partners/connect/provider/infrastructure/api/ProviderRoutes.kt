@@ -46,7 +46,7 @@ fun Route.providerRoutes() {
                     message = "You must be an organizer of at least one event to create providers",
                     meta = mapOf(
                         MetaKeys.EMAIL to userInfo.email,
-                        MetaKeys.REQUIRED_ROLE to "event_organizer",
+                        MetaKeys.REQUIRED_ROLE to "organizer",
                     ),
                 )
             }
