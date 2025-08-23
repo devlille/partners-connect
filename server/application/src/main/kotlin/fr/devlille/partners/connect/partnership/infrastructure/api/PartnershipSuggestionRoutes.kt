@@ -11,6 +11,8 @@ import fr.devlille.partners.connect.notifications.domain.NotificationVariables
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipSuggestionRepository
 import fr.devlille.partners.connect.partnership.domain.SuggestPartnership
+import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
+import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -25,6 +27,7 @@ fun Route.partnershipSuggestionRoutes() {
     val partnershipRepository by inject<PartnershipRepository>()
     val suggestionRepository by inject<PartnershipSuggestionRepository>()
     val notificationRepository by inject<NotificationRepository>()
+    val webhookRepository by inject<WebhookRepository>()
 
     route("/events/{eventSlug}/partnership/{partnershipId}") {
         post("/suggestion-approve") {
@@ -48,6 +51,10 @@ fun Route.partnershipSuggestionRoutes() {
                 partnership,
             )
             notificationRepository.sendMessage(eventSlug, variables)
+
+            // Send webhook notification for suggestion approval
+            webhookRepository.sendWebhooks(eventSlug, partnershipId, WebhookEventType.UPDATED)
+
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
         }
 
@@ -72,6 +79,10 @@ fun Route.partnershipSuggestionRoutes() {
                 partnership,
             )
             notificationRepository.sendMessage(eventSlug, variables)
+
+            // Send webhook notification for suggestion decline
+            webhookRepository.sendWebhooks(eventSlug, partnershipId, WebhookEventType.UPDATED)
+
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
         }
     }
@@ -108,6 +119,10 @@ fun Route.partnershipSuggestionRoutes() {
                 pack,
             )
             notificationRepository.sendMessage(eventSlug, variables)
+
+            // Send webhook notification for new suggestion
+            webhookRepository.sendWebhooks(eventSlug, partnershipId, WebhookEventType.UPDATED)
+
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
         }
     }

@@ -18,6 +18,8 @@ import fr.devlille.partners.connect.provider.infrastructure.bindings.providerMod
 import fr.devlille.partners.connect.sponsoring.infrastructure.bindings.sponsoringModule
 import fr.devlille.partners.connect.tickets.infrastructure.bindings.ticketingModule
 import fr.devlille.partners.connect.users.infrastructure.bindings.userModule
+import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
+import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.server.application.Application
 import io.mockk.mockk
@@ -37,6 +39,15 @@ fun Application.moduleMocked(
             listOf(
                 FakeBillingGateway(),
             )
+        }
+    },
+    mockWebhook: Module = module {
+        single<WebhookRepository> {
+            object : WebhookRepository {
+                override suspend fun sendWebhooks(eventSlug: String, partnershipId: UUID, eventType: WebhookEventType) {
+                    // Mock implementation - do nothing
+                }
+            }
         }
     },
 ) {
@@ -62,6 +73,7 @@ fun Application.moduleMocked(
                 mockNetwork,
                 mockStorage,
                 mockBillingIntegration,
+                mockWebhook,
             ),
         ),
     )

@@ -4,4 +4,5 @@ enum class IntegrationUsage {
     NOTIFICATION,
     BILLING,
     TICKETING,
+    WEBHOOK,
 }

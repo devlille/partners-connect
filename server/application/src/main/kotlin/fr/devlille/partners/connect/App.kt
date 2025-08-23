@@ -47,6 +47,7 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.bindings.sponsorin
 import fr.devlille.partners.connect.tickets.infrastructure.bindings.ticketingModule
 import fr.devlille.partners.connect.users.infrastructure.api.userRoutes
 import fr.devlille.partners.connect.users.infrastructure.bindings.userModule
+import fr.devlille.partners.connect.webhooks.infrastructure.bindings.webhookModule
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -105,6 +106,7 @@ data class ApplicationConfig(
         ticketingModule,
         integrationModule,
         providerModule,
+        webhookModule,
     ),
 )
 

@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.internal.infrastructure.migrations
 
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddBoothManagementFieldsMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddEventExternalLinksMigration
+import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddEventWebhooksMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddIntegrationCreatedAtMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPartnershipCommunicationFieldsMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddProviderManagementMigration
@@ -25,6 +26,7 @@ object MigrationRegistry {
         AddProviderManagementMigration,
         AddEventExternalLinksMigration,
         AddIntegrationCreatedAtMigration,
+        AddEventWebhooksMigration,
     )
 
     /**

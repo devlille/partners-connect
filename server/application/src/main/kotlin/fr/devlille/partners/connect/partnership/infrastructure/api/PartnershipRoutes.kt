@@ -12,6 +12,8 @@ import fr.devlille.partners.connect.notifications.domain.NotificationVariables
 import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
+import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
+import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -27,6 +29,7 @@ fun Route.partnershipRoutes() {
     val companyRepository by inject<CompanyRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
     val notificationRepository by inject<NotificationRepository>()
+    val webhookRepository by inject<WebhookRepository>()
 
     route("/events/{eventSlug}/partnership") {
         post {
@@ -52,6 +55,10 @@ fun Route.partnershipRoutes() {
                 pack,
             )
             notificationRepository.sendMessage(eventSlug, variables)
+
+            // Send webhook notification for partnership creation
+            webhookRepository.sendWebhooks(eventSlug, id, WebhookEventType.CREATED)
+
             call.respond(HttpStatusCode.Created, mapOf("id" to id.toString()))
         }
     }
@@ -114,6 +121,10 @@ fun Route.partnershipRoutes() {
                     pack,
                 )
                 notificationRepository.sendMessage(eventSlug, variables)
+
+                // Send webhook notification for partnership validation
+                webhookRepository.sendWebhooks(eventSlug, partnershipId, WebhookEventType.UPDATED)
+
                 call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
             }
         }
@@ -142,6 +153,10 @@ fun Route.partnershipRoutes() {
                     partnership,
                 )
                 notificationRepository.sendMessage(eventSlug, variables)
+
+                // Send webhook notification for partnership decline
+                webhookRepository.sendWebhooks(eventSlug, partnershipId, WebhookEventType.UPDATED)
+
                 call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
             }
         }
