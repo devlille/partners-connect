@@ -13,6 +13,7 @@ import fr.devlille.partners.connect.events.infrastructure.api.eventRoutes
 import fr.devlille.partners.connect.events.infrastructure.bindings.eventModule
 import fr.devlille.partners.connect.integrations.infrastructure.api.integrationRoutes
 import fr.devlille.partners.connect.integrations.infrastructure.bindings.integrationModule
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
 import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorResponse
@@ -55,7 +56,6 @@ import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.openapi.openAPI
@@ -211,12 +211,8 @@ private fun Application.configureContentNegotiation() {
 
 private fun Application.configureStatusPage() {
     install(StatusPages) {
-        exception<BadRequestException> { call, _ ->
-            call.respondWithStructuredError(
-                ErrorCode.BAD_REQUEST,
-                HttpStatusCode.BadRequest,
-                emptyMap(),
-            )
+        exception<BadRequestException> { call, cause ->
+            call.respondWithStructuredError(cause.code, cause.status, cause.meta.toStringMap())
         }
         exception<UnauthorizedException> { call, cause ->
             call.respondWithStructuredError(cause.code, cause.status, cause.meta.toStringMap())

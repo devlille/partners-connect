@@ -1,10 +1,11 @@
 package fr.devlille.partners.connect.events.infrastructure.api
 
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.provider.domain.ProviderRepository
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -21,7 +22,10 @@ fun Route.eventProviderRoutes() {
         install(AuthorizedOrganisationPlugin)
 
         post {
-            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Missing event slug",
+            )
             val providerIdStrings = call.receive<List<String>>()
 
             // Validate and convert provider IDs
@@ -32,7 +36,10 @@ fun Route.eventProviderRoutes() {
         }
 
         delete {
-            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Missing event slug",
+            )
             val providerIdStrings = call.receive<List<String>>()
 
             // Validate and convert provider IDs

@@ -4,6 +4,8 @@ import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.infrastructure.db.BilletWebConfig
 import fr.devlille.partners.connect.integrations.infrastructure.db.BilletWebIntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.get
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipTicketEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndPartnership
@@ -22,7 +24,6 @@ import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpHeaders
-import io.ktor.server.plugins.NotFoundException
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -41,7 +42,10 @@ class BilletWebTicketGateway(
     ): TicketOrder {
         val config = transaction { BilletWebIntegrationsTable[integrationId] }
         val billing = transaction { BillingEntity.singleByEventAndPartnership(eventId, partnershipId) }
-            ?: throw NotFoundException("Billing entity not found for event $eventId and partnership $partnershipId")
+            ?: throw NotFoundException(
+                code = ErrorCode.ENTITY_NOT_FOUND,
+                message = "Billing entity not found for event $eventId and partnership $partnershipId",
+            )
         val order = createOrder(billing.toOrderRequest(tickets, config), config)
         return order.toDomain(data = tickets)
     }
@@ -49,7 +53,10 @@ class BilletWebTicketGateway(
     override suspend fun updateTicket(integrationId: UUID, ticketId: String, data: TicketData): Ticket {
         val config = transaction { BilletWebIntegrationsTable[integrationId] }
         val ticket = transaction { PartnershipTicketEntity.findById(ticketId) }
-            ?: throw NotFoundException("Ticket with id $ticketId not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ENTITY_NOT_FOUND,
+                message = "Ticket with id $ticketId not found",
+            )
         updateProduct(ticket.toCreateOrderProduct(config), config)
         return ticket.toDomain()
     }

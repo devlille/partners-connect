@@ -2,14 +2,14 @@ package fr.devlille.partners.connect.partnership.application
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnsupportedMediaTypeException
 import fr.devlille.partners.connect.internal.infrastructure.bucket.MimeType
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
 import fr.devlille.partners.connect.partnership.domain.PartnershipStorageRepository
-import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
@@ -22,7 +22,10 @@ class PartnershipStorageRepositoryGoogleStorage(
         content: ByteArray,
     ): String = transaction {
         val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ENTITY_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+            )
         val eventId = event.id.value
         val uploaded = storage.upload(
             filename = "events/$eventId/partnerships/$partnershipId/agreement.pdf",
@@ -38,7 +41,10 @@ class PartnershipStorageRepositoryGoogleStorage(
         content: ByteArray,
     ): String = transaction {
         val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ENTITY_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+            )
         val eventId = event.id.value
         val uploaded = storage.upload(
             filename = "events/$eventId/partnerships/$partnershipId/signed-agreement.pdf",
@@ -55,12 +61,18 @@ class PartnershipStorageRepositoryGoogleStorage(
         mimeType: String,
     ): String = transaction {
         val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ENTITY_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+            )
         val eventId = event.id.value
 
         // Check for empty content
         if (content.isEmpty()) {
-            throw BadRequestException("Empty file content")
+            throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Empty file content",
+            )
         }
 
         // Convert mimeType string to MimeType enum and validate

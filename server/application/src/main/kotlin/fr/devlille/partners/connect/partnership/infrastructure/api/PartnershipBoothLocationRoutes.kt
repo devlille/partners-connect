@@ -1,10 +1,11 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -33,15 +34,24 @@ fun Route.partnershipBoothLocationRoutes() {
         install(AuthorizedOrganisationPlugin)
 
         put {
-            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Missing event slug",
+            )
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
-                ?: throw BadRequestException("Missing partnership id")
+                ?: throw BadRequestException(
+                    code = ErrorCode.BAD_REQUEST,
+                    message = "Missing partnership id",
+                )
 
             val request = call.receive<BoothLocationRequest>()
             val location = request.location.trim()
 
             if (location.isBlank()) {
-                throw BadRequestException("Location cannot be empty")
+                throw BadRequestException(
+                    code = ErrorCode.BAD_REQUEST,
+                    message = "Location cannot be empty",
+                )
             }
 
             partnershipRepository.updateBoothLocation(eventSlug, partnershipId, location)

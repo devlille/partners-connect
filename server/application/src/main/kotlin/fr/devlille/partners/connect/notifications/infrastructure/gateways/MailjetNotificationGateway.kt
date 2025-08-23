@@ -3,6 +3,8 @@ package fr.devlille.partners.connect.notifications.infrastructure.gateways
 import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.infrastructure.db.MailjetIntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.get
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.internal.infrastructure.resources.readResourceFile
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationGateway
@@ -16,7 +18,6 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpHeaders
 import io.ktor.http.isSuccess
-import io.ktor.server.plugins.NotFoundException
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -48,7 +49,10 @@ class MailjetNotificationGateway(
         val partnership = PartnershipEntity
             .find { PartnershipsTable.companyId eq variables.company.id.toUUID() }
             .singleOrNull()
-            ?: throw NotFoundException("No partnership found for company ${variables.company.id}")
+            ?: throw NotFoundException(
+                code = ErrorCode.ENTITY_NOT_FOUND,
+                message = "No partnership found for company ${variables.company.id}",
+            )
         val emails = PartnershipEmailEntity
             .find { PartnershipEmailsTable.partnershipId eq partnership.id }
             .toList()

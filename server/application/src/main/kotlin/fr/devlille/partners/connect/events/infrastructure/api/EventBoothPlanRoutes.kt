@@ -3,9 +3,10 @@ package fr.devlille.partners.connect.events.infrastructure.api
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventStorageRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -23,13 +24,22 @@ fun Route.eventBoothPlanRoutes() {
         install(AuthorizedOrganisationPlugin)
 
         post {
-            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Missing event slug",
+            )
 
             val multipart = call.receiveMultipart()
-            val part = multipart.readPart() ?: throw BadRequestException("Missing file part")
+            val part = multipart.readPart() ?: throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Missing file part",
+            )
             val bytes = part.asByteArray()
             val contentType = part.contentType?.toString()?.lowercase()
-                ?: throw BadRequestException("Content type is required")
+                ?: throw BadRequestException(
+                    code = ErrorCode.BAD_REQUEST,
+                    message = "Content type is required",
+                )
 
             val imageUrl = storageRepository.uploadBoothPlanImage(eventSlug, bytes, contentType)
             eventRepository.updateBoothPlanImageUrl(eventSlug, imageUrl)

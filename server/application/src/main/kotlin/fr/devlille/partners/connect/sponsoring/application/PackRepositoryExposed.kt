@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.sponsoring.application
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
@@ -14,7 +15,6 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackE
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionsByPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listPacksByEvent
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.singlePackById
-import io.ktor.server.plugins.BadRequestException
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
@@ -102,7 +102,10 @@ class PackRepositoryExposed : PackRepository {
         val pack = SponsoringPackEntity.singlePackById(event.id.value, packId)
         val hasOptions = PackOptionsTable.listOptionsByPack(pack.id.value).any()
         if (hasOptions) {
-            throw BadRequestException("Pack has attached options and cannot be deleted")
+            throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Pack has attached options and cannot be deleted",
+            )
         }
         pack.delete()
     }

@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.organisations.infrastructure.api
 
 import fr.devlille.partners.connect.auth.domain.AuthRepository
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
@@ -9,7 +10,6 @@ import fr.devlille.partners.connect.organisations.domain.Organisation
 import fr.devlille.partners.connect.organisations.domain.OrganisationRepository
 import fr.devlille.partners.connect.users.domain.UserRepository
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -38,12 +38,18 @@ fun Route.organisationRoutes() {
         }
 
         get("/{slug}") {
-            val slug = call.parameters["slug"] ?: throw BadRequestException("Missing slug")
+            val slug = call.parameters["slug"] ?: throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Missing slug",
+            )
             call.respond(HttpStatusCode.OK, repository.getById(slug))
         }
 
         put("/{orgSlug}") {
-            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Missing org slug")
+            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Missing org slug",
+            )
             val input = call.receive<Organisation>()
 
             val token = call.token

@@ -2,6 +2,9 @@ package fr.devlille.partners.connect.partnership.application
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.domain.PartnershipSuggestionRepository
 import fr.devlille.partners.connect.partnership.domain.SuggestPartnership
@@ -15,8 +18,6 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptio
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionalOptionsByPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listTranslationsByOptionAndLanguage
-import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -37,10 +38,16 @@ class PartnershipSuggestionRepositoryExposed(
         input: SuggestPartnership,
     ): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ENTITY_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+            )
         val partnership = findPartnership(event.id.value, partnershipId)
         val suggestedPack = packEntity.findById(input.packId.toUUID())
-            ?: throw NotFoundException("Pack ${input.packId} not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ENTITY_NOT_FOUND,
+                message = "Pack ${input.packId} not found",
+            )
         val optionalOptionIds = packOptionTable
             .listOptionalOptionsByPack(suggestedPack.id.value)
             .map { it[PackOptionsTable.option].value }
@@ -48,19 +55,28 @@ class PartnershipSuggestionRepositoryExposed(
         val optionsUUID = input.optionIds.map { it.toUUID() }
         val unknownOptions = optionsUUID.filterNot { it in optionalOptionIds }
         if (unknownOptions.isNotEmpty()) {
-            throw BadRequestException("Some options are not optional in the suggested pack: $unknownOptions")
+            throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Some options are not optional in the suggested pack: $unknownOptions",
+            )
         }
 
         // Remove previous suggested options
         partnershipOptionEntity.deleteAllByPartnershipId(partnership.id.value, suggestedPack.id.value)
 
         optionsUUID.forEach {
-            val option = SponsoringOptionEntity.findById(it) ?: throw NotFoundException("Option $it not found")
+            val option = SponsoringOptionEntity.findById(it) ?: throw NotFoundException(
+                code = ErrorCode.ENTITY_NOT_FOUND,
+                message = "Option $it not found",
+            )
             val noTranslation = translationEntity
                 .listTranslationsByOptionAndLanguage(it, partnership.language)
                 .isEmpty()
             if (noTranslation) {
-                throw BadRequestException("Option $it does not have a translation for language ${partnership.language}")
+                throw BadRequestException(
+                    code = ErrorCode.BAD_REQUEST,
+                    message = "Option $it does not have a translation for language ${partnership.language}",
+                )
             }
             PartnershipOptionEntity.new {
                 this.partnership = partnership
@@ -79,7 +95,10 @@ class PartnershipSuggestionRepositoryExposed(
 
     override fun approve(eventSlug: String, partnershipId: UUID): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ENTITY_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+            )
         val partnership = findPartnership(event.id.value, partnershipId)
         partnership.suggestionApprovedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
         partnership.id.value
@@ -87,7 +106,10 @@ class PartnershipSuggestionRepositoryExposed(
 
     override fun decline(eventSlug: String, partnershipId: UUID): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ENTITY_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+            )
         val partnership = findPartnership(event.id.value, partnershipId)
         partnership.suggestionDeclinedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
         partnership.id.value
@@ -96,5 +118,8 @@ class PartnershipSuggestionRepositoryExposed(
     private fun findPartnership(eventId: UUID, partnershipId: UUID): PartnershipEntity =
         partnershipEntity
             .singleByEventAndPartnership(eventId, partnershipId)
-            ?: throw NotFoundException("Partnership not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ENTITY_NOT_FOUND,
+                message = "Partnership not found",
+            )
 }

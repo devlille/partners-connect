@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.users.infrastructure.api
 
 import fr.devlille.partners.connect.auth.domain.AuthRepository
 import fr.devlille.partners.connect.events.domain.EventRepository
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
@@ -10,7 +11,6 @@ import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.organisations.domain.OrganisationRepository
 import fr.devlille.partners.connect.users.domain.UserRepository
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -48,11 +48,19 @@ fun Route.userRoutes() {
 
     route("/orgs/{orgSlug}/users") {
         get {
-            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Orga slug is required")
+            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException(
+                code = ErrorCode.MISSING_REQUIRED_PARAMETER,
+                message = "Orga slug is required",
+                meta = mapOf(MetaKeys.FIELD to "orgSlug"),
+            )
             call.respond(HttpStatusCode.OK, userRepository.findUsersByOrgSlug(orgSlug))
         }
         post("/grant") {
-            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Orga slug is required")
+            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException(
+                code = ErrorCode.MISSING_REQUIRED_PARAMETER,
+                message = "Orga slug is required",
+                meta = mapOf(MetaKeys.FIELD to "orgSlug"),
+            )
             val request = call.receive<GrantPermissionRequest>()
             val token = call.token
             val userInfo = authRepository.getUserInfo(token)

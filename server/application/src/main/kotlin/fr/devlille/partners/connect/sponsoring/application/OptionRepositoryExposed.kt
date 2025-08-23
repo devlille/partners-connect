@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.sponsoring.application
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
@@ -19,7 +20,6 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackE
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.allByEvent
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionsAttachedByEventAndOption
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.singlePackById
-import io.ktor.server.plugins.BadRequestException
 import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
@@ -71,17 +71,19 @@ class OptionRepositoryExposed(
                 message = "Event with slug $eventSlug not found",
                 meta = mapOf(MetaKeys.EVENT to eventSlug),
             )
-        val option = optionEntity.findById(optionId) 
+        val option = optionEntity.findById(optionId)
             ?: throw NotFoundException(
                 code = ErrorCode.INTEGRATION_NOT_FOUND,
                 message = "Option not found",
                 meta = mapOf(MetaKeys.ID to optionId.toString()),
             )
-        if (option.event.id.value != event.id.value) throw NotFoundException(
-            code = ErrorCode.INTEGRATION_NOT_FOUND,
-            message = "Option not found",
-            meta = mapOf(MetaKeys.ID to optionId.toString()),
-        )
+        if (option.event.id.value != event.id.value) {
+            throw NotFoundException(
+                code = ErrorCode.INTEGRATION_NOT_FOUND,
+                message = "Option not found",
+                meta = mapOf(MetaKeys.ID to optionId.toString()),
+            )
+        }
 
         option.price = input.price
 
@@ -109,7 +111,12 @@ class OptionRepositoryExposed(
         val isUsed = PackOptionsTable
             .listOptionsAttachedByEventAndOption(event.id.value, optionId)
             .empty().not()
-        if (isUsed) throw BadRequestException("Option is used in a pack and cannot be deleted")
+        if (isUsed) {
+            throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Option is used in a pack and cannot be deleted",
+            )
+        }
 
         // Delete translations first (FK constraint)
         OptionTranslationsTable.deleteWhere { OptionTranslationsTable.option eq optionId }
@@ -119,13 +126,16 @@ class OptionRepositoryExposed(
             (SponsoringOptionsTable.id eq optionId) and (SponsoringOptionsTable.eventId eq event.id.value)
         }
 
-        if (deleted == 0) throw NotFoundException(
-            code = ErrorCode.INTEGRATION_NOT_FOUND,
-            message = "Option not found",
-            meta = mapOf(),
-        )
+        if (deleted == 0) {
+            throw NotFoundException(
+                code = ErrorCode.INTEGRATION_NOT_FOUND,
+                message = "Option not found",
+                meta = mapOf(),
+            )
+        }
     }
 
+    @Suppress("LongMethod")
     override fun attachOptionsToPack(eventSlug: String, packId: UUID, options: AttachOptionsToPack) = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException(
@@ -135,7 +145,10 @@ class OptionRepositoryExposed(
             )
         val intersect = options.required.intersect(options.optional)
         if (intersect.isNotEmpty()) {
-            throw BadRequestException("options ${intersect.joinToString(",")} cannot be both required and optional")
+            throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "options ${intersect.joinToString(",")} cannot be both required and optional",
+            )
         }
 
         val pack = SponsoringPackEntity.singlePackById(event.id.value, packId)
@@ -159,7 +172,10 @@ class OptionRepositoryExposed(
             .distinct()
 
         if (existingOptions.size != allOptionIds.size) {
-            throw BadRequestException("Some options do not belong to the event")
+            throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Some options do not belong to the event",
+            )
         }
 
         val alreadyAttached = PackOptionsTable
@@ -168,7 +184,10 @@ class OptionRepositoryExposed(
             .map { it[PackOptionsTable.option].value }
 
         if (alreadyAttached.isNotEmpty()) {
-            throw BadRequestException("Option already attached to pack: ${alreadyAttached.joinToString()}")
+            throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Option already attached to pack: ${alreadyAttached.joinToString()}",
+            )
         }
 
         requiredOptions.forEach { option ->

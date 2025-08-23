@@ -12,6 +12,7 @@ import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinkEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinksTable
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
 import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
@@ -27,7 +28,6 @@ import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissi
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionsTable
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
-import io.ktor.server.plugins.BadRequestException
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -236,16 +236,25 @@ class EventRepositoryExposed(
     ): UUID = transaction {
         // Basic validation
         if (request.name.isBlank()) {
-            throw BadRequestException("External link name cannot be empty")
+            throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "External link name cannot be empty",
+            )
         }
         if (request.url.isBlank()) {
-            throw BadRequestException("External link URL cannot be empty")
+            throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "External link URL cannot be empty",
+            )
         }
 
         // Basic URL validation
         val urlPattern = Regex("^https?://.*")
         if (!urlPattern.matches(request.url)) {
-            throw BadRequestException("Invalid URL format - must start with http:// or https://")
+            throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Invalid URL format - must start with http:// or https://",
+            )
         }
 
         val eventEntity = entity.eventFindBySlug(eventSlug)

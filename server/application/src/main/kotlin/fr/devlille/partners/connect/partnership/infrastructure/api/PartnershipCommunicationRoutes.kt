@@ -1,13 +1,14 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipStorageRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.application.install
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.contentType
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -20,7 +21,7 @@ import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
 import kotlin.getValue
 
-@Suppress("ThrowsCount")
+@Suppress("ThrowsCount", "LongMethod")
 fun Route.partnershipCommunicationRoutes() {
     val partnershipRepository by inject<PartnershipRepository>()
     val storageRepository by inject<PartnershipStorageRepository>()
@@ -30,9 +31,15 @@ fun Route.partnershipCommunicationRoutes() {
 
         route("/publication") {
             put {
-                val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+                val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
+                    code = ErrorCode.BAD_REQUEST,
+                    message = "Missing event slug",
+                )
                 val partnershipId = call.parameters["partnershipId"]?.toUUID()
-                    ?: throw BadRequestException("Missing partnership id")
+                    ?: throw BadRequestException(
+                        code = ErrorCode.BAD_REQUEST,
+                        message = "Missing partnership id",
+                    )
 
                 val requestBody = call.receive<PublicationDateRequest>()
                 val publicationDate = requestBody.publicationDate
@@ -55,9 +62,15 @@ fun Route.partnershipCommunicationRoutes() {
 
         route("/support") {
             put {
-                val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+                val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
+                    code = ErrorCode.BAD_REQUEST,
+                    message = "Missing event slug",
+                )
                 val partnershipId = call.parameters["partnershipId"]?.toUUID()
-                    ?: throw BadRequestException("Missing partnership id")
+                    ?: throw BadRequestException(
+                        code = ErrorCode.BAD_REQUEST,
+                        message = "Missing partnership id",
+                    )
 
                 val contentType = call.request.contentType()
                 val bytes = call.receive<ByteArray>()

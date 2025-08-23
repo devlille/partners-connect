@@ -46,4 +46,5 @@ object MetaKeys {
     val AVAILABLE_TICKETS = MetaKey("available_tickets")
     val REQUESTED_TICKETS = MetaKey("requested_tickets")
     val EXPECTED_FORMAT = MetaKey("expected_format")
+    val LANGUAGE = MetaKey("language")
 }

@@ -2,9 +2,11 @@ package fr.devlille.partners.connect.billing.infrastructure.gateways.models.mapp
 
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoInvoiceItem
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoMoneyAmount
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
+import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
-import io.ktor.server.plugins.NotFoundException
 
 @Suppress("SpreadOperator")
 internal fun invoiceItems(
@@ -20,7 +22,14 @@ internal fun invoiceItems(
     ),
     *options.map { option ->
         val translation = option.translations.firstOrNull { it.language == language }
-            ?: throw NotFoundException("Translation not found for option ${option.id} in language $language")
+            ?: throw NotFoundException(
+                code = ErrorCode.TRANSLATION_NOT_FOUND,
+                message = "Translation not found for option ${option.id} in language $language",
+                meta = mapOf(
+                    MetaKeys.ID to option.id.value.toString(),
+                    MetaKeys.LANGUAGE to language,
+                ),
+            )
         QontoInvoiceItem(
             title = translation.name,
             quantity = "1",

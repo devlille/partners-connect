@@ -2,6 +2,8 @@ package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
@@ -11,7 +13,6 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipStorageRepository
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -32,9 +33,15 @@ fun Route.partnershipAgreementRoutes() {
         install(AuthorizedOrganisationPlugin)
 
         post {
-            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Missing event slug",
+            )
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
-                ?: throw BadRequestException("Missing partnership id")
+                ?: throw BadRequestException(
+                    code = ErrorCode.BAD_REQUEST,
+                    message = "Missing partnership id",
+                )
             val pdfBinary = agreementRepository.generateAgreement(eventSlug, partnershipId)
             val agreementUrl = storageRepository.uploadAgreement(eventSlug, partnershipId, pdfBinary)
             call.respond(HttpStatusCode.OK, mapOf("url" to agreementUrl))
@@ -43,14 +50,26 @@ fun Route.partnershipAgreementRoutes() {
 
     route("/events/{eventSlug}/partnership/{partnershipId}/signed-agreement") {
         post {
-            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Missing event slug",
+            )
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
-                ?: throw BadRequestException("Missing partnership id")
+                ?: throw BadRequestException(
+                    code = ErrorCode.BAD_REQUEST,
+                    message = "Missing partnership id",
+                )
             val multipart = call.receiveMultipart()
-            val part = multipart.readPart() ?: throw BadRequestException("Missing file part")
+            val part = multipart.readPart() ?: throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Missing file part",
+            )
             val bytes = part.asByteArray()
             if (part.contentType != ContentType.Application.Pdf) {
-                throw BadRequestException("Invalid file type, expected application/pdf")
+                throw BadRequestException(
+                    code = ErrorCode.BAD_REQUEST,
+                    message = "Invalid file type, expected application/pdf",
+                )
             }
             val url = storageRepository.uploadSignedAgreement(eventSlug, partnershipId, bytes)
             agreementRepository.updateAgreementSignedUrl(eventSlug, partnershipId, url)

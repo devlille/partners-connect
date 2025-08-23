@@ -6,6 +6,7 @@ import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.api.MetaKeys
+import fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
 import fr.devlille.partners.connect.internal.infrastructure.pdf.renderMarkdownToPdf
 import fr.devlille.partners.connect.internal.infrastructure.resources.readResourceFile
 import fr.devlille.partners.connect.internal.infrastructure.templating.templating
@@ -18,7 +19,6 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventA
 import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
-import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
@@ -38,15 +38,24 @@ class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
     @OptIn(FormatStringsInDatetimeFormats::class)
     override fun generateAgreement(eventSlug: String, partnershipId: UUID): ByteArray = transaction {
         val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
-        val partnership = PartnershipEntity.findById(partnershipId) ?: throw NotFoundException("Partnership not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ENTITY_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+            )
+        val partnership = PartnershipEntity.findById(partnershipId) ?: throw NotFoundException(
+            code = ErrorCode.ENTITY_NOT_FOUND,
+            message = "Partnership not found",
+        )
 
         // Eager load relationships to avoid lazy loading outside transaction
         val organisation = event.organisation
         val representativeUser = organisation.representativeUser
         val company = partnership.company
         val pack = partnership.validatedPack()
-            ?: throw NotFoundException("Validated pack not found for partnership")
+            ?: throw NotFoundException(
+                code = ErrorCode.ENTITY_NOT_FOUND,
+                message = "Validated pack not found for partnership",
+            )
         val options = PartnershipOptionEntity.listByPartnershipAndPack(partnership.id.value, pack.id.value)
 
         // Preload option translations to avoid lazy loading
@@ -72,9 +81,15 @@ class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
 
     override fun updateAgreementUrl(eventSlug: String, partnershipId: UUID, agreementUrl: String): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ENTITY_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+            )
         val partnership = PartnershipEntity.singleByEventAndPartnership(event.id.value, partnershipId)
-            ?: throw NotFoundException("Partnership not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ENTITY_NOT_FOUND,
+                message = "Partnership not found",
+            )
         partnership.agreementUrl = agreementUrl
         partnership.id.value
     }
@@ -85,9 +100,15 @@ class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
         agreementSignedUrl: String,
     ): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ENTITY_NOT_FOUND,
+                message = "Event with slug $eventSlug not found",
+            )
         val partnership = PartnershipEntity.singleByEventAndPartnership(event.id.value, partnershipId)
-            ?: throw NotFoundException("Partnership not found")
+            ?: throw NotFoundException(
+                code = ErrorCode.ENTITY_NOT_FOUND,
+                message = "Partnership not found",
+            )
         partnership.agreementSignedUrl = agreementSignedUrl
         partnership.id.value
     }
@@ -128,7 +149,10 @@ internal fun OrganisationEntity.toAgreementOrganisation(formatter: DateTimeForma
         createdAt = this.createdAt!!.date.format(formatter),
         publishedAt = this.publishedAt!!.date.format(formatter),
         representative = Contact(
-            name = this.representativeUser!!.name ?: throw NotFoundException("Representative not found"),
+            name = this.representativeUser!!.name ?: throw NotFoundException(
+                code = ErrorCode.ENTITY_NOT_FOUND,
+                message = "Representative not found",
+            ),
             role = this.representativeRole!!,
         ),
     )
@@ -165,7 +189,10 @@ internal fun PartnershipEntity.toAgreementPartnership(
     // Use preloaded option translations to avoid lazy loading outside transaction
     val optionTranslations = optionData.map { (partnershipOption, translations) ->
         val translation = translations.firstOrNull { it.language == this.language }
-            ?: throw NotFoundException("Translation not found for option ${partnershipOption.id} in language $language")
+            ?: throw NotFoundException(
+                code = ErrorCode.ENTITY_NOT_FOUND,
+                message = "Translation not found for option ${partnershipOption.id} in language $language",
+            )
         Option(name = translation.name)
     }
     val amount = pack.basePrice + optionData.filter { it.first.option.price != null }.sumOf { it.first.option.price!! }

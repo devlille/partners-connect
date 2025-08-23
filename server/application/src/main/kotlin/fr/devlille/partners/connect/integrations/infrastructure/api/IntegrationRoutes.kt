@@ -4,9 +4,10 @@ import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.IntegrationRepository
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receiveText
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -17,7 +18,7 @@ import io.ktor.server.routing.route
 import kotlinx.serialization.json.Json
 import org.koin.ktor.ext.inject
 
-@Suppress("ThrowsCount")
+@Suppress("ThrowsCount", "LongMethod")
 fun Route.integrationRoutes() {
     val integrationRepository by inject<IntegrationRepository>()
     val deserializerRegistry by inject<IntegrationDeserializerRegistry>()
@@ -26,20 +27,45 @@ fun Route.integrationRoutes() {
         install(AuthorizedOrganisationPlugin)
 
         get {
-            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Missing orgSlug")
-            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing eventSlug")
+            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Missing orgSlug",
+            )
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Missing eventSlug",
+            )
             val integrations = integrationRepository.findByEvent(orgSlug, eventSlug)
             call.respond(HttpStatusCode.OK, integrations)
         }
 
         post("/{provider}/{usage}") {
-            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing eventSlug")
-            val usageParam = call.parameters["usage"] ?: throw BadRequestException("Missing usage")
-            val providerParam = call.parameters["provider"] ?: throw BadRequestException("Missing provider")
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Missing eventSlug",
+            )
+            val usageParam = call.parameters["usage"] ?: throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Missing usage",
+            )
+            val providerParam = call.parameters["provider"] ?: throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Missing provider",
+            )
             val provider = runCatching { IntegrationProvider.valueOf(providerParam.uppercase()) }
-                .getOrElse { throw BadRequestException("Invalid provider: $providerParam") }
+                .getOrElse {
+                    throw BadRequestException(
+                        code = ErrorCode.BAD_REQUEST,
+                        message = "Invalid provider: $providerParam",
+                    )
+                }
             val usage = runCatching { IntegrationUsage.valueOf(usageParam.uppercase()) }
-                .getOrElse { throw BadRequestException("Invalid usage: $usageParam") }
+                .getOrElse {
+                    throw BadRequestException(
+                        code = ErrorCode.BAD_REQUEST,
+                        message = "Invalid usage: $usageParam",
+                    )
+                }
             val serializer = deserializerRegistry.serializerFor(provider)
             val json = Json { ignoreUnknownKeys = true }
             val input = json.decodeFromString(serializer, call.receiveText())
@@ -48,10 +74,19 @@ fun Route.integrationRoutes() {
         }
 
         delete("/{integrationId}") {
-            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Missing orgSlug")
-            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing eventSlug")
+            val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Missing orgSlug",
+            )
+            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Missing eventSlug",
+            )
             val integrationId = call.parameters["integrationId"]?.toUUID()
-                ?: throw BadRequestException("Missing integrationId")
+                ?: throw BadRequestException(
+                    code = ErrorCode.BAD_REQUEST,
+                    message = "Missing integrationId",
+                )
             integrationRepository.deleteById(orgSlug, eventSlug, integrationId)
             call.respond(HttpStatusCode.NoContent)
         }

@@ -4,12 +4,13 @@ import fr.devlille.partners.connect.companies.domain.CompanyImageProcessingRepos
 import fr.devlille.partners.connect.companies.domain.CompanyMediaRepository
 import fr.devlille.partners.connect.companies.domain.CompanyRepository
 import fr.devlille.partners.connect.companies.domain.CreateCompany
+import fr.devlille.partners.connect.internal.infrastructure.api.BadRequestException
+import fr.devlille.partners.connect.internal.infrastructure.api.ErrorCode
 import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receive
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
@@ -40,14 +41,23 @@ fun Route.companyRoutes() {
         }
 
         post("/{companyId}/logo") {
-            val companyId = call.parameters["companyId"]?.toUUID() ?: throw BadRequestException("Missing company id")
+            val companyId = call.parameters["companyId"]?.toUUID() ?: throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Missing company id",
+            )
             val multipart = call.receiveMultipart()
-            val part = multipart.readPart() ?: throw BadRequestException("Missing file part")
+            val part = multipart.readPart() ?: throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Missing file part",
+            )
             val bytes = part.asByteArray()
             val mediaBinaries = when (part.contentType) {
                 ContentType.Image.SVG -> imageProcessingRepository.processSvg(bytes)
                 ContentType.Image.PNG, ContentType.Image.JPEG -> imageProcessingRepository.processImage(bytes)
-                else -> throw BadRequestException("Unsupported file type: ${part.contentType}")
+                else -> throw BadRequestException(
+                    code = ErrorCode.BAD_REQUEST,
+                    message = "Unsupported file type: ${part.contentType}",
+                )
             }
             val media = mediaRepository.upload(companyId.toString(), mediaBinaries)
             companyRepository.updateLogoUrls(companyId, media)
@@ -55,7 +65,10 @@ fun Route.companyRoutes() {
         }
 
         get("/{companyId}/partnership") {
-            val companyId = call.parameters["companyId"]?.toUUID() ?: throw BadRequestException("Missing company id")
+            val companyId = call.parameters["companyId"]?.toUUID() ?: throw BadRequestException(
+                code = ErrorCode.BAD_REQUEST,
+                message = "Missing company id",
+            )
             val items = partnershipRepository.listByCompany(companyId)
             call.respond(HttpStatusCode.OK, items)
         }
