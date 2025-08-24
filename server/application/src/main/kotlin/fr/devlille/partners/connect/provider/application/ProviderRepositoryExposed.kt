@@ -2,6 +2,9 @@ package fr.devlille.partners.connect.provider.application
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedResponse
+import fr.devlille.partners.connect.internal.infrastructure.api.paginated
+import fr.devlille.partners.connect.internal.infrastructure.api.toPaginatedResponse
 import fr.devlille.partners.connect.provider.domain.CreateProvider
 import fr.devlille.partners.connect.provider.domain.Provider
 import fr.devlille.partners.connect.provider.domain.ProviderRepository
@@ -18,7 +21,13 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
 class ProviderRepositoryExposed : ProviderRepository {
-    override fun list(query: String?, sort: String?, direction: String?): List<Provider> = transaction {
+    override fun list(
+        query: String?,
+        sort: String?,
+        direction: String?,
+        page: Int,
+        pageSize: Int,
+    ): PaginatedResponse<Provider> = transaction {
         var queryBuilder = ProviderEntity.all()
 
         // Apply search filter if query is provided
@@ -40,7 +49,9 @@ class ProviderRepositoryExposed : ProviderRepository {
             else -> queryBuilder.orderBy(ProvidersTable.createdAt to sortOrder) // default to createdAt
         }
 
-        sortedQuery.map { entity ->
+        val total = sortedQuery.count()
+        val paginated = sortedQuery.paginated(page, pageSize)
+        val items = paginated.map { entity ->
             Provider(
                 id = entity.id.value.toString(),
                 name = entity.name,
@@ -51,6 +62,7 @@ class ProviderRepositoryExposed : ProviderRepository {
                 createdAt = entity.createdAt,
             )
         }
+        items.toPaginatedResponse(total, page, pageSize)
     }
 
     override fun create(input: CreateProvider): UUID = transaction {

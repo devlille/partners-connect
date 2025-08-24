@@ -35,7 +35,12 @@ class ProviderRoutesTest {
         val response = client.get("/providers")
 
         assertEquals(HttpStatusCode.OK, response.status)
-        assertEquals("[]", response.bodyAsText())
+        val responseText = response.bodyAsText()
+        val json = Json.parseToJsonElement(responseText).jsonObject
+        assertEquals(0, json["items"]?.jsonArray?.size)
+        assertEquals(1, json["page"]?.toString()?.toInt())
+        assertEquals(20, json["page_size"]?.toString()?.toInt())
+        assertEquals(0, json["total"]?.toString()?.toInt())
     }
 
     @Test
@@ -43,7 +48,6 @@ class ProviderRoutesTest {
         application {
             moduleMocked()
             insertMockedProvider(name = "Provider 1", type = "Tech")
-
             insertMockedProvider(name = "Provider 2", type = "Catering")
         }
 
@@ -51,11 +55,14 @@ class ProviderRoutesTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
         val responseText = response.bodyAsText()
-        val providers = Json.parseToJsonElement(responseText).jsonArray
-
+        val json = Json.parseToJsonElement(responseText).jsonObject
+        val providers = json["items"]?.jsonArray ?: error("Missing items array")
         assertEquals(2, providers.size)
         assertTrue(responseText.contains("Provider 1"))
         assertTrue(responseText.contains("Provider 2"))
+        assertEquals(1, json["page"]?.toString()?.toInt())
+        assertEquals(20, json["page_size"]?.toString()?.toInt())
+        assertEquals(2, json["total"]?.toString()?.toInt())
     }
 
     @Test
