@@ -1,4 +1,4 @@
-package fr.devlille.partners.connect.events.domain
+package fr.devlille.partners.connect.internal.infrastructure.api
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

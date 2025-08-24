@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.events.domain
 
+import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedResponse
 import java.util.UUID
 
 interface EventRepository {
