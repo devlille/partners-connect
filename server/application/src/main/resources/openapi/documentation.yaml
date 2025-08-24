@@ -58,22 +58,37 @@ paths:
                 $ref: "#/components/schemas/UserInfo"
   /companies:
     get:
-      description: ""
+      description: "List companies with paging support"
       parameters:
         - name: "query"
           in: "query"
           required: false
           schema:
             type: "string"
+        - name: "page"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            minimum: 1
+            default: 1
+          description: "Page number (must be >= 1)"
+        - name: "page_size"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: "Number of items per page (must be between 1 and 100)"
       responses:
         "200":
           description: "OK"
           content:
             '*/*':
               schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Company"
+                $ref: "#/components/schemas/PaginatedCompany"
     post:
       description: ""
       requestBody:
@@ -105,7 +120,7 @@ paths:
               type: object
               properties:
                 file:
-                  type: string
+                  type: "string"
                   format: binary
                   description: "Logo file (SVG, PNG, or JPEG)"
         required: true
@@ -148,16 +163,32 @@ paths:
                   $ref: "#/components/schemas/PartnershipItem"
   /events:
     get:
-      description: ""
+      description: "List events with paging support"
+      parameters:
+        - name: "page"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            minimum: 1
+            default: 1
+          description: "Page number (must be >= 1)"
+        - name: "page_size"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: "Number of items per page (must be between 1 and 100)"
       responses:
         "200":
           description: "OK"
           content:
             '*/*':
               schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/EventSummary"
+                $ref: "#/components/schemas/PaginatedEventSummary"
   /events/{eventSlug}:
     get:
       description: "Get event details with organization information"
@@ -579,15 +610,30 @@ paths:
             enum: ["asc", "desc"]
             default: "asc"
           description: "Sort direction (default: asc)"
+        - name: "page"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            minimum: 1
+            default: 1
+          description: "Page number (must be >= 1)"
+        - name: "page_size"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: "Number of items per page (must be between 1 and 100)"
       responses:
         "200":
-          description: "OK - List of providers"
+          description: "OK - Paginated list of providers"
           content:
             application/json:
               schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Provider"
+                $ref: "#/components/schemas/PaginatedProvider"
     post:
       description: "Create a new provider (requires authentication and organizer status)"
       security:
@@ -704,13 +750,30 @@ paths:
                 $ref: "#/components/schemas/Organisation"
   /orgs/{orgSlug}/events:
     get:
-      description: "List events for an organization"
+      description: "List events for an organization (paginated)"
       parameters:
         - name: "orgSlug"
           in: "path"
           required: true
           schema:
             type: "string"
+        - name: "page"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            default: 1
+            minimum: 1
+          description: "Page number (default: 1)"
+        - name: "page_size"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: "Number of items per page (default: 20)"
       security:
         - bearerAuth: []
       responses:
@@ -731,9 +794,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/EventSummary"
+                $ref: "#/components/schemas/PaginatedEventSummary"
     post:
       description: "Create a new event for an organization"
       parameters:
@@ -825,7 +886,7 @@ paths:
               type: object
               properties:
                 file:
-                  type: string
+                  type: "string"
                   format: binary
                   description: "Booth plan image file (PNG, JPEG, GIF)"
         required: true
@@ -2939,3 +3000,66 @@ components:
         - "done"
         - "planned"
         - "unplanned"
+    PaginatedEventSummary:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/EventSummary"
+        page:
+          type: integer
+          description: "Current page number"
+        page_size:
+          type: integer
+          description: "Number of items per page"
+        total:
+          type: integer
+          description: "Total number of items available"
+      required:
+        - items
+        - page
+        - page_size
+        - total
+    PaginatedCompany:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Company"
+        page:
+          type: integer
+          description: "Current page number"
+        page_size:
+          type: integer
+          description: "Number of items per page"
+        total:
+          type: integer
+          description: "Total number of items available"
+      required:
+        - items
+        - page
+        - page_size
+        - total
+    PaginatedProvider:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Provider"
+        page:
+          type: integer
+          description: "Current page number"
+        page_size:
+          type: integer
+          description: "Number of items per page"
+        total:
+          type: integer
+          description: "Total number of items available"
+      required:
+        - items
+        - page
+        - page_size
+        - total

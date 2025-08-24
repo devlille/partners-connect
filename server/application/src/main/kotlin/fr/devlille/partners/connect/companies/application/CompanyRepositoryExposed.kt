@@ -9,15 +9,21 @@ import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanySocialEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.deleteAllByCompanyId
 import fr.devlille.partners.connect.companies.infrastructure.db.listByQuery
+import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedResponse
+import fr.devlille.partners.connect.internal.infrastructure.api.paginated
+import fr.devlille.partners.connect.internal.infrastructure.api.toPaginatedResponse
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
 class CompanyRepositoryExposed : CompanyRepository {
-    override fun list(query: String?): List<Company> = transaction {
-        CompanyEntity
-            .listByQuery(query)
+    override fun listPaginated(query: String?, page: Int, pageSize: Int): PaginatedResponse<Company> = transaction {
+        val sized = CompanyEntity.listByQuery(query)
+        val total = sized.count()
+        sized
+            .paginated(page, pageSize)
             .map(CompanyEntity::toDomain)
+            .toPaginatedResponse(total, page, pageSize)
     }
 
     override fun getById(id: UUID): Company = transaction {

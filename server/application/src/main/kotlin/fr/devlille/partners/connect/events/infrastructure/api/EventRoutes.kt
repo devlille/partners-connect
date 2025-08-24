@@ -3,6 +3,7 @@ package fr.devlille.partners.connect.events.infrastructure.api
 import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.api.DEFAULT_PAGE_SIZE
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receive
@@ -20,7 +21,10 @@ fun Route.eventRoutes() {
 
     route("events") {
         get {
-            call.respond(repository.getAllEvents())
+            val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 1
+            val pageSize = call.request.queryParameters["page_size"]?.toIntOrNull() ?: DEFAULT_PAGE_SIZE
+            val paginated = repository.getAllEvents(page, pageSize)
+            call.respond(HttpStatusCode.OK, paginated)
         }
 
         get("/{event_slug}") {
@@ -35,7 +39,10 @@ fun Route.eventRoutes() {
 
         get {
             val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Missing organisation slug")
-            call.respond(HttpStatusCode.OK, repository.findByOrgSlug(orgSlug))
+            val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 1
+            val pageSize = call.request.queryParameters["page_size"]?.toIntOrNull() ?: DEFAULT_PAGE_SIZE
+            val paginated = repository.findByOrgSlugPaginated(orgSlug, page, pageSize)
+            call.respond(HttpStatusCode.OK, paginated)
         }
 
         post {

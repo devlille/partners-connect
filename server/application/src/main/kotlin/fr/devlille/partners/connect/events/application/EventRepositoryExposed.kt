@@ -12,7 +12,10 @@ import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinkEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinksTable
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
+import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedResponse
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
+import fr.devlille.partners.connect.internal.infrastructure.api.paginated
+import fr.devlille.partners.connect.internal.infrastructure.api.toPaginatedResponse
 import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
 import fr.devlille.partners.connect.organisations.application.mappers.toItemDomain
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
@@ -26,6 +29,7 @@ import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
+import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -36,17 +40,22 @@ import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug a
 class EventRepositoryExposed(
     private val entity: UUIDEntityClass<EventEntity>,
 ) : EventRepository {
-    override fun getAllEvents(): List<EventSummary> = transaction {
-        entity.all().map {
-            EventSummary(
-                slug = it.slug,
-                name = it.name,
-                startTime = it.startTime,
-                endTime = it.endTime,
-                submissionStartTime = it.submissionStartTime,
-                submissionEndTime = it.submissionEndTime,
-            )
-        }
+    override fun getAllEvents(page: Int, pageSize: Int): PaginatedResponse<EventSummary> = transaction {
+        val total = entity.count()
+        entity.all()
+            .orderBy(EventsTable.startTime to SortOrder.ASC)
+            .paginated(page, pageSize)
+            .map {
+                EventSummary(
+                    slug = it.slug,
+                    name = it.name,
+                    startTime = it.startTime,
+                    endTime = it.endTime,
+                    submissionStartTime = it.submissionStartTime,
+                    submissionEndTime = it.submissionEndTime,
+                )
+            }
+            .toPaginatedResponse(total, page, pageSize)
     }
 
     override fun findByOrgSlug(orgSlug: String): List<EventSummary> = transaction {
@@ -62,6 +71,31 @@ class EventRepositoryExposed(
                 submissionEndTime = it.submissionEndTime,
             )
         }
+    }
+
+    override fun findByOrgSlugPaginated(
+        orgSlug: String,
+        page: Int,
+        pageSize: Int,
+    ): PaginatedResponse<EventSummary> = transaction {
+        val organisation = OrganisationEntity.orgFindBySlug(orgSlug)
+            ?: throw NotFoundException("Organisation with slug $orgSlug not found")
+        val eventQuery = entity.find { EventsTable.organisationId eq organisation.id }
+        val total = eventQuery.count()
+        eventQuery
+            .orderBy(EventsTable.startTime to SortOrder.ASC)
+            .paginated(page, pageSize)
+            .map {
+                EventSummary(
+                    slug = it.slug,
+                    name = it.name,
+                    startTime = it.startTime,
+                    endTime = it.endTime,
+                    submissionStartTime = it.submissionStartTime,
+                    submissionEndTime = it.submissionEndTime,
+                )
+            }
+            .toPaginatedResponse(total, page, pageSize)
     }
 
     override fun getBySlug(eventSlug: String): EventWithOrganisation = transaction {

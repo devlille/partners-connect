@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.provider.infrastructure.api
 
 import fr.devlille.partners.connect.auth.domain.AuthRepository
 import fr.devlille.partners.connect.events.domain.EventRepository
+import fr.devlille.partners.connect.internal.infrastructure.api.DEFAULT_PAGE_SIZE
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.api.token
 import fr.devlille.partners.connect.provider.domain.CreateProvider
@@ -26,8 +27,10 @@ fun Route.providerRoutes() {
             val query = call.request.queryParameters["query"]
             val sort = call.request.queryParameters["sort"]
             val direction = call.request.queryParameters["direction"]
+            val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 1
+            val pageSize = call.request.queryParameters["page_size"]?.toIntOrNull() ?: DEFAULT_PAGE_SIZE
 
-            val providers = providerRepository.list(query, sort, direction)
+            val providers = providerRepository.list(query, sort, direction, page, pageSize)
             call.respond(HttpStatusCode.OK, providers)
         }
 

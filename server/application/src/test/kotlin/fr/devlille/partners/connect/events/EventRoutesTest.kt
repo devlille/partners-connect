@@ -118,7 +118,12 @@ class EventRoutesTest {
         val response = client.get("/events")
         assertEquals(HttpStatusCode.OK, response.status)
         val responseBody = response.bodyAsText()
-        assert(Json.parseToJsonElement(responseBody).jsonArray.isNotEmpty())
+        val paginated = Json.parseToJsonElement(responseBody).jsonObject
+        val items = paginated["items"]!!.jsonArray
+        assertTrue(items.isNotEmpty())
+        assertNotNull(paginated["page"])
+        assertNotNull(paginated["page_size"])
+        assertNotNull(paginated["total"])
     }
 
     @Test
@@ -139,8 +144,12 @@ class EventRoutesTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
         val responseBody = response.bodyAsText()
-        val events = Json.parseToJsonElement(responseBody).jsonArray
-        assertEquals(2, events.size)
+        val paginated = Json.parseToJsonElement(responseBody).jsonObject
+        val items = paginated["items"]!!.jsonArray
+        assertEquals(2, items.size)
+        assertEquals(1, paginated["page"]!!.toString().toInt())
+        assertEquals(20, paginated["page_size"]!!.toString().toInt())
+        assertEquals(2, paginated["total"]!!.toString().toInt())
     }
 
     @Test
@@ -159,8 +168,12 @@ class EventRoutesTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
         val responseBody = response.bodyAsText()
-        val events = Json.parseToJsonElement(responseBody).jsonArray
-        assertEquals(0, events.size)
+        val paginated = Json.parseToJsonElement(responseBody).jsonObject
+        val items = paginated["items"]!!.jsonArray
+        assertEquals(0, items.size)
+        assertEquals(1, paginated["page"]!!.toString().toInt())
+        assertEquals(20, paginated["page_size"]!!.toString().toInt())
+        assertEquals(0, paginated["total"]!!.toString().toInt())
     }
 
     @Test
@@ -454,5 +467,31 @@ class EventRoutesTest {
         val providerTypes = providers.map { it.jsonObject["type"]!!.toString().removeSurrounding("\"") }
         assertTrue(providerTypes.contains("Technology"))
         assertTrue(providerTypes.contains("Consulting"))
+    }
+
+    @Test
+    fun `GET orgs events returns 400 for invalid page or pageSize`() = testApplication {
+        val orgId = UUID.randomUUID()
+        application {
+            moduleMocked()
+            val admin = insertMockedAdminUser()
+            val org = insertMockedOrganisationEntity(id = orgId, representativeUser = admin)
+            insertMockedOrgaPermission(orgId = orgId, user = admin)
+            insertMockedEventWithOrga(name = "Event", slug = "event", organisation = org)
+        }
+
+        val invalidParams = listOf(
+            "page=0",
+            "page=-1",
+            "page_size=0",
+            "page_size=-5",
+        )
+
+        for (param in invalidParams) {
+            val response = client.get("/orgs/$orgId/events?$param") {
+                header(HttpHeaders.Authorization, "Bearer valid")
+            }
+            assertEquals(HttpStatusCode.BadRequest, response.status, "Should return 400 for param: $param")
+        }
     }
 }
