@@ -4,6 +4,7 @@ import fr.devlille.partners.connect.companies.domain.CompanyImageProcessingRepos
 import fr.devlille.partners.connect.companies.domain.CompanyMediaRepository
 import fr.devlille.partners.connect.companies.domain.CompanyRepository
 import fr.devlille.partners.connect.companies.domain.CreateCompany
+import fr.devlille.partners.connect.internal.infrastructure.api.DEFAULT_PAGE_SIZE
 import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
@@ -29,7 +30,9 @@ fun Route.companyRoutes() {
     route("/companies") {
         get {
             val query = call.request.queryParameters["query"]?.trim()
-            val companies = companyRepository.list(query)
+            val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 1
+            val pageSize = call.request.queryParameters["page_size"]?.toIntOrNull() ?: DEFAULT_PAGE_SIZE
+            val companies = companyRepository.listPaginated(query, page, pageSize)
             call.respond(companies)
         }
 

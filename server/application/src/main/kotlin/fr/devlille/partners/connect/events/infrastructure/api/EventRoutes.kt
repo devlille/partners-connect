@@ -3,6 +3,7 @@ package fr.devlille.partners.connect.events.infrastructure.api
 import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.api.DEFAULT_PAGE_SIZE
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receive
@@ -13,8 +14,6 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
-
-private const val DEFAULT_PAGE_SIZE = 20
 
 @Suppress("ThrowsCount")
 fun Route.eventRoutes() {

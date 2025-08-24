@@ -24,6 +24,8 @@ import io.mockk.every
 import io.mockk.mockk
 import junit.framework.TestCase.assertTrue
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 import org.koin.dsl.module
 import java.io.File
 import java.util.UUID
@@ -40,7 +42,13 @@ class CompanyRoutesTest {
         val response = client.get("/companies")
 
         assertEquals(HttpStatusCode.OK, response.status)
-        assertEquals("[]", response.bodyAsText())
+        val responseBody = response.bodyAsText()
+        val paginated = Json.parseToJsonElement(responseBody).jsonObject
+        val items = paginated["items"]!!.jsonArray
+        assertEquals(0, items.size)
+        assertEquals(1, paginated["page"]!!.toString().toInt())
+        assertEquals(20, paginated["page_size"]!!.toString().toInt())
+        assertEquals(0, paginated["total"]!!.toString().toInt())
     }
 
     @Test
@@ -81,7 +89,10 @@ class CompanyRoutesTest {
 
         val response = client.get("/companies")
         assertEquals(HttpStatusCode.OK, response.status)
-        assertTrue(response.bodyAsText().contains(id!!))
+        val responseBody = response.bodyAsText()
+        val paginated = Json.parseToJsonElement(responseBody).jsonObject
+        val items = paginated["items"]!!.jsonArray
+        assertTrue(items.any { it.toString().contains(id!!) })
     }
 
     @Test
@@ -162,8 +173,14 @@ class CompanyRoutesTest {
         val response = client.get("/companies")
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val body = response.bodyAsText()
-        assertTrue(body.indexOf("Alpha") < body.indexOf("Beta"))
-        assertTrue(body.indexOf("Beta") < body.indexOf("Zeta"))
+        val responseBody = response.bodyAsText()
+        val paginated = Json.parseToJsonElement(responseBody).jsonObject
+        val items = paginated["items"]!!.jsonArray
+        val names = items.map { it.jsonObject["name"]!!.toString() }
+        val alphaIdx = names.indexOf("\"Alpha\"")
+        val betaIdx = names.indexOf("\"Beta\"")
+        val zetaIdx = names.indexOf("\"Zeta\"")
+        assertTrue(alphaIdx < betaIdx)
+        assertTrue(betaIdx < zetaIdx)
     }
 }
