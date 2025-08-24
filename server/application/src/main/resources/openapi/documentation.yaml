@@ -105,7 +105,7 @@ paths:
               type: object
               properties:
                 file:
-                  type: string
+                  type: "string"
                   format: binary
                   description: "Logo file (SVG, PNG, or JPEG)"
         required: true
@@ -148,16 +148,32 @@ paths:
                   $ref: "#/components/schemas/PartnershipItem"
   /events:
     get:
-      description: ""
+      description: "List events with paging support"
+      parameters:
+        - name: "page"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            minimum: 1
+            default: 1
+          description: "Page number (must be >= 1)"
+        - name: "page_size"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: "Number of items per page (must be between 1 and 100)"
       responses:
         "200":
           description: "OK"
           content:
             '*/*':
               schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/EventSummary"
+                $ref: "#/components/schemas/PaginatedEventSummary"
   /events/{eventSlug}:
     get:
       description: "Get event details with organization information"
@@ -719,7 +735,7 @@ paths:
             default: 1
             minimum: 1
           description: "Page number (default: 1)"
-        - name: "pageSize"
+        - name: "page_size"
           in: "query"
           required: false
           schema:
@@ -840,7 +856,7 @@ paths:
               type: object
               properties:
                 file:
-                  type: string
+                  type: "string"
                   format: binary
                   description: "Booth plan image file (PNG, JPEG, GIF)"
         required: true
@@ -2964,7 +2980,7 @@ components:
         page:
           type: integer
           description: "Current page number"
-        pageSize:
+        page_size:
           type: integer
           description: "Number of items per page"
         total:
@@ -2973,5 +2989,5 @@ components:
       required:
         - items
         - page
-        - pageSize
+        - page_size
         - total

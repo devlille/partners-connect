@@ -38,17 +38,34 @@ import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug a
 class EventRepositoryExposed(
     private val entity: UUIDEntityClass<EventEntity>,
 ) : EventRepository {
-    override fun getAllEvents(): List<EventSummary> = transaction {
-        entity.all().map {
-            EventSummary(
-                slug = it.slug,
-                name = it.name,
-                startTime = it.startTime,
-                endTime = it.endTime,
-                submissionStartTime = it.submissionStartTime,
-                submissionEndTime = it.submissionEndTime,
-            )
+    override fun getAllEvents(page: Int, pageSize: Int): PaginatedResponse<EventSummary> = transaction {
+        if (page < 1) {
+            throw BadRequestException("Page number must be greater than 0")
         }
+        if (pageSize < 1) {
+            throw BadRequestException("Page size must be greater than 0")
+        }
+
+        val total = entity.count()
+        val items = entity.all()
+            .limit(pageSize)
+            .offset(((page - 1) * pageSize).toLong())
+            .map {
+                EventSummary(
+                    slug = it.slug,
+                    name = it.name,
+                    startTime = it.startTime,
+                    endTime = it.endTime,
+                    submissionStartTime = it.submissionStartTime,
+                    submissionEndTime = it.submissionEndTime,
+                )
+            }
+        PaginatedResponse(
+            items = items,
+            page = page,
+            pageSize = pageSize,
+            total = total,
+        )
     }
 
     override fun findByOrgSlug(orgSlug: String): List<EventSummary> = transaction {
@@ -69,7 +86,7 @@ class EventRepositoryExposed(
     override fun findByOrgSlugPaginated(
         orgSlug: String,
         page: Int,
-        pageSize: Int
+        pageSize: Int,
     ): PaginatedResponse<EventSummary> = transaction {
         if (page < 1) {
             throw BadRequestException("Page number must be greater than 0")
@@ -99,14 +116,14 @@ class EventRepositoryExposed(
                 startTime = eventEntity.startTime,
                 endTime = eventEntity.endTime,
                 submissionStartTime = eventEntity.submissionStartTime,
-                submissionEndTime = eventEntity.submissionEndTime
+                submissionEndTime = eventEntity.submissionEndTime,
             )
         }
         PaginatedResponse(
             items = items,
             page = page,
             pageSize = pageSize,
-            total = total
+            total = total,
         )
     }
 

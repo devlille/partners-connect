@@ -3,7 +3,7 @@ package fr.devlille.partners.connect.events.domain
 import java.util.UUID
 
 interface EventRepository {
-    fun getAllEvents(): List<EventSummary>
+    fun getAllEvents(page: Int, pageSize: Int): PaginatedResponse<EventSummary>
 
     fun getBySlug(eventSlug: String): EventWithOrganisation
 

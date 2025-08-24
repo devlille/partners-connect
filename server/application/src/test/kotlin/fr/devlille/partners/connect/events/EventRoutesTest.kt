@@ -118,7 +118,12 @@ class EventRoutesTest {
         val response = client.get("/events")
         assertEquals(HttpStatusCode.OK, response.status)
         val responseBody = response.bodyAsText()
-        assert(Json.parseToJsonElement(responseBody).jsonArray.isNotEmpty())
+        val paginated = Json.parseToJsonElement(responseBody).jsonObject
+        val items = paginated["items"]!!.jsonArray
+        assertTrue(items.isNotEmpty())
+        assertNotNull(paginated["page"])
+        assertNotNull(paginated["page_size"])
+        assertNotNull(paginated["total"])
     }
 
     @Test
@@ -142,6 +147,9 @@ class EventRoutesTest {
         val paginated = Json.parseToJsonElement(responseBody).jsonObject
         val items = paginated["items"]!!.jsonArray
         assertEquals(2, items.size)
+        assertEquals(1, paginated["page"]!!.toString().toInt())
+        assertEquals(20, paginated["page_size"]!!.toString().toInt())
+        assertEquals(2, paginated["total"]!!.toString().toInt())
     }
 
     @Test
@@ -163,6 +171,9 @@ class EventRoutesTest {
         val paginated = Json.parseToJsonElement(responseBody).jsonObject
         val items = paginated["items"]!!.jsonArray
         assertEquals(0, items.size)
+        assertEquals(1, paginated["page"]!!.toString().toInt())
+        assertEquals(20, paginated["page_size"]!!.toString().toInt())
+        assertEquals(0, paginated["total"]!!.toString().toInt())
     }
 
     @Test
@@ -470,10 +481,10 @@ class EventRoutesTest {
         }
 
         val invalidParams = listOf(
-            "page=0", // invalid page
-            "page=-1", // invalid page
-            "pageSize=0", // invalid pageSize
-            "pageSize=-5" // invalid pageSize
+            "page=0",
+            "page=-1",
+            "page_size=0",
+            "page_size=-5",
         )
 
         for (param in invalidParams) {
