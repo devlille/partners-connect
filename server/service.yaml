@@ -1,0 +1,54 @@
+# This file defines your Cloud Run service's configuration.
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: partners-connect-server
+spec:
+  template:
+    spec:
+      containers:
+        - image: europe-west1-docker.pkg.dev/cms4partners-ce427/partners-connect/partners-connect-server:initial
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PROJECT_ID
+              value: 'cms4partners-ce427'
+            - name: FRONTEND_BASE_URL
+              value: 'https://partenaire.devlille.fr'
+            - name: GOOGLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: google-client-id
+                  key: 'latest'
+            - name: GOOGLE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: google-client-secret
+                  key: 'latest'
+            - name: CRYPTO_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: crypto-key
+                  key: 'latest'
+            - name: CRYPTO_SALT
+              valueFrom:
+                secretKeyRef:
+                  name: crypto-salt
+                  key: 'latest'
+            - name: EXPOSED_DB_DRIVER
+              value: 'org.postgresql.Driver'
+            - name: EXPOSED_DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: db-connection-string
+                  key: 'latest'
+            - name: EXPOSED_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-user
+                  key: 'latest'
+            - name: EXPOSED_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-password
+                  key: 'latest'
