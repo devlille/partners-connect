@@ -15,6 +15,7 @@ application {
 }
 
 tasks.withType<ShadowJar> {
+    archiveClassifier.set("all")
     manifest {
         attributes["Main-Class"] = mainKlass
     }
