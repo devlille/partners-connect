@@ -1,0 +1,47 @@
+# .github/workflows/ci.yaml
+# This workflow builds and pushes a container image to Google Artifact Registry.
+# It triggers on every push to the 'main' branch.
+
+name: Build and Push Container
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: 'cms4partners-ce427'
+  REPOSITORY: 'partners-connect'
+  IMAGE_NAME: 'partners-connect-server'
+  REGION: 'europe-west1'
+
+jobs:
+  build-and-push:
+    name: Build and Push to Artifact Registry
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: 'google-github-actions/auth@v3'
+        id: auth
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
+          service_account: '${{ secrets.SERVICE_ACCOUNT }}'
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      - name: Build and push container image
+        run: |
+          # The image is tagged with the short Git commit SHA
+          docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
