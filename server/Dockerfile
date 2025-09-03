@@ -15,5 +15,5 @@ RUN gradle shadowJar --no-daemon
 FROM amazoncorretto:22 AS runtime
 EXPOSE 8080
 RUN mkdir /app
-COPY --from=build /home/gradle/src/application/build/libs/*.jar /app/application.jar
+COPY --from=build /home/gradle/src/application/build/libs/*-all.jar /app/application.jar
 ENTRYPOINT ["java","-jar","/app/application.jar"]
