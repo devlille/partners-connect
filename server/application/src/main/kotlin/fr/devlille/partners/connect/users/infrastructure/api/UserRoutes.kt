@@ -4,7 +4,6 @@ import fr.devlille.partners.connect.auth.domain.AuthRepository
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.token
-import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.organisations.domain.OrganisationRepository
 import fr.devlille.partners.connect.users.domain.UserRepository
 import io.ktor.http.HttpStatusCode
@@ -55,7 +54,7 @@ fun Route.userRoutes() {
             val token = call.token
             val userInfo = authRepository.getUserInfo(token)
             val hasPerm = userRepository.hasEditPermissionByEmail(userInfo.email, orgSlug)
-            if (!hasPerm && SystemVarEnv.owner != userInfo.email) {
+            if (!hasPerm) {
                 throw UnauthorizedException("You do not have permission to grant users for this event")
             }
             userRepository.grantUsers(orgSlug, request.userEmails)
