@@ -1,0 +1,55 @@
+# .github/workflows/cd.yaml
+# This workflow deploys an existing Docker image to Google Cloud Run.
+
+name: CD - Deploy to Cloud Run
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+
+# Configure environment variables for easy reuse
+env:
+  GCP_PROJECT_ID: 'cms4partners-ce427'
+  GCP_REGION: 'europe-west1'
+  GCP_ARTIFACT_REGISTRY: 'partners-connect'
+  IMAGE_NAME: 'partners-connect-server'
+  CLOUD_RUN_SERVICE: 'partners-connect-server'
+
+jobs:
+  deploy:
+    name: Deploy to Cloud Run
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: 'google-github-actions/auth@v3'
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
+          service_account: '${{ secrets.SERVICE_ACCOUNT }}'
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.CLOUD_RUN_SERVICE }}
+          region: ${{ env.GCP_REGION }}
+          image: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_ARTIFACT_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+      - name: Show deployed URL
+        run: echo "Successfully deployed to ${{ steps.deploy.outputs.url }}"
