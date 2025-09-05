@@ -10,11 +10,11 @@ on:
 
 # Configure environment variables for easy reuse
 env:
-  GCP_PROJECT_ID: 'cms4partners-ce427'
-  GCP_REGION: 'europe-west1'
-  GCP_ARTIFACT_REGISTRY: 'partners-connect'
+  PROJECT_ID: 'cms4partners-ce427'
+  REGION: 'europe-west1'
+  REPOSITORY: 'partners-connect'
   IMAGE_NAME: 'partners-connect-server'
-  CLOUD_RUN_SERVICE: 'partners-connect-server'
+  SERVICE_NAME: 'partners-connect-server'
 
 jobs:
   deploy:
@@ -44,12 +44,14 @@ jobs:
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
       - name: Deploy to Cloud Run
-        id: deploy
-        uses: google-github-actions/deploy-cloudrun@v2
-        with:
-          service: ${{ env.CLOUD_RUN_SERVICE }}
-          region: ${{ env.GCP_REGION }}
-          image: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_ARTIFACT_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-
-      - name: Show deployed URL
-        run: echo "Successfully deployed to ${{ steps.deploy.outputs.url }}"
+        run: |-
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --region ${{ env.REGION }} \
+            --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --platform managed
+          
+          SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} --region ${{ env.REGION }} --format='value(status.url)')
+          
+          gcloud run services update ${{ env.SERVICE_NAME }} \
+            --region ${{ env.REGION }} \
+            --update-env-vars="SERVER_BASE_URL=$SERVICE_URL"
