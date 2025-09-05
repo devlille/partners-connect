@@ -13,7 +13,7 @@ import io.ktor.server.auth.oauth
 fun Application.configureSecurity(redirect: (state: String, redirectUrl: String) -> Unit) {
     install(Authentication) {
         oauth("google-oauth") {
-            urlProvider = { "http://localhost:8080/auth/callback" }
+            urlProvider = { "${SystemVarEnv.serverBaseUrl}/auth/callback" }
             providerLookup = {
                 OAuthServerSettings.OAuth2ServerSettings(
                     name = "google",

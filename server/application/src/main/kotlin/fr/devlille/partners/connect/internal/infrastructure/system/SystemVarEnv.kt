@@ -4,6 +4,7 @@ import org.jetbrains.exposed.v1.crypt.Algorithms
 
 object SystemVarEnv {
     val projectId: String = System.getenv("PROJECT_ID") ?: "partners-connect"
+    val serverBaseUrl: String = System.getenv("SERVER_BASE_URL") ?: "http://localhost:8080"
     val frontendBaseUrl: String = System.getenv("FRONTEND_BASE_URL") ?: "http://localhost:80"
 
     object Exposed {
