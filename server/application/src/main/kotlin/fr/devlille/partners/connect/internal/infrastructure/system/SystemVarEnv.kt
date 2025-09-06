@@ -21,8 +21,8 @@ object SystemVarEnv {
     }
 
     object GoogleProvider {
-        val clientId: String = System.getenv("GOOGLE_CLIENT_ID")
-        val clientSecret: String = System.getenv("GOOGLE_CLIENT_SECRET")
+        val clientId: String = System.getenv("GOOGLE_CLIENT_ID").trim()
+        val clientSecret: String = System.getenv("GOOGLE_CLIENT_SECRET").trim()
     }
 
     object QontoProvider {
