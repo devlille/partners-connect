@@ -56,6 +56,28 @@ class EventRoutesTest {
     }
 
     @Test
+    fun `POST returns 409 when event already exist`() = testApplication {
+        val organisationId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val testSlug = "test-event"
+
+        application {
+            moduleMocked()
+            insertMockedOrganisationEntity(id = organisationId)
+            insertMockedEvent(id = eventId, orgId = organisationId, slug = testSlug)
+            insertMockedOrgaPermission(orgId = organisationId, user = insertMockedAdminUser())
+        }
+
+        val updateResponse = client.post("/orgs/$organisationId/events") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(json.encodeToString(Event.serializer(), createEvent(name = testSlug)))
+        }
+
+        assertEquals(HttpStatusCode.Conflict, updateResponse.status)
+    }
+
+    @Test
     fun `PUT updates an existing event`() = testApplication {
         val eventId = UUID.randomUUID()
         val orgId = UUID.randomUUID()

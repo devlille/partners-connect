@@ -12,6 +12,8 @@ import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinkEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinksTable
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
+import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedResponse
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.paginated
@@ -155,6 +157,9 @@ class EventRepositoryExposed(
             ?: throw NotFoundException("Organisation with slug $orgSlug not found")
 
         val slug = event.name.slugify()
+        if (EventEntity.findBySlug(slug = slug) != null) {
+            throw ConflictException("An event with the slug '$slug' already exists")
+        }
 
         entity.new {
             this.name = event.name
