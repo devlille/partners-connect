@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.organisations
 
+import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.domain.Organisation
 import fr.devlille.partners.connect.organisations.factories.createOrganisation
@@ -44,6 +45,27 @@ class OrganisationRoutesTest {
         assertEquals(HttpStatusCode.Created, response.status)
         val responseBody = Json.decodeFromString<Map<String, String>>(response.bodyAsText())
         assertNotNull(responseBody["slug"], "Response should contain a 'slug' field")
+    }
+
+    @Test
+    fun `POST fails if organization already exists`() = testApplication {
+        val organisation = createOrganisation()
+        val organisationSlug = organisation.name.slugify()
+
+        application {
+            moduleMocked()
+            val org = insertMockedOrganisationEntity(name = organisation.name)
+            insertMockedEventWithAdminUser(orgId = org.id.value)
+        }
+
+        val response = client.post("/orgs") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(json.encodeToString(Organisation.serializer(), organisation))
+        }
+
+        assertEquals(HttpStatusCode.Conflict, response.status)
+        assertEquals("Organisation with slug $organisationSlug already exists", response.bodyAsText())
     }
 
     @Test

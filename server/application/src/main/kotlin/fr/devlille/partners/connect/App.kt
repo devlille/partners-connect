@@ -13,6 +13,7 @@ import fr.devlille.partners.connect.events.infrastructure.api.eventRoutes
 import fr.devlille.partners.connect.events.infrastructure.bindings.eventModule
 import fr.devlille.partners.connect.integrations.infrastructure.api.integrationRoutes
 import fr.devlille.partners.connect.integrations.infrastructure.bindings.integrationModule
+import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnsupportedMediaTypeException
@@ -219,6 +220,9 @@ private fun Application.configureStatusPage() {
         }
         exception<NotFoundException> { call, cause ->
             call.respondText(text = cause.message ?: "404 Not Found", status = HttpStatusCode.NotFound)
+        }
+        exception<ConflictException> { call, cause ->
+            call.respondText(text = cause.message ?: "Conflict", status = HttpStatusCode.Conflict)
         }
         exception<UnsupportedMediaTypeException> { call, cause ->
             call.respondText(

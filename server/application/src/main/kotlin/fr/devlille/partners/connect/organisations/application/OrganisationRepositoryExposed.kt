@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.organisations.application
 
+import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
 import fr.devlille.partners.connect.organisations.application.mappers.toDomain
 import fr.devlille.partners.connect.organisations.application.mappers.toItemDomain
@@ -23,12 +24,15 @@ class OrganisationRepositoryExposed : OrganisationRepository {
         if (entity.name.isBlank()) {
             throw BadRequestException("Organisation name is required and cannot be empty")
         }
+        val slug = entity.name.slugify()
+        if (OrganisationEntity.findBySlug(slug = slug) != null) {
+            throw ConflictException("Organisation with slug $slug already exists")
+        }
 
         val user = entity.representativeUserEmail?.let { email ->
             UserEntity.singleUserByEmail(email)
                 ?: throw NotFoundException("User with email $email not found")
         }
-        val slug = entity.name.slugify()
         OrganisationEntity.new {
             this.name = entity.name
             this.slug = slug

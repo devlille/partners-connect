@@ -27,7 +27,6 @@ fun Route.organisationRoutes() {
     route("/orgs") {
         post {
             val input = call.receive<Organisation>()
-
             val token = call.token
             val slug = repository.create(input)
             val userInfo = authRepository.getUserInfo(token)
