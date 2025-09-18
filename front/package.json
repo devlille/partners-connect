@@ -12,17 +12,17 @@
     "orval": "npx orval --config ./orval.config.ts"
   },
   "dependencies": {
-    "@nuxt/eslint": "^1.4.1",
-    "@nuxt/test-utils": "^3.19.1",
-    "@nuxt/ui": "^3.2.0",
+    "@nuxt/eslint": "^1.9.0",
+    "@nuxt/test-utils": "^3.19.2",
+    "@nuxt/ui": "^3.3.3",
     "axios": "^1.11.0",
-    "eslint": "^9.30.0",
-    "nuxt": "^3.17.5",
-    "typescript": "^5.8.3",
-    "vue": "^3.5.17",
+    "eslint": "^9.35.0",
+    "nuxt": "^4.1.0",
+    "typescript": "^5.9.2",
+    "vue": "^3.5.21",
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
-    "oxlint": "^1.8.0"
+    "oxlint": "^1.14.0"
   }
 }

@@ -26,6 +26,13 @@
 </template>
 
 <script setup lang="ts">
+import authMiddleware from "~/middleware/auth";
+
+definePageMeta({
+  middleware: authMiddleware,
+  ssr: false
+})
+
 const route = useRoute();
 
 const data = await getOrgsOrgSlugEvents(route.params.slug as string).then(

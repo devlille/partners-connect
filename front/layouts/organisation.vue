@@ -7,7 +7,7 @@
       </button>
     </header>
     <div id="container">
-      <OrganisationMenu />
+      <NavigationMenu type="organisation" />
 
       <main class="auto-scroll">
         <slot />

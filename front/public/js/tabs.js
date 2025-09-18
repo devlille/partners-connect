@@ -2,6 +2,8 @@
   
   // Get relevant elements and collections
   const tabbed = document.querySelector(".tabs-block");
+
+  if (!tabbed) return;
   const tablist = tabbed.querySelector("ul");
   const tabs = tablist.querySelectorAll("button");
   const panels = tabbed.querySelectorAll(".tab-content");

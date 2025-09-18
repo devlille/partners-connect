@@ -6,6 +6,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import authMiddleware from "~/middleware/auth";
 
 const route = useRoute();
 const org = await getOrgsSlug(route.params.slug as string).then((r) => r.data);
@@ -36,6 +37,8 @@ async function onSave(organisation: Organisation) {
 
 definePageMeta({
   layout: "organisation",
+  middleware: authMiddleware,
+  ssr: false
 });
 
 useHead({

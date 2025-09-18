@@ -128,12 +128,25 @@ export interface EventDisplay {
   submission_end_time: string;
   address: string;
   contact: EventContact;
+  /** List of external links associated with the event */
+  external_links: EventExternalLink[];
+  /** List of providers (partners) associated with the event */
+  providers: Provider[];
 }
 
 export interface EventContact {
   email: string;
   /** @nullable */
   phone?: string | null;
+}
+
+export interface EventExternalLink {
+  /** Unique identifier of the external link */
+  id: string;
+  /** Display name for the external link */
+  name: string;
+  /** URL of the external resource */
+  url: string;
 }
 
 export interface Organisation {
@@ -402,15 +415,70 @@ export interface CommunicationPlan {
   unplanned: CommunicationItem[];
 }
 
+export interface PaginatedEventSummary {
+  items: EventSummary[];
+  /** Current page number */
+  page: number;
+  /** Number of items per page */
+  page_size: number;
+  /** Total number of items available */
+  total: number;
+}
+
+export interface PaginatedCompany {
+  items: Company[];
+  /** Current page number */
+  page: number;
+  /** Number of items per page */
+  page_size: number;
+  /** Total number of items available */
+  total: number;
+}
+
+export interface PaginatedProvider {
+  items: Provider[];
+  /** Current page number */
+  page: number;
+  /** Number of items per page */
+  page_size: number;
+  /** Total number of items available */
+  total: number;
+}
+
 export type GetAuthCallback404 = { [key: string]: unknown };
 
 export type GetCompaniesParams = {
 query?: string;
+/**
+ * Page number (must be >= 1)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page (must be between 1 and 100)
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
 };
 
 export type PostCompaniesCompanyIdLogoBody = {
   /** Logo file (SVG, PNG, or JPEG) */
   file?: Blob;
+};
+
+export type GetEventsParams = {
+/**
+ * Page number (must be >= 1)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page (must be between 1 and 100)
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
 };
 
 export type PostEventsEventSlugPartnershipPartnershipIdSignedAgreementBody = {
@@ -431,6 +499,17 @@ sort?: GetProvidersSort;
  * Sort direction (default: asc)
  */
 direction?: GetProvidersDirection;
+/**
+ * Page number (must be >= 1)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page (must be between 1 and 100)
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
 };
 
 export type GetProvidersSort = typeof GetProvidersSort[keyof typeof GetProvidersSort];
@@ -456,6 +535,20 @@ export const GetProvidersDirection = {
 export type PostProviders201 = {
   /** UUID of the created provider */
   id: string;
+};
+
+export type GetOrgsOrgSlugEventsParams = {
+/**
+ * Page number (default: 1)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page (default: 20)
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
 };
 
 export type PostOrgsOrgSlugEventsEventSlugBoothPlanBody = {
@@ -597,10 +690,13 @@ export const getAuthMe = (
       options);
     }
   
+/**
+ * List companies with paging support
+ */
 export const getCompanies = (
     params?: GetCompaniesParams,
  options?: SecondParameter<typeof customFetch>,) => {
-      return customFetch<Company[]>(
+      return customFetch<PaginatedCompany>(
       {url: `/companies`, method: 'GET',
         params
     },
@@ -646,11 +742,15 @@ export const getCompaniesCompanyIdPartnership = (
       options);
     }
   
+/**
+ * List events with paging support
+ */
 export const getEvents = (
-    
+    params?: GetEventsParams,
  options?: SecondParameter<typeof customFetch>,) => {
-      return customFetch<EventSummary[]>(
-      {url: `/events`, method: 'GET'
+      return customFetch<PaginatedEventSummary>(
+      {url: `/events`, method: 'GET',
+        params
     },
       options);
     }
@@ -818,7 +918,7 @@ export const putEventsEventSlugPartnershipPartnershipIdTicketsTicketId = (
 export const getProviders = (
     params?: GetProvidersParams,
  options?: SecondParameter<typeof customFetch>,) => {
-      return customFetch<Provider[]>(
+      return customFetch<PaginatedProvider>(
       {url: `/providers`, method: 'GET',
         params
     },
@@ -872,13 +972,15 @@ export const putOrgsOrgSlug = (
     }
   
 /**
- * List events for an organization
+ * List events for an organization (paginated)
  */
 export const getOrgsOrgSlugEvents = (
     orgSlug: string,
+    params?: GetOrgsOrgSlugEventsParams,
  options?: SecondParameter<typeof customFetch>,) => {
-      return customFetch<EventSummary[]>(
-      {url: `/orgs/${orgSlug}/events`, method: 'GET'
+      return customFetch<PaginatedEventSummary>(
+      {url: `/orgs/${orgSlug}/events`, method: 'GET',
+        params
     },
       options);
     }

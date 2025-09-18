@@ -7,7 +7,7 @@
       </button>
     </header>
     <div id="container">
-      <EventMenu />
+      <NavigationMenu type="event" />
 
       <main class="auto-scroll">
         <slot />

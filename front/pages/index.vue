@@ -37,6 +37,11 @@
           <input type="submit" value="Valider" />
         </p>
       </form>
+      
+      <div class="auth-section">
+        <p>Vous êtes un organisateur d'événements ?</p>
+        <NuxtLink to="/login" class="login-link">Se connecter pour gérer vos organisations</NuxtLink>
+      </div>
     </main>
   </div>
 </template>

@@ -4,6 +4,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import authMiddleware from "~/middleware/auth";
 const router = useRouter()
 
 const data = ref<Organisation>({
@@ -32,6 +33,8 @@ async function handleSave(payload: Organisation) {
 
 definePageMeta({
   layout: "organisation",
+  middleware: authMiddleware,
+  ssr: false
 });
 
 useHead({

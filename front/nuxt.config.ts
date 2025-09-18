@@ -7,7 +7,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: {
-        lang: 'fr'
+        lang: "fr",
       },
       script: [
         {
@@ -26,13 +26,12 @@ export default defineNuxtConfig({
           defer: true,
         },
       ],
-    }
+    },
   },
   runtimeConfig: {
     API_BASE_URL: "http://localhost:3000",
     public: {
-      apiBaseUrl:
-        process.env.NUXT_PUBLIC_API_BASE_URL || "http://localhost:8080",
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL,
     },
   },
 });

@@ -884,7 +884,7 @@ html:has(#partners) {
   html,
   body {
     height: 100%;
-    overflow-y: hidden;
+    /*overflow-y: hidden;*/
   }
   body:not(#partners) footer p {
     position: fixed;

@@ -1,6 +1,6 @@
 export default {
-  pearl: {
-    input: "http://localhost:8080/swagger/documentation.yaml",
+  api: {
+    input: "https://partners-connect-server-486924521070.europe-west1.run.app/swagger/documentation.yaml",
     output: {
       target: "./utils/api.ts",
       override: {

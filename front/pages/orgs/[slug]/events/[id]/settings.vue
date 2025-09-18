@@ -6,6 +6,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import authMiddleware from "~/middleware/auth";
 
 const route = useRoute();
 const event = await getEventsEventSlug(route.params.id as string).then(
@@ -35,6 +36,8 @@ async function submitForm(event: Omit<EventDisplay, 'slug'>) {
 
 definePageMeta({
   layout: "event",
+  middleware: authMiddleware,
+  ssr: false
 });
 
 useHead({

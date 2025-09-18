@@ -1,7 +1,6 @@
-(function () {
+/*(function () {
 
   const allScrollPanels = document.querySelectorAll('.auto-scroll');
-console.log(allScrollPanels)
   const getHeight = function(panel) {
     let windowH = window.innerHeight;
     let panelTop = panel.getBoundingClientRect().top;
@@ -30,4 +29,4 @@ console.log(allScrollPanels)
     });
   }, true);
 
-})();
+})();*/
