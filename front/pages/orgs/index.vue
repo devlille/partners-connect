@@ -1,7 +1,7 @@
 <template>
   <h2>Liste de Organisations</h2>
 
-  <div v-if="data.length > 0" class="results-list grid">
+  <div if="data.length > 0" class="results-list grid">
     <div v-for="evt in data" :key="evt.slug" class="card">
       <h3>
         <NuxtLink
@@ -12,7 +12,7 @@
 
       <dl>
         <dt>Owner</dt>
-        <dd>{{ evt.owner.displayName }}</dd>
+        <dd>{{ evt.owner?.display_name }}</dd>
       </dl>
     </div>
   </div>
@@ -36,7 +36,7 @@ onMounted(async () => {
     data.value = response.data;
   } catch (error) {
     console.error('Failed to load organizations:', error);
-  }
+  } 
 });
 
 useHead({
