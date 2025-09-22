@@ -1,7 +1,8 @@
-# End-to-End Deployment Guide: Kotlin App on Cloud Run with Supabase & GitHub Actions
+
+# End-to-End Deployment Guide: Kotlin App on Clever Cloud with Supabase & GitHub Actions
 
 This guide provides a complete, step-by-step process for deploying your application. The goal is to create a CI/CD 
-pipeline that automatically builds your application on pushes to main and deploys it to Google Cloud Run when you 
+pipeline that automatically builds your application on pushes to main and deploys it to Clever Cloud when you 
 create a version tag.
 
 > **Important**: Due to complexities with cross-platform builds, the recommended way to create your initial image 
@@ -9,12 +10,10 @@ create a version tag.
 
 ## Core Architecture
 
-* Application Hosting: Google Cloud Run (Serverless)
+* Application Hosting: Clever Cloud (Docker)
 * Database: Supabase (Serverless PostgreSQL)
-* Container Registry: Google Artifact Registry
 * CI/CD Pipeline: GitHub Actions
-* Secrets Management: Google Secret Manager
-* Cloud Authentication: Google Workload Identity Federation
+* Secrets Management: GitHub Secrets (Clever Cloud API Token)
 
 ## Phase 1: One-Time Infrastructure Setup
 
@@ -26,155 +25,55 @@ You only need to perform these steps once for your project.
 2. Navigate to Project Settings > Database. 
 3. Under Connection string, copy the JDBC.
 
-### 2. Configure Google Cloud Project
 
-1. Enable APIs:
-   ```
-   gcloud services enable run.googleapis.com secretmanager.googleapis.com artifactregistry.googleapis.com iam.googleapis.com storage.googleapis.com
-   ```
-2. Store Secrets:
-   1. Database URL (from Supabase):
-   ```
-   echo -n "jdbc:postgresql://aws-1-eu-west-3.pooler.supabase.com:5432/postgres?user=[YOUR-USER]&password=[YOUR-PASSWORD]" | gcloud secrets create db-connection-string --data-file=-
-   ```
-   2. Other Application Secrets: (Use -n to avoid adding extra newline characters)
-   ```
-   echo -n "your-google-client-id" | gcloud secrets create google-client-id --data-file=-
-   echo -n "your-google-client-secret" | gcloud secrets create google-client-secret --data-file=-
-   echo -n "your-super-secret-crypto-key" | gcloud secrets create crypto-key --data-file=-
-   echo -n "your-super-secret-crypto-salt" | gcloud secrets create crypto-salt --data-file=-
-   echo -n "your-db-user" | gcloud secrets create db-user --data-file=-
-   echo -n "your-db-password" | gcloud secrets create db-password --data-file=-
-   ```
-3. Create Artifact Registry:
-    ```
-    gcloud artifacts repositories create my-app-repo --repository-format=docker --location=europe-west1
-    ```
+### 2. Configure Clever Cloud Application & Secrets
 
-### 3. Set up Secure Connection (GitHub <-> GCP)
+1. Create a Clever Cloud account and application (choose Docker as the deployment type).
+2. Note your Clever Cloud App ID (from the dashboard).
+3. Generate a Clever Cloud API token (from your account settings) and add it as a GitHub secret named `CLEVERCLOUD_TOKEN`.
+4. Add your Clever Cloud App ID as a GitHub secret named `CLEVERCLOUD_APP_ID`.
+5. Migrate all secrets previously stored in Google Secret Manager to GitHub secrets. For each secret listed in your previous `service.yaml`, create a corresponding GitHub secret:
+	- `PROJECT_ID`
+	- `FRONTEND_BASE_URL`
+	- `GOOGLE_CLIENT_ID`
+	- `GOOGLE_CLIENT_SECRET`
+	- `CRYPTO_KEY`
+	- `CRYPTO_SALT`
+	- `EXPOSED_DB_DRIVER`
+	- `EXPOSED_DB_URL`
+	- `EXPOSED_DB_USER`
+	- `EXPOSED_DB_PASSWORD`
+6. These secrets will be injected as environment variables into your Clever Cloud app after deployment by the CD workflow.
+7. (Optional) You can also configure additional environment variables in the Clever Cloud dashboard or via the GitHub Action.
 
-Follow the official Google Cloud guide to set up Workload Identity Federation. This is a secure, keyless method for 
-authentication. During the setup, you will:
 
-1. Create a Service Account for GitHub Actions:
-   ```
-   gcloud iam service-accounts create github-actions-sa --display-name="GitHub Actions Service Account"
-   ```
-2. Grant Permissions to the Service Account:
-   ```
-   PROJECT_ID=$(gcloud config get-value project)
+### 3. Initial Deployment
 
-   # Allow pushing images to Artifact Registry
-   gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:github-actions-sa@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/artifactregistry.writer"
+1. Push your code to the GitHub main branch to trigger the CI workflow (`ci.yaml`). This workflow:
+	- Builds the Docker image for your server application.
+	- Pushes the image to Google Artifact Registry using your GCP credentials.
 
-   # Allow deploying and managing Cloud Run services
-   gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:github-actions-sa@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/run.admin"
+2. Create and push a git tag (e.g., `git tag 1.0.0 && git push origin 1.0.0`) to trigger the CD workflow (`cd.yaml`). This workflow:
+	- Authenticates to Google Cloud and pulls the Docker image from Artifact Registry.
+	- Tags the image for Clever Cloud.
+	- Deploys the image to Clever Cloud using the official GitHub Action.
+	- Installs the Clever Cloud CLI (`clever-tools`) and logs in using your API token.
+	- Dynamically fetches the Clever Cloud app's public base URL after deployment.
+	- Updates the `SERVER_BASE_URL` environment variable in Clever Cloud with the actual deployed URL.
 
-   # Allow it to act as a user of other service accounts (needed for deployments)
-   gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:github-actions-sa@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/iam.serviceAccountUser"
-   ```
-3. Create a Workload Identity Pool and Provider, linking it to your specific GitHub repository.
-   ```
-   PROJECT_ID=$(gcloud config get-value project)
-   OWNER=[YOUR-GITHUB-ORG-OR-USERNAME]
-   REPO_NAME=[YOUR-REPO-NAME]
-   
-   # Create the Identity Pool
-   gcloud iam workload-identity-pools create "github-pool" --project="$PROJECT_ID" --location="global" --display-name="GitHub Actions Pool"
+### 4. Ongoing CI/CD workflow
 
-   # Create the Identity Provider within the pool
-   gcloud iam workload-identity-pools providers create-oidc "github-provider" \
-      --project="$PROJECT_ID" \
-      --location="global" \
-      --workload-identity-pool="github-pool" \
-      --display-name="GitHub Actions Provider" \
-      --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository" \
-      --issuer-uri="https://token.actions.githubusercontent.com" \
-      --attribute-condition="assertion.repository=='$OWNER/$REPO_NAME'"
-   ```
-4. Allow GitHub to Impersonate the Service Account: This final step links your GitHub repository to the GCP service account.
-   ```
-   PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format='get(projectNumber)')
-   OWNER=[YOUR-GITHUB-ORG-OR-USERNAME]
-   REPO_NAME=[YOUR-REPO-NAME]
+Your pipeline is now fully configured:
 
-   gcloud iam service-accounts add-iam-policy-binding "github-actions-sa@$PROJECT_ID.iam.gserviceaccount.com" \
-      --project="$PROJECT_ID" \
-      --role="roles/iam.workloadIdentityUser" \
-      --member="principalSet://iam.googleapis.com/projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/github-pool/attribute.repository/repo:$OWNER/$REPO_NAME"
-   ```
+1. Code Changes (CI): Pushing to main builds and pushes a new Docker image to Google Artifact Registry.
 
-> You will need the Workload Identity Provider string for your GitHub Actions workflow file. You can construct it from 
-> the values above. It will look like: `projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/github-pool/providers/github-provider`
+2. Release (CD): Creating and pushing a git tag deploys the latest image to Clever Cloud and updates all required environment variables (including the base URL) automatically from GitHub secrets.
 
-### 4. Configure GitHub Actions Secrets
+### 5. Troubleshooting & Notes
 
-**Secret 1**:
-* Name: `WIF_PROVIDER`
-* Value: `projects/[PROJECT_NUMBER]/locations/global/workloadIdentityPools/github-pool/providers/github-provider` (Replace [PROJECT_NUMBER] with your actual GCP project number).
-
-**Secret 2**:
-* Name: `SERVICE_ACCOUNT`
-* Value: `github-actions-sa@[PROJECT_ID].iam.gserviceaccount.com` (Replace [PROJECT_ID] with your actual GCP project ID).
-
-### 5. Initial Cloud Run Deployment
-
-#### Continuous integration setup
-
-We will use the CI pipeline to perform the initial build, then deploy manually.
-
-**Create ci.yaml and cd.yaml Workflows**:
-
-* Create a `.github/workflows` directory in your project root.
-* Create the `ci.yaml` and `cd.yaml` files inside it using the templates provided in the Appendix at the end of this guide.
-
-> **Important**: Fill in the placeholder values at the top of the workflow files (PROJECT_ID, etc.).
-
-**Run the CI Pipeline**:
-
-* Commit and push the new `.github/workflows/ci.yaml` file to your main branch.
-* Go to the "Actions" tab in your GitHub repository.
-* You will see the "Build and Push Container" workflow running. Wait for it to complete successfully. 
-* Once it's green, a container image tagged with your latest commit SHA has been pushed to Artifact Registry.
-
-#### Continuous deployment setup
-
-**Deploy manually (First Time Only)**:
-
-* Find the Image URI: Go to your Artifact Registry in the GCP console, find your new image, and copy its full URI. It will look like: `europe-west1-docker.pkg.dev/YOUR_PROJECT_ID/my-app-repo/partners-connect-server:latest-commit-sha`
-* Update `service.yaml`: Paste this full image URI into the image: field in your `service.yaml` file.
-* Deploy the Service:
-  ```
-  gcloud run services replace service.yaml --region europe-west1
-  ```
-
-This first deployment will fail with a Permission denied error on secrets. This is expected. Proceed to the next step.
-
-**Grant Permissions to the Cloud Run Service**:
-
-1. Get Service Account Email: The error from the previous step will tell you the exact service account email used by Cloud Run.
-2. Grant Access:
-    ```
-    SERVICE_ACCOUNT_EMAIL="[EMAIL_FROM_ERROR]"
-    PROJECT_ID=$(gcloud config get-value project)
-    gcloud secrets add-iam-policy-binding db-connection-string --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" --role="roles/secretmanager.secretAccessor"
-    gcloud secrets add-iam-policy-binding google-client-id --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" --role="roles/secretmanager.secretAccessor"
-    gcloud secrets add-iam-policy-binding google-client-secret --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" --role="roles/secretmanager.secretAccessor"
-    gcloud secrets add-iam-policy-binding crypto-key --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" --role="roles/secretmanager.secretAccessor"
-    gcloud secrets add-iam-policy-binding crypto-salt --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" --role="roles/secretmanager.secretAccessor"
-    gcloud secrets add-iam-policy-binding db-user --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" --role="roles/secretmanager.secretAccessor"
-    gcloud secrets add-iam-policy-binding db-password --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" --role="roles/secretmanager.secretAccessor"
-    gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" --role="roles/storage.objectAdmin"
-    ```
-
-3. Re-run the Deployment: This final run will succeed.
-    ```
-    gcloud run services replace service.yaml --region europe-west1
-    ```
-
-#### Ongoing CI/CD workflow
-
-Your pipeline is now fully configured.
-
-1. Code Changes (CI): Pushing to main builds and pushes a new container image.
-2. Release (CD): Creating and pushing a git tag deploys the latest image to Cloud Run.
+* Ensure your Dockerfile exposes the correct port (default for Ktor is 8080).
+* Clever Cloud will automatically detect and run your Docker image.
+* All secrets and sensitive configuration values are now managed as GitHub secrets and injected as Clever Cloud environment variables after deployment.
+* The Clever Cloud app base URL is set dynamically after deployment using the CLI and GitHub Actions.
+* You can set additional environment variables via the Clever Cloud dashboard or in the GitHub Action step.
+* For more details, see: https://www.clever-cloud.com/doc/deploy/with-github-actions/
