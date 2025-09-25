@@ -2215,15 +2215,15 @@ components:
     UserInfo:
       type: "object"
       properties:
-        displayName:
+        display_name:
           type: "string"
-        pictureUrl:
+        picture_url:
           type: "string"
           nullable: true
         email:
           type: "string"
       required:
-        - "displayName"
+        - "display_name"
         - "email"
     Address:
       type: "object"
@@ -2246,17 +2246,17 @@ components:
       properties:
         original:
           type: "string"
-        png1000:
+        png_1000:
           type: "string"
-        png500:
+        png_500:
           type: "string"
-        png250:
+        png_250:
           type: "string"
       required:
         - "original"
-        - "png1000"
-        - "png500"
-        - "png250"
+        - "png_1000"
+        - "png_500"
+        - "png_250"
     Company:
       type: "object"
       properties:
@@ -2651,7 +2651,7 @@ components:
       properties:
         id:
           type: "string"
-        extId:
+        external_id:
           type: "string"
         url:
           type: "string"
@@ -2659,7 +2659,7 @@ components:
           $ref: "#/components/schemas/TicketData"
       required:
         - "id"
-        - "extId"
+        - "external_id"
         - "url"
         - "data"
     TicketOrder:
@@ -2724,27 +2724,27 @@ components:
           type: "string"
         name:
           type: "string"
-        basePrice:
+        base_price:
           type: "integer"
           format: "int32"
-        maxQuantity:
+        max_quantity:
           type: "integer"
           format: "int32"
           nullable: true
-        requiredOptions:
+        required_options:
           type: "array"
           items:
             $ref: "#/components/schemas/SponsoringOption"
-        optionalOptions:
+        optional_options:
           type: "array"
           items:
             $ref: "#/components/schemas/SponsoringOption"
       required:
         - "id"
         - "name"
-        - "basePrice"
-        - "requiredOptions"
-        - "optionalOptions"
+        - "base_price"
+        - "required_options"
+        - "optional_options"
     CreateSponsoringPack:
       type: "object"
       properties:
@@ -2753,20 +2753,20 @@ components:
         price:
           type: "integer"
           format: "int32"
-        withBooth:
+        with_booth:
           type: "boolean"
-        nbTickets:
+        nb_tickets:
           type: "integer"
           format: "int32"
-        maxQuantity:
+        max_quantity:
           type: "integer"
           format: "int32"
           nullable: true
       required:
         - "name"
         - "price"
-        - "withBooth"
-        - "nbTickets"
+        - "with_booth"
+        - "nb_tickets"
     AttachOptionsToPack:
       type: "object"
       properties:
@@ -2822,12 +2822,12 @@ components:
     Owner:
       type: "object"
       properties:
-        displayName:
+        display_name:
           type: "string"
         email:
           type: "string"
       required:
-        - "displayName"
+        - "display_name"
         - "email"
     OrganisationItem:
       type: "object"
@@ -2836,14 +2836,14 @@ components:
           type: "string"
         slug:
           type: "string"
-        headOffice:
+        head_office:
           type: "string"
         owner:
           $ref: "#/components/schemas/Owner"
       required:
         - "name"
         - "slug"
-        - "headOffice"
+        - "head_office"
         - "owner"
     Provider:
       type: "object"
