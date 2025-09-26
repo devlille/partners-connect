@@ -40,7 +40,7 @@ jobs:
       - name: Generate OpenAPI documentation
         uses: fluximus-prime/redocly-cli-github-action@v1
         with:
-          args: 'bundle application/src/main/resources/openapi/openapi.yaml --output application/src/main/resources/openapi/documentation.yaml'
+          args: 'bundle server/application/src/main/resources/openapi/openapi.yaml --output server/application/src/main/resources/openapi/documentation.yaml'
 
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
