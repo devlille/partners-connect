@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "properties": {
+    "pack_id": {
+      "type": "string"
+    },
+    "option_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "language": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "pack_id",
+    "language"
+  ]
+}

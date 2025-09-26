@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "external_id": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string"
+    },
+    "data": {
+      "$ref": "./ticket_data.schema.json"
+    }
+  },
+  "required": [
+    "id",
+    "external_id",
+    "url",
+    "data"
+  ]
+}

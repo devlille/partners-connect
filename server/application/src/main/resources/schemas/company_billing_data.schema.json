@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "nullable": true
+    },
+    "po": {
+      "type": "string",
+      "nullable": true
+    },
+    "contact": {
+      "$ref": "./billing_contact.schema.json"
+    }
+  },
+  "required": [
+    "contact"
+  ]
+}

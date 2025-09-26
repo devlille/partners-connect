@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "properties": {
+    "type": {
+      "enum": [
+        "LINKEDIN",
+        "X",
+        "BLUESKY",
+        "MASTODON",
+        "INSTAGRAM",
+        "FACEBOOK",
+        "YOUTUBE"
+      ]
+    },
+    "url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "type",
+    "url"
+  ]
+}

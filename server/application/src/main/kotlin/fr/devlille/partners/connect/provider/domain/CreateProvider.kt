@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class CreateProvider(
     val name: String,
     val type: String,
-    val website: String?,
-    val phone: String?,
-    val email: String?,
+    val website: String? = null,
+    val phone: String? = null,
+    val email: String? = null,
 )

@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "properties": {
+    "publication_date": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "publication_date"
+  ]
+}

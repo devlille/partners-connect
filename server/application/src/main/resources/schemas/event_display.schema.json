@@ -1,0 +1,45 @@
+{
+  "type": "object",
+  "properties": {
+    "slug": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "start_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "end_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "submission_start_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "submission_end_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "address": {
+      "type": "string"
+    },
+    "contact": {
+      "$ref": "./event_contact.schema.json"
+    },
+    "external_links": {
+      "type": "array",
+      "items": {
+        "$ref": "./event_external_link.schema.json"
+      }
+    },
+    "providers": {
+      "$ref": "./provider.schema.json"
+    }
+  },
+  "required": [
+    "slug", "name", "start_time", "end_time", "submission_start_time", "submission_end_time", "address", "contact", "external_links", "providers"
+  ]
+}

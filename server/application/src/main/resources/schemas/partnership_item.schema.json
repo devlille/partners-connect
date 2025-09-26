@@ -1,0 +1,42 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "contact": {
+      "$ref": "./contact.schema.json"
+    },
+    "company_name": {
+      "type": "string"
+    },
+    "event_name": {
+      "type": "string"
+    },
+    "pack_name": {
+      "type": "string",
+      "nullable": true
+    },
+    "suggested_pack_name": {
+      "type": "string",
+      "nullable": true
+    },
+    "language": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string",
+      "nullable": true
+    },
+    "emails": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "id", "contact", "company_name", "event_name", "language", "created_at"
+  ]
+}

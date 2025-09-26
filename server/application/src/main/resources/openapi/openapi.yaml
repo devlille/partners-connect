@@ -1,0 +1,2288 @@
+openapi: "3.1.0"
+info:
+  title: "partners_connect API"
+  description: "partners_connect API"
+  version: "1.0.0"
+servers:
+  - url: "https://partners_connect"
+paths:
+  /auth/callback:
+    get:
+      description: "OAuth callback endpoint"
+      responses:
+        "404":
+          description: "Not Found - Invalid OAuth state"
+          content:
+            application/json:
+              schema:
+                type: "object"
+        "302":
+          description: "Found - Redirect after successful authentication"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK - Authentication successful, returns session"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSession"
+  /auth/login:
+    get:
+      description: "Start OAuth login flow - redirects to Google OAuth"
+      responses:
+        "302":
+          description: "Redirect to OAuth provider"
+  /auth/logout:
+    get:
+      description: "Logout and clear session"
+      responses:
+        "204":
+          description: "No Content - Successfully logged out"
+  /auth/me:
+    get:
+      description: "Get current user information"
+      responses:
+        "401":
+          description: "Unauthorized - No valid session"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserInfo"
+  /companies:
+    get:
+      description: "List companies with paging support"
+      parameters:
+        - name: "query"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+        - name: "page"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            minimum: 1
+            default: 1
+          description: "Page number (must be >= 1)"
+        - name: "page_size"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: "Number of items per page (must be between 1 and 100)"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PaginatedCompany"
+    post:
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCompany"
+        required: true
+      responses:
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Identifier"
+  /companies/{companyId}/logo:
+    post:
+      description: "Upload a logo for a company"
+      parameters:
+        - name: "companyId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: "string"
+                  format: binary
+                  description: "Logo file (SVG, PNG, or JPEG)"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request - Invalid company ID or unsupported file type"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK - Logo uploaded successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Media"
+  /companies/{companyId}/partnership:
+    get:
+      description: ""
+      parameters:
+        - name: "companyId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/PartnershipItem"
+  /events:
+    get:
+      description: "List events with paging support"
+      parameters:
+        - name: "page"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            minimum: 1
+            default: 1
+          description: "Page number (must be >= 1)"
+        - name: "page_size"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: "Number of items per page (must be between 1 and 100)"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PaginatedEventSummary"
+  /events/{eventSlug}:
+    get:
+      description: "Get event details with organization information"
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "The slug identifier of the event"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventWithOrganisation"
+  /events/{eventSlug}/partnership:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterPartnership"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Identifier"
+  /events/{eventSlug}/partnership/{partnershipId}/billing:
+    get:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CompanyBillingData"
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompanyBillingData"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Identifier"
+    put:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompanyBillingData"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Identifier"
+  /events/{eventSlug}/partnership/{partnershipId}/billing/invoice:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Identifier"
+  /events/{eventSlug}/partnership/{partnershipId}/billing/quote:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Identifier"
+  /events/{eventSlug}/partnership/{partnershipId}/signed-agreement:
+    post:
+      description: "Upload a signed partnership agreement"
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: "Signed agreement PDF file"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request - Invalid file type or missing parameters"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK - Signed agreement uploaded successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+  /events/{eventSlug}/partnership/{partnershipId}/suggestion-approve:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Identifier"
+  /events/{eventSlug}/partnership/{partnershipId}/suggestion-decline:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Identifier"
+  /events/{eventSlug}/partnership/{partnershipId}/tickets:
+    get:
+      description: ""
+      parameters:
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Ticket"
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "array"
+              items:
+                $ref: "#/components/schemas/TicketData"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TicketOrder"
+  /events/{eventSlug}/partnership/{partnershipId}/tickets/{ticketId}:
+    put:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "ticketId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketData"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Ticket"
+  /providers:
+    get:
+      description: "List all providers with optional filtering and sorting"
+      parameters:
+        - name: "query"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+          description: "Search providers by name (case-insensitive)"
+        - name: "sort"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            enum: ["name", "createdAt", "creation", "created"]
+            default: "createdAt"
+          description: "Sort by field (default: createdAt)"
+        - name: "direction"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            enum: ["asc", "desc"]
+            default: "asc"
+          description: "Sort direction (default: asc)"
+        - name: "page"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            minimum: 1
+            default: 1
+          description: "Page number (must be >= 1)"
+        - name: "page_size"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: "Number of items per page (must be between 1 and 100)"
+      responses:
+        "200":
+          description: "OK - Paginated list of providers"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedProvider"
+    post:
+      description: "Create a new provider (requires authentication and organizer status)"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProvider"
+        required: true
+      responses:
+        "201":
+          description: "Created - Provider created successfully"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "string"
+                    format: "uuid"
+                    description: "UUID of the created provider"
+                required:
+                  - "id"
+        "400":
+          description: "Bad Request - Invalid input data"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized - Missing or invalid authentication"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "403":
+          description: "Forbidden - User is not an organizer of any event"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+  /orgs:
+    post:
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Organisation"
+        required: true
+      responses:
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Identifier"
+  /orgs/{slug}:
+    get:
+      description: ""
+      parameters:
+        - name: "slug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Organisation"
+  /orgs/{orgSlug}:
+    put:
+      description: ""
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Organisation"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Organisation"
+  /orgs/{orgSlug}/events:
+    get:
+      description: "List events for an organization (paginated)"
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "page"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            default: 1
+            minimum: 1
+          description: "Page number (default: 1)"
+        - name: "page_size"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: "Number of items per page (default: 20)"
+      security:
+        - bearerAuth: []
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedEventSummary"
+    post:
+      description: "Create a new event for an organization"
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Event"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+  /orgs/{orgSlug}/events/{eventSlug}:
+    put:
+      description: ""
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Event"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Identifier"
+  /orgs/{orgSlug}/events/{eventSlug}/booth-plan:
+    post:
+      description: "Upload booth plan image for an event"
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: "string"
+                  format: binary
+                  description: "Booth plan image file (PNG, JPEG, GIF)"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request - Invalid event slug or missing file"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "415":
+          description: "Unsupported Media Type - Invalid file format"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created - Booth plan image uploaded successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    description: "URL of the uploaded booth plan image"
+                required:
+                  - "url"
+  /orgs/{orgSlug}/events/{eventSlug}/integrations/{provider}/{usage}:
+    post:
+      description: "Register an integration for an event"
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "usage"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            enum: ["BILLING", "MAILING", "TICKETING"]
+        - name: "provider"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            enum: ["QONTO", "MAILJET", "BILLETWEB"]
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              description: "Integration configuration data"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request - Invalid provider, usage, or configuration"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+  /orgs/{orgSlug}/events/{eventSlug}/options:
+    get:
+      description: "List sponsoring options for an event"
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "Accept-Language"
+          in: "header"
+          required: false
+          schema:
+            type: "string"
+            default: "en"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      security:
+        - bearerAuth: []
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/SponsoringOption"
+    post:
+      description: "Create a new sponsoring option"
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSponsoringOption"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+  /orgs/{orgSlug}/events/{eventSlug}/options/{optionId}:
+    delete:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "optionId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "204":
+          description: "No Content"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+    put:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "optionId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSponsoringOption"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Identifier"
+  /orgs/{orgSlug}/events/{eventSlug}/packs:
+    get:
+      description: "List sponsoring packs for an event"
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "Accept-Language"
+          in: "header"
+          required: false
+          schema:
+            type: "string"
+            default: "en"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      security:
+        - bearerAuth: []
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/SponsoringPack"
+    post:
+      description: "Create a new sponsoring pack"
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSponsoringPack"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+  /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}:
+    delete:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "packId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "204":
+          description: "No Content"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+    put:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "packId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSponsoringPack"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Identifier"
+  /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}/options:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "packId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AttachOptionsToPack"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}/options/{optionId}:
+    delete:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "packId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "optionId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "204":
+          description: "No Content"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /orgs/{orgSlug}/events/{eventSlug}/communication:
+    get:
+      description: "Get communication plan for all partnerships of an event, grouped by status"
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organization slug"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug"
+      security:
+        - bearerAuth: []
+      responses:
+        "400":
+          description: "Bad Request - Missing or invalid parameters"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found - Event not found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommunicationPlan"
+  /orgs/{orgSlug}/events/{eventSlug}/external-link:
+    post:
+      description: "Attach a new external link to an event"
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                name:
+                  type: "string"
+                  description: "Display name for the external link"
+                  example: "Call for Papers"
+                url:
+                  type: "string"
+                  format: "uri"
+                  description: "URL of the external resource (must start with http:// or https://)"
+                  example: "https://sessionize.com/devlille2025"
+              required:
+                - "name"
+                - "url"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request - Invalid input or validation error"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized - Authentication required"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found - Event or organization not found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "201":
+          description: "Created - External link created successfully"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                format: "uuid"
+                description: "UUID of the created external link"
+  /orgs/{orgSlug}/events/{eventSlug}/external-link/{linkId}:
+    delete:
+      description: "Remove an external link by its ID"
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "linkId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+            description: "UUID of the external link to delete"
+      security:
+        - bearerAuth: []
+      responses:
+        "400":
+          description: "Bad Request - Invalid UUID format"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized - Authentication required"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found - External link, event or organization not found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "204":
+          description: "No Content - External link deleted successfully"
+  /orgs/{orgSlug}/events/{eventSlug}/partnership:
+    get:
+      description: "List partnerships for an event with filtering options"
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "filter[pack_id]"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+          description: "Filter by sponsoring pack ID"
+        - name: "filter[validated]"
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+          description: "Filter by validation status"
+        - name: "filter[suggestion]"
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+          description: "Filter by suggestion status"
+        - name: "filter[paid]"
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+          description: "Filter by payment status"
+        - name: "filter[agreement-generated]"
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+          description: "Filter by agreement generation status"
+        - name: "filter[agreement-signed]"
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+          description: "Filter by agreement signature status"
+        - name: "sort"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            default: "created"
+            enum: ["created", "updated"]
+          description: "Sort field"
+        - name: "direction"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            default: "asc"
+            enum: ["asc", "desc"]
+          description: "Sort direction"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      security:
+        - bearerAuth: []
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/PartnershipItem"
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/agreement:
+    post:
+      description: "Generate a partnership agreement PDF"
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      security:
+        - bearerAuth: []
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK - Agreement generated successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    description: "URL to the generated agreement PDF"
+                required:
+                  - "url"
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/billing/{billingStatus}:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "billingStatus"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Identifier"
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/booth-location:
+    put:
+      description: "Assign booth location to a partnership"
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BoothLocationRequest"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request - Invalid parameters or empty location"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "403":
+          description: "Forbidden - Booth location already assigned to another partnership"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found - Partnership or event not found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK - Booth location assigned successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoothLocationResponse"
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/suggestion:
+    post:
+      description: ""
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SuggestPartnership"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/validate:
+    post:
+      description: "Validate a partnership request"
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      security:
+        - bearerAuth: []
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/decline:
+    post:
+      description: "Decline a partnership request"
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      security:
+        - bearerAuth: []
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/communication/publication:
+    put:
+      description: "Schedule publication date for partnership communication"
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublicationDateRequest"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request - Invalid date format or missing parameters"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found - Partnership not found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK - Publication date scheduled successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicationDateResponse"
+  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/communication/support:
+    put:
+      description: "Upload visual support material for partnership communication"
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+          image/gif:
+            schema:
+              type: string
+              format: binary
+          image/svg+xml:
+            schema:
+              type: string
+              format: binary
+          image/webp:
+            schema:
+              type: string
+              format: binary
+        required: true
+      responses:
+        "400":
+          description: "Bad Request - Missing parameters or empty content"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found - Partnership not found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "415":
+          description: "Unsupported Media Type - Invalid image format"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK - Visual support uploaded successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupportUploadResponse"
+  /orgs/{orgSlug}/events/{eventSlug}/providers:
+    post:
+      description: "Attach providers to an event (requires event write access)"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organization slug"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "array"
+              items:
+                type: "string"
+                format: "uuid"
+              description: "List of provider UUIDs to attach"
+        required: true
+      responses:
+        "200":
+          description: "OK - Providers attached successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "string"
+                  format: "uuid"
+                description: "List of successfully attached provider UUIDs"
+        "400":
+          description: "Bad Request - Invalid provider IDs or empty list"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized - Missing or invalid authentication"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "403":
+          description: "Forbidden - No write access to the event"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found - Event or organization not found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+    delete:
+      description: "Remove providers from an event (requires event write access)"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organization slug"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "array"
+              items:
+                type: "string"
+                format: "uuid"
+              description: "List of provider UUIDs to remove"
+        required: true
+      responses:
+        "200":
+          description: "OK - Providers detached successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "string"
+                  format: "uuid"
+                description: "List of successfully detached provider UUIDs"
+        "400":
+          description: "Bad Request - Invalid provider IDs or empty list"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized - Missing or invalid authentication"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "403":
+          description: "Forbidden - No write access to the event"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found - Event or organization not found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+  /orgs/{orgSlug}/users:
+    get:
+      description: ""
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/User"
+  /orgs/{orgSlug}/users/grant:
+    post:
+      description: ""
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GrantPermissionRequest"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "Permissions granted"
+  /users/me/events:
+    get:
+      description: ""
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/EventSummary"
+  /users/me/orgs:
+    get:
+      description: ""
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/OrganisationItem"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Authentication token obtained through OAuth flow"
+  schemas:
+    UserSession:
+      $ref: "../schemas/user_session.schema.json"
+    UserInfo:
+      $ref: "../schemas/user_info.schema.json"
+    Address:
+      $ref: "../schemas/address.schema.json"
+    Media:
+      $ref: "../schemas/media.schema.json"
+    Company:
+      $ref: "../schemas/company.schema.json"
+    Social:
+      $ref: "../schemas/social.schema.json"
+    CreateCompany:
+      $ref: "../schemas/create_company.schema.json"
+    Identifier:
+      $ref: "../schemas/identifier.schema.json"
+    Contact:
+      $ref: "../schemas/contact.schema.json"
+    PartnershipItem:
+      $ref: "../schemas/partnership_item.schema.json"
+    EventSummary:
+      $ref: "../schemas/event_summary.schema.json"
+    Event:
+      $ref: "../schemas/event.schema.json"
+    EventDisplay:
+      $ref: "../schemas/event_display.schema.json"
+    Organisation:
+      $ref: "../schemas/organisation.schema.json"
+    EventWithOrganisation:
+      $ref: "../schemas/event_with_organisation.schema.json"
+    RegisterPartnership:
+      $ref: "../schemas/register_partnership.schema.json"
+    CompanyBillingData:
+      $ref: "../schemas/company_billing_data.schema.json"
+    TicketData:
+      $ref: "../schemas/ticket_data.schema.json"
+    Ticket:
+      $ref: "../schemas/ticket.schema.json"
+    TicketOrder:
+      $ref: "../schemas/ticket_order.schema.json"
+    SponsoringOption:
+      $ref: "../schemas/sponsoring_option.schema.json"
+    TranslatedLabel:
+      $ref: "../schemas/translated_label.schema.json"
+    CreateSponsoringOption:
+      $ref: "../schemas/create_sponsoring_option.schema.json"
+    SponsoringPack:
+      $ref: "../schemas/sponsoring_pack.schema.json"
+    CreateSponsoringPack:
+      $ref: "../schemas/create_sponsoring_pack.schema.json"
+    AttachOptionsToPack:
+      $ref: "../schemas/attach_options_to_pack.schema.json"
+    SuggestPartnership:
+      $ref: "../schemas/suggest_partnership.schema.json"
+    User:
+      $ref: "../schemas/user.schema.json"
+    GrantPermissionRequest:
+      $ref: "../schemas/grant_permission_request.schema.json"
+    OrganisationItem:
+      $ref: "../schemas/organisation_item.schema.json"
+    Provider:
+      $ref: "../schemas/provider.schema.json"
+    CreateProvider:
+      $ref: "../schemas/create_provider.schema.json"
+    BoothLocationRequest:
+      $ref: "../schemas/booth_location_request.schema.json"
+    BoothLocationResponse:
+      $ref: "../schemas/booth_location_response.schema.json"
+    PublicationDateRequest:
+      $ref: "../schemas/publication_date_request.schema.json"
+    PublicationDateResponse:
+      $ref: "../schemas/publication_date_response.schema.json"
+    SupportUploadResponse:
+      $ref: "../schemas/support_upload_response.schema.json"
+    CommunicationItem:
+      $ref: "../schemas/communication_item.schema.json"
+    CommunicationPlan:
+      $ref: "../schemas/communication_plan.schema.json"
+    PaginatedEventSummary:
+      $ref: "../schemas/paginated_event_summary.schema.json"
+    PaginatedCompany:
+      $ref: "../schemas/paginated_company.schema.json"
+    PaginatedProvider:
+      $ref: "../schemas/paginated_provider.schema.json"

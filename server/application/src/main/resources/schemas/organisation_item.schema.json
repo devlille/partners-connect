@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "properties": {
+    "slug": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "head_office": {
+      "type": "string"
+    },
+    "owner": {
+      "$ref": "./owner.schema.json",
+      "nullable": true
+    }
+  },
+  "required": [
+    "slug",
+    "name",
+    "head_office"
+  ]
+}

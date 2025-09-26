@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "properties": {
+    "partnership_id": {
+      "type": "string"
+    },
+    "company_name": {
+      "type": "string"
+    },
+    "publication_date": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+    },
+    "support_url": {
+      "type": "string",
+      "nullable": true
+    }
+  },
+  "required": [
+    "partnership_id",
+    "company_name"
+  ]
+}

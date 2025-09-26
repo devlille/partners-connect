@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "properties": {
+    "translations": {
+      "type": "array",
+      "items": {
+        "$ref": "./translated_label.schema.json"
+      }
+    },
+    "price": {
+      "type": "integer",
+      "nullable": true
+    }
+  },
+  "required": [
+    "translations"
+  ]
+}

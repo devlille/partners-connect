@@ -1,0 +1,34 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "head_office": {
+      "$ref": "./address.schema.json"
+    },
+    "siret": {
+      "type": "string"
+    },
+    "vat": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string",
+      "nullable": true
+    },
+    "site_url": {
+      "type": "string"
+    },
+    "medias": {
+      "$ref": "./media.schema.json",
+      "nullable": true
+    }
+  },
+  "required": [
+    "id", "name", "head_office", "siret", "vat", "site_url"
+  ]
+}

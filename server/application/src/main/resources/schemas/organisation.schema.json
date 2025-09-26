@@ -1,0 +1,77 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "head_office": {
+      "type": "string",
+      "nullable": true
+    },
+    "siret": {
+      "type": "string",
+      "nullable": true
+    },
+    "siren": {
+      "type": "string",
+      "nullable": true
+    },
+    "tva": {
+      "type": "string",
+      "nullable": true
+    },
+    "d_and_b": {
+      "type": "string",
+      "nullable": true
+    },
+    "nace": {
+      "type": "string",
+      "nullable": true
+    },
+    "naf": {
+      "type": "string",
+      "nullable": true
+    },
+    "duns": {
+      "type": "string",
+      "nullable": true
+    },
+    "iban": {
+      "type": "string",
+      "nullable": true
+    },
+    "bic": {
+      "type": "string",
+      "nullable": true
+    },
+    "rib_url": {
+      "type": "string",
+      "nullable": true
+    },
+    "representative_user_email": {
+      "type": "string",
+      "nullable": true
+    },
+    "representative_role": {
+      "type": "string",
+      "nullable": true
+    },
+    "creation_location": {
+      "type": "string",
+      "nullable": true
+    },
+    "created_at": {
+      "type": "string",
+      "nullable": true,
+      "format": "date-time"
+    },
+    "published_at": {
+      "type": "string",
+      "nullable": true,
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

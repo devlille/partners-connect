@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "tickets": {
+      "type": "array",
+      "items": {
+        "$ref": "./ticket.schema.json"
+      }
+    }
+  },
+  "required": [
+    "id",
+    "tickets"
+  ]
+}

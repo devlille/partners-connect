@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "properties": {
+    "address": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "zip_code": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "address", "city", "zip_code", "country"
+  ]
+}

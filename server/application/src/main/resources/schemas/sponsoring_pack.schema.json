@@ -1,0 +1,37 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "base_price": {
+      "type": "integer"
+    },
+    "max_quantity": {
+      "type": "integer",
+      "nullable": true
+    },
+    "required_options": {
+      "type": "array",
+      "items": {
+        "$ref": "./sponsoring_option.schema.json"
+      }
+    },
+    "optional_options": {
+      "type": "array",
+      "items": {
+        "$ref": "./sponsoring_option.schema.json"
+      }
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "base_price",
+    "required_options",
+    "optional_options"
+  ]
+}
