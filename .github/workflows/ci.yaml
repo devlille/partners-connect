@@ -30,14 +30,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up node
-        uses: actions/setup-node@v4
-      
-      # FIXME: https://github.com/Redocly/redocly-cli/issues/2327
-      # Temporary fix to install mobx-react@9.2.0 to avoid missing dependency issue
-      - name: Install Redocly CLI
-        run: npm install mobx-react@9.2.0 @redocly/cli@2.2.1 -g
-
       - uses: 'google-github-actions/auth@v3'
         id: auth
         with:
@@ -46,7 +38,9 @@ jobs:
           service_account: '${{ secrets.SERVICE_ACCOUNT }}'
 
       - name: Generate OpenAPI documentation
-        run: redocly bundle application/src/main/resources/openapi/openapi.yaml --output application/src/main/resources/openapi/documentation.yaml
+        uses: fluximus-prime/redocly-cli-github-action@v1
+        with:
+          args: 'bundle application/src/main/resources/openapi/openapi.yaml --output application/src/main/resources/openapi/documentation.yaml'
 
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
