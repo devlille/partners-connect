@@ -37,6 +37,11 @@ jobs:
           workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
           service_account: '${{ secrets.SERVICE_ACCOUNT }}'
 
+      - run: npm install -g @redocly/cli
+
+      - name: Generate OpenAPI documentation
+        run: redocly bundle application/src/main/resources/openapi/openapi.yaml --output application/src/main/resources/openapi/documentation.yaml
+
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
