@@ -30,9 +30,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
-        with: 
-          node-version: 22
+      - name: Set up node
+        uses: actions/setup-node@v4
+      
+      - name: Install Redocly CLI
+        run: npm install -g @redocly/cli@latest
 
       - uses: 'google-github-actions/auth@v3'
         id: auth
@@ -42,7 +44,7 @@ jobs:
           service_account: '${{ secrets.SERVICE_ACCOUNT }}'
 
       - name: Generate OpenAPI documentation
-        run: npx @redocly/cli@2.2.1 bundle application/src/main/resources/openapi/openapi.yaml --output application/src/main/resources/openapi/documentation.yaml
+        run: redocly bundle application/src/main/resources/openapi/openapi.yaml --output application/src/main/resources/openapi/documentation.yaml
 
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
