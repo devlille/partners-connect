@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "properties": {
+    "display_name": {
+      "type": "string"
+    },
+    "picture_url": {
+      "type": "string",
+      "nullable": true
+    },
+    "email": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "display_name", "email"
+  ]
+}

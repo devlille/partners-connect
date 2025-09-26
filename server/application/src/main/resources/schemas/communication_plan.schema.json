@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "properties": {
+    "done": {
+      "type": "array",
+      "items": {
+        "$ref": "./communication_item.schema.json"
+      }
+    },
+    "planned": {
+      "type": "array",
+      "items": {
+        "$ref": "./communication_item.schema.json"
+      }
+    },
+    "unplanned": {
+      "type": "array",
+      "items": {
+        "$ref": "./communication_item.schema.json"
+      }
+    }
+  },
+  "required": [
+    "done",
+    "planned",
+    "unplanned"
+  ]
+}

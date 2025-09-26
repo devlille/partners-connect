@@ -1,0 +1,46 @@
+{
+  "type": "object",
+  "properties": {
+    "company_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "pack_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "option_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "contact_name": {
+      "type": "string"
+    },
+    "contact_role": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string",
+      "nullable": true
+    },
+    "emails": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "company_id",
+    "pack_id",
+    "contact_name",
+    "contact_role",
+    "language"
+  ]
+}

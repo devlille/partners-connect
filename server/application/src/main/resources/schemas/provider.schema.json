@@ -1,0 +1,34 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string",
+      "nullable": true
+    },
+    "phone": {
+      "type": "string",
+      "nullable": true
+    },
+    "email": {
+      "type": "string",
+      "nullable": true
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "id", "name", "type", "website", "created_at"
+  ]
+}

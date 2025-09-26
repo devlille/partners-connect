@@ -1,0 +1,27 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string",
+      "nullable": true
+    },
+    "phone": {
+      "type": "string",
+      "nullable": true
+    },
+    "email": {
+      "type": "string",
+      "nullable": true
+    }
+  },
+  "required": [
+    "name",
+    "type"
+  ]
+}

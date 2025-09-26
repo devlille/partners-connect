@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "properties": {
+    "original": {
+      "type": "string"
+    },
+    "png_1000": {
+      "type": "string"
+    },
+    "png_500": {
+      "type": "string"
+    },
+    "png_250": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "original", "png_1000", "png_500", "png_250"
+  ]
+}

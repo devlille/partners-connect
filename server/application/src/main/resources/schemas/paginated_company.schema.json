@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "./company.schema.json"
+      }
+    },
+    "page": {
+      "type": "integer"
+    },
+    "page_size": {
+      "type": "integer"
+    },
+    "total": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "items",
+    "page",
+    "page_size",
+    "total"
+  ]
+}

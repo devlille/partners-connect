@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "properties": {
+    "user_emails": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "user_emails"
+  ]
+}

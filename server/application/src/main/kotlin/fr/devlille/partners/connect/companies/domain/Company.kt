@@ -12,6 +12,7 @@ data class Company(
     val siret: String,
     val vat: String,
     val description: String?,
+    @SerialName("site_url")
     val siteUrl: String,
     val medias: Media?,
 )

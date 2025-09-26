@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "properties": {
+    "state": {
+      "type": "string"
+    },
+    "token": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "state", "token"
+  ]
+}

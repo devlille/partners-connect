@@ -1,0 +1,33 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "head_office": {
+      "$ref": "./address.schema.json"
+    },
+    "siret": {
+      "type": "string"
+    },
+    "vat": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string",
+      "nullable": true
+    },
+    "site_url": {
+      "type": "string"
+    },
+    "socials": {
+      "type": "array",
+      "items": {
+        "$ref": "./social.schema.json"
+      }
+    }
+  },
+  "required": [
+    "name", "head_office", "siret", "vat", "site_url"
+  ]
+}

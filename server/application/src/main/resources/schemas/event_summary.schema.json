@@ -1,0 +1,30 @@
+{
+  "type": "object",
+  "properties": {
+    "slug": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "start_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "end_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "submission_start_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "submission_end_time": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "slug", "name", "start_time", "end_time", "submission_start_time", "submission_end_time"
+  ]
+}
