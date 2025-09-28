@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.internal.infrastructure.ktor
 
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
+import fr.devlille.partners.connect.internal.infrastructure.api.RequestBodyValidationException
 import fr.devlille.partners.connect.internal.infrastructure.resources.readResourceFile
 import io.github.optimumcode.json.schema.JsonSchemaLoader
 import io.github.optimumcode.json.schema.SchemaType
@@ -65,7 +66,7 @@ val schemas by lazy {
 
 suspend inline fun <reified T : Any> ApplicationCall.receive(schema: String): T = try {
     receive<T>()
-} catch (_: BadRequestException) {
+} catch (ex: BadRequestException) {
     val schemaContent = readResourceFile("/schemas/$schema")
     val schema = schemas.fromDefinition(schemaContent, SchemaType.DRAFT_7)
     val body = receiveText()
@@ -74,7 +75,10 @@ suspend inline fun <reified T : Any> ApplicationCall.receive(schema: String): T 
     if (valid) {
         throw ForbiddenException("Unreachable")
     } else {
-        val errorMessages = errors.joinToString("; ") { it.message }
-        throw BadRequestException("Invalid request body: $errorMessages")
+        throw RequestBodyValidationException(
+            errors = errors.map { it.message },
+            message = "Request body does not conform to schema $schema",
+            cause = ex,
+        )
     }
 }

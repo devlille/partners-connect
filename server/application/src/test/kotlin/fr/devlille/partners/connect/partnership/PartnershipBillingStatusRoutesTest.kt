@@ -9,7 +9,6 @@ import fr.devlille.partners.connect.partnership.factories.insertMockedPartnershi
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.users.factories.insertMockedAdminUser
 import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
-import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.statement.bodyAsText
@@ -109,8 +108,10 @@ class PartnershipBillingStatusRoutesTest {
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        val body = response.bodyAsText()
-        assertTrue(body.contains("Invalid billing status"))
+        assertTrue(
+            actual = response.bodyAsText()
+                .contains("Request parameter billingStatus couldn't be parsed/converted to InvoiceStatus"),
+        )
     }
 
     @Test

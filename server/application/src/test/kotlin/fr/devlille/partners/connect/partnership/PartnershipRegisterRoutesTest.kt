@@ -129,7 +129,7 @@ class PartnershipRegisterRoutesTest {
     }
 
     @Test
-    fun `POST returns 400 when partnership already exists`() = testApplication {
+    fun `POST returns 409 when partnership already exists`() = testApplication {
         val eventId = UUID.randomUUID()
         val eventSlug = "test-post-returns-400-whe-141"
         val companyId = UUID.randomUUID()
@@ -154,11 +154,11 @@ class PartnershipRegisterRoutesTest {
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
-        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals(HttpStatusCode.Conflict, response.status)
     }
 
     @Test
-    fun `POST returns 400 when option not optional`() = testApplication {
+    fun `POST returns 403 when option not optional`() = testApplication {
         val eventId = UUID.randomUUID()
         val eventSlug = "test-post-returns-400-whe-15"
         val companyId = UUID.randomUUID()
@@ -186,12 +186,12 @@ class PartnershipRegisterRoutesTest {
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
-        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals(HttpStatusCode.Forbidden, response.status)
         assertTrue(response.bodyAsText().contains("not optional"))
     }
 
     @Test
-    fun `POST returns 400 when option has no translation`() = testApplication {
+    fun `POST returns 403 when option has no translation`() = testApplication {
         val eventId = UUID.randomUUID()
         val eventSlug = "test-post-returns-400-whe-604"
         val companyId = UUID.randomUUID()
@@ -219,7 +219,7 @@ class PartnershipRegisterRoutesTest {
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
-        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals(HttpStatusCode.Forbidden, response.status)
         assertTrue(response.bodyAsText().contains("does not have a translation"))
     }
 }

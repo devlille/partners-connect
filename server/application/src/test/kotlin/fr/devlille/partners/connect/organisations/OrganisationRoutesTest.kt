@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.organisations
 
+import fr.devlille.partners.connect.internal.infrastructure.api.ResponseException
 import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.domain.Organisation
@@ -288,7 +289,8 @@ class OrganisationRoutesTest {
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertEquals("Organisation name is required and cannot be empty", response.bodyAsText())
+        val message = json.decodeFromString<ResponseException>(response.bodyAsText()).message
+        assertEquals("Request parameter 'name' is invalid: must not be empty", message)
     }
 
     @Test
@@ -306,7 +308,8 @@ class OrganisationRoutesTest {
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertEquals("Organisation name is required and cannot be empty", response.bodyAsText())
+        val message = json.decodeFromString<ResponseException>(response.bodyAsText()).message
+        assertEquals("Request parameter 'name' is invalid: must not be empty", message)
     }
 
     @Test
@@ -361,7 +364,8 @@ class OrganisationRoutesTest {
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertEquals("Organisation name is required and cannot be empty", response.bodyAsText())
+        val message = json.decodeFromString<ResponseException>(response.bodyAsText()).message
+        assertEquals("Request parameter 'name' is invalid: must not be empty", message)
     }
 
     @Test

@@ -16,7 +16,6 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
-@Suppress("ThrowsCount")
 fun Route.providerRoutes() {
     val providerRepository by inject<ProviderRepository>()
     val authRepository by inject<AuthRepository>()
@@ -29,22 +28,18 @@ fun Route.providerRoutes() {
             val direction = call.request.queryParameters["direction"]
             val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 1
             val pageSize = call.request.queryParameters["page_size"]?.toIntOrNull() ?: DEFAULT_PAGE_SIZE
-
             val providers = providerRepository.list(query, sort, direction, page, pageSize)
             call.respond(HttpStatusCode.OK, providers)
         }
 
         post {
-            // Requires authentication and user must be organizer of at least one event
             val token = call.token
             val userInfo = authRepository.getUserInfo(token)
-
             // Check if user is organizer (has at least one event)
             val userEvents = eventRepository.findByUserEmail(userInfo.email)
             if (userEvents.isEmpty()) {
                 throw ForbiddenException("You must be an organizer of at least one event to create providers")
             }
-
             val input = call.receive<CreateProvider>(schema = "create_provider.schema.json")
             val providerId = providerRepository.create(input)
             call.respond(HttpStatusCode.Created, mapOf("id" to providerId.toString()))

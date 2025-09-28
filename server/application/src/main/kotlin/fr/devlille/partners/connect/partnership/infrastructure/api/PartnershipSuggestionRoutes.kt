@@ -1,9 +1,9 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.events.domain.EventRepository
+import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
-import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
@@ -12,7 +12,6 @@ import fr.devlille.partners.connect.partnership.domain.SuggestPartnership
 import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
 import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -20,7 +19,7 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
-@Suppress("ThrowsCount", "LongMethod")
+@Suppress("LongMethod")
 fun Route.partnershipSuggestionRoutes() {
     val eventRepository by inject<EventRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
@@ -30,9 +29,8 @@ fun Route.partnershipSuggestionRoutes() {
 
     route("/events/{eventSlug}/partnership/{partnershipId}") {
         post("/suggestion-approve") {
-            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-            val partnershipId = call.parameters["partnershipId"]?.toUUID()
-                ?: throw BadRequestException("Missing partnership id")
+            val eventSlug = call.parameters.eventSlug
+            val partnershipId = call.parameters.partnershipId
             val id = suggestionRepository.approve(eventSlug, partnershipId)
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
@@ -52,9 +50,8 @@ fun Route.partnershipSuggestionRoutes() {
         }
 
         post("/suggestion-decline") {
-            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-            val partnershipId = call.parameters["partnershipId"]?.toUUID()
-                ?: throw BadRequestException("Missing partnership id")
+            val eventSlug = call.parameters.eventSlug
+            val partnershipId = call.parameters.partnershipId
             val id = suggestionRepository.decline(eventSlug, partnershipId)
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
@@ -79,9 +76,8 @@ fun Route.partnershipSuggestionRoutes() {
 
         @Suppress("ThrowsCount")
         post("/suggestion") {
-            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-            val partnershipId = call.parameters["partnershipId"]?.toUUID()
-                ?: throw BadRequestException("Missing partnership id")
+            val eventSlug = call.parameters.eventSlug
+            val partnershipId = call.parameters.partnershipId
             val input = call.receive<SuggestPartnership>(schema = "suggest_partnership.schema.json")
             val id = suggestionRepository.suggest(eventSlug, partnershipId, input)
             val partnership = partnershipRepository.getById(eventSlug, id)

@@ -118,7 +118,7 @@ class PartnershipCommunicationRoutesTest {
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("Invalid request body: value does not match 'date-time' format"))
+        assertTrue(response.bodyAsText().contains("value does not match 'date-time' format"))
     }
 
     @Test
@@ -299,7 +299,7 @@ class PartnershipCommunicationRoutesTest {
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("Empty file content"))
+        assertTrue(response.bodyAsText().contains("must not be empty"))
     }
 
     @Test

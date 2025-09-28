@@ -157,7 +157,7 @@ class CompanyRoutesTest {
             },
         )
 
-        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals(HttpStatusCode.UnsupportedMediaType, response.status)
         assertTrue(response.bodyAsText().contains("Unsupported file type"))
     }
 

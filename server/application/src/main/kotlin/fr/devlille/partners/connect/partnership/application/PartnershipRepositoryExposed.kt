@@ -5,6 +5,7 @@ import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.application.mappers.toDomain
@@ -32,7 +33,6 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptio
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionalOptionsByPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listTranslationsByOptionAndLanguage
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
@@ -63,7 +63,7 @@ class PartnershipRepositoryExposed(
 
         val existing = partnershipEntity.singleByEventAndCompany(eventId, companyId)
         if (existing != null) {
-            throw BadRequestException("Company already subscribed to this event")
+            throw ConflictException("Company already subscribed to this event")
         }
 
         val partnership = PartnershipEntity.new {
@@ -91,7 +91,7 @@ class PartnershipRepositoryExposed(
         val unknownOptions = optionsUUID.filterNot { it in optionalOptionIds }
 
         if (unknownOptions.isNotEmpty()) {
-            throw BadRequestException("Some options are not optional in the selected pack: $unknownOptions")
+            throw ForbiddenException("Some options are not optional in the selected pack: $unknownOptions")
         }
 
         optionsUUID.forEach {
@@ -102,7 +102,7 @@ class PartnershipRepositoryExposed(
                 .isEmpty()
 
             if (noTranslations) {
-                throw BadRequestException("Option $it does not have a translation for language ${register.language}")
+                throw ForbiddenException("Option $it does not have a translation for language ${register.language}")
             }
             PartnershipOptionEntity.new {
                 this.partnership = partnership

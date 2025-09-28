@@ -219,7 +219,7 @@ class PartnershipBoothLocationRoutesTest {
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
         val body = response.bodyAsText()
-        assertTrue(body.contains("cannot be empty"))
+        assertTrue(body.contains("must not be empty"))
     }
 
     @Test

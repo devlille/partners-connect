@@ -377,11 +377,11 @@ class PartnershipAgreementRoutesTest {
         )
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("Missing file part"))
+        assertTrue(response.bodyAsText().contains("Request parameter file is missing"))
     }
 
     @Test
-    fun `POST upload signed agreement - returns 400 if content type is not PDF`() = testApplication {
+    fun `POST upload signed agreement - returns 415 if content type is not PDF`() = testApplication {
         val storage = mockk<Storage>()
         val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
@@ -416,7 +416,7 @@ class PartnershipAgreementRoutesTest {
             },
         )
 
-        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals(HttpStatusCode.UnsupportedMediaType, response.status)
         assertTrue(response.bodyAsText().contains("Invalid file type"))
     }
 }

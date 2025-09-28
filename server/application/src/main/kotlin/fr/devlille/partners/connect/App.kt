@@ -15,6 +15,8 @@ import fr.devlille.partners.connect.integrations.infrastructure.api.integrationR
 import fr.devlille.partners.connect.integrations.infrastructure.bindings.integrationModule
 import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
+import fr.devlille.partners.connect.internal.infrastructure.api.RequestBodyValidationException
+import fr.devlille.partners.connect.internal.infrastructure.api.ResponseException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnsupportedMediaTypeException
 import fr.devlille.partners.connect.internal.infrastructure.api.UserSession
@@ -59,8 +61,8 @@ import io.ktor.server.plugins.doublereceive.DoubleReceive
 import io.ktor.server.plugins.openapi.openAPI
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.plugins.swagger.swaggerUI
+import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
-import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.sessions.Sessions
@@ -212,7 +214,22 @@ private fun Application.configureContentNegotiation() {
 private fun Application.configureStatusPage() {
     install(StatusPages) {
         exception<BadRequestException> { call, cause ->
-            call.respondText(text = cause.message ?: "400 Bad Request", status = HttpStatusCode.BadRequest)
+            val response = when (cause) {
+                is RequestBodyValidationException -> {
+                    ResponseException(
+                        message = cause.message ?: "Bad Request",
+                        errors = cause.errors,
+                        stack = cause.cause?.stackTraceToString(),
+                    )
+                }
+                else -> {
+                    ResponseException(
+                        message = cause.message ?: "Bad Request",
+                        stack = cause.cause?.stackTraceToString(),
+                    )
+                }
+            }
+            call.respond(status = HttpStatusCode.BadRequest, message = response)
         }
         exception<UnauthorizedException> { call, cause ->
             call.respondText(text = cause.message ?: "401 Unauthorized", status = HttpStatusCode.Unauthorized)

@@ -80,7 +80,7 @@ class SponsoringDeleteRoutesTest {
         val response = client.delete("/orgs/$orgId/events/$eventSlug/options/$optionId") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
-        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals(HttpStatusCode.Forbidden, response.status)
         assertTrue(response.bodyAsText().contains("cannot be deleted"))
     }
 
@@ -123,7 +123,7 @@ class SponsoringDeleteRoutesTest {
         val response = client.delete("/orgs/$orgId/events/$eventSlug/packs/$packId") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
-        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals(HttpStatusCode.Forbidden, response.status)
         assertTrue(response.bodyAsText().contains("cannot be deleted"))
     }
 

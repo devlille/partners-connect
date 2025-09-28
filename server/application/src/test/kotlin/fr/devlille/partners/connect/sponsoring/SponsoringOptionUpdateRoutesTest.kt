@@ -214,11 +214,7 @@ class SponsoringOptionUpdateRoutesTest {
 
         // The UUID parsing might happen at different levels, so let's just check it's not a 200
         assertTrue(response.status.value >= 400)
-        assertTrue(
-            response.bodyAsText().contains("Invalid UUID format") ||
-                response.bodyAsText().contains("not found", ignoreCase = true) ||
-                response.bodyAsText().contains("bad request", ignoreCase = true),
-        )
+        assertTrue(response.bodyAsText().contains("Request parameter id couldn't be parsed/converted to UUID"))
     }
 
     @Test

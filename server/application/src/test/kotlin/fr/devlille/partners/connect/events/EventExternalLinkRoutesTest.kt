@@ -88,7 +88,7 @@ class EventExternalLinkRoutesTest {
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("name cannot be empty"))
+        assertTrue(response.bodyAsText().contains("must not be empty"))
     }
 
     @Test
@@ -118,7 +118,7 @@ class EventExternalLinkRoutesTest {
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("URL cannot be empty"))
+        assertTrue(response.bodyAsText().contains("must not be empty"))
     }
 
     @Test
@@ -148,7 +148,7 @@ class EventExternalLinkRoutesTest {
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("Invalid URL format"))
+        assertTrue(response.bodyAsText().contains("must be a valid URL"))
     }
 
     @Test

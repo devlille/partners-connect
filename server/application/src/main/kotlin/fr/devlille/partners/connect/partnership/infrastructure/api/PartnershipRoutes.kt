@@ -2,7 +2,9 @@ package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.companies.domain.CompanyRepository
 import fr.devlille.partners.connect.events.domain.EventRepository
+import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
@@ -13,7 +15,6 @@ import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
 import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
 import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -22,7 +23,7 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
-@Suppress("ThrowsCount", "LongMethod")
+@Suppress("LongMethod")
 fun Route.partnershipRoutes() {
     val eventRepository by inject<EventRepository>()
     val companyRepository by inject<CompanyRepository>()
@@ -32,7 +33,7 @@ fun Route.partnershipRoutes() {
 
     route("/events/{eventSlug}/partnership") {
         post {
-            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventSlug = call.parameters.eventSlug
             val register = call.receive<RegisterPartnership>(schema = "register_partnership.schema.json")
             val id = partnershipRepository.register(eventSlug, register)
             val company = companyRepository.getById(register.companyId.toUUID())
@@ -60,7 +61,7 @@ fun Route.partnershipRoutes() {
         install(AuthorizedOrganisationPlugin)
 
         get {
-            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
+            val eventSlug = call.parameters.eventSlug
 
             // Parse query parameters for filters
             val filters = PartnershipFilters(
@@ -85,14 +86,13 @@ fun Route.partnershipRoutes() {
             install(AuthorizedOrganisationPlugin)
 
             post {
-                val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-                val partnershipId = call.parameters["partnershipId"]?.toUUID()
-                    ?: throw BadRequestException("Missing partnership id")
+                val eventSlug = call.parameters.eventSlug
+                val partnershipId = call.parameters.partnershipId
                 val id = partnershipRepository.validate(eventSlug, partnershipId)
                 val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
                 val partnership = partnershipRepository.getById(eventSlug, partnershipId)
                 val pack = partnership.selectedPack
-                    ?: throw BadRequestException("Partnership does not have a selected pack")
+                    ?: throw ForbiddenException("Partnership does not have a selected pack")
                 val event = eventRepository.getBySlug(eventSlug)
                 val variables = NotificationVariables.PartnershipValidated(
                     partnership.language,
@@ -114,9 +114,8 @@ fun Route.partnershipRoutes() {
             install(AuthorizedOrganisationPlugin)
 
             post {
-                val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-                val partnershipId = call.parameters["partnershipId"]?.toUUID()
-                    ?: throw BadRequestException("Missing partnership id")
+                val eventSlug = call.parameters.eventSlug
+                val partnershipId = call.parameters.partnershipId
                 val id = partnershipRepository.decline(eventSlug, partnershipId)
                 val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
                 val partnership = partnershipRepository.getById(eventSlug, partnershipId)
