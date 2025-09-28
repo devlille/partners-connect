@@ -260,7 +260,7 @@ class SponsoringPackRoutesTest {
     }
 
     @Test
-    fun `POST packs options returns 400 when same option is in required and optional`() = testApplication {
+    fun `POST packs options returns 409 when same option is in required and optional`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val eventSlug = "test-post-packs-options-r-541"
@@ -289,12 +289,12 @@ class SponsoringPackRoutesTest {
             )
         }
 
-        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals(HttpStatusCode.Conflict, response.status)
         assertTrue { response.bodyAsText().contains("cannot be both required and optional") }
     }
 
     @Test
-    fun `POST packs options returns 400 if any option is not linked to the event`() = testApplication {
+    fun `POST packs options returns 403 if any option is not linked to the event`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val eventSlug = "test-post-packs-options-r-864"
@@ -330,12 +330,12 @@ class SponsoringPackRoutesTest {
             )
         }
 
-        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals(HttpStatusCode.Forbidden, response.status)
         assertTrue { response.bodyAsText().contains("Some options do not belong to the event") }
     }
 
     @Test
-    fun `POST packs options returns 400 if option is already attached to pack`() = testApplication {
+    fun `POST packs options returns 409 if option is already attached to pack`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val eventSlug = "test-post-packs-options-r-522"
@@ -366,7 +366,7 @@ class SponsoringPackRoutesTest {
             )
         }
 
-        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals(HttpStatusCode.Conflict, response.status)
         assertTrue { response.bodyAsText().contains("Option already attached to pack") }
     }
 }

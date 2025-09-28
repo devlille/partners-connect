@@ -2,6 +2,8 @@ package fr.devlille.partners.connect.sponsoring.application
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
+import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.sponsoring.application.mappers.toDomain
 import fr.devlille.partners.connect.sponsoring.domain.AttachOptionsToPack
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
@@ -16,7 +18,6 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackE
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.allByEvent
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionsAttachedByEventAndOption
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.singlePackById
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.v1.core.and
@@ -82,7 +83,7 @@ class OptionRepositoryExposed(
         val isUsed = PackOptionsTable
             .listOptionsAttachedByEventAndOption(event.id.value, optionId)
             .empty().not()
-        if (isUsed) throw BadRequestException("Option is used in a pack and cannot be deleted")
+        if (isUsed) throw ForbiddenException("Option is used in a pack and cannot be deleted")
 
         // Delete translations first (FK constraint)
         OptionTranslationsTable.deleteWhere { OptionTranslationsTable.option eq optionId }
@@ -100,7 +101,7 @@ class OptionRepositoryExposed(
             ?: throw NotFoundException("Event with slug $eventSlug not found")
         val intersect = options.required.intersect(options.optional)
         if (intersect.isNotEmpty()) {
-            throw BadRequestException("options ${intersect.joinToString(",")} cannot be both required and optional")
+            throw ConflictException("options ${intersect.joinToString(",")} cannot be both required and optional")
         }
 
         val pack = SponsoringPackEntity.singlePackById(event.id.value, packId)
@@ -124,7 +125,7 @@ class OptionRepositoryExposed(
             .distinct()
 
         if (existingOptions.size != allOptionIds.size) {
-            throw BadRequestException("Some options do not belong to the event")
+            throw ForbiddenException("Some options do not belong to the event")
         }
 
         val alreadyAttached = PackOptionsTable
@@ -133,7 +134,7 @@ class OptionRepositoryExposed(
             .map { it[PackOptionsTable.option].value }
 
         if (alreadyAttached.isNotEmpty()) {
-            throw BadRequestException("Option already attached to pack: ${alreadyAttached.joinToString()}")
+            throw ConflictException("Option already attached to pack: ${alreadyAttached.joinToString()}")
         }
 
         requiredOptions.forEach { option ->

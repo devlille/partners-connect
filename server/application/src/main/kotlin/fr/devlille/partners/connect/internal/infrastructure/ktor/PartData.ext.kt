@@ -1,13 +1,13 @@
 package fr.devlille.partners.connect.internal.infrastructure.ktor
 
 import io.ktor.http.content.PartData
-import io.ktor.server.plugins.BadRequestException
+import io.ktor.server.plugins.ParameterConversionException
 import io.ktor.utils.io.jvm.javaio.toInputStream
 import java.io.ByteArrayOutputStream
 
 fun PartData?.asByteArray(): ByteArray {
     if (this !is PartData.FileItem) {
-        throw BadRequestException("PartData is not a file")
+        throw ParameterConversionException(parameterName = "body", type = "file")
     }
     try {
         val output = ByteArrayOutputStream()

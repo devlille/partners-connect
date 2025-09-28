@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.partnership.application
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.domain.PartnershipSuggestionRepository
 import fr.devlille.partners.connect.partnership.domain.SuggestPartnership
@@ -15,7 +16,6 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptio
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionalOptionsByPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listTranslationsByOptionAndLanguage
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -48,7 +48,7 @@ class PartnershipSuggestionRepositoryExposed(
         val optionsUUID = input.optionIds.map { it.toUUID() }
         val unknownOptions = optionsUUID.filterNot { it in optionalOptionIds }
         if (unknownOptions.isNotEmpty()) {
-            throw BadRequestException("Some options are not optional in the suggested pack: $unknownOptions")
+            throw ForbiddenException("Some options are not optional in the suggested pack: $unknownOptions")
         }
 
         // Remove previous suggested options
@@ -60,7 +60,7 @@ class PartnershipSuggestionRepositoryExposed(
                 .listTranslationsByOptionAndLanguage(it, partnership.language)
                 .isEmpty()
             if (noTranslation) {
-                throw BadRequestException("Option $it does not have a translation for language ${partnership.language}")
+                throw ForbiddenException("Option $it doesn't have a translation for language ${partnership.language}")
             }
             PartnershipOptionEntity.new {
                 this.partnership = partnership

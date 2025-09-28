@@ -5,9 +5,9 @@ import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.IntegrationRegistrar
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.integrations.domain.WebhookType
+import fr.devlille.partners.connect.internal.infrastructure.api.EmptyStringValidationException
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
@@ -26,14 +26,14 @@ class WebhookRegistrar : IntegrationRegistrar<CreateIntegration.CreateWebhookInt
     ): UUID = transaction {
         // Validate URL is not empty
         if (input.url.isBlank()) {
-            throw BadRequestException("Webhook URL cannot be empty")
+            throw EmptyStringValidationException("request url")
         }
 
         // If type is PARTNERSHIP, validate partnershipId is provided and exists
         var partnershipUuid: UUID? = null
         if (input.type == WebhookType.PARTNERSHIP) {
             if (input.partnershipId.isNullOrBlank()) {
-                throw BadRequestException("Partnership ID is required for PARTNERSHIP type webhook")
+                throw EmptyStringValidationException("partnership id")
             }
             partnershipUuid = input.partnershipId.toUUID()
             // Verify partnership exists

@@ -5,7 +5,6 @@ import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.provider.domain.ProviderRepository
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
@@ -13,7 +12,6 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
-@Suppress("ThrowsCount")
 fun Route.eventProviderRoutes() {
     val providerRepository by inject<ProviderRepository>()
 
@@ -21,23 +19,17 @@ fun Route.eventProviderRoutes() {
         install(AuthorizedOrganisationPlugin)
 
         post {
-            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-            val providerIdStrings = call.receive<List<String>>(schema = "create_by_identifiers.schema.json")
-
-            // Validate and convert provider IDs
-            val providerIds = providerIdStrings.map { it.toUUID() }
-
+            val eventSlug = call.parameters.eventSlug
+            val providerIds = call.receive<List<String>>(schema = "create_by_identifiers.schema.json")
+                .map { it.toUUID() }
             val attachedIds = providerRepository.attachToEvent(eventSlug, providerIds)
             call.respond(HttpStatusCode.OK, attachedIds.map { it.toString() })
         }
 
         delete {
-            val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-            val providerIdStrings = call.receive<List<String>>(schema = "create_by_identifiers.schema.json")
-
-            // Validate and convert provider IDs
-            val providerIds = providerIdStrings.map { it.toUUID() }
-
+            val eventSlug = call.parameters.eventSlug
+            val providerIds = call.receive<List<String>>(schema = "create_by_identifiers.schema.json")
+                .map { it.toUUID() }
             val detachedIds = providerRepository.detachFromEvent(eventSlug, providerIds)
             call.respond(HttpStatusCode.OK, detachedIds.map { it.toString() })
         }

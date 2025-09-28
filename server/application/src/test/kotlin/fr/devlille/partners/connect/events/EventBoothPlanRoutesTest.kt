@@ -215,6 +215,6 @@ class EventBoothPlanRoutesTest {
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
         val body = response.bodyAsText()
-        assertTrue(body.contains("Missing file part"))
+        assertTrue(body.contains("Request parameter file is missing"))
     }
 }

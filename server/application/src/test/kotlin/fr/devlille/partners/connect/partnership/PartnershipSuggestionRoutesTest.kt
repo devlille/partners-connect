@@ -147,7 +147,7 @@ class PartnershipSuggestionRoutesTest {
             setBody(Json.encodeToString(SuggestPartnership(packId.toString(), listOf(optionId.toString()), "en")))
         }
 
-        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals(HttpStatusCode.Forbidden, response.status)
         assertTrue(response.bodyAsText().contains("not optional"))
     }
 
@@ -179,7 +179,7 @@ class PartnershipSuggestionRoutesTest {
             setBody(Json.encodeToString(SuggestPartnership(packId.toString(), listOf(optionId.toString()), "en")))
         }
 
-        assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("does not have a translation"))
+        assertEquals(HttpStatusCode.Forbidden, response.status)
+        assertTrue(response.bodyAsText().contains("doesn't have a translation"))
     }
 }

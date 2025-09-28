@@ -132,7 +132,7 @@ class EventProviderRoutesTest {
     }
 
     @Test
-    fun `POST fails with 400 when provider IDs don't exist`() = testApplication {
+    fun `POST fails with 403 when provider IDs don't exist`() = testApplication {
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
@@ -159,7 +159,7 @@ class EventProviderRoutesTest {
             setBody(json.encodeToString(nonExistentIds))
         }
 
-        assertEquals(HttpStatusCode.BadRequest, response.status)
+        assertEquals(HttpStatusCode.Forbidden, response.status)
         assertTrue(response.bodyAsText().contains("One or more provider IDs do not exist"))
     }
 
@@ -187,7 +187,7 @@ class EventProviderRoutesTest {
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("Provider IDs list cannot be empty"))
+        assertTrue(response.bodyAsText().contains("must not be an empty list"))
     }
 
     @Test
@@ -214,7 +214,8 @@ class EventProviderRoutesTest {
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("Invalid UUID format"))
+        println(response.bodyAsText())
+        assertTrue(response.bodyAsText().contains("Request parameter id couldn't be parsed/converted to UUID"))
     }
 
     @Test

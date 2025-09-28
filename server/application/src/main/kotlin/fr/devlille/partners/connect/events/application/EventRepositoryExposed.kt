@@ -14,7 +14,9 @@ import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinksT
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
+import fr.devlille.partners.connect.internal.infrastructure.api.EmptyStringValidationException
 import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedResponse
+import fr.devlille.partners.connect.internal.infrastructure.api.URLValidationException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.paginated
 import fr.devlille.partners.connect.internal.infrastructure.api.toPaginatedResponse
@@ -29,7 +31,6 @@ import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissi
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionsTable
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.and
@@ -242,16 +243,16 @@ class EventRepositoryExposed(
     ): UUID = transaction {
         // Basic validation
         if (request.name.isBlank()) {
-            throw BadRequestException("External link name cannot be empty")
+            throw EmptyStringValidationException("request name")
         }
         if (request.url.isBlank()) {
-            throw BadRequestException("External link URL cannot be empty")
+            throw EmptyStringValidationException("request url")
         }
 
         // Basic URL validation
         val urlPattern = Regex("^https?://.*")
         if (!urlPattern.matches(request.url)) {
-            throw BadRequestException("Invalid URL format - must start with http:// or https://")
+            throw URLValidationException("request url")
         }
 
         val eventEntity = entity.eventFindBySlug(eventSlug)

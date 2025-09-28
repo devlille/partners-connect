@@ -83,7 +83,11 @@ class IntegrationRoutesTest {
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("Invalid usage"), "Expected error about usage")
+        assertTrue(
+            actual = response.bodyAsText()
+                .contains("Request parameter usage couldn't be parsed/converted to IntegrationUsage"),
+            message = "Expected error about usage",
+        )
     }
 
     @Test
@@ -108,7 +112,11 @@ class IntegrationRoutesTest {
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("Invalid provider"), "Expected error about provider")
+        assertTrue(
+            actual = response.bodyAsText()
+                .contains("Request parameter provider couldn't be parsed/converted to IntegrationProvider"),
+            message = "Expected error about provider",
+        )
     }
 
     @Test
@@ -315,7 +323,10 @@ class IntegrationRoutesTest {
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("Invalid UUID format"), "Expected invalid UUID format error")
+        assertTrue(
+            actual = response.bodyAsText().contains("Request parameter id couldn't be parsed/converted to UUID"),
+            message = "Expected invalid UUID format error",
+        )
     }
 
     @Test
