@@ -1,11 +1,11 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.put
@@ -37,7 +37,7 @@ fun Route.partnershipBoothLocationRoutes() {
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
 
-            val request = call.receive<BoothLocationRequest>()
+            val request = call.receive<BoothLocationRequest>(schema = "booth_location_request.schema.json")
             val location = request.location.trim()
 
             if (location.isBlank()) {

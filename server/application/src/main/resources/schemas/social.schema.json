@@ -1,4 +1,5 @@
 {
+  "$id": "social.schema.json",
   "type": "object",
   "properties": {
     "type": {

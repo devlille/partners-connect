@@ -1,4 +1,5 @@
 {
+  "$id": "event_summary.schema.json",
   "type": "object",
   "properties": {
     "slug": {
@@ -25,6 +26,11 @@
     }
   },
   "required": [
-    "slug", "name", "start_time", "end_time", "submission_start_time", "submission_end_time"
+    "slug",
+    "name",
+    "start_time",
+    "end_time",
+    "submission_start_time",
+    "submission_end_time"
   ]
 }

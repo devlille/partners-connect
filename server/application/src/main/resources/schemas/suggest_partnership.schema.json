@@ -1,4 +1,5 @@
 {
+  "$id": "suggest_partnership.schema.json",
   "type": "object",
   "properties": {
     "pack_id": {

@@ -1,4 +1,5 @@
 {
+  "$id": "translated_label.schema.json",
   "type": "object",
   "properties": {
     "language": {

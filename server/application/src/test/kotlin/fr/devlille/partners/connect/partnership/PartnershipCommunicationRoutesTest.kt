@@ -118,7 +118,7 @@ class PartnershipCommunicationRoutesTest {
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("Failed to convert request body"))
+        assertTrue(response.bodyAsText().contains("Invalid request body: value does not match 'date-time' format"))
     }
 
     @Test

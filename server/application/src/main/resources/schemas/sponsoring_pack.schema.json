@@ -1,4 +1,5 @@
 {
+  "$id": "sponsoring_pack.schema.json",
   "type": "object",
   "properties": {
     "id": {
@@ -17,13 +18,13 @@
     "required_options": {
       "type": "array",
       "items": {
-        "$ref": "./sponsoring_option.schema.json"
+        "$ref": "sponsoring_option.schema.json"
       }
     },
     "optional_options": {
       "type": "array",
       "items": {
-        "$ref": "./sponsoring_option.schema.json"
+        "$ref": "sponsoring_option.schema.json"
       }
     }
   },

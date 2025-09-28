@@ -1,4 +1,5 @@
 {
+  "$id": "grant_permission_request.schema.json",
   "type": "object",
   "properties": {
     "user_emails": {

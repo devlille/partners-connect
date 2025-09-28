@@ -1,4 +1,5 @@
 {
+  "$id": "publication_date_response.schema.json",
   "type": "object",
   "properties": {
     "id": {

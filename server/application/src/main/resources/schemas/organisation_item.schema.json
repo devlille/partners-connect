@@ -1,4 +1,5 @@
 {
+  "$id": "organisation_item.schema.json",
   "type": "object",
   "properties": {
     "slug": {
@@ -11,7 +12,7 @@
       "type": "string"
     },
     "owner": {
-      "$ref": "./owner.schema.json",
+      "$ref": "owner.schema.json",
       "nullable": true
     }
   },

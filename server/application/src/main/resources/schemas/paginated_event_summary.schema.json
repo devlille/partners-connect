@@ -1,10 +1,11 @@
 {
+  "$id": "paginated_event_summary.schema.json",
   "type": "object",
   "properties": {
     "items": {
       "type": "array",
       "items": {
-        "$ref": "./event_summary.schema.json"
+        "$ref": "event_summary.schema.json"
       }
     },
     "page": {

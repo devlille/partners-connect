@@ -55,6 +55,7 @@ import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
+import io.ktor.server.plugins.doublereceive.DoubleReceive
 import io.ktor.server.plugins.openapi.openAPI
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.plugins.swagger.swaggerUI
@@ -114,6 +115,7 @@ fun Application.module(config: ApplicationConfig = ApplicationConfig()) {
         password = config.databasePassword,
     )
     configureCors()
+    install(DoubleReceive)
     install(Koin) {
         slf4jLogger()
         modules(config.modules)

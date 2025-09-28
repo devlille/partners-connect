@@ -7,6 +7,7 @@ okhttp = "4.12.0"
 flexmark = "0.64.8"
 mustache = "0.9.10"
 slack = "1.45.3"
+json-schema-validator = "0.5.2"
 kotlin = "2.1.21"
 kotlinx-datetime = "0.6.1"
 kotlinx-serialization = "1.7.3"
@@ -55,6 +56,7 @@ ktor-server-statuspages = { module = "io.ktor:ktor-server-status-pages", version
 ktor-server-cors = { module = "io.ktor:ktor-server-cors", version.ref = "ktor" }
 ktor-server-conditional = { module = "io.ktor:ktor-server-conditional-headers", version.ref = "ktor" }
 ktor-server-sessions = { module = "io.ktor:ktor-server-sessions", version.ref = "ktor" }
+ktor-server-double-receive = { module = "io.ktor:ktor-server-double-receive", version.ref = "ktor" }
 ktor-server-openapi = { module = "io.ktor:ktor-server-openapi", version.ref = "ktor" }
 ktor-server-swagger = { module = "io.ktor:ktor-server-swagger", version.ref = "ktor" }
 ktor-server-test = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
@@ -77,6 +79,8 @@ google-cloud-storage = { module = "com.google.cloud:google-cloud-storage", versi
 
 imgscalr = { module = "org.imgscalr:imgscalr-lib", version.ref = "imgscalr" }
 
+json-schema-validator = { module = "io.github.optimumcode:json-schema-validator", version.ref = "json-schema-validator" }
+
 # Libraries can be bundled together for easier import
 [bundles]
 image-processing = ["apache-xmlgraphics-batik-transcoder", "apache-xmlgraphics-batik-codec", "imgscalr"]
@@ -85,7 +89,7 @@ slack-api = ["slack", "slack-api-model", "slack-api-client"]
 okhttp-mock = ["okhttp", "okhttp-mockwebserver"]
 kotlinx-ecosystem = ["kotlinx-datetime", "kotlinx-serialization", "kotlinx-coroutines"]
 koin-ktor = ["insert-koin", "insert-koin-logger"]
-ktor-server = ["ktor-server-core", "ktor-server-auth", "ktor-server-netty", "ktor-server-negotiation", "ktor-server-statuspages", "ktor-server-cors", "ktor-server-conditional", "ktor-server-sessions", "ktor-server-openapi", "ktor-server-swagger", "ktor-serialization-json"]
+ktor-server = ["ktor-server-core", "ktor-server-auth", "ktor-server-netty", "ktor-server-negotiation", "ktor-server-statuspages", "ktor-server-cors", "ktor-server-conditional", "ktor-server-sessions", "ktor-server-double-receive", "ktor-server-openapi", "ktor-server-swagger", "ktor-serialization-json"]
 ktor-client = ["ktor-client-core", "ktor-client-json", "ktor-client-logging", "ktor-client-serialization", "ktor-client-negotiation", "ktor-client-java"]
 
 [plugins]

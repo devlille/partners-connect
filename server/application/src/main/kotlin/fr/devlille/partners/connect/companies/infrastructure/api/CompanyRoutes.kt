@@ -6,12 +6,12 @@ import fr.devlille.partners.connect.companies.domain.CompanyRepository
 import fr.devlille.partners.connect.companies.domain.CreateCompany
 import fr.devlille.partners.connect.internal.infrastructure.api.DEFAULT_PAGE_SIZE
 import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
+import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.request.receive
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -37,7 +37,7 @@ fun Route.companyRoutes() {
         }
 
         post {
-            val input = call.receive<CreateCompany>()
+            val input = call.receive<CreateCompany>(schema = "create_company.schema.json")
             val id = companyRepository.createOrUpdate(input)
             call.respond(HttpStatusCode.Created, mapOf("id" to id.toString()))
         }

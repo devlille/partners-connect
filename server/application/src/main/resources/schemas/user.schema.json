@@ -1,4 +1,5 @@
 {
+  "$id": "user.schema.json",
   "type": "object",
   "properties": {
     "display_name": {

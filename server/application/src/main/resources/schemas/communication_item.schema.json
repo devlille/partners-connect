@@ -1,4 +1,5 @@
 {
+  "$id": "communication_item.schema.json",
   "type": "object",
   "properties": {
     "partnership_id": {

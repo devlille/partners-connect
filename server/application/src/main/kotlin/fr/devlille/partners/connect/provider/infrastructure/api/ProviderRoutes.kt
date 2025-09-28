@@ -5,10 +5,10 @@ import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.DEFAULT_PAGE_SIZE
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.api.token
+import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.provider.domain.CreateProvider
 import fr.devlille.partners.connect.provider.domain.ProviderRepository
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -45,7 +45,7 @@ fun Route.providerRoutes() {
                 throw ForbiddenException("You must be an organizer of at least one event to create providers")
             }
 
-            val input = call.receive<CreateProvider>()
+            val input = call.receive<CreateProvider>(schema = "create_provider.schema.json")
             val providerId = providerRepository.create(input)
             call.respond(HttpStatusCode.Created, mapOf("id" to providerId.toString()))
         }

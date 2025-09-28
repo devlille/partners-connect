@@ -1,4 +1,5 @@
 {
+  "$id": "ticket_data.schema.json",
   "type": "object",
   "properties": {
     "first_name": {

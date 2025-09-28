@@ -1417,20 +1417,7 @@ paths:
         content:
           application/json:
             schema:
-              type: "object"
-              properties:
-                name:
-                  type: "string"
-                  description: "Display name for the external link"
-                  example: "Call for Papers"
-                url:
-                  type: "string"
-                  format: "uri"
-                  description: "URL of the external resource (must start with http:// or https://)"
-                  example: "https://sessionize.com/devlille2025"
-              required:
-                - "name"
-                - "url"
+              $ref: "#/components/schemas/CreateEventExternalLink"
         required: true
       responses:
         "400":
@@ -2006,11 +1993,7 @@ paths:
         content:
           application/json:
             schema:
-              type: "array"
-              items:
-                type: "string"
-                format: "uuid"
-              description: "List of provider UUIDs to attach"
+              $ref: "#/components/schemas/CreateByIdentifiers"
         required: true
       responses:
         "200":
@@ -2068,11 +2051,7 @@ paths:
         content:
           application/json:
             schema:
-              type: "array"
-              items:
-                type: "string"
-                format: "uuid"
-              description: "List of provider UUIDs to remove"
+              $ref: "#/components/schemas/CreateByIdentifiers"
         required: true
       responses:
         "200":
@@ -2228,6 +2207,8 @@ components:
       $ref: "../schemas/event.schema.json"
     EventDisplay:
       $ref: "../schemas/event_display.schema.json"
+    CreateEventExternalLink:
+      $ref: "../schemas/create_event_external_link.schema.json"
     Organisation:
       $ref: "../schemas/organisation.schema.json"
     EventWithOrganisation:
@@ -2286,3 +2267,5 @@ components:
       $ref: "../schemas/paginated_company.schema.json"
     PaginatedProvider:
       $ref: "../schemas/paginated_provider.schema.json"
+    CreateByIdentifiers:
+      $ref: "../schemas/create_by_identifiers.schema.json"

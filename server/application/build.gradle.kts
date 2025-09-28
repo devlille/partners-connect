@@ -32,6 +32,7 @@ dependencies {
     implementation(libs.google.cloud.storage)
     implementation(libs.flexmark)
     implementation(libs.mustache)
+    implementation(libs.json.schema.validator)
     testImplementation(kotlin("test"))
     testImplementation(libs.ktor.server.test)
     testImplementation(libs.ktor.client.mock)

@@ -1,19 +1,16 @@
 {
-  "$id": "event_external_link.schema.json",
+  "$id": "create_event_external_link.schema.json",
   "type": "object",
   "properties": {
-    "id": {
-      "type": "string"
-    },
     "name": {
       "type": "string"
     },
     "url": {
-      "type": "string"
+      "type": "string",
+      "format": "uri"
     }
   },
   "required": [
-    "id",
     "name",
     "url"
   ]

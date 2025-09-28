@@ -1,4 +1,5 @@
 {
+  "$id": "organisation.schema.json",
   "type": "object",
   "properties": {
     "name": {

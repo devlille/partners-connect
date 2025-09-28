@@ -1,4 +1,5 @@
 {
+  "$id": "event_display.schema.json",
   "type": "object",
   "properties": {
     "slug": {
@@ -27,19 +28,28 @@
       "type": "string"
     },
     "contact": {
-      "$ref": "./event_contact.schema.json"
+      "$ref": "event_contact.schema.json"
     },
     "external_links": {
       "type": "array",
       "items": {
-        "$ref": "./event_external_link.schema.json"
+        "$ref": "event_external_link.schema.json"
       }
     },
     "providers": {
-      "$ref": "./provider.schema.json"
+      "$ref": "provider.schema.json"
     }
   },
   "required": [
-    "slug", "name", "start_time", "end_time", "submission_start_time", "submission_end_time", "address", "contact", "external_links", "providers"
+    "slug",
+    "name",
+    "start_time",
+    "end_time",
+    "submission_start_time",
+    "submission_end_time",
+    "address",
+    "contact",
+    "external_links",
+    "providers"
   ]
 }
