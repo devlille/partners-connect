@@ -4,9 +4,9 @@ import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.api.DEFAULT_PAGE_SIZE
+import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -47,7 +47,7 @@ fun Route.eventRoutes() {
 
         post {
             val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Missing organisation slug")
-            val request = call.receive<Event>()
+            val request = call.receive<Event>(schema = "event.schema.json")
             val slug = repository.createEvent(orgSlug, request)
             call.respond(
                 status = HttpStatusCode.Created,
@@ -58,7 +58,8 @@ fun Route.eventRoutes() {
         put("/{eventSlug}") {
             val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Missing organisation slug")
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-            val updatedSlug = repository.updateEvent(eventSlug, orgSlug, call.receive<Event>())
+            val updatedSlug = repository
+                .updateEvent(eventSlug, orgSlug, call.receive<Event>(schema = "event.schema.json"))
             call.respond(
                 status = HttpStatusCode.OK,
                 message = mapOf("slug" to updatedSlug),

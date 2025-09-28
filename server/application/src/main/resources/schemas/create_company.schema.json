@@ -1,11 +1,12 @@
 {
+  "$id": "create_company.schema.json",
   "type": "object",
   "properties": {
     "name": {
       "type": "string"
     },
     "head_office": {
-      "$ref": "./address.schema.json"
+      "$ref": "address.schema.json"
     },
     "siret": {
       "type": "string"
@@ -23,7 +24,7 @@
     "socials": {
       "type": "array",
       "items": {
-        "$ref": "./social.schema.json"
+        "$ref": "social.schema.json"
       }
     }
   },

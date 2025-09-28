@@ -4,6 +4,7 @@ import fr.devlille.partners.connect.billing.domain.BillingRepository
 import fr.devlille.partners.connect.companies.domain.CompanyBillingData
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
@@ -11,9 +12,7 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipBillingReposit
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.install
 import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -43,7 +42,7 @@ fun Route.partnershipBillingRoutes() {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
-            val input = call.receive<CompanyBillingData>()
+            val input = call.receive<CompanyBillingData>(schema = "company_billing_data.schema.json")
             val billingId = partnershipBillingRepository.createOrUpdate(eventSlug, partnershipId, input)
             call.respond(HttpStatusCode.Created, mapOf("id" to billingId.toString()))
         }
@@ -51,7 +50,7 @@ fun Route.partnershipBillingRoutes() {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
-            val input = call.receive<CompanyBillingData>()
+            val input = call.receive<CompanyBillingData>(schema = "company_billing_data.schema.json")
             val billingId = partnershipBillingRepository.createOrUpdate(eventSlug, partnershipId, input)
             call.respond(HttpStatusCode.OK, mapOf("id" to billingId.toString()))
         }

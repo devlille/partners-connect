@@ -1,0 +1,7 @@
+{
+  "$id": "create_ticket_data.schema.json",
+  "type": "array",
+  "items": {
+    "$ref": "ticket_data.schema.json"
+  }
+}

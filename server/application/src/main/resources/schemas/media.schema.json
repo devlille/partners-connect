@@ -1,4 +1,5 @@
 {
+  "$id": "media.schema.json",
   "type": "object",
   "properties": {
     "original": {

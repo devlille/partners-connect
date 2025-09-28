@@ -1,4 +1,5 @@
 {
+  "$id": "user_session.schema.json",
   "type": "object",
   "properties": {
     "state": {

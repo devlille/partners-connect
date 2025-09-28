@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.sponsoring.infrastructure.api
 
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.sponsoring.domain.AttachOptionsToPack
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
@@ -9,7 +10,6 @@ import fr.devlille.partners.connect.sponsoring.domain.OptionRepository
 import fr.devlille.partners.connect.sponsoring.domain.PackRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
@@ -44,7 +44,7 @@ private fun Route.packRoutes() {
         }
         post {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-            val request = call.receive<CreateSponsoringPack>()
+            val request = call.receive<CreateSponsoringPack>(schema = "create_sponsoring_pack.schema.json")
             val packId = repository.createPack(eventSlug = eventSlug, input = request)
             call.respond(HttpStatusCode.Created, mapOf("id" to packId.toString()))
         }
@@ -57,14 +57,14 @@ private fun Route.packRoutes() {
         put("/{packId}") {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val packId = call.parameters["packId"]?.toUUID() ?: throw BadRequestException("Missing pack id")
-            val input = call.receive<CreateSponsoringPack>()
+            val input = call.receive<CreateSponsoringPack>(schema = "create_sponsoring_pack.schema.json")
             val updatedId = repository.updatePack(eventSlug = eventSlug, packId = packId, input = input)
             call.respond(HttpStatusCode.OK, mapOf("id" to updatedId.toString()))
         }
         post("/{packId}/options") {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val packId = call.parameters["packId"]?.toUUID() ?: throw BadRequestException("Missing pack id")
-            val request = call.receive<AttachOptionsToPack>()
+            val request = call.receive<AttachOptionsToPack>(schema = "attach_options_to_pack.schema.json")
             optRepository.attachOptionsToPack(eventSlug = eventSlug, packId = packId, options = request)
             call.respond(HttpStatusCode.Created)
         }
@@ -94,14 +94,14 @@ private fun Route.optionRoutes() {
         }
         post {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
-            val request = call.receive<CreateSponsoringOption>()
+            val request = call.receive<CreateSponsoringOption>(schema = "create_sponsoring_option.schema.json")
             val optionId = repository.createOption(eventSlug = eventSlug, input = request)
             call.respond(HttpStatusCode.Created, mapOf("id" to optionId.toString()))
         }
         put("/{optionId}") {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val optionId = call.parameters["optionId"]?.toUUID() ?: throw BadRequestException("Missing option id")
-            val input = call.receive<CreateSponsoringOption>()
+            val input = call.receive<CreateSponsoringOption>(schema = "create_sponsoring_option.schema.json")
             val updatedId = repository.updateOption(eventSlug = eventSlug, optionId = optionId, input = input)
             call.respond(HttpStatusCode.OK, mapOf("id" to updatedId.toString()))
         }

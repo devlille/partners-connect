@@ -1429,20 +1429,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  description: Display name for the external link
-                  example: Call for Papers
-                url:
-                  type: string
-                  format: uri
-                  description: URL of the external resource (must start with http:// or https://)
-                  example: https://sessionize.com/devlille2025
-              required:
-                - name
-                - url
+              $ref: '#/components/schemas/create_event_external_link.schema'
         required: true
       responses:
         '201':
@@ -2022,11 +2009,7 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: string
-                format: uuid
-              description: List of provider UUIDs to attach
+              $ref: '#/components/schemas/create_by_identifiers.schema'
         required: true
       responses:
         '200':
@@ -2084,11 +2067,7 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: string
-                format: uuid
-              description: List of provider UUIDs to remove
+              $ref: '#/components/schemas/create_by_identifiers.schema'
         required: true
       responses:
         '200':
@@ -2244,6 +2223,8 @@ components:
       $ref: '#/components/schemas/event.schema'
     EventDisplay:
       $ref: '#/components/schemas/event_display.schema'
+    CreateEventExternalLink:
+      $ref: '#/components/schemas/create_event_external_link.schema'
     Organisation:
       $ref: '#/components/schemas/organisation.schema'
     EventWithOrganisation:
@@ -2302,7 +2283,10 @@ components:
       $ref: '#/components/schemas/paginated_company.schema'
     PaginatedProvider:
       $ref: '#/components/schemas/paginated_provider.schema'
+    CreateByIdentifiers:
+      $ref: '#/components/schemas/create_by_identifiers.schema'
     user_session.schema:
+      $id: user_session.schema.json
       type: object
       properties:
         state:
@@ -2313,6 +2297,7 @@ components:
         - state
         - token
     user_info.schema:
+      $id: user_info.schema.json
       type: object
       properties:
         display_name:
@@ -2326,6 +2311,7 @@ components:
         - display_name
         - email
     address.schema:
+      $id: address.schema.json
       type: object
       properties:
         address:
@@ -2342,6 +2328,7 @@ components:
         - zip_code
         - country
     media.schema:
+      $id: media.schema.json
       type: object
       properties:
         original:
@@ -2358,6 +2345,7 @@ components:
         - png_500
         - png_250
     company.schema:
+      $id: company.schema.json
       type: object
       properties:
         id:
@@ -2386,6 +2374,7 @@ components:
         - vat
         - site_url
     paginated_company.schema:
+      $id: paginated_company.schema.json
       type: object
       properties:
         items:
@@ -2404,6 +2393,7 @@ components:
         - page_size
         - total
     social.schema:
+      $id: social.schema.json
       type: object
       properties:
         type:
@@ -2421,6 +2411,7 @@ components:
         - type
         - url
     create_company.schema:
+      $id: create_company.schema.json
       type: object
       properties:
         name:
@@ -2447,6 +2438,7 @@ components:
         - vat
         - site_url
     identifier.schema:
+      $id: identifier.schema.json
       type: object
       properties:
         id:
@@ -2454,6 +2446,7 @@ components:
       required:
         - id
     contact.schema:
+      $id: contact.schema.json
       type: object
       properties:
         display_name:
@@ -2464,6 +2457,7 @@ components:
         - display_name
         - role
     partnership_item.schema:
+      $id: partnership_item.schema.json
       type: object
       properties:
         id:
@@ -2498,6 +2492,7 @@ components:
         - language
         - created_at
     event_summary.schema:
+      $id: event_summary.schema.json
       type: object
       properties:
         slug:
@@ -2524,6 +2519,7 @@ components:
         - submission_start_time
         - submission_end_time
     paginated_event_summary.schema:
+      $id: paginated_event_summary.schema.json
       type: object
       properties:
         items:
@@ -2542,6 +2538,7 @@ components:
         - page_size
         - total
     event_contact.schema:
+      $id: event_contact.schema.json
       type: object
       properties:
         email:
@@ -2553,6 +2550,7 @@ components:
         - email
         - phone
     event_external_link.schema:
+      $id: event_external_link.schema.json
       type: object
       properties:
         id:
@@ -2566,6 +2564,7 @@ components:
         - name
         - url
     provider.schema:
+      $id: provider.schema.json
       type: object
       properties:
         id:
@@ -2594,6 +2593,7 @@ components:
         - website
         - created_at
     event_display.schema:
+      $id: event_display.schema.json
       type: object
       properties:
         slug:
@@ -2634,6 +2634,7 @@ components:
         - external_links
         - providers
     owner.schema:
+      $id: owner.schema.json
       type: object
       properties:
         display_name:
@@ -2644,6 +2645,7 @@ components:
         - display_name
         - email
     organisation_item.schema:
+      $id: organisation_item.schema.json
       type: object
       properties:
         slug:
@@ -2660,6 +2662,7 @@ components:
         - name
         - head_office
     event_with_organisation.schema:
+      $id: event_with_organisation.schema.json
       type: object
       properties:
         event:
@@ -2670,6 +2673,7 @@ components:
         - event
         - organisation
     register_partnership.schema:
+      $id: register_partnership.schema.json
       type: object
       properties:
         company_id:
@@ -2703,6 +2707,7 @@ components:
         - contact_role
         - language
     billing_contact.schema:
+      $id: billing_contact.schema.json
       type: object
       properties:
         first_name:
@@ -2716,6 +2721,7 @@ components:
         - last_name
         - email
     company_billing_data.schema:
+      $id: company_billing_data.schema.json
       type: object
       properties:
         name:
@@ -2729,6 +2735,7 @@ components:
       required:
         - contact
     ticket_data.schema:
+      $id: ticket_data.schema.json
       type: object
       properties:
         first_name:
@@ -2739,6 +2746,7 @@ components:
         - first_name
         - last_name
     ticket.schema:
+      $id: ticket.schema.json
       type: object
       properties:
         id:
@@ -2755,6 +2763,7 @@ components:
         - url
         - data
     ticket_order.schema:
+      $id: ticket_order.schema.json
       type: object
       properties:
         id:
@@ -2767,6 +2776,7 @@ components:
         - id
         - tickets
     paginated_provider.schema:
+      $id: paginated_provider.schema.json
       type: object
       properties:
         items:
@@ -2785,6 +2795,7 @@ components:
         - page_size
         - total
     create_provider.schema:
+      $id: create_provider.schema.json
       type: object
       properties:
         name:
@@ -2804,6 +2815,7 @@ components:
         - name
         - type
     organisation.schema:
+      $id: organisation.schema.json
       type: object
       properties:
         name:
@@ -2861,6 +2873,7 @@ components:
       required:
         - name
     event.schema:
+      $id: event.schema.json
       type: object
       properties:
         name:
@@ -2891,6 +2904,7 @@ components:
         - address
         - contact
     sponsoring_option.schema:
+      $id: sponsoring_option.schema.json
       type: object
       properties:
         id:
@@ -2907,6 +2921,7 @@ components:
         - id
         - name
     translated_label.schema:
+      $id: translated_label.schema.json
       type: object
       properties:
         language:
@@ -2920,6 +2935,7 @@ components:
         - language
         - name
     create_sponsoring_option.schema:
+      $id: create_sponsoring_option.schema.json
       type: object
       properties:
         translations:
@@ -2932,6 +2948,7 @@ components:
       required:
         - translations
     sponsoring_pack.schema:
+      $id: sponsoring_pack.schema.json
       type: object
       properties:
         id:
@@ -2958,6 +2975,7 @@ components:
         - required_options
         - optional_options
     create_sponsoring_pack.schema:
+      $id: create_sponsoring_pack.schema.json
       type: object
       properties:
         name:
@@ -2977,6 +2995,7 @@ components:
         - price
         - nb_tickets
     attach_options_to_pack.schema:
+      $id: attach_options_to_pack.schema.json
       type: object
       properties:
         required:
@@ -2991,6 +3010,7 @@ components:
         - required
         - optional
     communication_item.schema:
+      $id: communication_item.schema.json
       type: object
       properties:
         partnership_id:
@@ -3008,6 +3028,7 @@ components:
         - partnership_id
         - company_name
     communication_plan.schema:
+      $id: communication_plan.schema.json
       type: object
       properties:
         done:
@@ -3026,7 +3047,20 @@ components:
         - done
         - planned
         - unplanned
+    create_event_external_link.schema:
+      $id: create_event_external_link.schema.json
+      type: object
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+          format: uri
+      required:
+        - name
+        - url
     booth_location_request.schema:
+      $id: booth_location_request.schema.json
       type: object
       properties:
         location:
@@ -3034,6 +3068,7 @@ components:
       required:
         - location
     booth_location_response.schema:
+      $id: booth_location_response.schema.json
       type: object
       properties:
         id:
@@ -3044,6 +3079,7 @@ components:
         - id
         - location
     suggest_partnership.schema:
+      $id: suggest_partnership.schema.json
       type: object
       properties:
         pack_id:
@@ -3059,6 +3095,7 @@ components:
         - pack_id
         - language
     publication_date_request.schema:
+      $id: publication_date_request.schema.json
       type: object
       properties:
         publication_date:
@@ -3067,6 +3104,7 @@ components:
       required:
         - publication_date
     publication_date_response.schema:
+      $id: publication_date_response.schema.json
       type: object
       properties:
         id:
@@ -3078,6 +3116,7 @@ components:
         - id
         - publication_date
     support_upload_response.schema:
+      $id: support_upload_response.schema.json
       type: object
       properties:
         id:
@@ -3087,7 +3126,14 @@ components:
       required:
         - id
         - url
+    create_by_identifiers.schema:
+      $id: create_by_identifiers.schema.json
+      type: array
+      items:
+        type: string
+        format: uuid
     user.schema:
+      $id: user.schema.json
       type: object
       properties:
         display_name:
@@ -3101,6 +3147,7 @@ components:
       required:
         - email
     grant_permission_request.schema:
+      $id: grant_permission_request.schema.json
       type: object
       properties:
         user_emails:

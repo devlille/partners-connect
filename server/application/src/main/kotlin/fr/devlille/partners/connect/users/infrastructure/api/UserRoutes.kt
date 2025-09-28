@@ -4,11 +4,11 @@ import fr.devlille.partners.connect.auth.domain.AuthRepository
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.token
+import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.organisations.domain.OrganisationRepository
 import fr.devlille.partners.connect.users.domain.UserRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -50,7 +50,7 @@ fun Route.userRoutes() {
         }
         post("/grant") {
             val orgSlug = call.parameters["orgSlug"] ?: throw BadRequestException("Orga slug is required")
-            val request = call.receive<GrantPermissionRequest>()
+            val request = call.receive<GrantPermissionRequest>(schema = "grant_permission_request.schema.json")
             val token = call.token
             val userInfo = authRepository.getUserInfo(token)
             val hasPerm = userRepository.hasEditPermissionByEmail(userInfo.email, orgSlug)

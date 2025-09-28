@@ -1,4 +1,5 @@
 {
+  "$id": "booth_location_request.schema.json",
   "type": "object",
   "properties": {
     "location": {

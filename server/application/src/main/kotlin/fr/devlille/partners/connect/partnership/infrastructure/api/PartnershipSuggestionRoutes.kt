@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
@@ -13,7 +14,6 @@ import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
-import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
@@ -82,7 +82,7 @@ fun Route.partnershipSuggestionRoutes() {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
-            val input = call.receive<SuggestPartnership>()
+            val input = call.receive<SuggestPartnership>(schema = "suggest_partnership.schema.json")
             val id = suggestionRepository.suggest(eventSlug, partnershipId, input)
             val partnership = partnershipRepository.getById(eventSlug, id)
             val pack = partnership.suggestionPack

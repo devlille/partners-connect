@@ -1,11 +1,12 @@
 {
+  "$id": "event_with_organisation.schema.json",
   "type": "object",
   "properties": {
     "event": {
-      "$ref": "./event_display.schema.json"
+      "$ref": "event_display.schema.json"
     },
     "organisation": {
-      "$ref": "./organisation_item.schema.json"
+      "$ref": "organisation_item.schema.json"
     }
   },
   "required": [

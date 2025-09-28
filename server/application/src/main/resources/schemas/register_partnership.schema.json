@@ -1,4 +1,5 @@
 {
+  "$id": "register_partnership.schema.json",
   "type": "object",
   "properties": {
     "company_id": {

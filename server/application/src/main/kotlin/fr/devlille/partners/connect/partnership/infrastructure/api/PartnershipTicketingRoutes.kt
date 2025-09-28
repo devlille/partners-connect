@@ -1,11 +1,11 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
+import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.tickets.domain.TicketData
 import fr.devlille.partners.connect.tickets.domain.TicketRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -30,7 +30,7 @@ fun Route.partnershipTicketingRoutes() {
             val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing event slug")
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
-            val body = call.receive<List<TicketData>>()
+            val body = call.receive<List<TicketData>>(schema = "create_ticket_data.schema.json")
             val result = ticketingRepository.createTickets(
                 eventSlug = eventSlug,
                 partnershipId = partnershipId,
@@ -44,7 +44,7 @@ fun Route.partnershipTicketingRoutes() {
             val partnershipId = call.parameters["partnershipId"]?.toUUID()
                 ?: throw BadRequestException("Missing partnership id")
             val ticketId = call.parameters["ticketId"] ?: throw BadRequestException("Missing ticket id")
-            val body = call.receive<TicketData>()
+            val body = call.receive<TicketData>(schema = "ticket_data.schema.json")
             val ticket = ticketingRepository.updateTicket(eventSlug, partnershipId, ticketId, body)
             call.respond(HttpStatusCode.OK, ticket)
         }

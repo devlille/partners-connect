@@ -1,4 +1,5 @@
 {
+  "$id": "publication_date_request.schema.json",
   "type": "object",
   "properties": {
     "publication_date": {

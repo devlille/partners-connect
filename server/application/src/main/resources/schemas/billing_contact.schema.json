@@ -1,4 +1,5 @@
 {
+  "$id": "billing_contact.schema.json",
   "type": "object",
   "properties": {
     "first_name": {

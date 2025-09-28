@@ -1,4 +1,5 @@
 {
+  "$id": "support_upload_response.schema.json",
   "type": "object",
   "properties": {
     "id": {

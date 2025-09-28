@@ -1,10 +1,11 @@
 {
+  "$id": "create_sponsoring_option.schema.json",
   "type": "object",
   "properties": {
     "translations": {
       "type": "array",
       "items": {
-        "$ref": "./translated_label.schema.json"
+        "$ref": "translated_label.schema.json"
       }
     },
     "price": {

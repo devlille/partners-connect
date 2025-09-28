@@ -1,11 +1,12 @@
 {
+  "$id": "partnership_item.schema.json",
   "type": "object",
   "properties": {
     "id": {
       "type": "string"
     },
     "contact": {
-      "$ref": "./contact.schema.json"
+      "$ref": "contact.schema.json"
     },
     "company_name": {
       "type": "string"

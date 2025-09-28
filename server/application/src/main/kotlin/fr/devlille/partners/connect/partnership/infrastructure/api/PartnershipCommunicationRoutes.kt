@@ -1,12 +1,11 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipStorageRepository
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.call
-import io.ktor.server.application.install
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.contentType
 import io.ktor.server.request.receive
@@ -34,7 +33,7 @@ fun Route.partnershipCommunicationRoutes() {
                 val partnershipId = call.parameters["partnershipId"]?.toUUID()
                     ?: throw BadRequestException("Missing partnership id")
 
-                val requestBody = call.receive<PublicationDateRequest>()
+                val requestBody = call.receive<PublicationDateRequest>(schema = "publication_date_request.schema.json")
                 val publicationDate = requestBody.publicationDate
 
                 val id = partnershipRepository.updateCommunicationPublicationDate(
