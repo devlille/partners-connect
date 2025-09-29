@@ -62,7 +62,6 @@ import io.ktor.server.plugins.openapi.openAPI
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.response.respond
-import io.ktor.server.response.respondText
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.sessions.Sessions
@@ -211,6 +210,7 @@ private fun Application.configureContentNegotiation() {
     }
 }
 
+@Suppress("LongMethod")
 private fun Application.configureStatusPage() {
     install(StatusPages) {
         exception<BadRequestException> { call, cause ->
@@ -232,26 +232,59 @@ private fun Application.configureStatusPage() {
             call.respond(status = HttpStatusCode.BadRequest, message = response)
         }
         exception<UnauthorizedException> { call, cause ->
-            call.respondText(text = cause.message ?: "401 Unauthorized", status = HttpStatusCode.Unauthorized)
+            call.respond(
+                status = HttpStatusCode.Unauthorized,
+                message = ResponseException(
+                    message = cause.message ?: "401 Unauthorized",
+                    stack = cause.cause?.stackTraceToString(),
+                ),
+            )
         }
         exception<ForbiddenException> { call, cause ->
-            call.respondText(text = cause.message ?: "403 Forbidden", status = HttpStatusCode.Forbidden)
+            call.respond(
+                status = HttpStatusCode.Forbidden,
+                message = ResponseException(
+                    message = cause.message ?: "403 Forbidden",
+                    stack = cause.cause?.stackTraceToString(),
+                ),
+            )
         }
         exception<NotFoundException> { call, cause ->
-            call.respondText(text = cause.message ?: "404 Not Found", status = HttpStatusCode.NotFound)
+            call.respond(
+                status = HttpStatusCode.NotFound,
+                message = ResponseException(
+                    message = cause.message ?: "404 Not Found",
+                    stack = cause.cause?.stackTraceToString(),
+                ),
+            )
         }
         exception<ConflictException> { call, cause ->
-            call.respondText(text = cause.message ?: "Conflict", status = HttpStatusCode.Conflict)
+            call.respond(
+                status = HttpStatusCode.Conflict,
+                message = ResponseException(
+                    message = cause.message ?: "409 Conflict",
+                    stack = cause.cause?.stackTraceToString(),
+                ),
+            )
         }
         exception<UnsupportedMediaTypeException> { call, cause ->
-            call.respondText(
-                text = cause.message ?: "415 Unsupported Media Type",
+            call.respond(
                 status = HttpStatusCode.UnsupportedMediaType,
+                message = ResponseException(
+                    message = cause.message ?: "415 Unsupported Media Type",
+                    stack = cause.cause?.stackTraceToString(),
+                ),
             )
         }
         exception<Throwable> { call, cause ->
             cause.printStackTrace()
-            call.respondText(text = "500: $cause", status = HttpStatusCode.InternalServerError)
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                message = ResponseException(
+                    message = cause.message ?: "500: $cause",
+                    stack = cause.cause?.stackTraceToString(),
+                ),
+            )
         }
     }
 }
