@@ -66,7 +66,8 @@ class OrganisationRoutesTest {
         }
 
         assertEquals(HttpStatusCode.Conflict, response.status)
-        assertEquals("Organisation with slug $organisationSlug already exists", response.bodyAsText())
+        val message = json.decodeFromString<ResponseException>(response.bodyAsText()).message
+        assertEquals("Organisation with slug $organisationSlug already exists", message)
     }
 
     @Test
@@ -85,7 +86,8 @@ class OrganisationRoutesTest {
             }
 
             assertEquals(HttpStatusCode.NotFound, response.status)
-            assertEquals("User with email ${organisation.representativeUserEmail} not found", response.bodyAsText())
+            val message = json.decodeFromString<ResponseException>(response.bodyAsText()).message
+            assertEquals("User with email ${organisation.representativeUserEmail} not found", message)
         }
     }
 
@@ -252,7 +254,8 @@ class OrganisationRoutesTest {
         }
 
         assertEquals(HttpStatusCode.NotFound, response.status)
-        assertEquals("User with email nonexistent@example.com not found", response.bodyAsText())
+        val message = json.decodeFromString<ResponseException>(response.bodyAsText()).message
+        assertEquals("User with email nonexistent@example.com not found", message)
     }
 
     @Test

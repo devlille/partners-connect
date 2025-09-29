@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.partnership
 
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.events.factories.insertMockedEventWithOrga
+import fr.devlille.partners.connect.internal.infrastructure.api.ResponseException
 import fr.devlille.partners.connect.internal.insertBilletWebIntegration
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.partnership.factories.insertMockedBilling
@@ -151,7 +152,8 @@ class PartnershipTicketsRoutesTest {
         }
 
         assertEquals(HttpStatusCode.NotFound, response.status)
-        assertEquals("No validated pack found for partnership $partnershipId", response.bodyAsText())
+        val message = json.decodeFromString<ResponseException>(response.bodyAsText()).message
+        assertEquals("No validated pack found for partnership $partnershipId", message)
     }
 
     @Test
@@ -195,8 +197,9 @@ class PartnershipTicketsRoutesTest {
         }
 
         assertEquals(HttpStatusCode.Forbidden, response.status)
+        val message = json.decodeFromString<ResponseException>(response.bodyAsText()).message
         val expected = "Not enough tickets in the validated pack: 0 available, ${tickets.size} requested"
-        assertEquals(expected, response.bodyAsText())
+        assertEquals(expected, message)
     }
 
     @Test
@@ -240,7 +243,8 @@ class PartnershipTicketsRoutesTest {
         }
 
         assertEquals(HttpStatusCode.Forbidden, response.status)
-        assertEquals("Invoice status PENDING is not PAID", response.bodyAsText())
+        val message = json.decodeFromString<ResponseException>(response.bodyAsText()).message
+        assertEquals("Invoice status PENDING is not PAID", message)
     }
 
     @Test
