@@ -19,6 +19,8 @@ const createCustomAxiosInstance = (baseUrl: string): AxiosInstance => {
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
+
+    config.headers["Accept-Language"] = "fr";
     return config;
   });
 

@@ -19,21 +19,22 @@ const router = useRouter();
 
 const packData = ref({
   name: "",
-  description: "",
   price: 0,
+  with_booth: false,
+  nb_tickets: 0,
   max_quantity: undefined
 });
 
 async function handleSave(formData: CreateSponsoringPack) {
   try {
-    const response = await postOrgsOrgSlugEventsEventSlugPacks(
+    await postOrgsOrgSlugEventsEventSlugPacks(
       route.params.slug as string,
       route.params.eventSlug as string,
       formData
     );
     
-    // Redirect to pack detail page
-    await router.push(`/orgs/${route.params.slug}/events/${route.params.eventSlug}/packs/${response.data.id}`);
+    // Redirect to packs list page (API returns MapString, not an object with id)
+    await router.push(`/orgs/${route.params.slug}/events/${route.params.eventSlug}/packs`);
   } catch (error) {
     console.error('Failed to create sponsoring pack:', error);
     // TODO: Add error handling/notification

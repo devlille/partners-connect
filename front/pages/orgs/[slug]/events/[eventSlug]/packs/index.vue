@@ -12,9 +12,9 @@
 
       <dl>
         <dt>Prix de base</dt>
-        <dd>{{ pack.basePrice }} €</dd>
+        <dd>{{ pack.base_price }} €</dd>
         <dt>Quantité maximale</dt>
-        <dd>{{ pack.maxQuantity || 'Illimitée' }}</dd>
+        <dd>{{ pack.max_quantity || 'Illimitée' }}</dd>
       </dl>
     </div>
   </div>

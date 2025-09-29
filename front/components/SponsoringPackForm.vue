@@ -13,17 +13,6 @@
     </p>
 
     <p>
-      <label for="description">Description</label>
-      <textarea
-        id="description"
-        v-model="form.description"
-        name="description"
-        rows="4"
-        placeholder="Description détaillée du pack de sponsoring"
-      ></textarea>
-    </p>
-
-    <p>
       <label for="price">Prix (€)*</label>
       <input
         id="price"
@@ -34,6 +23,29 @@
         min="0"
         step="0.01"
         placeholder="0.00"
+      >
+    </p>
+
+    <p>
+      <label for="with_booth">Inclut un stand*</label>
+      <input
+        id="with_booth"
+        v-model="form.with_booth"
+        type="checkbox"
+        name="with_booth"
+      >
+    </p>
+
+    <p>
+      <label for="nb_tickets">Nombre de billets*</label>
+      <input
+        id="nb_tickets"
+        v-model.number="form.nb_tickets"
+        type="number"
+        name="nb_tickets"
+        required
+        min="0"
+        placeholder="Nombre de billets inclus"
       >
     </p>
 
@@ -66,8 +78,9 @@ const emit = defineEmits<{
 
 const form = ref<CreateSponsoringPack>({
   name: data.name || "",
-  description: data.description || "",
   price: data.price || 0,
+  with_booth: data.with_booth || false,
+  nb_tickets: data.nb_tickets || 0,
   max_quantity: data.max_quantity || undefined
 })
 

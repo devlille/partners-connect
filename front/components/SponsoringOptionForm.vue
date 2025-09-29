@@ -51,13 +51,23 @@ const emit = defineEmits<{
   (e: 'save', payload: CreateSponsoringOption): void
 }>()
 
-const form = ref<CreateSponsoringOption>({
+const form = ref({
   name: data.name || "",
   description: data.description || "",
   price: data.price || undefined
 })
 
 function onSave() {
-  emit('save', form.value)
+  const formattedData: CreateSponsoringOption = {
+    translations: [
+      {
+        language: "fr",
+        name: form.value.name,
+        description: form.value.description || null
+      }
+    ],
+    price: form.value.price || null
+  };
+  emit('save', formattedData)
 }
 </script>

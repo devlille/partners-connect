@@ -3,7 +3,6 @@
     <SponsoringPackForm 
       :data="packFormData" 
       @save="handleSave"
-      :loading="loading"
     />
   </div>
   
@@ -36,9 +35,10 @@ const packFormData = computed(() => {
   
   return {
     name: pack.value.name,
-    description: "", // Note: SponsoringPack interface doesn't seem to have description
-    price: pack.value.basePrice,
-    max_quantity: pack.value.maxQuantity
+    price: pack.value.base_price,
+    with_booth: pack.value.with_booth, 
+    nb_tickets: pack.value.nb_tickets, // TODO: Map from existing pack data if available
+    max_quantity: pack.value.max_quantity
   };
 });
 
