@@ -1,0 +1,169 @@
+openapi: 3.0.3
+info:
+  title: Event Sponsoring Packs Public API
+  description: Public endpoint for retrieving sponsoring packages for events
+  version: 1.0.0
+  
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /events/{eventSlug}/sponsoring/packs:
+    get:
+      summary: Get sponsoring packages for an event
+      description: |
+        Retrieves all available sponsoring packages for a specific event.
+        This endpoint is public and requires no authentication.
+        Supports internationalization via Accept-Language header.
+      operationId: getEventSponsoringPacks
+      parameters:
+        - name: eventSlug
+          in: path
+          required: true
+          description: Unique slug identifier for the event
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9-_]+$'
+            example: "devlille-2025"
+        - name: Accept-Language
+          in: header
+          required: false
+          description: Language preference for option translations (ISO 639-1)
+          schema:
+            type: string
+            pattern: '^[a-z]{2}(-[A-Z]{2})?$'
+            default: "en"
+            example: "fr"
+      responses:
+        '200':
+          description: Successfully retrieved sponsoring packages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SponsoringPack'
+              examples:
+                with_packages:
+                  summary: Event with sponsoring packages
+                  value:
+                    - id: "123e4567-e89b-12d3-a456-426614174000"
+                      name: "Gold Sponsor"
+                      base_price: 50000
+                      max_quantity: 5
+                      required_options:
+                        - id: "456e7890-e89b-12d3-a456-426614174000"
+                          name: "Logo on website"
+                          description: "Company logo displayed on event website"
+                          price: null
+                      optional_options:
+                        - id: "789e0123-e89b-12d3-a456-426614174000"
+                          name: "Additional booth space"
+                          description: "Extra 2x2m booth space"
+                          price: 10000
+                empty_packages:
+                  summary: Event with no sponsoring packages
+                  value: []
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Event with slug 'invalid-event' not found"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Internal server error occurred"
+
+components:
+  schemas:
+    SponsoringPack:
+      type: object
+      required:
+        - id
+        - name
+        - base_price
+        - required_options
+        - optional_options
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the sponsoring package
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Display name of the sponsoring package
+          example: "Gold Sponsor"
+        base_price:
+          type: integer
+          minimum: 0
+          description: Base price of the package in cents
+          example: 50000
+        max_quantity:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: Maximum number of packages available (null for unlimited)
+          example: 5
+        required_options:
+          type: array
+          description: Options automatically included with the package
+          items:
+            $ref: '#/components/schemas/SponsoringOption'
+        optional_options:
+          type: array
+          description: Additional options that can be selected
+          items:
+            $ref: '#/components/schemas/SponsoringOption'
+    
+    SponsoringOption:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the sponsoring option
+          example: "456e7890-e89b-12d3-a456-426614174000"
+        name:
+          type: string
+          minLength: 1
+          description: Localized name of the option
+          example: "Logo on website"
+        description:
+          type: string
+          nullable: true
+          description: Localized description of the option
+          example: "Company logo displayed on event website"
+        price:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: Additional price for the option in cents (null for free)
+          example: 10000
+    
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Human-readable error message
+          example: "Event with slug 'invalid-event' not found"
+
+tags:
+  - name: sponsoring
+    description: Sponsoring package operations
