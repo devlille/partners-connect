@@ -15,8 +15,8 @@ internal fun SponsoringPackEntity.toDomain(
     maxQuantity = this.maxQuantity,
     requiredOptions = this.options
         .filter { requiredOptionIds.contains(it.id.value) }
-        .map { option -> option.toDomain(language) },
+        .map { option -> option.toDomain(language, required = true) },
     optionalOptions = this.options
         .filter { optionalOptions.contains(it.id.value) }
-        .map { option -> option.toDomain(language) },
+        .map { option -> option.toDomain(language, required = false) },
 )

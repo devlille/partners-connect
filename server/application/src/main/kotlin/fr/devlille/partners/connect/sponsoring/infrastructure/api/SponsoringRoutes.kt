@@ -7,9 +7,11 @@ import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.sponsoring.domain.AttachOptionsToPack
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringPack
+import fr.devlille.partners.connect.sponsoring.domain.EventPackRepository
 import fr.devlille.partners.connect.sponsoring.domain.OptionRepository
 import fr.devlille.partners.connect.sponsoring.domain.PackRepository
 import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.call
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
@@ -20,6 +22,10 @@ import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
 fun Route.sponsoringRoutes() {
+    // Public routes (no authentication required)
+    publicPackRoutes()
+
+    // Authenticated organizational routes
     route("/orgs/{orgSlug}/events/{eventSlug}") {
         packRoutes()
         optionRoutes()
@@ -107,6 +113,32 @@ private fun Route.optionRoutes() {
             val optionId = call.parameters.optionId
             repository.deleteOption(eventSlug = eventSlug, optionId = optionId)
             call.respond(HttpStatusCode.NoContent)
+        }
+    }
+}
+
+/**
+ * Public routes for sponsoring packages without authentication.
+ *
+ * These routes provide read-only access to sponsoring packages for public consumption,
+ * allowing potential sponsors to view available packages and options without authentication.
+ */
+private fun Route.publicPackRoutes() {
+    val eventPackRepository by inject<EventPackRepository>()
+
+    route("/events/{eventSlug}/sponsoring/packs") {
+        get {
+            val eventSlug = call.parameters.eventSlug
+
+            val acceptLanguage = call.request.headers["Accept-Language"]
+                ?.lowercase()
+                ?: throw MissingRequestHeaderException("accept-language")
+
+            val packs = eventPackRepository.findPublicPacksByEvent(
+                eventSlug = eventSlug,
+                language = acceptLanguage,
+            )
+            call.respond(HttpStatusCode.OK, packs)
         }
     }
 }

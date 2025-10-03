@@ -41,10 +41,10 @@ Create a public GET endpoint `/events/{eventSlug}/sponsoring/packs` that returns
 **Target Platform**: JVM server application (Docker containerized)
 **Project Type**: web - backend API with frontend separation  
 **Performance Goals**: <2 seconds response time for standard operations (per constitution)  
-**Constraints**: Accept-Language header for i18n, clean architecture with domain/infrastructure separation, reuse existing SponsoringPack/SponsoringOption entities  
+**Constraints**: Required Accept-Language header for i18n (returns 400 if missing), clean architecture with domain/infrastructure separation, reuse existing SponsoringPack/SponsoringOption entities  
 **Scale/Scope**: Public endpoint, no pagination needed (low volume per event), must handle special characters in event slugs
 
-**User-provided Implementation Details**: Service should be created in fr.devlille.partners.connect.sponsoring.infrastructure.api.sponsoringRoutes route function but with a new route starting with `/events` instead of `/orgs`. Must use `Accept-Language` header for options translations. Must respect clean architecture with routing in `infrastructure/api` package, interface repository and business logic entities in `domain` package, and repository exposed implementation in `application` package. Must reuse `SponsoringPack` and `SponsoringOption` data classes and create a new repository with exposed implementation using existing exposed tables.
+**User-provided Implementation Details**: Service should be created in fr.devlille.partners.connect.sponsoring.infrastructure.api.sponsoringRoutes route function but with a new route starting with `/events` instead of `/orgs`. Must require `Accept-Language` header for options translations (throw MissingRequestHeaderException if missing). Must respect clean architecture with routing in `infrastructure/api` package, interface repository and business logic entities in `domain` package, and repository exposed implementation in `application` package. Must reuse `SponsoringPack` and `SponsoringOption` data classes and create a new repository with exposed implementation using existing exposed tables.
 
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
