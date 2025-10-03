@@ -212,6 +212,44 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EventWithOrganisation"
+  /events/{eventSlug}/sponsoring/packs:
+    get:
+      summary: "List public sponsoring packages"
+      description: "List public sponsoring packages for an event with embedded and optional options"
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "The slug identifier of the event"
+        - name: "Accept-Language"
+          in: "header"
+          required: true
+          schema:
+            type: "string"
+          description: "Language code for option translations (e.g., 'en', 'fr')"
+      responses:
+        "400":
+          description: "Bad Request - Missing Accept-Language header or invalid request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found - Event with specified slug does not exist"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK - List of sponsoring packages with localized options"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/SponsoringPack"
   /events/{eventSlug}/partnership:
     post:
       description: ""
