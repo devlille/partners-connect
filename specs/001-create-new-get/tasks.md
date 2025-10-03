@@ -38,23 +38,24 @@ Based on plan.md structure: Kotlin backend with clean architecture
 - Tests: `server/application/src/test/kotlin/fr/devlille/partners/connect/sponsoring/`
 
 ## Phase 3.1: Setup
-- [ ] T001 Create EventPackRepository domain interface in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/domain/EventPackRepository.kt
+- [x] T001 Create EventPackRepository domain interface in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/domain/EventPackRepository.kt
 - [ ] T002 [P] Configure Koin DI binding for EventPackRepository in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/infrastructure/bindings/SponsoringModule.kt
 
 ## Phase 3.2: Tests First (TDD) ⚠️ MUST COMPLETE BEFORE 3.3
 **CRITICAL: These tests MUST be written and MUST FAIL before ANY implementation**
-- [ ] T003 [P] Contract test GET /events/{eventSlug}/sponsoring/packs OpenAPI compliance in server/application/src/test/kotlin/fr/devlille/partners/connect/sponsoring/EventPackContractTest.kt
-- [ ] T004 [P] Integration test successful pack retrieval with Accept-Language=en in server/application/src/test/kotlin/fr/devlille/partners/connect/sponsoring/EventPackRoutesTest.kt
-- [ ] T005 [P] Integration test successful pack retrieval with Accept-Language=fr in server/application/src/test/kotlin/fr/devlille/partners/connect/sponsoring/EventPackRoutesTest.kt
-- [ ] T006 [P] Integration test 404 error for non-existent event slug in server/application/src/test/kotlin/fr/devlille/partners/connect/sponsoring/EventPackRoutesTest.kt
-- [ ] T007 [P] Integration test empty pack list for event with no packs in server/application/src/test/kotlin/fr/devlille/partners/connect/sponsoring/EventPackRoutesTest.kt
-- [ ] T008 [P] Unit test EventPackRepositoryExposed with H2 database in server/application/src/test/kotlin/fr/devlille/partners/connect/sponsoring/EventPackRepositoryExposedTest.kt
+- [x] T003 [P] Contract test GET /events/{eventSlug}/sponsoring/packs OpenAPI compliance in server/application/src/test/kotlin/fr/devlille/partners/connect/sponsoring/EventPackContractTest.kt
+- [x] T004 [P] Integration test successful pack retrieval with Accept-Language=en in server/application/src/test/kotlin/fr/devlille/partners/connect/sponsoring/EventPackRoutesTest.kt
+- [x] T005 [P] Integration test successful pack retrieval with Accept-Language=fr in server/application/src/test/kotlin/fr/devlille/partners/connect/sponsoring/EventPackRoutesTest.kt
+- [x] T005b [P] Integration test for 400 Bad Request when Accept-Language header is missing in server/application/src/test/kotlin/fr/devlille/partners/connect/sponsoring/EventPackRoutesTest.kt
+- [x] T006 [P] Integration test 404 error for non-existent event slug in server/application/src/test/kotlin/fr/devlille/partners/connect/sponsoring/EventPackRoutesTest.kt
+- [x] T007 [P] Integration test empty pack list for event with no packs in server/application/src/test/kotlin/fr/devlille/partners/connect/sponsoring/EventPackRoutesTest.kt
+- [x] T008 [P] Unit test EventPackRepositoryExposed with H2 database in server/application/src/test/kotlin/fr/devlille/partners/connect/sponsoring/EventPackRepositoryExposedTest.kt
 
 ## Phase 3.3: Core Implementation (ONLY after tests are failing)
-- [ ] T009 EventPackRepositoryExposed implementation in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/application/EventPackRepositoryExposed.kt
-- [ ] T010 Add public route handler GET /events/{eventSlug}/sponsoring/packs in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/infrastructure/api/SponsoringRoutes.kt
-- [ ] T011 Accept-Language header processing and validation in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/infrastructure/api/SponsoringRoutes.kt
-- [ ] T012 Error handling for NotFoundException and proper HTTP status codes in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/infrastructure/api/SponsoringRoutes.kt
+- [x] T009 EventPackRepositoryExposed implementation in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/application/EventPackRepositoryExposed.kt
+- [x] T010 Add public route handler GET /events/{eventSlug}/sponsoring/packs in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/infrastructure/api/SponsoringRoutes.kt
+- [x] T011 Accept-Language header requirement validation (throw MissingRequestHeaderException if missing) in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/infrastructure/api/SponsoringRoutes.kt
+- [x] T012 Error handling for NotFoundException and proper HTTP status codes in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/infrastructure/api/SponsoringRoutes.kt
 
 ## Phase 3.4: Integration
 - [ ] T013 Register EventPackRepository binding in Koin DI container via SponsoringModule.kt
@@ -113,7 +114,8 @@ Add new route in sponsoringRoutes() function:
 route("/events/{eventSlug}/sponsoring/packs") {
     get {
         val eventSlug = call.parameters["eventSlug"] ?: throw BadRequestException("Missing eventSlug")
-        val acceptLanguage = call.request.headers["Accept-Language"]?.lowercase() ?: "en"
+        val acceptLanguage = call.request.headers["Accept-Language"]?.lowercase() 
+            ?: throw MissingRequestHeaderException("accept-language")
         val packs = eventPackRepository.findPublicPacksByEvent(eventSlug, acceptLanguage)
         call.respond(HttpStatusCode.OK, packs)
     }

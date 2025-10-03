@@ -11,11 +11,12 @@
 Event attendees, partners, and potential sponsors want to view available sponsoring packages for a specific event to understand sponsorship opportunities without needing to authenticate or navigate complex organizational structures.
 
 ### Acceptance Scenarios
-1. **Given** an event exists with sponsoring packages, **When** a user visits `/events/{eventSlug}/sponsoring/packs`, **Then** they see a complete list of all available sponsoring packages with their details
-2. **Given** an event has sponsoring packages with embedded options, **When** a user requests the sponsoring packs, **Then** they receive packages with all embedded options included in the response
-3. **Given** an event has sponsoring packages with optional add-ons, **When** a user views the packages, **Then** they see both the base package and available optional add-ons
-4. **Given** an event has no sponsoring packages, **When** a user requests sponsoring packs, **Then** they receive an empty list with appropriate messaging
-5. **Given** an invalid event slug is provided, **When** a user requests sponsoring packs, **Then** they receive a 404 error with clear messaging
+1. **Given** an event exists with sponsoring packages, **When** a user visits `/events/{eventSlug}/sponsoring/packs` with Accept-Language header, **Then** they see a complete list of all available sponsoring packages with their details
+2. **Given** an event has sponsoring packages with embedded options, **When** a user requests the sponsoring packs with Accept-Language header, **Then** they receive packages with all embedded options included in the response
+3. **Given** an event has sponsoring packages with optional add-ons, **When** a user views the packages with Accept-Language header, **Then** they see both the base package and available optional add-ons
+4. **Given** an event has no sponsoring packages, **When** a user requests sponsoring packs with Accept-Language header, **Then** they receive an empty list with appropriate messaging
+5. **Given** an invalid event slug is provided, **When** a user requests sponsoring packs with Accept-Language header, **Then** they receive a 404 error with clear messaging
+6. **Given** a valid event slug is provided, **When** a user requests sponsoring packs without Accept-Language header, **Then** they receive a 400 Bad Request error with clear messaging
 
 ### Edge Cases
 - What happens when an event exists but has no published sponsoring packages?
@@ -33,8 +34,9 @@ Event attendees, partners, and potential sponsors want to view available sponsor
 - **FR-006**: System MUST validate that the event exists and return appropriate error responses for invalid event slugs
 - **FR-007**: System MUST return packages in a consistent format with clear identification of embedded vs optional options
 - **FR-008**: System MUST handle events with zero sponsoring packages gracefully by returning an empty list
-- **FR-009**: System MUST provide appropriate HTTP status codes (200 for success, 404 for invalid event)
+- **FR-009**: System MUST provide appropriate HTTP status codes (200 for success, 404 for invalid event, 400 for missing required headers)
 - **FR-010**: System MUST return response data in JSON format suitable for public consumption
+- **FR-011**: System MUST require the Accept-Language header to provide localized option names and descriptions, returning 400 Bad Request if header is missing
 
 ### Key Entities
 - **Event**: Represents an event identified by its unique slug, contains sponsoring packages created by organizers

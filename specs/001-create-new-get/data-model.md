@@ -144,7 +144,7 @@ sponsoring_options.id → option_translations.option_id (one-to-many)
 
 ### Input Validation
 - `eventSlug`: Required, non-empty string
-- `Accept-Language`: Optional header, defaults handled by existing translation logic
+- `Accept-Language`: Required header; request will fail with 400 if absent
 
 ### Output Validation  
 - All SponsoringPack objects must have valid UUIDs as string IDs

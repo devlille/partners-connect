@@ -9,7 +9,6 @@ import fr.devlille.partners.connect.partnership.factories.insertMockedPartnershi
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
-import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
@@ -649,8 +648,6 @@ class PartnershipListRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        println("Response body: ${response.body<String>()}")
-        println("Content-Type: ${response.headers["Content-Type"]}")
     }
 
     @Test

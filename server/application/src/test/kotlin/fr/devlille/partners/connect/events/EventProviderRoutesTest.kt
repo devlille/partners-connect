@@ -214,7 +214,6 @@ class EventProviderRoutesTest {
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        println(response.bodyAsText())
         assertTrue(response.bodyAsText().contains("Request parameter id couldn't be parsed/converted to UUID"))
     }
 
