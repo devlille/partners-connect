@@ -1,0 +1,311 @@
+openapi: 3.0.3
+info:
+  title: Organizer Sponsoring Management API
+  description: Enhanced sponsoring pack and option management for organizers with multi-language support
+  version: 1.0.0
+  
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /orgs/{orgSlug}/events/{eventSlug}/packs:
+    get:
+      summary: List sponsoring packs with all translations (Organizer)
+      description: |
+        Retrieves all sponsoring packages for an event with complete translation data.
+        This endpoint is for organizer management and requires authentication.
+        Returns all available translations to help organizers identify missing languages.
+      operationId: getOrganizerEventSponsoringPacks
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          description: Organization slug identifier
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9-_]+$'
+            example: "devlille"
+        - name: eventSlug
+          in: path
+          required: true
+          description: Event slug identifier
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9-_]+$'
+            example: "devlille-2025"
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successfully retrieved sponsoring packages with all translations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SponsoringPackWithTranslations'
+              examples:
+                with_multi_language_packs:
+                  summary: Event with multi-language sponsoring packages
+                  value:
+                    - id: "123e4567-e89b-12d3-a456-426614174000"
+                      name: "Gold Sponsor"
+                      base_price: 50000
+                      max_quantity: 5
+                      required_options:
+                        - id: "456e7890-e89b-12d3-a456-426614174000"
+                          translations:
+                            en:
+                              language: "en"
+                              name: "Logo on website"
+                              description: "Company logo displayed on event website"
+                            fr:
+                              language: "fr"
+                              name: "Logo sur le site web"
+                              description: "Logo de l'entreprise affiché sur le site de l'événement"
+                          price: null
+                      optional_options:
+                        - id: "789e0123-e89b-12d3-a456-426614174000"
+                          translations:
+                            en:
+                              language: "en"
+                              name: "Social media promotion"
+                              description: "Promotion on event social media channels"
+                            fr:
+                              language: "fr"
+                              name: "Promotion sur les réseaux sociaux"
+                              description: null
+                          price: 15000
+                empty_packs:
+                  summary: Event with no sponsoring packages
+                  value: []
+        '401':
+          description: Unauthorized - Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - Insufficient permissions for organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /orgs/{orgSlug}/events/{eventSlug}/options:
+    get:
+      summary: List sponsoring options with all translations (Organizer)
+      description: |
+        Retrieves all sponsoring options for an event with complete translation data.
+        This endpoint is for organizer management and requires authentication.
+        Returns all available translations to help organizers identify missing languages.
+      operationId: getOrganizerEventSponsoringOptions
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          description: Organization slug identifier
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9-_]+$'
+            example: "devlille"
+        - name: eventSlug
+          in: path
+          required: true
+          description: Event slug identifier
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9-_]+$'
+            example: "devlille-2025"
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successfully retrieved sponsoring options with all translations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SponsoringOptionWithTranslations'
+              examples:
+                with_multi_language_options:
+                  summary: Event with multi-language options
+                  value:
+                    - id: "456e7890-e89b-12d3-a456-426614174000"
+                      translations:
+                        en:
+                          language: "en"
+                          name: "Logo on website"
+                          description: "Company logo displayed on event website"
+                        fr:
+                          language: "fr"
+                          name: "Logo sur le site web"
+                          description: "Logo de l'entreprise affiché sur le site de l'événement"
+                        de:
+                          language: "de"
+                          name: "Logo auf Website"
+                          description: null
+                      price: null
+                    - id: "789e0123-e89b-12d3-a456-426614174000"
+                      translations:
+                        en:
+                          language: "en"
+                          name: "Social media promotion"
+                          description: "Promotion on event social media channels"
+                      price: 15000
+                partial_translations:
+                  summary: Options with incomplete translations
+                  value:
+                    - id: "999e4567-e89b-12d3-a456-426614174000"
+                      translations:
+                        en:
+                          language: "en"
+                          name: "Premium booth space"
+                          description: "Prime location booth space"
+                      price: 25000
+        '401':
+          description: Unauthorized - Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - Insufficient permissions for organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    SponsoringPackWithTranslations:
+      type: object
+      required:
+        - id
+        - name
+        - base_price
+        - required_options  
+        - optional_options
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique package identifier
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        name:
+          type: string
+          description: Package name (typically in default language)
+          example: "Gold Sponsor"
+        base_price:
+          type: integer
+          minimum: 0
+          description: Base package price in cents
+          example: 50000
+        max_quantity:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: Maximum quantity available for purchase
+          example: 5
+        required_options:
+          type: array
+          items:
+            $ref: '#/components/schemas/SponsoringOptionWithTranslations'
+          description: Options that are automatically included
+        optional_options:
+          type: array
+          items:
+            $ref: '#/components/schemas/SponsoringOptionWithTranslations'
+          description: Optional add-on options available for purchase
+
+    SponsoringOptionWithTranslations:
+      type: object
+      required:
+        - id
+        - translations
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique option identifier
+          example: "456e7890-e89b-12d3-a456-426614174000"
+        translations:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/OptionTranslation'
+          description: All available translations keyed by language code
+          example:
+            en:
+              language: "en"
+              name: "Logo on website"
+              description: "Company logo displayed on event website"
+            fr:
+              language: "fr"
+              name: "Logo sur le site web"
+              description: "Logo de l'entreprise affiché sur le site de l'événement"
+        price:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: Additional cost in cents (null for free options)
+          example: 15000
+
+    OptionTranslation:
+      type: object
+      required:
+        - language
+        - name
+      properties:
+        language:
+          type: string
+          pattern: '^[a-z]{2}(-[A-Z]{2})?$'
+          description: ISO 639-1 language code
+          example: "en"
+        name:
+          type: string
+          description: Translated option name
+          example: "Logo on website"
+        description:
+          type: string
+          nullable: true
+          description: Translated option description
+          example: "Company logo displayed on event website"
+
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error code
+          example: "UNAUTHORIZED"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Authentication required"
+        details:
+          type: object
+          description: Additional error details
+          additionalProperties: true
