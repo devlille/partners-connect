@@ -12,4 +12,8 @@ interface PackRepository {
     fun updatePack(eventSlug: String, packId: UUID, input: CreateSponsoringPack): UUID
 
     fun deletePack(eventSlug: String, packId: UUID)
+
+    fun findPacksByEventWithAllTranslations(eventSlug: String): List<SponsoringPackWithTranslations>
+
+    fun getByIdWithAllTranslations(eventSlug: String, packId: UUID): SponsoringPackWithTranslations
 }
