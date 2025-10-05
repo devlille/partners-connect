@@ -4,7 +4,7 @@ import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
-import fr.devlille.partners.connect.sponsoring.domain.SponsoringOption
+import fr.devlille.partners.connect.sponsoring.domain.SponsoringOptionWithTranslations
 import fr.devlille.partners.connect.sponsoring.domain.TranslatedLabel
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.call.body
@@ -23,6 +23,7 @@ import kotlinx.serialization.json.Json
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class SponsoringOptionUpdateRoutesTest {
@@ -78,18 +79,25 @@ class SponsoringOptionUpdateRoutesTest {
         val updateResult = json.decodeFromString<Map<String, String>>(updateResponse.bodyAsText())
         assertEquals(optionId, updateResult["id"])
 
-        // Verify the option was updated by getting it with French language
-        val responseFr = client.get("/orgs/$orgId/events/$eventSlug/options") {
-            header(HttpHeaders.AcceptLanguage, "fr")
+        // Verify the option was updated by getting all translations
+        val response = client.get("/orgs/$orgId/events/$eventSlug/options") {
             header(HttpHeaders.Authorization, "Bearer valid")
+            // No Accept-Language header needed - organizer endpoint returns all translations
         }
 
-        assertEquals(HttpStatusCode.OK, responseFr.status)
-        val bodyFr = json.decodeFromString<List<SponsoringOption>>(responseFr.body())
-        assertEquals(1, bodyFr.size)
-        assertEquals("Option Mise à jour", bodyFr.first().name)
-        assertEquals("Description Mise à jour", bodyFr.first().description)
-        assertEquals(200, bodyFr.first().price)
+        assertEquals(HttpStatusCode.OK, response.status)
+        val body = json.decodeFromString<List<SponsoringOptionWithTranslations>>(response.body())
+        assertEquals(1, body.size)
+
+        val option = body.first()
+        // Verify both translations are present
+        assertTrue(option.translations.containsKey("fr"))
+        assertTrue(option.translations.containsKey("en"))
+        assertEquals("Option Mise à jour", option.translations["fr"]?.name)
+        assertEquals("Updated Option", option.translations["en"]?.name)
+        assertEquals("Description Mise à jour", option.translations["fr"]?.description)
+        assertEquals("Updated Description", option.translations["en"]?.description)
+        assertEquals(200, option.price)
     }
 
     @Test
@@ -137,25 +145,23 @@ class SponsoringOptionUpdateRoutesTest {
 
         assertEquals(HttpStatusCode.OK, updateResponse.status)
 
-        // Verify EN translation exists and is updated
-        val responseEn = client.get("/orgs/$orgId/events/$eventSlug/options") {
-            header(HttpHeaders.AcceptLanguage, "en")
+        // Verify the translation replacement using organizer endpoint (returns all translations)
+        val response = client.get("/orgs/$orgId/events/$eventSlug/options") {
             header(HttpHeaders.Authorization, "Bearer valid")
+            // No Accept-Language header needed - organizer endpoint returns all translations
         }
 
-        assertEquals(HttpStatusCode.OK, responseEn.status)
-        val bodyEn = json.decodeFromString<List<SponsoringOption>>(responseEn.body())
-        assertEquals(1, bodyEn.size)
-        assertEquals("Updated EN Option", bodyEn.first().name)
+        assertEquals(HttpStatusCode.OK, response.status)
+        val body = json.decodeFromString<List<SponsoringOptionWithTranslations>>(response.body())
+        assertEquals(1, body.size)
 
-        // Verify FR translation no longer exists
-        val responseFr = client.get("/orgs/$orgId/events/$eventSlug/options") {
-            header(HttpHeaders.AcceptLanguage, "fr")
-            header(HttpHeaders.Authorization, "Bearer valid")
-        }
-
-        assertEquals(HttpStatusCode.NotFound, responseFr.status)
-        assertTrue(responseFr.bodyAsText().contains("Translation not found"))
+        val option = body.first()
+        // Verify only EN translation exists (FR should be removed)
+        assertTrue(option.translations.containsKey("en"))
+        assertFalse(option.translations.containsKey("fr")) // Should be removed after update
+        assertEquals("Updated EN Option", option.translations["en"]?.name)
+        assertEquals("Updated EN Description", option.translations["en"]?.description)
+        assertEquals(150, option.price)
     }
 
     @Test

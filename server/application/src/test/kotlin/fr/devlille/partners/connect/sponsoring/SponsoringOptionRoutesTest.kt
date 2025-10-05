@@ -3,7 +3,7 @@ package fr.devlille.partners.connect.sponsoring
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
-import fr.devlille.partners.connect.sponsoring.domain.SponsoringOption
+import fr.devlille.partners.connect.sponsoring.domain.SponsoringOptionWithTranslations
 import fr.devlille.partners.connect.sponsoring.domain.TranslatedLabel
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.call.body
@@ -74,32 +74,30 @@ class SponsoringOptionRoutesTest {
 
         assertEquals(HttpStatusCode.Created, postResponse.status)
 
-        val response = json.decodeFromString<Map<String, String>>(postResponse.bodyAsText())
-        assertNotNull(response["id"])
+        val createResult = json.decodeFromString<Map<String, String>>(postResponse.bodyAsText())
+        assertNotNull(createResult["id"])
 
-        val responseFr = client.get("/orgs/$orgId/events/$eventSlug/options") {
-            header(HttpHeaders.AcceptLanguage, "fr")
+        val getResponse = client.get("/orgs/$orgId/events/$eventSlug/options") {
             header(HttpHeaders.Authorization, "Bearer valid")
+            // No Accept-Language header needed - organizer endpoint returns all translations
         }
 
-        assertEquals(HttpStatusCode.OK, responseFr.status)
-        val bodyFr = json.decodeFromString<List<SponsoringOption>>(responseFr.body())
-        assertEquals(1, bodyFr.size)
-        assertEquals("Option FR", bodyFr.first().name)
+        assertEquals(HttpStatusCode.OK, getResponse.status)
+        val body = json.decodeFromString<List<SponsoringOptionWithTranslations>>(getResponse.body())
+        assertEquals(1, body.size)
 
-        val responseEn = client.get("/orgs/$orgId/events/$eventSlug/options") {
-            header(HttpHeaders.AcceptLanguage, "en")
-            header(HttpHeaders.Authorization, "Bearer valid")
-        }
-
-        assertEquals(HttpStatusCode.OK, responseEn.status)
-        val bodyEn = json.decodeFromString<List<SponsoringOption>>(responseEn.body())
-        assertEquals(1, bodyEn.size)
-        assertEquals("Option EN", bodyEn.first().name)
+        val option = body.first()
+        // Verify both translations are present
+        assertTrue(option.translations.containsKey("fr"))
+        assertTrue(option.translations.containsKey("en"))
+        assertEquals("Option FR", option.translations["fr"]?.name)
+        assertEquals("Option EN", option.translations["en"]?.name)
+        assertEquals("Description FR", option.translations["fr"]?.description)
+        assertEquals("Description EN", option.translations["en"]?.description)
     }
 
     @Test
-    fun `GET returns 400 when Accept-Language is missing`() = testApplication {
+    fun `GET succeeds without Accept-Language header for organizer endpoints`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val eventSlug = "test-event-slug-3"
@@ -112,12 +110,14 @@ class SponsoringOptionRoutesTest {
         val response = client.get("/orgs/$orgId/events/$eventSlug/options") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
-        assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("accept-language", ignoreCase = true))
+        // Organizer endpoints now work without Accept-Language header
+        assertEquals(HttpStatusCode.OK, response.status)
+        val responseBody = response.bodyAsText()
+        assertTrue(responseBody.isNotEmpty())
     }
 
     @Test
-    fun `POST and GET fail if translation for requested language doesn't exist`() = testApplication {
+    fun `POST creates option and GET returns all translations regardless of Accept-Language`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val eventSlug = "test-event-slug-4"
@@ -140,11 +140,68 @@ class SponsoringOptionRoutesTest {
         }
 
         val response = client.get("/orgs/$orgId/events/$eventSlug/options") {
-            header(HttpHeaders.AcceptLanguage, "de")
+            header(HttpHeaders.AcceptLanguage, "de") // Unsupported language, but should still work
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
-        assertEquals(HttpStatusCode.NotFound, response.status)
-        assertTrue(response.bodyAsText().contains("Translation not found"))
+        // Organizer endpoints return all translations, so they don't fail on missing languages
+        assertEquals(HttpStatusCode.OK, response.status)
+        val responseBody = response.bodyAsText()
+        assertTrue(responseBody.contains("translations"))
+        assertTrue(responseBody.contains("\"fr\":")) // Should contain the French translation
+    }
+
+    @Test
+    fun `GET returns all options with all translations without Accept-Language header`() = testApplication {
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val eventSlug = "test-multi-language-options"
+        application {
+            moduleMocked()
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
+        }
+
+        val request = CreateSponsoringOption(
+            translations = listOf(
+                TranslatedLabel(
+                    language = "en",
+                    name = "Logo on website",
+                    description = "Company logo displayed on event website",
+                ),
+                TranslatedLabel(
+                    language = "fr",
+                    name = "Logo sur le site web",
+                    description = "Logo de l'entreprise affiché sur le site de l'événement",
+                ),
+                TranslatedLabel(language = "de", name = "Logo auf Website", description = ""),
+            ),
+            price = null,
+        )
+
+        client.post("/orgs/$orgId/events/$eventSlug/options") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(json.encodeToString(request))
+        }
+
+        val response = client.get("/orgs/$orgId/events/$eventSlug/options") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+            // Intentionally NO Accept-Language header
+        }
+
+        // Implementation completed - endpoint now works without Accept-Language header
+        // We expect OK status and response containing all translations
+        assertEquals(HttpStatusCode.OK, response.status)
+        val responseBody = response.bodyAsText()
+        assertTrue(responseBody.isNotEmpty())
+
+        // Verify response contains translations map structure
+        assertTrue(responseBody.contains("translations"))
+        assertTrue(
+            responseBody.contains("\"en\":") ||
+                responseBody.contains("\"fr\":") ||
+                responseBody.contains("\"de\":"),
+        )
     }
 }

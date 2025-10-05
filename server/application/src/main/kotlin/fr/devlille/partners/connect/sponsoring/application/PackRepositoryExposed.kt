@@ -4,9 +4,11 @@ import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.sponsoring.application.mappers.toDomain
+import fr.devlille.partners.connect.sponsoring.application.mappers.toDomainWithAllTranslations
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringPack
 import fr.devlille.partners.connect.sponsoring.domain.PackRepository
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringPack
+import fr.devlille.partners.connect.sponsoring.domain.SponsoringPackWithTranslations
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionsByPack
@@ -83,5 +85,40 @@ class PackRepositoryExposed : PackRepository {
             throw ForbiddenException("Pack has attached options and cannot be deleted")
         }
         pack.delete()
+    }
+
+    override fun findPacksByEventWithAllTranslations(
+        eventSlug: String,
+    ): List<SponsoringPackWithTranslations> = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val packs = SponsoringPackEntity.listPacksByEvent(event.id.value)
+        packs.map { pack ->
+            pack.toDomainWithAllTranslations(
+                requiredOptionIds = PackOptionsTable.listOptionsByPack(pack.id.value)
+                    .filter { it[PackOptionsTable.required] }
+                    .map { it[PackOptionsTable.option].value },
+                optionalOptions = PackOptionsTable.listOptionsByPack(pack.id.value)
+                    .filterNot { it[PackOptionsTable.required] }
+                    .map { it[PackOptionsTable.option].value },
+            )
+        }
+    }
+
+    override fun getByIdWithAllTranslations(
+        eventSlug: String,
+        packId: UUID,
+    ): SponsoringPackWithTranslations = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val pack = SponsoringPackEntity.singlePackById(event.id.value, packId)
+        pack.toDomainWithAllTranslations(
+            requiredOptionIds = PackOptionsTable.listOptionsByPack(packId)
+                .filter { it[PackOptionsTable.required] }
+                .map { it[PackOptionsTable.option].value },
+            optionalOptions = PackOptionsTable.listOptionsByPack(packId)
+                .filterNot { it[PackOptionsTable.required] }
+                .map { it[PackOptionsTable.option].value },
+        )
     }
 }

@@ -125,10 +125,10 @@ class SponsoringPackRoutesTest {
     }
 
     @Test
-    fun `GET fails if Accept-Language is missing`() = testApplication {
+    fun `GET succeeds without Accept-Language header for organizer endpoints`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        val eventSlug = "test-get-fails-if-accept--118"
+        val eventSlug = "test-get-succeeds-without-accept-lang"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
@@ -138,32 +138,36 @@ class SponsoringPackRoutesTest {
         val response = client.get("/orgs/$orgId/events/$eventSlug/packs") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
-        assertEquals(HttpStatusCode.BadRequest, response.status)
+        // Organizer endpoints now work without Accept-Language header
+        assertEquals(HttpStatusCode.OK, response.status)
     }
 
     @Test
-    fun `GET fails if Accept-Language is not supported`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val eventSlug = "test-get-fails-if-accept--193"
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
+    fun `GET returns all translations regardless of Accept-Language header for organizer endpoints`() =
+        testApplication {
+            val orgId = UUID.randomUUID()
+            val eventId = UUID.randomUUID()
+            val eventSlug = "test-get-returns-all-translations"
+            application {
+                moduleMocked()
+                insertMockedOrganisationEntity(orgId)
+                insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
-            val pack = insertMockedSponsoringPack(event = eventId)
-            val option = insertMockedSponsoringOption(eventId = eventId)
-            insertMockedOptionTranslation(optionId = option.id.value)
-            insertMockedPackOptions(packId = pack.id.value, optionId = option.id.value)
-        }
+                val pack = insertMockedSponsoringPack(event = eventId)
+                val option = insertMockedSponsoringOption(eventId = eventId)
+                insertMockedOptionTranslation(optionId = option.id.value)
+                insertMockedPackOptions(packId = pack.id.value, optionId = option.id.value)
+            }
 
-        val response = client.get("/orgs/$orgId/events/$eventSlug/packs") {
-            header(HttpHeaders.AcceptLanguage, "xx")
-            header(HttpHeaders.Authorization, "Bearer valid")
+            val response = client.get("/orgs/$orgId/events/$eventSlug/packs") {
+                header(HttpHeaders.AcceptLanguage, "xx") // Unsupported language but should still work
+                header(HttpHeaders.Authorization, "Bearer valid")
+            }
+            // Organizer endpoints return all translations, so any Accept-Language value is fine
+            assertEquals(HttpStatusCode.OK, response.status)
+            val responseBody = response.bodyAsText()
+            assertTrue(responseBody.contains("translations"))
         }
-        assertEquals(HttpStatusCode.NotFound, response.status)
-        assertTrue(response.bodyAsText().contains("Translation not found for option"))
-    }
 
     @Test
     fun `POST to attach options adds options to pack`() = testApplication {
@@ -368,5 +372,61 @@ class SponsoringPackRoutesTest {
 
         assertEquals(HttpStatusCode.Conflict, response.status)
         assertTrue { response.bodyAsText().contains("Option already attached to pack") }
+    }
+
+    @Test
+    fun `GET returns all packs with all translations without Accept-Language header`() = testApplication {
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val eventSlug = "test-multi-language-packs"
+        application {
+            moduleMocked()
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
+
+            val pack = insertMockedSponsoringPack(event = eventId, name = "Gold Sponsor")
+            val option = insertMockedSponsoringOption(eventId = eventId)
+
+            // Insert multiple translations for the option
+            insertMockedOptionTranslation(
+                optionId = option.id.value,
+                language = "en",
+                name = "Logo on website",
+                description = "Company logo displayed on event website",
+            )
+            insertMockedOptionTranslation(
+                optionId = option.id.value,
+                language = "fr",
+                name = "Logo sur le site web",
+                description = "Logo de l'entreprise affiché sur le site de l'événement",
+            )
+            insertMockedOptionTranslation(
+                optionId = option.id.value,
+                language = "de",
+                name = "Logo auf Website",
+                description = "",
+            )
+
+            insertMockedPackOptions(packId = pack.id.value, optionId = option.id.value, required = true)
+        }
+
+        val response = client.get("/orgs/$orgId/events/$eventSlug/packs") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+            // Intentionally NO Accept-Language header
+        }
+
+        // Implementation completed - endpoint now works without Accept-Language header
+        // We expect OK status and response containing all translations
+        assertEquals(HttpStatusCode.OK, response.status)
+        val responseBody = response.bodyAsText()
+        assertTrue(responseBody.isNotEmpty())
+
+        // Verify response contains translations map structure
+        assertTrue(responseBody.contains("translations"))
+        assertTrue(
+            responseBody.contains("\"en\":") ||
+                responseBody.contains("\"fr\":") ||
+                responseBody.contains("\"de\":"),
+        )
     }
 }

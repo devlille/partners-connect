@@ -40,10 +40,7 @@ private fun Route.packRoutes() {
         install(AuthorizedOrganisationPlugin)
         get {
             val eventSlug = call.parameters.eventSlug
-            val acceptLanguage = call.request.headers["Accept-Language"]
-                ?.lowercase()
-                ?: throw MissingRequestHeaderException("accept-language")
-            val packs = repository.findPacksByEvent(eventSlug = eventSlug, language = acceptLanguage)
+            val packs = repository.findPacksByEventWithAllTranslations(eventSlug = eventSlug)
             call.respond(HttpStatusCode.OK, packs)
         }
         post {
@@ -89,10 +86,7 @@ private fun Route.optionRoutes() {
         install(AuthorizedOrganisationPlugin)
         get {
             val eventSlug = call.parameters.eventSlug
-            val acceptLanguage = call.request.headers["Accept-Language"]
-                ?.lowercase()
-                ?: throw MissingRequestHeaderException("accept-language")
-            val options = repository.listOptionsByEvent(eventSlug = eventSlug, language = acceptLanguage)
+            val options = repository.listOptionsByEventWithAllTranslations(eventSlug = eventSlug)
             call.respond(HttpStatusCode.OK, options)
         }
         post {

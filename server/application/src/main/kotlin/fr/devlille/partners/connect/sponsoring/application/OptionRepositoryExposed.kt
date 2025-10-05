@@ -5,10 +5,12 @@ import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.sponsoring.application.mappers.toDomain
+import fr.devlille.partners.connect.sponsoring.application.mappers.toDomainWithAllTranslations
 import fr.devlille.partners.connect.sponsoring.domain.AttachOptionsToPack
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.OptionRepository
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringOption
+import fr.devlille.partners.connect.sponsoring.domain.SponsoringOptionWithTranslations
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
@@ -20,6 +22,7 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionsAtta
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.singlePackById
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
@@ -162,6 +165,18 @@ class OptionRepositoryExposed(
         }
         if (deleted == 0) {
             throw NotFoundException("Option not attached to pack")
+        }
+    }
+
+    override fun listOptionsByEventWithAllTranslations(
+        eventSlug: String,
+    ): List<SponsoringOptionWithTranslations> = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+
+        // Use the existing extension function which is working correctly
+        optionEntity.allByEvent(event.id.value).map { option ->
+            option.toDomainWithAllTranslations()
         }
     }
 }
