@@ -833,26 +833,7 @@ html:has(#partners) {
     font-size: clamp(0.9em, calc(0.9em + 1vw), 1.2em);
   }
 
-  & label {
-    position: absolute;
-    top: 0;
-    left: 0.25rem;
-    width: 100%;
-    font-size: 0.9em;
-    font-variation-settings: var(--fvs-light);
-    text-align: left;
-    padding: 0.5rem;
-  }
 
-  & input:not([type="submit"]),
-  select {
-    width: calc(100% - 1em);
-    padding: 2.5rem 0.5em 0.5em;
-  }
-
-  & select {
-    width: calc(100% + 0.25rem);
-  }
 
   & .buttons-bar {
     max-width: 7em;

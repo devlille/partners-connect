@@ -6,32 +6,40 @@
   <div id="container">
     <main>
       <form>
-        <p>
-          <label for="ip-name">Nom</label>
-          <input id="ip-name" type="text" name="ip-name" autocomplete="name" />
-        </p>
-        <p>
-          <label for="sel-pack">Pack de sponsoring</label>
-          <select id="sel-pack" name="sel-pack">
-            <option>Gold</option>
-            <option>Silver</option>
-            <option>Bronze</option>
-            <option>Média</option>
-          </select>
-        </p>
-        <p>
-          <label for="ip-email">Email</label>
-          <input
-            id="ip-email"
-            type="emailtext"
-            name="ip-email"
-            autocomplete="email"
-          />
-        </p>
-        <p>
-          <label for="ip-phone">Tél.</label>
-          <input id="ip-phone" type="tel" name="ip-phone" autocomplete="tel" />
-        </p>
+        <TextInput
+          id="ip-name"
+          label="Nom"
+          type="text"
+          name="ip-name"
+          autocomplete="name"
+        />
+        <SelectInput
+          id="sel-pack"
+          label="Pack de sponsoring"
+          name="sel-pack"
+        >
+          <option v-for="pack in packs" :key="pack.id" :value="pack.id">
+            {{ pack.name }} - {{ pack.base_price }} €
+          </option>
+        </SelectInput>
+        <TextInput
+          id="ip-email"
+          label="Email"
+          type="email"
+          name="ip-email"
+          autocomplete="email"
+        />
+        <PhoneInput
+          id="ip-phone"
+          label="Tél."
+          name="ip-phone"
+          autocomplete="tel"
+        />
+
+        <OptionsInput
+          legend="Options de sponsoring"
+          :options="options"
+        />
 
         <p class="buttons-bar">
           <input type="submit" value="Valider" />
@@ -46,11 +54,33 @@
   </div>
 </template>
 
-<script setup>
-//document.body.id = "partners";
+<script setup lang="ts">
+import { getOrgsOrgSlugEventsEventSlugPacks, getOrgsOrgSlugEventsEventSlugOptions, type SponsoringPack, type SponsoringOption } from "~/utils/api";
 
 definePageMeta({
   layout: "minimal",
+  auth: false,
+});
+
+const packs = ref<SponsoringPack[]>([]);
+const options = ref<SponsoringOption[]>([ { id: 1, name: 'Option 1', price: 100 }, { id: 2, name: 'Option 2', price: 200 }]);
+
+onMounted(async () => {
+  const orgSlug = "test"
+  const eventSlug = 'devlille';
+
+  if (false && orgSlug && eventSlug) {
+    try {
+      const [packsResponse, optionsResponse] = await Promise.all([
+        getOrgsOrgSlugEventsEventSlugPacks(orgSlug, eventSlug),
+        getOrgsOrgSlugEventsEventSlugOptions(orgSlug, eventSlug)
+      ]);
+      packs.value = packsResponse.data;
+      options.value = optionsResponse.data;
+    } catch (error) {
+      console.error('Failed to load sponsoring data:', error);
+    }
+  }
 });
 
 useHead({
