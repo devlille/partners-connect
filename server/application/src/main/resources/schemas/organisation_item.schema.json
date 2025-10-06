@@ -13,7 +13,9 @@
     },
     "owner": {
       "$ref": "owner.schema.json",
-      "nullable": true
+      "type": [
+        "null"
+      ]
     }
   },
   "required": [

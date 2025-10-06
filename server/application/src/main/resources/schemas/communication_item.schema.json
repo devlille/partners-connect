@@ -9,13 +9,17 @@
       "type": "string"
     },
     "publication_date": {
-      "type": "string",
-      "format": "date-time",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
     },
     "support_url": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
   "required": [

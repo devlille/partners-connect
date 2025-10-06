@@ -9,8 +9,10 @@
       }
     },
     "price": {
-      "type": "integer",
-      "nullable": true
+      "type": [
+        "integer",
+        "null"
+      ]
     }
   },
   "required": [

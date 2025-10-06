@@ -18,18 +18,27 @@
       "type": "string"
     },
     "description": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "site_url": {
       "type": "string"
     },
     "medias": {
       "$ref": "media.schema.json",
-      "nullable": true
+      "type": [
+        "null"
+      ]
     }
   },
   "required": [
-    "id", "name", "head_office", "siret", "vat", "site_url"
+    "id",
+    "name",
+    "head_office",
+    "siret",
+    "vat",
+    "site_url"
   ]
 }

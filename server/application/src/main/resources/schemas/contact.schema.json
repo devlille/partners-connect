@@ -10,6 +10,7 @@
     }
   },
   "required": [
-    "display_name", "role"
+    "display_name",
+    "role"
   ]
 }

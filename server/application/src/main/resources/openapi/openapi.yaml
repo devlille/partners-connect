@@ -8,7 +8,11 @@ servers:
 paths:
   /auth/callback:
     get:
+      summary: "OAuth callback endpoint"
+      operationId: "getAuthCallback"
       description: "OAuth callback endpoint"
+      security:
+        - {}
       responses:
         "404":
           description: "Not Found - Invalid OAuth state"
@@ -30,19 +34,37 @@ paths:
                 $ref: "#/components/schemas/UserSession"
   /auth/login:
     get:
+      summary: "Get resource"
+      operationId: "getAuthLogin"
       description: "Start OAuth login flow - redirects to Google OAuth"
+      security:
+        - {}
       responses:
+        "200":
+          description: "OK - Login page or redirect information"
+          content:
+            text/html:
+              schema:
+                type: "string"
         "302":
           description: "Redirect to OAuth provider"
   /auth/logout:
     get:
+      summary: "Get resource"
+      operationId: "getAuthLogout"
       description: "Logout and clear session"
+      security:
+        - {}
       responses:
         "204":
           description: "No Content - Successfully logged out"
   /auth/me:
     get:
+      summary: "Get resource"
+      operationId: "getAuthMe"
       description: "Get current user information"
+      security:
+        - bearerAuth: []
       responses:
         "401":
           description: "Unauthorized - No valid session"
@@ -58,7 +80,11 @@ paths:
                 $ref: "#/components/schemas/UserInfo"
   /companies:
     get:
+      summary: "Get resource"
+      operationId: "getCompanies"
       description: "List companies with paging support"
+      security:
+        - {}
       parameters:
         - name: "query"
           in: "query"
@@ -90,7 +116,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/PaginatedCompany"
     post:
+      summary: "Create company"
+      operationId: "postCompanies"
       description: ""
+      security:
+        - {}
       requestBody:
         content:
           application/json:
@@ -106,7 +136,11 @@ paths:
                 $ref: "#/components/schemas/Identifier"
   /companies/{companyId}/logo:
     post:
+      summary: "Create resource"
+      operationId: "postCompaniesLogo"
       description: "Upload a logo for a company"
+      security:
+        - {}
       parameters:
         - name: "companyId"
           in: "path"
@@ -139,7 +173,11 @@ paths:
                 $ref: "#/components/schemas/Media"
   /companies/{companyId}/partnership:
     get:
+      summary: "List partnerships"
+      operationId: "getCompaniesPartnership"
       description: ""
+      security:
+        - {}
       parameters:
         - name: "companyId"
           in: "path"
@@ -163,7 +201,11 @@ paths:
                   $ref: "#/components/schemas/PartnershipItem"
   /events:
     get:
+      summary: "List organization events"
+      operationId: "getEvents"
       description: "List events with paging support"
+      security:
+        - {}
       parameters:
         - name: "page"
           in: "query"
@@ -191,7 +233,11 @@ paths:
                 $ref: "#/components/schemas/PaginatedEventSummary"
   /events/{eventSlug}:
     get:
+      summary: "Get resource"
+      operationId: "getEventBySlug"
       description: "Get event details with organization information"
+      security:
+        - {}
       parameters:
         - name: "eventSlug"
           in: "path"
@@ -215,7 +261,10 @@ paths:
   /events/{eventSlug}/sponsoring/packs:
     get:
       summary: "List public sponsoring packages"
-      description: "List public sponsoring packages for an event with embedded and optional options"
+      operationId: "getEventsSponsoringPacks"
+      description: "List public sponsoring packages for an event with embedded and optional options (authentication optional - publicly accessible)"
+      security:
+        - {}
       parameters:
         - name: "eventSlug"
           in: "path"
@@ -252,6 +301,10 @@ paths:
                   $ref: "#/components/schemas/SponsoringPack"
   /events/{eventSlug}/partnership:
     post:
+      summary: "Create resource"
+      operationId: "postEventsPartnership"
+      security:
+        - {}
       description: ""
       parameters:
         - name: "eventSlug"
@@ -286,7 +339,11 @@ paths:
                 $ref: "#/components/schemas/Identifier"
   /events/{eventSlug}/partnership/{partnershipId}/billing:
     get:
+      summary: "Get partnership billing information"
+      operationId: "getEventsPartnershipBilling"
       description: ""
+      security:
+        - {}
       parameters:
         - name: "eventSlug"
           in: "path"
@@ -312,7 +369,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/CompanyBillingData"
     post:
+      summary: "Create partnership billing"
       description: ""
+      operationId: "postEventsPartnershipBilling"
+      security:
+        - {}
       parameters:
         - name: "eventSlug"
           in: "path"
@@ -344,7 +405,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/Identifier"
     put:
+      summary: "Update partnership billing"
       description: ""
+      operationId: "putEventsPartnershipBilling"
+      security:
+        - bearerAuth: []
       parameters:
         - name: "eventSlug"
           in: "path"
@@ -377,6 +442,10 @@ paths:
                 $ref: "#/components/schemas/Identifier"
   /events/{eventSlug}/partnership/{partnershipId}/billing/invoice:
     post:
+      summary: "Generate partnership invoice"
+      operationId: "postEventsPartnershipBillingInvoice"
+      security:
+        - {}
       description: ""
       parameters:
         - name: "eventSlug"
@@ -404,6 +473,10 @@ paths:
                 $ref: "#/components/schemas/Identifier"
   /events/{eventSlug}/partnership/{partnershipId}/billing/quote:
     post:
+      summary: "Generate partnership quote"
+      operationId: "postEventsPartnershipBillingQuote"
+      security:
+        - {}
       description: ""
       parameters:
         - name: "eventSlug"
@@ -431,6 +504,10 @@ paths:
                 $ref: "#/components/schemas/Identifier"
   /events/{eventSlug}/partnership/{partnershipId}/signed-agreement:
     post:
+      summary: "Upload signed partnership agreement"
+      operationId: "postEventsPartnershipSignedAgreement"
+      security:
+        - {}
       description: "Upload a signed partnership agreement"
       parameters:
         - name: "eventSlug"
@@ -469,6 +546,10 @@ paths:
                 $ref: "#/components/schemas/Identifier"
   /events/{eventSlug}/partnership/{partnershipId}/suggestion-approve:
     post:
+      summary: "Approve partnership suggestion"
+      operationId: "postEventsPartnershipSuggestionApprove"
+      security:
+        - {}
       description: ""
       parameters:
         - name: "eventSlug"
@@ -496,6 +577,10 @@ paths:
                 $ref: "#/components/schemas/Identifier"
   /events/{eventSlug}/partnership/{partnershipId}/suggestion-decline:
     post:
+      summary: "Decline partnership suggestion"
+      operationId: "postEventsPartnershipSuggestionDecline"
+      security:
+        - {}
       description: ""
       parameters:
         - name: "eventSlug"
@@ -523,6 +608,10 @@ paths:
                 $ref: "#/components/schemas/Identifier"
   /events/{eventSlug}/partnership/{partnershipId}/tickets:
     get:
+      summary: "Get partnership tickets"
+      operationId: "getEventsPartnershipTickets"
+      security:
+        - {}
       description: ""
       parameters:
         - name: "partnershipId"
@@ -551,7 +640,11 @@ paths:
                 items:
                   $ref: "#/components/schemas/Ticket"
     post:
+      summary: "Create partnership tickets"
       description: ""
+      operationId: "postEventsPartnershipTickets"
+      security:
+        - {}
       parameters:
         - name: "eventSlug"
           in: "path"
@@ -586,6 +679,10 @@ paths:
                 $ref: "#/components/schemas/TicketOrder"
   /events/{eventSlug}/partnership/{partnershipId}/tickets/{ticketId}:
     put:
+      summary: "Update partnership ticket"
+      operationId: "putEventsPartnershipTickets"
+      security:
+        - {}
       description: ""
       parameters:
         - name: "eventSlug"
@@ -624,6 +721,10 @@ paths:
                 $ref: "#/components/schemas/Ticket"
   /providers:
     get:
+      summary: "List providers"
+      operationId: "getProviders"
+      security:
+        - {}
       description: "List all providers with optional filtering and sorting"
       parameters:
         - name: "query"
@@ -673,7 +774,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/PaginatedProvider"
     post:
+      summary: "Create new provider"
       description: "Create a new provider (requires authentication and organizer status)"
+      operationId: "postProviders"
       security:
         - bearerAuth: []
       requestBody:
@@ -716,6 +819,10 @@ paths:
                 type: "string"
   /orgs:
     post:
+      summary: "Create new organization"
+      operationId: "postOrgs"
+      security:
+        - bearerAuth: []
       description: ""
       requestBody:
         content:
@@ -730,11 +837,15 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Identifier"
-  /orgs/{slug}:
+  /orgs/{orgSlug}:
     get:
+      summary: "Get organization details"
+      operationId: "getOrgs"
+      security:
+        - {}
       description: ""
       parameters:
-        - name: "slug"
+        - name: "orgSlug"
           in: "path"
           required: true
           schema:
@@ -752,8 +863,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Organisation"
-  /orgs/{orgSlug}:
     put:
+      summary: "Update organization"
+      operationId: "putOrgs"
+      security:
+        - bearerAuth: []
       description: ""
       parameters:
         - name: "orgSlug"
@@ -788,6 +902,8 @@ paths:
                 $ref: "#/components/schemas/Organisation"
   /orgs/{orgSlug}/events:
     get:
+      summary: "Get organization details"
+      operationId: "getOrgsEvents"
       description: "List events for an organization (paginated)"
       parameters:
         - name: "orgSlug"
@@ -834,7 +950,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/PaginatedEventSummary"
     post:
+      summary: "Create organization event"
       description: "Create a new event for an organization"
+      operationId: "postOrgsEvents"
       parameters:
         - name: "orgSlug"
           in: "path"
@@ -870,6 +988,10 @@ paths:
                 $ref: "#/components/schemas/Identifier"
   /orgs/{orgSlug}/events/{eventSlug}:
     put:
+      summary: "Update event"
+      operationId: "putOrgsEvents"
+      security:
+        - bearerAuth: []
       description: ""
       parameters:
         - name: "orgSlug"
@@ -903,6 +1025,8 @@ paths:
                 $ref: "#/components/schemas/Identifier"
   /orgs/{orgSlug}/events/{eventSlug}/booth-plan:
     post:
+      summary: "Upload booth plan"
+      operationId: "postOrgsEventsBoothPlan"
       description: "Upload booth plan image for an event"
       parameters:
         - name: "orgSlug"
@@ -961,6 +1085,8 @@ paths:
                   - "url"
   /orgs/{orgSlug}/events/{eventSlug}/integrations/{provider}/{usage}:
     post:
+      summary: "Create event integration"
+      operationId: "postOrgsEventsIntegrations"
       description: "Register an integration for an event"
       parameters:
         - name: "eventSlug"
@@ -1015,6 +1141,8 @@ paths:
                 $ref: "#/components/schemas/Identifier"
   /orgs/{orgSlug}/events/{eventSlug}/options:
     get:
+      summary: "Get organization details"
+      operationId: "getOrgsEventsOptions"
       description: "List sponsoring options for an event"
       parameters:
         - name: "eventSlug"
@@ -1056,7 +1184,9 @@ paths:
                 items:
                   $ref: "#/components/schemas/SponsoringOption"
     post:
+      summary: "Create sponsoring option"
       description: "Create a new sponsoring option"
+      operationId: "postOrgsEventsOptions"
       parameters:
         - name: "eventSlug"
           in: "path"
@@ -1097,6 +1227,10 @@ paths:
                 $ref: "#/components/schemas/Identifier"
   /orgs/{orgSlug}/events/{eventSlug}/options/{optionId}:
     delete:
+      summary: "Delete sponsoring option"
+      operationId: "deleteOrgsEventsOptions"
+      security:
+        - bearerAuth: []
       description: ""
       parameters:
         - name: "eventSlug"
@@ -1128,7 +1262,11 @@ paths:
               schema:
                 type: "object"
     put:
+      summary: "Update sponsoring option"
       description: ""
+      operationId: "putOrgsEventsOptions"
+      security:
+        - bearerAuth: []
       parameters:
         - name: "eventSlug"
           in: "path"
@@ -1166,6 +1304,8 @@ paths:
                 $ref: "#/components/schemas/Identifier"
   /orgs/{orgSlug}/events/{eventSlug}/packs:
     get:
+      summary: "Get organization details"
+      operationId: "getOrgsEventsPacks"
       description: "List sponsoring packs for an event"
       parameters:
         - name: "eventSlug"
@@ -1208,6 +1348,8 @@ paths:
                 items:
                   $ref: "#/components/schemas/SponsoringPack"
     post:
+      summary: "Create sponsoring pack"
+      operationId: "postOrgsEventsPacks"
       description: "Create a new sponsoring pack"
       parameters:
         - name: "eventSlug"
@@ -1249,6 +1391,10 @@ paths:
                 $ref: "#/components/schemas/Identifier"
   /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}:
     delete:
+      summary: "Delete sponsoring pack"
+      operationId: "deleteOrgsEventsPacks"
+      security:
+        - bearerAuth: []
       description: ""
       parameters:
         - name: "eventSlug"
@@ -1280,6 +1426,10 @@ paths:
               schema:
                 type: "object"
     put:
+      summary: "Update sponsoring pack"
+      operationId: "putOrgsEventsPacks"
+      security:
+        - bearerAuth: []
       description: ""
       parameters:
         - name: "eventSlug"
@@ -1318,6 +1468,10 @@ paths:
                 $ref: "#/components/schemas/Identifier"
   /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}/options:
     post:
+      summary: "Create sponsoring option"
+      operationId: "postOrgsEventsPacksOptions"
+      security:
+        - bearerAuth: []
       description: ""
       parameters:
         - name: "eventSlug"
@@ -1356,6 +1510,10 @@ paths:
                 type: "object"
   /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}/options/{optionId}:
     delete:
+      summary: "Delete sponsoring option"
+      operationId: "deleteOrgsEventsPacksOptions"
+      security:
+        - bearerAuth: []
       description: ""
       parameters:
         - name: "eventSlug"
@@ -1393,6 +1551,8 @@ paths:
                 type: "object"
   /orgs/{orgSlug}/events/{eventSlug}/communication:
     get:
+      summary: "Get organization details"
+      operationId: "getOrgsEventsCommunication"
       description: "Get communication plan for all partnerships of an event, grouped by status"
       parameters:
         - name: "orgSlug"
@@ -1436,6 +1596,8 @@ paths:
                 $ref: "#/components/schemas/CommunicationPlan"
   /orgs/{orgSlug}/events/{eventSlug}/external-link:
     post:
+      summary: "Add external link"
+      operationId: "postOrgsEventsExternalLink"
       description: "Attach a new external link to an event"
       parameters:
         - name: "orgSlug"
@@ -1485,6 +1647,8 @@ paths:
                 description: "UUID of the created external link"
   /orgs/{orgSlug}/events/{eventSlug}/external-link/{linkId}:
     delete:
+      summary: "Delete external link"
+      operationId: "deleteOrgsEventsExternalLink"
       description: "Remove an external link by its ID"
       parameters:
         - name: "orgSlug"
@@ -1529,6 +1693,8 @@ paths:
           description: "No Content - External link deleted successfully"
   /orgs/{orgSlug}/events/{eventSlug}/partnership:
     get:
+      summary: "Get partnership list"
+      operationId: "getOrgsEventsPartnership"
       description: "List partnerships for an event with filtering options"
       parameters:
         - name: "eventSlug"
@@ -1618,6 +1784,8 @@ paths:
                   $ref: "#/components/schemas/PartnershipItem"
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/agreement:
     post:
+      summary: "Generate partnership agreement"
+      operationId: "postOrgsEventsPartnershipAgreement"
       description: "Generate a partnership agreement PDF"
       parameters:
         - name: "eventSlug"
@@ -1664,6 +1832,10 @@ paths:
                   - "url"
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/billing/{billingStatus}:
     post:
+      summary: "Update partnership billing status"
+      operationId: "postOrgsEventsPartnershipBilling"
+      security:
+        - bearerAuth: []
       description: ""
       parameters:
         - name: "eventSlug"
@@ -1701,6 +1873,8 @@ paths:
                 $ref: "#/components/schemas/Identifier"
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/booth-location:
     put:
+      summary: "Update organization"
+      operationId: "putOrgsEventsPartnershipBoothLocation"
       description: "Assign booth location to a partnership"
       parameters:
         - name: "orgSlug"
@@ -1759,6 +1933,10 @@ paths:
                 $ref: "#/components/schemas/BoothLocationResponse"
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/suggestion:
     post:
+      summary: "Create partnership suggestion"
+      operationId: "postOrgsEventsPartnershipSuggestion"
+      security:
+        - bearerAuth: []
       description: ""
       parameters:
         - name: "eventSlug"
@@ -1803,6 +1981,8 @@ paths:
                 $ref: "#/components/schemas/Identifier"
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/validate:
     post:
+      summary: "Validate partnership"
+      operationId: "postOrgsEventsPartnershipValidate"
       description: "Validate a partnership request"
       parameters:
         - name: "eventSlug"
@@ -1843,6 +2023,8 @@ paths:
                 $ref: "#/components/schemas/Identifier"
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/decline:
     post:
+      summary: "Decline partnership"
+      operationId: "postOrgsEventsPartnershipDecline"
       description: "Decline a partnership request"
       parameters:
         - name: "eventSlug"
@@ -1883,6 +2065,8 @@ paths:
                 $ref: "#/components/schemas/Identifier"
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/communication/publication:
     put:
+      summary: "Update organization"
+      operationId: "putOrgsEventsPartnershipCommunicationPublication"
       description: "Schedule publication date for partnership communication"
       parameters:
         - name: "orgSlug"
@@ -1935,6 +2119,8 @@ paths:
                 $ref: "#/components/schemas/PublicationDateResponse"
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/communication/support:
     put:
+      summary: "Update organization"
+      operationId: "putOrgsEventsPartnershipCommunicationSupport"
       description: "Upload visual support material for partnership communication"
       parameters:
         - name: "orgSlug"
@@ -2010,6 +2196,8 @@ paths:
                 $ref: "#/components/schemas/SupportUploadResponse"
   /orgs/{orgSlug}/events/{eventSlug}/providers:
     post:
+      summary: "Create new provider"
+      operationId: "postOrgsEventsProviders"
       description: "Attach providers to an event (requires event write access)"
       security:
         - bearerAuth: []
@@ -2068,6 +2256,8 @@ paths:
               schema:
                 type: "string"
     delete:
+      summary: "Remove providers from event"
+      operationId: "deleteOrgsEventsProviders"
       description: "Remove providers from an event (requires event write access)"
       security:
         - bearerAuth: []
@@ -2127,6 +2317,10 @@ paths:
                 type: "string"
   /orgs/{orgSlug}/users:
     get:
+      summary: "Get organization details"
+      operationId: "getOrgsUsers"
+      security:
+        - bearerAuth: []
       description: ""
       parameters:
         - name: "orgSlug"
@@ -2151,6 +2345,10 @@ paths:
                   $ref: "#/components/schemas/User"
   /orgs/{orgSlug}/users/grant:
     post:
+      summary: "Create resource"
+      operationId: "postOrgsUsersGrant"
+      security:
+        - bearerAuth: []
       description: ""
       parameters:
         - name: "orgSlug"
@@ -2188,6 +2386,10 @@ paths:
                   value: "Permissions granted"
   /users/me/events:
     get:
+      summary: "List organization events"
+      operationId: "getUsersMeEvents"
+      security:
+        - bearerAuth: []
       description: ""
       responses:
         "200":
@@ -2200,6 +2402,10 @@ paths:
                   $ref: "#/components/schemas/EventSummary"
   /users/me/orgs:
     get:
+      summary: "Get resource"
+      operationId: "getUsersMeOrgs"
+      security:
+        - bearerAuth: []
       description: ""
       responses:
         "200":

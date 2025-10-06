@@ -12,8 +12,10 @@
       "type": "integer"
     },
     "max_quantity": {
-      "type": "integer",
-      "nullable": true
+      "type": [
+        "integer",
+        "null"
+      ]
     },
     "required_options": {
       "type": "array",

@@ -16,6 +16,9 @@
     }
   },
   "required": [
-    "original", "png_1000", "png_500", "png_250"
+    "original",
+    "png_1000",
+    "png_500",
+    "png_250"
   ]
 }

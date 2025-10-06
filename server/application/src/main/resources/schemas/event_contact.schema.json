@@ -6,11 +6,14 @@
       "type": "string"
     },
     "phone": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
   "required": [
-    "email", "phone"
+    "email",
+    "phone"
   ]
 }

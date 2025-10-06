@@ -10,6 +10,7 @@
     }
   },
   "required": [
-    "display_name", "email"
+    "display_name",
+    "email"
   ]
 }

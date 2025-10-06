@@ -3,12 +3,16 @@
   "type": "object",
   "properties": {
     "name": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "po": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "contact": {
       "$ref": "billing_contact.schema.json"
