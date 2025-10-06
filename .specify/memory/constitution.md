@@ -104,6 +104,40 @@ instead of manual null checks with custom exceptions. Use `call.parameters.event
 IllegalArgumentException or other custom exceptions for missing parameters - this breaks the 
 StatusPages exception handling contract and creates inconsistent error responses.
 
+## OpenAPI Configuration Standards (CRITICAL)
+
+### Validation Requirements
+The OpenAPI specification MUST pass complete validation with zero errors using `npm run validate` 
+from the project root. This runs Redocly CLI validation against the comprehensive OpenAPI 3.1.0 
+specification. Warnings are acceptable but all errors MUST be resolved before merging.
+
+**Validation Command**: `npm run validate` (executes `redocly lint server/application/src/main/resources/openapi/openapi.yaml`)
+
+### OpenAPI 3.1.0 Compliance (NON-NEGOTIABLE)
+All API operations MUST conform to OpenAPI 3.1.0 standards:
+
+#### Security Configuration
+- **All operations** MUST include security definitions: `security: - bearerAuth: []`
+- **Public endpoints**  MUST use empty security: `security: - {}`
+- **bearerAuth scheme** is defined in `components/securitySchemes` for JWT token authentication
+- Backend implementation MUST handle optional authentication appropriately for public endpoints
+
+#### Operation Standards
+- **operationId**: Every operation MUST have a unique operationId in camelCase (e.g., `getEvents`, `postCompanies`)
+- **summary**: Every operation MUST have a summary field with brief description
+- **responses**: Operations SHOULD include both 2xx success and 4xx error responses for completeness
+- **parameters**: Path parameters MUST be consistent across related endpoints (use `{orgSlug}` consistently, not mixed with `{slug}`)
+
+#### Schema Compatibility
+- **JSON Schema files** (`server/application/src/main/resources/schemas/*.json`) MUST be OpenAPI 3.1 compatible
+- **NO `nullable: true`** - Use union types instead: `"type": ["string", "null"]`
+- **Schema references** MUST resolve correctly from openapi.yaml to external schema files
+
+### File Structure Standards
+- **Main specification**: `server/application/src/main/resources/openapi/openapi.yaml` (2500+ lines)
+- **External schemas**: `server/application/src/main/resources/schemas/*.json` (50+ schema files)
+- **Generated files**: `documentation.yaml` is auto-generated - NEVER edit manually
+
 ## Governance
 
 This constitution supersedes all other development practices and coding guidelines. All pull 

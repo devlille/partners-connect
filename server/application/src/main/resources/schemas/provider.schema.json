@@ -13,16 +13,22 @@
       "type": "string"
     },
     "website": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "phone": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "email": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "created_at": {
       "type": "string",
@@ -30,6 +36,10 @@
     }
   },
   "required": [
-    "id", "name", "type", "website", "created_at"
+    "id",
+    "name",
+    "type",
+    "website",
+    "created_at"
   ]
 }

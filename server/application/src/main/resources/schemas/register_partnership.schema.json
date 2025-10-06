@@ -27,8 +27,10 @@
       "type": "string"
     },
     "phone": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "emails": {
       "type": "array",

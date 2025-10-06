@@ -16,6 +16,9 @@
     }
   },
   "required": [
-    "address", "city", "zip_code", "country"
+    "address",
+    "city",
+    "zip_code",
+    "country"
   ]
 }

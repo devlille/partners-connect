@@ -15,19 +15,25 @@
       "type": "string"
     },
     "pack_name": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "suggested_pack_name": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "language": {
       "type": "string"
     },
     "phone": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "emails": {
       "type": "string"
@@ -38,6 +44,11 @@
     }
   },
   "required": [
-    "id", "contact", "company_name", "event_name", "language", "created_at"
+    "id",
+    "contact",
+    "company_name",
+    "event_name",
+    "language",
+    "created_at"
   ]
 }

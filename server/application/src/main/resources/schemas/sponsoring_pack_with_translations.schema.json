@@ -1,0 +1,47 @@
+{
+  "$id": "sponsoring_pack_with_translations.schema.json",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the sponsoring pack"
+    },
+    "name": {
+      "type": "string",
+      "description": "Pack name"
+    },
+    "base_price": {
+      "type": "integer",
+      "description": "Base price in cents"
+    },
+    "max_quantity": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Maximum quantity available (null for unlimited)"
+    },
+    "required_options": {
+      "type": "array",
+      "items": {
+        "$ref": "sponsoring_option_with_translations.schema.json"
+      },
+      "description": "Required options with all translations"
+    },
+    "optional_options": {
+      "type": "array",
+      "items": {
+        "$ref": "sponsoring_option_with_translations.schema.json"
+      },
+      "description": "Optional add-on options with all translations"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "base_price",
+    "max_quantity",
+    "required_options",
+    "optional_options"
+  ]
+}

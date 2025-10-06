@@ -8,7 +8,11 @@ servers:
 paths:
   /auth/callback:
     get:
+      summary: Get resource
+      operationId: getAuthCallback
       description: OAuth callback endpoint
+      security:
+        - {}
       responses:
         '200':
           description: OK - Authentication successful, returns session
@@ -30,19 +34,37 @@ paths:
                 type: object
   /auth/login:
     get:
-      description: Start OAuth login flow - redirects to Google OAuth
+      summary: Get resource
+      operationId: getAuthLogin
+      description: Start OAuth login flow - redirects to Google OAuth (authentication optional)
+      security:
+        - {}
       responses:
+        '200':
+          description: OK - Login page or redirect information
+          content:
+            text/html:
+              schema:
+                type: string
         '302':
           description: Redirect to OAuth provider
   /auth/logout:
     get:
-      description: Logout and clear session
+      summary: Get resource
+      operationId: getAuthLogout
+      description: Logout and clear session (authentication optional)
+      security:
+        - {}
       responses:
         '204':
           description: No Content - Successfully logged out
   /auth/me:
     get:
+      summary: Get resource
+      operationId: getAuthMe
       description: Get current user information
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: OK
@@ -58,7 +80,11 @@ paths:
                 type: string
   /companies:
     get:
+      summary: Get resource
+      operationId: getCompanies
       description: List companies with paging support
+      security:
+        - {}
       parameters:
         - name: query
           in: query
@@ -90,7 +116,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/paginated_company.schema'
     post:
+      summary: Create company
+      operationId: postCompanies
       description: ''
+      security:
+        - {}
       requestBody:
         content:
           application/json:
@@ -106,7 +136,11 @@ paths:
                 $ref: '#/components/schemas/identifier.schema'
   /companies/{companyId}/logo:
     post:
+      summary: Create resource
+      operationId: postCompaniesLogo
       description: Upload a logo for a company
+      security:
+        - {}
       parameters:
         - name: companyId
           in: path
@@ -139,7 +173,11 @@ paths:
                 type: string
   /companies/{companyId}/partnership:
     get:
+      summary: List partnerships
+      operationId: getCompaniesPartnership
       description: ''
+      security:
+        - {}
       parameters:
         - name: companyId
           in: path
@@ -163,7 +201,11 @@ paths:
                 type: string
   /events:
     get:
+      summary: List organization events
+      operationId: getEvents
       description: List events with paging support
+      security:
+        - {}
       parameters:
         - name: page
           in: query
@@ -191,7 +233,11 @@ paths:
                 $ref: '#/components/schemas/paginated_event_summary.schema'
   /events/{eventSlug}:
     get:
+      summary: Get resource
+      operationId: getEventBySlug
       description: Get event details with organization information
+      security:
+        - {}
       parameters:
         - name: eventSlug
           in: path
@@ -212,8 +258,53 @@ paths:
             text/plain:
               schema:
                 type: string
+  /events/{eventSlug}/sponsoring/packs:
+    get:
+      summary: List public sponsoring packages
+      operationId: getEventsSponsoringPacks
+      description: List public sponsoring packages for an event with embedded and optional options (authentication optional - publicly accessible)
+      security:
+        - {}
+      parameters:
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The slug identifier of the event
+        - name: Accept-Language
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Language code for option translations (e.g., 'en', 'fr')
+      responses:
+        '200':
+          description: OK - List of sponsoring packages with localized options
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/sponsoring_pack.schema'
+        '400':
+          description: Bad Request - Missing Accept-Language header or invalid request
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Not Found - Event with specified slug does not exist
+          content:
+            text/plain:
+              schema:
+                type: string
   /events/{eventSlug}/partnership:
     post:
+      summary: Create resource
+      operationId: postEventsPartnership
+      security:
+        - {}
       description: ''
       parameters:
         - name: eventSlug
@@ -248,7 +339,11 @@ paths:
                 type: string
   /events/{eventSlug}/partnership/{partnershipId}/billing:
     get:
+      summary: Get partnership billing information
+      operationId: getEventsPartnershipBilling
       description: ''
+      security:
+        - {}
       parameters:
         - name: eventSlug
           in: path
@@ -274,7 +369,11 @@ paths:
               schema:
                 type: string
     post:
+      summary: Create partnership billing
       description: ''
+      operationId: postEventsPartnershipBilling
+      security:
+        - {}
       parameters:
         - name: eventSlug
           in: path
@@ -306,7 +405,11 @@ paths:
               schema:
                 type: string
     put:
+      summary: Update partnership billing
       description: ''
+      operationId: putEventsPartnershipBilling
+      security:
+        - bearerAuth: []
       parameters:
         - name: eventSlug
           in: path
@@ -339,6 +442,10 @@ paths:
                 type: string
   /events/{eventSlug}/partnership/{partnershipId}/billing/invoice:
     post:
+      summary: Generate partnership invoice
+      operationId: postEventsPartnershipBillingInvoice
+      security:
+        - {}
       description: ''
       parameters:
         - name: eventSlug
@@ -366,6 +473,10 @@ paths:
                 type: string
   /events/{eventSlug}/partnership/{partnershipId}/billing/quote:
     post:
+      summary: Generate partnership quote
+      operationId: postEventsPartnershipBillingQuote
+      security:
+        - {}
       description: ''
       parameters:
         - name: eventSlug
@@ -393,6 +504,10 @@ paths:
                 type: string
   /events/{eventSlug}/partnership/{partnershipId}/signed-agreement:
     post:
+      summary: Upload signed partnership agreement
+      operationId: postEventsPartnershipSignedAgreement
+      security:
+        - {}
       description: Upload a signed partnership agreement
       parameters:
         - name: eventSlug
@@ -431,6 +546,10 @@ paths:
                 type: string
   /events/{eventSlug}/partnership/{partnershipId}/suggestion-approve:
     post:
+      summary: Approve partnership suggestion
+      operationId: postEventsPartnershipSuggestionApprove
+      security:
+        - {}
       description: ''
       parameters:
         - name: eventSlug
@@ -458,6 +577,10 @@ paths:
                 type: string
   /events/{eventSlug}/partnership/{partnershipId}/suggestion-decline:
     post:
+      summary: Decline partnership suggestion
+      operationId: postEventsPartnershipSuggestionDecline
+      security:
+        - {}
       description: ''
       parameters:
         - name: eventSlug
@@ -485,6 +608,10 @@ paths:
                 type: string
   /events/{eventSlug}/partnership/{partnershipId}/tickets:
     get:
+      summary: Get partnership tickets
+      operationId: getEventsPartnershipTickets
+      security:
+        - {}
       description: ''
       parameters:
         - name: partnershipId
@@ -513,7 +640,11 @@ paths:
               schema:
                 type: string
     post:
+      summary: Create partnership tickets
       description: ''
+      operationId: postEventsPartnershipTickets
+      security:
+        - {}
       parameters:
         - name: eventSlug
           in: path
@@ -548,6 +679,10 @@ paths:
                 type: string
   /events/{eventSlug}/partnership/{partnershipId}/tickets/{ticketId}:
     put:
+      summary: Update partnership ticket
+      operationId: putEventsPartnershipTickets
+      security:
+        - {}
       description: ''
       parameters:
         - name: eventSlug
@@ -586,6 +721,10 @@ paths:
                 type: string
   /providers:
     get:
+      summary: List providers
+      operationId: getProviders
+      security:
+        - {}
       description: List all providers with optional filtering and sorting
       parameters:
         - name: query
@@ -641,7 +780,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/paginated_provider.schema'
     post:
+      summary: Create new provider
       description: Create a new provider (requires authentication and organizer status)
+      operationId: postProviders
       security:
         - bearerAuth: []
       requestBody:
@@ -684,6 +825,10 @@ paths:
                 type: string
   /orgs:
     post:
+      summary: Create new organization
+      operationId: postOrgs
+      security:
+        - bearerAuth: []
       description: ''
       requestBody:
         content:
@@ -698,11 +843,15 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/identifier.schema'
-  /orgs/{slug}:
+  /orgs/{orgSlug}:
     get:
+      summary: Get organization details
+      operationId: getOrgs
+      security:
+        - {}
       description: ''
       parameters:
-        - name: slug
+        - name: orgSlug
           in: path
           required: true
           schema:
@@ -720,8 +869,11 @@ paths:
             text/plain:
               schema:
                 type: string
-  /orgs/{orgSlug}:
     put:
+      summary: Update organization
+      operationId: putOrgs
+      security:
+        - bearerAuth: []
       description: ''
       parameters:
         - name: orgSlug
@@ -756,6 +908,8 @@ paths:
                 type: string
   /orgs/{orgSlug}/events:
     get:
+      summary: Get organization details
+      operationId: getOrgsEvents
       description: List events for an organization (paginated)
       parameters:
         - name: orgSlug
@@ -802,7 +956,9 @@ paths:
               schema:
                 type: string
     post:
+      summary: Create organization event
       description: Create a new event for an organization
+      operationId: postOrgsEvents
       parameters:
         - name: orgSlug
           in: path
@@ -838,6 +994,10 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}:
     put:
+      summary: Update event
+      operationId: putOrgsEvents
+      security:
+        - bearerAuth: []
       description: ''
       parameters:
         - name: orgSlug
@@ -871,6 +1031,8 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/booth-plan:
     post:
+      summary: Upload booth plan
+      operationId: postOrgsEventsBoothPlan
       description: Upload booth plan image for an event
       parameters:
         - name: orgSlug
@@ -929,6 +1091,8 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/integrations/{provider}/{usage}:
     post:
+      summary: Create event integration
+      operationId: postOrgsEventsIntegrations
       description: Register an integration for an event
       parameters:
         - name: eventSlug
@@ -989,6 +1153,8 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/options:
     get:
+      summary: Get organization details
+      operationId: getOrgsEventsOptions
       description: List sponsoring options for an event
       parameters:
         - name: eventSlug
@@ -1001,7 +1167,6 @@ paths:
           required: false
           schema:
             type: string
-            default: en
         - name: orgSlug
           in: path
           required: true
@@ -1031,7 +1196,9 @@ paths:
               schema:
                 type: string
     post:
+      summary: Create sponsoring option
       description: Create a new sponsoring option
+      operationId: postOrgsEventsOptions
       parameters:
         - name: eventSlug
           in: path
@@ -1072,6 +1239,10 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/options/{optionId}:
     delete:
+      summary: Delete sponsoring option
+      operationId: deleteOrgsEventsOptions
+      security:
+        - bearerAuth: []
       description: ''
       parameters:
         - name: eventSlug
@@ -1103,7 +1274,11 @@ paths:
               schema:
                 type: string
     put:
+      summary: Update sponsoring option
       description: ''
+      operationId: putOrgsEventsOptions
+      security:
+        - bearerAuth: []
       parameters:
         - name: eventSlug
           in: path
@@ -1141,6 +1316,8 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/packs:
     get:
+      summary: Get organization details
+      operationId: getOrgsEventsPacks
       description: List sponsoring packs for an event
       parameters:
         - name: eventSlug
@@ -1183,6 +1360,8 @@ paths:
               schema:
                 type: string
     post:
+      summary: Create sponsoring pack
+      operationId: postOrgsEventsPacks
       description: Create a new sponsoring pack
       parameters:
         - name: eventSlug
@@ -1224,6 +1403,10 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}:
     delete:
+      summary: Delete sponsoring pack
+      operationId: deleteOrgsEventsPacks
+      security:
+        - bearerAuth: []
       description: ''
       parameters:
         - name: eventSlug
@@ -1255,6 +1438,10 @@ paths:
               schema:
                 type: string
     put:
+      summary: Update sponsoring pack
+      operationId: putOrgsEventsPacks
+      security:
+        - bearerAuth: []
       description: ''
       parameters:
         - name: eventSlug
@@ -1293,6 +1480,10 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}/options:
     post:
+      summary: Create sponsoring option
+      operationId: postOrgsEventsPacksOptions
+      security:
+        - bearerAuth: []
       description: ''
       parameters:
         - name: eventSlug
@@ -1331,6 +1522,10 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}/options/{optionId}:
     delete:
+      summary: Delete sponsoring option
+      operationId: deleteOrgsEventsPacksOptions
+      security:
+        - bearerAuth: []
       description: ''
       parameters:
         - name: eventSlug
@@ -1368,6 +1563,8 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/communication:
     get:
+      summary: Get organization details
+      operationId: getOrgsEventsCommunication
       description: Get communication plan for all partnerships of an event, grouped by status
       parameters:
         - name: orgSlug
@@ -1411,6 +1608,8 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/external-link:
     post:
+      summary: Add external link
+      operationId: postOrgsEventsExternalLink
       description: Attach a new external link to an event
       parameters:
         - name: orgSlug
@@ -1460,6 +1659,8 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/external-link/{linkId}:
     delete:
+      summary: Delete external link
+      operationId: deleteOrgsEventsExternalLink
       description: Remove an external link by its ID
       parameters:
         - name: orgSlug
@@ -1504,6 +1705,8 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/partnership:
     get:
+      summary: Get partnership list
+      operationId: getOrgsEventsPartnership
       description: List partnerships for an event with filtering options
       parameters:
         - name: eventSlug
@@ -1597,6 +1800,8 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/agreement:
     post:
+      summary: Generate partnership agreement
+      operationId: postOrgsEventsPartnershipAgreement
       description: Generate a partnership agreement PDF
       parameters:
         - name: eventSlug
@@ -1643,6 +1848,10 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/billing/{billingStatus}:
     post:
+      summary: Update partnership billing status
+      operationId: postOrgsEventsPartnershipBilling
+      security:
+        - bearerAuth: []
       description: ''
       parameters:
         - name: eventSlug
@@ -1680,6 +1889,8 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/booth-location:
     put:
+      summary: Update organization
+      operationId: putOrgsEventsPartnershipBoothLocation
       description: Assign booth location to a partnership
       parameters:
         - name: orgSlug
@@ -1738,6 +1949,10 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/suggestion:
     post:
+      summary: Create partnership suggestion
+      operationId: postOrgsEventsPartnershipSuggestion
+      security:
+        - bearerAuth: []
       description: ''
       parameters:
         - name: eventSlug
@@ -1782,6 +1997,8 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/validate:
     post:
+      summary: Validate partnership
+      operationId: postOrgsEventsPartnershipValidate
       description: Validate a partnership request
       parameters:
         - name: eventSlug
@@ -1822,6 +2039,8 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/decline:
     post:
+      summary: Decline partnership
+      operationId: postOrgsEventsPartnershipDecline
       description: Decline a partnership request
       parameters:
         - name: eventSlug
@@ -1862,6 +2081,8 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/communication/publication:
     put:
+      summary: Update organization
+      operationId: putOrgsEventsPartnershipCommunicationPublication
       description: Schedule publication date for partnership communication
       parameters:
         - name: orgSlug
@@ -1914,6 +2135,8 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/communication/support:
     put:
+      summary: Update organization
+      operationId: putOrgsEventsPartnershipCommunicationSupport
       description: Upload visual support material for partnership communication
       parameters:
         - name: orgSlug
@@ -1989,6 +2212,8 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/providers:
     post:
+      summary: Create new provider
+      operationId: postOrgsEventsProviders
       description: Attach providers to an event (requires event write access)
       security:
         - bearerAuth: []
@@ -2047,6 +2272,8 @@ paths:
               schema:
                 type: string
     delete:
+      summary: Remove providers from event
+      operationId: deleteOrgsEventsProviders
       description: Remove providers from an event (requires event write access)
       security:
         - bearerAuth: []
@@ -2106,6 +2333,10 @@ paths:
                 type: string
   /orgs/{orgSlug}/users:
     get:
+      summary: Get organization details
+      operationId: getOrgsUsers
+      security:
+        - bearerAuth: []
       description: ''
       parameters:
         - name: orgSlug
@@ -2130,6 +2361,10 @@ paths:
                 type: string
   /orgs/{orgSlug}/users/grant:
     post:
+      summary: Create resource
+      operationId: postOrgsUsersGrant
+      security:
+        - bearerAuth: []
       description: ''
       parameters:
         - name: orgSlug
@@ -2167,6 +2402,10 @@ paths:
                 type: string
   /users/me/events:
     get:
+      summary: List organization events
+      operationId: getUsersMeEvents
+      security:
+        - bearerAuth: []
       description: ''
       responses:
         '200':
@@ -2179,6 +2418,10 @@ paths:
                   $ref: '#/components/schemas/event_summary.schema'
   /users/me/orgs:
     get:
+      summary: Get resource
+      operationId: getUsersMeOrgs
+      security:
+        - bearerAuth: []
       description: ''
       responses:
         '200':
@@ -2303,8 +2546,9 @@ components:
         display_name:
           type: string
         picture_url:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         email:
           type: string
       required:
@@ -2359,13 +2603,15 @@ components:
         vat:
           type: string
         description:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         site_url:
           type: string
         medias:
           $ref: '#/components/schemas/media.schema'
-          nullable: true
+          type:
+            - 'null'
       required:
         - id
         - name
@@ -2423,8 +2669,9 @@ components:
         vat:
           type: string
         description:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         site_url:
           type: string
         socials:
@@ -2469,16 +2716,19 @@ components:
         event_name:
           type: string
         pack_name:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         suggested_pack_name:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         language:
           type: string
         phone:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         emails:
           type: string
         created_at:
@@ -2544,8 +2794,9 @@ components:
         email:
           type: string
         phone:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
       required:
         - email
         - phone
@@ -2575,14 +2826,17 @@ components:
         type:
           type: string
         website:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         phone:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         email:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         created_at:
           type: string
           format: date-time
@@ -2656,7 +2910,8 @@ components:
           type: string
         owner:
           $ref: '#/components/schemas/owner.schema'
-          nullable: true
+          type:
+            - 'null'
       required:
         - slug
         - name
@@ -2672,6 +2927,53 @@ components:
       required:
         - event
         - organisation
+    sponsoring_option.schema:
+      $id: sponsoring_option.schema.json
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type:
+            - string
+            - 'null'
+        price:
+          type:
+            - integer
+            - 'null'
+      required:
+        - id
+        - name
+    sponsoring_pack.schema:
+      $id: sponsoring_pack.schema.json
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        base_price:
+          type: integer
+        max_quantity:
+          type:
+            - integer
+            - 'null'
+        required_options:
+          type: array
+          items:
+            $ref: '#/components/schemas/sponsoring_option.schema'
+        optional_options:
+          type: array
+          items:
+            $ref: '#/components/schemas/sponsoring_option.schema'
+      required:
+        - id
+        - name
+        - base_price
+        - required_options
+        - optional_options
     register_partnership.schema:
       $id: register_partnership.schema.json
       type: object
@@ -2694,8 +2996,9 @@ components:
         language:
           type: string
         phone:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         emails:
           type: array
           items:
@@ -2725,11 +3028,13 @@ components:
       type: object
       properties:
         name:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         po:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         contact:
           $ref: '#/components/schemas/billing_contact.schema'
       required:
@@ -2803,14 +3108,17 @@ components:
         type:
           type: string
         website:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         phone:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         email:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
       required:
         - name
         - type
@@ -2821,54 +3129,70 @@ components:
         name:
           type: string
         head_office:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         siret:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         siren:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         tva:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         d_and_b:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         nace:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         naf:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         duns:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         iban:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         bic:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         rib_url:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         representative_user_email:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         representative_role:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         creation_location:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         created_at:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
           format: date-time
         published_at:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
           format: date-time
       required:
         - name
@@ -2903,23 +3227,6 @@ components:
         - submission_end_time
         - address
         - contact
-    sponsoring_option.schema:
-      $id: sponsoring_option.schema.json
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        description:
-          type: string
-          nullable: true
-        price:
-          type: integer
-          nullable: true
-      required:
-        - id
-        - name
     translated_label.schema:
       $id: translated_label.schema.json
       type: object
@@ -2929,8 +3236,9 @@ components:
         name:
           type: string
         description:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
       required:
         - language
         - name
@@ -2943,37 +3251,11 @@ components:
           items:
             $ref: '#/components/schemas/translated_label.schema'
         price:
-          type: integer
-          nullable: true
+          type:
+            - integer
+            - 'null'
       required:
         - translations
-    sponsoring_pack.schema:
-      $id: sponsoring_pack.schema.json
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        base_price:
-          type: integer
-        max_quantity:
-          type: integer
-          nullable: true
-        required_options:
-          type: array
-          items:
-            $ref: '#/components/schemas/sponsoring_option.schema'
-        optional_options:
-          type: array
-          items:
-            $ref: '#/components/schemas/sponsoring_option.schema'
-      required:
-        - id
-        - name
-        - base_price
-        - required_options
-        - optional_options
     create_sponsoring_pack.schema:
       $id: create_sponsoring_pack.schema.json
       type: object
@@ -2988,8 +3270,9 @@ components:
         nb_tickets:
           type: integer
         max_quantity:
-          type: integer
-          nullable: true
+          type:
+            - integer
+            - 'null'
       required:
         - name
         - price
@@ -3018,12 +3301,14 @@ components:
         company_name:
           type: string
         publication_date:
-          type: string
+          type:
+            - string
+            - 'null'
           format: date-time
-          nullable: true
         support_url:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
       required:
         - partnership_id
         - company_name
@@ -3137,11 +3422,13 @@ components:
       type: object
       properties:
         display_name:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         picture_url:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         email:
           type: string
       required:

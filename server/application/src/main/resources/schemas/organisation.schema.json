@@ -6,69 +6,101 @@
       "type": "string"
     },
     "head_office": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "siret": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "siren": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "tva": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "d_and_b": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "nace": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "naf": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "duns": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "iban": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "bic": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "rib_url": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "representative_user_email": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "representative_role": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "creation_location": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "created_at": {
-      "type": "string",
-      "nullable": true,
+      "type": [
+        "string",
+        "null"
+      ],
       "format": "date-time"
     },
     "published_at": {
-      "type": "string",
-      "nullable": true,
+      "type": [
+        "string",
+        "null"
+      ],
       "format": "date-time"
     }
   },

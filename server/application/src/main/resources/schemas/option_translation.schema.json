@@ -1,0 +1,26 @@
+{
+  "$id": "option_translation.schema.json",
+  "type": "object",
+  "properties": {
+    "language": {
+      "type": "string",
+      "description": "ISO 639-1 language code (e.g., 'en', 'fr')"
+    },
+    "name": {
+      "type": "string",
+      "description": "Translated option name"
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Translated option description (optional)"
+    }
+  },
+  "required": [
+    "language",
+    "name",
+    "description"
+  ]
+}

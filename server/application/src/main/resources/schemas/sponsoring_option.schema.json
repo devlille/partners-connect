@@ -9,12 +9,16 @@
       "type": "string"
     },
     "description": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "price": {
-      "type": "integer",
-      "nullable": true
+      "type": [
+        "integer",
+        "null"
+      ]
     }
   },
   "required": [

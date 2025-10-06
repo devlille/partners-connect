@@ -15,8 +15,10 @@
       "type": "string"
     },
     "description": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "site_url": {
       "type": "string"
@@ -29,6 +31,10 @@
     }
   },
   "required": [
-    "name", "head_office", "siret", "vat", "site_url"
+    "name",
+    "head_office",
+    "siret",
+    "vat",
+    "site_url"
   ]
 }

@@ -3,12 +3,16 @@
   "type": "object",
   "properties": {
     "display_name": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "picture_url": {
-      "type": "string",
-      "nullable": true
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "email": {
       "type": "string"

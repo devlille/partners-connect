@@ -1,0 +1,29 @@
+{
+  "$id": "sponsoring_option_with_translations.schema.json",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the sponsoring option"
+    },
+    "translations": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "option_translation.schema.json"
+      },
+      "description": "Map of translations keyed by language code (e.g., 'en', 'fr', 'de')"
+    },
+    "price": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Additional cost in cents (null for free options)"
+    }
+  },
+  "required": [
+    "id",
+    "translations",
+    "price"
+  ]
+}
