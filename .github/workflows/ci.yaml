@@ -37,10 +37,18 @@ jobs:
           workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
           service_account: '${{ secrets.SERVICE_ACCOUNT }}'
 
-      - name: Generate OpenAPI documentation
-        uses: fluximus-prime/redocly-cli-github-action@v1
+      - uses: actions/setup-node@v4
         with:
-          args: 'bundle server/application/src/main/resources/openapi/openapi.yaml --output server/application/src/main/resources/openapi/documentation.yaml'
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ../
+
+      - name: Generate OpenAPI documentation
+        run: npm run bundle
+        working-directory: ../
 
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
