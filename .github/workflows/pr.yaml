@@ -10,9 +10,11 @@ concurrency:
 
 jobs:
   check:
-    env:
-      working-directory: server
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -34,11 +36,10 @@ jobs:
       - name: Validate OpenAPI specification
         run: npm run validate
       - run: ./gradlew check
-        working-directory: ${{ env.working-directory }}
       - name: Upload reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: reports
           path: |
-            ${{ env.working-directory }}/**/build/reports/*
+            **/build/reports/*
