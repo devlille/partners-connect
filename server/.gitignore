@@ -41,6 +41,9 @@ bin/
 ### VS Code ###
 .vscode/
 
+# Ignore dependency directories
+node_modules/
+
 ### Mac OS ###
 .DS_Store
 

@@ -38,17 +38,12 @@ jobs:
           service_account: '${{ secrets.SERVICE_ACCOUNT }}'
 
       - uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
 
       - name: Install dependencies
         run: npm install
-        working-directory: ../
 
       - name: Generate OpenAPI documentation
         run: npm run bundle
-        working-directory: ../
 
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev

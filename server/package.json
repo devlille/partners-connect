@@ -1,0 +1,14 @@
+{
+  "name": "partners-connect-api-docs",
+  "version": "1.0.0",
+  "description": "API documentation generation for partners-connect",
+  "scripts": {
+    "bundle": "redocly bundle application/src/main/resources/openapi/openapi.yaml --output application/src/main/resources/openapi/documentation.yaml",
+    "validate": "redocly lint application/src/main/resources/openapi/openapi.yaml",
+    "preview": "redocly preview-docs application/src/main/resources/openapi/documentation.yaml",
+    "build-docs": "npm run validate && npm run bundle"
+  },
+  "devDependencies": {
+    "@redocly/cli": "^1.0.0"
+  }
+}
