@@ -28,9 +28,6 @@ jobs:
           build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
           build-scan-terms-of-use-agree: "yes"
       - uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
       - name: Install dependencies
         run: npm install
       - name: Validate OpenAPI specification
