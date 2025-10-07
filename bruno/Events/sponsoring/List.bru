@@ -5,18 +5,17 @@ meta {
 }
 
 get {
-  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/options
+  url: {{scheme}}://{{base_url}}/events/:event_slug/sponsoring/packs
   body: none
   auth: none
 }
 
 params:path {
   event_slug: {{event_slug}}
-  org_slug: {{org_slug}}
 }
 
 headers {
-  Authorization: Bearer {{token}}
+  Accept-Language: fr
 }
 
 body:json {
