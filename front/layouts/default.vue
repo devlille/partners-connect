@@ -7,11 +7,13 @@
       </button>
     </header>
     <div id="container">
+      <UApp>
       <NavigationMenu type="general" />
 
       <main class="auto-scroll">
         <slot />
       </main>
+      </UApp>
     </div>
 
     <Footer />

@@ -22,7 +22,6 @@
 </template>
 
 <script setup lang="ts">
-import { getOrgsOrgSlugEvents, type GetOrgsOrgSlugEventsResult } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 
 definePageMeta({
@@ -35,7 +34,7 @@ const data = ref<GetOrgsOrgSlugEventsResult['data']['items']>([]);
 
 onMounted(async () => {
   try {
-    const response = await getOrgsOrgSlugEvents(route.params.slug as string);
+    const response = await getOrgsEvents(route.params.slug as string);
     data.value = response.data.items;
   } catch (error) {
     console.error('Failed to load events:', error);

@@ -20,7 +20,6 @@
 </template>
 
 <script setup lang="ts">
-import { getEventsEventSlug, putOrgsOrgSlugEventsEventSlug, type GetEventsEventSlugResult } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 
 definePageMeta({
@@ -53,7 +52,7 @@ const eventFormData = computed(() => {
 
 onMounted(async () => {
   try {
-    const response = await getEventsEventSlug(route.params.eventSlug as string);
+    const response = await getEventBySlug(route.params.eventSlug as string);
     event.value = response.data;
   } catch (error) {
     console.error('Failed to load event:', error);
@@ -80,7 +79,7 @@ async function handleSave(formData: any) {
       }
     };
 
-    await putOrgsOrgSlugEventsEventSlug(
+    await putOrgsEvents(
       route.params.slug as string, 
       route.params.eventSlug as string, 
       payload

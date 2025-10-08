@@ -9,7 +9,7 @@ import { ref } from "vue";
 import authMiddleware from "~/middleware/auth";
 
 const route = useRoute();
-const org = await getOrgsSlug(route.params.slug as string).then((r) => r.data);
+const org = await getOrgs(route.params.slug as string).then((r) => r.data);
 
 const form = ref<Organisation>({
   name: org?.name ?? "",
