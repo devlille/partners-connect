@@ -103,16 +103,24 @@ onMounted(async () => {
 
   if (orgSlug && eventSlug) {
     try {
-      const [packsResponse, optionsResponse] = await Promise.all([
-        getEventsSponsoringPacks(eventSlug),
-        /*getOrgsEventsOptions(orgSlug, eventSlug)*/
-      ]);
+      const packsResponse = await getEventsSponsoringPacks(eventSlug);
       console.log(packsResponse.data)
       packs.value = packsResponse.data;
       //options.value = optionsResponse.data;
     } catch (error) {
       console.error('Failed to load sponsoring data:', error);
     }
+  }
+});
+
+watch(() => formData.value.packId, (newPackId) => {
+  if (newPackId) {
+    const selectedPack = packs.value.find(pack => pack.id === newPackId);
+    if (selectedPack) {
+      options.value = selectedPack.optional_options || [];
+    }
+  } else {
+    options.value = [];
   }
 });
 
