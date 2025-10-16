@@ -7,3 +7,6 @@ import java.util.UUID
 
 val StringValues.companyUUID: UUID
     get() = getValue("companyId").toUUID()
+
+val StringValues.jobOfferUUID: UUID
+    get() = getValue("jobOfferId").toUUID()

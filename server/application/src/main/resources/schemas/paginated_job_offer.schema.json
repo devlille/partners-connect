@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "PaginatedJobOffer",
+  "description": "Paginated response containing job offers and pagination metadata",
+  "properties": {
+    "items": {
+      "type": "array",
+      "description": "Array of job offers for the current page",
+      "items": {
+        "$ref": "job_offer_response.schema.json"
+      }
+    },
+    "page": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Current page number"
+    },
+    "page_size": {
+      "type": "integer", 
+      "minimum": 1,
+      "maximum": 100,
+      "description": "Number of items per page"
+    },
+    "total": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total number of job offers across all pages"
+    }
+  },
+  "required": [
+    "items",
+    "page", 
+    "page_size",
+    "total"
+  ],
+  "additionalProperties": false
+}

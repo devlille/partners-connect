@@ -21,13 +21,19 @@ technical debt without explicit architectural approval and remediation timeline.
 and prevents accumulation of technical debt in a complex partnership management system.
 
 ### II. Comprehensive Testing Strategy (NON-NEGOTIABLE)
-Every new feature MUST include unit tests achieving minimum 80% code coverage. Integration tests 
-MUST cover all external service interactions (Slack, Mailjet, BilletWeb, Google Cloud Storage). 
-Database operations MUST be tested with H2 in-memory database. Test-driven development is 
-STRONGLY ENCOURAGED for complex business logic.
+Every new feature MUST include integration tests achieving minimum 80% code coverage through 
+HTTP route testing. Integration tests MUST cover all external service interactions (Slack, 
+Mailjet, BilletWeb, Google Cloud Storage). Database operations MUST be tested via HTTP endpoints 
+using H2 in-memory database. Test-driven development is STRONGLY ENCOURAGED for complex business logic.
 
-**Rationale**: Partnership and billing operations require absolute reliability. Comprehensive 
-testing prevents revenue-impacting bugs and ensures confidence in deployments.
+**CRITICAL**: Focus on HTTP route integration tests that validate API behavior, NOT repository 
+tests that directly test implementation details. Repository logic is validated implicitly through 
+route tests which provide better coverage of the complete request/response cycle including 
+serialization, validation, and error handling.
+
+**Rationale**: Partnership and billing operations require absolute reliability. Integration-focused 
+testing prevents revenue-impacting bugs, ensures proper API contracts, and provides confidence 
+in deployments while avoiding brittle implementation-specific tests.
 
 ### III. Clean Modular Architecture
 Domain modules MUST remain decoupled with clear boundaries. Each module (auth, billing, companies, 
@@ -92,9 +98,19 @@ with correct `required` flags.
 ### Exception Handling Pattern (CRITICAL)
 Route handlers MUST NOT include try-catch blocks for exception-to-HTTP conversion. The Ktor 
 StatusPages plugin handles all exception-to-HTTP response mapping automatically with consistent 
-error formatting. Domain/repository layers SHOULD throw appropriate exceptions (NotFoundException, 
-IllegalArgumentException, etc.) which StatusPages converts to proper HTTP responses. Manual 
-exception handling in routes creates inconsistent error responses and duplicates functionality.
+error formatting. Domain/repository layers MUST throw appropriate exceptions (NotFoundException, 
+ConflictException, ForbiddenException, etc.) defined in `internal/infrastructure/api` which 
+StatusPages converts to proper HTTP responses. Repository implementations MUST throw exceptions 
+instead of returning nullable types or Boolean success flags - this ensures consistent error 
+handling and proper HTTP status code mapping. Manual exception handling in routes creates 
+inconsistent error responses and duplicates functionality.
+
+**Repository Exception Requirements**:
+- NEVER return `null` or `Boolean` for operations that can fail - throw exceptions instead
+- Use `NotFoundException` for missing entities (mapped to HTTP 404)
+- Use `ConflictException` for business rule violations (mapped to HTTP 409)  
+- Use `ForbiddenException` for authorization failures (mapped to HTTP 403)
+- All exceptions MUST be defined in `internal/infrastructure/api` package for StatusPages mapping
 
 ### Parameter Extraction Pattern (CRITICAL)
 Route handlers MUST use the predefined StringValues extension functions for parameter extraction 
