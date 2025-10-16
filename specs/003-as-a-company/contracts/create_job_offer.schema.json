@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Create Job Offer Request",
+  "description": "Schema for creating a new job offer for a company",
+  "required": ["url", "title", "location", "publicationDate"],
+  "properties": {
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "maxLength": 500,
+      "description": "URL to the detailed job posting",
+      "example": "https://example.com/jobs/senior-developer"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "Job position title",
+      "example": "Senior Software Developer"
+    },
+    "location": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "description": "Work location for the position",
+      "example": "Paris, France"
+    },
+    "publicationDate": {
+      "type": "string",
+      "format": "date",
+      "description": "Date when the job offer was published (YYYY-MM-DD format, cannot be in the future)",
+      "example": "2025-10-15"
+    },
+    "endDate": {
+      "type": ["string", "null"],
+      "format": "date",
+      "description": "Optional application deadline (YYYY-MM-DD format, must be after publicationDate)",
+      "example": "2025-12-15"
+    },
+    "experienceYears": {
+      "type": ["integer", "null"],
+      "minimum": 1,
+      "maximum": 20,
+      "description": "Minimum years of experience required",
+      "example": 5
+    },
+    "salary": {
+      "type": ["string", "null"],
+      "maxLength": 100,
+      "description": "Salary information (can be range, amount, or text description)",
+      "example": "60000-80000 EUR"
+    }
+  },
+  "additionalProperties": false
+}
