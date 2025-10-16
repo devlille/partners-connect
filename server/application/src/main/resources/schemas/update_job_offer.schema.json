@@ -1,0 +1,40 @@
+{
+  "$id": "update_job_offer.schema.json",
+  "type": "object",
+  "properties": {
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "maxLength": 500
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "location": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "publication_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "end_date": {
+      "type": ["string", "null"],
+      "format": "date"
+    },
+    "experience_years": {
+      "type": ["integer", "null"],
+      "minimum": 1,
+      "maximum": 20
+    },
+    "salary": {
+      "type": ["string", "null"],
+      "maxLength": 100
+    }
+  },
+  "additionalProperties": false,
+  "minProperties": 1
+}

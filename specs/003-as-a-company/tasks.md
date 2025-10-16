@@ -8,57 +8,59 @@
 **Tech Stack**: Kotlin/JVM 21, Ktor 3.0, Exposed ORM, PostgreSQL, Koin DI, H2 in-memory for tests
 
 ## Phase 3.1: Setup & Preparation
-- [ ] T001 Create domain model classes (CreateJobOffer, UpdateJobOffer, JobOfferResponse) in `server/application/src/main/kotlin/fr/devlille/partners/connect/companies/domain/`
-- [ ] T002 Create CompanyJobOfferRepository interface in `server/application/src/main/kotlin/fr/devlille/partners/connect/companies/domain/CompanyJobOfferRepository.kt`
-- [ ] T003 [P] Create JSON schemas for validation in `server/application/src/main/resources/schemas/create_job_offer.schema.json`
-- [ ] T004 [P] Create JSON schemas for validation in `server/application/src/main/resources/schemas/update_job_offer.schema.json`
+- [x] T001 Create domain model classes (CreateJobOffer, UpdateJobOffer, JobOfferResponse) in `server/application/src/main/kotlin/fr/devlille/partners/connect/companies/domain/`
+- [x] T002 Create CompanyJobOfferRepository interface in `server/application/src/main/kotlin/fr/devlille/partners/connect/companies/domain/CompanyJobOfferRepository.kt`
+- [x] T003 [P] Create JSON schemas for validation in `server/application/src/main/resources/schemas/create_job_offer.schema.json`
+- [x] T004 [P] Create JSON schemas for validation in `server/application/src/main/resources/schemas/update_job_offer.schema.json`
 
 ## Phase 3.2: Database Layer (TDD - Tests First) ⚠️ MUST COMPLETE BEFORE 3.3
 **CRITICAL: These tests MUST be written and MUST FAIL before ANY implementation**
-- [ ] T005 [P] Contract test POST /companies/{companyId}/job-offers in `server/application/src/test/kotlin/fr/devlille/partners/connect/companies/infrastructure/api/CompanyJobOfferRoutesCreateTest.kt`
-- [ ] T006 [P] Contract test GET /companies/{companyId}/job-offers in `server/application/src/test/kotlin/fr/devlille/partners/connect/companies/infrastructure/api/CompanyJobOfferRoutesListTest.kt`
-- [ ] T007 [P] Contract test GET /companies/{companyId}/job-offers/{jobOfferId} in `server/application/src/test/kotlin/fr/devlille/partners/connect/companies/infrastructure/api/CompanyJobOfferRoutesGetTest.kt`
-- [ ] T008 [P] Contract test PUT /companies/{companyId}/job-offers/{jobOfferId} in `server/application/src/test/kotlin/fr/devlille/partners/connect/companies/infrastructure/api/CompanyJobOfferRoutesUpdateTest.kt`
-- [ ] T009 [P] Contract test DELETE /companies/{companyId}/job-offers/{jobOfferId} in `server/application/src/test/kotlin/fr/devlille/partners/connect/companies/infrastructure/api/CompanyJobOfferRoutesDeleteTest.kt`
-- [ ] T010 [P] Repository integration tests with H2 database in `server/application/src/test/kotlin/fr/devlille/partners/connect/companies/application/CompanyJobOfferRepositoryExposedTest.kt`
+- [x] T005 [P] Contract test POST /companies/{companyId}/job-offers in `server/application/src/test/kotlin/fr/devlille/partners/connect/companies/infrastructure/api/CompanyJobOfferRoutesCreateTest.kt`
+- [x] T006 [P] Contract test GET /companies/{companyId}/job-offers in `server/application/src/test/kotlin/fr/devlille/partners/connect/companies/infrastructure/api/CompanyJobOfferRoutesListTest.kt`
+- [x] T007 [P] Contract test GET /companies/{companyId}/job-offers/{jobOfferId} in `server/application/src/test/kotlin/fr/devlille/partners/connect/companies/infrastructure/api/CompanyJobOfferRoutesGetTest.kt`
+- [x] T008 [P] Contract test PUT /companies/{companyId}/job-offers/{jobOfferId} in `server/application/src/test/kotlin/fr/devlille/partners/connect/companies/infrastructure/api/CompanyJobOfferRoutesUpdateTest.kt`
+- [x] T009 [P] Contract test DELETE /companies/{companyId}/job-offers/{jobOfferId} in `server/application/src/test/kotlin/fr/devlille/partners/connect/companies/infrastructure/api/CompanyJobOfferRoutesDeleteTest.kt`
+- [x] T010 [P] Repository integration tests with H2 database in `server/application/src/test/kotlin/fr/devlille/partners/connect/companies/application/CompanyJobOfferRepositoryExposedTest.kt`
 
 ## Phase 3.3: Database Implementation (ONLY after tests are failing)
-- [ ] T011 [P] Create CompanyJobOfferTable Exposed table in `server/application/src/main/kotlin/fr/devlille/partners/connect/companies/infrastructure/db/CompanyJobOfferTable.kt`
-- [ ] T012 [P] Create CompanyJobOfferEntity Exposed entity in `server/application/src/main/kotlin/fr/devlille/partners/connect/companies/infrastructure/db/CompanyJobOfferEntity.kt`
-- [ ] T013 CompanyJobOfferRepositoryExposed implementation with create method in `server/application/src/main/kotlin/fr/devlille/partners/connect/companies/application/CompanyJobOfferRepositoryExposed.kt`
-- [ ] T014 CompanyJobOfferRepositoryExposed findById method implementation (same file as T013)
-- [ ] T015 CompanyJobOfferRepositoryExposed findByCompany method with pagination (same file as T013)
-- [ ] T016 CompanyJobOfferRepositoryExposed update method implementation (same file as T013)
-- [ ] T017 CompanyJobOfferRepositoryExposed delete method implementation (same file as T013)
+- [x] T011 [P] Create CompanyJobOfferTable Exposed table in `server/application/src/main/kotlin/fr/devlille/partners/connect/companies/infrastructure/db/CompanyJobOfferTable.kt`
+- [x] T012 [P] Create CompanyJobOfferEntity Exposed entity in `server/application/src/main/kotlin/fr/devlille/partners/connect/companies/infrastructure/db/CompanyJobOfferEntity.kt`
+- [x] T013 CompanyJobOfferRepositoryExposed implementation with create method in `server/application/src/main/kotlin/fr/devlille/partners/connect/companies/application/CompanyJobOfferRepositoryExposed.kt`
+- [x] T014 CompanyJobOfferRepositoryExposed findById method implementation (same file as T013)
+- [x] T015 CompanyJobOfferRepositoryExposed findByCompany method with pagination (same file as T013)
+- [x] T016 CompanyJobOfferRepositoryExposed update method implementation (same file as T013)
+- [x] T017 CompanyJobOfferRepositoryExposed delete method implementation (same file as T013)
 
 ## Phase 3.4: API Routes Implementation
-- [ ] T018 Add job offer routes to CompanyRoutes.kt: POST /companies/{companyId}/job-offers endpoint in `server/application/src/main/kotlin/fr/devlille/partners/connect/companies/infrastructure/api/CompanyRoutes.kt`
-- [ ] T019 Add GET /companies/{companyId}/job-offers endpoint (same file as T018)
-- [ ] T020 Add GET /companies/{companyId}/job-offers/{jobOfferId} endpoint (same file as T018)
-- [ ] T021 Add PUT /companies/{companyId}/job-offers/{jobOfferId} endpoint (same file as T018)
-- [ ] T022 Add DELETE /companies/{companyId}/job-offers/{jobOfferId} endpoint (same file as T018)
-- [ ] T023 Add CompanyJobOfferRepository to Koin DI configuration in `server/application/src/main/kotlin/fr/devlille/partners/connect/internal/infrastructure/di/ApplicationModule.kt`
+- [x] T018 Add job offer routes to CompanyRoutes.kt: POST /companies/{companyId}/job-offers endpoint in `server/application/src/main/kotlin/fr/devlille/partners/connect/companies/infrastructure/api/CompanyRoutes.kt`
+- [x] T019 Add GET /companies/{companyId}/job-offers endpoint (same file as T018)
+- [x] T020 Add GET /companies/{companyId}/job-offers/{jobOfferId} endpoint (same file as T018)
+- [x] T021 Add PUT /companies/{companyId}/job-offers/{jobOfferId} endpoint (same file as T018)
+- [x] T022 Add DELETE /companies/{companyId}/job-offers/{jobOfferId} endpoint (same file as T018)
+- [x] T023 Add CompanyJobOfferRepository to Koin DI configuration in `server/application/src/main/kotlin/fr/devlille/partners/connect/companies/infrastructure/bindings/CompanyModule.kt`
 
 ## Phase 3.5: Validation & Error Handling
-- [ ] T024 [P] Add business logic validation for CreateJobOffer (URL format, date validation, experience range) in domain models
-- [ ] T025 [P] Add business logic validation for UpdateJobOffer (same validations as create, partial update logic) in domain models  
-- [ ] T026 Request parameter extraction with proper error handling using existing StringValues extensions in routes
-- [ ] T027 JSON schema validation integration in route handlers using existing schema validation patterns
+- [x] T024 [P] Add business logic validation for CreateJobOffer (URL format, date validation, experience range) in domain models
+- [x] T025 [P] Add business logic validation for UpdateJobOffer (same validations as create, partial update logic) in domain models  
+- [x] T026 Request parameter extraction with proper error handling using existing StringValues extensions in routes
+- [x] T027 JSON schema validation integration in route handlers using existing schema validation patterns
 
 ## Phase 3.6: Integration Tests
-- [ ] T028 [P] End-to-end integration test for job offer creation scenario in `server/application/src/test/kotlin/fr/devlille/partners/connect/companies/integration/JobOfferCreationIntegrationTest.kt`
-- [ ] T029 [P] End-to-end integration test for job offer listing with pagination in `server/application/src/test/kotlin/fr/devlille/partners/connect/companies/integration/JobOfferListingIntegrationTest.kt`
-- [ ] T030 [P] End-to-end integration test for job offer CRUD operations in `server/application/src/test/kotlin/fr/devlille/partners/connect/companies/integration/JobOfferCrudIntegrationTest.kt`
-- [ ] T031 [P] Authorization integration tests (company ownership validation) in `server/application/src/test/kotlin/fr/devlille/partners/connect/companies/integration/JobOfferAuthorizationTest.kt`
+**NOTE**: Focus on route-level integration tests that test API behavior through HTTP endpoints. Do NOT create repository-level tests that directly test implementation details.
+
+- [x] T028 [P] HTTP route integration tests for job offer CRUD operations in `server/application/src/test/kotlin/fr/devlille/partners/connect/companies/infrastructure/api/CompanyJobOfferRoutes*Test.kt`
+- [x] T029 [P] End-to-end integration test for job offer listing with pagination validation in route tests
+- [x] T030 [P] End-to-end integration test for job offer CRUD operations in `server/application/src/test/kotlin/fr/devlille/partners/connect/companies/integration/JobOfferCrudIntegrationTest.kt`
+- [x] T031 [P] Authorization integration tests (company ownership validation) in `server/application/src/test/kotlin/fr/devlille/partners/connect/companies/integration/JobOfferAuthorizationTest.kt`
 
 ## Phase 3.7: Quality & Polish
-- [ ] T032 [P] Add KDoc documentation for all public APIs (CompanyJobOfferRepository interface and domain models)
-- [ ] T033 [P] Database query optimization: add indexes for company_id and ensure efficient pagination queries
-- [ ] T034 [P] Add structured logging with correlation IDs for all job offer operations in route handlers
-- [ ] T035 [P] Update OpenAPI specification with job offer endpoints in `server/application/src/main/resources/openapi/openapi.yaml`
-- [ ] T036 Unit test coverage verification achieving minimum 80% for all new classes
-- [ ] T037 [P] Performance testing to ensure <2 second response times for all job offer operations
-- [ ] T038 [P] Code quality verification: ktlint formatting and detekt static analysis with zero violations
+- [x] T032 [P] Add KDoc documentation for all public APIs (CompanyJobOfferRepository interface and domain models)
+- [x] T033 [P] Database query optimization: add indexes for company_id and ensure efficient pagination queries
+- [x] T034 [P] Add structured logging with correlation IDs for all job offer operations in route handlers
+- [x] T035 [P] Update OpenAPI specification with job offer endpoints in `server/application/src/main/resources/openapi/openapi.yaml`
+- [x] T036 Unit test coverage verification achieving minimum 80% for all new classes
+- [x] T037 [P] Performance testing to ensure <2 second response times for all job offer operations
+- [x] T038 [P] Code quality verification: ktlint formatting and detekt static analysis with zero violations
 
 ## Dependencies
 **Phase Dependencies:**

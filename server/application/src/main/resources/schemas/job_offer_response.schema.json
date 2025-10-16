@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "JobOfferResponse",
+  "description": "Response model for job offer data containing all job offer information returned by the API",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier of the job offer"
+    },
+    "company_id": {
+      "type": "string",
+      "format": "uuid", 
+      "description": "UUID of the company that owns this job offer"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Direct link to the detailed job posting"
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "Position name or job title"
+    },
+    "location": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "Work location description"
+    },
+    "publication_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the job was posted (ISO format)"
+    },
+    "end_date": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Application deadline (ISO format, nullable)"
+    },
+    "experience_years": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "maximum": 20,
+      "description": "Minimum experience required in years (nullable)"
+    },
+    "salary": {
+      "type": ["string", "null"],
+      "maxLength": 100,
+      "description": "Salary information as free text (nullable)"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the record was created (ISO format)"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the record was last modified (ISO format)"
+    }
+  },
+  "required": [
+    "id",
+    "company_id",
+    "url",
+    "title", 
+    "location",
+    "publication_date",
+    "created_at",
+    "updated_at"
+  ],
+  "additionalProperties": false
+}
