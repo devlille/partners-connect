@@ -1,0 +1,32 @@
+meta {
+  name: Create
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/companies/:company_id/job-offers
+  body: json
+  auth: none
+}
+
+params:path {
+  company_id: {{company_id}}
+}
+
+body:json {
+  {
+    "url": "https://duckduckgo.com/hiring",
+    "title": "Senior Android Engineer",
+    "location": "Remote",
+    "publication_date": "2024-06-11T08:00:00",
+    "end_date": null,
+    "experience_years": 5,
+    "salary": "150000$ - 175000$"
+  }
+}
+
+script:post-response {
+  let data = res.getBody();
+  bru.setEnvVar("job_offer_id", data.id)
+}

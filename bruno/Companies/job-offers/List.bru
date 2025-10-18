@@ -1,0 +1,37 @@
+meta {
+  name: List
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{scheme}}://{{base_url}}/companies/:company_id/job-offers
+  body: none
+  auth: none
+}
+
+params:path {
+  company_id: {{company_id}}
+}
+
+body:json {
+  {
+    "name": "DuckDuckGo",
+    "site_url": "https://duckduckgo.com/",
+    "description": "Switch to DuckDuckGo. It’s private and free!",
+    "head_office": {
+      "address": "74 rue des Arts",
+      "city": "Lille",
+      "zip_code": "59800",
+      "country": "FR"
+    },
+    "vat": "FR65827999616",
+    "siret": "32878178601143",
+    "socials": [
+      {
+        "type": "LINKEDIN",
+        "url": "https://www.linkedin.com/company/duck-duck-go/"
+      }
+    ]
+  }
+}
