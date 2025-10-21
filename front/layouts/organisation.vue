@@ -20,4 +20,4 @@
 
 <script lang="ts" setup></script>
 
-<style></style>
+<style src="~/assets/css/backoffice.css"></style>

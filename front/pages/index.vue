@@ -190,3 +190,4 @@ useHead({
   }
 });
 </script>
+<style src="~/assets/css/main.css"></style>

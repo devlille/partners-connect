@@ -26,6 +26,9 @@ importers:
       nuxt:
         specifier: ^4.1.0
         version: 4.1.3(@biomejs/biome@2.2.5)(@parcel/watcher@2.5.1)(@types/node@20.19.20)(@vue/compiler-sfc@3.5.22)(db0@0.3.4)(eslint@9.37.0(jiti@2.6.1))(ioredis@5.8.1)(lightningcss@1.30.1)(magicast@0.3.5)(optionator@0.9.4)(oxlint@1.22.0)(rollup@4.52.4)(terser@5.44.0)(typescript@5.9.3)(vite@7.1.9(@types/node@20.19.20)(jiti@2.6.1)(lightningcss@1.30.1)(terser@5.44.0)(yaml@2.8.1))(yaml@2.8.1)
+      tailwindcss:
+        specifier: ^4.1.15
+        version: 4.1.15
       typescript:
         specifier: ^5.9.2
         version: 5.9.3
@@ -36,15 +39,15 @@ importers:
         specifier: ^4.5.1
         version: 4.5.1(vue@3.5.22(typescript@5.9.3))
     devDependencies:
-      '@biomejs/biome':
-        specifier: ^2.2.5
-        version: 2.2.5
       '@nuxtjs/tailwindcss':
         specifier: ^6.14.0
         version: 6.14.0(magicast@0.3.5)(yaml@2.8.1)
       '@tailwindcss/postcss':
         specifier: ^4.1.14
         version: 4.1.14
+      oxlint:
+        specifier: ^1.14.0
+        version: 1.22.0
 
 packages:
 
@@ -4624,6 +4627,9 @@ packages:
   tailwindcss@4.1.14:
     resolution: {integrity: sha512-b7pCxjGO98LnxVkKjaZSDeNuljC4ueKUddjENJOADtubtdo8llTaJy7HwBMeLNSSo2N5QIAgklslK1+Ir8r6CA==}
 
+  tailwindcss@4.1.15:
+    resolution: {integrity: sha512-k2WLnWkYFkdpRv+Oby3EBXIyQC8/s1HOFMBUViwtAh6Z5uAozeUSMQlIsn/c6Q2iJzqG6aJT3wdPaRNj70iYxQ==}
+
   tapable@2.3.0:
     resolution: {integrity: sha512-g9ljZiwki/LfxmQADO3dEY1CbpmXT5Hm2fJ+QaGKwSXUylMybePR7/67YW7jOrrvjEgL1Fmz5kzyAjWVWLlucg==}
     engines: {node: '>=6'}
@@ -5427,6 +5433,7 @@ snapshots:
       '@biomejs/cli-linux-x64-musl': 2.2.5
       '@biomejs/cli-win32-arm64': 2.2.5
       '@biomejs/cli-win32-x64': 2.2.5
+    optional: true
 
   '@biomejs/cli-darwin-arm64@2.2.5':
     optional: true
@@ -6231,8 +6238,8 @@ snapshots:
       reka-ui: 2.5.1(typescript@5.9.3)(vue@3.5.22(typescript@5.9.3))
       scule: 1.3.0
       tailwind-merge: 3.3.1
-      tailwind-variants: 3.1.1(tailwind-merge@3.3.1)(tailwindcss@4.1.14)
-      tailwindcss: 4.1.14
+      tailwind-variants: 3.1.1(tailwind-merge@3.3.1)(tailwindcss@4.1.15)
+      tailwindcss: 4.1.15
       tinyglobby: 0.2.15
       typescript: 5.9.3
       unplugin: 2.3.10
@@ -9536,7 +9543,6 @@ snapshots:
       '@oxlint/linux-x64-musl': 1.22.0
       '@oxlint/win32-arm64': 1.22.0
       '@oxlint/win32-x64': 1.22.0
-    optional: true
 
   p-limit@3.1.0:
     dependencies:
@@ -10277,9 +10283,9 @@ snapshots:
 
   tailwind-merge@3.3.1: {}
 
-  tailwind-variants@3.1.1(tailwind-merge@3.3.1)(tailwindcss@4.1.14):
+  tailwind-variants@3.1.1(tailwind-merge@3.3.1)(tailwindcss@4.1.15):
     dependencies:
-      tailwindcss: 4.1.14
+      tailwindcss: 4.1.15
     optionalDependencies:
       tailwind-merge: 3.3.1
 
@@ -10312,6 +10318,8 @@ snapshots:
       - yaml
 
   tailwindcss@4.1.14: {}
+
+  tailwindcss@4.1.15: {}
 
   tapable@2.3.0: {}
 

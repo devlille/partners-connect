@@ -3,7 +3,6 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-05-15",
   devtools: { enabled: true },
   modules: ["@nuxt/ui", "@nuxt/test-utils", "@nuxt/eslint"],
-  css: ["~/public/css/main.css"],
   app: {
     head: {
       htmlAttrs: {
@@ -12,16 +11,6 @@ export default defineNuxtConfig({
       script: [
         {
           src: "/js/main-nav.js",
-          type: "text/javascript",
-          defer: true,
-        },
-        {
-          src: "/js/autoScroll.js",
-          type: "text/javascript",
-          defer: true,
-        },
-        {
-          src: "/js/tabs.js",
           type: "text/javascript",
           defer: true,
         },

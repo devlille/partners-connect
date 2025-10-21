@@ -1,11 +1,21 @@
 <template>
-  <organisation-form :data="data" @save="handleSave"/>
+  <Dashboard :main-links="mainLinks" :footer-links="footerLinks">
+    <div class="bg-white border-b border-gray-200 p-6">
+      <h1 class="text-2xl font-bold text-gray-900">Créer une organisation</h1>
+    </div>
+
+    <div class="p-6">
+      <organisation-form :data="data" @save="handleSave" />
+    </div>
+  </Dashboard>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
 import authMiddleware from "~/middleware/auth";
+
 const router = useRouter()
+const { mainLinks, footerLinks } = useDashboardLinks()
 
 const data = ref<Organisation>({
   name: "",
@@ -39,7 +49,6 @@ async function handleSave(payload: Organisation) {
 }
 
 definePageMeta({
-  layout: "organisation",
   middleware: authMiddleware,
   ssr: false
 });

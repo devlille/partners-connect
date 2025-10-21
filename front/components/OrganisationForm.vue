@@ -1,195 +1,202 @@
 <template>
   <form @submit.prevent="onSave">
-    <p>
-      <label for="name">Nom</label>
-      <input
-        id="name"
-        v-model="initialState.name"
-        type="text"
-        name="name"
-        autocomplete="organization"
-      >
-    </p>
+    <!-- Bloc principal -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div>
+        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+        <UInput
+          id="name"
+          v-model="initialState.name"
+          type="text"
+          autocomplete="organization"
+          placeholder="Nom de l'organisation"
+        />
+      </div>
 
-    <p>
-      <label for="head_office">Head Office</label>
-      <input
-        id="head_office"
-        v-model="initialState.head_office"
-        type="text"
-        name="head_office"
-        autocomplete="street-address"
-      >
-    </p>
+      <div>
+        <label for="head_office" class="block text-sm font-medium text-gray-700 mb-1">Siège social</label>
+        <UInput
+          id="head_office"
+          v-model="initialState.head_office"
+          type="text"
+          autocomplete="street-address"
+          placeholder="Adresse du siège social"
+        />
+      </div>
 
-    <p>
-      <label for="siret">SIRET</label>
-      <input
-        id="siret"
-        v-model="initialState.siret"
-        type="text"
-        name="siret"
-        inputmode="numeric"
-        autocomplete="off"
-      >
-    </p>
+      <div>
+        <label for="siret" class="block text-sm font-medium text-gray-700 mb-1">SIRET</label>
+        <UInput
+          id="siret"
+          v-model="initialState.siret"
+          type="text"
+          autocomplete="off"
+          placeholder="Numéro SIRET"
+        />
+      </div>
 
-    <p>
-      <label for="siren">SIREN</label>
-      <input
-        id="siren"
-        v-model="initialState.siren"
-        type="text"
-        name="siren"
-        inputmode="numeric"
-        autocomplete="off"
-      >
-    </p>
+      <div>
+        <label for="siren" class="block text-sm font-medium text-gray-700 mb-1">SIREN</label>
+        <UInput
+          id="siren"
+          v-model="initialState.siren"
+          type="text"
+          autocomplete="off"
+          placeholder="Numéro SIREN"
+        />
+      </div>
 
-    <p>
-      <label for="tva">TVA</label>
-      <input
-        id="tva"
-        v-model="initialState.tva"
-        type="text"
-        name="tva"
-        autocomplete="off"
-      >
-    </p>
+      <div>
+        <label for="rib_url" class="block text-sm font-medium text-gray-700 mb-1">RIB (URL)</label>
+        <UInput
+          id="rib_url"
+          v-model="initialState.rib_url"
+          type="url"
+          autocomplete="url"
+          placeholder="https://..."
+        />
+      </div>
 
-    <p>
-      <label for="d_and_b">D&amp;B</label>
-      <input
-        id="d_and_b"
-        v-model="initialState.d_and_b"
-        type="text"
-        name="d_and_b"
-        autocomplete="off"
-      >
-    </p>
+      <div>
+        <label for="representative_user_email" class="block text-sm font-medium text-gray-700 mb-1">Email du représentant</label>
+        <UInput
+          id="representative_user_email"
+          v-model="initialState.representative_user_email"
+          type="email"
+          autocomplete="email"
+          placeholder="email@example.com"
+        />
+      </div>
 
-    <p>
-      <label for="nace">NACE</label>
-      <input
-        id="nace"
-        v-model="initialState.nace"
-        type="text"
-        name="nace"
-        autocomplete="off"
-      >
-    </p>
+      <div>
+        <label for="representative_role" class="block text-sm font-medium text-gray-700 mb-1">Rôle du représentant</label>
+        <UInput
+          id="representative_role"
+          v-model="initialState.representative_role"
+          type="text"
+          autocomplete="organization-title"
+          placeholder="Directeur, Responsable, etc."
+        />
+      </div>
 
-    <p>
-      <label for="naf">NAF</label>
-      <input
-        id="naf"
-        v-model="initialState.naf"
-        type="text"
-        name="naf"
-        autocomplete="off"
-      >
-    </p>
+      <div>
+        <label for="created_at" class="block text-sm font-medium text-gray-700 mb-1">Date de création</label>
+        <UInput
+          id="created_at"
+          v-model="initialState.created_at"
+          type="date"
+        />
+      </div>
 
-    <p>
-      <label for="duns">DUNS</label>
-      <input
-        id="duns"
-        v-model="initialState.duns"
-        type="text"
-        name="duns"
-        inputmode="numeric"
-        autocomplete="off"
-      >
-    </p>
+      <div>
+        <label for="creation_location" class="block text-sm font-medium text-gray-700 mb-1">Lieu de création</label>
+        <UInput
+          id="creation_location"
+          v-model="initialState.creation_location"
+          type="text"
+          placeholder="Ville de création"
+        />
+      </div>
 
-    <p>
-      <label for="iban">IBAN</label>
-      <input
-        id="iban"
-        v-model="initialState.iban"
-        type="text"
-        name="iban"
-        autocomplete="off"
-      >
-    </p>
+      <div>
+        <label for="published_at" class="block text-sm font-medium text-gray-700 mb-1">Date de publication des statuts</label>
+        <UInput
+          id="published_at"
+          v-model="initialState.published_at"
+          type="date"
+        />
+      </div>
+    </div>
 
-    <p>
-      <label for="bic">BIC</label>
-      <input
-        id="bic"
-        v-model="initialState.bic"
-        type="text"
-        name="bic"
-        autocomplete="off"
-      >
-    </p>
+    <!-- Panneau déroulant - Informations complémentaires -->
+    <UAccordion :items="[{ label: 'Informations complémentaires', slot: 'complementary' }]" class="mb-6">
+      <template #complementary>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+          <div>
+            <label for="tva" class="block text-sm font-medium text-gray-700 mb-1">TVA intracommunautaire</label>
+            <UInput
+              id="tva"
+              v-model="initialState.tva"
+              type="text"
+              autocomplete="off"
+              placeholder="Numéro de TVA"
+            />
+          </div>
 
-    <p>
-      <label for="rib_url">RIB (URL)</label>
-      <input
-        id="rib_url"
-        v-model="initialState.rib_url"
-        type="url"
-        name="rib_url"
-        autocomplete="url"
-        placeholder="https://…"
-      >
-    </p>
+          <div>
+            <label for="d_and_b" class="block text-sm font-medium text-gray-700 mb-1">D&B</label>
+            <UInput
+              id="d_and_b"
+              v-model="initialState.d_and_b"
+              type="text"
+              autocomplete="off"
+              placeholder="D&B"
+            />
+          </div>
 
-    <p>
-      <label for="representative_user_email">Email du représentant</label>
-      <input
-        id="representative_user_email"
-        v-model="initialState.representative_user_email"
-        type="email"
-        name="representative_user_email"
-        autocomplete="email"
-      >
-    </p>
+          <div>
+            <label for="nace" class="block text-sm font-medium text-gray-700 mb-1">NACE</label>
+            <UInput
+              id="nace"
+              v-model="initialState.nace"
+              type="text"
+              autocomplete="off"
+              placeholder="Code NACE"
+            />
+          </div>
 
-    <p>
-      <label for="representative_role">Rôle du représentant</label>
-      <input
-        id="representative_role"
-        v-model="initialState.representative_role"
-        type="text"
-        name="representative_role"
-        autocomplete="organization-title"
-      >
-    </p>
+          <div>
+            <label for="naf" class="block text-sm font-medium text-gray-700 mb-1">NAF</label>
+            <UInput
+              id="naf"
+              v-model="initialState.naf"
+              type="text"
+              autocomplete="off"
+              placeholder="Code NAF"
+            />
+          </div>
 
-    <p>
-      <label for="created_at">Date de Création</label>
-      <input
-        id="created_at"
-        v-model="initialState.created_at"
-        type="date"
-        name="created_at"
-      >
-    </p>
+          <div>
+            <label for="duns" class="block text-sm font-medium text-gray-700 mb-1">DUNS</label>
+            <UInput
+              id="duns"
+              v-model="initialState.duns"
+              type="text"
+              autocomplete="off"
+              placeholder="Numéro DUNS"
+            />
+          </div>
 
-    <p>
-      <label for="representative_role">Lieu de Création</label>
-      <input
-        id="creation_location"
-        v-model="initialState.creation_location"
-        type="text"
-        name="creation_location"
-      >
-    </p>
-    <p>
-      <label for="published_at">Lieu de publication des status</label>
-      <input
-        id="published_at"
-        v-model="initialState.published_at"
-        type="date"
-        name="published_at"
-      >
-    </p>
+          <div>
+            <label for="iban" class="block text-sm font-medium text-gray-700 mb-1">IBAN</label>
+            <UInput
+              id="iban"
+              v-model="initialState.iban"
+              type="text"
+              autocomplete="off"
+              placeholder="IBAN"
+            />
+          </div>
 
-    <p class="buttons-bar">
-      <input type="submit" value="Valider" >
-    </p>
+          <div>
+            <label for="bic" class="block text-sm font-medium text-gray-700 mb-1">BIC</label>
+            <UInput
+              id="bic"
+              v-model="initialState.bic"
+              type="text"
+              autocomplete="off"
+              placeholder="BIC"
+            />
+          </div>
+        </div>
+      </template>
+    </UAccordion>
+
+    <div class="flex justify-end gap-4 pt-4">
+      <UButton type="submit" color="primary" size="lg">
+        Valider
+      </UButton>
+    </div>
   </form>
 </template>
 
@@ -205,4 +212,3 @@ function onSave() {
   emit('save', initialState.value)
 }
 </script>
-

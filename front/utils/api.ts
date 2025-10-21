@@ -92,6 +92,14 @@ export type PaginatedCompany = PaginatedCompanySchema;
 
 export type PaginatedProvider = PaginatedProviderSchema;
 
+export type PaginatedJobOffer = PaginatedJobOfferSchema;
+
+export type CreateJobOffer = CreateJobOfferSchema;
+
+export type UpdateJobOffer = UpdateJobOfferSchema;
+
+export type JobOfferResponse = JobOfferResponseSchema;
+
 export type CreateByIdentifiers = CreateByIdentifiersSchema;
 
 export interface UserSessionSchema {
@@ -198,6 +206,163 @@ export interface PartnershipItemSchema {
   phone?: PartnershipItemSchemaPhone;
   emails?: string;
   created_at: string;
+}
+
+/**
+ * Application deadline (ISO format, nullable)
+ */
+export type JobOfferResponseSchemaEndDate = string | null;
+
+/**
+ * Minimum experience required in years (nullable)
+ * @minimum 0
+ * @maximum 20
+ */
+export type JobOfferResponseSchemaExperienceYears = number | null;
+
+/**
+ * Salary information as free text (nullable)
+ * @maxLength 100
+ */
+export type JobOfferResponseSchemaSalary = string | null;
+
+/**
+ * Response model for job offer data containing all job offer information returned by the API
+ */
+export interface JobOfferResponseSchema {
+  /** Unique identifier of the job offer */
+  id: string;
+  /** UUID of the company that owns this job offer */
+  company_id: string;
+  /** Direct link to the detailed job posting */
+  url: string;
+  /**
+   * Position name or job title
+   * @maxLength 255
+   */
+  title: string;
+  /**
+   * Work location description
+   * @maxLength 200
+   */
+  location: string;
+  /** When the job was posted (ISO format) */
+  publication_date: string;
+  /** Application deadline (ISO format, nullable) */
+  end_date?: JobOfferResponseSchemaEndDate;
+  /**
+   * Minimum experience required in years (nullable)
+   * @minimum 0
+   * @maximum 20
+   */
+  experience_years?: JobOfferResponseSchemaExperienceYears;
+  /**
+   * Salary information as free text (nullable)
+   * @maxLength 100
+   */
+  salary?: JobOfferResponseSchemaSalary;
+  /** Timestamp when the record was created (ISO format) */
+  created_at: string;
+  /** Timestamp when the record was last modified (ISO format) */
+  updated_at: string;
+}
+
+/**
+ * Paginated response containing job offers and pagination metadata
+ */
+export interface PaginatedJobOfferSchema {
+  /** Array of job offers for the current page */
+  items: JobOfferResponseSchema[];
+  /**
+   * Current page number
+   * @minimum 1
+   */
+  page: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size: number;
+  /**
+   * Total number of job offers across all pages
+   * @minimum 0
+   */
+  total: number;
+}
+
+export type CreateJobOfferSchemaEndDate = string | null;
+
+/**
+ * @minimum 1
+ * @maximum 20
+ */
+export type CreateJobOfferSchemaExperienceYears = number | null;
+
+/**
+ * @maxLength 100
+ */
+export type CreateJobOfferSchemaSalary = string | null;
+
+export interface CreateJobOfferSchema {
+  /** @maxLength 500 */
+  url: string;
+  /**
+   * @minLength 1
+   * @maxLength 200
+   */
+  title: string;
+  /**
+   * @minLength 1
+   * @maxLength 100
+   */
+  location: string;
+  publication_date: string;
+  end_date?: CreateJobOfferSchemaEndDate;
+  /**
+   * @minimum 1
+   * @maximum 20
+   */
+  experience_years?: CreateJobOfferSchemaExperienceYears;
+  /** @maxLength 100 */
+  salary?: CreateJobOfferSchemaSalary;
+}
+
+export type UpdateJobOfferSchemaEndDate = string | null;
+
+/**
+ * @minimum 1
+ * @maximum 20
+ */
+export type UpdateJobOfferSchemaExperienceYears = number | null;
+
+/**
+ * @maxLength 100
+ */
+export type UpdateJobOfferSchemaSalary = string | null;
+
+export interface UpdateJobOfferSchema {
+  /** @maxLength 500 */
+  url?: string;
+  /**
+   * @minLength 1
+   * @maxLength 200
+   */
+  title?: string;
+  /**
+   * @minLength 1
+   * @maxLength 100
+   */
+  location?: string;
+  publication_date?: string;
+  end_date?: UpdateJobOfferSchemaEndDate;
+  /**
+   * @minimum 1
+   * @maximum 20
+   */
+  experience_years?: UpdateJobOfferSchemaExperienceYears;
+  /** @maxLength 100 */
+  salary?: UpdateJobOfferSchemaSalary;
 }
 
 export interface EventSummarySchema {
@@ -545,6 +710,28 @@ export type PostCompaniesLogoBody = {
   file?: Blob;
 };
 
+export type GetCompaniesJobOffersParams = {
+/**
+ * Page number (must be >= 1)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page (must be between 1 and 100)
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
+};
+
+export type GetCompaniesJobOffers404 = {
+  message?: string;
+};
+
+export type PostCompaniesJobOffers400 = {
+  message?: string;
+};
+
 export type GetEventsParams = {
 /**
  * Page number (must be >= 1)
@@ -821,6 +1008,82 @@ export const getCompaniesPartnership = (
  options?: SecondParameter<typeof customFetch<PartnershipItemSchema[]>>,) => {
       return customFetch<PartnershipItemSchema[]>(
       {url: `/companies/${companyId}/partnership`, method: 'GET'
+    },
+      options);
+    }
+  
+/**
+ * Retrieve all job offers for a specific company with pagination support
+ * @summary List job offers for company
+ */
+export const getCompaniesJobOffers = (
+    companyId: string,
+    params?: GetCompaniesJobOffersParams,
+ options?: SecondParameter<typeof customFetch<PaginatedJobOfferSchema>>,) => {
+      return customFetch<PaginatedJobOfferSchema>(
+      {url: `/companies/${companyId}/job-offers`, method: 'GET',
+        params
+    },
+      options);
+    }
+  
+/**
+ * Create a new job offer for the specified company
+ * @summary Create job offer
+ */
+export const postCompaniesJobOffers = (
+    companyId: string,
+    createJobOfferSchema: CreateJobOfferSchema,
+ options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
+      return customFetch<IdentifierSchema>(
+      {url: `/companies/${companyId}/job-offers`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createJobOfferSchema
+    },
+      options);
+    }
+  
+/**
+ * Retrieve a specific job offer by its ID
+ * @summary Get job offer by ID
+ */
+export const getCompaniesJobOffersById = (
+    companyId: string,
+    jobOfferId: string,
+ options?: SecondParameter<typeof customFetch<JobOfferResponseSchema>>,) => {
+      return customFetch<JobOfferResponseSchema>(
+      {url: `/companies/${companyId}/job-offers/${jobOfferId}`, method: 'GET'
+    },
+      options);
+    }
+  
+/**
+ * Update an existing job offer with partial or complete data
+ * @summary Update job offer
+ */
+export const putCompaniesJobOffersById = (
+    companyId: string,
+    jobOfferId: string,
+    updateJobOfferSchema: UpdateJobOfferSchema,
+ options?: SecondParameter<typeof customFetch<JobOfferResponseSchema>>,) => {
+      return customFetch<JobOfferResponseSchema>(
+      {url: `/companies/${companyId}/job-offers/${jobOfferId}`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: updateJobOfferSchema
+    },
+      options);
+    }
+  
+/**
+ * Delete an existing job offer
+ * @summary Delete job offer
+ */
+export const deleteCompaniesJobOffersById = (
+    companyId: string,
+    jobOfferId: string,
+ options?: SecondParameter<typeof customFetch<void>>,) => {
+      return customFetch<void>(
+      {url: `/companies/${companyId}/job-offers/${jobOfferId}`, method: 'DELETE'
     },
       options);
     }
@@ -1643,6 +1906,11 @@ export type GetCompaniesResult = NonNullable<Awaited<ReturnType<typeof getCompan
 export type PostCompaniesResult = NonNullable<Awaited<ReturnType<typeof postCompanies>>>
 export type PostCompaniesLogoResult = NonNullable<Awaited<ReturnType<typeof postCompaniesLogo>>>
 export type GetCompaniesPartnershipResult = NonNullable<Awaited<ReturnType<typeof getCompaniesPartnership>>>
+export type GetCompaniesJobOffersResult = NonNullable<Awaited<ReturnType<typeof getCompaniesJobOffers>>>
+export type PostCompaniesJobOffersResult = NonNullable<Awaited<ReturnType<typeof postCompaniesJobOffers>>>
+export type GetCompaniesJobOffersByIdResult = NonNullable<Awaited<ReturnType<typeof getCompaniesJobOffersById>>>
+export type PutCompaniesJobOffersByIdResult = NonNullable<Awaited<ReturnType<typeof putCompaniesJobOffersById>>>
+export type DeleteCompaniesJobOffersByIdResult = NonNullable<Awaited<ReturnType<typeof deleteCompaniesJobOffersById>>>
 export type GetEventsResult = NonNullable<Awaited<ReturnType<typeof getEvents>>>
 export type GetEventBySlugResult = NonNullable<Awaited<ReturnType<typeof getEventBySlug>>>
 export type GetEventsSponsoringPacksResult = NonNullable<Awaited<ReturnType<typeof getEventsSponsoringPacks>>>

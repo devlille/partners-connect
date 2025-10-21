@@ -8,7 +8,7 @@
     </header>
     <div id="container">
       <NavigationMenu type="event" />
-<UApp>
+      <UApp>
       <main class="auto-scroll">
         <slot />
       </main>
@@ -21,4 +21,4 @@
 
 <script lang="ts" setup></script>
 
-<style></style>
+<style src="~/assets/css/backoffice.css"></style>
