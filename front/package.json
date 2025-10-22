@@ -2,6 +2,7 @@
   "name": "nuxt-app",
   "private": true,
   "type": "module",
+  "main": ".output/server/index.mjs",
   "scripts": {
     "build": "npm run orval && nuxt build",
     "dev": "npm run orval && nuxt dev",
