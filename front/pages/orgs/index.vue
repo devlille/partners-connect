@@ -13,7 +13,10 @@
     </div>
 
     <div class="p-6">
-      <UTable :data="data" />
+      <UTable
+        :data="data"
+        @select="onSelectOrg"
+      />
     </div>
   </Dashboard>
 </template>
@@ -21,7 +24,9 @@
 <script setup lang="ts">
 import { getUsersMeOrgs, type OrganisationItem } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
+import type {TableRow} from "@nuxt/ui";
 
+const router = useRouter();
 const { mainLinks, footerLinks } = useDashboardLinks()
 
 definePageMeta({
@@ -30,6 +35,10 @@ definePageMeta({
 })
 
 const data = ref<OrganisationItem[]>([]);
+
+const onSelectOrg = (row: TableRow<OrganisationItem>) => {
+  router.push(`/orgs/${row.original.slug}`);
+};
 
 onMounted(async () => {
   try {

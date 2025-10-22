@@ -8,13 +8,6 @@ export default defineNuxtConfig({
       htmlAttrs: {
         lang: "fr",
       },
-      script: [
-        {
-          src: "/js/main-nav.js",
-          type: "text/javascript",
-          defer: true,
-        },
-      ],
     },
   },
   runtimeConfig: {

@@ -3,7 +3,6 @@
     <UApp>
       <slot />
     </UApp>
-
   </div>
 </template>
 
