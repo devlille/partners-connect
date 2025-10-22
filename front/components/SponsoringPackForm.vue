@@ -1,74 +1,72 @@
 <template>
   <form @submit.prevent="onSave">
-    <p>
-      <label for="name">Nom du pack*</label>
-      <input
-        id="name"
-        v-model="form.name"
-        type="text"
-        name="name"
-        required
-        placeholder="Ex: Pack Or, Pack Argent..."
-      >
-    </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div>
+        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nom du pack*</label>
+        <UInput
+          id="name"
+          v-model="form.name"
+          type="text"
+          required
+          placeholder="Ex: Pack Or, Pack Argent..."
+        />
+      </div>
 
-    <p>
-      <label for="price">Prix (€)*</label>
-      <input
-        id="price"
-        v-model.number="form.price"
-        type="number"
-        name="price"
-        required
-        min="0"
-        step="0.01"
-        placeholder="0.00"
-      >
-    </p>
+      <div>
+        <label for="price" class="block text-sm font-medium text-gray-700 mb-1">Prix (€)*</label>
+        <UInput
+          id="price"
+          v-model.number="form.price"
+          type="number"
+          required
+          :min="0"
+          :step="0.01"
+          placeholder="0.00"
+        />
+      </div>
 
-    <p>
-      <label for="with_booth">Inclut un stand*</label>
-      <input
-        id="with_booth"
-        v-model="form.with_booth"
-        type="checkbox"
-        name="with_booth"
-      >
-    </p>
+      <div>
+        <label for="nb_tickets" class="block text-sm font-medium text-gray-700 mb-1">Nombre de billets*</label>
+        <UInput
+          id="nb_tickets"
+          v-model.number="form.nb_tickets"
+          type="number"
+          required
+          :min="0"
+          placeholder="Nombre de billets inclus"
+        />
+      </div>
 
-    <p>
-      <label for="nb_tickets">Nombre de billets*</label>
-      <input
-        id="nb_tickets"
-        v-model.number="form.nb_tickets"
-        type="number"
-        name="nb_tickets"
-        required
-        min="0"
-        placeholder="Nombre de billets inclus"
-      >
-    </p>
+      <div>
+        <label for="max_quantity" class="block text-sm font-medium text-gray-700 mb-1">Quantité maximale</label>
+        <UInput
+          id="max_quantity"
+          v-model.number="form.max_quantity"
+          type="number"
+          :min="1"
+          placeholder="Nombre maximum de sponsors pour ce pack"
+        />
+      </div>
 
-    <p>
-      <label for="max_quantity">Quantité maximale</label>
-      <input
-        id="max_quantity"
-        v-model.number="form.max_quantity"
-        type="number"
-        name="max_quantity"
-        min="1"
-        placeholder="Nombre maximum de sponsors pour ce pack"
-      >
-    </p>
+      <div class="flex items-center">
+        <UCheckbox
+          id="with_booth"
+          v-model="form.with_booth"
+          label="Inclut un stand"
+        />
+      </div>
+    </div>
 
-    <p class="buttons-bar">
-      <input type="submit" value="Valider">
-    </p>
+    <div class="flex justify-end gap-4 pt-4">
+      <UButton type="submit" color="primary" size="lg">
+        Valider
+      </UButton>
+    </div>
   </form>
 </template>
 
 <script lang="ts" setup>
-import type { SponsoringPack, CreateSponsoringPack } from "~/utils/api";
+import type { CreateSponsoringPack } from "~/utils/api";
 
 const { data } = defineProps<{ data: Partial<CreateSponsoringPack> }>()
 

@@ -44,6 +44,7 @@
 <script setup lang="ts">
 import { getOrgsEvents, getOrgs, type EventSummary } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
+import type {TableRow} from "@nuxt/ui";
 
 const route = useRoute();
 const router = useRouter();
@@ -84,9 +85,8 @@ const orgLinks = computed(() => [
   }
 ]);
 
-const onSelectEvent = (row: unknown) => {
-  const event = row as EventSummary;
-  router.push(`/orgs/${slug.value}/events/${event.slug}`);
+const onSelectEvent = (row: TableRow<EventSummary>) => {
+  router.push(`/orgs/${slug.value}/events/${row.original.slug}`);
 };
 
 async function loadEvents() {
