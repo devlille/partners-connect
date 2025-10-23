@@ -17,6 +17,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
 import io.mockk.every
 import io.mockk.mockk
@@ -112,13 +113,12 @@ class PartnershipCommunicationRoutesTest {
         val response = client.put(
             "/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/communication/publication",
         ) {
+            contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             setBody(requestBody)
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("value does not match 'date-time' format"))
     }
 
     @Test

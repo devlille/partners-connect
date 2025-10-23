@@ -1,0 +1,1 @@
+Job offer promotion approved - {{event_name}}

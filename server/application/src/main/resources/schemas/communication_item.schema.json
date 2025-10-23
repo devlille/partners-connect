@@ -13,7 +13,7 @@
         "string",
         "null"
       ],
-      "format": "date-time"
+      "format": "datetime"
     },
     "support_url": {
       "type": [

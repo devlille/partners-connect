@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "JobOfferPromotionResponse",
+  "description": "Response containing complete job offer promotion details with embedded job offer data",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique promotion identifier"
+    },
+    "job_offer_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "ID of the promoted job offer"
+    },
+    "partnership_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Partnership through which promotion was requested"
+    },
+    "event_slug": {
+      "type": "string",
+      "description": "Human-readable event identifier"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "approved", "declined"],
+      "description": "Current promotion status"
+    },
+    "promoted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when promotion was initially requested (ISO format)"
+    },
+    "reviewed_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Timestamp when organizer approved/declined (ISO format, null if pending)"
+    },
+    "reviewed_by": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "User ID of organizer who reviewed (null if pending)"
+    },
+    "decline_reason": {
+      "type": ["string", "null"],
+      "maxLength": 500,
+      "description": "Optional reason provided when declining promotion"
+    },
+    "job_offer": {
+      "type": "object",
+      "description": "Embedded job offer entity",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Job offer identifier"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 255,
+          "description": "Job offer title"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "External URL to the full job offer page"
+        }
+      },
+      "required": ["id", "title", "url"],
+      "additionalProperties": false
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Record creation timestamp (ISO format)"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Record last modification timestamp (ISO format)"
+    }
+  },
+  "required": [
+    "id",
+    "job_offer_id",
+    "partnership_id",
+    "event_slug",
+    "status",
+    "promoted_at",
+    "job_offer",
+    "created_at",
+    "updated_at"
+  ],
+  "additionalProperties": false
+}

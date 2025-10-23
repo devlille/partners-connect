@@ -1,13 +1,11 @@
 package fr.devlille.partners.connect.internal.infrastructure.ktor
 
-import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.api.RequestBodyValidationException
 import fr.devlille.partners.connect.internal.infrastructure.resources.readResourceFile
 import io.github.optimumcode.json.schema.JsonSchemaLoader
 import io.github.optimumcode.json.schema.SchemaType
 import io.github.optimumcode.json.schema.ValidationError
 import io.ktor.server.application.ApplicationCall
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receive
 import io.ktor.server.request.receiveText
 import kotlinx.serialization.json.Json
@@ -62,23 +60,25 @@ val schemas by lazy {
         .register(readResourceFile("/schemas/user.schema.json"), SchemaType.DRAFT_7)
         .register(readResourceFile("/schemas/user_info.schema.json"), SchemaType.DRAFT_7)
         .register(readResourceFile("/schemas/user_session.schema.json"), SchemaType.DRAFT_7)
+        .register(readResourceFile("/schemas/create_job_offer.schema.json"), SchemaType.DRAFT_7)
+        .register(readResourceFile("/schemas/promote_job_offer.schema.json"), SchemaType.DRAFT_7)
+        .register(readResourceFile("/schemas/approve_job_offer_promotion.schema.json"), SchemaType.DRAFT_7)
+        .register(readResourceFile("/schemas/decline_job_offer_promotion.schema.json"), SchemaType.DRAFT_7)
 }
 
-suspend inline fun <reified T : Any> ApplicationCall.receive(schema: String): T = try {
-    receive<T>()
-} catch (ex: BadRequestException) {
+suspend inline fun <reified T : Any> ApplicationCall.receive(schema: String): T {
+    val body = receiveText()
     val schemaContent = readResourceFile("/schemas/$schema")
     val schema = schemas.fromDefinition(schemaContent, SchemaType.DRAFT_7)
-    val body = receiveText()
     val errors = mutableListOf<ValidationError>()
     val valid = schema.validate(Json.parseToJsonElement(body), errors::add)
     if (valid) {
-        throw ForbiddenException("Unreachable")
+        return receive<T>()
     } else {
         throw RequestBodyValidationException(
             errors = errors.map { it.message },
             message = "Request body does not conform to schema $schema",
-            cause = ex,
+            cause = null,
         )
     }
 }

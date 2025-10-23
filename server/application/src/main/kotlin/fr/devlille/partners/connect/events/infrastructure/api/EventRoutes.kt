@@ -46,7 +46,7 @@ fun Route.eventRoutes() {
 
         post {
             val orgSlug = call.parameters.orgSlug
-            val request = call.receive<Event>(schema = "event.schema.json")
+            val request = call.receive<Event>(schema = "create_event.schema.json")
             val slug = repository.createEvent(orgSlug, request)
             call.respond(
                 status = HttpStatusCode.Created,
@@ -58,7 +58,7 @@ fun Route.eventRoutes() {
             val orgSlug = call.parameters.orgSlug
             val eventSlug = call.parameters.eventSlug
             val updatedSlug = repository
-                .updateEvent(eventSlug, orgSlug, call.receive<Event>(schema = "event.schema.json"))
+                .updateEvent(eventSlug, orgSlug, call.receive<Event>(schema = "create_event.schema.json"))
             call.respond(
                 status = HttpStatusCode.OK,
                 message = mapOf("slug" to updatedSlug),

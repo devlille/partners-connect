@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.notifications.domain
 
 import fr.devlille.partners.connect.companies.domain.Company
+import fr.devlille.partners.connect.companies.domain.JobOffer
 import fr.devlille.partners.connect.events.domain.EventWithOrganisation
 import fr.devlille.partners.connect.partnership.domain.Partnership
 import fr.devlille.partners.connect.partnership.domain.PartnershipPack
@@ -163,5 +164,71 @@ sealed interface NotificationVariables {
             .replace("{{event_name}}", event.event.name)
             .replace("{{event_contact}}", event.event.contact.email)
             .replace("{{company_name}}", company.name)
+    }
+
+    data class JobOfferPromoted(
+        override val language: String,
+        override val event: EventWithOrganisation,
+        override val company: Company,
+        val partnership: Partnership,
+        val jobOffer: JobOffer,
+    ) : NotificationVariables {
+        override val usageName: String = "job_offer_promoted"
+
+        override fun populate(content: String): String {
+            val partnershipLink = partnership.link(event)
+            return content
+                .replace("{{event_name}}", event.event.name)
+                .replace("{{event_contact}}", event.event.contact.email)
+                .replace("{{company_name}}", company.name)
+                .replace("{{job_offer_title}}", jobOffer.title)
+                .replace("{{job_offer_url}}", jobOffer.url)
+                .replace("{{partnership_link}}", partnershipLink)
+        }
+    }
+
+    data class JobOfferApproved(
+        override val language: String,
+        override val event: EventWithOrganisation,
+        override val company: Company,
+        val partnership: Partnership,
+        val jobOffer: JobOffer,
+    ) : NotificationVariables {
+        override val usageName: String = "job_offer_approved"
+
+        override fun populate(content: String): String {
+            val partnershipLink = partnership.link(event)
+            return content
+                .replace("{{event_name}}", event.event.name)
+                .replace("{{event_contact}}", event.event.contact.email)
+                .replace("{{company_name}}", company.name)
+                .replace("{{job_offer_title}}", jobOffer.title)
+                .replace("{{job_offer_url}}", jobOffer.url)
+                .replace("{{partnership_link}}", partnershipLink)
+        }
+    }
+
+    data class JobOfferDeclined(
+        override val language: String,
+        override val event: EventWithOrganisation,
+        override val company: Company,
+        val partnership: Partnership,
+        val jobOffer: JobOffer,
+        val declineReason: String?,
+    ) : NotificationVariables {
+        override val usageName: String = "job_offer_declined"
+
+        override fun populate(content: String): String {
+            val partnershipLink = partnership.link(event)
+            val reasonText = declineReason ?: "No reason provided"
+            return content
+                .replace("{{event_name}}", event.event.name)
+                .replace("{{event_contact}}", event.event.contact.email)
+                .replace("{{company_name}}", company.name)
+                .replace("{{job_offer_title}}", jobOffer.title)
+                .replace("{{job_offer_url}}", jobOffer.url)
+                .replace("{{partnership_link}}", partnershipLink)
+                .replace("{{decline_reason}}", reasonText)
+        }
     }
 }

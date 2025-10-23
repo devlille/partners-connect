@@ -31,12 +31,12 @@
     },
     "publication_date": {
       "type": "string",
-      "format": "date-time",
+      "format": "datetime",
       "description": "When the job was posted (ISO format)"
     },
     "end_date": {
       "type": ["string", "null"],
-      "format": "date-time",
+      "format": "datetime",
       "description": "Application deadline (ISO format, nullable)"
     },
     "experience_years": {
@@ -52,12 +52,12 @@
     },
     "created_at": {
       "type": "string",
-      "format": "date-time",
+      "format": "datetime",
       "description": "Timestamp when the record was created (ISO format)"
     },
     "updated_at": {
       "type": "string",
-      "format": "date-time",
+      "format": "datetime",
       "description": "Timestamp when the record was last modified (ISO format)"
     }
   },

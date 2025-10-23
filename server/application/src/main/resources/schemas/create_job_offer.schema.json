@@ -20,11 +20,11 @@
     },
     "publication_date": {
       "type": "string",
-      "format": "date"
+      "format": "datetime"
     },
     "end_date": {
       "type": ["string", "null"],
-      "format": "date"
+      "format": "datetime"
     },
     "experience_years": {
       "type": ["integer", "null"],

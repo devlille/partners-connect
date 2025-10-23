@@ -2,11 +2,13 @@ package fr.devlille.partners.connect.partnership.infrastructure.bindings
 
 import fr.devlille.partners.connect.partnership.application.PartnershipAgreementRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipBillingRepositoryExposed
+import fr.devlille.partners.connect.partnership.application.PartnershipJobOfferRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipStorageRepositoryGoogleStorage
 import fr.devlille.partners.connect.partnership.application.PartnershipSuggestionRepositoryExposed
 import fr.devlille.partners.connect.partnership.domain.PartnershipAgreementRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipBillingRepository
+import fr.devlille.partners.connect.partnership.domain.PartnershipJobOfferRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipStorageRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipSuggestionRepository
@@ -27,5 +29,8 @@ val partnershipModule = module {
     }
     single<PartnershipStorageRepository> {
         PartnershipStorageRepositoryGoogleStorage(get())
+    }
+    single<PartnershipJobOfferRepository> {
+        PartnershipJobOfferRepositoryExposed()
     }
 }

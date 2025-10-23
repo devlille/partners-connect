@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.companies.infrastructure.db
 
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.UUIDEntity
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
@@ -45,3 +46,10 @@ class CompanyJobOfferEntity(id: EntityID<UUID>) : UUIDEntity(id) {
      */
     var company by CompanyEntity referencedOn CompanyJobOfferTable.companyId
 }
+
+fun UUIDEntityClass<CompanyJobOfferEntity>.singleByCompanyAndJobOffer(
+    companyId: UUID,
+    jobOfferId: UUID,
+): CompanyJobOfferEntity? = this
+    .find { (CompanyJobOfferTable.id eq jobOfferId) and (CompanyJobOfferTable.companyId eq companyId) }
+    .singleOrNull()

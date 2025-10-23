@@ -90,7 +90,7 @@ class PartnershipRegisterRoutesTest {
 
         val body = RegisterPartnership(
             companyId = UUID.randomUUID().toString(),
-            packId = "pack",
+            packId = UUID.randomUUID().toString(),
             optionIds = listOf(),
             contactName = "John Doe",
             contactRole = "Marketing Manager",

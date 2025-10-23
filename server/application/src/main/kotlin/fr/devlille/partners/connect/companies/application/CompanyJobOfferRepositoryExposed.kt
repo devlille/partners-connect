@@ -6,6 +6,8 @@ import fr.devlille.partners.connect.companies.domain.JobOfferResponse
 import fr.devlille.partners.connect.companies.domain.UpdateJobOffer
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyJobOfferEntity
+import fr.devlille.partners.connect.companies.infrastructure.db.CompanyJobOfferPromotionEntity
+import fr.devlille.partners.connect.companies.infrastructure.db.CompanyJobOfferPromotionsTable
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyJobOfferTable
 import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedResponse
 import fr.devlille.partners.connect.internal.infrastructure.api.paginated
@@ -124,6 +126,10 @@ class CompanyJobOfferRepositoryExposed : CompanyJobOfferRepository {
     }
 
     override suspend fun delete(jobOfferId: UUID, companyId: UUID) = transaction {
+        CompanyJobOfferPromotionEntity
+            .find { CompanyJobOfferPromotionsTable.jobOfferId eq jobOfferId }
+            .forEach { it.delete() }
+
         val entity = CompanyJobOfferEntity.find {
             CompanyJobOfferTable.id eq jobOfferId and (CompanyJobOfferTable.companyId eq companyId)
         }.singleOrNull() ?: throw NotFoundException("Job offer not found or not owned by company: $jobOfferId")

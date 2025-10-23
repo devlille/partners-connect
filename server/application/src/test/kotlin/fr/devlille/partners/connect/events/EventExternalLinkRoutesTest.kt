@@ -118,7 +118,7 @@ class EventExternalLinkRoutesTest {
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("must not be empty"))
+        assertTrue(response.bodyAsText().contains("value does not match 'uri' format"))
     }
 
     @Test
@@ -148,7 +148,7 @@ class EventExternalLinkRoutesTest {
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
-        assertTrue(response.bodyAsText().contains("must be a valid URL"))
+        assertTrue(response.bodyAsText().contains("value does not match 'uri' format"))
     }
 
     @Test

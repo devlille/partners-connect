@@ -94,14 +94,14 @@
         "string",
         "null"
       ],
-      "format": "date-time"
+      "format": "datetime"
     },
     "published_at": {
       "type": [
         "string",
         "null"
       ],
-      "format": "date-time"
+      "format": "datetime"
     }
   },
   "required": [

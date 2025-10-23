@@ -1,0 +1,40 @@
+{
+  "$id": "event.schema.json",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "start_time": {
+      "type": "string",
+      "format": "datetime"
+    },
+    "end_time": {
+      "type": "string",
+      "format": "datetime"
+    },
+    "submission_start_time": {
+      "type": "string",
+      "format": "datetime"
+    },
+    "submission_end_time": {
+      "type": "string",
+      "format": "datetime"
+    },
+    "address": {
+      "type": "string"
+    },
+    "contact": {
+      "$ref": "event_contact.schema.json"
+    }
+  },
+  "required": [
+    "name",
+    "start_time",
+    "end_time",
+    "submission_start_time",
+    "submission_end_time",
+    "address",
+    "contact"
+  ]
+}

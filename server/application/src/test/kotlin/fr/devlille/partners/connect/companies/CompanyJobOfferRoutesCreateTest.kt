@@ -46,11 +46,6 @@ class CompanyJobOfferRoutesCreateTest {
             setBody(json.encodeToString(jobOffer))
         }
 
-        // Debug: print actual status if test fails
-        if (response.status != HttpStatusCode.Created) {
-            println("Actual status: ${response.status}, body: ${response.bodyAsText()}")
-        }
-
         assertEquals(HttpStatusCode.Created, response.status)
 
         val responseBody = Json.parseToJsonElement(response.bodyAsText()).jsonObject
