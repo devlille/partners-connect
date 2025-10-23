@@ -3,14 +3,7 @@
     <div class="bg-white border-b border-gray-200 p-6">
       <div class="flex items-center justify-between">
         <div>
-          <UButton
-            :to="`/orgs/${orgSlug}/events/${eventSlug}/packs`"
-            icon="i-heroicons-arrow-left"
-            color="neutral"
-            variant="ghost"
-            class="mb-2"
-            label="Retour"
-          />
+          <BackButton :to="`/orgs/${orgSlug}/events/${eventSlug}/packs`" label="Retour" />
           <h1 class="text-2xl font-bold text-gray-900">{{ pack?.name }} - {{ eventName }}</h1>
         </div>
       </div>
@@ -53,7 +46,7 @@ const orgSlug = computed(() => {
   return Array.isArray(params) ? params[0] as string : params as string;
 });
 const eventSlug = computed(() => {
-  const params = route.params.slug;
+  const params = route.params.eventSlug;
   return Array.isArray(params) ? params[1] as string : params as string;
 });
 const packId = computed(() => route.params.packId as string);
@@ -64,18 +57,7 @@ const error = ref<string | null>(null);
 const eventName = ref<string>('');
 
 // Menu contextuel pour la page d'édition de pack
-const eventLinks = computed(() => [
-  {
-    label: 'Informations',
-    icon: 'i-heroicons-information-circle',
-    to: `/orgs/${orgSlug.value}/events/${eventSlug.value}`
-  },
-  {
-    label: 'Mes Packs',
-    icon: 'i-heroicons-cube',
-    to: `/orgs/${orgSlug.value}/events/${eventSlug.value}/packs`
-  }
-]);
+const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
 
 // Convertir SponsoringPack en CreateSponsoringPack pour le formulaire
 const packFormData = computed((): Partial<CreateSponsoringPack> => {
@@ -83,13 +65,17 @@ const packFormData = computed((): Partial<CreateSponsoringPack> => {
 
   // Extraire les informations du pack
   const hasStand = pack.value.required_options.some(o => o.name === 'Stand');
-  const ticketsOption = pack.value.required_options.find(o => o.name === 'Billets');
+
+  // Note: Le nombre de billets n'est pas directement disponible dans SponsoringOptionSchema
+  // Il faudra peut-être ajuster selon la structure réelle de vos données
+  // Pour l'instant, on initialise à 0
+  const nb_tickets = 0;
 
   return {
     name: pack.value.name,
     price: pack.value.base_price,
     with_booth: hasStand,
-    nb_tickets: ticketsOption?.quantity || 0,
+    nb_tickets: nb_tickets,
     max_quantity: pack.value.max_quantity || undefined
   };
 });

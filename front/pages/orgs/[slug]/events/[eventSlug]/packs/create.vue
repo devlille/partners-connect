@@ -3,14 +3,7 @@
     <div class="bg-white border-b border-gray-200 p-6">
       <div class="flex items-center justify-between">
         <div>
-          <UButton
-            :to="`/orgs/${orgSlug}/events/${eventSlug}/packs`"
-            icon="i-heroicons-arrow-left"
-            color="neutral"
-            variant="ghost"
-            class="mb-2"
-            label="Retour"
-          />
+          <BackButton :to="`/orgs/${orgSlug}/events/${eventSlug}/packs`" label="Retour" />
           <h1 class="text-2xl font-bold text-gray-900">Créer un pack - {{ eventName }}</h1>
         </div>
       </div>
@@ -51,7 +44,7 @@ const orgSlug = computed(() => {
   return Array.isArray(params) ? params[0] as string : params as string;
 });
 const eventSlug = computed(() => {
-  const params = route.params.slug;
+  const params = route.params.eventSlug;
   return Array.isArray(params) ? params[1] as string : params as string;
 });
 
@@ -60,18 +53,7 @@ const success = ref(false);
 const eventName = ref<string>('');
 
 // Menu contextuel pour la page de création de pack
-const eventLinks = computed(() => [
-  {
-    label: 'Informations',
-    icon: 'i-heroicons-information-circle',
-    to: `/orgs/${orgSlug.value}/events/${eventSlug.value}`
-  },
-  {
-    label: 'Mes Packs',
-    icon: 'i-heroicons-cube',
-    to: `/orgs/${orgSlug.value}/events/${eventSlug.value}/packs`
-  }
-]);
+const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
 
 // Données initiales pour le formulaire vide
 const initialData: Partial<CreateSponsoringPack> = {

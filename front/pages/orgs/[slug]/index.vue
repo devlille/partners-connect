@@ -3,14 +3,7 @@
     <div class="bg-white border-b border-gray-200 p-6">
       <div class="flex items-center justify-between">
         <div>
-          <UButton
-            to="/orgs"
-            icon="i-heroicons-arrow-left"
-            color="neutral"
-            variant="ghost"
-            class="mb-2"
-            label="Retour"
-          />
+          <BackButton to="/orgs" label="Retour" />
           <h1 class="text-2xl font-bold text-gray-900">{{ organisation?.name }}</h1>
         </div>
       </div>

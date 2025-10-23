@@ -52,7 +52,7 @@ const orgSlug = computed(() => {
   return Array.isArray(params) ? params[0] as string : params as string;
 });
 const eventSlug = computed(() => {
-  const params = route.params.slug;
+  const params = route.params.eventSlug;
   return Array.isArray(params) ? params[1] as string : params as string;
 });
 
@@ -62,18 +62,7 @@ const error = ref<string | null>(null);
 const organisationName = ref<string>('');
 
 // Menu contextuel pour la page de détail d'événement
-const orgLinks = computed(() => [
-  {
-    label: 'Informations',
-    icon: 'i-heroicons-information-circle',
-    to: `/orgs/${orgSlug.value}/events/${eventSlug.value}`
-  },
-  {
-    label: 'Mes Packs',
-    icon: 'i-heroicons-cube',
-    to: `/orgs/${orgSlug.value}/events/${eventSlug.value}/packs`
-  }
-]);
+const { eventLinks: orgLinks } = useEventLinks(orgSlug.value, eventSlug.value);
 
 async function loadEvent() {
   try {
