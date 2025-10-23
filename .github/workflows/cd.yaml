@@ -1,57 +1,133 @@
 # .github/workflows/cd.yaml
-# This workflow deploys an existing Docker image to Google Cloud Run.
+# This workflow deploys a pre-built Docker image to Clever Cloud.
 
-name: CD - Deploy to Cloud Run
+name: CD - Deploy to Clever Cloud
 
 on:
   push:
     tags:
       - '*.*.*'
-
-# Configure environment variables for easy reuse
-env:
-  PROJECT_ID: 'cms4partners-ce427'
-  REGION: 'europe-west1'
-  REPOSITORY: 'partners-connect'
-  IMAGE_NAME: 'partners-connect-server'
-  SERVICE_NAME: 'partners-connect-server'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        type: choice
+        options:
+          - production
+          - preprod
+      image_tag:
+        description: 'Docker image tag to deploy'
+        required: true
+        default: 'latest'
+  workflow_run:
+    workflows: ["Build and Push Container"]
+    types:
+      - completed
+    branches:
+      - main
 
 jobs:
   deploy:
-    name: Deploy to Cloud Run
+    name: Deploy to Clever Cloud
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: server
+
+    if: |
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
 
     permissions:
       contents: 'read'
-      id-token: 'write'
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Authenticate to Google Cloud
-        id: auth
-        uses: 'google-github-actions/auth@v3'
+      - uses: actions/checkout@v4
         with:
-          project_id: ${{ env.PROJECT_ID }}
-          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
-          service_account: '${{ secrets.SERVICE_ACCOUNT }}'
+          fetch-depth: 0
 
-      - name: Configure Docker for Artifact Registry
-        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+      - name: Set deployment variables
+        id: vars
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "environment=${{ inputs.environment }}" >> $GITHUB_OUTPUT
+            echo "image_tag=${{ inputs.image_tag }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+            echo "image_tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "workflow_run" ]; then
+            echo "environment=preprod" >> $GITHUB_OUTPUT
+            echo "image_tag=latest" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Deploy to Cloud Run
-        run: |-
-          gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --region ${{ env.REGION }} \
-            --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
-            --platform managed
-          
-          SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} --region ${{ env.REGION }} --format='value(status.url)')
-          
-          gcloud run services update ${{ env.SERVICE_NAME }} \
-            --region ${{ env.REGION }} \
-            --update-env-vars="SERVER_BASE_URL=$SERVICE_URL"
+      - name: Set Clever Cloud App ID
+        id: app
+        run: |
+          if [ "${{ steps.vars.outputs.environment }}" = "production" ]; then
+            echo "id=${{ secrets.CLEVERCLOUD_APP_ID }}" >> $GITHUB_OUTPUT
+            echo "url=${{ secrets.CLEVERCLOUD_BASE_URL }}" >> $GITHUB_OUTPUT
+            echo "postgres_url=${{ secrets.EXPOSED_DB_URL }}" >> $GITHUB_OUTPUT
+            echo "postgres_user=${{ secrets.EXPOSED_DB_USER }}" >> $GITHUB_OUTPUT
+            echo "postgres_password=${{ secrets.EXPOSED_DB_PASSWORD }}" >> $GITHUB_OUTPUT
+          else
+            echo "id=${{ secrets.CLEVERCLOUD_APP_ID_PP }}" >> $GITHUB_OUTPUT
+            echo "url=${{ secrets.CLEVERCLOUD_BASE_URL_PP }}" >> $GITHUB_OUTPUT
+            echo "postgres_url=${{ secrets.EXPOSED_DB_URL_PP }}" >> $GITHUB_OUTPUT
+            echo "postgres_user=${{ secrets.EXPOSED_DB_USER_PP }}" >> $GITHUB_OUTPUT
+            echo "postgres_password=${{ secrets.EXPOSED_DB_PASSWORD_PP }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install Clever Tools
+        run: npm install -g clever-tools
+
+      - name: Configure Clever Cloud for monorepo
+        env:
+          CLEVER_TOKEN: ${{ secrets.CLEVERCLOUD_TOKEN }}
+          CLEVER_SECRET: ${{ secrets.CLEVERCLOUD_SECRET }}
+          CLEVER_APP_ID: ${{ steps.app.outputs.id }}
+          CLEVERCLOUD_BASE_URL: ${{ steps.app.outputs.url }}
+          CC_DOCKER_LOGIN_PASSWORD: ${{ secrets.CC_DOCKER_LOGIN_PASSWORD }}
+          CC_DOCKER_LOGIN_USERNAME: ${{ secrets.CC_DOCKER_LOGIN_USERNAME }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          FRONTEND_BASE_URL: ${{ secrets.FRONTEND_BASE_URL }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          CRYPTO_KEY: ${{ secrets.CRYPTO_KEY }}
+          CRYPTO_SALT: ${{ secrets.CRYPTO_SALT }}
+          EXPOSED_DB_DRIVER: ${{ secrets.EXPOSED_DB_DRIVER }}
+          EXPOSED_DB_URL: ${{ steps.app.outputs.postgres_url }}
+          EXPOSED_DB_USER: ${{ steps.app.outputs.postgres_user }}
+          EXPOSED_DB_PASSWORD: ${{ steps.app.outputs.postgres_password }}
+        run: |
+          clever env set APP_FOLDER "server" --app $CLEVER_APP_ID
+          clever env set CC_DOCKERFILE "Dockerfile.deploy" --app $CLEVER_APP_ID
+          clever env set CC_DOCKER_LOGIN_PASSWORD "$CC_DOCKER_LOGIN_PASSWORD" --app $CLEVER_APP_ID
+          clever env set CC_DOCKER_LOGIN_USERNAME "$CC_DOCKER_LOGIN_USERNAME" --app $CLEVER_APP_ID
+          clever env set CC_DOCKER_LOGIN_SERVER "ghcr.io" --app $CLEVER_APP_ID
+          clever env set PROJECT_ID "$PROJECT_ID" --app $CLEVER_APP_ID
+          clever env set SERVER_BASE_URL "$CLEVERCLOUD_BASE_URL" --app $CLEVER_APP_ID
+          clever env set FRONTEND_BASE_URL "$FRONTEND_BASE_URL" --app $CLEVER_APP_ID
+          clever env set GOOGLE_CLIENT_ID "$GOOGLE_CLIENT_ID" --app $CLEVER_APP_ID
+          clever env set GOOGLE_CLIENT_SECRET "$GOOGLE_CLIENT_SECRET" --app $CLEVER_APP_ID
+          clever env set CRYPTO_KEY "$CRYPTO_KEY" --app $CLEVER_APP_ID
+          clever env set CRYPTO_SALT "$CRYPTO_SALT" --app $CLEVER_APP_ID
+          clever env set EXPOSED_DB_DRIVER "$EXPOSED_DB_DRIVER" --app $CLEVER_APP_ID
+          clever env set EXPOSED_DB_URL "$EXPOSED_DB_URL" --app $CLEVER_APP_ID
+          clever env set EXPOSED_DB_USER "$EXPOSED_DB_USER" --app $CLEVER_APP_ID
+          clever env set EXPOSED_DB_PASSWORD "$EXPOSED_DB_PASSWORD" --app $CLEVER_APP_ID
+
+      - name: Set image tag for deployment
+        env:
+          CLEVER_TOKEN: ${{ secrets.CLEVERCLOUD_TOKEN }}
+          CLEVER_SECRET: ${{ secrets.CLEVERCLOUD_SECRET }}
+          CLEVER_APP_ID: ${{ steps.app.outputs.id }}
+        run: |
+          clever env set TAG_VERSION "${{ steps.vars.outputs.image_tag }}" --app $CLEVER_APP_ID
+
+      - name: Link and Deploy to Clever Cloud
+        env:
+          CLEVER_TOKEN: ${{ secrets.CLEVERCLOUD_TOKEN }}
+          CLEVER_SECRET: ${{ secrets.CLEVERCLOUD_SECRET }}
+          CLEVER_APP_ID: ${{ steps.app.outputs.id }}
+        run: |
+          clever link $CLEVER_APP_ID
+          clever deploy --force --verbose
