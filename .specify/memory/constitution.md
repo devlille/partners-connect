@@ -44,6 +44,75 @@ backwards-compatible with migration strategy.
 **Rationale**: Modular architecture enables independent development, testing, and deployment 
 of features while maintaining system coherence and supporting team scalability.
 
+#### Repository Layer Separation of Concerns (CRITICAL)
+
+Repository implementations MUST adhere to strict architectural boundaries:
+
+1. **Repository implementations MUST NOT depend on other repositories**
+   - ❌ WRONG: `class MyRepositoryExposed(private val notificationRepository: NotificationRepository, private val otherRepository: OtherRepository)`
+   - ✅ CORRECT: `class MyRepositoryExposed : MyRepository` (no constructor parameters for repositories)
+   - Repository layer is pure data access - cross-domain operations belong in route handlers
+
+2. **Notification sending MUST happen in the route layer, NOT in repositories**
+   - ❌ WRONG: Repository methods that call `notificationRepository.sendMessage()`
+   - ✅ CORRECT: Route handlers inject `NotificationRepository`, fetch domain data, create `NotificationVariables`, send notifications
+   - Repositories return data; routes orchestrate cross-cutting concerns
+
+3. **Clean Architecture Layer Responsibilities**:
+   - **Domain Layer** (`domain/`): Interfaces, domain models, business rules (no implementations)
+   - **Application Layer** (`application/`): Repository implementations using Exposed entities directly, database operations only
+   - **Infrastructure Layer** (`infrastructure/api/`): HTTP routes, request/response handling, orchestration of multiple repositories
+   - Cross-cutting concerns (notifications, logging, metrics) belong in infrastructure layer
+
+4. **Exposed ORM Pattern**:
+   - Repository implementations MUST use Exposed entities directly: `Entity.findById()`, `Entity.find { query }`, etc.
+   - Repository implementations MUST ONLY interact with database via Exposed - no other repository dependencies
+   - Cross-domain data fetching happens in route handlers after repository calls return
+
+**Reference Implementation**: See `PartnershipRoutes.kt` lines 35-53, 91-105, 118-126 for correct notification pattern:
+```kotlin
+// ✅ CORRECT - Route handler orchestration
+fun Route.partnershipRoutes() {
+    val partnershipRepository by inject<PartnershipRepository>()
+    val notificationRepository by inject<NotificationRepository>()
+    val eventRepository by inject<EventRepository>()
+    
+    post("/{id}/approve") {
+        val partnership = partnershipRepository.approve(id)
+        
+        // Fetch related domain objects for notification
+        val event = eventRepository.findById(partnership.eventId)
+        val company = partnership.company  // From partnership entity
+        
+        // Create notification variables
+        val variables = NotificationVariables.PartnershipApproved(
+            language = partnership.language,
+            event = event,
+            company = company,
+            partnership = partnership
+        )
+        
+        // Send notification directly
+        notificationRepository.sendMessage(event.orgSlug, variables)
+        
+        call.respond(HttpStatusCode.OK, partnership)
+    }
+}
+```
+
+**Why This Matters**:
+- Prevents circular dependencies between repositories
+- Makes testing easier (mock repository interfaces, not internal dependencies)
+- Follows Single Responsibility Principle (repositories handle data, routes handle orchestration)
+- Matches existing codebase patterns (auth, billing, partnership all follow this)
+- Enables independent evolution of domain modules
+
+**Notification Pattern Details**:
+- Template files: `server/application/src/main/resources/notifications/email/{event_name}/content.{lang}.html` and `notifications/slack/{event_name}/{lang}.md`
+- Route layer: Inject `NotificationRepository`, fetch domain data after repository operations, create `NotificationVariables` subclass, call `sendMessage()`
+- Error handling: Notification failures are handled internally by the notification repository implementation
+- Language: Use partnership/company language preference for template selection
+
 ### IV. API Consistency & User Experience
 REST API endpoints MUST follow consistent naming conventions, HTTP status codes, and error 
 response formats. All endpoints MUST include comprehensive OpenAPI documentation. Response 

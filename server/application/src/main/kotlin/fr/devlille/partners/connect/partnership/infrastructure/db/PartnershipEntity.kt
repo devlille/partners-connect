@@ -74,3 +74,10 @@ fun UUIDEntityClass<PartnershipEntity>.singleByEventAndPartnership(
 ): PartnershipEntity? = this
     .find { (PartnershipsTable.eventId eq eventId) and (PartnershipsTable.id eq partnershipId) }
     .singleOrNull()
+
+fun UUIDEntityClass<PartnershipEntity>.singleByCompanyAndPartnership(
+    companyId: UUID,
+    partnershipId: UUID,
+): PartnershipEntity? = this
+    .find { (PartnershipsTable.companyId eq companyId) and (PartnershipsTable.id eq partnershipId) }
+    .singleOrNull()

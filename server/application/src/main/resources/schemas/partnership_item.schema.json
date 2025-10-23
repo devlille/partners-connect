@@ -40,7 +40,7 @@
     },
     "created_at": {
       "type": "string",
-      "format": "date-time"
+      "format": "datetime"
     }
   },
   "required": [

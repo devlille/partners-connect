@@ -93,14 +93,9 @@ class CompanyJobOfferRoutesUpdateTest {
         }
 
         val updateData = UpdateJobOffer(title = "Updated Title")
-
-        val response = createClient {
-            install(ContentNegotiation) {
-                json()
-            }
-        }.put("/companies/$companyId/job-offers/$nonExistentJobOfferId") {
+        val response = client.put("/companies/$companyId/job-offers/$nonExistentJobOfferId") {
             contentType(ContentType.Application.Json)
-            setBody(updateData)
+            setBody(json.encodeToString(UpdateJobOffer.serializer(), updateData))
         }
 
         assertEquals(HttpStatusCode.NotFound, response.status)
@@ -117,14 +112,9 @@ class CompanyJobOfferRoutesUpdateTest {
         }
 
         val updateData = UpdateJobOffer(title = "Updated Title")
-
-        val response = createClient {
-            install(ContentNegotiation) {
-                json()
-            }
-        }.put("/companies/$nonExistentCompanyId/job-offers/$jobOfferId") {
+        val response = client.put("/companies/$nonExistentCompanyId/job-offers/$jobOfferId") {
             contentType(ContentType.Application.Json)
-            setBody(updateData)
+            setBody(json.encodeToString(UpdateJobOffer.serializer(), updateData))
         }
 
         assertEquals(HttpStatusCode.NotFound, response.status)

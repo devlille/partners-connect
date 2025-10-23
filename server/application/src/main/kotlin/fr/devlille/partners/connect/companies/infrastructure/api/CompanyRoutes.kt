@@ -1,18 +1,25 @@
 package fr.devlille.partners.connect.companies.infrastructure.api
 
 import fr.devlille.partners.connect.companies.domain.CompanyImageProcessingRepository
+import fr.devlille.partners.connect.companies.domain.CompanyJobOfferPromotionRepository
 import fr.devlille.partners.connect.companies.domain.CompanyJobOfferRepository
 import fr.devlille.partners.connect.companies.domain.CompanyMediaRepository
 import fr.devlille.partners.connect.companies.domain.CompanyRepository
 import fr.devlille.partners.connect.companies.domain.CreateCompany
 import fr.devlille.partners.connect.companies.domain.CreateJobOffer
+import fr.devlille.partners.connect.companies.domain.PromoteJobOfferRequest
 import fr.devlille.partners.connect.companies.domain.UpdateJobOffer
+import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.DEFAULT_PAGE_SIZE
 import fr.devlille.partners.connect.internal.infrastructure.api.UnsupportedMediaTypeException
 import fr.devlille.partners.connect.internal.infrastructure.api.ValidationException
 import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
+import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
+import fr.devlille.partners.connect.notifications.domain.NotificationRepository
+import fr.devlille.partners.connect.notifications.domain.NotificationVariables
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
+import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipId
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.MissingRequestParameterException
@@ -30,9 +37,6 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.ktor.ext.inject
-
-private const val MIN_EXPERIENCE_YEARS = 0
-private const val MAX_EXPERIENCE_YEARS = 20
 
 fun Route.companyRoutes() {
     val companyRepository by inject<CompanyRepository>()
@@ -78,21 +82,122 @@ fun Route.companyRoutes() {
 
         // Job offer routes
         companyJobOfferRoutes()
+        companyPromoteJobOfferRoute()
     }
 }
 
-/**
- * Validates experience years field for job offers.
- * @param experienceYears The experience years to validate (nullable)
- * @throws ValidationException if years are outside valid range
- */
-private fun validateExperienceYears(experienceYears: Int?) {
-    experienceYears?.let { years ->
-        if (years !in MIN_EXPERIENCE_YEARS..MAX_EXPERIENCE_YEARS) {
-            throw ValidationException(
-                "experience_years",
-                "must be between $MIN_EXPERIENCE_YEARS and $MAX_EXPERIENCE_YEARS",
+fun Route.companyPromoteJobOfferRoute() {
+    val companyRepository by inject<CompanyRepository>()
+    val partnershipRepository by inject<PartnershipRepository>()
+    val notificationRepository by inject<NotificationRepository>()
+    val eventRepository by inject<EventRepository>()
+    val promotionRepository by inject<CompanyJobOfferPromotionRepository>()
+
+    route("/{companyId}/partnerships/{partnershipId}/promote") {
+        post {
+            val companyId = call.parameters.companyUUID
+            val partnershipId = call.parameters.partnershipId
+            val request = call.receive<PromoteJobOfferRequest>(schema = "promote_job_offer.schema.json")
+            val jobOfferId = request.jobOfferId.toUUID()
+
+            val promotionId = promotionRepository.promoteJobOffer(
+                companyId = companyId,
+                partnershipId = partnershipId,
+                jobOfferId = jobOfferId,
             )
+
+            // Fetch the promotion to get complete data including eventSlug for notification
+            val promotions = promotionRepository.listJobOfferPromotions(
+                companyId = companyId,
+                jobOfferId = jobOfferId,
+                partnershipId = partnershipId,
+                page = 1,
+                pageSize = 1,
+            )
+            val promotion = promotions.items.firstOrNull()
+                ?: throw NotFoundException("Promotion not found after creation")
+
+            // Send notification to organizers
+            val company = companyRepository.getById(companyId)
+            val partnership = partnershipRepository.getById(promotion.eventSlug, partnershipId)
+            val event = eventRepository.getBySlug(promotion.eventSlug)
+
+            val variables = NotificationVariables.JobOfferPromoted(
+                language = partnership.language,
+                event = event,
+                company = company,
+                partnership = partnership,
+                jobOffer = promotion.jobOffer,
+            )
+            notificationRepository.sendMessage(promotion.eventSlug, variables)
+
+            call.respond(HttpStatusCode.Created, mapOf("id" to promotionId.toString()))
+        }
+    }
+}
+
+fun Route.companyJobOfferRoutes() {
+    val jobOfferRepository by inject<CompanyJobOfferRepository>()
+    val promotionRepository by inject<CompanyJobOfferPromotionRepository>()
+
+    route("/{companyId}/job-offers") {
+        post {
+            val companyId = call.parameters.companyUUID
+            val createJobOffer = call.receive<CreateJobOffer>(schema = "create_job_offer.schema.json")
+            validatePublicationDate(createJobOffer.publicationDate)
+            val jobOfferId = jobOfferRepository.create(companyId, createJobOffer)
+            call.respond(HttpStatusCode.Created, mapOf("id" to jobOfferId.toString()))
+        }
+
+        get {
+            val companyId = call.parameters.companyUUID
+            val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 1
+            val pageSize = call.request.queryParameters["page_size"]?.toIntOrNull() ?: DEFAULT_PAGE_SIZE
+            val jobOffers = jobOfferRepository.findByCompany(companyId, page, pageSize)
+            call.respond(HttpStatusCode.OK, jobOffers)
+        }
+
+        get("/{jobOfferId}") {
+            val companyId = call.parameters.companyUUID
+            val jobOfferId = call.parameters.jobOfferUUID
+            val jobOffer = jobOfferRepository.findById(jobOfferId)
+            if (jobOffer.companyId != companyId.toString()) {
+                throw NotFoundException("Job offer not found or not owned by company")
+            }
+            call.respond(HttpStatusCode.OK, jobOffer)
+        }
+
+        put("/{jobOfferId}") {
+            val companyId = call.parameters.companyUUID
+            val jobOfferId = call.parameters.jobOfferUUID
+            val updateJobOffer = call.receive<UpdateJobOffer>(schema = "update_job_offer.schema.json")
+            updateJobOffer.publicationDate?.let { validatePublicationDate(it) }
+            jobOfferRepository.update(jobOfferId, updateJobOffer, companyId)
+            val jobOffer = jobOfferRepository.findById(jobOfferId)
+            call.respond(HttpStatusCode.OK, jobOffer)
+        }
+
+        delete("/{jobOfferId}") {
+            val companyId = call.parameters.companyUUID
+            val jobOfferId = call.parameters.jobOfferUUID
+            jobOfferRepository.delete(jobOfferId, companyId)
+            call.respond(HttpStatusCode.NoContent)
+        }
+
+        get("/{jobOfferId}/promotions") {
+            val companyId = call.parameters.companyUUID
+            val jobOfferId = call.parameters.jobOfferUUID
+            val partnershipId = call.request.queryParameters["partnership_id"]?.toUUID()
+            val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 1
+            val pageSize = call.request.queryParameters["page_size"]?.toIntOrNull() ?: DEFAULT_PAGE_SIZE
+            val promotions = promotionRepository.listJobOfferPromotions(
+                companyId = companyId,
+                jobOfferId = jobOfferId,
+                partnershipId = partnershipId,
+                page = page,
+                pageSize = pageSize,
+            )
+            call.respond(HttpStatusCode.OK, promotions)
         }
     }
 }
@@ -106,102 +211,5 @@ private fun validatePublicationDate(publicationDate: LocalDateTime) {
     val now = Clock.System.now().toLocalDateTime(TimeZone.UTC)
     if (publicationDate > now) {
         throw ValidationException("publication_date", "cannot be in the future")
-    }
-}
-
-/**
- * Checks if basic job offer fields are all null.
- */
-private fun areBasicFieldsNull(updateJobOffer: UpdateJobOffer): Boolean =
-    updateJobOffer.url == null && updateJobOffer.title == null && updateJobOffer.location == null
-
-/**
- * Checks if date-related fields are all null.
- */
-private fun areDateFieldsNull(updateJobOffer: UpdateJobOffer): Boolean =
-    updateJobOffer.publicationDate == null && updateJobOffer.endDate == null
-
-/**
- * Checks if additional job offer fields are all null.
- */
-private fun areAdditionalFieldsNull(updateJobOffer: UpdateJobOffer): Boolean =
-    updateJobOffer.experienceYears == null && updateJobOffer.salary == null
-
-/**
- * Validates that at least one field is provided for update operations.
- * @param updateJobOffer The update request to validate
- * @throws ValidationException if all fields are null
- */
-private fun validateUpdateNotEmpty(updateJobOffer: UpdateJobOffer) {
-    if (areBasicFieldsNull(updateJobOffer) &&
-        areDateFieldsNull(updateJobOffer) &&
-        areAdditionalFieldsNull(updateJobOffer)
-    ) {
-        throw ValidationException("body", "at least one field must be provided for update")
-    }
-}
-
-fun Route.companyJobOfferRoutes() {
-    val jobOfferRepository by inject<CompanyJobOfferRepository>()
-
-    route("/{companyId}/job-offers") {
-        // POST /companies/{companyId}/job-offers - Create job offer
-        post {
-            val companyId = call.parameters.companyUUID
-            val createJobOffer = call.receive<CreateJobOffer>(schema = "create_job_offer.schema.json")
-
-            // Validate input data
-            validateExperienceYears(createJobOffer.experienceYears)
-            validatePublicationDate(createJobOffer.publicationDate)
-
-            val jobOfferId = jobOfferRepository.create(companyId, createJobOffer)
-            call.respond(HttpStatusCode.Created, mapOf("id" to jobOfferId.toString()))
-        }
-
-        // GET /companies/{companyId}/job-offers - List job offers with pagination
-        get {
-            val companyId = call.parameters.companyUUID
-            val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 1
-            val pageSize = call.request.queryParameters["page_size"]?.toIntOrNull() ?: DEFAULT_PAGE_SIZE
-            val jobOffers = jobOfferRepository.findByCompany(companyId, page, pageSize)
-            call.respond(HttpStatusCode.OK, jobOffers)
-        }
-
-        // GET /companies/{companyId}/job-offers/{jobOfferId} - Get single job offer
-        get("/{jobOfferId}") {
-            val companyId = call.parameters.companyUUID
-            val jobOfferId = call.parameters.jobOfferUUID
-            val jobOffer = jobOfferRepository.findById(jobOfferId)
-            if (jobOffer.companyId != companyId.toString()) {
-                throw NotFoundException("Job offer not found or not owned by company")
-            }
-            call.respond(HttpStatusCode.OK, jobOffer)
-        }
-
-        // PUT /companies/{companyId}/job-offers/{jobOfferId} - Update job offer
-        put("/{jobOfferId}") {
-            val companyId = call.parameters.companyUUID
-            val jobOfferId = call.parameters.jobOfferUUID
-            val updateJobOffer = call.receive<UpdateJobOffer>(schema = "update_job_offer.schema.json")
-
-            // Validate input data
-            validateUpdateNotEmpty(updateJobOffer)
-            validateExperienceYears(updateJobOffer.experienceYears)
-            updateJobOffer.publicationDate?.let { validatePublicationDate(it) }
-
-            jobOfferRepository.update(jobOfferId, updateJobOffer, companyId)
-
-            // Fetch the updated job offer to return
-            val jobOffer = jobOfferRepository.findById(jobOfferId)
-            call.respond(HttpStatusCode.OK, jobOffer)
-        }
-
-        // DELETE /companies/{companyId}/job-offers/{jobOfferId} - Delete job offer
-        delete("/{jobOfferId}") {
-            val companyId = call.parameters.companyUUID
-            val jobOfferId = call.parameters.jobOfferUUID
-            jobOfferRepository.delete(jobOfferId, companyId)
-            call.respond(HttpStatusCode.NoContent)
-        }
     }
 }

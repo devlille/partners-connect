@@ -1,0 +1,1 @@
+Job offer promotion declined - {{event_name}}

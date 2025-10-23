@@ -1,10 +1,12 @@
 package fr.devlille.partners.connect.companies.infrastructure.bindings
 
 import fr.devlille.partners.connect.companies.application.CompanyImageProcessingRepositoryDefault
+import fr.devlille.partners.connect.companies.application.CompanyJobOfferPromotionRepositoryExposed
 import fr.devlille.partners.connect.companies.application.CompanyJobOfferRepositoryExposed
 import fr.devlille.partners.connect.companies.application.CompanyMediaRepositoryGoogleCloud
 import fr.devlille.partners.connect.companies.application.CompanyRepositoryExposed
 import fr.devlille.partners.connect.companies.domain.CompanyImageProcessingRepository
+import fr.devlille.partners.connect.companies.domain.CompanyJobOfferPromotionRepository
 import fr.devlille.partners.connect.companies.domain.CompanyJobOfferRepository
 import fr.devlille.partners.connect.companies.domain.CompanyMediaRepository
 import fr.devlille.partners.connect.companies.domain.CompanyRepository
@@ -18,6 +20,9 @@ val companyModule = module {
     }
     single<CompanyJobOfferRepository> {
         CompanyJobOfferRepositoryExposed()
+    }
+    single<CompanyJobOfferPromotionRepository> {
+        CompanyJobOfferPromotionRepositoryExposed()
     }
     single<CompanyMediaRepository> {
         CompanyMediaRepositoryGoogleCloud(get())

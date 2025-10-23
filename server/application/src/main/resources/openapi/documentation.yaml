@@ -400,6 +400,127 @@ paths:
           description: Forbidden - Not authorized for this company
         '404':
           description: Job offer not found or not owned by company
+  /companies/{companyId}/partnerships/{partnershipId}/promote:
+    post:
+      summary: Promote job offer to partnership
+      operationId: promoteJobOfferToPartnership
+      description: Company owner promotes a job offer to an active partnership with an event
+      tags:
+        - companies
+        - job-offers
+        - promotions
+      security:
+        - {}
+      parameters:
+        - name: companyId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Company unique identifier
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Partnership unique identifier
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/promote_job_offer.schema'
+        required: true
+      responses:
+        '201':
+          description: Job offer promoted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+        '400':
+          description: Bad Request - Invalid request body or missing required fields
+        '403':
+          description: Forbidden - Event has ended
+        '404':
+          description: Not Found - Company, partnership, or job offer not found
+        '409':
+          description: Conflict - Job offer already promoted with status pending/approved
+  /companies/{companyId}/job-offers/{jobOfferId}/promotions:
+    get:
+      summary: List job offer promotions
+      operationId: listJobOfferPromotions
+      description: List all promotions for a specific job offer across all partnerships
+      tags:
+        - companies
+        - job-offers
+        - promotions
+      security:
+        - {}
+      parameters:
+        - name: companyId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Company unique identifier
+        - name: jobOfferId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Job offer unique identifier
+        - name: partnership_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Filter by partnership ID
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number for pagination
+        - name: page_size
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Items per page
+      responses:
+        '200':
+          description: Successfully retrieved promotions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/job_offer_promotion_response.schema'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  page_size:
+                    type: integer
+        '404':
+          description: Company or job offer not found
   /events:
     get:
       summary: List organization events
@@ -1172,7 +1293,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/event.schema'
+              $ref: '#/components/schemas/create_event.schema'
         required: true
       responses:
         '201':
@@ -1215,7 +1336,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/event.schema'
+              $ref: '#/components/schemas/create_event.schema'
         required: true
       responses:
         '200':
@@ -2411,6 +2532,358 @@ paths:
             text/plain:
               schema:
                 type: string
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/job-offers:
+    get:
+      summary: List job offers for partnership
+      operationId: listPartnershipJobOffers
+      description: Get paginated list of job offer promotions for a specific partnership. Public endpoint accessible without authentication.
+      tags:
+        - partnerships
+        - job-offers
+      security:
+        - {}
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Partnership UUID
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - pending
+              - approved
+              - declined
+          description: Filter by promotion status
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number (1-indexed)
+        - name: page_size
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Number of items per page
+      responses:
+        '200':
+          description: OK - Successfully retrieved job offer promotions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/job_offer_promotion_response.schema'
+                  page:
+                    type: integer
+                    minimum: 1
+                  pageSize:
+                    type: integer
+                    minimum: 1
+                  totalItems:
+                    type: integer
+                    minimum: 0
+                  totalPages:
+                    type: integer
+                    minimum: 0
+        '400':
+          description: Bad Request - Invalid query parameters
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Not Found - Partnership or event not found
+          content:
+            text/plain:
+              schema:
+                type: string
+  /orgs/{orgSlug}/events/{eventSlug}/job-offers:
+    get:
+      summary: List all job offers for event
+      operationId: listEventJobOfferPromotions
+      description: Get paginated list of all job offer promotions for an event. Requires organization edit permissions.
+      tags:
+        - events
+        - job-offers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - pending
+              - approved
+              - declined
+          description: Filter by promotion status
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number (1-indexed)
+        - name: page_size
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Number of items per page
+      responses:
+        '200':
+          description: OK - Successfully retrieved job offer promotions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/job_offer_promotion_response.schema'
+                  page:
+                    type: integer
+                    minimum: 1
+                  pageSize:
+                    type: integer
+                    minimum: 1
+                  totalItems:
+                    type: integer
+                    minimum: 0
+                  totalPages:
+                    type: integer
+                    minimum: 0
+        '400':
+          description: Bad Request - Invalid query parameters
+          content:
+            text/plain:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                type: string
+        '403':
+          description: Forbidden - User does not have edit permissions
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Not Found - Event not found
+          content:
+            text/plain:
+              schema:
+                type: string
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/job-offers/{promotionId}/approve:
+    post:
+      summary: Approve job offer promotion
+      operationId: approveJobOfferPromotion
+      description: Approve a pending job offer promotion. Requires organization edit permissions. Sends notification to company.
+      tags:
+        - partnerships
+        - job-offers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Partnership UUID
+        - name: promotionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Promotion UUID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+        required: true
+      responses:
+        '200':
+          description: OK - Job offer promotion approved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job_offer_promotion_response.schema'
+        '400':
+          description: Bad Request - Invalid promotion state or parameters
+          content:
+            text/plain:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                type: string
+        '403':
+          description: Forbidden - User does not have edit permissions
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Not Found - Promotion, partnership, or event not found
+          content:
+            text/plain:
+              schema:
+                type: string
+        '409':
+          description: Conflict - Promotion already processed
+          content:
+            text/plain:
+              schema:
+                type: string
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/job-offers/{promotionId}/decline:
+    post:
+      summary: Decline job offer promotion
+      operationId: declineJobOfferPromotion
+      description: Decline a pending job offer promotion with optional reason. Requires organization edit permissions. Sends notification to company.
+      tags:
+        - partnerships
+        - job-offers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Partnership UUID
+        - name: promotionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Promotion UUID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/decline_job_offer_promotion.schema'
+        required: true
+      responses:
+        '200':
+          description: OK - Job offer promotion declined successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job_offer_promotion_response.schema'
+        '400':
+          description: Bad Request - Invalid promotion state or parameters
+          content:
+            text/plain:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                type: string
+        '403':
+          description: Forbidden - User does not have edit permissions
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Not Found - Promotion, partnership, or event not found
+          content:
+            text/plain:
+              schema:
+                type: string
+        '409':
+          description: Conflict - Promotion already processed
+          content:
+            text/plain:
+              schema:
+                type: string
   /orgs/{orgSlug}/events/{eventSlug}/providers:
     post:
       summary: Create new provider
@@ -2663,6 +3136,8 @@ components:
       $ref: '#/components/schemas/partnership_item.schema'
     EventSummary:
       $ref: '#/components/schemas/event_summary.schema'
+    CreateEvent:
+      $ref: '#/components/schemas/create_event.schema'
     Event:
       $ref: '#/components/schemas/event.schema'
     EventDisplay:
@@ -2737,6 +3212,12 @@ components:
       $ref: '#/components/schemas/job_offer_response.schema'
     CreateByIdentifiers:
       $ref: '#/components/schemas/create_by_identifiers.schema'
+    PromoteJobOfferRequest:
+      $ref: '#/components/schemas/promote_job_offer.schema'
+    JobOfferPromotionResponse:
+      $ref: '#/components/schemas/job_offer_promotion_response.schema'
+    DeclineJobOfferRequest:
+      $ref: '#/components/schemas/decline_job_offer_promotion.schema'
     user_session.schema:
       $id: user_session.schema.json
       type: object
@@ -2942,7 +3423,7 @@ components:
           type: string
         created_at:
           type: string
-          format: date-time
+          format: datetime
       required:
         - id
         - contact
@@ -2978,13 +3459,13 @@ components:
           description: Work location description
         publication_date:
           type: string
-          format: date-time
+          format: datetime
           description: When the job was posted (ISO format)
         end_date:
           type:
             - string
             - 'null'
-          format: date-time
+          format: datetime
           description: Application deadline (ISO format, nullable)
         experience_years:
           type:
@@ -3001,11 +3482,11 @@ components:
           description: Salary information as free text (nullable)
         created_at:
           type: string
-          format: date-time
+          format: datetime
           description: Timestamp when the record was created (ISO format)
         updated_at:
           type: string
-          format: date-time
+          format: datetime
           description: Timestamp when the record was last modified (ISO format)
       required:
         - id
@@ -3070,12 +3551,12 @@ components:
           maxLength: 100
         publication_date:
           type: string
-          format: date
+          format: datetime
         end_date:
           type:
             - string
             - 'null'
-          format: date
+          format: datetime
         experience_years:
           type:
             - integer
@@ -3106,12 +3587,12 @@ components:
           maxLength: 100
         publication_date:
           type: string
-          format: date
+          format: datetime
         end_date:
           type:
             - string
             - 'null'
-          format: date
+          format: datetime
         experience_years:
           type:
             - integer
@@ -3125,6 +3606,107 @@ components:
           maxLength: 100
       additionalProperties: false
       minProperties: 1
+    promote_job_offer.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      type: object
+      required:
+        - job_offer_id
+      properties:
+        job_offer_id:
+          type: string
+          format: uuid
+          description: UUID of the job offer to promote
+      additionalProperties: false
+    job_offer_promotion_response.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      type: object
+      title: JobOfferPromotionResponse
+      description: Response containing complete job offer promotion details with embedded job offer data
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique promotion identifier
+        job_offer_id:
+          type: string
+          format: uuid
+          description: ID of the promoted job offer
+        partnership_id:
+          type: string
+          format: uuid
+          description: Partnership through which promotion was requested
+        event_slug:
+          type: string
+          description: Human-readable event identifier
+        status:
+          type: string
+          enum:
+            - pending
+            - approved
+            - declined
+          description: Current promotion status
+        promoted_at:
+          type: string
+          format: date-time
+          description: Timestamp when promotion was initially requested (ISO format)
+        reviewed_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          description: Timestamp when organizer approved/declined (ISO format, null if pending)
+        reviewed_by:
+          type:
+            - string
+            - 'null'
+          format: uuid
+          description: User ID of organizer who reviewed (null if pending)
+        decline_reason:
+          type:
+            - string
+            - 'null'
+          maxLength: 500
+          description: Optional reason provided when declining promotion
+        job_offer:
+          type: object
+          description: Embedded job offer entity
+          properties:
+            id:
+              type: string
+              format: uuid
+              description: Job offer identifier
+            title:
+              type: string
+              maxLength: 255
+              description: Job offer title
+            url:
+              type: string
+              format: uri
+              description: External URL to the full job offer page
+          required:
+            - id
+            - title
+            - url
+          additionalProperties: false
+        created_at:
+          type: string
+          format: date-time
+          description: Record creation timestamp (ISO format)
+        updated_at:
+          type: string
+          format: date-time
+          description: Record last modification timestamp (ISO format)
+      required:
+        - id
+        - job_offer_id
+        - partnership_id
+        - event_slug
+        - status
+        - promoted_at
+        - job_offer
+        - created_at
+        - updated_at
+      additionalProperties: false
     event_summary.schema:
       $id: event_summary.schema.json
       type: object
@@ -3135,16 +3717,16 @@ components:
           type: string
         start_time:
           type: string
-          format: date-time
+          format: datetime
         end_time:
           type: string
-          format: date-time
+          format: datetime
         submission_start_time:
           type: string
-          format: date-time
+          format: datetime
         submission_end_time:
           type: string
-          format: date-time
+          format: datetime
       required:
         - slug
         - name
@@ -3223,7 +3805,7 @@ components:
             - 'null'
         created_at:
           type: string
-          format: date-time
+          format: datetime
       required:
         - id
         - name
@@ -3240,16 +3822,16 @@ components:
           type: string
         start_time:
           type: string
-          format: date-time
+          format: datetime
         end_time:
           type: string
-          format: date-time
+          format: datetime
         submission_start_time:
           type: string
-          format: date-time
+          format: datetime
         submission_end_time:
           type: string
-          format: date-time
+          format: datetime
         address:
           type: string
         contact:
@@ -3572,15 +4154,15 @@ components:
           type:
             - string
             - 'null'
-          format: date-time
+          format: datetime
         published_at:
           type:
             - string
             - 'null'
-          format: date-time
+          format: datetime
       required:
         - name
-    event.schema:
+    create_event.schema:
       $id: event.schema.json
       type: object
       properties:
@@ -3588,22 +4170,21 @@ components:
           type: string
         start_time:
           type: string
-          format: date-time
+          format: datetime
         end_time:
           type: string
-          format: date-time
+          format: datetime
         submission_start_time:
           type: string
-          format: date-time
+          format: datetime
         submission_end_time:
           type: string
-          format: date-time
+          format: datetime
         address:
           type: string
         contact:
           $ref: '#/components/schemas/event_contact.schema'
       required:
-        - slug
         - name
         - start_time
         - end_time
@@ -3688,7 +4269,7 @@ components:
           type:
             - string
             - 'null'
-          format: date-time
+          format: datetime
         support_url:
           type:
             - string
@@ -3769,7 +4350,7 @@ components:
       properties:
         publication_date:
           type: string
-          format: date-time
+          format: datetime
       required:
         - publication_date
     publication_date_response.schema:
@@ -3780,7 +4361,7 @@ components:
           type: string
         publication_date:
           type: string
-          format: date-time
+          format: datetime
       required:
         - id
         - publication_date
@@ -3795,6 +4376,17 @@ components:
       required:
         - id
         - url
+    decline_job_offer_promotion.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      type: object
+      properties:
+        reason:
+          type:
+            - string
+            - 'null'
+          maxLength: 500
+          description: Optional reason for declining the job offer promotion
+      additionalProperties: false
     create_by_identifiers.schema:
       $id: create_by_identifiers.schema.json
       type: array
@@ -3827,3 +4419,34 @@ components:
             type: string
       required:
         - user_emails
+    event.schema:
+      $id: event.schema.json
+      type: object
+      properties:
+        name:
+          type: string
+        start_time:
+          type: string
+          format: datetime
+        end_time:
+          type: string
+          format: datetime
+        submission_start_time:
+          type: string
+          format: datetime
+        submission_end_time:
+          type: string
+          format: datetime
+        address:
+          type: string
+        contact:
+          $ref: '#/components/schemas/event_contact.schema'
+      required:
+        - slug
+        - name
+        - start_time
+        - end_time
+        - submission_start_time
+        - submission_end_time
+        - address
+        - contact
