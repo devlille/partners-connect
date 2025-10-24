@@ -3074,6 +3074,56 @@ paths:
             text/plain:
               schema:
                 type: string
+  /orgs/{orgSlug}/users/revoke:
+    post:
+      summary: Revoke user permissions
+      operationId: postOrgsUsersRevoke
+      security:
+        - bearerAuth: []
+      description: Revoke edit permissions for multiple users on an organisation
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/revoke_permission_request.schema'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/revoke_users_result.schema'
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                type: string
+        '409':
+          description: Conflict - Cannot revoke last editor's own access
+          content:
+            text/plain:
+              schema:
+                type: string
   /users/me/events:
     get:
       summary: List organization events
@@ -3176,6 +3226,10 @@ components:
       $ref: '#/components/schemas/user.schema'
     GrantPermissionRequest:
       $ref: '#/components/schemas/grant_permission_request.schema'
+    RevokePermissionRequest:
+      $ref: '#/components/schemas/revoke_permission_request.schema'
+    RevokeUsersResult:
+      $ref: '#/components/schemas/revoke_users_result.schema'
     OrganisationItem:
       $ref: '#/components/schemas/organisation_item.schema'
     Provider:
@@ -4419,6 +4473,39 @@ components:
             type: string
       required:
         - user_emails
+    revoke_permission_request.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      type: object
+      required:
+        - user_emails
+      properties:
+        user_emails:
+          type: array
+          items:
+            type: string
+            format: email
+          description: List of user email addresses to revoke access from
+      additionalProperties: false
+    revoke_users_result.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      type: object
+      title: RevokeUsersResult
+      description: Result of a user permission revocation operation
+      properties:
+        revoked_count:
+          type: integer
+          description: Number of users whose permissions were successfully revoked
+          minimum: 0
+        not_found_emails:
+          type: array
+          description: List of email addresses that were not found in the system
+          items:
+            type: string
+            format: email
+      required:
+        - revoked_count
+        - not_found_emails
+      additionalProperties: false
     event.schema:
       $id: event.schema.json
       type: object

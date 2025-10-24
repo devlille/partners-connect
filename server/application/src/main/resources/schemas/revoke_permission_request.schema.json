@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["user_emails"],
+  "properties": {
+    "user_emails": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "email"
+      },
+      "description": "List of user email addresses to revoke access from"
+    }
+  },
+  "additionalProperties": false
+}

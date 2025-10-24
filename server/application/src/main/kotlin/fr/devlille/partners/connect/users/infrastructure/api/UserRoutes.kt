@@ -55,5 +55,17 @@ fun Route.userRoutes() {
             userRepository.grantUsers(orgSlug, request.userEmails)
             call.respond(HttpStatusCode.OK, "Permissions granted")
         }
+        post("/revoke") {
+            val token = call.token
+            val orgSlug = call.parameters.orgSlug
+            val request = call.receive<RevokePermissionRequest>(schema = "revoke_permission_request.schema.json")
+            val userInfo = authRepository.getUserInfo(token)
+            val hasPerm = userRepository.hasEditPermissionByEmail(userInfo.email, orgSlug)
+            if (!hasPerm) {
+                throw UnauthorizedException("You do not have permission to revoke users for this organisation")
+            }
+            val result = userRepository.revokeUsers(orgSlug, request.userEmails, userInfo.email)
+            call.respond(HttpStatusCode.OK, result)
+        }
     }
 }
