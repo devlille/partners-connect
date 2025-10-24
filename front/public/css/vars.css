@@ -1,0 +1,52 @@
+@font-face {
+  font-family: "Outfit";
+  src: url("./Outfit-VariableFont_wght.ttf");
+  font-weight: 100 900;
+  unicode-range: U+000D, U+0020-007E, U+00A0-00FF, U+0131, U+0152-0153, U+02BC,
+    U+02C6, U+02DA, U+02DC, U+0300-0304, U+0308, U+030A, U+0327, U+2013-2014,
+    U+2018-201A, U+201C-201E, U+2022, U+2026, U+2039-203A, U+2044, U+2074,
+    U+20AC, U+2212, U+2215, U+2713, U+FB01-FB02;
+}
+
+:root {
+  --body-text: #303030;
+  --body-bg: #fdfdfd;
+  --body-bg-dark: #00465b;
+  --text-inv: #fff;
+
+  --link-color: var(--main-dark);
+
+  --main-color: #00a6e8;
+  --main-light: #c2e1f9;
+  --main-u-light: #edf4fa;
+  --main-dark: #00465b;
+  --main-medium: #005772;
+  --hot-color: #ffbb3d;
+  --hot-light: #fff2bd;
+  --light-cold: #c2f9d2;
+  --light-hot: #f9c3e6;
+  --n-dark: #000;
+  --n-light: #eee;
+  --n-u-light: #f2f2f2;
+  --n-medium: #cbcbcb;
+
+  --stack: "Outfit", Calibri, Roboto, "Droid Sans", Helvetica, Arial, sans-serif;
+  --fvs-light: "wght" 300;
+  --fvs-regular: "wght" 400;
+  --fvs-medium: "wght" 600;
+  --fvs-bold: "wght" 700;
+  --fvs-black: "wght" 900;
+
+  --radius: 0.3em;
+
+  --input-bg: var(--n-medium);
+  --input-border: var(--n-light);
+
+  --fieldset-border: var(--main-medium);
+  --legend-text: var(--n-dark);
+
+  --switch-bg-checked: var(--main-dark);
+  --switch-text-checked: var(--hot-color);
+  --switch-bg: var(--main-light);
+  --switch-border: var(--main-color);
+}

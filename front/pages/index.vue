@@ -187,7 +187,12 @@ useHead({
   title: "Demande de Partenariat | DevLille",
   bodyAttrs: {
     id: "partners",
-  }
+  },
+  link: [
+    {
+      rel: 'stylesheet',
+      href: '/css/main.css'
+    }
+  ]
 });
 </script>
-<style src="~/assets/css/main.css" scoped></style>
