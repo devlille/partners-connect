@@ -1,0 +1,7 @@
+# Pull the pre-built image from GitHub Container Registry
+ARG  TAG_VERSION=latest
+FROM ghcr.io/devlille/devlille/partners-connect-front:${TAG_VERSION}
+
+EXPOSE 8080
+
+CMD ["node", ".output/server/index.mjs"]
