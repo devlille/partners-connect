@@ -64,13 +64,15 @@ jobs:
         run: |
           if [ "${{ steps.vars.outputs.environment }}" = "production" ]; then
             echo "id=${{ secrets.CLEVERCLOUD_APP_ID }}" >> $GITHUB_OUTPUT
-            echo "url=${{ secrets.CLEVERCLOUD_BASE_URL }}" >> $GITHUB_OUTPUT
+            echo "url_server=${{ secrets.CLEVERCLOUD_BASE_URL }}" >> $GITHUB_OUTPUT
+            echo "url_front=${{ secrets.FRONTEND_BASE_URL }}" >> $GITHUB_OUTPUT
             echo "postgres_url=${{ secrets.EXPOSED_DB_URL }}" >> $GITHUB_OUTPUT
             echo "postgres_user=${{ secrets.EXPOSED_DB_USER }}" >> $GITHUB_OUTPUT
             echo "postgres_password=${{ secrets.EXPOSED_DB_PASSWORD }}" >> $GITHUB_OUTPUT
           else
             echo "id=${{ secrets.CLEVERCLOUD_APP_ID_PP }}" >> $GITHUB_OUTPUT
-            echo "url=${{ secrets.CLEVERCLOUD_BASE_URL_PP }}" >> $GITHUB_OUTPUT
+            echo "url_server=${{ secrets.CLEVERCLOUD_BASE_URL_PP }}" >> $GITHUB_OUTPUT
+            echo "url_front=${{ secrets.FRONTEND_BASE_URL_PP }}" >> $GITHUB_OUTPUT
             echo "postgres_url=${{ secrets.EXPOSED_DB_URL_PP }}" >> $GITHUB_OUTPUT
             echo "postgres_user=${{ secrets.EXPOSED_DB_USER_PP }}" >> $GITHUB_OUTPUT
             echo "postgres_password=${{ secrets.EXPOSED_DB_PASSWORD_PP }}" >> $GITHUB_OUTPUT
@@ -84,11 +86,11 @@ jobs:
           CLEVER_TOKEN: ${{ secrets.CLEVERCLOUD_TOKEN }}
           CLEVER_SECRET: ${{ secrets.CLEVERCLOUD_SECRET }}
           CLEVER_APP_ID: ${{ steps.app.outputs.id }}
-          CLEVERCLOUD_BASE_URL: ${{ steps.app.outputs.url }}
+          CLEVERCLOUD_BASE_URL: ${{ steps.app.outputs.url_server }}
           CC_DOCKER_LOGIN_PASSWORD: ${{ secrets.CC_DOCKER_LOGIN_PASSWORD }}
           CC_DOCKER_LOGIN_USERNAME: ${{ secrets.CC_DOCKER_LOGIN_USERNAME }}
           PROJECT_ID: ${{ secrets.PROJECT_ID }}
-          FRONTEND_BASE_URL: ${{ secrets.FRONTEND_BASE_URL }}
+          FRONTEND_BASE_URL: ${{ steps.app.outputs.url_front }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           CRYPTO_KEY: ${{ secrets.CRYPTO_KEY }}
