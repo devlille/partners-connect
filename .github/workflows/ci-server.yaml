@@ -2,7 +2,7 @@
 # This workflow builds and pushes a container image to Google Artifact Registry.
 # It triggers on every push to the 'main' branch.
 
-name: Build and Push Container
+name: Build and Push Server Container
 
 on:
   push:
@@ -10,8 +10,8 @@ on:
       - main
 
 jobs:
-  build-and-push:
-    name: Build and Push to Artifact Registry
+  build-and-push-server:
+    name: Build and Push Server to Artifact Registry
     runs-on: ubuntu-latest
     
     defaults:
