@@ -4,7 +4,7 @@
       <div class="flex items-center justify-between">
         <div>
           <BackButton :to="`/orgs/${orgSlug}/events/${eventSlug}/options`" label="Retour" />
-          <h1 class="text-2xl font-bold text-gray-900">{{ option?.name }} - {{ eventName }}</h1>
+          <h1 class="text-2xl font-bold text-gray-900">{{ option?.name || 'Option' }}</h1>
         </div>
       </div>
     </div>
@@ -18,7 +18,8 @@
         {{ error }}
       </div>
 
-      <div v-else-if="option">
+      <div v-else-if="option" class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations de l'option</h2>
         <SponsoringOptionForm
           :data="optionFormData"
           @save="onSave"
@@ -29,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { getEventBySlug, getOrgsEventsOptions, putOrgsEventsOptions, type SponsoringOption, type CreateSponsoringOption } from "~/utils/api";
+import { getOrgsEventsOptions, putOrgsEventsOptions, type SponsoringOption } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 
 const route = useRoute();
@@ -41,26 +42,38 @@ definePageMeta({
   ssr: false
 });
 
-const orgSlug = computed(() => route.params.slug as string);
-const eventSlug = computed(() => route.params.eventSlug as string);
-const optionId = computed(() => route.params.optionId as string);
+const orgSlug = computed(() => {
+  const params = route.params.slug;
+  return Array.isArray(params) ? params[0] as string : params as string;
+});
+
+const eventSlug = computed(() => {
+  const params = route.params.eventSlug;
+  return Array.isArray(params) ? params[1] as string : params as string;
+});
+
+const optionId = computed(() => {
+  const params = route.params.optionId;
+  return Array.isArray(params) ? params[0] as string : params as string;
+});
 
 const option = ref<SponsoringOption | null>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
-const eventName = ref<string>('');
 
-// Menu contextuel pour la page d'édition d'option
 const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
 
-// Convertir SponsoringOption en données pour le formulaire
+// Préparer les données pour le formulaire
 const optionFormData = computed(() => {
   if (!option.value) return {};
 
+  // L'API retourne translations.fr.name, pas name directement
+  const frTranslation = option.value.translations?.fr;
+
   return {
-    name: option.value.name,
-    description: option.value.description || '',
-    price: option.value.price || undefined
+    name: frTranslation?.name || '',
+    description: frTranslation?.description || '',
+    price: option.value.price || 0
   };
 });
 
@@ -69,44 +82,43 @@ async function loadOption() {
     loading.value = true;
     error.value = null;
 
-    // Charger le nom de l'événement
-    const eventResponse = await getEventBySlug(eventSlug.value);
-    eventName.value = eventResponse.data.event.name;
-
     // Charger toutes les options et trouver celle qui correspond
-    const optionsResponse = await getOrgsEventsOptions(orgSlug.value, eventSlug.value);
-    const foundOption = optionsResponse.data.find(o => o.id === optionId.value);
+    const response = await getOrgsEventsOptions(orgSlug.value, eventSlug.value);
+    const found = response.data.find(o => o.id === optionId.value);
 
-    if (!foundOption) {
+    if (!found) {
       error.value = 'Option non trouvée';
       return;
     }
 
-    option.value = foundOption;
+    option.value = found;
   } catch (err) {
     console.error('Failed to load option:', err);
-    error.value = 'Impossible de charger les informations de l\'option';
+    error.value = 'Impossible de charger l\'option';
   } finally {
     loading.value = false;
   }
 }
 
-async function onSave(optionData: CreateSponsoringOption) {
+async function onSave(data: any) {
   try {
     error.value = null;
 
+    const optionData = {
+      translations: [
+        {
+          language: 'fr',
+          name: data.name,
+          description: data.description || null
+        }
+      ],
+      price: data.price || null
+    };
+
     await putOrgsEventsOptions(orgSlug.value, eventSlug.value, optionId.value, optionData);
 
-    // Recharger les données après la mise à jour
-    await loadOption();
-
-    // Afficher un message de succès (vous pouvez ajouter un toast ici)
-    console.log('Option mise à jour avec succès');
-
-    // Rediriger vers la liste des options
-    setTimeout(() => {
-      router.push(`/orgs/${orgSlug.value}/events/${eventSlug.value}/options`);
-    }, 500);
+    // Rediriger vers la liste
+    router.push(`/orgs/${orgSlug.value}/events/${eventSlug.value}/options`);
   } catch (err) {
     console.error('Failed to update option:', err);
     error.value = 'Impossible de mettre à jour l\'option';
@@ -117,12 +129,11 @@ onMounted(() => {
   loadOption();
 });
 
-// Recharger si les slugs changent
 watch([orgSlug, eventSlug, optionId], () => {
   loadOption();
 });
 
 useHead({
-  title: computed(() => `${option.value?.name || 'Option'} - ${eventName.value || 'Événement'} | DevLille`)
+  title: computed(() => `${option.value?.name || 'Option'} | DevLille`)
 });
 </script>

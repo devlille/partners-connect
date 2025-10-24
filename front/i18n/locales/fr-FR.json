@@ -1,0 +1,55 @@
+{
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "back": "Retour",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "logout": "Déconnexion"
+  },
+  "nav": {
+    "myOrganizations": "Mes organisations",
+    "createOrganization": "Créer une organisation",
+    "events": "Événements",
+    "packs": "Packs",
+    "options": "Options",
+    "sponsors": "Sponsors"
+  },
+  "organizations": {
+    "title": "Organisations",
+    "create": "Créer une organisation",
+    "list": "Liste des organisations"
+  },
+  "events": {
+    "title": "Événements",
+    "create": "Créer un événement",
+    "list": "Liste des événements"
+  },
+  "packs": {
+    "title": "Packs de sponsoring",
+    "create": "Créer un pack",
+    "name": "Nom du pack",
+    "price": "Prix",
+    "maxQuantity": "Quantité maximale",
+    "nbTickets": "Nombre de billets",
+    "withBooth": "Inclut un stand",
+    "requiredOptions": "Options obligatoires",
+    "optionalOptions": "Options optionnelles"
+  },
+  "options": {
+    "title": "Options de sponsoring",
+    "create": "Créer une option",
+    "name": "Nom de l'option",
+    "description": "Description",
+    "price": "Prix",
+    "free": "Gratuit"
+  },
+  "sponsors": {
+    "title": "Sponsors",
+    "list": "Liste des sponsors"
+  }
+}

@@ -1,4 +1,6 @@
 export const useDashboardLinks = () => {
+  const { logoutLink } = useLogoutLink()
+
   const mainLinks = [{
     label: 'Mes organisations',
     icon: 'i-heroicons-building-office',
@@ -9,7 +11,7 @@ export const useDashboardLinks = () => {
     to: '/orgs/create'
   }]
 
-  const footerLinks: never[] = []
+  const footerLinks = [logoutLink]
 
   return {
     mainLinks,

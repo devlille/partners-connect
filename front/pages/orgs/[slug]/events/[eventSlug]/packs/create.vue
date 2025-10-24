@@ -10,16 +10,22 @@
     </div>
 
     <div class="p-6">
-      <div v-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+      <div v-if="loading" class="flex justify-center py-8">
+        <div class="text-gray-500">Chargement...</div>
+      </div>
+
+      <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
         {{ error }}
       </div>
 
-      <div v-if="success" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
+      <div v-else-if="success" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
         Pack créé avec succès ! Redirection en cours...
       </div>
 
       <SponsoringPackForm
+        v-else
         :data="initialData"
+        :options="options"
         @save="onSave"
       />
     </div>
@@ -27,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { getEventBySlug, postOrgsEventsPacks, type CreateSponsoringPack } from "~/utils/api";
+import { getEventBySlug, postOrgsEventsPacks, getOrgsEventsOptions, postOrgsEventsPacksOptions, type CreateSponsoringPack, type SponsoringOption } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 
 const route = useRoute();
@@ -50,7 +56,9 @@ const eventSlug = computed(() => {
 
 const error = ref<string | null>(null);
 const success = ref(false);
+const loading = ref(true);
 const eventName = ref<string>('');
+const options = ref<SponsoringOption[]>([]);
 
 // Menu contextuel pour la page de création de pack
 const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
@@ -64,22 +72,40 @@ const initialData: Partial<CreateSponsoringPack> = {
   max_quantity: undefined
 };
 
-async function loadEventName() {
+async function loadData() {
   try {
-    const eventResponse = await getEventBySlug(eventSlug.value);
+    loading.value = true;
+    const [eventResponse, optionsResponse] = await Promise.all([
+      getEventBySlug(eventSlug.value),
+      getOrgsEventsOptions(orgSlug.value, eventSlug.value)
+    ]);
     eventName.value = eventResponse.data.event.name;
+    options.value = optionsResponse.data;
   } catch (err) {
-    console.error('Failed to load event:', err);
-    error.value = 'Impossible de charger les informations de l\'événement';
+    console.error('Failed to load data:', err);
+    error.value = 'Impossible de charger les informations';
+  } finally {
+    loading.value = false;
   }
 }
 
-async function onSave(packData: CreateSponsoringPack) {
+async function onSave(data: { pack: CreateSponsoringPack; requiredOptions: string[]; optionalOptions: string[] }) {
   try {
     error.value = null;
     success.value = false;
 
-    await postOrgsEventsPacks(orgSlug.value, eventSlug.value, packData);
+    // Créer le pack
+    const packResponse = await postOrgsEventsPacks(orgSlug.value, eventSlug.value, data.pack);
+    const packId = packResponse.data.id;
+
+    // Attacher les options au pack
+    if (data.requiredOptions.length > 0 || data.optionalOptions.length > 0) {
+      await postOrgsEventsPacksOptions(orgSlug.value, eventSlug.value, packId, {
+        required: data.requiredOptions,
+        optional: data.optionalOptions
+      });
+    }
+
     success.value = true;
 
     // Rediriger vers la liste des packs après 1 seconde
@@ -93,7 +119,7 @@ async function onSave(packData: CreateSponsoringPack) {
 }
 
 onMounted(() => {
-  loadEventName();
+  loadData();
 });
 
 useHead({

@@ -57,6 +57,7 @@
         />
 
         <OptionsInput
+          v-model="formData.optionIds"
           legend="Options de sponsoring"
           :options="options"
         />
@@ -95,6 +96,7 @@ const formData = ref({
   packId: '',
   contactName: '',
   contactRole: '',
+  optionIds: [] as string[],
 });
 
 onMounted(async () => {
@@ -114,9 +116,13 @@ onMounted(async () => {
 });
 
 watch(() => formData.value.packId, (newPackId) => {
+  // Réinitialiser les options sélectionnées quand on change de pack
+  formData.value.optionIds = [];
+
   if (newPackId) {
     const selectedPack = packs.value.find(pack => pack.id === newPackId);
     if (selectedPack) {
+      // Afficher uniquement les options optionnelles du pack sélectionné
       options.value = selectedPack.optional_options || [];
     }
   } else {
@@ -153,7 +159,7 @@ const handleSubmit = async () => {
     const partnershipData: RegisterPartnership = {
       company_id: companyResponse.data.id,
       pack_id: formData.value.packId,
-      option_ids: [],
+      option_ids: formData.value.optionIds,
       contact_name: formData.value.contactName || formData.value.name,
       contact_role: formData.value.contactRole || '',
       language: 'fr',
@@ -174,6 +180,7 @@ const handleSubmit = async () => {
       packId: '',
       contactName: '',
       contactRole: '',
+      optionIds: [],
     };
   } catch (err) {
     console.error('Failed to create company or partnership:', err);

@@ -8,8 +8,10 @@
           type="checkbox"
           :name="`option-${option.id}`"
           :value="option.id"
+          :checked="modelValue.includes(option.id)"
+          @change="handleChange(option.id, ($event.target as HTMLInputElement).checked)"
         />
-        {{ option.name }} - {{ option.price }} €
+        {{ getOptionName(option) }} - {{ option.price || 0 }} €
       </label>
     </div>
   </fieldset>
@@ -18,10 +20,33 @@
 <script setup lang="ts">
 import type { SponsoringOption } from "~/utils/api";
 
-defineProps<{
+const props = defineProps<{
   legend: string;
   options: SponsoringOption[];
+  modelValue: string[];
 }>();
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: string[]): void;
+}>();
+
+function getOptionName(option: SponsoringOption): string {
+  // Récupérer la première traduction disponible
+  if (option.translations) {
+    const firstTranslation = Object.values(option.translations)[0];
+    if (firstTranslation && typeof firstTranslation === 'object' && 'name' in firstTranslation) {
+      return firstTranslation.name as string;
+    }
+  }
+  return option.name || 'Option sans nom';
+}
+
+function handleChange(optionId: string, checked: boolean) {
+  const newValue = checked
+    ? [...props.modelValue, optionId]
+    : props.modelValue.filter(id => id !== optionId);
+  emit('update:modelValue', newValue);
+}
 </script>
 
 <style lang="css" scoped>

@@ -26,7 +26,8 @@
 
       <UTable
         v-else
-        :data="packsFormatted"
+        :data="packs"
+        :columns="columns"
         @select="onSelectPack"
       />
     </div>
@@ -64,34 +65,27 @@ const eventName = ref<string>('');
 // Menu contextuel pour la page des packs
 const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
 
+// Colonnes du tableau
+const columns = [
+  {
+    header: 'Nom',
+    accessorKey: 'name',
+    cell: (info: TableRow<SponsoringPack>) => info.getValue('name')
+  },
+  {
+    header: 'Prix',
+    accessorKey: 'base_price',
+    cell: (info: TableRow<SponsoringPack>) => `${info.getValue('base_price')}€`
+  },
+  {
+    header: 'Quantité',
+    accessorKey: 'max_quantity',
+    cell: (info: TableRow<SponsoringPack>) => info.getValue('max_quantity') || '-'
+  }
+];
 
-// Type pour les lignes du tableau
-type PackTableRow = {
-  id: string;
-  name: string;
-  base_price: string;
-  required_options_count: number;
-  optional_options_count: number;
-  max_quantity: string | number;
-  _original: SponsoringPack;
-};
-
-// Formater les données pour le tableau
-const packsFormatted = computed(() => {
-  return packs.value.map(pack => ({
-    id: pack.id,
-    name: pack.name,
-    base_price: `${pack.base_price}€`,
-    required_options_count: pack.required_options.length,
-    optional_options_count: pack.optional_options.length,
-    max_quantity: pack.max_quantity || '-',
-    _original: pack
-  }));
-});
-
-const onSelectPack = (row: TableRow<PackTableRow>) => {
-  const pack = row.original._original;
-  router.push(`/orgs/${orgSlug.value}/events/${eventSlug.value}/packs/${pack.id}`);
+const onSelectPack = (row: TableRow<SponsoringPack>) => {
+  router.push(`/orgs/${orgSlug.value}/events/${eventSlug.value}/packs/${row.original.id}`);
 };
 
 async function loadPacks() {

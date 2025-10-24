@@ -1,0 +1,55 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "back": "Back",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "logout": "Logout"
+  },
+  "nav": {
+    "myOrganizations": "My organizations",
+    "createOrganization": "Create organization",
+    "events": "Events",
+    "packs": "Packs",
+    "options": "Options",
+    "sponsors": "Sponsors"
+  },
+  "organizations": {
+    "title": "Organizations",
+    "create": "Create organization",
+    "list": "Organizations list"
+  },
+  "events": {
+    "title": "Events",
+    "create": "Create event",
+    "list": "Events list"
+  },
+  "packs": {
+    "title": "Sponsoring packs",
+    "create": "Create pack",
+    "name": "Pack name",
+    "price": "Price",
+    "maxQuantity": "Maximum quantity",
+    "nbTickets": "Number of tickets",
+    "withBooth": "Includes booth",
+    "requiredOptions": "Required options",
+    "optionalOptions": "Optional options"
+  },
+  "options": {
+    "title": "Sponsoring options",
+    "create": "Create option",
+    "name": "Option name",
+    "description": "Description",
+    "price": "Price",
+    "free": "Free"
+  },
+  "sponsors": {
+    "title": "Sponsors",
+    "list": "Sponsors list"
+  }
+}

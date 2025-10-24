@@ -8,10 +8,11 @@
         </div>
         <UButton
           :to="`/orgs/${orgSlug}/events/${eventSlug}/options/create`"
-          label="Créer une option"
           icon="i-heroicons-plus"
           color="primary"
-        />
+        >
+          Créer une option
+        </UButton>
       </div>
     </div>
 
@@ -24,11 +25,18 @@
         {{ error }}
       </div>
 
-      <UTable
-        v-else
-        :data="optionsFormatted"
-        @select="onSelectOption"
-      />
+      <div v-else-if="options.length === 0" class="text-center py-12">
+        <div class="text-gray-500 mb-4">Aucune option pour le moment</div>
+        <UButton
+          :to="`/orgs/${orgSlug}/events/${eventSlug}/options/create`"
+          icon="i-heroicons-plus"
+          color="primary"
+        >
+          Créer une option
+        </UButton>
+      </div>
+
+      <UTable v-else :data="options" :columns="columns" @select="onRowClick" />
     </div>
   </Dashboard>
 </template>
@@ -36,10 +44,9 @@
 <script setup lang="ts">
 import { getOrgsEventsOptions, getEventBySlug, type SponsoringOption } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
-import type { TableRow } from "@nuxt/ui";
+import type {TableRow} from "@nuxt/ui";
 
 const route = useRoute();
-const router = useRouter();
 const { footerLinks } = useDashboardLinks();
 
 definePageMeta({
@@ -47,56 +54,62 @@ definePageMeta({
   ssr: false
 });
 
-const orgSlug = computed(() => route.params.slug as string);
-const eventSlug = computed(() => route.params.eventSlug as string);
+const orgSlug = computed(() => {
+  const params = route.params.slug;
+  return Array.isArray(params) ? params[0] as string : params as string;
+});
+
+const eventSlug = computed(() => {
+  const params = route.params.eventSlug;
+  return Array.isArray(params) ? params[1] as string : params as string;
+});
 
 const options = ref<SponsoringOption[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const eventName = ref<string>('');
 
-// Menu contextuel pour la page des options
 const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
 
-
-
-// Type pour les lignes du tableau
-type OptionTableRow = {
-  id: string;
-  name: string;
-  description: string;
-  price: string;
-  _original: SponsoringOption;
-};
-
-// Formater les données pour le tableau
-const optionsFormatted = computed(() => {
-  return options.value.map(option => ({
-    id: option.id,
-    name: option.name,
-    description: option.description || '-',
-    price: option.price ? `${option.price}€` : 'Gratuit',
-    _original: option
-  }));
-});
-
-const onSelectOption = (row: TableRow<OptionTableRow>) => {
-  const option = row.original._original;
-  router.push(`/orgs/${orgSlug.value}/events/${eventSlug.value}/options/${option.id}`);
-};
+// Colonnes du tableau
+const columns = [
+  {
+    header: 'Nom',
+    accessorKey: 'name',
+    cell: (info: TableRow<SponsoringOption>) => {
+      const option = info.row.original;
+      // Récupérer la première traduction disponible
+      if (option.translations) {
+        const firstTranslation = Object.values(option.translations)[0];
+        if (firstTranslation && typeof firstTranslation === 'object' && 'name' in firstTranslation) {
+          return firstTranslation.name as string;
+        }
+      }
+      return option.name || 'Option sans nom';
+    }
+  },
+  {
+    header: 'Prix',
+    accessorKey: 'price',
+    cell: (info: TableRow<SponsoringOption>) => {
+      const price = info.getValue('price');
+      return price ? `${price}€` : 'Gratuit';
+    }
+  }
+];
 
 async function loadOptions() {
   try {
     loading.value = true;
     error.value = null;
 
-    // Charger le nom de l'événement
-    const eventResponse = await getEventBySlug(eventSlug.value);
-    eventName.value = eventResponse.data.event.name;
+    const [optionsResponse, eventResponse] = await Promise.all([
+      getOrgsEventsOptions(orgSlug.value, eventSlug.value),
+      getEventBySlug(eventSlug.value)
+    ]);
 
-    // Charger les options
-    const response = await getOrgsEventsOptions(orgSlug.value, eventSlug.value);
-    options.value = response.data;
+    options.value = optionsResponse.data;
+    eventName.value = eventResponse.data.event.name;
   } catch (err) {
     console.error('Failed to load options:', err);
     error.value = 'Impossible de charger les options';
@@ -109,12 +122,15 @@ onMounted(() => {
   loadOptions();
 });
 
-// Recharger si les slugs changent
 watch([orgSlug, eventSlug], () => {
   loadOptions();
 });
 
+function onRowClick(row: TableRow<SponsoringOption>) {
+  navigateTo(`/orgs/${orgSlug.value}/events/${eventSlug.value}/options/${row.original.id}`);
+}
+
 useHead({
-  title: computed(() => `Options de sponsoring - ${eventName.value || 'Événement'} | DevLille`)
+  title: computed(() => `Options - ${eventName.value || 'Événement'} | DevLille`)
 });
 </script>

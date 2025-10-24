@@ -45,7 +45,7 @@ async function handleSave(payload: Organisation) {
     )
   ) as Organisation;
   
-  await postOrgs(filteredPayload).then(response => router.push(`/orgs/${response.data["slug"]}/settings`))
+  await postOrgs(filteredPayload).then(response => router.push(`/orgs/${response.data["slug"]}`))
 }
 
 definePageMeta({

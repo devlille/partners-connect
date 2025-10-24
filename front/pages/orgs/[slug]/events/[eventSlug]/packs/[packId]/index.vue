@@ -21,6 +21,9 @@
       <div v-else-if="pack">
         <SponsoringPackForm
           :data="packFormData"
+          :options="options"
+          :initial-required-options="initialRequiredOptions"
+          :initial-optional-options="initialOptionalOptions"
           @save="onSave"
         />
       </div>
@@ -29,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { getEventBySlug, getOrgsEventsPacks, putOrgsEventsPacks, type SponsoringPack, type CreateSponsoringPack } from "~/utils/api";
+import { getEventBySlug, getOrgsEventsPacks, putOrgsEventsPacks, getOrgsEventsOptions, postOrgsEventsPacksOptions, type SponsoringPack, type CreateSponsoringPack, type SponsoringOption } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 
 const route = useRoute();
@@ -52,12 +55,22 @@ const eventSlug = computed(() => {
 const packId = computed(() => route.params.packId as string);
 
 const pack = ref<SponsoringPack | null>(null);
+const options = ref<SponsoringOption[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const eventName = ref<string>('');
 
 // Menu contextuel pour la page d'édition de pack
 const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
+
+// Options initiales sélectionnées
+const initialRequiredOptions = computed(() => {
+  return pack.value?.required_options.map(o => o.id) || [];
+});
+
+const initialOptionalOptions = computed(() => {
+  return pack.value?.optional_options.map(o => o.id) || [];
+});
 
 // Convertir SponsoringPack en CreateSponsoringPack pour le formulaire
 const packFormData = computed((): Partial<CreateSponsoringPack> => {
@@ -85,12 +98,17 @@ async function loadPack() {
     loading.value = true;
     error.value = null;
 
-    // Charger le nom de l'événement
-    const eventResponse = await getEventBySlug(eventSlug.value);
-    eventName.value = eventResponse.data.event.name;
+    // Charger toutes les données en parallèle
+    const [eventResponse, packsResponse, optionsResponse] = await Promise.all([
+      getEventBySlug(eventSlug.value),
+      getOrgsEventsPacks(orgSlug.value, eventSlug.value),
+      getOrgsEventsOptions(orgSlug.value, eventSlug.value)
+    ]);
 
-    // Charger tous les packs et trouver celui qui correspond
-    const packsResponse = await getOrgsEventsPacks(orgSlug.value, eventSlug.value);
+    eventName.value = eventResponse.data.event.name;
+    options.value = optionsResponse.data;
+
+    // Trouver le pack correspondant
     const foundPack = packsResponse.data.find(p => p.id === packId.value);
 
     if (!foundPack) {
@@ -107,11 +125,20 @@ async function loadPack() {
   }
 }
 
-async function onSave(packData: CreateSponsoringPack) {
+async function onSave(data: { pack: CreateSponsoringPack; requiredOptions: string[]; optionalOptions: string[] }) {
   try {
     error.value = null;
 
-    await putOrgsEventsPacks(orgSlug.value, eventSlug.value, packId.value, packData);
+    // Mettre à jour le pack
+    await putOrgsEventsPacks(orgSlug.value, eventSlug.value, packId.value, data.pack);
+
+    // Mettre à jour les options associées
+    if (data.requiredOptions.length > 0 || data.optionalOptions.length > 0) {
+      await postOrgsEventsPacksOptions(orgSlug.value, eventSlug.value, packId.value, {
+        required: data.requiredOptions,
+        optional: data.optionalOptions
+      });
+    }
 
     // Recharger les données après la mise à jour
     await loadPack();

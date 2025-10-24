@@ -6,6 +6,12 @@
           <BackButton :to="`/orgs/${orgSlug}/events/${eventSlug}`" label="Retour" />
           <h1 class="text-2xl font-bold text-gray-900">Sponsors - {{ eventName }}</h1>
         </div>
+        <UButton
+          :to="`/orgs/${orgSlug}/events/${eventSlug}/sponsors/create`"
+          label="Créer un sponsor"
+          icon="i-heroicons-plus"
+          color="primary"
+        />
       </div>
     </div>
 

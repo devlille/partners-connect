@@ -19,8 +19,7 @@
       </div>
 
       <SponsoringOptionForm
-        :data="initialData"
-        :packs="packs"
+        :data="{}"
         @save="onSave"
       />
     </div>
@@ -28,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { getEventBySlug, getOrgsEventsPacks, postOrgsEventsOptions, postOrgsEventsPacksOptions, type SponsoringPack } from "~/utils/api";
+import { getEventBySlug, postOrgsEventsOptions, type CreateSponsoringOption } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 
 const route = useRoute();
@@ -40,63 +39,51 @@ definePageMeta({
   ssr: false
 });
 
-const orgSlug = computed(() => route.params.slug as string);
-const eventSlug = computed(() => route.params.eventSlug as string);
+const orgSlug = computed(() => {
+  const params = route.params.slug;
+  return Array.isArray(params) ? params[0] as string : params as string;
+});
+
+const eventSlug = computed(() => {
+  const params = route.params.eventSlug;
+  return Array.isArray(params) ? params[1] as string : params as string;
+});
 
 const error = ref<string | null>(null);
 const success = ref(false);
 const eventName = ref<string>('');
-const packs = ref<SponsoringPack[]>([]);
 
-// Menu contextuel pour la page de création d'option
 const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
 
-// Données initiales pour le formulaire vide
-const initialData = {
-  name: '',
-  description: '',
-  price: undefined,
-  selectedPacks: []
-};
-
-async function loadEventData() {
+async function loadEventName() {
   try {
     const eventResponse = await getEventBySlug(eventSlug.value);
     eventName.value = eventResponse.data.event.name;
-
-    // Charger les packs disponibles
-    const packsResponse = await getOrgsEventsPacks(orgSlug.value, eventSlug.value);
-    packs.value = packsResponse.data;
   } catch (err) {
-    console.error('Failed to load event data:', err);
+    console.error('Failed to load event:', err);
     error.value = 'Impossible de charger les informations de l\'événement';
   }
 }
 
-async function onSave(data: { option: any; selectedPacks: string[] }) {
+async function onSave(data: any) {
   try {
     error.value = null;
     success.value = false;
 
-    // Créer l'option
-    const optionResponse = await postOrgsEventsOptions(orgSlug.value, eventSlug.value, data.option);
-    const optionId = optionResponse.data.id;
+    const optionData: CreateSponsoringOption = {
+      translations: [
+        {
+          language: 'fr',
+          name: data.name,
+          description: data.description || null
+        }
+      ],
+      price: data.price || null
+    };
 
-    // Associer l'option aux packs sélectionnés
-    if (data.selectedPacks.length > 0) {
-      await Promise.all(
-        data.selectedPacks.map(packId =>
-          postOrgsEventsPacksOptions(orgSlug.value, eventSlug.value, packId, {
-            required: [optionId],
-            optional: []
-          })
-        )
-      );
-    }
-
+    await postOrgsEventsOptions(orgSlug.value, eventSlug.value, optionData);
     success.value = true;
 
-    // Rediriger vers la liste des options après 1 seconde
     setTimeout(() => {
       router.push(`/orgs/${orgSlug.value}/events/${eventSlug.value}/options`);
     }, 1000);
@@ -107,7 +94,7 @@ async function onSave(data: { option: any; selectedPacks: string[] }) {
 }
 
 onMounted(() => {
-  loadEventData();
+  loadEventName();
 });
 
 useHead({
