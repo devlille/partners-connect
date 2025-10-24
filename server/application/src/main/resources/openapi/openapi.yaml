@@ -3052,6 +3052,56 @@ paths:
               examples:
                 Example#1:
                   value: "Permissions granted"
+  /orgs/{orgSlug}/users/revoke:
+    post:
+      summary: "Revoke user permissions"
+      operationId: "postOrgsUsersRevoke"
+      security:
+        - bearerAuth: []
+      description: "Revoke edit permissions for multiple users on an organisation"
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RevokePermissionRequest"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "401":
+          description: "Unauthorized"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "409":
+          description: "Conflict - Cannot revoke last editor's own access"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RevokeUsersResult"
   /users/me/events:
     get:
       summary: "List organization events"
@@ -3154,6 +3204,10 @@ components:
       $ref: "../schemas/user.schema.json"
     GrantPermissionRequest:
       $ref: "../schemas/grant_permission_request.schema.json"
+    RevokePermissionRequest:
+      $ref: "../schemas/revoke_permission_request.schema.json"
+    RevokeUsersResult:
+      $ref: "../schemas/revoke_users_result.schema.json"
     OrganisationItem:
       $ref: "../schemas/organisation_item.schema.json"
     Provider:

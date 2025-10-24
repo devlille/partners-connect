@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "RevokeUsersResult",
+  "description": "Result of a user permission revocation operation",
+  "properties": {
+    "revoked_count": {
+      "type": "integer",
+      "description": "Number of users whose permissions were successfully revoked",
+      "minimum": 0
+    },
+    "not_found_emails": {
+      "type": "array",
+      "description": "List of email addresses that were not found in the system",
+      "items": {
+        "type": "string",
+        "format": "email"
+      }
+    }
+  },
+  "required": [
+    "revoked_count",
+    "not_found_emails"
+  ],
+  "additionalProperties": false
+}
