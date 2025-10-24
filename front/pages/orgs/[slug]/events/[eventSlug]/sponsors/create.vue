@@ -241,7 +241,7 @@ async function onSave() {
     const validation = sponsorSchema.safeParse(formData.value);
 
     if (!validation.success) {
-      validation.error.errors.forEach((err) => {
+      validation.error.issues.forEach((err: any) => {
         const field = err.path[0] as string;
         validationErrors.value[field] = t(err.message);
       });

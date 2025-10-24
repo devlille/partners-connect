@@ -24,9 +24,9 @@ export interface Toast {
 const toasts = ref<Toast[]>([]);
 
 /**
- * Composable pour gérer les notifications toast
+ * Composable pour gérer les notifications toast personnalisées
  */
-export const useToast = () => {
+export const useCustomToast = () => {
   /**
    * Ajouter une notification
    */

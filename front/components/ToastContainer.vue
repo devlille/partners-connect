@@ -51,9 +51,9 @@
 </template>
 
 <script setup lang="ts">
-import { ToastType, useToast } from '~/composables/useToast';
+import { ToastType, useCustomToast } from '~/composables/useCustomToast';
 
-const { toasts, removeToast } = useToast();
+const { toasts, removeToast } = useCustomToast();
 
 /**
  * Classes CSS en fonction du type de toast

@@ -211,7 +211,7 @@ function onSave() {
   });
 
   if (!packValidation.success) {
-    packValidation.error.errors.forEach((err) => {
+    packValidation.error.issues.forEach((err: any) => {
       const field = err.path[0] as string;
       validationErrors.value[field] = t(err.message);
     });
@@ -224,7 +224,7 @@ function onSave() {
   });
 
   if (!optionsValidation.success) {
-    optionsValidation.error.errors.forEach((err) => {
+    optionsValidation.error.issues.forEach((err: any) => {
       validationErrors.value['options'] = err.message;
     });
   }

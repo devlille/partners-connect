@@ -275,7 +275,7 @@ function onSave() {
   });
 
   if (!validation.success) {
-    validation.error.errors.forEach((err) => {
+    validation.error.issues.forEach((err: any) => {
       const field = err.path.join('.');
       validationErrors.value[field] = t(err.message);
     });

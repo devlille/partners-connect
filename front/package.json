@@ -10,11 +10,13 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "oxlint",
-    "orval": "npx orval --config ./orval.config.ts"
+    "orval": "npx orval --config ./orval.config.ts",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
   },
   "dependencies": {
     "@nuxt/eslint": "^1.9.0",
-    "@nuxt/test-utils": "^3.19.2",
     "@nuxt/ui": "^3.3.3",
     "@nuxtjs/i18n": "^10.1.1",
     "@pinia/nuxt": "^0.11.2",
@@ -29,8 +31,13 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@nuxt/test-utils": "^3.19.2",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@tailwindcss/postcss": "^4.1.14",
-    "oxlint": "^1.14.0"
+    "@vitest/ui": "^4.0.3",
+    "@vue/test-utils": "^2.4.6",
+    "happy-dom": "^20.0.8",
+    "oxlint": "^1.14.0",
+    "vitest": "^4.0.3"
   }
 }
