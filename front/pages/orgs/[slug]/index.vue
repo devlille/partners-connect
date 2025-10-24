@@ -44,19 +44,7 @@ const organisation = ref<Organisation | null>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
 
-// Menu différent pour la page de détail d'organisation
-const orgLinks = computed(() => [
-  {
-    label: 'Informations',
-    icon: 'i-heroicons-information-circle',
-    to: `/orgs/${slug.value}`
-  },
-  {
-    label: 'Événements',
-    icon: 'i-heroicons-calendar',
-    to: `/orgs/${slug.value}/events`
-  }
-]);
+const { orgLinks } = useOrgLinks(slug.value);
 
 async function loadOrganisation() {
   try {

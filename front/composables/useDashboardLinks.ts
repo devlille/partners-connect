@@ -1,6 +1,4 @@
 export const useDashboardLinks = () => {
-  const { logoutLink } = useLogoutLink()
-
   const mainLinks = [{
     label: 'Mes organisations',
     icon: 'i-heroicons-building-office',
@@ -11,7 +9,14 @@ export const useDashboardLinks = () => {
     to: '/orgs/create'
   }]
 
-  const footerLinks = [logoutLink]
+  const footerLinks = [{
+    label: 'Déconnexion',
+    icon: 'i-heroicons-arrow-right-on-rectangle',
+    to: '#',
+    click: () => {
+      navigateTo('/api/auth/signout', { external: true })
+    }
+  }]
 
   return {
     mainLinks,
