@@ -12,6 +12,10 @@ WORKDIR /app
 # Stage de construction
 FROM base AS builder
 
+# Définir les variables d'environnement pour le build
+ENV NODE_ENV=production
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 # Copier les fichiers de dépendances
 COPY package.json pnpm-lock.yaml ./
 
@@ -22,7 +26,7 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Construire l'application Nuxt
-RUN npm run build
+RUN pnpm run build
 
 # Stage de production
 FROM base AS runner

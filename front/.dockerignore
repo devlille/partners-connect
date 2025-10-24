@@ -3,6 +3,7 @@ node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
 # Fichiers de build Nuxt
 .nuxt
@@ -13,6 +14,8 @@ dist
 .env
 .env.local
 .env.*.local
+.env.development
+.env.test
 
 # Logs
 logs
@@ -29,10 +32,17 @@ logs
 # Fichiers de test
 coverage
 .nyc_output
+tests
+test
+*.test.ts
+*.test.js
+*.spec.ts
+*.spec.js
 
 # Fichiers temporaires
 *.tmp
 .cache
+.temp
 
 # Git
 .git
@@ -40,9 +50,17 @@ coverage
 .gitattributes
 
 # Docker
-Dockerfile
+Dockerfile*
 .dockerignore
-docker-compose.yml
+docker-compose*.yml
 
 # Documentation
 README.md
+CHANGELOG.md
+LICENSE
+*.md
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
