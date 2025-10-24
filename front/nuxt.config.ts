@@ -13,36 +13,36 @@ export default defineNuxtConfig({
   i18n: {
     locales: [
       {
-        code: 'fr',
-        iso: 'fr-FR',
-        name: 'Français',
-        file: 'fr-FR.json'
+        code: "fr",
+        iso: "fr-FR",
+        name: "Français",
+        file: "fr-FR.json",
       },
       {
-        code: 'en',
-        iso: 'en-US',
-        name: 'English',
-        file: 'en-US.json'
+        code: "en",
+        iso: "en-US",
+        name: "English",
+        file: "en-US.json",
       },
       {
-        code: 'es',
-        iso: 'es-ES',
-        name: 'Español',
-        file: 'es-ES.json'
-      }
+        code: "es",
+        iso: "es-ES",
+        name: "Español",
+        file: "es-ES.json",
+      },
     ],
-    defaultLocale: 'fr',
+    defaultLocale: "fr",
     lazy: true,
-    langDir: 'locales',
-    strategy: 'no_prefix',
+    langDir: "locales",
+    strategy: "no_prefix",
     detectBrowserLanguage: {
       useCookie: true,
-      cookieKey: 'i18n_redirected',
-      redirectOn: 'root',
-    }
+      cookieKey: "i18n_redirected",
+      redirectOn: "root",
+    },
   },
   runtimeConfig: {
-    API_BASE_URL: "http://localhost:3000",
+    API_BASE_URL: "http://localhost:8080",
     public: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL,
     },
