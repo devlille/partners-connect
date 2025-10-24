@@ -198,6 +198,14 @@ private fun Application.configureCors() {
             "localhost:8080",
             schemes = listOf("http", "https"),
         )
+
+        // Allow frontend base URL
+        allowHost(
+            host = SystemVarEnv.frontendBaseUrl
+                .replace("http://", "")
+                .replace("https://", ""),
+            schemes = listOf("https"),
+        )
     }
 }
 
