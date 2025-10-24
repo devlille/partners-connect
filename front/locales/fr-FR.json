@@ -51,5 +51,13 @@
   "sponsors": {
     "title": "Sponsors",
     "list": "Liste des sponsors"
+  },
+  "errors": {
+    "network": "Erreur de connexion. Vérifiez votre connexion internet.",
+    "validation": "Les données fournies sont invalides. Vérifiez le formulaire.",
+    "unauthorized": "Vous n'êtes pas autorisé à effectuer cette action.",
+    "notFound": "La ressource demandée n'a pas été trouvée.",
+    "server": "Une erreur serveur est survenue. Réessayez plus tard.",
+    "unknown": "Une erreur inattendue est survenue."
   }
 }

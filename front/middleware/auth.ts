@@ -15,7 +15,7 @@ export default defineNuxtRouteMiddleware((to) => {
     if (!isAuthenticated.value) {
       const config = useRuntimeConfig();
       const redirectUrl = encodeURIComponent(
-        `${process.env.NODE_ENV === "development" ? "http://localhost:3000" : window.location.origin}${to.fullPath}`
+        `${process.env.NODE_ENV === "development" ? "http://localhost:8080" : window.location.origin}${to.fullPath}`
       );
       window.location.href = `${config.public.apiBaseUrl}/auth/login?redirectUrl=${redirectUrl}`;
     }

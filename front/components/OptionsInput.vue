@@ -30,16 +30,7 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: string[]): void;
 }>();
 
-function getOptionName(option: SponsoringOption): string {
-  // Récupérer la première traduction disponible
-  if (option.translations) {
-    const firstTranslation = Object.values(option.translations)[0];
-    if (firstTranslation && typeof firstTranslation === 'object' && 'name' in firstTranslation) {
-      return firstTranslation.name as string;
-    }
-  }
-  return option.name || 'Option sans nom';
-}
+const { getOptionName } = useOptionTranslation();
 
 function handleChange(optionId: string, checked: boolean) {
   const newValue = checked

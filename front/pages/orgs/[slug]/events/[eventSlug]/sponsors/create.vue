@@ -38,7 +38,9 @@
                   type="text"
                   required
                   placeholder="Nom de l'entreprise"
+                  :class="{ 'border-red-500': validationErrors.company_name }"
                 />
+                <p v-if="validationErrors.company_name" class="mt-1 text-sm text-red-600">{{ validationErrors.company_name }}</p>
               </div>
 
               <div>
@@ -49,7 +51,9 @@
                   type="text"
                   required
                   placeholder="Nom du contact"
+                  :class="{ 'border-red-500': validationErrors.contact_name }"
                 />
+                <p v-if="validationErrors.contact_name" class="mt-1 text-sm text-red-600">{{ validationErrors.contact_name }}</p>
               </div>
 
               <div>
@@ -70,7 +74,9 @@
                   type="email"
                   required
                   placeholder="email@entreprise.com"
+                  :class="{ 'border-red-500': validationErrors.email }"
                 />
+                <p v-if="validationErrors.email" class="mt-1 text-sm text-red-600">{{ validationErrors.email }}</p>
               </div>
 
               <div>
@@ -95,12 +101,14 @@
                 v-model="formData.pack_id"
                 required
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                :class="{ 'border-red-500': validationErrors.pack_id }"
               >
                 <option value="">-- Choisir un pack --</option>
                 <option v-for="pack in packs" :key="pack.id" :value="pack.id">
                   {{ pack.name }} - {{ pack.base_price }}€
                 </option>
               </select>
+              <p v-if="validationErrors.pack_id" class="mt-1 text-sm text-red-600">{{ validationErrors.pack_id }}</p>
             </div>
           </div>
 
@@ -149,10 +157,13 @@
 <script setup lang="ts">
 import { getEventBySlug, getOrgsEventsPacks, postCompanies, postEventsPartnership, type SponsoringPack, type SponsoringOption, type CreateCompany, type RegisterPartnership } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
+import { sponsorSchema } from "~/utils/validation/schemas";
 
 const route = useRoute();
 const router = useRouter();
 const { footerLinks } = useDashboardLinks();
+const { t } = useI18n();
+const { handleError } = useErrorHandler();
 
 definePageMeta({
   middleware: authMiddleware,
@@ -175,6 +186,7 @@ const saving = ref(false);
 const error = ref<string | null>(null);
 const success = ref(false);
 const eventName = ref<string>('');
+const validationErrors = ref<Record<string, string>>({});
 
 const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
 
@@ -200,16 +212,7 @@ watch(() => formData.value.pack_id, () => {
   formData.value.option_ids = [];
 });
 
-function getOptionName(option: SponsoringOption): string {
-  // Récupérer la première traduction disponible
-  if (option.translations) {
-    const firstTranslation = Object.values(option.translations)[0];
-    if (firstTranslation && typeof firstTranslation === 'object' && 'name' in firstTranslation) {
-      return firstTranslation.name as string;
-    }
-  }
-  return option.name || 'Option sans nom';
-}
+const { getOptionName } = useOptionTranslation();
 
 async function loadData() {
   try {
@@ -232,6 +235,20 @@ async function onSave() {
   try {
     saving.value = true;
     error.value = null;
+    validationErrors.value = {};
+
+    // Valider les données du formulaire
+    const validation = sponsorSchema.safeParse(formData.value);
+
+    if (!validation.success) {
+      validation.error.errors.forEach((err) => {
+        const field = err.path[0] as string;
+        validationErrors.value[field] = t(err.message);
+      });
+      error.value = t('errors.validation');
+      saving.value = false;
+      return;
+    }
 
     // Step 1: Create company
     const companyData: CreateCompany = {
@@ -270,7 +287,7 @@ async function onSave() {
     }, 1000);
   } catch (err) {
     console.error('Failed to create sponsor:', err);
-    error.value = 'Impossible de créer le sponsor. Vérifiez les données du formulaire.';
+    error.value = handleError(err, 'Creating sponsor');
   } finally {
     saving.value = false;
   }

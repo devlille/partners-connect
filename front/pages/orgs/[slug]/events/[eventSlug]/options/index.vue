@@ -70,6 +70,7 @@ const error = ref<string | null>(null);
 const eventName = ref<string>('');
 
 const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
+const { getOptionName } = useOptionTranslation();
 
 // Colonnes du tableau
 const columns = [
@@ -77,15 +78,7 @@ const columns = [
     header: 'Nom',
     accessorKey: 'name',
     cell: (info: TableRow<SponsoringOption>) => {
-      const option = info.row.original;
-      // Récupérer la première traduction disponible
-      if (option.translations) {
-        const firstTranslation = Object.values(option.translations)[0];
-        if (firstTranslation && typeof firstTranslation === 'object' && 'name' in firstTranslation) {
-          return firstTranslation.name as string;
-        }
-      }
-      return option.name || 'Option sans nom';
+      return getOptionName(info.row.original);
     }
   },
   {

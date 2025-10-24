@@ -34,7 +34,7 @@ FROM base AS runner
 # Définir les variables d'environnement
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
-ENV PORT=3000
+ENV PORT=8080
 
 # Créer un utilisateur non-root pour la sécurité
 RUN addgroup -g 1001 -S nodejs && \
@@ -48,7 +48,7 @@ COPY --from=builder --chown=nuxtjs:nodejs /app/public /app/public
 USER nuxtjs
 
 # Exposer le port
-EXPOSE 3000
+EXPOSE 8080
 
 # Démarrer l'application
 CMD ["node", ".output/server/index.mjs"]

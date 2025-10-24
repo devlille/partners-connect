@@ -41,7 +41,11 @@ const createCustomAxiosInstance = (baseUrl: string): AxiosInstance => {
             localStorage.removeItem('user_info');
             
             const config = useRuntimeConfig();
-            const redirectUrl = encodeURIComponent(`${process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : window.location.origin}${window.location.pathname}`);
+            const redirectUrl = encodeURIComponent(
+              `${process.env.NODE_ENV === "development" ? "http://localhost:8080" : window.location.origin}${
+                window.location.pathname
+              }`
+            );
             window.location.href = `${config.public.apiBaseUrl}/auth/login?redirectUrl=${redirectUrl}`;
           }
         }

@@ -51,5 +51,13 @@
   "sponsors": {
     "title": "Patrocinadores",
     "list": "Lista de patrocinadores"
+  },
+  "errors": {
+    "network": "Error de conexión. Verifique su conexión a internet.",
+    "validation": "Los datos proporcionados no son válidos. Verifique el formulario.",
+    "unauthorized": "No está autorizado para realizar esta acción.",
+    "notFound": "No se encontró el recurso solicitado.",
+    "server": "Se produjo un error del servidor. Inténtelo más tarde.",
+    "unknown": "Se produjo un error inesperado."
   }
 }

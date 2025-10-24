@@ -51,5 +51,13 @@
   "sponsors": {
     "title": "Sponsors",
     "list": "Sponsors list"
+  },
+  "errors": {
+    "network": "Connection error. Check your internet connection.",
+    "validation": "The provided data is invalid. Check the form.",
+    "unauthorized": "You are not authorized to perform this action.",
+    "notFound": "The requested resource was not found.",
+    "server": "A server error occurred. Try again later.",
+    "unknown": "An unexpected error occurred."
   }
 }

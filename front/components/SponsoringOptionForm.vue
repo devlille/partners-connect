@@ -1,12 +1,15 @@
 <template>
-  <form @submit.prevent="onSave">
+  <form @submit.prevent="onSave" novalidate>
     <!-- Onglets de langues avec bouton d'ajout -->
     <div class="mb-6">
-      <div class="flex gap-2 border-b items-center">
+      <div class="flex gap-2 border-b items-center" role="tablist" aria-label="Langues disponibles">
         <button
           v-for="lang in activeLanguages"
           :key="lang.code"
           type="button"
+          role="tab"
+          :aria-selected="currentLanguage === lang.code"
+          :aria-controls="`panel-${lang.code}`"
           class="px-4 py-3 text-base font-semibold transition-colors relative inline-flex items-center gap-2"
           :class="currentLanguage === lang.code
             ? 'text-primary-600 border-b-2 border-primary-600'
@@ -39,8 +42,19 @@
       </div>
     </div>
 
+    <!-- Message d'erreur général pour les traductions -->
+    <p v-if="validationErrors['translations']" class="mb-4 text-sm text-red-600" role="alert" aria-live="polite">
+      {{ validationErrors['translations'] }}
+    </p>
+
     <!-- Formulaire pour la langue sélectionnée -->
-    <div v-if="form.translations[currentLanguage]" class="grid grid-cols-1 gap-4 mb-6">
+    <div
+      v-if="form.translations[currentLanguage]"
+      :id="`panel-${currentLanguage}`"
+      role="tabpanel"
+      :aria-labelledby="`tab-${currentLanguage}`"
+      class="grid grid-cols-1 gap-4 mb-6"
+    >
       <div>
         <label :for="`name-${currentLanguage}`" class="block text-sm font-medium text-gray-700 mb-1">
           Nom de l'option* ({{ getCurrentLanguageLabel() }})
@@ -51,7 +65,13 @@
           type="text"
           required
           placeholder="Ex: Logo sur T-shirt, Stand premium..."
+          :class="{ 'border-red-500': validationErrors[`translations.${currentLanguage}.name`] }"
+          :aria-invalid="!!validationErrors[`translations.${currentLanguage}.name`]"
+          :aria-describedby="validationErrors[`translations.${currentLanguage}.name`] ? `name-${currentLanguage}-error` : undefined"
         />
+        <p v-if="validationErrors[`translations.${currentLanguage}.name`]" :id="`name-${currentLanguage}-error`" class="mt-1 text-sm text-red-600" role="alert">
+          {{ validationErrors[`translations.${currentLanguage}.name`] }}
+        </p>
       </div>
 
       <div>
@@ -78,27 +98,33 @@
           :min="0"
           :step="0.01"
           placeholder="0.00 (laisser vide si gratuit)"
+          :class="{ 'border-red-500': validationErrors.price }"
+          :aria-invalid="!!validationErrors.price"
+          :aria-describedby="validationErrors.price ? 'price-error' : undefined"
         />
+        <p v-if="validationErrors.price" id="price-error" class="mt-1 text-sm text-red-600" role="alert">{{ validationErrors.price }}</p>
       </div>
     </div>
 
     <!-- Section des packs -->
     <div v-if="packs && packs.length > 0" class="border-t border-gray-200 pt-4 mb-6">
-      <label class="block text-sm font-medium text-gray-700 mb-3">Associer à des packs</label>
-      <div class="space-y-2">
-        <div v-for="pack in packs" :key="pack.id" class="flex items-center space-x-3">
-          <input
-            :id="`pack-${pack.id}`"
-            v-model="form.selectedPacks"
-            type="checkbox"
-            :value="pack.id"
-            class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-          />
-          <label :for="`pack-${pack.id}`" class="text-sm text-gray-700 cursor-pointer">
-            {{ pack.name }} ({{ pack.base_price }}€)
-          </label>
+      <fieldset>
+        <legend class="block text-sm font-medium text-gray-700 mb-3">Associer à des packs</legend>
+        <div class="space-y-2" role="group" aria-label="Packs disponibles">
+          <div v-for="pack in packs" :key="pack.id" class="flex items-center space-x-3">
+            <input
+              :id="`pack-${pack.id}`"
+              v-model="form.selectedPacks"
+              type="checkbox"
+              :value="pack.id"
+              class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+            />
+            <label :for="`pack-${pack.id}`" class="text-sm text-gray-700 cursor-pointer">
+              {{ pack.name }} ({{ pack.base_price }}€)
+            </label>
+          </div>
         </div>
-      </div>
+      </fieldset>
     </div>
 
     <div class="flex justify-end gap-4 pt-4">
@@ -111,6 +137,7 @@
 
 <script lang="ts" setup>
 import type { CreateSponsoringOption, SponsoringPack } from "~/utils/api";
+import { sponsoringOptionSchema } from "~/utils/validation/schemas";
 
 // Toutes les langues disponibles
 const allAvailableLanguages = [
@@ -150,6 +177,9 @@ const emit = defineEmits<{
   (e: 'save', payload: any): void
 }>()
 
+const { t } = useI18n();
+const { handleError } = useErrorHandler();
+
 // Langues actives (commence avec français uniquement)
 const activeLanguages = ref<Array<{ code: string, label: string }>>([
   allAvailableLanguages[0] // Français
@@ -169,6 +199,8 @@ const form = ref<OptionFormData>({
   price: props.data?.price || undefined,
   selectedPacks: props.data?.selectedPacks || []
 })
+
+const validationErrors = ref<Record<string, string>>({});
 
 function getCurrentLanguageLabel() {
   return activeLanguages.value.find(lang => lang.code === currentLanguage.value)?.label || '';
@@ -206,6 +238,8 @@ function removeLanguage(langCode: string) {
 }
 
 function onSave() {
+  validationErrors.value = {};
+
   // Construire le tableau de traductions uniquement pour les langues actives et remplies
   const translations = activeLanguages.value
     .filter(lang => {
@@ -221,9 +255,37 @@ function onSave() {
       };
     });
 
+  // Préparer les données pour la validation
+  const translationsForValidation: Record<string, { name: string; description?: string }> = {};
+  activeLanguages.value.forEach(lang => {
+    const translation = form.value.translations[lang.code];
+    if (translation && translation.name.trim() !== '') {
+      translationsForValidation[lang.code] = {
+        name: translation.name,
+        description: translation.description || undefined
+      };
+    }
+  });
+
+  // Valider avec Zod
+  const validation = sponsoringOptionSchema.safeParse({
+    translations: translationsForValidation,
+    price: form.value.price || 0,
+    is_free: !form.value.price || form.value.price === 0
+  });
+
+  if (!validation.success) {
+    validation.error.errors.forEach((err) => {
+      const field = err.path.join('.');
+      validationErrors.value[field] = t(err.message);
+    });
+    console.error('Validation errors:', validationErrors.value);
+    return;
+  }
+
   // Vérifier qu'au moins une traduction existe
   if (translations.length === 0) {
-    alert('Veuillez remplir au moins une traduction');
+    validationErrors.value['translations'] = t('errors.validation');
     return;
   }
 
