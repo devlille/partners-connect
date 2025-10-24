@@ -1,7 +1,7 @@
 # .github/workflows/cd.yaml
 # This workflow deploys a pre-built Docker image to Clever Cloud.
 
-name: CD - Deploy to Clever Cloud
+name: CD - Deploy Front to Clever Cloud
 
 on:
   push:
@@ -21,7 +21,7 @@ on:
         required: true
         default: 'latest'
   workflow_run:
-    workflows: ["Build and Push Server Container"]
+    workflows: ["Build and Push Front Container"]
     types:
       - completed
     branches:
@@ -63,17 +63,11 @@ jobs:
         id: app
         run: |
           if [ "${{ steps.vars.outputs.environment }}" = "production" ]; then
-            echo "id=${{ secrets.CLEVERCLOUD_APP_ID }}" >> $GITHUB_OUTPUT
+            echo "id=${{ secrets.CLEVERCLOUD_FRONT_APP_ID }}" >> $GITHUB_OUTPUT
             echo "url=${{ secrets.CLEVERCLOUD_BASE_URL }}" >> $GITHUB_OUTPUT
-            echo "postgres_url=${{ secrets.EXPOSED_DB_URL }}" >> $GITHUB_OUTPUT
-            echo "postgres_user=${{ secrets.EXPOSED_DB_USER }}" >> $GITHUB_OUTPUT
-            echo "postgres_password=${{ secrets.EXPOSED_DB_PASSWORD }}" >> $GITHUB_OUTPUT
           else
-            echo "id=${{ secrets.CLEVERCLOUD_APP_ID_PP }}" >> $GITHUB_OUTPUT
+            echo "id=${{ secrets.CLEVERCLOUD_FRONT_APP_ID_PP }}" >> $GITHUB_OUTPUT
             echo "url=${{ secrets.CLEVERCLOUD_BASE_URL_PP }}" >> $GITHUB_OUTPUT
-            echo "postgres_url=${{ secrets.EXPOSED_DB_URL_PP }}" >> $GITHUB_OUTPUT
-            echo "postgres_user=${{ secrets.EXPOSED_DB_USER_PP }}" >> $GITHUB_OUTPUT
-            echo "postgres_password=${{ secrets.EXPOSED_DB_PASSWORD_PP }}" >> $GITHUB_OUTPUT
           fi
 
       - name: Install Clever Tools
@@ -87,33 +81,14 @@ jobs:
           CLEVERCLOUD_BASE_URL: ${{ steps.app.outputs.url }}
           CC_DOCKER_LOGIN_PASSWORD: ${{ secrets.CC_DOCKER_LOGIN_PASSWORD }}
           CC_DOCKER_LOGIN_USERNAME: ${{ secrets.CC_DOCKER_LOGIN_USERNAME }}
-          PROJECT_ID: ${{ secrets.PROJECT_ID }}
-          FRONTEND_BASE_URL: ${{ secrets.FRONTEND_BASE_URL }}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          CRYPTO_KEY: ${{ secrets.CRYPTO_KEY }}
-          CRYPTO_SALT: ${{ secrets.CRYPTO_SALT }}
-          EXPOSED_DB_DRIVER: ${{ secrets.EXPOSED_DB_DRIVER }}
-          EXPOSED_DB_URL: ${{ steps.app.outputs.postgres_url }}
-          EXPOSED_DB_USER: ${{ steps.app.outputs.postgres_user }}
-          EXPOSED_DB_PASSWORD: ${{ steps.app.outputs.postgres_password }}
         run: |
-          clever env set APP_FOLDER "server" --app $CLEVER_APP_ID
+          clever env set APP_FOLDER "front" --app $CLEVER_APP_ID
           clever env set CC_DOCKERFILE "Dockerfile.deploy" --app $CLEVER_APP_ID
+          clever env set CC_DOCKER_EXPOSED_HTTP_PORT "8080" --app $CLEVER_APP_ID
           clever env set CC_DOCKER_LOGIN_PASSWORD "$CC_DOCKER_LOGIN_PASSWORD" --app $CLEVER_APP_ID
           clever env set CC_DOCKER_LOGIN_USERNAME "$CC_DOCKER_LOGIN_USERNAME" --app $CLEVER_APP_ID
           clever env set CC_DOCKER_LOGIN_SERVER "ghcr.io" --app $CLEVER_APP_ID
-          clever env set PROJECT_ID "$PROJECT_ID" --app $CLEVER_APP_ID
-          clever env set SERVER_BASE_URL "$CLEVERCLOUD_BASE_URL" --app $CLEVER_APP_ID
-          clever env set FRONTEND_BASE_URL "$FRONTEND_BASE_URL" --app $CLEVER_APP_ID
-          clever env set GOOGLE_CLIENT_ID "$GOOGLE_CLIENT_ID" --app $CLEVER_APP_ID
-          clever env set GOOGLE_CLIENT_SECRET "$GOOGLE_CLIENT_SECRET" --app $CLEVER_APP_ID
-          clever env set CRYPTO_KEY "$CRYPTO_KEY" --app $CLEVER_APP_ID
-          clever env set CRYPTO_SALT "$CRYPTO_SALT" --app $CLEVER_APP_ID
-          clever env set EXPOSED_DB_DRIVER "$EXPOSED_DB_DRIVER" --app $CLEVER_APP_ID
-          clever env set EXPOSED_DB_URL "$EXPOSED_DB_URL" --app $CLEVER_APP_ID
-          clever env set EXPOSED_DB_USER "$EXPOSED_DB_USER" --app $CLEVER_APP_ID
-          clever env set EXPOSED_DB_PASSWORD "$EXPOSED_DB_PASSWORD" --app $CLEVER_APP_ID
+          clever env set NUXT_PUBLIC_API_BASE_URL "$CLEVERCLOUD_BASE_URL" --app $CLEVER_APP_ID
 
       - name: Set image tag for deployment
         env:
