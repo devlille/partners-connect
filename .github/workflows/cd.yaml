@@ -21,7 +21,7 @@ on:
         required: true
         default: 'latest'
   workflow_run:
-    workflows: ["Build and Push Container"]
+    workflows: ["Build and Push Server Container"]
     types:
       - completed
     branches:
