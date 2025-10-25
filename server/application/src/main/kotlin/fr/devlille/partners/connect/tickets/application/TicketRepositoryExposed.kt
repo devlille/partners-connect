@@ -29,9 +29,6 @@ class TicketRepositoryExposed(
 ) : TicketRepository {
     override fun listTickets(partnershipId: UUID): List<Ticket> = transaction {
         val tickets = PartnershipTicketEntity.listByPartnership(partnershipId)
-        if (tickets.isEmpty()) {
-            throw NotFoundException("No tickets found for partnership $partnershipId")
-        }
         tickets.map { ticket ->
             Ticket(
                 id = ticket.id.value,

@@ -20,7 +20,11 @@ fun Route.partnershipTicketingRoutes() {
         get {
             val partnershipId = call.parameters.partnershipId
             val tickets = ticketingRepository.listTickets(partnershipId)
-            call.respond(HttpStatusCode.OK, tickets)
+            if (tickets.isEmpty()) {
+                call.respond(HttpStatusCode.NoContent)
+            } else {
+                call.respond(HttpStatusCode.OK, tickets)
+            }
         }
 
         post {
