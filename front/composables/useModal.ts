@@ -6,14 +6,7 @@
 import type { UseModalOptions, UseModalReturn, ModalSize } from '~/types/modal';
 
 export function useModal(options: UseModalOptions = {}): UseModalReturn {
-  const {
-    defaultSize = 'md',
-    autoFocus = true,
-    closeOnEsc = true,
-    closeOnBackdropClick = true,
-    onOpen,
-    onClose,
-  } = options;
+  const { defaultSize = "md", autoFocus = true, closeOnEsc = true, onOpen, onClose } = options;
 
   const isOpen = ref(false);
   const size = ref<ModalSize>(defaultSize);

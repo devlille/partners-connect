@@ -374,7 +374,7 @@ function handleFileSelect(event: Event) {
       toast.add({
         title: 'Erreur',
         description: 'Veuillez sélectionner une image PNG ou JPEG',
-        color: 'red'
+        color: 'error'
       });
       return;
     }
@@ -384,7 +384,7 @@ function handleFileSelect(event: Event) {
       toast.add({
         title: 'Erreur',
         description: 'L\'image ne doit pas dépasser 5MB',
-        color: 'red'
+        color: 'error'
       });
       return;
     }
@@ -434,7 +434,7 @@ async function handleSchedulePublication() {
     toast.add({
       title: 'Erreur',
       description: ERROR_MESSAGES.UPDATE_FAILED('la date de publication'),
-      color: 'red'
+      color: 'error'
     });
   } finally {
     schedulingDate.value = false;
@@ -473,7 +473,7 @@ async function handleUploadSupport() {
     toast.add({
       title: 'Erreur',
       description: ERROR_MESSAGES.UPDATE_FAILED('le support visuel'),
-      color: 'red'
+      color: 'error'
     });
   } finally {
     uploadingSupport.value = false;

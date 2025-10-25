@@ -1,5 +1,95 @@
 /**
- * Types d'erreurs API possibles
+ * Discriminated union types for application errors
+ * Provides automatic type narrowing based on the error type
+ */
+
+/**
+ * Network error - failed to connect to server
+ */
+export interface NetworkError {
+  type: 'network';
+  message: string;
+  i18nKey: 'errors.network';
+  details: TypeError;
+}
+
+/**
+ * Validation error - invalid data (400)
+ */
+export interface ValidationError {
+  type: 'validation';
+  message: string;
+  i18nKey: 'errors.validation';
+  details?: unknown;
+}
+
+/**
+ * Unauthorized error - authentication/authorization failed (401, 403)
+ */
+export interface UnauthorizedError {
+  type: 'unauthorized';
+  message: string;
+  i18nKey: 'errors.unauthorized';
+  details?: unknown;
+}
+
+/**
+ * Not found error - resource not found (404)
+ */
+export interface NotFoundError {
+  type: 'not_found';
+  message: string;
+  i18nKey: 'errors.notFound';
+  details?: unknown;
+}
+
+/**
+ * Server error - internal server error (500, 502, 503)
+ */
+export interface ServerError {
+  type: 'server';
+  message: string;
+  i18nKey: 'errors.server';
+  details?: unknown;
+}
+
+/**
+ * Unknown error - unhandled error type
+ */
+export interface UnknownError {
+  type: 'unknown';
+  message: string;
+  i18nKey: 'errors.unknown';
+  details?: unknown;
+}
+
+/**
+ * Discriminated union of all application errors
+ * TypeScript automatically narrows the type based on the 'type' property
+ *
+ * @example
+ * ```typescript
+ * const error = parseError(unknownError);
+ * if (error.type === 'network') {
+ *   // TypeScript knows this is NetworkError
+ *   console.log(error.details); // TypeError
+ * } else if (error.type === 'validation') {
+ *   // TypeScript knows this is ValidationError
+ *   // Can safely access validation-specific properties
+ * }
+ * ```
+ */
+export type AppError =
+  | NetworkError
+  | ValidationError
+  | UnauthorizedError
+  | NotFoundError
+  | ServerError
+  | UnknownError;
+
+/**
+ * Legacy enum for backward compatibility
+ * @deprecated Use discriminated union types instead
  */
 export enum ErrorType {
   NETWORK = 'network',
@@ -11,16 +101,6 @@ export enum ErrorType {
 }
 
 /**
- * Interface pour les erreurs structurées
- */
-export interface AppError {
-  type: ErrorType;
-  message: string;
-  i18nKey: string;
-  details?: unknown;
-}
-
-/**
  * Composable pour gérer les erreurs de manière centralisée
  */
 export const useErrorHandler = () => {
@@ -28,16 +108,17 @@ export const useErrorHandler = () => {
 
   /**
    * Mappe une erreur API vers une erreur structurée avec clé i18n
+   * Returns a discriminated union type for automatic type narrowing
    */
   const parseError = (error: unknown): AppError => {
     // Erreur réseau (pas de connexion)
     if (error instanceof TypeError && error.message === 'Failed to fetch') {
       return {
-        type: ErrorType.NETWORK,
+        type: 'network',
         message: 'Network error',
         i18nKey: 'errors.network',
         details: error
-      };
+      } satisfies NetworkError;
     }
 
     // Erreur HTTP
@@ -47,45 +128,45 @@ export const useErrorHandler = () => {
       switch (httpError.status) {
         case 400:
           return {
-            type: ErrorType.VALIDATION,
+            type: 'validation',
             message: 'Validation error',
             i18nKey: 'errors.validation',
             details: httpError.data
-          };
+          } satisfies ValidationError;
         case 401:
         case 403:
           return {
-            type: ErrorType.UNAUTHORIZED,
+            type: 'unauthorized',
             message: 'Unauthorized',
             i18nKey: 'errors.unauthorized',
             details: httpError.data
-          };
+          } satisfies UnauthorizedError;
         case 404:
           return {
-            type: ErrorType.NOT_FOUND,
+            type: 'not_found',
             message: 'Not found',
             i18nKey: 'errors.notFound',
             details: httpError.data
-          };
+          } satisfies NotFoundError;
         case 500:
         case 502:
         case 503:
           return {
-            type: ErrorType.SERVER,
+            type: 'server',
             message: 'Server error',
             i18nKey: 'errors.server',
             details: httpError.data
-          };
+          } satisfies ServerError;
       }
     }
 
     // Erreur inconnue
     return {
-      type: ErrorType.UNKNOWN,
+      type: 'unknown',
       message: 'Unknown error',
       i18nKey: 'errors.unknown',
       details: error
-    };
+    } satisfies UnknownError;
   };
 
   /**

@@ -10,9 +10,7 @@
     </div>
 
     <div class="p-6">
-      <div v-if="loading" class="flex justify-center py-8">
-        <div class="text-gray-500">Chargement...</div>
-      </div>
+      <TableSkeleton v-if="loading" :columns="4" :rows="6" />
 
       <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
         {{ error }}

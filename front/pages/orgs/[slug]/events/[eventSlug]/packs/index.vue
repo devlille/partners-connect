@@ -16,9 +16,7 @@
     </div>
 
     <div class="p-6 space-y-6">
-      <div v-if="loading" class="flex justify-center py-8">
-        <div class="text-gray-500">Chargement...</div>
-      </div>
+      <TableSkeleton v-if="loading" :columns="3" :rows="8" />
 
       <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
         {{ error }}
@@ -26,7 +24,7 @@
 
       <template v-else>
         <!-- Statistiques -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div
             v-for="pack in packs"
             :key="`stat-${pack.id}`"
@@ -60,7 +58,8 @@
         </div>
 
         <!-- Liste des packs -->
-        <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div>
+          <div class="bg-white rounded-lg shadow overflow-hidden">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
@@ -97,6 +96,7 @@
           </tbody>
         </table>
       </div>
+        </div>
       </template>
     </div>
 

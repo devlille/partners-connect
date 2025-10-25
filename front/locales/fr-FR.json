@@ -5,11 +5,19 @@
     "delete": "Supprimer",
     "edit": "Modifier",
     "create": "Créer",
+    "add": "Ajouter",
     "back": "Retour",
     "loading": "Chargement...",
     "error": "Erreur",
     "success": "Succès",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "confirm": "Confirmer",
+    "close": "Fermer",
+    "actions": "Actions",
+    "name": "Nom",
+    "price": "Prix",
+    "yes": "Oui",
+    "no": "Non"
   },
   "nav": {
     "myOrganizations": "Mes organisations",
@@ -50,7 +58,91 @@
   },
   "sponsors": {
     "title": "Sponsors",
-    "list": "Liste des sponsors"
+    "list": "Liste des sponsors",
+    "create": "Créer un sponsor",
+    "companyName": "Nom de l'entreprise",
+    "pack": "Pack",
+    "noSponsors": "Aucun sponsor pour le moment",
+    "suggested": "suggéré"
+  },
+  "users": {
+    "title": "Utilisateurs",
+    "noUsers": "Aucun utilisateur",
+    "authorized": "Utilisateurs autorisés",
+    "addAccess": "Ajouter des accès",
+    "addEmails": "Ajouter des emails",
+    "emailsPlaceholder": "Adresses email (une par ligne)",
+    "emailsHelp": "Entrez une adresse email par ligne",
+    "manageAccess": "Gérez les personnes ayant accès à l'organisation {orgSlug}"
+  },
+  "jobOffers": {
+    "title": "Offres d'emploi",
+    "add": "Ajouter une offre",
+    "addTitle": "Ajouter une offre d'emploi",
+    "noOffers": "Aucune offre d'emploi",
+    "startAdding": "Commencez par ajouter une offre d'emploi.",
+    "jobTitle": "Titre du poste",
+    "location": "Localisation",
+    "url": "URL de l'offre",
+    "publicationDate": "Date de publication",
+    "endDate": "Date limite",
+    "experienceYears": "Années d'expérience",
+    "salary": "Salaire",
+    "optional": "optionnel",
+    "required": "obligatoire",
+    "viewFullOffer": "Voir l'offre complète",
+    "publishedOn": "Publié le",
+    "deadline": "Date limite",
+    "experience": "Expérience",
+    "manage": "Gérez les offres d'emploi de votre entreprise"
+  },
+  "externalLinks": {
+    "title": "Liens externes",
+    "add": "Ajouter un lien",
+    "addTitle": "Ajouter un lien externe",
+    "noLinks": "Aucun lien externe",
+    "startAdding": "Commencez par ajouter un lien externe.",
+    "name": "Nom",
+    "url": "URL"
+  },
+  "providers": {
+    "title": "Prestataires",
+    "add": "Ajouter un prestataire",
+    "addTitle": "Ajouter un prestataire",
+    "noProviders": "Aucun prestataire",
+    "startAdding": "Commencez par ajouter un prestataire.",
+    "name": "Nom",
+    "type": "Type",
+    "website": "Site web",
+    "email": "Email",
+    "phone": "Téléphone"
+  },
+  "modals": {
+    "confirmDelete": "Confirmer la suppression",
+    "areYouSure": "Êtes-vous sûr de vouloir supprimer",
+    "irreversible": "Cette action est irréversible.",
+    "irreversibleWithOptions": "Cette action est irréversible et supprimera également toutes les options associées.",
+    "revokeAccess": "Êtes-vous sûr de vouloir retirer l'accès à",
+    "noLongerAccess": "Cette personne ne pourra plus accéder à l'organisation."
+  },
+  "form": {
+    "required": "obligatoire",
+    "optional": "optionnel",
+    "requiredField": "Ce champ est obligatoire",
+    "invalidEmail": "Email invalide",
+    "invalidUrl": "URL invalide"
+  },
+  "validation": {
+    "nameRequired": "Le nom est obligatoire",
+    "titleRequired": "Le titre est obligatoire",
+    "locationRequired": "La localisation est obligatoire",
+    "urlRequired": "L'URL est obligatoire",
+    "publicationDateRequired": "La date de publication est obligatoire",
+    "typeRequired": "Le type est obligatoire",
+    "invalidUrl": "L'URL n'est pas valide",
+    "invalidWebsite": "Le site web n'est pas une URL valide",
+    "atLeastOneEmail": "Veuillez entrer au moins une adresse email",
+    "invalidEmails": "Emails invalides"
   },
   "errors": {
     "network": "Erreur de connexion. Vérifiez votre connexion internet.",
@@ -58,6 +150,60 @@
     "unauthorized": "Vous n'êtes pas autorisé à effectuer cette action.",
     "notFound": "La ressource demandée n'a pas été trouvée.",
     "server": "Une erreur serveur est survenue. Réessayez plus tard.",
-    "unknown": "Une erreur inattendue est survenue."
+    "unknown": "Une erreur inattendue est survenue.",
+    "cannotLoad": "Impossible de charger",
+    "cannotAdd": "Impossible d'ajouter",
+    "cannotDelete": "Impossible de supprimer",
+    "cannotCreate": "Impossible de créer",
+    "checkInformation": "Vérifiez les informations.",
+    "users": "Impossible de charger la liste des utilisateurs",
+    "deleteUser": "Impossible de supprimer l'utilisateur",
+    "addEmails": "Impossible d'ajouter les emails. Vérifiez les informations.",
+    "jobOffers": "Impossible de charger les offres d'emploi",
+    "addJobOffer": "Impossible d'ajouter l'offre d'emploi. Vérifiez les informations.",
+    "deleteJobOffer": "Impossible de supprimer l'offre d'emploi",
+    "deleteOffer": "Impossible de supprimer l'offre",
+    "externalLinks": "Impossible de charger les liens externes",
+    "addExternalLink": "Impossible d'ajouter le lien. Vérifiez les informations.",
+    "deleteExternalLink": "Impossible de supprimer le lien",
+    "providers": "Impossible de charger les prestataires",
+    "addProvider": "Impossible d'ajouter le prestataire. Vérifiez les informations.",
+    "sponsors": "Impossible de charger les sponsors",
+    "packs": "Impossible de charger les packs",
+    "deletePack": "Impossible de supprimer le pack",
+    "sponsoringOptions": "Impossible de charger les options",
+    "deleteOption": "Impossible de supprimer l'option",
+    "event": "Impossible de créer l'événement. Vérifiez les données du formulaire.",
+    "partnership": "Une erreur est survenue lors de la création de la demande de partenariat",
+    "loginError": "Erreur lors de la connexion"
+  },
+  "messages": {
+    "eventCreated": "Événement créé avec succès ! Redirection en cours...",
+    "companyCreated": "Compagnie créée avec succès !",
+    "organizationUpdated": "Organisation mise à jour avec succès"
+  },
+  "emptyStates": {
+    "noData": "Aucune donnée disponible",
+    "startBy": "Commencez par",
+    "unlimited": "Illimité",
+    "max": "Max"
+  },
+  "tableHeaders": {
+    "name": "Nom",
+    "price": "Prix",
+    "maxQuantity": "Quantité max",
+    "actions": "Actions",
+    "url": "URL",
+    "type": "Type",
+    "website": "Site web",
+    "email": "Email",
+    "phone": "Téléphone",
+    "companyName": "Nom de l'entreprise",
+    "pack": "Pack"
+  },
+  "misc": {
+    "backToHome": "Retour à l'accueil",
+    "sponsors": "sponsor(s)",
+    "year": "an(s)"
   }
 }

@@ -128,7 +128,6 @@ export function useCache() {
   function restore(): void {
     if (!import.meta.client) return;
 
-    const now = Date.now();
     const keysToCheck: string[] = [];
 
     // Identifier toutes les clés de cache

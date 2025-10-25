@@ -21,9 +21,7 @@
 
     <div class="p-6">
       <!-- Loading state -->
-      <div v-if="loading" class="flex justify-center py-12">
-        <div class="text-gray-500">Chargement...</div>
-      </div>
+      <TableSkeleton v-if="loading" :columns="4" :rows="8" />
 
       <!-- Error state -->
       <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">

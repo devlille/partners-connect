@@ -1,15 +1,20 @@
 import { defineStore } from 'pinia';
-import type { Partnership } from '~/utils/api';
+import type { PartnershipItemSchema } from '~/utils/api';
+import type { EntityState } from '~/types/generics';
 
-interface SponsorsState {
-  sponsors: Partnership[];
-  loading: boolean;
-  error: string | null;
+/**
+ * Sponsors store state using generic EntityState
+ * Reduces code duplication by reusing the EntityState pattern
+ */
+interface SponsorsState extends EntityState<PartnershipItemSchema> {
+  // Items are renamed to 'sponsors' for semantic clarity
+  sponsors: PartnershipItemSchema[];
 }
 
 export const useSponsorsStore = defineStore('sponsors', {
   state: (): SponsorsState => ({
     sponsors: [],
+    items: [], // Required by EntityState<PartnershipItemSchema>
     loading: false,
     error: null,
   }),
@@ -19,7 +24,7 @@ export const useSponsorsStore = defineStore('sponsors', {
      * Obtenir les sponsors par statut
      */
     sponsorsByStatus: (state) => (status: string) => {
-      return state.sponsors.filter(s => s.status === status);
+      return state.sponsors.filter((s: PartnershipItemSchema) => s.status === status);
     },
 
     /**
@@ -31,7 +36,7 @@ export const useSponsorsStore = defineStore('sponsors', {
      * Obtenir les sponsors par pack
      */
     sponsorsByPack: (state) => (packId: string) => {
-      return state.sponsors.filter(s => s.pack.id === packId);
+      return state.sponsors.filter((s: PartnershipItemSchema) => s.pack_id === packId);
     },
   },
 
@@ -39,22 +44,22 @@ export const useSponsorsStore = defineStore('sponsors', {
     /**
      * Définir la liste des sponsors
      */
-    setSponsors(sponsors: Partnership[]) {
+    setSponsors(sponsors: PartnershipItemSchema[]) {
       this.sponsors = sponsors;
     },
 
     /**
      * Ajouter un sponsor
      */
-    addSponsor(sponsor: Partnership) {
+    addSponsor(sponsor: PartnershipItemSchema) {
       this.sponsors.push(sponsor);
     },
 
     /**
      * Mettre à jour un sponsor
      */
-    updateSponsor(sponsorId: string, updatedSponsor: Partial<Partnership>) {
-      const index = this.sponsors.findIndex(s => s.id === sponsorId);
+    updateSponsor(sponsorId: string, updatedSponsor: Partial<PartnershipItemSchema>) {
+      const index = this.sponsors.findIndex((s: PartnershipItemSchema) => s.id === sponsorId);
       if (index !== -1) {
         this.sponsors[index] = { ...this.sponsors[index], ...updatedSponsor };
       }
@@ -64,7 +69,7 @@ export const useSponsorsStore = defineStore('sponsors', {
      * Supprimer un sponsor
      */
     removeSponsor(sponsorId: string) {
-      this.sponsors = this.sponsors.filter(s => s.id !== sponsorId);
+      this.sponsors = this.sponsors.filter((s: PartnershipItemSchema) => s.id !== sponsorId);
     },
 
     /**

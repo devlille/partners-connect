@@ -1,15 +1,20 @@
 import { defineStore } from 'pinia';
 import type { SponsoringPack } from '~/utils/api';
+import type { EntityState } from '~/types/generics';
 
-interface PacksState {
+/**
+ * Packs store state using generic EntityState
+ * Reduces code duplication by reusing the EntityState pattern
+ */
+interface PacksState extends EntityState<SponsoringPack> {
+  // Items are renamed to 'packs' for semantic clarity
   packs: SponsoringPack[];
-  loading: boolean;
-  error: string | null;
 }
 
 export const usePacksStore = defineStore('packs', {
   state: (): PacksState => ({
     packs: [],
+    items: [], // Required by EntityState<SponsoringPack>
     loading: false,
     error: null,
   }),

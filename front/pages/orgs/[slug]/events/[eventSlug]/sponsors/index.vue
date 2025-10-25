@@ -16,9 +16,7 @@
     </div>
 
     <div class="p-6 space-y-6">
-      <div v-if="loading" class="flex justify-center py-8">
-        <div class="text-gray-500">Chargement...</div>
-      </div>
+      <TableSkeleton v-if="loading" :columns="2" :rows="10" />
 
       <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
         {{ error }}
@@ -26,7 +24,7 @@
 
       <template v-else>
         <!-- Statistiques -->
-        <div v-if="packs.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div v-if="packs.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div
             v-for="pack in packs"
             :key="`stat-${pack.id}`"
@@ -64,12 +62,13 @@
           <div class="text-gray-500 mb-4">Aucun sponsor pour le moment</div>
         </div>
 
-        <UTable
-          v-else
-          :data="partnerships"
-          :columns="columns"
-          @select="onRowClick"
-        />
+        <div v-else>
+          <UTable
+            :data="partnerships"
+            :columns="columns"
+            @select="onRowClick"
+          />
+        </div>
       </template>
     </div>
   </Dashboard>

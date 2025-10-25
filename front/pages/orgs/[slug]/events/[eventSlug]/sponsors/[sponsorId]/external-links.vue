@@ -17,9 +17,7 @@
           <p class="mt-1 text-sm text-gray-500">Liens configurés pour cet événement</p>
         </div>
 
-        <div v-if="loadingEvent" class="flex justify-center py-8">
-          <div class="text-gray-500">Chargement...</div>
-        </div>
+        <TableSkeleton v-if="loadingEvent" :columns="2" :rows="6" />
 
         <div v-else-if="eventError" class="px-6 py-4 bg-red-50 border border-red-200 text-red-700">
           {{ eventError }}
@@ -64,9 +62,7 @@
           <p class="mt-1 text-sm text-gray-500">Prestataires configurés pour cet événement</p>
         </div>
 
-        <div v-if="loadingProviders" class="flex justify-center py-8">
-          <div class="text-gray-500">Chargement...</div>
-        </div>
+        <TableSkeleton v-if="loadingProviders" :columns="5" :rows="6" />
 
         <div v-else-if="providersError" class="px-6 py-4 bg-red-50 border border-red-200 text-red-700">
           {{ providersError }}

@@ -10,9 +10,7 @@
     </div>
 
     <div class="p-6">
-      <div v-if="loading" class="flex justify-center py-8">
-        <div class="text-gray-500">Chargement...</div>
-      </div>
+      <TableSkeleton v-if="loading" :columns="4" :rows="6" />
 
       <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
         {{ error }}
@@ -49,13 +47,21 @@
           />
         </div>
 
+        <!-- Tickets Tab -->
+        <div v-show="activeTab === 'tickets'" class="bg-white rounded-lg shadow p-6">
+          <TicketsManager
+            v-if="partnership"
+            :event-slug="eventSlug"
+            :partnership-id="sponsorId"
+            @tickets-updated="handleTicketsUpdated"
+          />
+        </div>
+
         <!-- Company Info Tab -->
         <div v-show="activeTab === 'company'" class="bg-white rounded-lg shadow p-6">
           <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations de l'entreprise</h2>
 
-          <div v-if="loadingCompany" class="flex justify-center py-8">
-            <div class="text-gray-500">Chargement...</div>
-          </div>
+          <TableSkeleton v-if="loadingCompany" :columns="4" :rows="6" />
 
           <div v-else-if="companyError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
             {{ companyError }}
@@ -126,6 +132,18 @@
                 :disabled="savingCompany"
                 rows="4"
                 class="w-full"
+              />
+            </div>
+
+            <div class="border-t pt-4">
+              <LogoUpload
+                v-if="company"
+                :company-id="company.id"
+                :company-name="company.name"
+                :current-logo-media="company.medias"
+                :disabled="savingCompany"
+                @uploaded="handleLogoUploaded"
+                @error="handleLogoError"
               />
             </div>
 
@@ -231,7 +249,7 @@
 </template>
 
 <script setup lang="ts">
-import { getOrgsEventsPartnership, getCompanies, getCompaniesPartnership, type PartnershipItem, type CompanySchema } from "~/utils/api";
+import { getOrgsEventsPartnership, getCompanies, getCompaniesPartnership, type PartnershipItem, type CompanySchema, type MediaSchema } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 
 const route = useRoute();
@@ -258,9 +276,10 @@ const sponsorId = computed(() => {
   return Array.isArray(params) ? params[0] as string : params as string;
 });
 
-const activeTab = ref<'partnership' | 'company'>('partnership');
+const activeTab = ref<'partnership' | 'tickets' | 'company'>('partnership');
 const tabs = [
   { id: 'partnership' as const, label: 'Partenariat' },
+  { id: 'tickets' as const, label: 'Tickets' },
   { id: 'company' as const, label: 'Entreprise' }
 ];
 
@@ -485,6 +504,25 @@ async function onSave(data: any) {
 
 function onCancel() {
   router.push(`/orgs/${orgSlug.value}/events/${eventSlug.value}/sponsors`);
+}
+
+function handleLogoUploaded(media: MediaSchema) {
+  // Mettre à jour le logo de la company
+  if (company.value) {
+    company.value = {
+      ...company.value,
+      medias: media
+    };
+  }
+}
+
+function handleLogoError(errorMessage: string) {
+  companyError.value = errorMessage;
+}
+
+function handleTicketsUpdated(updatedTickets: any) {
+  // Les tickets ont été mis à jour avec succès
+  console.log('Tickets updated:', updatedTickets);
 }
 
 onMounted(() => {
