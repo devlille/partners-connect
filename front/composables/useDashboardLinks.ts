@@ -14,7 +14,13 @@ export const useDashboardLinks = () => {
     icon: 'i-heroicons-arrow-right-on-rectangle',
     to: '#',
     click: () => {
-      navigateTo('/api/auth/signout', { external: true })
+      // Supprimer le token d'authentification
+      if (import.meta.client) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_info');
+      }
+      // Rediriger vers la page de login
+      navigateTo('/login')
     }
   }]
 

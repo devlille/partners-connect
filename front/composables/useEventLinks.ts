@@ -29,6 +29,11 @@ export const useEventLinks = (orgSlug: string, eventSlug: string) => {
       label: 'Liens externes',
       icon: 'i-heroicons-link',
       to: `/orgs/${orgSlug}/events/${eventSlug}/external-links`
+    },
+    {
+      label: 'Communication',
+      icon: 'i-heroicons-megaphone',
+      to: `/orgs/${orgSlug}/events/${eventSlug}/communication`
     }
   ]
 

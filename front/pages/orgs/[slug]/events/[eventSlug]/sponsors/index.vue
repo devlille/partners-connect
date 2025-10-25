@@ -15,7 +15,7 @@
       </div>
     </div>
 
-    <div class="p-6">
+    <div class="p-6 space-y-6">
       <div v-if="loading" class="flex justify-center py-8">
         <div class="text-gray-500">Chargement...</div>
       </div>
@@ -24,22 +24,59 @@
         {{ error }}
       </div>
 
-      <div v-else-if="partnerships.length === 0" class="text-center py-12">
-        <div class="text-gray-500 mb-4">Aucun sponsor pour le moment</div>
-      </div>
+      <template v-else>
+        <!-- Statistiques -->
+        <div v-if="packs.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div
+            v-for="pack in packs"
+            :key="`stat-${pack.id}`"
+            class="bg-white rounded-lg shadow p-6 border border-gray-200"
+          >
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-sm font-medium text-gray-500">{{ pack.name }}</h3>
+              <div class="text-xs text-gray-400">
+                {{ pack.max_quantity ? `Max: ${pack.max_quantity}` : 'Illimité' }}
+              </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="text-3xl font-bold text-gray-900">
+                {{ getPackPartnershipCount(pack.id) }}
+              </span>
+              <span v-if="pack.max_quantity" class="text-sm text-gray-500">
+                / {{ pack.max_quantity }}
+              </span>
+              <span class="text-sm text-gray-500">sponsor(s)</span>
+            </div>
+            <div v-if="pack.max_quantity" class="mt-3">
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  class="h-2 rounded-full transition-all"
+                  :class="getProgressBarColor(pack.id, pack.max_quantity)"
+                  :style="{ width: `${getProgressPercentage(pack.id, pack.max_quantity)}%` }"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
 
-      <UTable
-        v-else
-        :data="partnerships"
-        :columns="columns"
-        @select="onRowClick"
-      />
+        <!-- Liste des sponsors -->
+        <div v-if="partnerships.length === 0" class="text-center py-12">
+          <div class="text-gray-500 mb-4">Aucun sponsor pour le moment</div>
+        </div>
+
+        <UTable
+          v-else
+          :data="partnerships"
+          :columns="columns"
+          @select="onRowClick"
+        />
+      </template>
     </div>
   </Dashboard>
 </template>
 
 <script setup lang="ts">
-import { getOrgsEventsPartnership, getEventBySlug, type PartnershipItem } from "~/utils/api";
+import { getOrgsEventsPartnership, getEventBySlug, getOrgsEventsPacks, type PartnershipItem, type SponsoringPack } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 import type {TableRow} from "@nuxt/ui";
 
@@ -84,6 +121,7 @@ const eventSlug = computed(() => {
 });
 
 const partnerships = ref<PartnershipItem[]>([]);
+const packs = ref<SponsoringPack[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const eventName = ref<string>('');
@@ -91,19 +129,45 @@ const eventName = ref<string>('');
 // Menu contextuel pour la page des sponsors
 const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
 
+// Calculer le nombre de partnerships par pack
+function getPackPartnershipCount(packId: string): number {
+  // Trouver le nom du pack correspondant à l'ID
+  const pack = packs.value.find(p => p.id === packId);
+  if (!pack) return 0;
+
+  // Compter les partnerships qui ont ce pack_name
+  return partnerships.value.filter(p => p.pack_name === pack.name).length;
+}
+
+// Calculer le pourcentage de remplissage
+function getProgressPercentage(packId: string, maxQuantity: number): number {
+  const count = getPackPartnershipCount(packId);
+  return Math.min((count / maxQuantity) * 100, 100);
+}
+
+// Déterminer la couleur de la barre de progression
+function getProgressBarColor(packId: string, maxQuantity: number): string {
+  const percentage = getProgressPercentage(packId, maxQuantity);
+  if (percentage >= 90) return 'bg-red-500';
+  if (percentage >= 70) return 'bg-yellow-500';
+  return 'bg-green-500';
+}
+
 async function loadPartnerships() {
   try {
     loading.value = true;
     error.value = null;
 
-    // Charger le nom de l'événement
-    const eventResponse = await getEventBySlug(eventSlug.value);
-    eventName.value = eventResponse.data.event.name;
+    // Charger toutes les données en parallèle
+    const [eventResponse, partnershipsResponse, packsResponse] = await Promise.all([
+      getEventBySlug(eventSlug.value),
+      getOrgsEventsPartnership(orgSlug.value, eventSlug.value),
+      getOrgsEventsPacks(orgSlug.value, eventSlug.value)
+    ]);
 
-    console.log(orgSlug.value, eventSlug.value)
-    // Charger les partnerships (sponsors)
-    const response = await getOrgsEventsPartnership(orgSlug.value, eventSlug.value);
-    partnerships.value = response.data;
+    eventName.value = eventResponse.data.event.name;
+    partnerships.value = partnershipsResponse.data;
+    packs.value = packsResponse.data;
   } catch (err) {
     console.error('Failed to load partnerships:', err);
     error.value = 'Impossible de charger les sponsors';

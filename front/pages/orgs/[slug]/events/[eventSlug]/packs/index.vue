@@ -15,7 +15,7 @@
       </div>
     </div>
 
-    <div class="p-6">
+    <div class="p-6 space-y-6">
       <div v-if="loading" class="flex justify-center py-8">
         <div class="text-gray-500">Chargement...</div>
       </div>
@@ -24,7 +24,43 @@
         {{ error }}
       </div>
 
-      <div v-else class="bg-white rounded-lg shadow overflow-hidden">
+      <template v-else>
+        <!-- Statistiques -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div
+            v-for="pack in packs"
+            :key="`stat-${pack.id}`"
+            class="bg-white rounded-lg shadow p-6 border border-gray-200"
+          >
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-sm font-medium text-gray-500">{{ pack.name }}</h3>
+              <div class="text-xs text-gray-400">
+                {{ pack.max_quantity ? `Max: ${pack.max_quantity}` : 'Illimité' }}
+              </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="text-3xl font-bold text-gray-900">
+                {{ getPackPartnershipCount(pack.id) }}
+              </span>
+              <span v-if="pack.max_quantity" class="text-sm text-gray-500">
+                / {{ pack.max_quantity }}
+              </span>
+              <span class="text-sm text-gray-500">sponsor(s)</span>
+            </div>
+            <div v-if="pack.max_quantity" class="mt-3">
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  class="h-2 rounded-full transition-all"
+                  :class="getProgressBarColor(pack.id, pack.max_quantity)"
+                  :style="{ width: `${getProgressPercentage(pack.id, pack.max_quantity)}%` }"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Liste des packs -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
@@ -61,11 +97,13 @@
           </tbody>
         </table>
       </div>
+      </template>
     </div>
 
     <!-- Modal de confirmation de suppression -->
-    <Teleport to="body">
-      <div v-if="isDeleteModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" @click.self="isDeleteModalOpen = false">
+    <ClientOnly>
+      <Teleport to="body">
+        <div v-if="isDeleteModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" @click.self="isDeleteModalOpen = false">
         <div class="w-full max-w-lg bg-white rounded-lg shadow-xl" @click.stop>
           <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-semibold text-gray-900">Confirmer la suppression</h3>
@@ -99,12 +137,13 @@
           </div>
         </div>
       </div>
-    </Teleport>
+      </Teleport>
+    </ClientOnly>
   </Dashboard>
 </template>
 
 <script setup lang="ts">
-import { getOrgsEventsPacks, getEventBySlug, deleteOrgsEventsPacks, type SponsoringPack } from "~/utils/api";
+import { getOrgsEventsPacks, getEventBySlug, deleteOrgsEventsPacks, getOrgsEventsPartnership, type SponsoringPack, type PartnershipItemSchema } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 
 const route = useRoute();
@@ -126,6 +165,7 @@ const eventSlug = computed(() => {
 });
 
 const packs = ref<SponsoringPack[]>([]);
+const partnerships = ref<PartnershipItemSchema[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const eventName = ref<string>('');
@@ -136,6 +176,30 @@ const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
 const isDeleteModalOpen = ref(false);
 const packToDelete = ref<SponsoringPack | null>(null);
 const deletingPackId = ref<string | null>(null);
+
+// Calculer le nombre de partnerships par pack
+function getPackPartnershipCount(packId: string): number {
+  // Trouver le nom du pack correspondant à l'ID
+  const pack = packs.value.find(p => p.id === packId);
+  if (!pack) return 0;
+
+  // Compter les partnerships qui ont ce pack_name
+  return partnerships.value.filter(p => p.pack_name === pack.name).length;
+}
+
+// Calculer le pourcentage de remplissage
+function getProgressPercentage(packId: string, maxQuantity: number): number {
+  const count = getPackPartnershipCount(packId);
+  return Math.min((count / maxQuantity) * 100, 100);
+}
+
+// Déterminer la couleur de la barre de progression
+function getProgressBarColor(packId: string, maxQuantity: number): string {
+  const percentage = getProgressPercentage(packId, maxQuantity);
+  if (percentage >= 90) return 'bg-red-500';
+  if (percentage >= 70) return 'bg-yellow-500';
+  return 'bg-green-500';
+}
 
 const onSelectPack = (row: SponsoringPack) => {
   router.push(`/orgs/${orgSlug.value}/events/${eventSlug.value}/packs/${row.id}`);
@@ -173,13 +237,16 @@ async function loadPacks() {
     loading.value = true;
     error.value = null;
 
-    // Charger le nom de l'événement
-    const eventResponse = await getEventBySlug(eventSlug.value);
-    eventName.value = eventResponse.data.event.name;
+    // Charger toutes les données en parallèle
+    const [eventResponse, packsResponse, partnershipsResponse] = await Promise.all([
+      getEventBySlug(eventSlug.value),
+      getOrgsEventsPacks(orgSlug.value, eventSlug.value),
+      getOrgsEventsPartnership(orgSlug.value, eventSlug.value)
+    ]);
 
-    // Charger les packs
-    const response = await getOrgsEventsPacks(orgSlug.value, eventSlug.value);
-    packs.value = response.data;
+    eventName.value = eventResponse.data.event.name;
+    packs.value = packsResponse.data;
+    partnerships.value = partnershipsResponse.data;
   } catch (err) {
     console.error('Failed to load packs:', err);
     error.value = 'Impossible de charger les packs';

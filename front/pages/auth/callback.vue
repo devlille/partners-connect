@@ -43,6 +43,10 @@ onMounted(async () => {
   }
 })
 
+definePageMeta({
+  auth: false
+})
+
 useHead({
   title: 'Connexion | DevLille'
 })

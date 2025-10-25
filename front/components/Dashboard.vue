@@ -26,13 +26,14 @@
         <UButton
           v-for="link in footerLinks"
           :key="link.to"
-          :to="link.to"
+          :to="link.click ? undefined : link.to"
           :icon="link.icon"
           :label="link.label"
           color="neutral"
           variant="ghost"
           block
           class="justify-start"
+          @click="link.click"
         />
       </nav>
     </aside>
@@ -49,6 +50,7 @@ interface Link {
   label: string
   icon: string
   to: string
+  click?: () => void
 }
 
 interface Props {
