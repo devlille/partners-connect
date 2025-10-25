@@ -36,15 +36,84 @@
         </UButton>
       </div>
 
-      <UTable v-else :data="options" :columns="columns" @select="onRowClick" />
+      <div v-else class="bg-white rounded-lg shadow overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix</th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr v-for="option in options" :key="option.id" class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 cursor-pointer" @click="onRowClick(option)">
+                {{ getOptionName(option) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                {{ option.price ? `${option.price}€` : 'Gratuit' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <UButton
+                  color="error"
+                  variant="ghost"
+                  size="sm"
+                  icon="i-heroicons-trash"
+                  :loading="deletingOptionId === option.id"
+                  @click.stop="confirmDelete(option)"
+                >
+                  Supprimer
+                </UButton>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+
+    <!-- Modal de confirmation de suppression -->
+    <Teleport to="body">
+      <div v-if="isDeleteModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" @click.self="isDeleteModalOpen = false">
+        <div class="w-full max-w-lg bg-white rounded-lg shadow-xl" @click.stop>
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Confirmer la suppression</h3>
+          </div>
+
+          <div class="px-6 py-4 space-y-4">
+            <p class="text-sm text-gray-700">
+              Êtes-vous sûr de vouloir supprimer l'option <strong>{{ optionToDelete ? getOptionName(optionToDelete) : '' }}</strong> ?
+            </p>
+            <p class="text-sm text-gray-500">
+              Cette action est irréversible.
+            </p>
+          </div>
+
+          <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+            <UButton
+              color="neutral"
+              variant="ghost"
+              :disabled="!!deletingOptionId"
+              @click="isDeleteModalOpen = false"
+            >
+              Annuler
+            </UButton>
+            <UButton
+              color="error"
+              :loading="!!deletingOptionId"
+              @click="handleDelete"
+            >
+              Supprimer
+            </UButton>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </Dashboard>
 </template>
 
 <script setup lang="ts">
-import { getOrgsEventsOptions, getEventBySlug, type SponsoringOption } from "~/utils/api";
+import { getOrgsEventsOptions, getEventBySlug, deleteOrgsEventsOptions, type SponsoringOption } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
-import type {TableRow} from "@nuxt/ui";
 
 const route = useRoute();
 const { footerLinks } = useDashboardLinks();
@@ -72,24 +141,9 @@ const eventName = ref<string>('');
 const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
 const { getOptionName } = useOptionTranslation();
 
-// Colonnes du tableau
-const columns = [
-  {
-    header: 'Nom',
-    accessorKey: 'name',
-    cell: (info: TableRow<SponsoringOption>) => {
-      return getOptionName(info.row.original);
-    }
-  },
-  {
-    header: 'Prix',
-    accessorKey: 'price',
-    cell: (info: TableRow<SponsoringOption>) => {
-      const price = info.getValue('price');
-      return price ? `${price}€` : 'Gratuit';
-    }
-  }
-];
+const isDeleteModalOpen = ref(false);
+const optionToDelete = ref<SponsoringOption | null>(null);
+const deletingOptionId = ref<string | null>(null);
 
 async function loadOptions() {
   try {
@@ -119,8 +173,35 @@ watch([orgSlug, eventSlug], () => {
   loadOptions();
 });
 
-function onRowClick(row: TableRow<SponsoringOption>) {
-  navigateTo(`/orgs/${orgSlug.value}/events/${eventSlug.value}/options/${row.original.id}`);
+function onRowClick(row: SponsoringOption) {
+  navigateTo(`/orgs/${orgSlug.value}/events/${eventSlug.value}/options/${row.id}`);
+}
+
+function confirmDelete(option: SponsoringOption) {
+  optionToDelete.value = option;
+  isDeleteModalOpen.value = true;
+}
+
+async function handleDelete() {
+  if (!optionToDelete.value) return;
+
+  try {
+    deletingOptionId.value = optionToDelete.value.id;
+
+    await deleteOrgsEventsOptions(orgSlug.value, eventSlug.value, optionToDelete.value.id);
+
+    // Recharger la liste
+    await loadOptions();
+
+    // Fermer le modal
+    isDeleteModalOpen.value = false;
+    optionToDelete.value = null;
+  } catch (err) {
+    console.error('Failed to delete option:', err);
+    error.value = 'Impossible de supprimer l\'option';
+  } finally {
+    deletingOptionId.value = null;
+  }
 }
 
 useHead({

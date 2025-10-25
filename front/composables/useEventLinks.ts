@@ -19,6 +19,16 @@ export const useEventLinks = (orgSlug: string, eventSlug: string) => {
       label: 'Sponsors',
       icon: 'i-heroicons-building-office-2',
       to: `/orgs/${orgSlug}/events/${eventSlug}/sponsors`
+    },
+    {
+      label: 'Prestataires',
+      icon: 'i-heroicons-user-group',
+      to: `/orgs/${orgSlug}/events/${eventSlug}/providers`
+    },
+    {
+      label: 'Liens externes',
+      icon: 'i-heroicons-link',
+      to: `/orgs/${orgSlug}/events/${eventSlug}/external-links`
     }
   ]
 

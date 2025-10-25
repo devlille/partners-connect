@@ -104,16 +104,8 @@ async function onSave(data: any) {
   try {
     error.value = null;
 
-    const optionData = {
-      translations: [
-        {
-          language: 'fr',
-          name: data.name,
-          description: data.description || null
-        }
-      ],
-      price: data.price || null
-    };
+    // Le formulaire envoie { option: CreateSponsoringOption, selectedPacks: string[] }
+    const optionData = data.option;
 
     await putOrgsEventsOptions(orgSlug.value, eventSlug.value, optionId.value, optionData);
 

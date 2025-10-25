@@ -24,20 +24,88 @@
         {{ error }}
       </div>
 
-      <UTable
-        v-else
-        :data="packs"
-        :columns="columns"
-        @select="onSelectPack"
-      />
+      <div v-else class="bg-white rounded-lg shadow overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantité max</th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr v-for="pack in packs" :key="pack.id" class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 cursor-pointer" @click="onSelectPack(pack)">
+                {{ pack.name }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                {{ pack.base_price }}€
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                {{ pack.max_quantity || '-' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <UButton
+                  color="error"
+                  variant="ghost"
+                  size="sm"
+                  icon="i-heroicons-trash"
+                  :loading="deletingPackId === pack.id"
+                  @click.stop="confirmDelete(pack)"
+                >
+                  Supprimer
+                </UButton>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+
+    <!-- Modal de confirmation de suppression -->
+    <Teleport to="body">
+      <div v-if="isDeleteModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" @click.self="isDeleteModalOpen = false">
+        <div class="w-full max-w-lg bg-white rounded-lg shadow-xl" @click.stop>
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Confirmer la suppression</h3>
+          </div>
+
+          <div class="px-6 py-4 space-y-4">
+            <p class="text-sm text-gray-700">
+              Êtes-vous sûr de vouloir supprimer le pack <strong>{{ packToDelete?.name }}</strong> ?
+            </p>
+            <p class="text-sm text-gray-500">
+              Cette action est irréversible et supprimera également toutes les options associées.
+            </p>
+          </div>
+
+          <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+            <UButton
+              color="neutral"
+              variant="ghost"
+              :disabled="!!deletingPackId"
+              @click="isDeleteModalOpen = false"
+            >
+              Annuler
+            </UButton>
+            <UButton
+              color="error"
+              :loading="!!deletingPackId"
+              @click="handleDelete"
+            >
+              Supprimer
+            </UButton>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </Dashboard>
 </template>
 
 <script setup lang="ts">
-import { getOrgsEventsPacks, getEventBySlug, type SponsoringPack } from "~/utils/api";
+import { getOrgsEventsPacks, getEventBySlug, deleteOrgsEventsPacks, type SponsoringPack } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
-import type { TableRow } from "@nuxt/ui";
 
 const route = useRoute();
 const router = useRouter();
@@ -65,28 +133,40 @@ const eventName = ref<string>('');
 // Menu contextuel pour la page des packs
 const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
 
-// Colonnes du tableau
-const columns = [
-  {
-    header: 'Nom',
-    accessorKey: 'name',
-    cell: (info: TableRow<SponsoringPack>) => info.getValue('name')
-  },
-  {
-    header: 'Prix',
-    accessorKey: 'base_price',
-    cell: (info: TableRow<SponsoringPack>) => `${info.getValue('base_price')}€`
-  },
-  {
-    header: 'Quantité',
-    accessorKey: 'max_quantity',
-    cell: (info: TableRow<SponsoringPack>) => info.getValue('max_quantity') || '-'
-  }
-];
+const isDeleteModalOpen = ref(false);
+const packToDelete = ref<SponsoringPack | null>(null);
+const deletingPackId = ref<string | null>(null);
 
-const onSelectPack = (row: TableRow<SponsoringPack>) => {
-  router.push(`/orgs/${orgSlug.value}/events/${eventSlug.value}/packs/${row.original.id}`);
+const onSelectPack = (row: SponsoringPack) => {
+  router.push(`/orgs/${orgSlug.value}/events/${eventSlug.value}/packs/${row.id}`);
 };
+
+function confirmDelete(pack: SponsoringPack) {
+  packToDelete.value = pack;
+  isDeleteModalOpen.value = true;
+}
+
+async function handleDelete() {
+  if (!packToDelete.value) return;
+
+  try {
+    deletingPackId.value = packToDelete.value.id;
+
+    await deleteOrgsEventsPacks(orgSlug.value, eventSlug.value, packToDelete.value.id);
+
+    // Recharger la liste
+    await loadPacks();
+
+    // Fermer le modal
+    isDeleteModalOpen.value = false;
+    packToDelete.value = null;
+  } catch (err) {
+    console.error('Failed to delete pack:', err);
+    error.value = 'Impossible de supprimer le pack';
+  } finally {
+    deletingPackId.value = null;
+  }
+}
 
 async function loadPacks() {
   try {

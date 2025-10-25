@@ -104,6 +104,40 @@ describe('useSponsorsStore', () => {
 
       expect(store.sponsors).toHaveLength(0);
     });
+
+    it('should not remove anything if sponsor not found', () => {
+      const store = useSponsorsStore();
+      store.setSponsors([mockSponsor]);
+
+      store.removeSponsor('999');
+
+      expect(store.sponsors).toHaveLength(1);
+      expect(store.sponsors[0]).toEqual(mockSponsor);
+    });
+
+    it('should remove only the specified sponsor from multiple sponsors', () => {
+      const store = useSponsorsStore();
+      const sponsor1 = { ...mockSponsor, id: '1', company: { ...mockSponsor.company, name: 'Company 1' } };
+      const sponsor2 = { ...mockSponsor, id: '2', company: { ...mockSponsor.company, name: 'Company 2' } };
+      const sponsor3 = { ...mockSponsor, id: '3', company: { ...mockSponsor.company, name: 'Company 3' } };
+
+      store.setSponsors([sponsor1, sponsor2, sponsor3]);
+
+      store.removeSponsor('2');
+
+      expect(store.sponsors).toHaveLength(2);
+      expect(store.sponsors.find(s => s.id === '1')).toBeDefined();
+      expect(store.sponsors.find(s => s.id === '2')).toBeUndefined();
+      expect(store.sponsors.find(s => s.id === '3')).toBeDefined();
+    });
+
+    it('should handle removing from empty list', () => {
+      const store = useSponsorsStore();
+
+      store.removeSponsor('1');
+
+      expect(store.sponsors).toHaveLength(0);
+    });
   });
 
   describe('getters', () => {

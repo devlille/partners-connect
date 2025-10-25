@@ -85,6 +85,40 @@ describe('usePacksStore', () => {
 
       expect(store.packs).toHaveLength(0);
     });
+
+    it('should not remove anything if pack not found', () => {
+      const store = usePacksStore();
+      store.setPacks([mockPack]);
+
+      store.removePack('999');
+
+      expect(store.packs).toHaveLength(1);
+      expect(store.packs[0]).toEqual(mockPack);
+    });
+
+    it('should remove only the specified pack from multiple packs', () => {
+      const store = usePacksStore();
+      const pack1 = { ...mockPack, id: '1', name: 'Pack 1' };
+      const pack2 = { ...mockPack, id: '2', name: 'Pack 2' };
+      const pack3 = { ...mockPack, id: '3', name: 'Pack 3' };
+
+      store.setPacks([pack1, pack2, pack3]);
+
+      store.removePack('2');
+
+      expect(store.packs).toHaveLength(2);
+      expect(store.packs.find(p => p.id === '1')).toBeDefined();
+      expect(store.packs.find(p => p.id === '2')).toBeUndefined();
+      expect(store.packs.find(p => p.id === '3')).toBeDefined();
+    });
+
+    it('should handle removing from empty list', () => {
+      const store = usePacksStore();
+
+      store.removePack('1');
+
+      expect(store.packs).toHaveLength(0);
+    });
   });
 
   describe('getters', () => {

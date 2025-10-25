@@ -70,16 +70,8 @@ async function onSave(data: any) {
     error.value = null;
     success.value = false;
 
-    const optionData: CreateSponsoringOption = {
-      translations: [
-        {
-          language: 'fr',
-          name: data.name,
-          description: data.description || null
-        }
-      ],
-      price: data.price || null
-    };
+    // Le formulaire envoie { option: CreateSponsoringOption, selectedPacks: string[] }
+    const optionData: CreateSponsoringOption = data.option;
 
     await postOrgsEventsOptions(orgSlug.value, eventSlug.value, optionData);
     success.value = true;
