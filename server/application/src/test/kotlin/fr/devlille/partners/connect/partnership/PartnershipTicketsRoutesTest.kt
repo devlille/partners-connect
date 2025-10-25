@@ -294,7 +294,7 @@ class PartnershipTicketsRoutesTest {
     }
 
     @Test
-    fun `GET returns 404 if partnership does not exist`() = testApplication {
+    fun `GET returns 204 if no ticket generated for the partnership`() = testApplication {
         val eventId = UUID.randomUUID()
         val eventSlug = "test-get-returns-404-if-p-518"
         val partnershipId = UUID.randomUUID()
@@ -305,7 +305,7 @@ class PartnershipTicketsRoutesTest {
         }
 
         val response = client.get("/events/$eventSlug/partnership/$partnershipId/tickets")
-        assertEquals(HttpStatusCode.NotFound, response.status)
+        assertEquals(HttpStatusCode.NoContent, response.status)
     }
 
     @Test
