@@ -23,7 +23,7 @@
             <button
               v-for="tab in tabs"
               :key="tab.id"
-              @click="activeTab = tab.id"
+              @click="changeTab(tab.id)"
               :class="[
                 activeTab === tab.id
                   ? 'border-primary-500 text-primary-600'
@@ -55,6 +55,62 @@
             :partnership-id="sponsorId"
             @tickets-updated="handleTicketsUpdated"
           />
+        </div>
+
+        <!-- Communication Tab -->
+        <div v-show="activeTab === 'communication'" class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Communication</h2>
+
+          <TableSkeleton v-if="loadingCommunication" :columns="2" :rows="1" />
+
+          <div v-else-if="communicationError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            {{ communicationError }}
+          </div>
+
+          <div v-else class="space-y-4">
+            <div class="bg-gray-50 rounded-lg p-6">
+              <div class="flex items-start gap-4">
+                <div class="flex-shrink-0">
+                  <i class="i-heroicons-calendar-days text-3xl text-primary-600" />
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-sm font-medium text-gray-900 mb-1">Date de communication prévue</h3>
+                  <p v-if="communicationData?.publication_date && communicationData.publication_date !== null" class="text-2xl font-semibold text-gray-900">
+                    {{ formatDateSafe(communicationData.publication_date) }}
+                  </p>
+                  <p v-else class="text-lg text-gray-500 italic">
+                    Aucune date planifiée
+                  </p>
+                  <p class="text-sm text-gray-600 mt-2">
+                    Statut:
+                    <span v-if="!communicationData?.publication_date || communicationData.publication_date === null" class="text-orange-600 font-medium">Non planifié</span>
+                    <span v-else-if="isDatePassed(communicationData.publication_date)" class="text-green-600 font-medium">Effectuée</span>
+                    <span v-else class="text-blue-600 font-medium">Planifiée</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="communicationData?.support_url" class="bg-gray-50 rounded-lg p-6">
+              <div class="flex items-start gap-4">
+                <div class="flex-shrink-0">
+                  <i class="i-heroicons-photo text-3xl text-primary-600" />
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-sm font-medium text-gray-900 mb-2">Support visuel</h3>
+                  <a
+                    :href="communicationData.support_url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-2 text-primary-600 hover:text-primary-800 font-medium"
+                  >
+                    Voir le support
+                    <i class="i-heroicons-arrow-top-right-on-square" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Company Info Tab -->
@@ -249,12 +305,13 @@
 </template>
 
 <script setup lang="ts">
-import { getOrgsEventsPartnership, getCompanies, getCompaniesPartnership, type PartnershipItem, type CompanySchema, type MediaSchema } from "~/utils/api";
+import { getOrgsEventsPartnership, getCompanies, getCompaniesPartnership, getOrgsEventsCommunication, type PartnershipItem, type CompanySchema, type MediaSchema, type CommunicationItemSchema } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 
 const route = useRoute();
 const router = useRouter();
 const { footerLinks } = useDashboardLinks();
+const { formatDate } = useFormatters();
 
 definePageMeta({
   middleware: authMiddleware,
@@ -276,12 +333,21 @@ const sponsorId = computed(() => {
   return Array.isArray(params) ? params[0] as string : params as string;
 });
 
-const activeTab = ref<'partnership' | 'tickets' | 'company'>('partnership');
 const tabs = [
   { id: 'partnership' as const, label: 'Partenariat' },
   { id: 'tickets' as const, label: 'Tickets' },
+  { id: 'communication' as const, label: 'Communication' },
   { id: 'company' as const, label: 'Entreprise' }
 ];
+
+// Initialiser le tab actif à partir du hash de l'URL
+const getInitialTab = (): 'partnership' | 'tickets' | 'communication' | 'company' => {
+  const hash = route.hash.replace('#', '');
+  const validTabs = tabs.map(t => t.id);
+  return validTabs.includes(hash as any) ? hash as any : 'partnership';
+};
+
+const activeTab = ref<'partnership' | 'tickets' | 'communication' | 'company'>(getInitialTab());
 
 const partnership = ref<PartnershipItem | null>(null);
 const loading = ref(true);
@@ -291,6 +357,10 @@ const error = ref<string | null>(null);
 const company = ref<CompanySchema | null>(null);
 const loadingCompany = ref(false);
 const companyError = ref<string | null>(null);
+
+const communicationData = ref<CommunicationItemSchema | null>(null);
+const loadingCommunication = ref(false);
+const communicationError = ref<string | null>(null);
 
 const companyForm = ref({
   name: '',
@@ -329,8 +399,11 @@ async function loadPartnership() {
 
     partnership.value = found;
 
-    // Charger les informations de la company
-    await loadCompanyInfo();
+    // Charger les informations de la company et de la communication en parallèle
+    await Promise.all([
+      loadCompanyInfo(),
+      loadCommunicationInfo()
+    ]);
   } catch (err) {
     console.error('Failed to load partnership:', err);
     error.value = 'Impossible de charger les informations du sponsor';
@@ -382,6 +455,86 @@ async function loadCompanyInfo() {
   } finally {
     loadingCompany.value = false;
   }
+}
+
+async function loadCommunicationInfo() {
+  try {
+    loadingCommunication.value = true;
+    communicationError.value = null;
+
+    // Récupérer le plan de communication global
+    const communicationPlan = await getOrgsEventsCommunication(orgSlug.value, eventSlug.value);
+
+    // Chercher les données de communication pour ce partenariat dans toutes les catégories
+    const allCommunications = [
+      ...communicationPlan.data.done,
+      ...communicationPlan.data.planned,
+      ...communicationPlan.data.unplanned
+    ];
+
+    // Trouver la communication qui correspond à ce partenariat
+    const found = allCommunications.find(c => c.partnership_id === sponsorId.value);
+
+    if (found) {
+      communicationData.value = found;
+    } else {
+      // Pas de données de communication pour ce partenariat
+      communicationData.value = {
+        partnership_id: sponsorId.value,
+        company_name: partnership.value?.company_name || '',
+        publication_date: null,
+        support_url: null
+      };
+    }
+  } catch (err) {
+    console.error('Failed to load communication info:', err);
+    communicationError.value = 'Impossible de charger les informations de communication';
+  } finally {
+    loadingCommunication.value = false;
+  }
+}
+
+function formatDateSafe(dateString: string | null | undefined): string {
+  if (!dateString) return 'Date invalide';
+
+  try {
+    // Use the formatDate from useFormatters() called at top level
+    const formatted = formatDate(dateString, 'long');
+    // If formatDate returns empty string, use fallback
+    if (!formatted) {
+      return new Date(dateString).toLocaleDateString('fr-FR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+    return formatted;
+  } catch (error) {
+    console.error('Error formatting date:', error, dateString);
+    // Fallback: afficher la date brute
+    return new Date(dateString).toLocaleDateString('fr-FR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+}
+
+function isDatePassed(dateString: string): boolean {
+  try {
+    const date = new Date(dateString);
+    const now = new Date();
+    return date < now;
+  } catch (error) {
+    console.error('Error checking date:', error, dateString);
+    return false;
+  }
+}
+
+function changeTab(tabId: 'partnership' | 'tickets' | 'communication' | 'company') {
+  activeTab.value = tabId;
+  // Mettre à jour le hash de l'URL
+  router.push({ hash: `#${tabId}` });
 }
 
 function resetCompanyForm() {
@@ -532,6 +685,15 @@ onMounted(() => {
 // Recharger si les slugs changent
 watch([orgSlug, eventSlug, sponsorId], () => {
   loadPartnership();
+});
+
+// Synchroniser le tab actif avec le hash de l'URL
+watch(() => route.hash, (newHash) => {
+  const hash = newHash.replace('#', '');
+  const validTabs = tabs.map(t => t.id);
+  if (validTabs.includes(hash as any)) {
+    activeTab.value = hash as 'partnership' | 'tickets' | 'communication' | 'company';
+  }
 });
 
 useHead({
