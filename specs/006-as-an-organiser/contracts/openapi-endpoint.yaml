@@ -1,0 +1,250 @@
+openapi: 3.1.0
+info:
+  title: Partnership Validation Endpoint
+  version: 1.0.0
+  description: API contract for validating partnerships with customizable package details
+
+paths:
+  /organisations/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/validate:
+    post:
+      summary: Validate a partnership with optional customized details
+      description: |
+        Validates a partnership and optionally customizes the number of tickets, 
+        job offers, and booth size. If not provided, values default to those 
+        defined in the associated sponsoring pack.
+        
+        **Re-validation Policy:**
+        - Partnerships can be re-validated multiple times BEFORE the agreement is signed
+        - Once agreementSignedUrl is set, validation is immutable (returns 400 Conflict)
+        
+        **Booth Size Validation:**
+        - If boothSize is provided, it must match a boothSize value present in at least 
+          one sponsoring pack configured for this event
+        - Cross-pack validation ensures consistency across event's sponsorship tiers
+      operationId: validatePartnership
+      tags:
+        - Partnership Management
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          description: URL slug of the organization
+          schema:
+            type: string
+          example: devlille
+        - name: eventSlug
+          in: path
+          required: true
+          description: URL slug of the event
+          schema:
+            type: string
+          example: devlille-2026
+        - name: partnershipId
+          in: path
+          required: true
+          description: UUID of the partnership to validate
+          schema:
+            type: string
+            format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+      requestBody:
+        description: |
+          Optional customization of package details. If omitted or empty, 
+          all values default to the sponsoring pack configuration.
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidatePartnershipRequest'
+            examples:
+              withCustomization:
+                summary: Validate with customized values
+                value:
+                  nbTickets: 10
+                  nbJobOffers: 2
+                  boothSize: "3x3m"
+              onlyJobOffers:
+                summary: Validate with only job offers specified
+                value:
+                  nbJobOffers: 5
+              packDefaults:
+                summary: Validate using pack defaults (empty body)
+                value: {}
+      responses:
+        '200':
+          description: Partnership validated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidatePartnershipResponse'
+              example:
+                id: "550e8400-e29b-41d4-a716-446655440000"
+                eventSlug: "devlille-2026"
+                companyId: "660e8400-e29b-41d4-a716-446655440001"
+                sponsoringPackId: "770e8400-e29b-41d4-a716-446655440002"
+                validatedAt: "2025-01-15T10:30:00Z"
+                validatedNbTickets: 10
+                validatedNbJobOffers: 2
+                validatedBoothSize: "3x3m"
+                agreementSignedUrl: null
+        '400':
+          description: Bad Request - Validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidBoothSize:
+                  summary: Booth size not found in event packs
+                  value:
+                    error: "Bad Request"
+                    message: "Booth size '10x10m' is not available in any sponsoring pack for this event"
+                    status: 400
+                negativeValues:
+                  summary: Negative ticket count
+                  value:
+                    error: "Bad Request"
+                    message: "nbTickets must be >= 0"
+                    status: 400
+                agreementSigned:
+                  summary: Re-validation blocked after signature
+                  value:
+                    error: "Conflict"
+                    message: "Cannot re-validate partnership: agreement already signed"
+                    status: 400
+        '401':
+          description: Unauthorized - Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Forbidden"
+                message: "User must be an organizer of this event to validate partnerships"
+                status: 403
+        '404':
+          description: Not Found - Partnership, event, or organization not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Not Found"
+                message: "Partnership with id '550e8400-e29b-41d4-a716-446655440000' not found"
+                status: 404
+
+components:
+  schemas:
+    ValidatePartnershipRequest:
+      type: object
+      description: Optional request body for validating a partnership with customized package details
+      properties:
+        nbTickets:
+          type: integer
+          description: Number of tickets allocated. Must be >= 0. Defaults to sponsoring pack value if omitted.
+          minimum: 0
+          example: 10
+        nbJobOffers:
+          type: integer
+          description: Number of job offers allowed. Must be >= 0. Required field.
+          minimum: 0
+          example: 2
+        boothSize:
+          type: string
+          description: Size of booth (e.g., '3x3m'). Must match a value in event's packs. Defaults to pack value if omitted.
+          example: "3x3m"
+          pattern: "^.+$"
+          minLength: 1
+      required:
+        - nbJobOffers
+      additionalProperties: false
+
+    ValidatePartnershipResponse:
+      type: object
+      description: Response returned after successfully validating a partnership
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the partnership
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        eventSlug:
+          type: string
+          description: URL slug of the event
+          example: "devlille-2026"
+        companyId:
+          type: string
+          format: uuid
+          description: ID of the company in this partnership
+          example: "660e8400-e29b-41d4-a716-446655440001"
+        sponsoringPackId:
+          type: string
+          format: uuid
+          description: ID of the sponsoring pack associated
+          example: "770e8400-e29b-41d4-a716-446655440002"
+        validatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the partnership was validated (ISO 8601)
+          example: "2025-01-15T10:30:00Z"
+        validatedNbTickets:
+          type:
+            - integer
+            - "null"
+          description: Number of tickets allocated at validation time
+          minimum: 0
+          example: 10
+        validatedNbJobOffers:
+          type:
+            - integer
+            - "null"
+          description: Number of job offers allowed at validation time
+          minimum: 0
+          example: 2
+        validatedBoothSize:
+          type:
+            - string
+            - "null"
+          description: Booth size allocated at validation time (e.g., '3x3m')
+          example: "3x3m"
+        agreementSignedUrl:
+          type:
+            - string
+            - "null"
+          format: uri
+          description: URL to the signed agreement document. Null if not yet signed.
+          example: null
+      required:
+        - id
+        - eventSlug
+        - companyId
+        - sponsoringPackId
+        - validatedAt
+      additionalProperties: false
+
+    ErrorResponse:
+      type: object
+      description: Standard error response format
+      properties:
+        error:
+          type: string
+          description: Error category
+          example: "Bad Request"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Validation failed"
+        status:
+          type: integer
+          description: HTTP status code
+          example: 400
+      required:
+        - error
+        - message
+        - status

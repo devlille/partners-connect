@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ValidatePartnershipResponse",
+  "title": "ValidatePartnershipResponse",
+  "description": "Response returned after successfully validating a partnership",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier of the partnership",
+      "example": "550e8400-e29b-41d4-a716-446655440000"
+    },
+    "eventSlug": {
+      "type": "string",
+      "description": "URL slug of the event",
+      "example": "devlille-2026"
+    },
+    "companyId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "ID of the company in this partnership",
+      "example": "660e8400-e29b-41d4-a716-446655440001"
+    },
+    "sponsoringPackId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "ID of the sponsoring pack associated",
+      "example": "770e8400-e29b-41d4-a716-446655440002"
+    },
+    "validatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the partnership was validated (ISO 8601 format)",
+      "example": "2025-01-15T10:30:00Z"
+    },
+    "validatedNbTickets": {
+      "type": ["integer", "null"],
+      "description": "Number of tickets allocated at validation time",
+      "minimum": 0,
+      "example": 10
+    },
+    "validatedNbJobOffers": {
+      "type": ["integer", "null"],
+      "description": "Number of job offers allowed at validation time",
+      "minimum": 0,
+      "example": 2
+    },
+    "validatedBoothSize": {
+      "type": ["string", "null"],
+      "description": "Booth size allocated at validation time (e.g., '3x3m')",
+      "example": "3x3m"
+    },
+    "agreementSignedUrl": {
+      "type": ["string", "null"],
+      "format": "uri",
+      "description": "URL to the signed agreement document. Null if not yet signed.",
+      "example": null
+    }
+  },
+  "required": [
+    "id",
+    "eventSlug",
+    "companyId",
+    "sponsoringPackId",
+    "validatedAt"
+  ],
+  "additionalProperties": false
+}
