@@ -21,13 +21,6 @@ export const useSponsorsStore = defineStore('sponsors', {
 
   getters: {
     /**
-     * Obtenir les sponsors par statut
-     */
-    sponsorsByStatus: (state) => (status: string) => {
-      return state.sponsors.filter((s: PartnershipItemSchema) => s.status === status);
-    },
-
-    /**
      * Obtenir le nombre total de sponsors
      */
     totalSponsors: (state) => state.sponsors.length,
@@ -35,8 +28,15 @@ export const useSponsorsStore = defineStore('sponsors', {
     /**
      * Obtenir les sponsors par pack
      */
-    sponsorsByPack: (state) => (packId: string) => {
-      return state.sponsors.filter((s: PartnershipItemSchema) => s.pack_id === packId);
+    sponsorsByPack: (state) => (packName: string) => {
+      return state.sponsors.filter((s: PartnershipItemSchema) => s.pack_name === packName);
+    },
+
+    /**
+     * Obtenir les sponsors par événement
+     */
+    sponsorsByEvent: (state) => (eventName: string) => {
+      return state.sponsors.filter((s: PartnershipItemSchema) => s.event_name === eventName);
     },
   },
 

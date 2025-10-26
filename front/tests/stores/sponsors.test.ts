@@ -1,41 +1,27 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useSponsorsStore } from '~/stores/sponsors';
-import type { Partnership } from '~/utils/api';
+import type { PartnershipItemSchema } from '~/utils/api';
 
 describe('useSponsorsStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
   });
 
-  const mockSponsor: Partnership = {
+  const mockSponsor: PartnershipItemSchema = {
     id: '1',
-    company: {
-      id: 'company-1',
-      name: 'Test Company',
-      head_office: {
-        address: '123 Test St',
-        city: 'Paris',
-        zip_code: '75001',
-        country: 'France',
-      },
-      siret: '12345678901234',
-      vat: 'FR12345678901',
-      site_url: 'https://test.com',
+    contact: {
+      display_name: 'John Doe',
+      role: 'CEO',
     },
-    pack: {
-      id: 'pack-1',
-      name: 'Gold Pack',
-      base_price: 1000,
-      nb_tickets: 5,
-      with_booth: true,
-    },
-    status: 'pending',
-    contact_name: 'John Doe',
-    contact_role: 'CEO',
+    company_name: 'Test Company',
+    event_name: 'DevLille 2025',
+    pack_name: 'Gold Pack',
+    suggested_pack_name: null,
     language: 'fr',
     phone: '+33123456789',
-    emails: ['john@test.com'],
+    emails: 'john@test.com',
+    created_at: '2025-01-01T00:00:00Z',
   };
 
   describe('initial state', () => {
@@ -80,18 +66,18 @@ describe('useSponsorsStore', () => {
       const store = useSponsorsStore();
       store.setSponsors([mockSponsor]);
 
-      store.updateSponsor('1', { status: 'approved' });
+      store.updateSponsor('1', { company_name: 'Updated Company' });
 
-      expect(store.sponsors[0].status).toBe('approved');
+      expect(store.sponsors[0]!.company_name).toBe('Updated Company');
     });
 
     it('should not update if sponsor not found', () => {
       const store = useSponsorsStore();
       store.setSponsors([mockSponsor]);
 
-      store.updateSponsor('999', { status: 'approved' });
+      store.updateSponsor('999', { company_name: 'Updated Company' });
 
-      expect(store.sponsors[0].status).toBe('pending');
+      expect(store.sponsors[0]!.company_name).toBe('Test Company');
     });
   });
 
@@ -117,9 +103,9 @@ describe('useSponsorsStore', () => {
 
     it('should remove only the specified sponsor from multiple sponsors', () => {
       const store = useSponsorsStore();
-      const sponsor1 = { ...mockSponsor, id: '1', company: { ...mockSponsor.company, name: 'Company 1' } };
-      const sponsor2 = { ...mockSponsor, id: '2', company: { ...mockSponsor.company, name: 'Company 2' } };
-      const sponsor3 = { ...mockSponsor, id: '3', company: { ...mockSponsor.company, name: 'Company 3' } };
+      const sponsor1 = { ...mockSponsor, id: '1', company_name: 'Company 1' };
+      const sponsor2 = { ...mockSponsor, id: '2', company_name: 'Company 2' };
+      const sponsor3 = { ...mockSponsor, id: '3', company_name: 'Company 3' };
 
       store.setSponsors([sponsor1, sponsor2, sponsor3]);
 
@@ -148,28 +134,28 @@ describe('useSponsorsStore', () => {
       expect(store.totalSponsors).toBe(1);
     });
 
-    it('sponsorsByStatus should filter by status', () => {
+    it('sponsorsByPack should filter by pack name', () => {
       const store = useSponsorsStore();
-      const pendingSponsor = { ...mockSponsor, id: '1', status: 'pending' };
-      const approvedSponsor = { ...mockSponsor, id: '2', status: 'approved' };
-
-      store.setSponsors([pendingSponsor, approvedSponsor]);
-
-      const pending = store.sponsorsByStatus('pending');
-      expect(pending).toHaveLength(1);
-      expect(pending[0].id).toBe('1');
-    });
-
-    it('sponsorsByPack should filter by pack ID', () => {
-      const store = useSponsorsStore();
-      const sponsor1 = { ...mockSponsor, id: '1', pack: { ...mockSponsor.pack, id: 'pack-1' } };
-      const sponsor2 = { ...mockSponsor, id: '2', pack: { ...mockSponsor.pack, id: 'pack-2' } };
+      const sponsor1 = { ...mockSponsor, id: '1', pack_name: 'Gold Pack' };
+      const sponsor2 = { ...mockSponsor, id: '2', pack_name: 'Silver Pack' };
 
       store.setSponsors([sponsor1, sponsor2]);
 
-      const packSponsors = store.sponsorsByPack('pack-1');
+      const packSponsors = store.sponsorsByPack('Gold Pack');
       expect(packSponsors).toHaveLength(1);
-      expect(packSponsors[0].id).toBe('1');
+      expect(packSponsors[0]!.id).toBe('1');
+    });
+
+    it('sponsorsByEvent should filter by event name', () => {
+      const store = useSponsorsStore();
+      const sponsor1 = { ...mockSponsor, id: '1', event_name: 'DevLille 2025' };
+      const sponsor2 = { ...mockSponsor, id: '2', event_name: 'DevLille 2026' };
+
+      store.setSponsors([sponsor1, sponsor2]);
+
+      const eventSponsors = store.sponsorsByEvent('DevLille 2025');
+      expect(eventSponsors).toHaveLength(1);
+      expect(eventSponsors[0]!.id).toBe('1');
     });
   });
 
