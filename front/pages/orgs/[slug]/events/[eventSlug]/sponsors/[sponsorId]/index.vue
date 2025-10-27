@@ -3,12 +3,12 @@
     <div class="bg-white p-6">
       <div class="flex items-center justify-between">
         <div>
-          <BackButton :to="`/orgs/${orgSlug}/events/${eventSlug}/sponsors`" label="Retour aux sponsors" />
           <h1 class="text-2xl font-bold text-gray-900">{{ partnership?.company_name || 'Sponsor' }}</h1>
+          <p class="text-sm text-gray-600 mt-1">Partenariat</p>
         </div>
         <div v-if="partnership" class="flex gap-3">
           <UButton
-            color="red"
+            color="error"
             variant="outline"
             :loading="isDeclining"
             :disabled="isValidating"
@@ -39,292 +39,14 @@
         {{ error }}
       </div>
 
-      <div v-else>
-        <!-- Tabs -->
-        <div class="border-b border-gray-200 mb-6">
-          <nav class="-mb-px flex space-x-8" aria-label="Navigation des sections du sponsor">
-            <button
-              v-for="tab in tabs"
-              :key="tab.id"
-              @click="changeTab(tab.id)"
-              :aria-selected="activeTab === tab.id"
-              :aria-label="`Section ${tab.label}`"
-              role="tab"
-              :class="[
-                activeTab === tab.id
-                  ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
-                'whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium'
-              ]"
-            >
-              {{ tab.label }}
-            </button>
-          </nav>
-        </div>
-
-        <!-- Partnership Tab -->
-        <div v-show="activeTab === 'partnership'" class="bg-white rounded-lg shadow p-6">
-          <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations du partenariat</h2>
-          <PartnershipForm
-            :partnership="partnership"
-            :loading="saving"
-            @save="onSave"
-            @cancel="onCancel"
-          />
-        </div>
-
-        <!-- Tickets Tab -->
-        <div v-show="activeTab === 'tickets'" class="bg-white rounded-lg shadow p-6">
-          <TicketsManager
-            v-if="partnership"
-            :event-slug="eventSlug"
-            :partnership-id="sponsorId"
-            @tickets-updated="handleTicketsUpdated"
-          />
-        </div>
-
-        <!-- Communication Tab -->
-        <div v-show="activeTab === 'communication'" class="bg-white rounded-lg shadow p-6">
-          <h2 class="text-lg font-semibold text-gray-900 mb-4">Communication</h2>
-
-          <TableSkeleton v-if="loadingCommunication" :columns="2" :rows="1" />
-
-          <div v-else-if="communicationError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-            {{ communicationError }}
-          </div>
-
-          <div v-else class="space-y-4">
-            <div class="bg-gray-50 rounded-lg p-6">
-              <div class="flex items-start gap-4">
-                <div class="flex-shrink-0">
-                  <i class="i-heroicons-calendar-days text-3xl text-primary-600" />
-                </div>
-                <div class="flex-1">
-                  <h3 class="text-sm font-medium text-gray-900 mb-1">Date de communication prévue</h3>
-                  <p v-if="communicationData?.publication_date && communicationData.publication_date !== null" class="text-2xl font-semibold text-gray-900">
-                    {{ formatDateSafe(communicationData.publication_date) }}
-                  </p>
-                  <p v-else class="text-lg text-gray-500 italic">
-                    Aucune date planifiée
-                  </p>
-                  <p class="text-sm text-gray-600 mt-2">
-                    Statut:
-                    <span v-if="!communicationData?.publication_date || communicationData.publication_date === null" class="text-orange-600 font-medium">Non planifié</span>
-                    <span v-else-if="isDatePassed(communicationData.publication_date)" class="text-green-600 font-medium">Effectuée</span>
-                    <span v-else class="text-blue-600 font-medium">Planifiée</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div v-if="communicationData?.support_url" class="bg-gray-50 rounded-lg p-6">
-              <div class="flex items-start gap-4">
-                <div class="flex-shrink-0">
-                  <i class="i-heroicons-photo text-3xl text-primary-600" />
-                </div>
-                <div class="flex-1">
-                  <h3 class="text-sm font-medium text-gray-900 mb-2">Support visuel</h3>
-                  <a
-                    :href="communicationData.support_url"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center gap-2 text-primary-600 hover:text-primary-800 font-medium"
-                  >
-                    Voir le support
-                    <i class="i-heroicons-arrow-top-right-on-square" />
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Company Info Tab -->
-        <div v-show="activeTab === 'company'" class="bg-white rounded-lg shadow p-6">
-          <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations de l'entreprise</h2>
-
-          <TableSkeleton v-if="loadingCompany" :columns="4" :rows="6" />
-
-          <div v-else-if="companyError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-            {{ companyError }}
-          </div>
-
-          <div v-else-if="company" class="space-y-4">
-            <div>
-              <label for="company-name" class="block text-sm font-medium text-gray-700 mb-2">
-                Nom <span class="text-red-500">*</span>
-              </label>
-              <UInput
-                id="company-name"
-                v-model="companyForm.name"
-                placeholder="Nom de l'entreprise"
-                :disabled="savingCompany"
-                class="w-full"
-              />
-            </div>
-
-            <div>
-              <label for="company-siret" class="block text-sm font-medium text-gray-700 mb-2">
-                SIRET <span class="text-red-500">*</span>
-              </label>
-              <UInput
-                id="company-siret"
-                v-model="companyForm.siret"
-                placeholder="12345678901234"
-                :disabled="savingCompany"
-                class="w-full"
-              />
-            </div>
-
-            <div>
-              <label for="company-vat" class="block text-sm font-medium text-gray-700 mb-2">
-                TVA <span class="text-red-500">*</span>
-              </label>
-              <UInput
-                id="company-vat"
-                v-model="companyForm.vat"
-                placeholder="FR12345678901"
-                :disabled="savingCompany"
-                class="w-full"
-              />
-            </div>
-
-            <div>
-              <label for="company-site-url" class="block text-sm font-medium text-gray-700 mb-2">
-                Site web <span class="text-red-500">*</span>
-              </label>
-              <UInput
-                id="company-site-url"
-                v-model="companyForm.site_url"
-                type="url"
-                placeholder="https://example.com"
-                :disabled="savingCompany"
-                class="w-full"
-              />
-            </div>
-
-            <div>
-              <label for="company-description" class="block text-sm font-medium text-gray-700 mb-2">
-                Description (optionnel)
-              </label>
-              <UTextarea
-                id="company-description"
-                v-model="companyForm.description"
-                placeholder="Description de l'entreprise"
-                :disabled="savingCompany"
-                rows="4"
-                class="w-full"
-              />
-            </div>
-
-            <div class="border-t pt-4">
-              <LogoUpload
-                v-if="company"
-                :company-id="company.id"
-                :company-name="company.name"
-                :current-logo-media="company.medias"
-                :disabled="savingCompany"
-                @uploaded="handleLogoUploaded"
-                @error="handleLogoError"
-              />
-            </div>
-
-            <div class="border-t pt-4">
-              <h3 class="text-sm font-medium text-gray-900 mb-3">Adresse du siège social</h3>
-
-              <div class="space-y-4">
-                <div>
-                  <label for="company-street" class="block text-sm font-medium text-gray-700 mb-2">
-                    Rue <span class="text-red-500">*</span>
-                  </label>
-                  <UInput
-                    id="company-street"
-                    v-model="companyForm.head_office.street"
-                    placeholder="123 Rue de la République"
-                    :disabled="savingCompany"
-                    class="w-full"
-                  />
-                </div>
-
-                <div>
-                  <label for="company-street-2" class="block text-sm font-medium text-gray-700 mb-2">
-                    Complément d'adresse (optionnel)
-                  </label>
-                  <UInput
-                    id="company-street-2"
-                    v-model="companyForm.head_office.street_2"
-                    placeholder="Bâtiment A, 3ème étage"
-                    :disabled="savingCompany"
-                    class="w-full"
-                  />
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label for="company-zip" class="block text-sm font-medium text-gray-700 mb-2">
-                      Code postal <span class="text-red-500">*</span>
-                    </label>
-                    <UInput
-                      id="company-zip"
-                      v-model="companyForm.head_office.zip"
-                      placeholder="75001"
-                      :disabled="savingCompany"
-                      class="w-full"
-                    />
-                  </div>
-
-                  <div>
-                    <label for="company-city" class="block text-sm font-medium text-gray-700 mb-2">
-                      Ville <span class="text-red-500">*</span>
-                    </label>
-                    <UInput
-                      id="company-city"
-                      v-model="companyForm.head_office.city"
-                      placeholder="Paris"
-                      :disabled="savingCompany"
-                      class="w-full"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label for="company-country" class="block text-sm font-medium text-gray-700 mb-2">
-                    Pays <span class="text-red-500">*</span>
-                  </label>
-                  <UInput
-                    id="company-country"
-                    v-model="companyForm.head_office.country"
-                    placeholder="France"
-                    :disabled="savingCompany"
-                    class="w-full"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div v-if="companyFormError" class="text-sm text-red-600">
-              {{ companyFormError }}
-            </div>
-
-            <div class="flex justify-end gap-3 pt-4">
-              <UButton
-                color="neutral"
-                variant="ghost"
-                :disabled="savingCompany"
-                @click="resetCompanyForm"
-              >
-                Annuler
-              </UButton>
-              <UButton
-                color="primary"
-                :loading="savingCompany"
-                @click="handleSaveCompany"
-              >
-                Enregistrer
-              </UButton>
-            </div>
-          </div>
-        </div>
+      <div v-else class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations du partenariat</h2>
+        <PartnershipForm
+          :partnership="partnership"
+          :loading="saving"
+          @save="onSave"
+          @cancel="onCancel"
+        />
       </div>
     </div>
 
@@ -344,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { getOrgsEventsPartnership, getCompanies, getCompaniesPartnership, getOrgsEventsCommunication, type CompanySchema, type MediaSchema, type CommunicationItemSchema } from "~/utils/api";
+import { getOrgsEventsPartnership } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 import type { ExtendedPartnershipItem } from "~/types/partnership";
 import { PARTNERSHIP_CONFIRM } from "~/constants/partnership";
@@ -352,7 +74,6 @@ import { PARTNERSHIP_CONFIRM } from "~/constants/partnership";
 const route = useRoute();
 const router = useRouter();
 const { footerLinks } = useDashboardLinks();
-const { formatDate } = useFormatters();
 const { validatePartnership, declinePartnership } = usePartnershipActions();
 const { confirm, confirmState, handleConfirm: confirmModalConfirm, handleCancel: confirmModalCancel } = useConfirm();
 
@@ -376,58 +97,14 @@ const sponsorId = computed(() => {
   return Array.isArray(params) ? params[0] as string : params as string;
 });
 
-const tabs = [
-  { id: 'partnership' as const, label: 'Partenariat' },
-  { id: 'tickets' as const, label: 'Tickets' },
-  { id: 'communication' as const, label: 'Communication' },
-  { id: 'company' as const, label: 'Entreprise' }
-];
-
-// Initialiser le tab actif à partir du hash de l'URL
-const getInitialTab = (): 'partnership' | 'tickets' | 'communication' | 'company' => {
-  const hash = route.hash.replace('#', '');
-  const validTabs = tabs.map(t => t.id);
-  return validTabs.includes(hash as any) ? hash as any : 'partnership';
-};
-
-const activeTab = ref<'partnership' | 'tickets' | 'communication' | 'company'>(getInitialTab());
-
 const partnership = ref<ExtendedPartnershipItem | null>(null);
 const loading = ref(true);
 const saving = ref(false);
 const error = ref<string | null>(null);
 
-const company = ref<CompanySchema | null>(null);
-const loadingCompany = ref(false);
-const companyError = ref<string | null>(null);
-
-const communicationData = ref<CommunicationItemSchema | null>(null);
-const loadingCommunication = ref(false);
-const communicationError = ref<string | null>(null);
-
 // États pour validation/refus de partenariat
 const isValidating = ref(false);
 const isDeclining = ref(false);
-const showValidateConfirm = ref(false);
-const showDeclineConfirm = ref(false);
-
-const companyForm = ref({
-  name: '',
-  siret: '',
-  vat: '',
-  site_url: '',
-  description: '',
-  head_office: {
-    street: '',
-    street_2: '',
-    city: '',
-    zip: '',
-    country: ''
-  }
-});
-
-const savingCompany = ref(false);
-const companyFormError = ref<string | null>(null);
 
 // Menu contextuel pour la page du sponsor
 const { sponsorLinks } = useSponsorLinks(orgSlug.value, eventSlug.value, sponsorId.value);
@@ -447,256 +124,11 @@ async function loadPartnership() {
     }
 
     partnership.value = found;
-
-    // Charger les informations de la company et de la communication en parallèle
-    await Promise.all([
-      loadCompanyInfo(),
-      loadCommunicationInfo()
-    ]);
   } catch (err) {
     console.error('Failed to load partnership:', err);
     error.value = 'Impossible de charger les informations du sponsor';
   } finally {
     loading.value = false;
-  }
-}
-
-/**
- * Charge les informations de l'entreprise associée au partenariat
- * OPTIMISATION: Utilise Promise.all pour paralléliser les requêtes au lieu d'une boucle séquentielle
- */
-async function loadCompanyInfo() {
-  try {
-    loadingCompany.value = true;
-    companyError.value = null;
-
-    // Récupérer toutes les companies
-    const companiesResponse = await getCompanies();
-    const companies = companiesResponse.data.items;
-
-    // OPTIMISATION: Paralléliser les appels API au lieu de les faire en séquence
-    const partnershipChecks = await Promise.all(
-      companies.map(async (comp) => {
-        try {
-          const partnershipsResponse = await getCompaniesPartnership(comp.id);
-          const hasPartnership = partnershipsResponse.data.find((p: any) => p.id === sponsorId.value);
-          return hasPartnership ? comp : null;
-        } catch (err) {
-          // Si une erreur survient pour une company, on continue avec les autres
-          console.warn(`Failed to check partnerships for company ${comp.id}:`, err);
-          return null;
-        }
-      })
-    );
-
-    // Trouver la première company qui a ce partnership
-    const foundCompany = partnershipChecks.find(comp => comp !== null);
-
-    if (foundCompany) {
-      company.value = foundCompany;
-
-      // Initialiser le formulaire avec les données de la company
-      companyForm.value = {
-        name: foundCompany.name,
-        siret: foundCompany.siret,
-        vat: foundCompany.vat,
-        site_url: foundCompany.site_url,
-        description: foundCompany.description || '',
-        head_office: {
-          street: foundCompany.head_office.street,
-          street_2: foundCompany.head_office.street_2 || '',
-          city: foundCompany.head_office.city,
-          zip: foundCompany.head_office.zip,
-          country: foundCompany.head_office.country
-        }
-      };
-    } else {
-      companyError.value = 'Entreprise non trouvée';
-    }
-  } catch (err) {
-    console.error('Failed to load company info:', err);
-    companyError.value = 'Impossible de charger les informations de l\'entreprise';
-  } finally {
-    loadingCompany.value = false;
-  }
-}
-
-async function loadCommunicationInfo() {
-  try {
-    loadingCommunication.value = true;
-    communicationError.value = null;
-
-    // Récupérer le plan de communication global
-    const communicationPlan = await getOrgsEventsCommunication(orgSlug.value, eventSlug.value);
-
-    // Chercher les données de communication pour ce partenariat dans toutes les catégories
-    const allCommunications = [
-      ...communicationPlan.data.done,
-      ...communicationPlan.data.planned,
-      ...communicationPlan.data.unplanned
-    ];
-
-    // Trouver la communication qui correspond à ce partenariat
-    const found = allCommunications.find(c => c.partnership_id === sponsorId.value);
-
-    if (found) {
-      communicationData.value = found;
-    } else {
-      // Pas de données de communication pour ce partenariat
-      communicationData.value = {
-        partnership_id: sponsorId.value,
-        company_name: partnership.value?.company_name || '',
-        publication_date: null,
-        support_url: null
-      };
-    }
-  } catch (err) {
-    console.error('Failed to load communication info:', err);
-    communicationError.value = 'Impossible de charger les informations de communication';
-  } finally {
-    loadingCommunication.value = false;
-  }
-}
-
-function formatDateSafe(dateString: string | null | undefined): string {
-  if (!dateString) return 'Date invalide';
-
-  try {
-    // Use the formatDate from useFormatters() called at top level
-    const formatted = formatDate(dateString, 'long');
-    // If formatDate returns empty string, use fallback
-    if (!formatted) {
-      return new Date(dateString).toLocaleDateString('fr-FR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-    }
-    return formatted;
-  } catch (error) {
-    console.error('Error formatting date:', error, dateString);
-    // Fallback: afficher la date brute
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  }
-}
-
-function isDatePassed(dateString: string): boolean {
-  try {
-    const date = new Date(dateString);
-    const now = new Date();
-    return date < now;
-  } catch (error) {
-    console.error('Error checking date:', error, dateString);
-    return false;
-  }
-}
-
-function changeTab(tabId: 'partnership' | 'tickets' | 'communication' | 'company') {
-  activeTab.value = tabId;
-  // Mettre à jour le hash de l'URL
-  router.push({ hash: `#${tabId}` });
-}
-
-function resetCompanyForm() {
-  if (!company.value) return;
-
-  companyForm.value = {
-    name: company.value.name,
-    siret: company.value.siret,
-    vat: company.value.vat,
-    site_url: company.value.site_url,
-    description: company.value.description || '',
-    head_office: {
-      street: company.value.head_office.street,
-      street_2: company.value.head_office.street_2 || '',
-      city: company.value.head_office.city,
-      zip: company.value.head_office.zip,
-      country: company.value.head_office.country
-    }
-  };
-  companyFormError.value = null;
-}
-
-async function handleSaveCompany() {
-  companyFormError.value = null;
-
-  // Validation
-  if (!companyForm.value.name || !companyForm.value.name.trim()) {
-    companyFormError.value = 'Le nom est obligatoire';
-    return;
-  }
-
-  if (!companyForm.value.siret || !companyForm.value.siret.trim()) {
-    companyFormError.value = 'Le SIRET est obligatoire';
-    return;
-  }
-
-  if (!companyForm.value.vat || !companyForm.value.vat.trim()) {
-    companyFormError.value = 'La TVA est obligatoire';
-    return;
-  }
-
-  if (!companyForm.value.site_url || !companyForm.value.site_url.trim()) {
-    companyFormError.value = 'Le site web est obligatoire';
-    return;
-  }
-
-  if (!companyForm.value.head_office.street || !companyForm.value.head_office.street.trim()) {
-    companyFormError.value = 'La rue est obligatoire';
-    return;
-  }
-
-  if (!companyForm.value.head_office.zip || !companyForm.value.head_office.zip.trim()) {
-    companyFormError.value = 'Le code postal est obligatoire';
-    return;
-  }
-
-  if (!companyForm.value.head_office.city || !companyForm.value.head_office.city.trim()) {
-    companyFormError.value = 'La ville est obligatoire';
-    return;
-  }
-
-  if (!companyForm.value.head_office.country || !companyForm.value.head_office.country.trim()) {
-    companyFormError.value = 'Le pays est obligatoire';
-    return;
-  }
-
-  try {
-    savingCompany.value = true;
-
-    // TODO: Appeler l'API de mise à jour quand elle sera disponible
-    console.log('Données de la company à sauvegarder:', companyForm.value);
-
-    // Pour l'instant, afficher un message
-    companyFormError.value = 'La fonctionnalité de mise à jour sera disponible prochainement. Les données ont été validées avec succès.';
-
-    // Simuler une mise à jour locale
-    if (company.value) {
-      company.value = {
-        ...company.value,
-        name: companyForm.value.name,
-        siret: companyForm.value.siret,
-        vat: companyForm.value.vat,
-        site_url: companyForm.value.site_url,
-        description: companyForm.value.description || null,
-        head_office: {
-          street: companyForm.value.head_office.street,
-          street_2: companyForm.value.head_office.street_2 || null,
-          city: companyForm.value.head_office.city,
-          zip: companyForm.value.head_office.zip,
-          country: companyForm.value.head_office.country
-        }
-      };
-    }
-  } catch (err) {
-    console.error('Failed to save company:', err);
-    companyFormError.value = 'Impossible de sauvegarder les modifications';
-  } finally {
-    savingCompany.value = false;
   }
 }
 
@@ -721,25 +153,6 @@ async function onSave(data: any) {
 
 function onCancel() {
   router.push(`/orgs/${orgSlug.value}/events/${eventSlug.value}/sponsors`);
-}
-
-function handleLogoUploaded(media: MediaSchema) {
-  // Mettre à jour le logo de la company
-  if (company.value) {
-    company.value = {
-      ...company.value,
-      medias: media
-    };
-  }
-}
-
-function handleLogoError(errorMessage: string) {
-  companyError.value = errorMessage;
-}
-
-function handleTicketsUpdated(updatedTickets: any) {
-  // Les tickets ont été mis à jour avec succès
-  console.log('Tickets updated:', updatedTickets);
 }
 
 /**
@@ -827,15 +240,6 @@ onMounted(() => {
 // Recharger si les slugs changent
 watch([orgSlug, eventSlug, sponsorId], () => {
   loadPartnership();
-});
-
-// Synchroniser le tab actif avec le hash de l'URL
-watch(() => route.hash, (newHash) => {
-  const hash = newHash.replace('#', '');
-  const validTabs = tabs.map(t => t.id);
-  if (validTabs.includes(hash as any)) {
-    activeTab.value = hash as 'partnership' | 'tickets' | 'communication' | 'company';
-  }
 });
 
 useHead({

@@ -6,14 +6,29 @@ export const useSponsorLinks = (orgSlug: string, eventSlug: string, sponsorId: s
       to: `/orgs/${orgSlug}/events/${eventSlug}/sponsors`
     },
     {
-      label: 'Informations',
-      icon: 'i-heroicons-information-circle',
+      label: 'Partenariat',
+      icon: 'i-heroicons-hand-raised',
       to: `/orgs/${orgSlug}/events/${eventSlug}/sponsors/${sponsorId}`
     },
     {
+      label: 'Tickets',
+      icon: 'i-heroicons-ticket',
+      to: `/orgs/${orgSlug}/events/${eventSlug}/sponsors/${sponsorId}/tickets`
+    },
+    {
+      label: 'Communication',
+      icon: 'i-heroicons-megaphone',
+      to: `/orgs/${orgSlug}/events/${eventSlug}/sponsors/${sponsorId}/communication`
+    },
+    {
       label: 'Documents',
-      icon: 'i-heroicons-document',
+      icon: 'i-heroicons-document-text',
       to: `/orgs/${orgSlug}/events/${eventSlug}/sponsors/${sponsorId}/documents`
+    },
+    {
+      label: 'Entreprise',
+      icon: 'i-heroicons-building-office',
+      to: `/orgs/${orgSlug}/events/${eventSlug}/sponsors/${sponsorId}/company`
     },
     {
       label: 'Offres d\'emploi',

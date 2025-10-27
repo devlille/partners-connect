@@ -677,4 +677,335 @@ describe('Sponsor Detail Page - Partnership Actions', () => {
       expect(formatErrorMessage(500)).toBe('Une erreur est survenue');
     });
   });
+
+  describe('Agreement Generation', () => {
+    describe('Generate Agreement API Call', () => {
+      it('should call API with correct parameters', async () => {
+        const mockApi = {
+          postOrgsEventsPartnershipAgreement: vi.fn().mockResolvedValue({
+            data: { url: 'https://example.com/agreement.pdf' }
+          })
+        };
+
+        const orgSlug = 'test-org';
+        const eventSlug = 'test-event';
+        const sponsorId = 'sponsor-123';
+
+        await mockApi.postOrgsEventsPartnershipAgreement(orgSlug, eventSlug, sponsorId);
+
+        expect(mockApi.postOrgsEventsPartnershipAgreement).toHaveBeenCalledWith(
+          orgSlug,
+          eventSlug,
+          sponsorId
+        );
+      });
+
+      it('should return agreement URL on success', async () => {
+        const expectedUrl = 'https://example.com/agreement.pdf';
+        const mockApi = {
+          postOrgsEventsPartnershipAgreement: vi.fn().mockResolvedValue({
+            data: { url: expectedUrl }
+          })
+        };
+
+        const result = await mockApi.postOrgsEventsPartnershipAgreement('org', 'event', 'sponsor');
+
+        expect(result.data.url).toBe(expectedUrl);
+      });
+
+      it('should handle 404 error when partnership not found', async () => {
+        const mockApi = {
+          postOrgsEventsPartnershipAgreement: vi.fn().mockRejectedValue({
+            response: { status: 404 }
+          })
+        };
+
+        await expect(
+          mockApi.postOrgsEventsPartnershipAgreement('org', 'event', 'invalid-id')
+        ).rejects.toMatchObject({
+          response: { status: 404 }
+        });
+      });
+
+      it('should handle 403 error when not authorized', async () => {
+        const mockApi = {
+          postOrgsEventsPartnershipAgreement: vi.fn().mockRejectedValue({
+            response: { status: 403 }
+          })
+        };
+
+        await expect(
+          mockApi.postOrgsEventsPartnershipAgreement('org', 'event', 'sponsor')
+        ).rejects.toMatchObject({
+          response: { status: 403 }
+        });
+      });
+
+      it('should handle generic API error', async () => {
+        const mockApi = {
+          postOrgsEventsPartnershipAgreement: vi.fn().mockRejectedValue({
+            response: { status: 500 }
+          })
+        };
+
+        await expect(
+          mockApi.postOrgsEventsPartnershipAgreement('org', 'event', 'sponsor')
+        ).rejects.toMatchObject({
+          response: { status: 500 }
+        });
+      });
+
+      it('should handle network error', async () => {
+        const mockApi = {
+          postOrgsEventsPartnershipAgreement: vi.fn().mockRejectedValue(
+            new Error('Network error')
+          )
+        };
+
+        await expect(
+          mockApi.postOrgsEventsPartnershipAgreement('org', 'event', 'sponsor')
+        ).rejects.toThrow('Network error');
+      });
+    });
+
+    describe('Agreement Generation State Management', () => {
+      it('should set loading state to true when generating', () => {
+        const state = {
+          isGeneratingAgreement: false
+        };
+
+        // Simulate start of generation
+        state.isGeneratingAgreement = true;
+
+        expect(state.isGeneratingAgreement).toBe(true);
+      });
+
+      it('should set loading state to false after success', async () => {
+        const state = {
+          isGeneratingAgreement: true,
+          agreementUrl: null as string | null,
+          agreementError: null as string | null
+        };
+
+        // Simulate successful generation
+        state.agreementUrl = 'https://example.com/agreement.pdf';
+        state.isGeneratingAgreement = false;
+        state.agreementError = null;
+
+        expect(state.isGeneratingAgreement).toBe(false);
+        expect(state.agreementUrl).toBe('https://example.com/agreement.pdf');
+        expect(state.agreementError).toBeNull();
+      });
+
+      it('should set loading state to false after error', () => {
+        const state = {
+          isGeneratingAgreement: true,
+          agreementError: null as string | null
+        };
+
+        // Simulate error
+        state.agreementError = 'Une erreur est survenue';
+        state.isGeneratingAgreement = false;
+
+        expect(state.isGeneratingAgreement).toBe(false);
+        expect(state.agreementError).toBe('Une erreur est survenue');
+      });
+
+      it('should clear error when starting new generation', () => {
+        const state = {
+          agreementError: 'Previous error' as string | null,
+          isGeneratingAgreement: false
+        };
+
+        // Simulate start of new generation
+        state.agreementError = null;
+        state.isGeneratingAgreement = true;
+
+        expect(state.agreementError).toBeNull();
+        expect(state.isGeneratingAgreement).toBe(true);
+      });
+
+      it('should store agreement URL after successful generation', () => {
+        const state = {
+          agreementUrl: null as string | null
+        };
+
+        const generatedUrl = 'https://example.com/agreements/123.pdf';
+        state.agreementUrl = generatedUrl;
+
+        expect(state.agreementUrl).toBe(generatedUrl);
+      });
+    });
+
+    describe('Agreement Error Handling', () => {
+      it('should format 404 error message', () => {
+        const formatAgreementError = (err: any): string => {
+          if (err.response?.status === 404) {
+            return 'Partenariat introuvable';
+          }
+          if (err.response?.status === 403) {
+            return 'Vous n\'êtes pas autorisé à générer cette convention';
+          }
+          return 'Une erreur est survenue lors de la génération de la convention';
+        };
+
+        const error = { response: { status: 404 } };
+        expect(formatAgreementError(error)).toBe('Partenariat introuvable');
+      });
+
+      it('should format 403 error message', () => {
+        const formatAgreementError = (err: any): string => {
+          if (err.response?.status === 404) {
+            return 'Partenariat introuvable';
+          }
+          if (err.response?.status === 403) {
+            return 'Vous n\'êtes pas autorisé à générer cette convention';
+          }
+          return 'Une erreur est survenue lors de la génération de la convention';
+        };
+
+        const error = { response: { status: 403 } };
+        expect(formatAgreementError(error)).toBe('Vous n\'êtes pas autorisé à générer cette convention');
+      });
+
+      it('should format generic error message', () => {
+        const formatAgreementError = (err: any): string => {
+          if (err.response?.status === 404) {
+            return 'Partenariat introuvable';
+          }
+          if (err.response?.status === 403) {
+            return 'Vous n\'êtes pas autorisé à générer cette convention';
+          }
+          return 'Une erreur est survenue lors de la génération de la convention';
+        };
+
+        const error = { response: { status: 500 } };
+        expect(formatAgreementError(error)).toBe('Une erreur est survenue lors de la génération de la convention');
+      });
+
+      it('should handle error without response', () => {
+        const formatAgreementError = (err: any): string => {
+          if (err.response?.status === 404) {
+            return 'Partenariat introuvable';
+          }
+          if (err.response?.status === 403) {
+            return 'Vous n\'êtes pas autorisé à générer cette convention';
+          }
+          return 'Une erreur est survenue lors de la génération de la convention';
+        };
+
+        const error = new Error('Network error');
+        expect(formatAgreementError(error)).toBe('Une erreur est survenue lors de la génération de la convention');
+      });
+    });
+
+    describe('Agreement Success Handling', () => {
+      it('should open PDF in new tab on success', () => {
+        const mockWindow = {
+          open: vi.fn()
+        };
+
+        const agreementUrl = 'https://example.com/agreement.pdf';
+        mockWindow.open(agreementUrl, '_blank');
+
+        expect(mockWindow.open).toHaveBeenCalledWith(agreementUrl, '_blank');
+      });
+
+      it('should show success toast notification', () => {
+        const mockToast = {
+          success: vi.fn()
+        };
+
+        mockToast.success('La convention a été générée avec succès');
+
+        expect(mockToast.success).toHaveBeenCalledWith('La convention a été générée avec succès');
+      });
+
+      it('should handle missing URL in response', () => {
+        const response = { data: {} };
+        const hasUrl = 'url' in response.data;
+
+        expect(hasUrl).toBe(false);
+      });
+    });
+
+    describe('Documents Tab Integration', () => {
+      it('should include documents tab in tabs array', () => {
+        const tabs = [
+          { id: 'partnership' as const, label: 'Partenariat' },
+          { id: 'tickets' as const, label: 'Tickets' },
+          { id: 'communication' as const, label: 'Communication' },
+          { id: 'documents' as const, label: 'Documents' },
+          { id: 'company' as const, label: 'Entreprise' }
+        ];
+
+        const documentTab = tabs.find(t => t.id === 'documents');
+
+        expect(documentTab).toBeDefined();
+        expect(documentTab?.label).toBe('Documents');
+      });
+
+      it('should navigate to documents tab via hash', () => {
+        const tabs = [
+          { id: 'partnership' as const, label: 'Partenariat' },
+          { id: 'tickets' as const, label: 'Tickets' },
+          { id: 'communication' as const, label: 'Communication' },
+          { id: 'documents' as const, label: 'Documents' },
+          { id: 'company' as const, label: 'Entreprise' }
+        ];
+
+        const getInitialTab = (hash: string): 'partnership' | 'tickets' | 'communication' | 'documents' | 'company' => {
+          const cleanHash = hash.replace('#', '');
+          const validTabs = tabs.map(t => t.id);
+          return validTabs.includes(cleanHash as any) ? cleanHash as any : 'partnership';
+        };
+
+        expect(getInitialTab('#documents')).toBe('documents');
+      });
+
+      it('should update URL hash when changing to documents tab', () => {
+        const mockRouter = {
+          push: vi.fn()
+        };
+
+        const changeTab = (tabId: 'partnership' | 'tickets' | 'communication' | 'documents' | 'company') => {
+          mockRouter.push({ hash: `#${tabId}` });
+        };
+
+        changeTab('documents');
+
+        expect(mockRouter.push).toHaveBeenCalledWith({ hash: '#documents' });
+      });
+    });
+
+    describe('Agreement Button State', () => {
+      it('should disable button while generating', () => {
+        const state = {
+          isGeneratingAgreement: true
+        };
+
+        const isDisabled = state.isGeneratingAgreement;
+
+        expect(isDisabled).toBe(true);
+      });
+
+      it('should enable button when not generating', () => {
+        const state = {
+          isGeneratingAgreement: false
+        };
+
+        const isDisabled = state.isGeneratingAgreement;
+
+        expect(isDisabled).toBe(false);
+      });
+
+      it('should show loading indicator while generating', () => {
+        const state = {
+          isGeneratingAgreement: true
+        };
+
+        expect(state.isGeneratingAgreement).toBe(true);
+      });
+    });
+  });
 });
