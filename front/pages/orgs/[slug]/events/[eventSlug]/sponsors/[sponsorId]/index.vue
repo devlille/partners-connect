@@ -6,6 +6,29 @@
           <BackButton :to="`/orgs/${orgSlug}/events/${eventSlug}/sponsors`" label="Retour aux sponsors" />
           <h1 class="text-2xl font-bold text-gray-900">{{ partnership?.company_name || 'Sponsor' }}</h1>
         </div>
+        <div v-if="partnership" class="flex gap-3">
+          <UButton
+            color="red"
+            variant="outline"
+            :loading="isDeclining"
+            :disabled="isValidating"
+            :aria-label="`Refuser le partenariat avec ${partnership.company_name}`"
+            @click="handleDeclinePartnership"
+          >
+            <i class="i-heroicons-x-mark mr-2" aria-hidden="true" />
+            Refuser
+          </UButton>
+          <UButton
+            color="primary"
+            :loading="isValidating"
+            :disabled="isDeclining"
+            :aria-label="`Valider le partenariat avec ${partnership.company_name}`"
+            @click="handleValidatePartnership"
+          >
+            <i class="i-heroicons-check mr-2" aria-hidden="true" />
+            Valider
+          </UButton>
+        </div>
       </div>
     </div>
 
@@ -19,11 +42,14 @@
       <div v-else>
         <!-- Tabs -->
         <div class="border-b border-gray-200 mb-6">
-          <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+          <nav class="-mb-px flex space-x-8" aria-label="Navigation des sections du sponsor">
             <button
               v-for="tab in tabs"
               :key="tab.id"
               @click="changeTab(tab.id)"
+              :aria-selected="activeTab === tab.id"
+              :aria-label="`Section ${tab.label}`"
+              role="tab"
               :class="[
                 activeTab === tab.id
                   ? 'border-primary-500 text-primary-600'
@@ -301,17 +327,34 @@
         </div>
       </div>
     </div>
+
+    <!-- Modale de confirmation globale -->
+    <ConfirmModal
+      v-model="confirmState.isOpen"
+      :title="confirmState.options.title"
+      :message="confirmState.options.message"
+      :confirm-label="confirmState.options.confirmLabel"
+      :cancel-label="confirmState.options.cancelLabel"
+      :type="confirmState.options.type"
+      :confirming="confirmState.confirming"
+      @confirm="handleConfirm"
+      @cancel="handleCancel"
+    />
   </Dashboard>
 </template>
 
 <script setup lang="ts">
-import { getOrgsEventsPartnership, getCompanies, getCompaniesPartnership, getOrgsEventsCommunication, type PartnershipItem, type CompanySchema, type MediaSchema, type CommunicationItemSchema } from "~/utils/api";
+import { getOrgsEventsPartnership, getCompanies, getCompaniesPartnership, getOrgsEventsCommunication, type CompanySchema, type MediaSchema, type CommunicationItemSchema } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
+import type { ExtendedPartnershipItem } from "~/types/partnership";
+import { PARTNERSHIP_CONFIRM } from "~/constants/partnership";
 
 const route = useRoute();
 const router = useRouter();
 const { footerLinks } = useDashboardLinks();
 const { formatDate } = useFormatters();
+const { validatePartnership, declinePartnership } = usePartnershipActions();
+const { confirm, confirmState, handleConfirm: confirmModalConfirm, handleCancel: confirmModalCancel } = useConfirm();
 
 definePageMeta({
   middleware: authMiddleware,
@@ -349,7 +392,7 @@ const getInitialTab = (): 'partnership' | 'tickets' | 'communication' | 'company
 
 const activeTab = ref<'partnership' | 'tickets' | 'communication' | 'company'>(getInitialTab());
 
-const partnership = ref<PartnershipItem | null>(null);
+const partnership = ref<ExtendedPartnershipItem | null>(null);
 const loading = ref(true);
 const saving = ref(false);
 const error = ref<string | null>(null);
@@ -361,6 +404,12 @@ const companyError = ref<string | null>(null);
 const communicationData = ref<CommunicationItemSchema | null>(null);
 const loadingCommunication = ref(false);
 const communicationError = ref<string | null>(null);
+
+// États pour validation/refus de partenariat
+const isValidating = ref(false);
+const isDeclining = ref(false);
+const showValidateConfirm = ref(false);
+const showDeclineConfirm = ref(false);
 
 const companyForm = ref({
   name: '',
@@ -412,6 +461,10 @@ async function loadPartnership() {
   }
 }
 
+/**
+ * Charge les informations de l'entreprise associée au partenariat
+ * OPTIMISATION: Utilise Promise.all pour paralléliser les requêtes au lieu d'une boucle séquentielle
+ */
 async function loadCompanyInfo() {
   try {
     loadingCompany.value = true;
@@ -421,34 +474,45 @@ async function loadCompanyInfo() {
     const companiesResponse = await getCompanies();
     const companies = companiesResponse.data.items;
 
-    // Trouver la company qui a ce partnership
-    for (const comp of companies) {
-      const partnershipsResponse = await getCompaniesPartnership(comp.id);
-      const hasPartnership = partnershipsResponse.data.find((p: any) => p.id === sponsorId.value);
+    // OPTIMISATION: Paralléliser les appels API au lieu de les faire en séquence
+    const partnershipChecks = await Promise.all(
+      companies.map(async (comp) => {
+        try {
+          const partnershipsResponse = await getCompaniesPartnership(comp.id);
+          const hasPartnership = partnershipsResponse.data.find((p: any) => p.id === sponsorId.value);
+          return hasPartnership ? comp : null;
+        } catch (err) {
+          // Si une erreur survient pour une company, on continue avec les autres
+          console.warn(`Failed to check partnerships for company ${comp.id}:`, err);
+          return null;
+        }
+      })
+    );
 
-      if (hasPartnership) {
-        company.value = comp;
+    // Trouver la première company qui a ce partnership
+    const foundCompany = partnershipChecks.find(comp => comp !== null);
 
-        // Initialiser le formulaire avec les données de la company
-        companyForm.value = {
-          name: comp.name,
-          siret: comp.siret,
-          vat: comp.vat,
-          site_url: comp.site_url,
-          description: comp.description || '',
-          head_office: {
-            street: comp.head_office.street,
-            street_2: comp.head_office.street_2 || '',
-            city: comp.head_office.city,
-            zip: comp.head_office.zip,
-            country: comp.head_office.country
-          }
-        };
-        return;
-      }
+    if (foundCompany) {
+      company.value = foundCompany;
+
+      // Initialiser le formulaire avec les données de la company
+      companyForm.value = {
+        name: foundCompany.name,
+        siret: foundCompany.siret,
+        vat: foundCompany.vat,
+        site_url: foundCompany.site_url,
+        description: foundCompany.description || '',
+        head_office: {
+          street: foundCompany.head_office.street,
+          street_2: foundCompany.head_office.street_2 || '',
+          city: foundCompany.head_office.city,
+          zip: foundCompany.head_office.zip,
+          country: foundCompany.head_office.country
+        }
+      };
+    } else {
+      companyError.value = 'Entreprise non trouvée';
     }
-
-    companyError.value = 'Entreprise non trouvée';
   } catch (err) {
     console.error('Failed to load company info:', err);
     companyError.value = 'Impossible de charger les informations de l\'entreprise';
@@ -676,6 +740,84 @@ function handleLogoError(errorMessage: string) {
 function handleTicketsUpdated(updatedTickets: any) {
   // Les tickets ont été mis à jour avec succès
   console.log('Tickets updated:', updatedTickets);
+}
+
+/**
+ * Gère la validation d'un partenariat avec confirmation utilisateur
+ */
+async function handleValidatePartnership() {
+  if (!partnership.value) return;
+
+  // Demander confirmation avec modale personnalisée
+  const confirmed = await confirm({
+    ...PARTNERSHIP_CONFIRM.VALIDATE,
+    message: PARTNERSHIP_CONFIRM.VALIDATE.message(partnership.value.company_name)
+  });
+
+  if (!confirmed) return;
+
+  isValidating.value = true;
+  error.value = null;
+
+  const result = await validatePartnership(
+    partnership.value,
+    orgSlug.value,
+    eventSlug.value,
+    sponsorId.value,
+    loadPartnership
+  );
+
+  if (!result.success && result.error) {
+    error.value = result.error;
+  }
+
+  isValidating.value = false;
+}
+
+/**
+ * Gère le refus d'un partenariat avec confirmation utilisateur
+ */
+async function handleDeclinePartnership() {
+  if (!partnership.value) return;
+
+  // Demander confirmation avec modale personnalisée
+  const confirmed = await confirm({
+    ...PARTNERSHIP_CONFIRM.DECLINE,
+    message: PARTNERSHIP_CONFIRM.DECLINE.message(partnership.value.company_name)
+  });
+
+  if (!confirmed) return;
+
+  isDeclining.value = true;
+  error.value = null;
+
+  const result = await declinePartnership(
+    partnership.value,
+    orgSlug.value,
+    eventSlug.value,
+    sponsorId.value,
+    () => router.push(`/orgs/${orgSlug.value}/events/${eventSlug.value}/sponsors`)
+  );
+
+  if (!result.success && result.error) {
+    error.value = result.error;
+  }
+
+  isDeclining.value = false;
+}
+
+/**
+ * Gestionnaire de confirmation de la modale
+ */
+function handleConfirm() {
+  confirmModalConfirm();
+}
+
+/**
+ * Gestionnaire d'annulation de la modale
+ */
+function handleCancel() {
+  confirmModalCancel();
 }
 
 onMounted(() => {

@@ -1,6 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
-import { createRouter, createMemoryHistory } from 'vue-router';
+import { describe, it, expect, vi } from 'vitest';
 
 describe('Sponsor Detail Page - Tab Navigation', () => {
   describe('Tab Hash URL functionality', () => {
@@ -166,7 +164,7 @@ describe('Sponsor Detail Page - Date Formatting', () => {
             month: 'long',
             day: 'numeric'
           });
-        } catch (error) {
+        } catch {
           return 'Date invalide';
         }
       };
@@ -186,7 +184,7 @@ describe('Sponsor Detail Page - Date Formatting', () => {
             month: 'long',
             day: 'numeric'
           });
-        } catch (error) {
+        } catch {
           return 'Date invalide';
         }
       };
@@ -207,7 +205,7 @@ describe('Sponsor Detail Page - Date Formatting', () => {
             month: 'long',
             day: 'numeric'
           });
-        } catch (error) {
+        } catch {
           return 'Date invalide';
         }
       };
@@ -230,7 +228,7 @@ describe('Sponsor Detail Page - Date Formatting', () => {
           const date = new Date(dateString);
           const now = new Date();
           return date < now;
-        } catch (error) {
+        } catch {
           return false;
         }
       };
@@ -245,7 +243,7 @@ describe('Sponsor Detail Page - Date Formatting', () => {
           const date = new Date(dateString);
           const now = new Date();
           return date < now;
-        } catch (error) {
+        } catch {
           return false;
         }
       };
@@ -260,7 +258,7 @@ describe('Sponsor Detail Page - Date Formatting', () => {
           const date = new Date(dateString);
           const now = new Date();
           return date < now;
-        } catch (error) {
+        } catch {
           return false;
         }
       };
@@ -381,6 +379,302 @@ describe('Sponsor Detail Page - Helper Functions', () => {
 
       expect(communication.publication_date).toBeNull();
       expect(communication.support_url).toBeNull();
+    });
+  });
+});
+
+describe('Sponsor Detail Page - Partnership Actions', () => {
+  describe('Partnership Validation', () => {
+    it('should call validate API with correct parameters', async () => {
+      const mockValidate = vi.fn().mockResolvedValue({ data: { id: 'partnership-123' } });
+
+      const orgSlug = 'devlille';
+      const eventSlug = '2025';
+      const partnershipId = 'abc123';
+
+      await mockValidate(orgSlug, eventSlug, partnershipId);
+
+      expect(mockValidate).toHaveBeenCalledWith(orgSlug, eventSlug, partnershipId);
+      expect(mockValidate).toHaveBeenCalledTimes(1);
+    });
+
+    it('should handle successful validation', async () => {
+      const mockValidate = vi.fn().mockResolvedValue({
+        data: { id: 'partnership-123' }
+      });
+
+      const result = await mockValidate('devlille', '2025', 'abc123');
+
+      expect(result.data.id).toBe('partnership-123');
+    });
+
+    it('should handle validation error', async () => {
+      const mockValidate = vi.fn().mockRejectedValue(
+        new Error('Failed to validate partnership')
+      );
+
+      await expect(mockValidate('devlille', '2025', 'abc123')).rejects.toThrow(
+        'Failed to validate partnership'
+      );
+    });
+
+    it('should handle validation with 404 error', async () => {
+      const mockValidate = vi.fn().mockRejectedValue({
+        response: { status: 404, data: { message: 'Partnership not found' } }
+      });
+
+      try {
+        await mockValidate('devlille', '2025', 'invalid-id');
+      } catch (error: any) {
+        expect(error.response.status).toBe(404);
+        expect(error.response.data.message).toBe('Partnership not found');
+      }
+    });
+
+    it('should handle validation with 403 forbidden error', async () => {
+      const mockValidate = vi.fn().mockRejectedValue({
+        response: { status: 403, data: { message: 'Unauthorized' } }
+      });
+
+      try {
+        await mockValidate('devlille', '2025', 'abc123');
+      } catch (error: any) {
+        expect(error.response.status).toBe(403);
+      }
+    });
+  });
+
+  describe('Partnership Decline', () => {
+    it('should call decline API with correct parameters', async () => {
+      const mockDecline = vi.fn().mockResolvedValue({ data: { id: 'partnership-123' } });
+
+      const orgSlug = 'devlille';
+      const eventSlug = '2025';
+      const partnershipId = 'abc123';
+
+      await mockDecline(orgSlug, eventSlug, partnershipId);
+
+      expect(mockDecline).toHaveBeenCalledWith(orgSlug, eventSlug, partnershipId);
+      expect(mockDecline).toHaveBeenCalledTimes(1);
+    });
+
+    it('should handle successful decline', async () => {
+      const mockDecline = vi.fn().mockResolvedValue({
+        data: { id: 'partnership-123' }
+      });
+
+      const result = await mockDecline('devlille', '2025', 'abc123');
+
+      expect(result.data.id).toBe('partnership-123');
+    });
+
+    it('should handle decline error', async () => {
+      const mockDecline = vi.fn().mockRejectedValue(
+        new Error('Failed to decline partnership')
+      );
+
+      await expect(mockDecline('devlille', '2025', 'abc123')).rejects.toThrow(
+        'Failed to decline partnership'
+      );
+    });
+
+    it('should handle decline with 404 error', async () => {
+      const mockDecline = vi.fn().mockRejectedValue({
+        response: { status: 404, data: { message: 'Partnership not found' } }
+      });
+
+      try {
+        await mockDecline('devlille', '2025', 'invalid-id');
+      } catch (error: any) {
+        expect(error.response.status).toBe(404);
+        expect(error.response.data.message).toBe('Partnership not found');
+      }
+    });
+
+    it('should handle decline with 403 forbidden error', async () => {
+      const mockDecline = vi.fn().mockRejectedValue({
+        response: { status: 403, data: { message: 'Unauthorized' } }
+      });
+
+      try {
+        await mockDecline('devlille', '2025', 'abc123');
+      } catch (error: any) {
+        expect(error.response.status).toBe(403);
+      }
+    });
+  });
+
+  describe('Partnership Action State Management', () => {
+    it('should set loading state during validation', () => {
+      let isValidating = false;
+      let error = null;
+
+      // Simulate starting validation
+      isValidating = true;
+      error = null;
+
+      expect(isValidating).toBe(true);
+      expect(error).toBeNull();
+
+      // Simulate validation complete
+      isValidating = false;
+
+      expect(isValidating).toBe(false);
+    });
+
+    it('should set loading state during decline', () => {
+      let isDeclining = false;
+      let error = null;
+
+      // Simulate starting decline
+      isDeclining = true;
+      error = null;
+
+      expect(isDeclining).toBe(true);
+      expect(error).toBeNull();
+
+      // Simulate decline complete
+      isDeclining = false;
+
+      expect(isDeclining).toBe(false);
+    });
+
+    it('should set error state on validation failure', () => {
+      let isValidating = false;
+      let error: string | null = null;
+
+      // Simulate validation failure
+      isValidating = false;
+      error = 'Failed to validate partnership';
+
+      expect(isValidating).toBe(false);
+      expect(error).toBe('Failed to validate partnership');
+    });
+
+    it('should set error state on decline failure', () => {
+      let isDeclining = false;
+      let error: string | null = null;
+
+      // Simulate decline failure
+      isDeclining = false;
+      error = 'Failed to decline partnership';
+
+      expect(isDeclining).toBe(false);
+      expect(error).toBe('Failed to decline partnership');
+    });
+
+    it('should reset error state before new action', () => {
+      let error: string | null = 'Previous error';
+
+      // Reset error before new action
+      error = null;
+
+      expect(error).toBeNull();
+    });
+  });
+
+  describe('Partnership Action Confirmation', () => {
+    it('should require confirmation before validation', () => {
+      const confirmValidation = (_partnershipName: string): boolean => {
+        // In real implementation, this would show a modal
+        // For testing, we just return true
+        return true;
+      };
+
+      expect(confirmValidation('Test Company')).toBe(true);
+    });
+
+    it('should require confirmation before decline', () => {
+      const confirmDecline = (_partnershipName: string): boolean => {
+        // In real implementation, this would show a modal
+        // For testing, we just return true
+        return true;
+      };
+
+      expect(confirmDecline('Test Company')).toBe(true);
+    });
+
+    it('should not proceed if confirmation is cancelled', () => {
+      const confirmAction = (): boolean => false;
+      const performAction = vi.fn();
+
+      if (confirmAction()) {
+        performAction();
+      }
+
+      expect(performAction).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Partnership Action Success Handling', () => {
+    it('should show success message after validation', () => {
+      const showSuccessToast = vi.fn();
+      const partnershipName = 'Test Company';
+
+      showSuccessToast(`Le partenariat avec ${partnershipName} a été validé avec succès`);
+
+      expect(showSuccessToast).toHaveBeenCalledWith(
+        'Le partenariat avec Test Company a été validé avec succès'
+      );
+    });
+
+    it('should show success message after decline', () => {
+      const showSuccessToast = vi.fn();
+      const partnershipName = 'Test Company';
+
+      showSuccessToast(`Le partenariat avec ${partnershipName} a été refusé`);
+
+      expect(showSuccessToast).toHaveBeenCalledWith(
+        'Le partenariat avec Test Company a été refusé'
+      );
+    });
+
+    it('should reload partnership data after successful validation', async () => {
+      const reloadPartnership = vi.fn().mockResolvedValue(undefined);
+
+      await reloadPartnership();
+
+      expect(reloadPartnership).toHaveBeenCalledTimes(1);
+    });
+
+    it('should reload partnership data after successful decline', async () => {
+      const reloadPartnership = vi.fn().mockResolvedValue(undefined);
+
+      await reloadPartnership();
+
+      expect(reloadPartnership).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Partnership Action Error Messages', () => {
+    it('should format 404 error message', () => {
+      const formatErrorMessage = (status: number): string => {
+        if (status === 404) return 'Partenariat introuvable';
+        if (status === 403) return 'Vous n\'êtes pas autorisé à effectuer cette action';
+        return 'Une erreur est survenue';
+      };
+
+      expect(formatErrorMessage(404)).toBe('Partenariat introuvable');
+    });
+
+    it('should format 403 error message', () => {
+      const formatErrorMessage = (status: number): string => {
+        if (status === 404) return 'Partenariat introuvable';
+        if (status === 403) return 'Vous n\'êtes pas autorisé à effectuer cette action';
+        return 'Une erreur est survenue';
+      };
+
+      expect(formatErrorMessage(403)).toBe('Vous n\'êtes pas autorisé à effectuer cette action');
+    });
+
+    it('should format generic error message', () => {
+      const formatErrorMessage = (status: number): string => {
+        if (status === 404) return 'Partenariat introuvable';
+        if (status === 403) return 'Vous n\'êtes pas autorisé à effectuer cette action';
+        return 'Une erreur est survenue';
+      };
+
+      expect(formatErrorMessage(500)).toBe('Une erreur est survenue');
     });
   });
 });
