@@ -26,6 +26,9 @@ fun insertMockedPartnership(
     suggestionDeclinedAt: LocalDateTime? = null,
     declinedAt: LocalDateTime? = null,
     validatedAt: LocalDateTime? = null,
+    validatedNbTickets: Int? = null,
+    validatedNbJobOffers: Int? = null,
+    validatedBoothSize: String? = null,
     communicationPublicationDate: LocalDateTime? = null,
     communicationSupportUrl: String? = null,
 ): PartnershipEntity = transaction {
@@ -45,6 +48,9 @@ fun insertMockedPartnership(
         this.suggestionDeclinedAt = suggestionDeclinedAt
         this.declinedAt = declinedAt
         this.validatedAt = validatedAt
+        this.validatedNbTickets = validatedNbTickets
+        this.validatedNbJobOffers = validatedNbJobOffers
+        this.validatedBoothSize = validatedBoothSize
         this.communicationPublicationDate = communicationPublicationDate
         this.communicationSupportUrl = communicationSupportUrl
     }

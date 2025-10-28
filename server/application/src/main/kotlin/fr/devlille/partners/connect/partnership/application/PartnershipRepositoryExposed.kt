@@ -17,6 +17,7 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
 import fr.devlille.partners.connect.partnership.domain.PartnershipItem
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
+import fr.devlille.partners.connect.partnership.domain.ValidatePartnershipRequest
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
@@ -31,8 +32,10 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslati
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPacksTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionalOptionsByPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listTranslationsByOptionAndLanguage
+import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
@@ -139,6 +142,9 @@ class PartnershipRepositoryExposed(
                         .map { it.id.value },
                 )
             },
+            validatedNbTickets = partnership.validatedNbTickets,
+            validatedNbJobOffers = partnership.validatedNbJobOffers,
+            validatedBoothSize = partnership.validatedBoothSize,
         )
     }
 
@@ -148,11 +154,53 @@ class PartnershipRepositoryExposed(
         findPartnership(event.id.value, partnershipId).company.toDomain()
     }
 
-    override fun validate(eventSlug: String, partnershipId: UUID): UUID = transaction {
+    override fun validate(
+        eventSlug: String,
+        partnershipId: UUID,
+        request: ValidatePartnershipRequest?,
+    ): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
         val partnership = findPartnership(event.id.value, partnershipId)
+
+        // Check if agreement is already signed - cannot re-validate after signature
+        if (!partnership.agreementSignedUrl.isNullOrBlank()) {
+            throw ConflictException("Cannot re-validate partnership: agreement already signed")
+        }
+
+        // Load selected pack to get defaults
+        val pack = partnership.selectedPack
+            ?: throw NotFoundException("Partnership has no selected pack")
+
+        // Determine final values: use request values if provided, otherwise use pack defaults
+        // Note: nbJobOffers has no pack default - when not provided use 0, but when request exists it's required
+        val finalTickets = request?.nbTickets ?: pack.nbTickets
+        val finalJobOffers = if (request != null) {
+            request.nbJobOffers
+        } else {
+            0
+        }
+        val finalBoothSize = request?.boothSize ?: pack.boothSize
+
+        // Validate booth size exists in event packs if provided
+        if (finalBoothSize != null) {
+            val boothSizeExists = SponsoringPackEntity.find {
+                (SponsoringPacksTable.eventId eq event.id) and (SponsoringPacksTable.boothSize eq finalBoothSize)
+            }.any()
+
+            if (!boothSizeExists) {
+                throw BadRequestException(
+                    "Booth size '$finalBoothSize' is not available in any sponsoring pack for this event",
+                )
+            }
+        }
+
+        // Update partnership with validated values
         partnership.validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+        partnership.validatedNbTickets = finalTickets
+        partnership.validatedNbJobOffers = finalJobOffers
+        partnership.validatedBoothSize = finalBoothSize
+
         partnership.id.value
     }
 

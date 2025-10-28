@@ -163,7 +163,7 @@ internal fun PartnershipEntity.toAgreementPartnership(
     return Partnership(
         amount = "$amount",
         options = optionTranslations,
-        hasBooth = pack.withBooth,
+        hasBooth = pack.boothSize != null,
         contact = Contact(name = this.contactName, role = this.contactRole),
     )
 }

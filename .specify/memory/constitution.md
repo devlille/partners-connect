@@ -311,6 +311,90 @@ event or organization data, whether in top-level responses or nested objects.
 - **External schemas**: `server/application/src/main/resources/schemas/*.json` (50+ schema files)
 - **Generated files**: `documentation.yaml` is auto-generated - NEVER edit manually
 
+### OpenAPI Validation Process (CRITICAL)
+
+All OpenAPI changes MUST be validated before committing to ensure specification accuracy and completeness.
+
+#### Validation Command
+From the `server/` directory, run:
+```bash
+cd server && npm run validate
+```
+
+This executes Redocly CLI linting: `redocly lint application/src/main/resources/openapi/openapi.yaml`
+
+#### Success Criteria
+- **Zero errors required** - validation must pass with 0 errors (warnings are acceptable)
+- All schema `$ref` references must resolve correctly
+- All examples must validate against their schemas
+- JSON Schema files must use OpenAPI 3.1-compatible syntax
+
+#### Common Issues & Resolution
+
+**1. Unresolved Schema References**
+- **Error**: `Can't resolve $ref to <SchemaName>`
+- **Cause**: Schema referenced in `components/schemas` but `.schema.json` file doesn't exist
+- **Solution**:
+  1. Create schema file: `server/application/src/main/resources/schemas/<schema_name>.schema.json`
+  2. Follow JSON Schema Draft 7 format with proper validation rules
+  3. Add to `openapi.yaml` components section:
+     ```yaml
+     components:
+       schemas:
+         SchemaName:
+           $ref: "../schemas/schema_name.schema.json"
+     ```
+
+**2. Invalid `nullable` Property**
+- **Error**: `Property 'nullable' is not expected here`
+- **Cause**: JSON Schema Draft 7 doesn't support OpenAPI 3.0's `nullable` keyword
+- **Solution**: Use union types:
+  ```json
+  {
+    "type": ["string", "null"]  // ✅ CORRECT
+  }
+  ```
+  Instead of:
+  ```json
+  {
+    "type": "string",
+    "nullable": true  // ❌ WRONG - OpenAPI 3.0 only
+  }
+  ```
+
+**3. Example Validation Errors**
+- **Error**: `Example must have required property 'field_name'`
+- **Cause**: Request/response examples don't match schema constraints
+- **Solution**: Update example to include all required fields or adjust schema requirements
+
+**4. Structural Validation Errors**
+- Missing required OpenAPI fields (info, paths, components)
+- Invalid JSON Schema syntax in external `.schema.json` files
+- Incorrect `$ref` paths (must be relative: `"../schemas/file.schema.json"`)
+
+#### Integration Points
+- **Before Commit**: Run `npm run validate` to catch errors early
+- **CI/CD**: GitHub Actions should include validation step (if configured)
+- **Documentation Build**: Run `npm run build-docs` (validates + bundles spec)
+- **PR Reviews**: Reviewers must verify validation passes for OpenAPI changes
+
+#### Related Commands
+```bash
+# Bundle specification into single file
+npm run bundle
+
+# Preview API documentation locally
+npm run preview
+
+# Full documentation build (validate + bundle)
+npm run build-docs
+```
+
+**Rationale**: Valid OpenAPI specifications ensure accurate API documentation, enable automated 
+client generation, prevent deployment issues, and maintain API contract integrity. The validation 
+process catches schema mismatches, reference errors, and format violations before they reach 
+production, reducing integration bugs and improving developer experience.
+
 ## Governance
 
 This constitution supersedes all other development practices and coding guidelines. All pull 

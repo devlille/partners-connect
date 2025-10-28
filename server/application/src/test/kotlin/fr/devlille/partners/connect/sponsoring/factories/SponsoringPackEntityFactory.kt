@@ -11,7 +11,7 @@ fun insertMockedSponsoringPack(
     event: UUID = UUID.randomUUID(),
     name: String = "Mock Sponsoring Pack",
     basePrice: Int = 1000,
-    withBooth: Boolean = false,
+    boothSize: String? = null,
     nbTickets: Int = 10,
     maxQuantity: Int? = 100,
 ): SponsoringPackEntity = transaction {
@@ -19,7 +19,7 @@ fun insertMockedSponsoringPack(
         this.event = EventEntity[event]
         this.name = name
         this.basePrice = basePrice
-        this.withBooth = withBooth
+        this.boothSize = boothSize
         this.nbTickets = nbTickets
         this.maxQuantity = maxQuantity
     }

@@ -5,6 +5,7 @@ import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddEventWebhooksMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddIntegrationCreatedAtMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPartnershipCommunicationFieldsMigration
+import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPartnershipValidationFieldsMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddProviderManagementMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateCompanyJobOffersTableMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateJobOfferPromotionsTableMigration
@@ -31,6 +32,7 @@ object MigrationRegistry {
         AddEventWebhooksMigration,
         CreateCompanyJobOffersTableMigration,
         CreateJobOfferPromotionsTableMigration,
+        AddPartnershipValidationFieldsMigration,
     )
 
     /**

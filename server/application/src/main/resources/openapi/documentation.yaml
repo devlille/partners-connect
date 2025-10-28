@@ -2319,46 +2319,126 @@ paths:
                 type: string
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/validate:
     post:
-      summary: Validate partnership
+      summary: Validate a partnership with optional customized details
       operationId: postOrgsEventsPartnershipValidate
-      description: Validate a partnership request
+      description: |
+        Validates a partnership and optionally customizes the number of tickets, 
+        job offers, and booth size. If not provided, values default to those 
+        defined in the associated sponsoring pack.
+
+        **Re-validation Policy:**
+        - Partnerships can be re-validated multiple times BEFORE the agreement is signed
+        - Once agreementSignedUrl is set, validation is immutable (returns 409 Conflict)
+
+        **Booth Size Validation:**
+        - If boothSize is provided, it must match a boothSize value present in at least 
+          one sponsoring pack configured for this event
+        - Cross-pack validation ensures consistency across event's sponsorship tiers
+      tags:
+        - Partnership Management
       parameters:
-        - name: eventSlug
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: partnershipId
-          in: path
-          required: true
-          schema:
-            type: string
         - name: orgSlug
           in: path
           required: true
+          description: URL slug of the organization
           schema:
             type: string
+          example: devlille
+        - name: eventSlug
+          in: path
+          required: true
+          description: URL slug of the event
+          schema:
+            type: string
+          example: devlille-2026
+        - name: partnershipId
+          in: path
+          required: true
+          description: UUID of the partnership to validate
+          schema:
+            type: string
+            format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+      requestBody:
+        description: |
+          Optional customization of package details. If omitted or empty, 
+          all values default to the sponsoring pack configuration.
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/validate_partnership_request.schema'
+            examples:
+              withCustomization:
+                summary: Validate with customized values
+                value:
+                  nb_tickets: 10
+                  nb_job_offers: 2
+                  booth_size: 3x3m
+              onlyJobOffers:
+                summary: Validate with only job offers specified
+                value:
+                  nb_job_offers: 5
+              packDefaults:
+                summary: Validate using pack defaults (minimal required)
+                value:
+                  nb_job_offers: 0
       security:
         - bearerAuth: []
       responses:
         '200':
-          description: OK
+          description: Partnership validated successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/identifier.schema'
+              example:
+                id: 550e8400-e29b-41d4-a716-446655440000
         '400':
-          description: Bad Request
+          description: Bad Request - Validation errors
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/response_exception.schema'
+              examples:
+                invalidBoothSize:
+                  summary: Booth size not found in event packs
+                  value:
+                    message: Booth size '10x10m' is not available in any sponsoring pack for this event
+                negativeValues:
+                  summary: Negative ticket count
+                  value:
+                    message: nb_tickets must be >= 0
         '401':
-          description: Unauthorized
+          description: Unauthorized - Authentication required
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/response_exception.schema'
+        '403':
+          description: Forbidden - Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/response_exception.schema'
+              example:
+                message: User must be an organizer of this event to validate partnerships
+        '404':
+          description: Not Found - Partnership, event, or organization not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/response_exception.schema'
+              example:
+                message: Partnership with id '550e8400-e29b-41d4-a716-446655440000' not found
+        '409':
+          description: Conflict - Re-validation blocked after agreement signed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/response_exception.schema'
+              example:
+                message: 'Cannot re-validate partnership: agreement already signed'
   /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/decline:
     post:
       summary: Decline partnership
@@ -3200,6 +3280,10 @@ components:
       $ref: '#/components/schemas/event_with_organisation.schema'
     RegisterPartnership:
       $ref: '#/components/schemas/register_partnership.schema'
+    ValidatePartnershipRequest:
+      $ref: '#/components/schemas/validate_partnership_request.schema'
+    ResponseException:
+      $ref: '#/components/schemas/response_exception.schema'
     CompanyBillingData:
       $ref: '#/components/schemas/company_billing_data.schema'
     TicketData:
@@ -4398,6 +4482,51 @@ components:
       required:
         - pack_id
         - language
+    validate_partnership_request.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      type: object
+      title: ValidatePartnershipRequest
+      description: Request body for validating a partnership with optional customized package details
+      properties:
+        nb_tickets:
+          type: integer
+          description: Number of tickets allocated. Must be >= 0. Defaults to sponsoring pack value if omitted.
+          minimum: 0
+        nb_job_offers:
+          type: integer
+          description: Number of job offers allowed. Must be >= 0. Required field.
+          minimum: 0
+        booth_size:
+          type: string
+          description: Size of booth (e.g., '3x3m'). Must match a value in event's packs. Defaults to pack value if omitted.
+          minLength: 1
+          pattern: ^.+$
+      required:
+        - nb_job_offers
+      additionalProperties: false
+    response_exception.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      type: object
+      title: ResponseException
+      description: Error response structure for all API errors
+      properties:
+        message:
+          type: string
+          description: Human-readable error message
+        errors:
+          type: array
+          description: List of specific validation errors or additional error details
+          items:
+            type: string
+          default: []
+        stack:
+          type:
+            - string
+            - 'null'
+          description: Stack trace (only included in development mode)
+      required:
+        - message
+      additionalProperties: false
     publication_date_request.schema:
       $id: publication_date_request.schema.json
       type: object

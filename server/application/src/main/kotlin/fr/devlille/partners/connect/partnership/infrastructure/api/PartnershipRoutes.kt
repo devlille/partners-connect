@@ -6,12 +6,14 @@ import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
+import fr.devlille.partners.connect.internal.infrastructure.ktor.receiveNullable
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
 import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
+import fr.devlille.partners.connect.partnership.domain.ValidatePartnershipRequest
 import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
 import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
 import io.ktor.http.HttpStatusCode
@@ -88,7 +90,14 @@ fun Route.partnershipRoutes() {
             post {
                 val eventSlug = call.parameters.eventSlug
                 val partnershipId = call.parameters.partnershipId
-                val id = partnershipRepository.validate(eventSlug, partnershipId)
+
+                // Accept optional request body for customization
+                // Schema validation handles negative values, blank strings, etc.
+                val request = call.receiveNullable<ValidatePartnershipRequest>(
+                    schema = "validate_partnership_request.schema.json",
+                )
+
+                val id = partnershipRepository.validate(eventSlug, partnershipId, request)
                 val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
                 val partnership = partnershipRepository.getById(eventSlug, partnershipId)
                 val pack = partnership.selectedPack
