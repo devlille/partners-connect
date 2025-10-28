@@ -26,7 +26,7 @@ defineEmits<{
 
 <style lang="css" scoped>
 select {
-    width: calc(100% + 0.25rem);
+    width: 100%;
     padding: 2.5rem 0.5em 0.5em;
   }
 </style>

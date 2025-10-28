@@ -27,7 +27,7 @@ defineEmits<{
 </script>
 <style lang="css" scoped>
 input {
-    width: calc(100% - 1em);
+    width: 100% - 1em;
     padding: 2.5rem 0.5em 0.5em;
 }
 </style>

@@ -62,6 +62,21 @@
       </div>
 
       <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Options
+        </label>
+        <div v-if="partnership?.option_ids && partnership.option_ids.length > 0" class="bg-gray-50 rounded-lg p-3">
+          <ul class="space-y-1 text-sm text-gray-700">
+            <li v-for="optionId in partnership.option_ids" :key="optionId" class="flex items-center">
+              <i class="i-heroicons-check-circle mr-2 text-green-600" />
+              {{ optionId }}
+            </li>
+          </ul>
+        </div>
+        <p v-else class="text-sm text-gray-500 italic">Aucune option sélectionnée</p>
+      </div>
+
+      <div>
         <LanguageSelect
           v-model="form.language"
           label="Langue"
@@ -113,10 +128,10 @@
 </template>
 
 <script setup lang="ts">
-import type { PartnershipItem } from "~/utils/api";
+import type { ExtendedPartnershipItem } from "~/types/partnership";
 
 interface Props {
-  partnership?: PartnershipItem | null;
+  partnership?: ExtendedPartnershipItem | null;
   loading?: boolean;
 }
 

@@ -100,8 +100,9 @@ const formData = ref({
 });
 
 onMounted(async () => {
-  const orgSlug = "test"
-  const eventSlug = 'devlille';
+  const config = useRuntimeConfig();
+  const orgSlug = config.public.defaultOrgSlug;
+  const eventSlug = config.public.defaultEventSlug;
 
   if (orgSlug && eventSlug) {
     try {
@@ -136,7 +137,8 @@ const handleSubmit = async () => {
   success.value = false;
 
   try {
-    const eventSlug = 'devlille';
+    const config = useRuntimeConfig();
+    const eventSlug = config.public.defaultEventSlug;
 
     // Step 1: Create company
     const companyData: CreateCompany = {

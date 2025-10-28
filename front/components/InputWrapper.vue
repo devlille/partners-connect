@@ -30,11 +30,7 @@ label {
 
 :deep(input),
 :deep(select) {
-  width: calc(100% - 1em);
+  width: 100%;
   padding: 2.5rem 0.5em 0.5em;
-}
-
-:deep(select) {
-  width: calc(100% + 0.25rem);
 }
 </style>

@@ -156,6 +156,8 @@ export default defineNuxtConfig({
     API_BASE_URL: "http://localhost:8080",
     public: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL,
+      defaultOrgSlug: process.env.NUXT_PUBLIC_DEFAULT_ORG_SLUG || 'test',
+      defaultEventSlug: process.env.NUXT_PUBLIC_DEFAULT_EVENT_SLUG || 'devlille',
     },
   },
 });
