@@ -4,6 +4,10 @@ export const useDashboardLinks = () => {
     icon: 'i-heroicons-building-office',
     to: '/orgs'
   }, {
+    label: 'Événements Favoris',
+    icon: 'i-heroicons-star',
+    to: '/orgs/favorites'
+  }, {
     label: 'Créer une organisation',
     icon: 'i-heroicons-plus-circle',
     to: '/orgs/create'

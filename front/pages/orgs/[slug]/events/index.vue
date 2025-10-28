@@ -54,7 +54,15 @@ definePageMeta({
   ssr: false
 });
 const {formatDate} = useDateFormatter();
-const columns = [
+const { isFavorite, toggleFavorite } = useFavoriteEvents();
+
+const slug = computed(() => route.params.slug as string);
+const data = ref<EventSummary[]>([]);
+const loading = ref(true);
+const error = ref<string | null>(null);
+const organisationName = ref<string>('');
+
+const columns = computed(() => [
   {
     header: 'Nom',
     accessorKey: 'name',
@@ -79,13 +87,28 @@ const columns = [
     header: 'Date de fin CFP',
     accessorKey: 'submission_end_time',
     cell: (info: TableRow<EventSummary>) => formatDate(info.getValue('submission_end_time'))
+  },
+  {
+    header: 'Favori',
+    accessorKey: 'slug',
+    cell: (info: TableRow<EventSummary>) => {
+      const event = info.row.original;
+      return h('button', {
+        onClick: (e: Event) => {
+          e.stopPropagation();
+          toggleFavorite({
+            orgSlug: slug.value,
+            orgName: organisationName.value,
+            eventSlug: event.slug,
+            eventName: event.name
+          });
+        },
+        class: 'text-2xl hover:scale-110 transition-transform',
+        title: isFavorite(slug.value, event.slug) ? 'Retirer des favoris' : 'Ajouter aux favoris'
+      }, isFavorite(slug.value, event.slug) ? '⭐' : '☆');
+    }
   }
-];
-const slug = computed(() => route.params.slug as string);
-const data = ref<EventSummary[]>([]);
-const loading = ref(true);
-const error = ref<string | null>(null);
-const organisationName = ref<string>('');
+]);
 
 // Menu contextuel pour la page d'événements de l'organisation
 const orgLinks = computed(() => [
