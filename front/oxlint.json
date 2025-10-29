@@ -1,0 +1,37 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+  "rules": {
+    "typescript": "warn",
+    "unicorn": "warn",
+    "react": "off",
+    "jsx-a11y": "off"
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2021": true
+  },
+  "globals": {
+    "defineNuxtConfig": "readonly",
+    "navigateTo": "readonly",
+    "useRouter": "readonly",
+    "useRoute": "readonly",
+    "useRuntimeConfig": "readonly",
+    "useFetch": "readonly",
+    "useAsyncData": "readonly",
+    "useState": "readonly",
+    "useHead": "readonly",
+    "useSeoMeta": "readonly",
+    "useNuxtApp": "readonly",
+    "definePageMeta": "readonly",
+    "ref": "readonly",
+    "computed": "readonly",
+    "reactive": "readonly",
+    "watch": "readonly",
+    "watchEffect": "readonly",
+    "onMounted": "readonly",
+    "onUnmounted": "readonly",
+    "nextTick": "readonly",
+    "h": "readonly"
+  }
+}

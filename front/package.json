@@ -17,28 +17,26 @@
     "i18n:check": "npx tsx scripts/check-i18n.ts"
   },
   "dependencies": {
-    "@nuxt/eslint": "^1.9.0",
-    "@nuxt/ui": "^3.3.3",
-    "@nuxtjs/i18n": "^10.1.1",
+    "@nuxt/ui": "^4.1.0",
+    "@nuxtjs/i18n": "^10.1.2",
     "@pinia/nuxt": "^0.11.2",
-    "axios": "^1.11.0",
-    "eslint": "^9.35.0",
-    "nuxt": "^4.1.0",
+    "axios": "^1.13.1",
+    "nuxt": "^4.2.0",
     "pinia": "^3.0.3",
-    "tailwindcss": "^4.1.15",
-    "typescript": "^5.9.2",
-    "vue": "^3.5.21",
-    "vue-router": "^4.5.1",
+    "tailwindcss": "^4.1.16",
+    "typescript": "^5.9.3",
+    "vue": "^3.5.22",
+    "vue-router": "^4.6.3",
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@nuxt/test-utils": "^3.19.2",
+    "@nuxt/test-utils": "^3.20.1",
     "@nuxtjs/tailwindcss": "^6.14.0",
-    "@tailwindcss/postcss": "^4.1.14",
-    "@vitest/ui": "^4.0.3",
+    "@tailwindcss/postcss": "^4.1.16",
+    "@vitest/ui": "^4.0.4",
     "@vue/test-utils": "^2.4.6",
-    "happy-dom": "^20.0.8",
-    "oxlint": "^1.14.0",
-    "vitest": "^4.0.3"
+    "happy-dom": "^20.0.10",
+    "oxlint": "^1.24.0",
+    "vitest": "^4.0.4"
   }
 }
