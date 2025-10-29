@@ -33,8 +33,6 @@
         v-else
         :data="data"
         :columns="columns"
-        @select="onSelectEvent"
-       
       />
     </div>
   </Dashboard>
@@ -45,9 +43,8 @@ import { getOrgsEvents, getOrgs, type EventSummary } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 import type {TableRow} from "@nuxt/ui";
 
-const route = useRoute();
-const router = useRouter();
 const { footerLinks } = useDashboardLinks();
+const { getOrgSlug } = useRouteParams();
 
 definePageMeta({
   middleware: authMiddleware,
@@ -56,7 +53,7 @@ definePageMeta({
 const {formatDate} = useDateFormatter();
 const { isFavorite, toggleFavorite } = useFavoriteEvents();
 
-const slug = computed(() => route.params.slug as string);
+const slug = computed(() => getOrgSlug());
 const data = ref<EventSummary[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
@@ -91,7 +88,7 @@ const columns = computed(() => [
   {
     header: 'Favori',
     accessorKey: 'slug',
-    cell: (info: TableRow<EventSummary>) => {
+    cell: (info: any) => {
       const event = info.row.original;
       return h('button', {
         onClick: (e: Event) => {
@@ -106,6 +103,24 @@ const columns = computed(() => [
         class: 'text-2xl hover:scale-110 transition-transform',
         title: isFavorite(slug.value, event.slug) ? 'Retirer des favoris' : 'Ajouter aux favoris'
       }, isFavorite(slug.value, event.slug) ? '⭐' : '☆');
+    }
+  },
+  {
+    header: 'Actions',
+    accessorKey: 'slug',
+    cell: (info: any) => {
+      const event = info.row.original;
+      return h(resolveComponent('UButton'), {
+        onClick: () => {
+          navigateTo(`/orgs/${slug.value}/events/${event.slug}`);
+        },
+        icon: 'i-heroicons-arrow-right-circle',
+        size: 'md',
+        color: 'primary',
+        variant: 'ghost',
+        square: true,
+        title: 'Voir l\'événement'
+      });
     }
   }
 ]);
@@ -133,10 +148,6 @@ const orgLinks = computed(() => [
     to: `/orgs/${slug.value}/partnerships`
   }
 ]);
-
-const onSelectEvent = (row: TableRow<EventSummary>) => {
-  router.push(`/orgs/${slug.value}/events/${row.original.slug}`);
-};
 
 async function loadEvents() {
   try {

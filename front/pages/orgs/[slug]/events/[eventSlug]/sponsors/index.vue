@@ -66,7 +66,6 @@
           <UTable
             :data="partnerships"
             :columns="columns"
-            @select="onRowClick"
           />
         </div>
       </template>
@@ -79,13 +78,16 @@ import { getOrgsEventsPartnership, getEventBySlug, getOrgsEventsPacks, type Part
 import authMiddleware from "~/middleware/auth";
 import type {TableRow} from "@nuxt/ui";
 
-const route = useRoute();
 const { footerLinks } = useDashboardLinks();
+const { getOrgSlug, getEventSlug } = useRouteParams();
 
 definePageMeta({
   middleware: authMiddleware,
   ssr: false
 });
+
+const orgSlug = computed(() => getOrgSlug());
+const eventSlug = computed(() => getEventSlug());
 
 const columns = [
   {
@@ -96,7 +98,7 @@ const columns = [
   {
     header: 'Pack',
     accessorKey: 'pack_name',
-    cell: (info: TableRow<PartnershipItem>) => {
+    cell: (info: any) => {
       const packName = info.getValue('pack_name');
       const suggestedPackName = info.row.original.suggested_pack_name;
 
@@ -107,17 +109,26 @@ const columns = [
       }
       return '-';
     }
+  },
+  {
+    header: 'Actions',
+    accessorKey: 'id',
+    cell: (info: any) => {
+      const partnership = info.row.original;
+      return h(resolveComponent('UButton'), {
+        onClick: () => {
+          navigateTo(`/orgs/${orgSlug.value}/events/${eventSlug.value}/sponsors/${partnership.id}`);
+        },
+        icon: 'i-heroicons-arrow-right-circle',
+        size: 'md',
+        color: 'primary',
+        variant: 'ghost',
+        square: true,
+        title: 'Voir le sponsor'
+      });
+    }
   }
 ];
-
-const orgSlug = computed(() => {
-  const params = route.params.slug;
-  return Array.isArray(params) ? params[0] as string : params as string;
-});
-const eventSlug = computed(() => {
-  const params = route.params.eventSlug;
-  return Array.isArray(params) ? params[1] as string : params as string;
-});
 
 const partnerships = ref<PartnershipItem[]>([]);
 const packs = ref<SponsoringPack[]>([]);
@@ -183,11 +194,6 @@ onMounted(() => {
 watch([orgSlug, eventSlug], () => {
   loadPartnerships();
 });
-
-// Gérer le clic sur une ligne du tableau
-function onRowClick(row: TableRow<PartnershipItem>) {
-  navigateTo(`/orgs/${orgSlug.value}/events/${eventSlug.value}/sponsors/${row.original.id}`);
-}
 
 useHead({
   title: computed(() => `Sponsors - ${eventName.value || 'Événement'} | DevLille`)

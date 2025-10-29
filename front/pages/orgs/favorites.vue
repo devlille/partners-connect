@@ -27,7 +27,6 @@
         v-else
         :data="favoritesList"
         :columns="columns"
-        @select="onSelectEvent"
       />
     </div>
   </Dashboard>
@@ -38,7 +37,6 @@ import authMiddleware from "~/middleware/auth";
 import type { TableRow } from "@nuxt/ui";
 import type { FavoriteEvent } from "~/composables/useFavoriteEvents";
 
-const router = useRouter();
 const { mainLinks, footerLinks } = useDashboardLinks();
 const { getFavorites, removeFavorite } = useFavoriteEvents();
 
@@ -75,24 +73,37 @@ const columns = [
   {
     header: 'Actions',
     accessorKey: 'eventSlug',
-    cell: (info: TableRow<FavoriteEvent>) => {
+    cell: (info: any) => {
       const fav = info.row.original;
-      return h('button', {
-        onClick: (e: Event) => {
-          e.stopPropagation();
-          removeFavorite(fav.orgSlug, fav.eventSlug);
-        },
-        class: 'text-red-600 hover:text-red-800 hover:scale-110 transition-transform text-xl',
-        title: 'Retirer des favoris'
-      }, '🗑️');
+      const container = h('div', { class: 'flex gap-2 items-center' }, [
+        h(resolveComponent('UButton'), {
+          onClick: () => {
+            navigateTo(`/orgs/${fav.orgSlug}/events/${fav.eventSlug}`);
+          },
+          icon: 'i-heroicons-arrow-right-circle',
+          size: 'md',
+          color: 'primary',
+          variant: 'ghost',
+          square: true,
+          title: 'Voir l\'événement'
+        }),
+        h(resolveComponent('UButton'), {
+          onClick: (e: Event) => {
+            e.stopPropagation();
+            removeFavorite(fav.orgSlug, fav.eventSlug);
+          },
+          icon: 'i-heroicons-trash',
+          size: 'md',
+          color: 'red',
+          variant: 'ghost',
+          square: true,
+          title: 'Retirer des favoris'
+        })
+      ]);
+      return container;
     }
   }
 ];
-
-const onSelectEvent = (row: TableRow<FavoriteEvent>) => {
-  const fav = row.original;
-  router.push(`/orgs/${fav.orgSlug}/events/${fav.eventSlug}`);
-};
 
 useHead({
   title: "Événements Favoris | DevLille"

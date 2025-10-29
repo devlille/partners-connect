@@ -15,7 +15,7 @@
     <div class="p-6">
       <UTable
         :data="data"
-        @select="onSelectOrg"
+        :columns="columns"
       />
     </div>
   </Dashboard>
@@ -26,7 +26,6 @@ import { getUsersMeOrgs, type OrganisationItem } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 import type {TableRow} from "@nuxt/ui";
 
-const router = useRouter();
 const { mainLinks, footerLinks } = useDashboardLinks()
 
 definePageMeta({
@@ -36,9 +35,36 @@ definePageMeta({
 
 const data = ref<OrganisationItem[]>([]);
 
-const onSelectOrg = (row: TableRow<OrganisationItem>) => {
-  router.push(`/orgs/${row.original.slug}`);
-};
+const columns = [
+  {
+    header: 'Nom',
+    accessorKey: 'name',
+    cell: (info: TableRow<OrganisationItem>) => info.getValue('name')
+  },
+  {
+    header: 'Siège social',
+    accessorKey: 'head_office',
+    cell: (info: TableRow<OrganisationItem>) => info.getValue('head_office')
+  },
+  {
+    header: 'Actions',
+    accessorKey: 'slug',
+    cell: (info: any) => {
+      const org = info.row.original;
+      return h(resolveComponent('UButton'), {
+        onClick: () => {
+          navigateTo(`/orgs/${org.slug}`);
+        },
+        icon: 'i-heroicons-arrow-right-circle',
+        size: 'md',
+        color: 'primary',
+        variant: 'ghost',
+        square: true,
+        title: 'Voir l\'organisation'
+      });
+    }
+  }
+];
 
 onMounted(async () => {
   try {
