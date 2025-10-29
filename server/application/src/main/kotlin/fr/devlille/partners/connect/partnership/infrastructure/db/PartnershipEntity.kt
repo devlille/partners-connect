@@ -21,6 +21,9 @@ class PartnershipEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var language by PartnershipsTable.language
     var agreementUrl by PartnershipsTable.agreementUrl
     var agreementSignedUrl by PartnershipsTable.agreementSignedUrl
+    var validatedNbTickets by PartnershipsTable.validatedNbTickets
+    var validatedNbJobOffers by PartnershipsTable.validatedNbJobOffers
+    var validatedBoothSize by PartnershipsTable.validatedBoothSize
     var selectedPack by SponsoringPackEntity optionalReferencedOn PartnershipsTable.selectedPackId
     var suggestionPack by SponsoringPackEntity optionalReferencedOn PartnershipsTable.suggestionPackId
     var suggestionSentAt by PartnershipsTable.suggestionSentAt

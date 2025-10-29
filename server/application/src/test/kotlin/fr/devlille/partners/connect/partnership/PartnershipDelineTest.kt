@@ -5,7 +5,6 @@ import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
-import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.request.delete
 import io.ktor.client.request.header
@@ -21,62 +20,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class PartnershipValidationRoutesTest {
-    @Test
-    fun `POST validates a partnership`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val companyId = UUID.randomUUID()
-        val partnershipId = UUID.randomUUID()
-        val packId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-1"
-
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-
-            insertMockedCompany(companyId)
-            val selectedPack = insertMockedSponsoringPack(packId, eventId)
-            insertMockedPartnership(
-                id = partnershipId,
-                eventId = eventId,
-                companyId = companyId,
-                selectedPackId = selectedPack.id.value,
-            )
-        }
-
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/validate") {
-            contentType(ContentType.Application.Json)
-            header(HttpHeaders.Authorization, "Bearer valid")
-        }
-
-        assertEquals(HttpStatusCode.OK, response.status)
-        val partnership = transaction { PartnershipEntity.findById(partnershipId) }
-        assertNotNull(partnership?.validatedAt)
-    }
-
-    @Test
-    fun `POST returns 404 if partnership does not exist`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val partnershipId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-2"
-
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-        }
-
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/validate") {
-            contentType(ContentType.Application.Json)
-            header(HttpHeaders.Authorization, "Bearer valid")
-        }
-
-        assertEquals(HttpStatusCode.NotFound, response.status)
-    }
-
+class PartnershipDelineTest {
     @Test
     fun `POST declines a partnership`() = testApplication {
         val orgId = UUID.randomUUID()

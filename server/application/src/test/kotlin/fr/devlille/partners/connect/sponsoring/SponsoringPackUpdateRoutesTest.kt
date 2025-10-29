@@ -47,7 +47,7 @@ class SponsoringPackUpdateRoutesTest {
                 basePrice = 1000,
                 maxQuantity = 5,
                 nbTickets = 2,
-                withBooth = false,
+                boothSize = null,
             )
         }
 
@@ -56,7 +56,7 @@ class SponsoringPackUpdateRoutesTest {
             price = 2500,
             maxQuantity = 15,
             nbTickets = 5,
-            withBooth = true,
+            boothSize = "3x3m",
         )
 
         val response = client.put("/orgs/$orgId/events/$eventSlug/packs/$packId") {
@@ -79,7 +79,7 @@ class SponsoringPackUpdateRoutesTest {
         assertEquals(2500, updatedPack.basePrice)
         assertEquals(15, updatedPack.maxQuantity)
         assertEquals(5, updatedPack.nbTickets)
-        assertEquals(true, updatedPack.withBooth)
+        assertEquals("3x3m", updatedPack.boothSize)
     }
 
     @Test

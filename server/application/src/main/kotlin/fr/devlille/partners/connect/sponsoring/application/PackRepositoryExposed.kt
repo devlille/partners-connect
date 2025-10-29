@@ -58,7 +58,7 @@ class PackRepositoryExposed : PackRepository {
             this.event = event
             this.name = input.name
             this.basePrice = input.price
-            this.withBooth = input.withBooth
+            this.boothSize = input.boothSize
             this.nbTickets = input.nbTickets
             this.maxQuantity = input.maxQuantity
         }.id.value
@@ -70,7 +70,7 @@ class PackRepositoryExposed : PackRepository {
         val pack = SponsoringPackEntity.singlePackById(event.id.value, packId)
         pack.name = input.name
         pack.basePrice = input.price
-        pack.withBooth = input.withBooth
+        pack.boothSize = input.boothSize
         pack.nbTickets = input.nbTickets
         pack.maxQuantity = input.maxQuantity
         pack.id.value

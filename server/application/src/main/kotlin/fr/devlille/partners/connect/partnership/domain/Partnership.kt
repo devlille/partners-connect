@@ -7,6 +7,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@Suppress("LongParameterList")
 class Partnership(
     val id: String,
     val phone: String? = null,
@@ -16,6 +17,12 @@ class Partnership(
     val selectedPack: PartnershipPack? = null,
     @SerialName("suggestion_pack")
     val suggestionPack: PartnershipPack? = null,
+    @SerialName("validated_nb_tickets")
+    val validatedNbTickets: Int? = null,
+    @SerialName("validated_nb_job_offers")
+    val validatedNbJobOffers: Int? = null,
+    @SerialName("validated_booth_size")
+    val validatedBoothSize: String? = null,
 )
 
 @Serializable

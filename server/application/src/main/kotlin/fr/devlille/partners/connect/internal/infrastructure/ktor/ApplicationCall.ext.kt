@@ -37,6 +37,7 @@ val schemas by lazy {
         .register(readResourceFile("/schemas/event_with_organisation.schema.json"), SchemaType.DRAFT_7)
         .register(readResourceFile("/schemas/grant_permission_request.schema.json"), SchemaType.DRAFT_7)
         .register(readResourceFile("/schemas/revoke_permission_request.schema.json"), SchemaType.DRAFT_7)
+        .register(readResourceFile("/schemas/validate_partnership_request.schema.json"), SchemaType.DRAFT_7)
         .register(readResourceFile("/schemas/identifier.schema.json"), SchemaType.DRAFT_7)
         .register(readResourceFile("/schemas/media.schema.json"), SchemaType.DRAFT_7)
         .register(readResourceFile("/schemas/organisation.schema.json"), SchemaType.DRAFT_7)
@@ -82,4 +83,12 @@ suspend inline fun <reified T : Any> ApplicationCall.receive(schema: String): T 
             cause = null,
         )
     }
+}
+
+suspend inline fun <reified T : Any> ApplicationCall.receiveNullable(schema: String): T? {
+    val body = receiveText()
+    if (body.isBlank()) {
+        return null
+    }
+    return receive(schema = schema)
 }

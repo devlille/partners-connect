@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "ResponseException",
+  "description": "Error response structure for all API errors",
+  "properties": {
+    "message": {
+      "type": "string",
+      "description": "Human-readable error message"
+    },
+    "errors": {
+      "type": "array",
+      "description": "List of specific validation errors or additional error details",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "stack": {
+      "type": ["string", "null"],
+      "description": "Stack trace (only included in development mode)"
+    }
+  },
+  "required": ["message"],
+  "additionalProperties": false
+}

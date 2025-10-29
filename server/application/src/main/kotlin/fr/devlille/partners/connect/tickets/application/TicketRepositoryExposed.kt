@@ -64,9 +64,13 @@ class TicketRepositoryExposed(
         val partnership = transaction { billing.partnership }
         if (validatedPack == null) {
             throw NotFoundException("No validated pack found for partnership ${partnership.id}")
-        } else if (validatedPack.nbTickets < tickets.size) {
+        }
+
+        // Use validatedNbTickets if available, otherwise fall back to pack default
+        val ticketCount = partnership.validatedNbTickets ?: validatedPack.nbTickets
+        if (ticketCount < tickets.size) {
             val message = """
-Not enough tickets in the validated pack: ${validatedPack.nbTickets} available, ${tickets.size} requested
+Not enough tickets in the validated pack: $ticketCount available, ${tickets.size} requested
             """.trimIndent()
             throw ForbiddenException(message)
         }

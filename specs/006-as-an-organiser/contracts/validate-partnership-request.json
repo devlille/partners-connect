@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ValidatePartnershipRequest",
+  "title": "ValidatePartnershipRequest",
+  "description": "Optional request body for validating a partnership with customized package details",
+  "type": "object",
+  "properties": {
+    "nbTickets": {
+      "type": "integer",
+      "description": "Number of tickets allocated to this partnership. Must be >= 0. If not provided, defaults to the value from the sponsoring pack.",
+      "minimum": 0,
+      "example": 10
+    },
+    "nbJobOffers": {
+      "type": "integer",
+      "description": "Number of job offers allowed for this partnership. Must be >= 0. Required field.",
+      "minimum": 0,
+      "example": 2
+    },
+    "boothSize": {
+      "type": "string",
+      "description": "Size of the booth allocated to this partnership (e.g., '3x3m', '6x2m'). Must match a boothSize value present in at least one sponsoring pack for this event. If not provided, defaults to the value from the sponsoring pack.",
+      "example": "3x3m",
+      "pattern": "^.+$",
+      "minLength": 1
+    }
+  },
+  "required": ["nbJobOffers"],
+  "additionalProperties": false
+}
