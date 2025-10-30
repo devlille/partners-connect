@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "PaginatedJobOfferPromotion",
+  "description": "Paginated response containing job offer promotions and pagination metadata",
+  "properties": {
+    "items": {
+      "type": "array",
+      "description": "Array of job offer promotions for the current page",
+      "items": {
+        "$ref": "job_offer_promotion_response.schema.json"
+      }
+    },
+    "page": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Current page number (1-indexed)"
+    },
+    "page_size": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100,
+      "description": "Number of items per page"
+    },
+    "total": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total number of job offer promotions across all pages"
+    }
+  },
+  "required": [
+    "items",
+    "page",
+    "page_size",
+    "total"
+  ],
+  "additionalProperties": false
+}

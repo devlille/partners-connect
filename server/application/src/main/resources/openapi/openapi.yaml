@@ -1041,6 +1041,73 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Ticket"
+  /events/{eventSlug}/partnership/{partnershipId}/job-offers:
+    get:
+      summary: "List job offers for partnership"
+      operationId: "getPartnershipJobOffers"
+      description: "Get paginated list of job offer promotions for a specific partnership. Public endpoint accessible without authentication."
+      tags:
+        - partnerships
+        - job-offers
+      security:
+        - {}
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "Partnership UUID"
+        - name: "status"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            enum: ["pending", "approved", "declined"]
+          description: "Filter by promotion status"
+        - name: "page"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            minimum: 1
+            default: 1
+          description: "Page number (1-indexed)"
+        - name: "page_size"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: "Number of items per page"
+      responses:
+        "200":
+          description: "OK - Successfully retrieved job offer promotions"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedJobOfferPromotion"
+        "400":
+          description: "Bad Request - Invalid query parameters"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found - Partnership or event not found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
   /providers:
     get:
       summary: "List providers"
@@ -3236,6 +3303,8 @@ components:
       $ref: "../schemas/paginated_provider.schema.json"
     PaginatedJobOffer:
       $ref: "../schemas/paginated_job_offer.schema.json"
+    PaginatedJobOfferPromotion:
+      $ref: "../schemas/paginated_job_offer_promotion.schema.json"
     CreateJobOffer:
       $ref: "../schemas/create_job_offer.schema.json"
     UpdateJobOffer:
