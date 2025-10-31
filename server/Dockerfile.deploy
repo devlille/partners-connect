@@ -2,4 +2,5 @@
 ARG  TAG_VERSION=latest
 FROM ghcr.io/devlille/devlille/partners-connect-server:${TAG_VERSION}
 
-ENTRYPOINT ["java","-jar","/app/application.jar"]
+# The base image already has the entrypoint script, so we use it
+ENTRYPOINT ["/app/entrypoint.sh"]

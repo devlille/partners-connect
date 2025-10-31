@@ -15,5 +15,14 @@ RUN gradle shadowJar --no-daemon
 FROM amazoncorretto:21 AS runtime
 EXPOSE 8080
 RUN mkdir /app
+
+# Create directory for Google Cloud credentials
+RUN mkdir -p /app/config
+
 COPY --from=build /home/gradle/src/application/build/libs/*-all.jar /app/application.jar
-ENTRYPOINT ["java","-jar","/app/application.jar"]
+
+# Copy and setup entrypoint script
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+ENTRYPOINT ["/app/entrypoint.sh"]
