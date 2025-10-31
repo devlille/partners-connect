@@ -3,12 +3,16 @@ package fr.devlille.partners.connect.companies.application
 import fr.devlille.partners.connect.companies.application.mappers.toDomain
 import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.companies.domain.CompanyRepository
+import fr.devlille.partners.connect.companies.domain.CompanyStatus
 import fr.devlille.partners.connect.companies.domain.CreateCompany
 import fr.devlille.partners.connect.companies.domain.Media
+import fr.devlille.partners.connect.companies.domain.UpdateCompany
+import fr.devlille.partners.connect.companies.infrastructure.db.CompaniesTable
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanySocialEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.deleteAllByCompanyId
-import fr.devlille.partners.connect.companies.infrastructure.db.listByQuery
+import fr.devlille.partners.connect.companies.infrastructure.db.listByQueryAndStatus
+import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedResponse
 import fr.devlille.partners.connect.internal.infrastructure.api.paginated
 import fr.devlille.partners.connect.internal.infrastructure.api.toPaginatedResponse
@@ -17,10 +21,15 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
 class CompanyRepositoryExposed : CompanyRepository {
-    override fun listPaginated(query: String?, page: Int, pageSize: Int): PaginatedResponse<Company> = transaction {
-        val sized = CompanyEntity.listByQuery(query)
-        val total = sized.count()
-        sized
+    override fun listPaginated(
+        query: String?,
+        status: CompanyStatus?,
+        page: Int,
+        pageSize: Int,
+    ): PaginatedResponse<Company> = transaction {
+        val companies = CompanyEntity.listByQueryAndStatus(query, status)
+        val total = companies.count()
+        companies
             .paginated(page, pageSize)
             .map(CompanyEntity::toDomain)
             .toPaginatedResponse(total, page, pageSize)
@@ -63,6 +72,56 @@ class CompanyRepositoryExposed : CompanyRepository {
         company.logoUrl1000 = uploaded.png1000
         company.logoUrl500 = uploaded.png500
         company.logoUrl250 = uploaded.png250
+        company.id.value
+    }
+
+    override fun update(id: UUID, input: UpdateCompany): Company = transaction {
+        val company = CompanyEntity.findById(id)
+            ?: throw NotFoundException("Company with id $id not found")
+
+        // Check for SIRET conflicts if provided
+        input.siret?.let { newSiret ->
+            val existingCompany = CompanyEntity
+                .find { CompaniesTable.siret eq newSiret }
+                .firstOrNull { it.id.value != id }
+            if (existingCompany != null) {
+                throw ConflictException("Company with SIRET $newSiret already exists")
+            }
+        }
+
+        // Update only non-null fields (partial update)
+        input.name?.let { company.name = it }
+        input.siteUrl?.let { company.siteUrl = it }
+        input.headOffice?.let { address ->
+            company.address = address.address
+            company.city = address.city
+            company.zipCode = address.zipCode
+            company.country = address.country
+        }
+        input.siret?.let { company.siret = it }
+        input.vat?.let { company.vat = it }
+        input.description?.let { company.description = it }
+
+        // Update socials if provided
+        input.socials?.let { socials ->
+            CompanySocialEntity.deleteAllByCompanyId(company.id.value)
+            socials.forEach { social ->
+                CompanySocialEntity.new {
+                    this.company = company
+                    this.type = social.type
+                    this.url = social.url
+                }
+            }
+        }
+
+        company.toDomain()
+    }
+
+    override fun softDelete(id: UUID): UUID = transaction {
+        val company = CompanyEntity.findById(id)
+            ?: throw NotFoundException("Company with id $id not found")
+
+        company.status = CompanyStatus.INACTIVE
         company.id.value
     }
 }

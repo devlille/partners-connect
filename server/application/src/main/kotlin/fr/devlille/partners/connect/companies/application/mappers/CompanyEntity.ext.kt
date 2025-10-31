@@ -31,5 +31,6 @@ internal fun CompanyEntity.toDomain(): Company {
         } else {
             null
         },
+        status = status,
     )
 }

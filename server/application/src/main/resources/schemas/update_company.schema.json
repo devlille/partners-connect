@@ -1,0 +1,70 @@
+{
+  "$id": "update_company.schema.json",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "head_office": {
+      "anyOf": [
+        {
+          "$ref": "address.schema.json"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "siret": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^\\d{14}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "vat": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[A-Z]{2}[0-9A-Z]+$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "site_url": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "socials": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "$ref": "social.schema.json"
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

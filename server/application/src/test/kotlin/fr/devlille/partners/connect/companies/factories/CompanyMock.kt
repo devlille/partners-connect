@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.companies.factories
 
+import fr.devlille.partners.connect.companies.domain.CompanyStatus
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
@@ -16,6 +17,7 @@ fun insertMockedCompany(
     vat: String = "FR12345678901",
     description: String? = "This is a mock company for testing purposes.",
     siteUrl: String = "https://www.mockcompany.com",
+    status: CompanyStatus = CompanyStatus.ACTIVE,
 ): CompanyEntity = transaction {
     CompanyEntity.new(id) {
         this.name = name
@@ -31,5 +33,6 @@ fun insertMockedCompany(
         this.logoUrl1000 = null
         this.logoUrl500 = null
         this.logoUrl250 = null
+        this.status = status
     }
 }
