@@ -4,8 +4,9 @@
   "type": "module",
   "main": ".output/server/index.mjs",
   "scripts": {
-    "build": "npm run orval && nuxt build",
-    "dev": "npm run orval && nuxt dev",
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "dev:orval": "npm run orval && nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",

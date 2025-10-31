@@ -17,7 +17,9 @@
     "name": "Nom",
     "price": "Prix",
     "yes": "Oui",
-    "no": "Non"
+    "no": "Non",
+    "clear": "Effacer",
+    "activeFilters": "Filtres actifs"
   },
   "nav": {
     "myOrganizations": "Mes organisations",
@@ -63,7 +65,21 @@
     "companyName": "Nom de l'entreprise",
     "pack": "Pack",
     "noSponsors": "Aucun sponsor pour le moment",
-    "suggested": "suggéré"
+    "suggested": "suggéré",
+    "filters": {
+      "pack": "Pack de sponsoring",
+      "validated": "Validé",
+      "paid": "Payé",
+      "agreementGenerated": "Accord généré",
+      "agreementSigned": "Accord signé",
+      "suggestion": "Suggestion",
+      "clearAll": "Effacer tous les filtres",
+      "showingResults": "Affichage de {count} sponsor(s)",
+      "noResults": "Aucun sponsor ne correspond aux filtres sélectionnés",
+      "allPacks": "Tous les packs",
+      "statusFilters": "Filtres de statut",
+      "filterPanel": "Filtrer les sponsors"
+    }
   },
   "users": {
     "title": "Utilisateurs",

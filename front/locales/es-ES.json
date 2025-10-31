@@ -9,7 +9,11 @@
     "loading": "Cargando...",
     "error": "Error",
     "success": "Éxito",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "clear": "Limpiar",
+    "activeFilters": "Filtros Activos",
+    "yes": "Sí",
+    "no": "No"
   },
   "nav": {
     "myOrganizations": "Mis organizaciones",
@@ -50,7 +54,26 @@
   },
   "sponsors": {
     "title": "Patrocinadores",
-    "list": "Lista de patrocinadores"
+    "list": "Lista de patrocinadores",
+    "create": "Crear patrocinador",
+    "companyName": "Nombre de la empresa",
+    "pack": "Paquete",
+    "noSponsors": "Aún no hay patrocinadores",
+    "suggested": "sugerido",
+    "filters": {
+      "pack": "Paquete de Patrocinio",
+      "validated": "Validado",
+      "paid": "Pagado",
+      "agreementGenerated": "Acuerdo Generado",
+      "agreementSigned": "Acuerdo Firmado",
+      "suggestion": "Sugerencia",
+      "clearAll": "Limpiar Todos los Filtros",
+      "showingResults": "Mostrando {count} patrocinador(es)",
+      "noResults": "Ningún patrocinador coincide con los filtros seleccionados",
+      "allPacks": "Todos los Paquetes",
+      "statusFilters": "Filtros de Estado",
+      "filterPanel": "Filtrar Patrocinadores"
+    }
   },
   "errors": {
     "network": "Error de conexión. Verifique su conexión a internet.",

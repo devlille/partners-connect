@@ -9,7 +9,11 @@
     "loading": "Loading...",
     "error": "Error",
     "success": "Success",
-    "logout": "Logout"
+    "logout": "Logout",
+    "clear": "Clear",
+    "activeFilters": "Active Filters",
+    "yes": "Yes",
+    "no": "No"
   },
   "nav": {
     "myOrganizations": "My organizations",
@@ -50,7 +54,26 @@
   },
   "sponsors": {
     "title": "Sponsors",
-    "list": "Sponsors list"
+    "list": "Sponsors list",
+    "create": "Create sponsor",
+    "companyName": "Company name",
+    "pack": "Pack",
+    "noSponsors": "No sponsors yet",
+    "suggested": "suggested",
+    "filters": {
+      "pack": "Sponsoring Pack",
+      "validated": "Validated",
+      "paid": "Paid",
+      "agreementGenerated": "Agreement Generated",
+      "agreementSigned": "Agreement Signed",
+      "suggestion": "Suggestion",
+      "clearAll": "Clear All Filters",
+      "showingResults": "Showing {count} sponsor(s)",
+      "noResults": "No sponsors match the selected filters",
+      "allPacks": "All Packs",
+      "statusFilters": "Status Filters",
+      "filterPanel": "Filter Sponsors"
+    }
   },
   "errors": {
     "network": "Connection error. Check your internet connection.",

@@ -23,6 +23,34 @@
       </div>
 
       <template v-else>
+        <!-- Filter Panel -->
+        <FilterPanel
+          v-model="filters"
+          :packs="packs"
+          :loading="loading"
+          :active-filter-count="activeFilterCount"
+          @clear-all="clearAllFilters"
+        />
+
+        <!-- Active Filters Badges -->
+        <ActiveFilters
+          :filters="filters"
+          :packs="packs"
+          @clear="clearFilter"
+          @clear-all="clearAllFilters"
+        />
+
+        <!-- Result Count with ARIA live region for screen readers -->
+        <div
+          v-if="!loading"
+          class="text-sm text-gray-600 mb-4"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {{ $t('sponsors.filters.showingResults', { count: partnerships.length }) }}
+        </div>
+
         <!-- Statistiques -->
         <div v-if="packs.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div
@@ -59,7 +87,9 @@
 
         <!-- Liste des sponsors -->
         <div v-if="partnerships.length === 0" class="text-center py-12">
-          <div class="text-gray-500 mb-4">Aucun sponsor pour le moment</div>
+          <div class="text-gray-500 mb-4">
+            {{ activeFilterCount > 0 ? $t('sponsors.filters.noResults') : $t('sponsors.noSponsors') }}
+          </div>
         </div>
 
         <div v-else>
@@ -77,6 +107,9 @@
 import { getOrgsEventsPartnership, getEventBySlug, getOrgsEventsPacks, type PartnershipItem, type SponsoringPack } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 import type {TableRow} from "@nuxt/ui";
+import { useSponsorFilters } from '~/composables/useSponsorFilters'
+import FilterPanel from '~/components/sponsors/FilterPanel.vue'
+import ActiveFilters from '~/components/sponsors/ActiveFilters.vue'
 
 const { footerLinks } = useDashboardLinks();
 const { getOrgSlug, getEventSlug } = useRouteParams();
@@ -88,6 +121,19 @@ definePageMeta({
 
 const orgSlug = computed(() => getOrgSlug());
 const eventSlug = computed(() => getEventSlug());
+
+// Initialize sponsor filters
+const {
+  filters,
+  activeFilterCount,
+  isEmpty: filtersEmpty,
+  queryParams,
+  clearAllFilters,
+  clearFilter
+} = useSponsorFilters({
+  orgSlug: orgSlug.value,
+  eventSlug: eventSlug.value
+})
 
 const columns = [
   {
@@ -169,9 +215,10 @@ async function loadPartnerships() {
     error.value = null;
 
     // Charger toutes les données en parallèle
+    // Apply query params for filtering
     const [eventResponse, partnershipsResponse, packsResponse] = await Promise.all([
       getEventBySlug(eventSlug.value),
-      getOrgsEventsPartnership(orgSlug.value, eventSlug.value),
+      getOrgsEventsPartnership(orgSlug.value, eventSlug.value, queryParams.value),
       getOrgsEventsPacks(orgSlug.value, eventSlug.value)
     ]);
 
@@ -193,6 +240,14 @@ onMounted(() => {
 // Recharger si les slugs changent
 watch([orgSlug, eventSlug], () => {
   loadPartnerships();
+});
+
+// Watch for filter changes and reload partnerships
+watchEffect(() => {
+  // Trigger reload when queryParams change
+  if (queryParams.value) {
+    loadPartnerships();
+  }
 });
 
 useHead({
