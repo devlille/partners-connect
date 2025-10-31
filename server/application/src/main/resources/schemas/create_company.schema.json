@@ -9,10 +9,12 @@
       "$ref": "address.schema.json"
     },
     "siret": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^\\d{14}$"
     },
     "vat": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^[A-Z]{2}[0-9A-Z]+$"
     },
     "description": {
       "type": [

@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.companies.infrastructure.db
 
+import fr.devlille.partners.connect.companies.domain.CompanyStatus
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -22,5 +23,12 @@ object CompaniesTable : UUIDTable("companies") {
     val logoUrl250 = text("logo_url_250").nullable()
     val createdAt = datetime("created_at").clientDefault {
         Clock.System.now().toLocalDateTime(TimeZone.UTC)
+    }
+    val status = enumerationByName<CompanyStatus>("status", length = 20)
+        .default(defaultValue = CompanyStatus.ACTIVE)
+
+    init {
+        // Index for efficient status filtering
+        index(isUnique = false, status)
     }
 }

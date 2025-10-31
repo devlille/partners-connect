@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.internal.infrastructure.migrations
 
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddBoothManagementFieldsMigration
+import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddCompanyStatusColumnMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddEventExternalLinksMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddEventWebhooksMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddIntegrationCreatedAtMigration
@@ -31,6 +32,7 @@ object MigrationRegistry {
         AddEventWebhooksMigration,
         CreateCompanyJobOffersTableMigration,
         CreateJobOfferPromotionsTableMigration,
+        AddCompanyStatusColumnMigration(),
     )
 
     /**

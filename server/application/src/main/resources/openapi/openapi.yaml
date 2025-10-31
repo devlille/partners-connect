@@ -91,6 +91,14 @@ paths:
           required: false
           schema:
             type: "string"
+          description: "Search companies by name"
+        - name: "filter[status]"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            enum: ["active", "inactive"]
+          description: "Filter companies by status"
         - name: "page"
           in: "query"
           required: false
@@ -134,6 +142,139 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Identifier"
+  /companies/{companyId}:
+    get:
+      summary: "Get company by ID"
+      operationId: "getCompanyById"
+      description: "Retrieve a specific company by its UUID"
+      security:
+        - {}
+      parameters:
+        - name: "companyId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "UUID of the company"
+      responses:
+        "200":
+          description: "OK - Company retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Company"
+        "404":
+          description: "Not Found - Company with specified ID not found"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+        "400":
+          description: "Bad Request - Invalid company ID format"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+    put:
+      summary: "Update company"
+      operationId: "putCompanyById"
+      description: "Update an existing company with partial or complete data"
+      security:
+        - {}
+      parameters:
+        - name: "companyId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "UUID of the company"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCompany"
+        required: true
+      responses:
+        "200":
+          description: "OK - Company updated successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Company"
+        "400":
+          description: "Bad Request - Invalid update data or validation errors"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                  errors:
+                    type: "array"
+                    items:
+                      type: "string"
+        "404":
+          description: "Not Found - Company with specified ID not found"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+        "409":
+          description: "Conflict - SIRET already exists for another company"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+    delete:
+      summary: "Delete company (soft delete)"
+      operationId: "deleteCompanyById"
+      description: "Soft delete a company by setting its status to inactive"
+      security:
+        - {}
+      parameters:
+        - name: "companyId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "UUID of the company"
+      responses:
+        "204":
+          description: "No Content - Company soft deleted successfully"
+        "404":
+          description: "Not Found - Company with specified ID not found"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+        "400":
+          description: "Bad Request - Invalid company ID format"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
   /companies/{companyId}/logo:
     post:
       summary: "Create resource"
@@ -3223,6 +3364,8 @@ components:
       $ref: "../schemas/social.schema.json"
     CreateCompany:
       $ref: "../schemas/create_company.schema.json"
+    UpdateCompany:
+      $ref: "../schemas/update_company.schema.json"
     Identifier:
       $ref: "../schemas/identifier.schema.json"
     Contact:

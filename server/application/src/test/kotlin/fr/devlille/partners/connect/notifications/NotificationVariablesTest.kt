@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.notifications
 
 import fr.devlille.partners.connect.companies.domain.Address
 import fr.devlille.partners.connect.companies.domain.Company
+import fr.devlille.partners.connect.companies.domain.CompanyStatus
 import fr.devlille.partners.connect.events.domain.Contact
 import fr.devlille.partners.connect.events.domain.Event
 import fr.devlille.partners.connect.events.domain.EventDisplay
@@ -92,6 +93,7 @@ class NotificationVariablesTest {
         description = "Test company",
         siteUrl = "https://testcompany.com",
         medias = null,
+        status = CompanyStatus.ACTIVE,
     )
 
     private fun createPack() = PartnershipPack(

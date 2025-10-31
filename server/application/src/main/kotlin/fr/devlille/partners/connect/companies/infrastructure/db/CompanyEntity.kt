@@ -1,6 +1,8 @@
 package fr.devlille.partners.connect.companies.infrastructure.db
 
+import fr.devlille.partners.connect.companies.domain.CompanyStatus
 import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.lowerCase
 import org.jetbrains.exposed.v1.dao.UUIDEntity
@@ -25,13 +27,27 @@ class CompanyEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var logoUrl500 by CompaniesTable.logoUrl500
     var logoUrl250 by CompaniesTable.logoUrl250
     var createdAt by CompaniesTable.createdAt
+    var status by CompaniesTable.status
 }
 
-fun UUIDEntityClass<CompanyEntity>.listByQuery(query: String?): SizedIterable<CompanyEntity> {
-    val companies = if (query.isNullOrBlank()) {
-        this.all()
+fun UUIDEntityClass<CompanyEntity>.listByQueryAndStatus(
+    query: String?,
+    status: CompanyStatus?,
+): SizedIterable<CompanyEntity> {
+    val companies = if (query.isNullOrBlank() && status == null) {
+        // Default: all companies
+        all()
+    } else if (query.isNullOrBlank() && status != null) {
+        // Filter by status only
+        find { CompaniesTable.status eq status }
+    } else if (!query.isNullOrBlank() && status == null) {
+        // Search query only (existing behavior)
+        find { CompaniesTable.name.lowerCase() like "%${query.lowercase()}%" }
     } else {
-        this.find { CompaniesTable.name.lowerCase() like "%${query.lowercase()}%" }
+        // Both query and status
+        find {
+            (CompaniesTable.name.lowerCase() like "%${query!!.lowercase()}%") and (CompaniesTable.status eq status!!)
+        }
     }
     return companies.orderBy(CompaniesTable.name to SortOrder.ASC)
 }

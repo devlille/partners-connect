@@ -15,6 +15,7 @@ data class Company(
     @SerialName("site_url")
     val siteUrl: String,
     val medias: Media?,
+    val status: CompanyStatus,
 )
 
 @Serializable
