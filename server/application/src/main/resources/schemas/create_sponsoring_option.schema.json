@@ -1,21 +1,168 @@
 {
-  "$id": "create_sponsoring_option.schema.json",
-  "type": "object",
-  "properties": {
-    "translations": {
-      "type": "array",
-      "items": {
-        "$ref": "translated_label.schema.json"
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CreateSponsoringOption",
+  "description": "Polymorphic sealed class for creating sponsoring options",
+  "oneOf": [
+    {
+      "$ref": "#/definitions/CreateText"
+    },
+    {
+      "$ref": "#/definitions/CreateTypedQuantitative"
+    },
+    {
+      "$ref": "#/definitions/CreateTypedNumber"
+    },
+    {
+      "$ref": "#/definitions/CreateTypedSelectable"
+    }
+  ],
+  "definitions": {
+    "TranslatedLabel": {
+      "type": "object",
+      "required": ["language", "name"],
+      "properties": {
+        "language": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 5
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": ["string", "null"]
+        }
       }
     },
-    "price": {
-      "type": [
-        "integer",
-        "null"
-      ]
+    "CreateText": {
+      "type": "object",
+      "required": ["type", "translations"],
+      "properties": {
+        "type": {
+          "const": "text"
+        },
+        "translations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TranslatedLabel"
+          },
+          "minItems": 1
+        },
+        "price": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "CreateTypedQuantitative": {
+      "type": "object",
+      "required": ["type", "translations", "type_descriptor"],
+      "properties": {
+        "type": {
+          "const": "typed_quantitative"
+        },
+        "translations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TranslatedLabel"
+          },
+          "minItems": 1
+        },
+        "price": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "type_descriptor": {
+          "type": "string",
+          "enum": ["job_offer"],
+          "description": "Quantitative descriptor for user-defined quantities"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CreateTypedNumber": {
+      "type": "object",
+      "required": ["type", "translations", "type_descriptor", "fixed_quantity"],
+      "properties": {
+        "type": {
+          "const": "typed_number"
+        },
+        "translations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TranslatedLabel"
+          },
+          "minItems": 1
+        },
+        "price": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "type_descriptor": {
+          "type": "string",
+          "enum": ["nb_ticket"],
+          "description": "Number descriptor for fixed quantities"
+        },
+        "fixed_quantity": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Fixed quantity that cannot be modified by users"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CreateTypedSelectable": {
+      "type": "object",
+      "required": ["type", "translations", "type_descriptor", "selectable_values"],
+      "properties": {
+        "type": {
+          "const": "typed_selectable"
+        },
+        "translations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TranslatedLabel"
+          },
+          "minItems": 1
+        },
+        "price": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "type_descriptor": {
+          "type": "string",
+          "enum": ["booth"],
+          "description": "Selectable descriptor for predefined choices"
+        },
+        "selectable_values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CreateSelectableValue"
+          },
+          "minItems": 1,
+          "description": "Predefined values with individual pricing that users can select from"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CreateSelectableValue": {
+      "type": "object",
+      "required": ["value", "price"],
+      "properties": {
+        "value": {
+          "type": "string",
+          "maxLength": 255,
+          "description": "Display value for the selectable option"
+        },
+        "price": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Individual price for this selectable value in cents"
+        }
+      },
+      "additionalProperties": false
     }
-  },
-  "required": [
-    "translations"
-  ]
+  }
 }

@@ -1,28 +1,143 @@
 {
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "sponsoring_option.schema.json",
-  "type": "object",
-  "properties": {
-    "id": {
-      "type": "string"
+  "title": "SponsoringOption",
+  "description": "Polymorphic sealed class hierarchy for sponsoring options",
+  "oneOf": [
+    {
+      "$ref": "#/definitions/Text"
     },
-    "name": {
-      "type": "string"
+    {
+      "$ref": "#/definitions/TypedQuantitative"
     },
-    "description": {
-      "type": [
-        "string",
-        "null"
-      ]
+    {
+      "$ref": "#/definitions/TypedNumber"
     },
-    "price": {
-      "type": [
-        "integer",
-        "null"
-      ]
+    {
+      "$ref": "#/definitions/TypedSelectable"
     }
-  },
-  "required": [
-    "id",
-    "name"
-  ]
+  ],
+  "definitions": {
+    "Text": {
+      "type": "object",
+      "required": ["type", "id", "name"],
+      "properties": {
+        "type": {
+          "const": "text"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": ["string", "null"]
+        },
+        "price": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "TypedQuantitative": {
+      "type": "object",
+      "required": ["type", "id", "name", "type_descriptor"],
+      "properties": {
+        "type": {
+          "const": "typed_quantitative"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": ["string", "null"]
+        },
+        "price": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "type_descriptor": {
+          "type": "string",
+          "enum": ["job_offer"],
+          "description": "Quantitative descriptor for user-defined quantities"
+        }
+      },
+      "additionalProperties": false
+    },
+    "TypedNumber": {
+      "type": "object",
+      "required": ["type", "id", "name", "type_descriptor", "fixed_quantity"],
+      "properties": {
+        "type": {
+          "const": "typed_number"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": ["string", "null"]
+        },
+        "price": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "type_descriptor": {
+          "type": "string",
+          "enum": ["nb_ticket"],
+          "description": "Number descriptor for fixed quantities"
+        },
+        "fixed_quantity": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Fixed quantity that cannot be modified by users"
+        }
+      },
+      "additionalProperties": false
+    },
+    "TypedSelectable": {
+      "type": "object",
+      "required": ["type", "id", "name", "type_descriptor", "selectable_values"],
+      "properties": {
+        "type": {
+          "const": "typed_selectable"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": ["string", "null"]
+        },
+        "price": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "type_descriptor": {
+          "type": "string",
+          "enum": ["booth"],
+          "description": "Selectable descriptor for predefined choices"
+        },
+        "selectable_values": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "minItems": 1,
+          "description": "Predefined values that users can select from"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
 }

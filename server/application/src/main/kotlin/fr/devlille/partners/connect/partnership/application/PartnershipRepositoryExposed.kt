@@ -12,11 +12,15 @@ import fr.devlille.partners.connect.partnership.application.mappers.toDomain
 import fr.devlille.partners.connect.partnership.domain.CommunicationItem
 import fr.devlille.partners.connect.partnership.domain.CommunicationPlan
 import fr.devlille.partners.connect.partnership.domain.Contact
+import fr.devlille.partners.connect.partnership.domain.NumberSelection
 import fr.devlille.partners.connect.partnership.domain.Partnership
 import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
 import fr.devlille.partners.connect.partnership.domain.PartnershipItem
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
+import fr.devlille.partners.connect.partnership.domain.QuantitativeSelection
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
+import fr.devlille.partners.connect.partnership.domain.SelectableSelection
+import fr.devlille.partners.connect.partnership.domain.TextSelection
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
@@ -44,24 +48,24 @@ import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
-@Suppress("TooManyFunctions") // Required to support both listByEvent and listByCompany methods
+@Suppress("TooManyFunctions")
 class PartnershipRepositoryExposed(
     private val partnershipEntity: UUIDEntityClass<PartnershipEntity> = PartnershipEntity,
     private val packEntity: UUIDEntityClass<SponsoringPackEntity> = SponsoringPackEntity,
     private val translationEntity: UUIDEntityClass<OptionTranslationEntity> = OptionTranslationEntity,
     private val packOptionTable: PackOptionsTable = PackOptionsTable,
 ) : PartnershipRepository {
+    @Suppress("LongMethod", "CyclomaticComplexMethod")
     override fun register(eventSlug: String, register: RegisterPartnership): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
-        val eventId = event.id.value
         val companyId = register.companyId.toUUID()
         val company = CompanyEntity.findById(companyId)
             ?: throw NotFoundException("Company $companyId not found")
         val pack = packEntity.findById(register.packId.toUUID())
             ?: throw NotFoundException("Pack ${register.packId} not found")
 
-        val existing = partnershipEntity.singleByEventAndCompany(eventId, companyId)
+        val existing = partnershipEntity.singleByEventAndCompany(event.id.value, companyId)
         if (existing != null) {
             throw ConflictException("Company already subscribed to this event")
         }
@@ -87,27 +91,64 @@ class PartnershipRepositoryExposed(
             .listOptionalOptionsByPack(pack.id.value)
             .map { it[PackOptionsTable.option].value }
 
-        val optionsUUID = register.optionIds.map { it.toUUID() }
+        val optionsUUID = register.optionSelections.map { it.optionId.toUUID() }
         val unknownOptions = optionsUUID.filterNot { it in optionalOptionIds }
 
         if (unknownOptions.isNotEmpty()) {
             throw ForbiddenException("Some options are not optional in the selected pack: $unknownOptions")
         }
 
-        optionsUUID.forEach {
-            val option = SponsoringOptionEntity.findById(it) ?: throw NotFoundException("Option $it not found")
+        register.optionSelections.forEach { selection ->
+            val optionId = selection.optionId.toUUID()
+            val option = SponsoringOptionEntity.findById(optionId)
+                ?: throw NotFoundException("Option $optionId not found")
 
             val noTranslations = translationEntity
-                .listTranslationsByOptionAndLanguage(it, register.language)
+                .listTranslationsByOptionAndLanguage(optionId, register.language)
                 .isEmpty()
 
             if (noTranslations) {
-                throw ForbiddenException("Option $it does not have a translation for language ${register.language}")
+                throw ForbiddenException(
+                    "Option $optionId does not have a translation for language ${register.language}",
+                )
             }
+
+            // Create partnership option with selection data based on selection type
             PartnershipOptionEntity.new {
                 this.partnership = partnership
                 this.packId = pack.id
                 this.option = option
+
+                // Set selection data based on the polymorphic selection type
+                when (selection) {
+                    is TextSelection -> {
+                        // No additional data needed for text selections
+                    }
+
+                    is QuantitativeSelection -> {
+                        this.selectedQuantity = selection.selectedQuantity
+                    }
+
+                    is NumberSelection -> {
+                        // For number selections, the quantity is the fixed quantity from the option
+                        this.selectedQuantity = option.fixedQuantity
+                    }
+
+                    is SelectableSelection -> {
+                        // Validate that the selected value ID exists for this option
+                        val selectedValueUUID = selection.selectedValueId.toUUID()
+                        val selectedValueEntity = option.selectableValues.find { it.id.value == selectedValueUUID }
+
+                        if (selectedValueEntity == null) {
+                            val validValueIds = option.selectableValues.map { "${it.value} (${it.id.value})" }
+                            throw ForbiddenException(
+                                "Selected value ID '${selection.selectedValueId}' is not valid for option $optionId. " +
+                                    "Valid values: ${validValueIds.joinToString(", ")}",
+                            )
+                        }
+                        this.selectedValue = selectedValueEntity
+                    }
+                }
             }
         }
 

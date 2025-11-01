@@ -16,4 +16,6 @@ interface OptionRepository {
     fun detachOptionFromPack(eventSlug: String, packId: UUID, optionId: UUID)
 
     fun listOptionsByEventWithAllTranslations(eventSlug: String): List<SponsoringOptionWithTranslations>
+
+    fun getOptionByIdWithAllTranslations(eventSlug: String, optionId: UUID): SponsoringOptionWithTranslations
 }

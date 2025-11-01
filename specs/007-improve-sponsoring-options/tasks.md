@@ -40,25 +40,25 @@
 - Routes in `infrastructure/api/`
 
 ## Phase 3.1: Setup & Schema
-- [ ] T001 [P] Extend SponsoringOptionsTable with new columns in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/infrastructure/db/SponsoringOptionsTable.kt
-- [ ] T002 [P] Create SelectableValuesTable for typed_selectable options in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/infrastructure/db/SelectableValuesTable.kt
-- [ ] T003 [P] Extend PartnershipOptionsTable with selection columns in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/PartnershipOptionsTable.kt
+- [x] T001 [P] Extend SponsoringOptionsTable with new columns in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/infrastructure/db/SponsoringOptionsTable.kt
+- [x] T002 [P] Create SelectableValuesTable for typed_selectable options in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/infrastructure/db/SelectableValuesTable.kt
+- [x] T003 [P] Extend PartnershipOptionsTable with selection columns in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/PartnershipOptionsTable.kt
 
-## Phase 3.2: Tests First (TDD) ⚠️ MUST COMPLETE BEFORE 3.3
+## Phase 3.2: Tests First (TDD) ✅ COMPLETE - Tests failing as required
 **CRITICAL: These tests MUST be written and MUST FAIL before ANY implementation**
 **Use existing mock factory functions or create them if needed for test data setup**
-- [ ] T004 [P] Contract test POST /orgs/{orgSlug}/events/{eventSlug}/options with mock factory setup in server/application/src/test/kotlin/fr/devlille/partners/connect/sponsoring/infrastructure/api/CreateSponsoringOptionTest.kt
-- [ ] T005 [P] Contract test PUT /orgs/{orgSlug}/events/{eventSlug}/options/{optionId} with mock factory setup in server/application/src/test/kotlin/fr/devlille/partners/connect/sponsoring/infrastructure/api/UpdateSponsoringOptionTest.kt
-- [ ] T006 [P] Contract test GET /orgs/{orgSlug}/events/{eventSlug}/options/{optionId} with mock factory setup in server/application/src/test/kotlin/fr/devlille/partners/connect/sponsoring/infrastructure/api/GetSponsoringOptionTest.kt
-- [ ] T007 [P] Contract test POST /events/{eventSlug}/partnerships with mock factory setup in server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/CreatePartnershipTest.kt
-- [ ] T008 [P] Contract test GET /events/{eventSlug}/partnerships/{partnershipId} with mock factory setup in server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/GetPartnershipTest.kt
+- [x] T004 [P] Contract test POST /orgs/{orgSlug}/events/{eventSlug}/options with mock factory setup in server/application/src/test/kotlin/fr/devlille/partners/connect/sponsoring/infrastructure/api/CreateSponsoringOptionTest.kt
+- [x] T005 [P] Contract test PUT /orgs/{orgSlug}/events/{eventSlug}/options/{optionId} with mock factory setup in server/application/src/test/kotlin/fr/devlille/partners/connect/sponsoring/infrastructure/api/UpdateSponsoringOptionTest.kt
+- [x] T006 [P] Contract test GET /orgs/{orgSlug}/events/{eventSlug}/options/{optionId} with mock factory setup in server/application/src/test/kotlin/fr/devlille/partners/connect/sponsoring/infrastructure/api/GetSponsoringOptionTest.kt
+- [x] T007 [P] Contract test POST /events/{eventSlug}/partnerships with mock factory setup in server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/CreatePartnershipTest.kt
+- [x] T008 [P] Contract test GET /events/{eventSlug}/partnerships/{partnershipId} with mock factory setup in server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/GetPartnershipTest.kt
 
-## Phase 3.3: Core Implementation (ONLY after tests are failing)
-- [ ] T009 [P] Create enum descriptors (QuantitativeDescriptor, NumberDescriptor, SelectableDescriptor) in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/domain/OptionDescriptors.kt
-- [ ] T010 [P] Convert SponsoringOption to polymorphic sealed class in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/domain/SponsoringOption.kt
-- [ ] T011 [P] Convert SponsoringOptionWithTranslations to polymorphic sealed class in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/domain/SponsoringOptionWithTranslations.kt
-- [ ] T012 [P] Create PartnershipOption polymorphic sealed class in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipOption.kt
-- [ ] T013 Create database entities for new tables (SelectableValueEntity) in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/infrastructure/db/SelectableValueEntity.kt
+## Phase 3.3: Core Implementation ✅ CORE MODELS COMPLETE
+- [x] T009 [P] Create enum descriptors (QuantitativeDescriptor, NumberDescriptor, SelectableDescriptor) in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/domain/OptionDescriptors.kt
+- [x] T010 [P] Convert SponsoringOption to polymorphic sealed class in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/domain/SponsoringOption.kt
+- [x] T011 [P] Convert SponsoringOptionWithTranslations to polymorphic sealed class in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/domain/SponsoringOptionWithTranslations.kt
+- [x] T012 [P] Create PartnershipOption polymorphic sealed class in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipOption.kt
+- [x] T013 Create database entities for new tables (SelectableValueEntity) in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/infrastructure/db/SelectableValueEntity.kt
 - [ ] T014 Extend SponsoringOptionEntity with new nullable columns in server/application/src/main/kotlin/fr/devlille/partners/connect/sponsoring/infrastructure/db/SponsoringOptionEntity.kt
 - [ ] T015 Extend PartnershipOptionEntity with selection columns in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/PartnershipOptionEntity.kt
 

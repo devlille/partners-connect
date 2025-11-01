@@ -4,16 +4,23 @@ import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionsTable
 import fr.devlille.partners.connect.sponsoring.application.mappers.toDomain
 import fr.devlille.partners.connect.sponsoring.application.mappers.toDomainWithAllTranslations
 import fr.devlille.partners.connect.sponsoring.domain.AttachOptionsToPack
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
+import fr.devlille.partners.connect.sponsoring.domain.CreateText
+import fr.devlille.partners.connect.sponsoring.domain.CreateTypedNumber
+import fr.devlille.partners.connect.sponsoring.domain.CreateTypedQuantitative
+import fr.devlille.partners.connect.sponsoring.domain.CreateTypedSelectable
 import fr.devlille.partners.connect.sponsoring.domain.OptionRepository
+import fr.devlille.partners.connect.sponsoring.domain.OptionType
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringOptionWithTranslations
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.SelectableValueEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
@@ -46,6 +53,37 @@ class OptionRepositoryExposed(
         val option = optionEntity.new {
             this.event = event
             this.price = input.price
+            // Set polymorphic fields based on the sealed class variant
+            when (input) {
+                is CreateText -> {
+                    this.optionType = OptionType.TEXT
+                    this.quantitativeDescriptor = null
+                    this.numberDescriptor = null
+                    this.selectableDescriptor = null
+                    this.fixedQuantity = null
+                }
+                is CreateTypedQuantitative -> {
+                    this.optionType = OptionType.TYPED_QUANTITATIVE
+                    this.quantitativeDescriptor = input.typeDescriptor
+                    this.numberDescriptor = null
+                    this.selectableDescriptor = null
+                    this.fixedQuantity = null
+                }
+                is CreateTypedNumber -> {
+                    this.optionType = OptionType.TYPED_NUMBER
+                    this.quantitativeDescriptor = null
+                    this.numberDescriptor = input.typeDescriptor
+                    this.selectableDescriptor = null
+                    this.fixedQuantity = input.fixedQuantity
+                }
+                is CreateTypedSelectable -> {
+                    this.optionType = OptionType.TYPED_SELECTABLE
+                    this.quantitativeDescriptor = null
+                    this.numberDescriptor = null
+                    this.selectableDescriptor = input.typeDescriptor
+                    this.fixedQuantity = null
+                }
+            }
         }
         input.translations.forEach {
             OptionTranslationEntity.new {
@@ -53,6 +91,12 @@ class OptionRepositoryExposed(
                 this.language = it.language
                 this.name = it.name
                 this.description = it.description
+            }
+        }
+        // Create selectable values if provided (only for selectable type)
+        if (input is CreateTypedSelectable) {
+            input.selectableValues.forEach { selectableValue ->
+                SelectableValueEntity.createForOption(option.id.value, selectableValue.value, selectableValue.price)
             }
         }
         option.id.value
@@ -65,6 +109,37 @@ class OptionRepositoryExposed(
         if (option.event.id.value != event.id.value) throw NotFoundException("Option not found")
 
         option.price = input.price
+        // Update polymorphic fields based on the sealed class variant
+        when (input) {
+            is CreateText -> {
+                option.optionType = OptionType.TEXT
+                option.quantitativeDescriptor = null
+                option.numberDescriptor = null
+                option.selectableDescriptor = null
+                option.fixedQuantity = null
+            }
+            is CreateTypedQuantitative -> {
+                option.optionType = OptionType.TYPED_QUANTITATIVE
+                option.quantitativeDescriptor = input.typeDescriptor
+                option.numberDescriptor = null
+                option.selectableDescriptor = null
+                option.fixedQuantity = null
+            }
+            is CreateTypedNumber -> {
+                option.optionType = OptionType.TYPED_NUMBER
+                option.quantitativeDescriptor = null
+                option.numberDescriptor = input.typeDescriptor
+                option.selectableDescriptor = null
+                option.fixedQuantity = input.fixedQuantity
+            }
+            is CreateTypedSelectable -> {
+                option.optionType = OptionType.TYPED_SELECTABLE
+                option.quantitativeDescriptor = null
+                option.numberDescriptor = null
+                option.selectableDescriptor = input.typeDescriptor
+                option.fixedQuantity = null
+            }
+        }
 
         // Replace translations - delete existing and insert new ones
         OptionTranslationsTable.deleteWhere { OptionTranslationsTable.option eq optionId }
@@ -77,16 +152,33 @@ class OptionRepositoryExposed(
             }
         }
 
+        // Update selectable values - delete existing and create new ones (always clean up)
+        SelectableValueEntity.deleteAllByOption(optionId)
+        if (input is CreateTypedSelectable) {
+            input.selectableValues.forEach { selectableValue ->
+                SelectableValueEntity.createForOption(optionId, selectableValue.value, selectableValue.price)
+            }
+        }
+
         option.id.value
     }
 
     override fun deleteOption(eventSlug: String, optionId: UUID) = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
-        val isUsed = PackOptionsTable
+
+        // Check if option is used in packs
+        val isUsedInPacks = PackOptionsTable
             .listOptionsAttachedByEventAndOption(event.id.value, optionId)
             .empty().not()
-        if (isUsed) throw ForbiddenException("Option is used in a pack and cannot be deleted")
+        if (isUsedInPacks) throw ForbiddenException("Option is used in a pack and cannot be deleted")
+
+        // Check if option is used in partnerships
+        val isUsedInPartnerships = PartnershipOptionsTable
+            .selectAll()
+            .where { PartnershipOptionsTable.optionId eq optionId }
+            .empty().not()
+        if (isUsedInPartnerships) throw ForbiddenException("Option is used in partnerships and cannot be deleted")
 
         // Delete translations first (FK constraint)
         OptionTranslationsTable.deleteWhere { OptionTranslationsTable.option eq optionId }
@@ -175,8 +267,24 @@ class OptionRepositoryExposed(
             ?: throw NotFoundException("Event with slug $eventSlug not found")
 
         // Use the existing extension function which is working correctly
-        optionEntity.allByEvent(event.id.value).map { option ->
-            option.toDomainWithAllTranslations()
+        optionEntity
+            .allByEvent(event.id.value)
+            .map { option -> option.toDomainWithAllTranslations() }
+    }
+
+    override fun getOptionByIdWithAllTranslations(
+        eventSlug: String,
+        optionId: UUID,
+    ): SponsoringOptionWithTranslations = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+
+        val option = optionEntity.findById(optionId) ?: throw NotFoundException("Option not found")
+
+        if (option.event.id.value != event.id.value) {
+            throw NotFoundException("Option not found")
         }
+
+        option.toDomainWithAllTranslations()
     }
 }

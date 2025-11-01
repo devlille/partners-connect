@@ -1,23 +1,58 @@
 {
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "suggest_partnership.schema.json",
+  "title": "SuggestPartnership",
+  "description": "Partnership suggestion request with enhanced option selections",
   "type": "object",
   "properties": {
     "pack_id": {
-      "type": "string"
-    },
-    "option_ids": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "default": []
+      "type": "string",
+      "format": "uuid",
+      "description": "UUID of the sponsoring pack to suggest"
     },
     "language": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^[a-z]{2}$",
+      "description": "Two-letter language code (e.g., 'en', 'fr')"
+    },
+    "option_selections": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PartnershipOptionSelection"
+      },
+      "default": [],
+      "description": "Array of selected sponsoring options with type-specific selections"
     }
   },
   "required": [
     "pack_id",
     "language"
-  ]
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "PartnershipOptionSelection": {
+      "type": "object",
+      "required": ["type", "option_id"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["text_selection", "quantitative_selection", "number_selection", "selectable_selection"]
+        },
+        "option_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "selected_quantity": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Required for quantitative_selection, 0 means exclude option"
+        },
+        "selected_value_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Required for selectable_selection"
+        }
+      }
+    }
+  }
 }

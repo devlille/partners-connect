@@ -2,7 +2,6 @@ package fr.devlille.partners.connect.sponsoring
 
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
-import fr.devlille.partners.connect.sponsoring.factories.insertMockedOptionTranslation
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedPackOptions
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringOption
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
@@ -32,26 +31,6 @@ class OrganizerSponsoringIntegrationTest {
 
             val pack = insertMockedSponsoringPack(event = eventId, name = "Gold Sponsor")
             val option = insertMockedSponsoringOption(eventId = eventId)
-
-            // Insert multiple translations for the option
-            insertMockedOptionTranslation(
-                optionId = option.id.value,
-                language = "en",
-                name = "Logo on website",
-                description = "Company logo displayed on event website",
-            )
-            insertMockedOptionTranslation(
-                optionId = option.id.value,
-                language = "fr",
-                name = "Logo sur le site web",
-                description = "Logo de l'entreprise affiché sur le site de l'événement",
-            )
-            insertMockedOptionTranslation(
-                optionId = option.id.value,
-                language = "de",
-                name = "Logo auf Website",
-                description = "",
-            )
 
             insertMockedPackOptions(packId = pack.id.value, optionId = option.id.value, required = true)
         }
@@ -91,26 +70,6 @@ class OrganizerSponsoringIntegrationTest {
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
             val option = insertMockedSponsoringOption(eventId = eventId)
-
-            // Insert multiple translations for the option
-            insertMockedOptionTranslation(
-                optionId = option.id.value,
-                language = "en",
-                name = "Premium booth",
-                description = "Premium location booth space",
-            )
-            insertMockedOptionTranslation(
-                optionId = option.id.value,
-                language = "fr",
-                name = "Stand premium",
-                description = "Espace de stand à emplacement privilégié",
-            )
-            insertMockedOptionTranslation(
-                optionId = option.id.value,
-                language = "es",
-                name = "Stand premium",
-                description = "",
-            )
         }
 
         val response = client.get("/orgs/$orgId/events/$eventSlug/options") {
@@ -149,19 +108,6 @@ class OrganizerSponsoringIntegrationTest {
 
             val pack = insertMockedSponsoringPack(event = eventId, name = "Silver Sponsor")
             val option = insertMockedSponsoringOption(eventId = eventId)
-
-            insertMockedOptionTranslation(
-                optionId = option.id.value,
-                language = "en",
-                name = "Social media promotion",
-                description = "Promotion on social media channels",
-            )
-            insertMockedOptionTranslation(
-                optionId = option.id.value,
-                language = "fr",
-                name = "Promotion réseaux sociaux",
-                description = "Promotion sur les réseaux sociaux",
-            )
 
             insertMockedPackOptions(packId = pack.id.value, optionId = option.id.value, required = false)
         }

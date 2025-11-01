@@ -1,6 +1,8 @@
 {
-  "$id": "register_partnership.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RegisterPartnership",
   "type": "object",
+  "required": ["company_id", "pack_id", "contact_name", "contact_role", "language"],
   "properties": {
     "company_id": {
       "type": "string",
@@ -10,11 +12,10 @@
       "type": "string",
       "format": "uuid"
     },
-    "option_ids": {
+    "option_selections": {
       "type": "array",
       "items": {
-        "type": "string",
-        "format": "uuid"
+        "$ref": "#/definitions/PartnershipOptionSelection"
       }
     },
     "contact_name": {
@@ -27,23 +28,40 @@
       "type": "string"
     },
     "phone": {
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": ["string", "null"]
     },
     "emails": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "format": "email"
       }
     }
   },
-  "required": [
-    "company_id",
-    "pack_id",
-    "contact_name",
-    "contact_role",
-    "language"
-  ]
+  "definitions": {
+    "PartnershipOptionSelection": {
+      "type": "object",
+      "required": ["type", "option_id"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["text_selection", "quantitative_selection", "number_selection", "selectable_selection"]
+        },
+        "option_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "selected_quantity": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Required for quantitative_selection, 0 means exclude option"
+        },
+        "selected_value_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Required for selectable_selection"
+        }
+      }
+    }
+  }
 }

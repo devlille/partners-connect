@@ -1,0 +1,45 @@
+meta {
+  name: Create Selectable
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/options
+  body: json
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  org_slug: {{org_slug}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "type": "typed_selectable",
+    "translations": [
+      {
+        "language": "fr",
+        "name": "Taille gold du stand",
+        "description": "Dans votre pack, vous avez des tickets pour préparer votre stand, l'animer ou simplement profiter de l'évènement"
+      },
+      {
+        "language": "en",
+        "name": "Gold booth size",
+        "description": "In your pack, you can add tickets to prepare your booth, animate or simply enjoy the event"
+      }
+    ],
+    "selectable_values": [
+      {
+        "value": "3x6m",
+        "price": 1000
+      }
+    ],
+    "type_descriptor": "booth"
+  }
+}
