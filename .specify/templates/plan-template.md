@@ -152,7 +152,8 @@ directories captured above]
 
 3. **Generate contract tests** from contracts:
    - One test file per endpoint
-   - Assert request/response schemas
+   - Assert request/response schemas (NOT business logic)
+   - Use existing mock factory functions or plan new ones for test data
    - Tests must fail (no implementation yet)
 
 4. **Extract test scenarios** from user stories:
@@ -176,9 +177,11 @@ directories captured above]
 **Task Generation Strategy**:
 - Load `.specify/templates/tasks-template.md` as base
 - Generate tasks from Phase 1 design docs (contracts, data model, quickstart)
-- Each contract → contract test task [P]
+- Each contract → contract test task [P] with mock factory usage
 - Each entity → model creation task [P] 
 - Each user story → integration test task
+- JSON schema generation task for request/response validation
+- Implementation tasks using call.receive<T>(schema) pattern
 - Implementation tasks to make tests pass
 
 **Ordering Strategy**:
