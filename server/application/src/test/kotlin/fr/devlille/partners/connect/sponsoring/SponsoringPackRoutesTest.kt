@@ -155,7 +155,6 @@ class SponsoringPackRoutesTest {
 
                 val pack = insertMockedSponsoringPack(event = eventId)
                 val option = insertMockedSponsoringOption(eventId = eventId)
-                insertMockedOptionTranslation(optionId = option.id.value)
                 insertMockedPackOptions(packId = pack.id.value, optionId = option.id.value)
             }
 
@@ -183,10 +182,8 @@ class SponsoringPackRoutesTest {
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
             insertMockedSponsoringPack(packId, eventId)
-            insertMockedSponsoringOption(optionId = optionId1, eventId = eventId)
-            insertMockedOptionTranslation(optionId = optionId1, name = "Logo")
-            insertMockedSponsoringOption(optionId = optionId2, eventId = eventId)
-            insertMockedOptionTranslation(optionId = optionId2, name = "Talk")
+            insertMockedSponsoringOption(optionId = optionId1, eventId = eventId, name = "Logo")
+            insertMockedSponsoringOption(optionId = optionId2, eventId = eventId, name = "Talk")
         }
 
         val attachRequest = AttachOptionsToPack(
@@ -277,7 +274,6 @@ class SponsoringPackRoutesTest {
 
             insertMockedSponsoringPack(packId, eventId)
             insertMockedSponsoringOption(optionId = optionId, eventId = eventId)
-            insertMockedOptionTranslation(optionId = optionId)
         }
 
         val response = client.post("/orgs/$orgId/events/$eventSlug/packs/$packId/options") {
@@ -316,9 +312,7 @@ class SponsoringPackRoutesTest {
             insertMockedEventWithOrga(otherEventId, organisation = org)
             insertMockedSponsoringPack(packId, eventId)
             insertMockedSponsoringOption(optionId = optionValid, eventId = eventId)
-            insertMockedOptionTranslation(optionId = optionValid)
             insertMockedSponsoringOption(optionId = optionInvalid, eventId = otherEventId)
-            insertMockedOptionTranslation(optionId = optionInvalid)
         }
 
         val response = client.post("/orgs/$orgSlug/events/$eventSlug/packs/$packId/options") {
@@ -353,7 +347,6 @@ class SponsoringPackRoutesTest {
 
             insertMockedSponsoringPack(packId, eventId)
             insertMockedSponsoringOption(optionId = optionId, eventId = eventId)
-            insertMockedOptionTranslation(optionId = optionId)
             insertMockedPackOptions(packId, optionId)
         }
 
@@ -385,15 +378,13 @@ class SponsoringPackRoutesTest {
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
             val pack = insertMockedSponsoringPack(event = eventId, name = "Gold Sponsor")
-            val option = insertMockedSponsoringOption(eventId = eventId)
-
-            // Insert multiple translations for the option
-            insertMockedOptionTranslation(
-                optionId = option.id.value,
-                language = "en",
+            val option = insertMockedSponsoringOption(
+                eventId = eventId,
                 name = "Logo on website",
                 description = "Company logo displayed on event website",
             )
+
+            // Insert additional translations for the option (en already created by insertMockedSponsoringOption)
             insertMockedOptionTranslation(
                 optionId = option.id.value,
                 language = "fr",

@@ -11,7 +11,6 @@ import fr.devlille.partners.connect.sponsoring.domain.EventPackRepository
 import fr.devlille.partners.connect.sponsoring.domain.OptionRepository
 import fr.devlille.partners.connect.sponsoring.domain.PackRepository
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.call
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
@@ -94,6 +93,12 @@ private fun Route.optionRoutes() {
             val request = call.receive<CreateSponsoringOption>(schema = "create_sponsoring_option.schema.json")
             val optionId = repository.createOption(eventSlug = eventSlug, input = request)
             call.respond(HttpStatusCode.Created, mapOf("id" to optionId.toString()))
+        }
+        get("/{optionId}") {
+            val eventSlug = call.parameters.eventSlug
+            val optionId = call.parameters.optionId
+            val option = repository.getOptionByIdWithAllTranslations(eventSlug = eventSlug, optionId = optionId)
+            call.respond(HttpStatusCode.OK, option)
         }
         put("/{optionId}") {
             val eventSlug = call.parameters.eventSlug

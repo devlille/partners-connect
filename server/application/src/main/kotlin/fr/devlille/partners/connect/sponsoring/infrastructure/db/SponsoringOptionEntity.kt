@@ -13,6 +13,14 @@ class SponsoringOptionEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var event by EventEntity referencedOn SponsoringOptionsTable.eventId
     var price by SponsoringOptionsTable.price
     val translations by OptionTranslationEntity referrersOn OptionTranslationsTable.option
+    var optionType by SponsoringOptionsTable.optionType
+    var quantitativeDescriptor by SponsoringOptionsTable.quantitativeDescriptor
+    var numberDescriptor by SponsoringOptionsTable.numberDescriptor
+    var selectableDescriptor by SponsoringOptionsTable.selectableDescriptor
+    var fixedQuantity by SponsoringOptionsTable.fixedQuantity
+
+    // Relationship to selectable values for TYPED_SELECTABLE options
+    val selectableValues by SelectableValueEntity referrersOn SelectableValuesTable.optionId
 }
 
 fun UUIDEntityClass<SponsoringOptionEntity>.allByEvent(eventId: UUID): SizedIterable<SponsoringOptionEntity> = this

@@ -31,7 +31,7 @@ fun Route.partnershipRoutes() {
     val notificationRepository by inject<NotificationRepository>()
     val webhookRepository by inject<WebhookRepository>()
 
-    route("/events/{eventSlug}/partnership") {
+    route("/events/{eventSlug}/partnerships") {
         post {
             val eventSlug = call.parameters.eventSlug
             val register = call.receive<RegisterPartnership>(schema = "register_partnership.schema.json")

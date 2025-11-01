@@ -4,9 +4,9 @@ import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.partnership.domain.SuggestPartnership
+import fr.devlille.partners.connect.partnership.domain.TextSelection
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
-import fr.devlille.partners.connect.sponsoring.factories.insertMockedOptionTranslation
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedPackOptions
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringOption
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
@@ -48,7 +48,6 @@ class PartnershipSuggestionRoutesTest {
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
             insertMockedSponsoringPack(packId, eventId)
             insertMockedSponsoringOption(optionId, eventId)
-            insertMockedOptionTranslation(optionId = optionId)
             insertMockedPackOptions(packId, optionId, required = false)
         }
 
@@ -57,7 +56,11 @@ class PartnershipSuggestionRoutesTest {
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(
                 Json.encodeToString(
-                    SuggestPartnership(packId.toString(), listOf(optionId.toString()), "en"),
+                    SuggestPartnership(
+                        packId = packId.toString(),
+                        language = "en",
+                        optionSelections = listOf(TextSelection(optionId = optionId.toString())),
+                    ),
                 ),
             )
         }
@@ -86,7 +89,7 @@ class PartnershipSuggestionRoutesTest {
         val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$fakeId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(Json.encodeToString(SuggestPartnership("fake-pack", emptyList(), "en")))
+            setBody(Json.encodeToString(SuggestPartnership(packId = UUID.randomUUID().toString(), language = "en")))
         }
 
         assertEquals(HttpStatusCode.NotFound, response.status)
@@ -112,7 +115,7 @@ class PartnershipSuggestionRoutesTest {
         val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(Json.encodeToString(SuggestPartnership(UUID.randomUUID().toString(), emptyList(), "en")))
+            setBody(Json.encodeToString(SuggestPartnership(packId = UUID.randomUUID().toString(), language = "en")))
         }
 
         assertEquals(HttpStatusCode.NotFound, response.status)
@@ -137,14 +140,21 @@ class PartnershipSuggestionRoutesTest {
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
             insertMockedSponsoringPack(packId, eventId)
             insertMockedSponsoringOption(optionId, eventId)
-            insertMockedOptionTranslation(optionId = optionId)
             insertMockedPackOptions(packId, optionId)
         }
 
         val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(Json.encodeToString(SuggestPartnership(packId.toString(), listOf(optionId.toString()), "en")))
+            setBody(
+                Json.encodeToString(
+                    SuggestPartnership(
+                        packId = packId.toString(),
+                        language = "en",
+                        optionSelections = listOf(TextSelection(optionId = optionId.toString())),
+                    ),
+                ),
+            )
         }
 
         assertEquals(HttpStatusCode.Forbidden, response.status)
@@ -176,7 +186,15 @@ class PartnershipSuggestionRoutesTest {
         val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(Json.encodeToString(SuggestPartnership(packId.toString(), listOf(optionId.toString()), "en")))
+            setBody(
+                Json.encodeToString(
+                    SuggestPartnership(
+                        packId = packId.toString(),
+                        language = "en",
+                        optionSelections = listOf(TextSelection(optionId = optionId.toString())),
+                    ),
+                ),
+            )
         }
 
         assertEquals(HttpStatusCode.Forbidden, response.status)

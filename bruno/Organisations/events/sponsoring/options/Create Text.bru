@@ -1,11 +1,11 @@
 meta {
-  name: Delete
+  name: Create Text
   type: http
-  seq: 7
+  seq: 2
 }
 
-delete {
-  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/options/:option_id
+post {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/options
   body: json
   auth: none
 }
@@ -13,7 +13,6 @@ delete {
 params:path {
   event_slug: {{event_slug}}
   org_slug: {{org_slug}}
-  option_id: {{option_id}}
 }
 
 headers {
@@ -22,6 +21,7 @@ headers {
 
 body:json {
   {
+    "type": "text",
     "translations": [
       {
         "language": "fr",

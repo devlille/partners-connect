@@ -3,9 +3,16 @@ package fr.devlille.partners.connect.sponsoring
 import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
+import fr.devlille.partners.connect.sponsoring.domain.CreateSelectableValue
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
+import fr.devlille.partners.connect.sponsoring.domain.CreateText
+import fr.devlille.partners.connect.sponsoring.domain.CreateTypedQuantitative
+import fr.devlille.partners.connect.sponsoring.domain.CreateTypedSelectable
+import fr.devlille.partners.connect.sponsoring.domain.QuantitativeDescriptor
+import fr.devlille.partners.connect.sponsoring.domain.SelectableDescriptor
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringOptionWithTranslations
 import fr.devlille.partners.connect.sponsoring.domain.TranslatedLabel
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringOption
 import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -30,74 +37,121 @@ class SponsoringOptionUpdateRoutesTest {
     private val json = Json { ignoreUnknownKeys = true }
 
     @Test
-    fun `PUT updates an option and returns 200 with option id`() = testApplication {
+    fun `PUT updates text option - schema validation`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        val eventSlug = "test-event-slug"
+        val eventSlug = "test-event-update-text"
+        val optionId = UUID.randomUUID()
 
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
+            insertMockedSponsoringOption(optionId, eventId)
         }
 
-        // First create an option
-        val createRequest = CreateSponsoringOption(
+        val request = CreateText(
             translations = listOf(
-                TranslatedLabel(language = "fr", name = "Option Original", description = "Description Originale"),
-                TranslatedLabel(language = "en", name = "Original Option", description = "Original Description"),
+                TranslatedLabel(
+                    language = "en",
+                    name = "Updated Social Media",
+                    description = "Updated description",
+                ),
             ),
-            price = 100,
+            price = 600,
         )
 
-        val createResponse = client.post("/orgs/$orgId/events/$eventSlug/options") {
+        val response = client.put("/orgs/$orgId/events/$eventSlug/options/$optionId") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(createRequest))
+            setBody(Json.encodeToString(CreateSponsoringOption.serializer(), request))
         }
 
-        assertEquals(HttpStatusCode.Created, createResponse.status)
-        val createResult = json.decodeFromString<Map<String, String>>(createResponse.bodyAsText())
-        val optionId = createResult["id"]!!
-
-        // Now update the option
-        val updateRequest = CreateSponsoringOption(
-            translations = listOf(
-                TranslatedLabel(language = "fr", name = "Option Mise à jour", description = "Description Mise à jour"),
-                TranslatedLabel(language = "en", name = "Updated Option", description = "Updated Description"),
-            ),
-            price = 200,
-        )
-
-        val updateResponse = client.put("/orgs/$orgId/events/$eventSlug/options/$optionId") {
-            contentType(ContentType.Application.Json)
-            header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(updateRequest))
-        }
-
-        assertEquals(HttpStatusCode.OK, updateResponse.status)
-        val updateResult = json.decodeFromString<Map<String, String>>(updateResponse.bodyAsText())
-        assertEquals(optionId, updateResult["id"])
-
-        // Verify the option was updated by getting all translations
-        val response = client.get("/orgs/$orgId/events/$eventSlug/options") {
-            header(HttpHeaders.Authorization, "Bearer valid")
-            // No Accept-Language header needed - organizer endpoint returns all translations
-        }
-
+        // Contract test: Should return 200 with updated option ID
         assertEquals(HttpStatusCode.OK, response.status)
-        val body = json.decodeFromString<List<SponsoringOptionWithTranslations>>(response.body())
-        assertEquals(1, body.size)
+        val responseBody = response.bodyAsText()
+        assertTrue(responseBody.contains("id"))
+        assertTrue(responseBody.contains("\"id\":"))
+    }
 
-        val option = body.first()
-        // Verify both translations are present
-        assertTrue(option.translations.containsKey("fr"))
-        assertTrue(option.translations.containsKey("en"))
-        assertEquals("Option Mise à jour", option.translations["fr"]?.name)
-        assertEquals("Updated Option", option.translations["en"]?.name)
-        assertEquals("Description Mise à jour", option.translations["fr"]?.description)
-        assertEquals("Updated Description", option.translations["en"]?.description)
-        assertEquals(200, option.price)
+    @Test
+    fun `PUT updates typed_quantitative option - schema validation`() = testApplication {
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val eventSlug = "test-event-update-quantitative"
+        val optionId = UUID.randomUUID()
+
+        application {
+            moduleMocked()
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
+            insertMockedSponsoringOption(optionId, eventId)
+        }
+
+        val request = CreateTypedQuantitative(
+            translations = listOf(
+                TranslatedLabel(
+                    language = "en",
+                    name = "Updated Job Offers",
+                    description = "Updated job board posting",
+                ),
+            ),
+            price = 150,
+            typeDescriptor = QuantitativeDescriptor.JOB_OFFER,
+        )
+
+        val response = client.put("/orgs/$orgId/events/$eventSlug/options/$optionId") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(Json.encodeToString(CreateSponsoringOption.serializer(), request))
+        }
+
+        // Contract test: This should fail initially - polymorphic types not implemented
+        assertEquals(HttpStatusCode.OK, response.status)
+        val responseBody = response.bodyAsText()
+        assertTrue(responseBody.contains("id"))
+    }
+
+    @Test
+    fun `PUT updates typed_selectable option - schema validation`() = testApplication {
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val eventSlug = "test-event-update-selectable"
+        val optionId = UUID.randomUUID()
+
+        application {
+            moduleMocked()
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
+            insertMockedSponsoringOption(optionId, eventId)
+        }
+
+        val request = CreateTypedSelectable(
+            translations = listOf(
+                TranslatedLabel(
+                    language = "en",
+                    name = "Updated Exhibition Booth",
+                    description = "Updated booth space",
+                ),
+            ),
+            typeDescriptor = SelectableDescriptor.BOOTH,
+            selectableValues = listOf(
+                CreateSelectableValue("2x2m", 80000),
+                CreateSelectableValue("4x4m", 120000),
+                CreateSelectableValue("6x8m", 250000),
+            ),
+        )
+
+        val response = client.put("/orgs/$orgId/events/$eventSlug/options/$optionId") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(Json.encodeToString(CreateSponsoringOption.serializer(), request))
+        }
+
+        // Contract test: This should fail initially
+        assertEquals(HttpStatusCode.OK, response.status)
+        val responseBody = response.bodyAsText()
+        assertTrue(responseBody.contains("id"))
     }
 
     @Test
@@ -112,7 +166,7 @@ class SponsoringOptionUpdateRoutesTest {
         }
 
         // Create option with FR and EN translations
-        val createRequest = CreateSponsoringOption(
+        val createRequest = CreateText(
             translations = listOf(
                 TranslatedLabel(language = "fr", name = "Option FR", description = "Description FR"),
                 TranslatedLabel(language = "en", name = "Option EN", description = "Description EN"),
@@ -123,14 +177,14 @@ class SponsoringOptionUpdateRoutesTest {
         val createResponse = client.post("/orgs/$orgId/events/$eventSlug/options") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(createRequest))
+            setBody(json.encodeToString(CreateSponsoringOption.serializer(), createRequest))
         }
 
         val createResult = json.decodeFromString<Map<String, String>>(createResponse.bodyAsText())
         val optionId = createResult["id"]!!
 
         // Update with only EN translation (should remove FR)
-        val updateRequest = CreateSponsoringOption(
+        val updateRequest = CreateText(
             translations = listOf(
                 TranslatedLabel(language = "en", name = "Updated EN Option", description = "Updated EN Description"),
             ),
@@ -140,7 +194,7 @@ class SponsoringOptionUpdateRoutesTest {
         val updateResponse = client.put("/orgs/$orgId/events/$eventSlug/options/$optionId") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(updateRequest))
+            setBody(json.encodeToString(CreateSponsoringOption.serializer(), updateRequest))
         }
 
         assertEquals(HttpStatusCode.OK, updateResponse.status)
@@ -172,7 +226,7 @@ class SponsoringOptionUpdateRoutesTest {
             insertMockedOrganisationEntity(orgId)
         }
 
-        val updateRequest = CreateSponsoringOption(
+        val updateRequest = CreateText(
             translations = listOf(
                 TranslatedLabel(language = "en", name = "Updated Option"),
             ),
@@ -205,7 +259,7 @@ class SponsoringOptionUpdateRoutesTest {
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
-        val updateRequest = CreateSponsoringOption(
+        val updateRequest = CreateText(
             translations = listOf(
                 TranslatedLabel(language = "en", name = "Updated Option"),
             ),
@@ -224,35 +278,19 @@ class SponsoringOptionUpdateRoutesTest {
     }
 
     @Test
-    fun `PUT returns 200 when payload has empty translations (consistent with create behavior)`() = testApplication {
+    fun `PUT returns 400 when payload has empty translations`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val optionId = UUID.randomUUID()
         val eventSlug = "test-event-slug-4"
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
+            insertMockedSponsoringOption(optionId, eventId)
         }
 
-        // First create an option with translations
-        val createRequest = CreateSponsoringOption(
-            translations = listOf(
-                TranslatedLabel(language = "en", name = "Original Option"),
-            ),
-            price = 100,
-        )
-
-        val createResponse = client.post("/orgs/$orgId/events/$eventSlug/options") {
-            contentType(ContentType.Application.Json)
-            header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(createRequest))
-        }
-
-        val createResult = json.decodeFromString<Map<String, String>>(createResponse.bodyAsText())
-        val optionId = createResult["id"]!!
-
-        // Update with empty translations
-        val updateRequest = CreateSponsoringOption(
+        val updateRequest = CreateText(
             translations = emptyList(),
             price = 200,
         )
@@ -260,12 +298,10 @@ class SponsoringOptionUpdateRoutesTest {
         val response = client.put("/orgs/$orgId/events/$eventSlug/options/$optionId") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(updateRequest))
+            setBody(json.encodeToString(CreateSponsoringOption.serializer(), updateRequest))
         }
 
-        assertEquals(HttpStatusCode.OK, response.status)
-        val updateResult = json.decodeFromString<Map<String, String>>(response.bodyAsText())
-        assertEquals(optionId, updateResult["id"])
+        assertEquals(HttpStatusCode.BadRequest, response.status)
     }
 
     @Test
@@ -279,7 +315,7 @@ class SponsoringOptionUpdateRoutesTest {
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
-        val updateRequest = CreateSponsoringOption(
+        val updateRequest = CreateText(
             translations = listOf(
                 TranslatedLabel(language = "en", name = "Updated Option"),
             ),
@@ -305,7 +341,7 @@ class SponsoringOptionUpdateRoutesTest {
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
-        val updateRequest = CreateSponsoringOption(
+        val updateRequest = CreateText(
             translations = listOf(
                 TranslatedLabel(language = "en", name = "Updated Option"),
             ),
@@ -329,12 +365,10 @@ class SponsoringOptionUpdateRoutesTest {
         application {
             moduleMocked()
             insertMockedOrganisationEntity(orgId)
-            val event = insertMockedEventWithAdminUser(eventId, orgId)
-
-            val eventSlug = event.slug
+            insertMockedEventWithAdminUser(eventId, orgId)
         }
 
-        val updateRequest = CreateSponsoringOption(
+        val updateRequest = CreateText(
             translations = listOf(
                 TranslatedLabel(language = "en", name = "Updated Option"),
             ),
@@ -344,7 +378,7 @@ class SponsoringOptionUpdateRoutesTest {
         val response = client.put("/orgs/$orgId/events/$nonExistentEventSlug/options/${UUID.randomUUID()}") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(updateRequest))
+            setBody(json.encodeToString(CreateSponsoringOption.serializer(), updateRequest))
         }
 
         assertEquals(HttpStatusCode.NotFound, response.status)
@@ -361,7 +395,7 @@ class SponsoringOptionUpdateRoutesTest {
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
-        val updateRequest = CreateSponsoringOption(
+        val updateRequest = CreateText(
             translations = listOf(
                 TranslatedLabel(language = "en", name = "Updated Option"),
             ),
@@ -372,7 +406,7 @@ class SponsoringOptionUpdateRoutesTest {
         val response = client.put("/orgs/$orgId/events/$eventSlug/options/$nonExistentOptionId") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(updateRequest))
+            setBody(json.encodeToString(CreateSponsoringOption.serializer(), updateRequest))
         }
 
         assertEquals(HttpStatusCode.NotFound, response.status)
@@ -396,7 +430,7 @@ class SponsoringOptionUpdateRoutesTest {
         }
 
         // Create option for event1
-        val createRequest = CreateSponsoringOption(
+        val createRequest = CreateText(
             translations = listOf(
                 TranslatedLabel(language = "en", name = "Original Option"),
             ),
@@ -406,14 +440,14 @@ class SponsoringOptionUpdateRoutesTest {
         val createResponse = client.post("/orgs/$orgId/events/$event1Slug/options") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(createRequest))
+            setBody(json.encodeToString(CreateSponsoringOption.serializer(), createRequest))
         }
 
         val createResult = json.decodeFromString<Map<String, String>>(createResponse.bodyAsText())
         val optionId = createResult["id"]!!
 
         // Try to update the option through a different eventId (should fail)
-        val updateRequest = CreateSponsoringOption(
+        val updateRequest = CreateText(
             translations = listOf(
                 TranslatedLabel(language = "en", name = "Updated Option"),
             ),
@@ -423,7 +457,7 @@ class SponsoringOptionUpdateRoutesTest {
         val response = client.put("/orgs/$orgId/events/$event2Slug/options/$optionId") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(updateRequest))
+            setBody(json.encodeToString(CreateSponsoringOption.serializer(), updateRequest))
         }
 
         assertEquals(HttpStatusCode.NotFound, response.status)

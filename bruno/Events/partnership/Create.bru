@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{scheme}}://{{base_url}}/events/:event_slug/partnership
+  url: {{scheme}}://{{base_url}}/events/:event_slug/partnerships
   body: json
   auth: none
 }
@@ -18,7 +18,7 @@ body:json {
   {
     "company_id": "{{company_id}}",
     "pack_id": "{{pack_id}}",
-    "option_ids": [],
+    "option_selections": [],
     "contact_name": "John Doe",
     "contact_role": "Director",
     "language": "en",

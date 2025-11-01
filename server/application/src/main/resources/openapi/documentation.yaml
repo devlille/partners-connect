@@ -4203,10 +4203,15 @@ components:
       required:
         - event
         - organisation
-    sponsoring_option.schema:
-      $id: sponsoring_option.schema.json
+    Text:
       type: object
+      required:
+        - type
+        - id
+        - name
       properties:
+        type:
+          const: text
         id:
           type: string
         name:
@@ -4219,9 +4224,242 @@ components:
           type:
             - integer
             - 'null'
+          minimum: 0
+      additionalProperties: false
+    TypedQuantitative:
+      type: object
       required:
+        - type
         - id
         - name
+        - type_descriptor
+      properties:
+        type:
+          const: typed_quantitative
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type:
+            - string
+            - 'null'
+        price:
+          type:
+            - integer
+            - 'null'
+          minimum: 0
+        type_descriptor:
+          type: string
+          enum:
+            - job_offer
+          description: Quantitative descriptor for user-defined quantities
+      additionalProperties: false
+    TypedNumber:
+      type: object
+      required:
+        - type
+        - id
+        - name
+        - type_descriptor
+        - fixed_quantity
+      properties:
+        type:
+          const: typed_number
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type:
+            - string
+            - 'null'
+        price:
+          type:
+            - integer
+            - 'null'
+          minimum: 0
+        type_descriptor:
+          type: string
+          enum:
+            - nb_ticket
+          description: Number descriptor for fixed quantities
+        fixed_quantity:
+          type: integer
+          minimum: 1
+          description: Fixed quantity that cannot be modified by users
+      additionalProperties: false
+    TypedSelectable:
+      type: object
+      required:
+        - type
+        - id
+        - name
+        - type_descriptor
+        - selectable_values
+      properties:
+        type:
+          const: typed_selectable
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type:
+            - string
+            - 'null'
+        price:
+          type:
+            - integer
+            - 'null'
+          minimum: 0
+        type_descriptor:
+          type: string
+          enum:
+            - booth
+          description: Selectable descriptor for predefined choices
+        selectable_values:
+          type: array
+          items:
+            type: string
+            maxLength: 255
+          minItems: 1
+          description: Predefined values that users can select from
+      additionalProperties: false
+    sponsoring_option.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      $id: sponsoring_option.schema.json
+      title: SponsoringOption
+      description: Polymorphic sealed class hierarchy for sponsoring options
+      oneOf:
+        - $ref: '#/components/schemas/Text'
+        - $ref: '#/components/schemas/TypedQuantitative'
+        - $ref: '#/components/schemas/TypedNumber'
+        - $ref: '#/components/schemas/TypedSelectable'
+      definitions:
+        Text:
+          type: object
+          required:
+            - type
+            - id
+            - name
+          properties:
+            type:
+              const: text
+            id:
+              type: string
+            name:
+              type: string
+            description:
+              type:
+                - string
+                - 'null'
+            price:
+              type:
+                - integer
+                - 'null'
+              minimum: 0
+          additionalProperties: false
+        TypedQuantitative:
+          type: object
+          required:
+            - type
+            - id
+            - name
+            - type_descriptor
+          properties:
+            type:
+              const: typed_quantitative
+            id:
+              type: string
+            name:
+              type: string
+            description:
+              type:
+                - string
+                - 'null'
+            price:
+              type:
+                - integer
+                - 'null'
+              minimum: 0
+            type_descriptor:
+              type: string
+              enum:
+                - job_offer
+              description: Quantitative descriptor for user-defined quantities
+          additionalProperties: false
+        TypedNumber:
+          type: object
+          required:
+            - type
+            - id
+            - name
+            - type_descriptor
+            - fixed_quantity
+          properties:
+            type:
+              const: typed_number
+            id:
+              type: string
+            name:
+              type: string
+            description:
+              type:
+                - string
+                - 'null'
+            price:
+              type:
+                - integer
+                - 'null'
+              minimum: 0
+            type_descriptor:
+              type: string
+              enum:
+                - nb_ticket
+              description: Number descriptor for fixed quantities
+            fixed_quantity:
+              type: integer
+              minimum: 1
+              description: Fixed quantity that cannot be modified by users
+          additionalProperties: false
+        TypedSelectable:
+          type: object
+          required:
+            - type
+            - id
+            - name
+            - type_descriptor
+            - selectable_values
+          properties:
+            type:
+              const: typed_selectable
+            id:
+              type: string
+            name:
+              type: string
+            description:
+              type:
+                - string
+                - 'null'
+            price:
+              type:
+                - integer
+                - 'null'
+              minimum: 0
+            type_descriptor:
+              type: string
+              enum:
+                - booth
+              description: Selectable descriptor for predefined choices
+            selectable_values:
+              type: array
+              items:
+                type: string
+                maxLength: 255
+              minItems: 1
+              description: Predefined values that users can select from
+          additionalProperties: false
     sponsoring_pack.schema:
       $id: sponsoring_pack.schema.json
       type: object
@@ -4250,9 +4488,40 @@ components:
         - base_price
         - required_options
         - optional_options
-    register_partnership.schema:
-      $id: register_partnership.schema.json
+    PartnershipOptionSelection:
       type: object
+      required:
+        - type
+        - option_id
+      properties:
+        type:
+          type: string
+          enum:
+            - text_selection
+            - quantitative_selection
+            - number_selection
+            - selectable_selection
+        option_id:
+          type: string
+          format: uuid
+        selected_quantity:
+          type: integer
+          minimum: 0
+          description: Required for quantitative_selection, 0 means exclude option
+        selected_value_id:
+          type: string
+          format: uuid
+          description: Required for selectable_selection
+    register_partnership.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      title: RegisterPartnership
+      type: object
+      required:
+        - company_id
+        - pack_id
+        - contact_name
+        - contact_role
+        - language
       properties:
         company_id:
           type: string
@@ -4260,11 +4529,10 @@ components:
         pack_id:
           type: string
           format: uuid
-        option_ids:
+        option_selections:
           type: array
           items:
-            type: string
-            format: uuid
+            $ref: '#/components/schemas/PartnershipOptionSelection'
         contact_name:
           type: string
         contact_role:
@@ -4279,12 +4547,32 @@ components:
           type: array
           items:
             type: string
-      required:
-        - company_id
-        - pack_id
-        - contact_name
-        - contact_role
-        - language
+            format: email
+      definitions:
+        PartnershipOptionSelection:
+          type: object
+          required:
+            - type
+            - option_id
+          properties:
+            type:
+              type: string
+              enum:
+                - text_selection
+                - quantitative_selection
+                - number_selection
+                - selectable_selection
+            option_id:
+              type: string
+              format: uuid
+            selected_quantity:
+              type: integer
+              minimum: 0
+              description: Required for quantitative_selection, 0 means exclude option
+            selected_value_id:
+              type: string
+              format: uuid
+              description: Required for selectable_selection
     billing_contact.schema:
       $id: billing_contact.schema.json
       type: object
@@ -4532,35 +4820,292 @@ components:
         - submission_end_time
         - address
         - contact
-    translated_label.schema:
-      $id: translated_label.schema.json
+    definitions-TranslatedLabel:
       type: object
+      required:
+        - language
+        - name
       properties:
         language:
           type: string
+          minLength: 2
+          maxLength: 5
         name:
           type: string
+          minLength: 1
         description:
           type:
             - string
             - 'null'
-      required:
-        - language
-        - name
-    create_sponsoring_option.schema:
-      $id: create_sponsoring_option.schema.json
+    CreateSelectableValue:
       type: object
+      required:
+        - value
+        - price
       properties:
+        value:
+          type: string
+          maxLength: 255
+          description: Display value for the selectable option
+        price:
+          type: integer
+          minimum: 0
+          description: Individual price for this selectable value in cents
+      additionalProperties: false
+    CreateText:
+      type: object
+      required:
+        - type
+        - translations
+      properties:
+        type:
+          const: text
         translations:
           type: array
           items:
-            $ref: '#/components/schemas/translated_label.schema'
+            $ref: '#/components/schemas/definitions-TranslatedLabel'
+          minItems: 1
         price:
           type:
             - integer
             - 'null'
+          minimum: 0
+      additionalProperties: false
+    CreateTypedQuantitative:
+      type: object
       required:
+        - type
         - translations
+        - type_descriptor
+      properties:
+        type:
+          const: typed_quantitative
+        translations:
+          type: array
+          items:
+            $ref: '#/components/schemas/definitions-TranslatedLabel'
+          minItems: 1
+        price:
+          type:
+            - integer
+            - 'null'
+          minimum: 0
+        type_descriptor:
+          type: string
+          enum:
+            - job_offer
+          description: Quantitative descriptor for user-defined quantities
+      additionalProperties: false
+    CreateTypedNumber:
+      type: object
+      required:
+        - type
+        - translations
+        - type_descriptor
+        - fixed_quantity
+      properties:
+        type:
+          const: typed_number
+        translations:
+          type: array
+          items:
+            $ref: '#/components/schemas/definitions-TranslatedLabel'
+          minItems: 1
+        price:
+          type:
+            - integer
+            - 'null'
+          minimum: 0
+        type_descriptor:
+          type: string
+          enum:
+            - nb_ticket
+          description: Number descriptor for fixed quantities
+        fixed_quantity:
+          type: integer
+          minimum: 1
+          description: Fixed quantity that cannot be modified by users
+      additionalProperties: false
+    CreateTypedSelectable:
+      type: object
+      required:
+        - type
+        - translations
+        - type_descriptor
+        - selectable_values
+      properties:
+        type:
+          const: typed_selectable
+        translations:
+          type: array
+          items:
+            $ref: '#/components/schemas/definitions-TranslatedLabel'
+          minItems: 1
+        price:
+          type:
+            - integer
+            - 'null'
+          minimum: 0
+        type_descriptor:
+          type: string
+          enum:
+            - booth
+          description: Selectable descriptor for predefined choices
+        selectable_values:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateSelectableValue'
+          minItems: 1
+          description: Predefined values with individual pricing that users can select from
+      additionalProperties: false
+    create_sponsoring_option.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      title: CreateSponsoringOption
+      description: Polymorphic sealed class for creating sponsoring options
+      oneOf:
+        - $ref: '#/components/schemas/CreateText'
+        - $ref: '#/components/schemas/CreateTypedQuantitative'
+        - $ref: '#/components/schemas/CreateTypedNumber'
+        - $ref: '#/components/schemas/CreateTypedSelectable'
+      definitions:
+        TranslatedLabel:
+          type: object
+          required:
+            - language
+            - name
+          properties:
+            language:
+              type: string
+              minLength: 2
+              maxLength: 5
+            name:
+              type: string
+              minLength: 1
+            description:
+              type:
+                - string
+                - 'null'
+        CreateText:
+          type: object
+          required:
+            - type
+            - translations
+          properties:
+            type:
+              const: text
+            translations:
+              type: array
+              items:
+                $ref: '#/components/schemas/definitions-TranslatedLabel'
+              minItems: 1
+            price:
+              type:
+                - integer
+                - 'null'
+              minimum: 0
+          additionalProperties: false
+        CreateTypedQuantitative:
+          type: object
+          required:
+            - type
+            - translations
+            - type_descriptor
+          properties:
+            type:
+              const: typed_quantitative
+            translations:
+              type: array
+              items:
+                $ref: '#/components/schemas/definitions-TranslatedLabel'
+              minItems: 1
+            price:
+              type:
+                - integer
+                - 'null'
+              minimum: 0
+            type_descriptor:
+              type: string
+              enum:
+                - job_offer
+              description: Quantitative descriptor for user-defined quantities
+          additionalProperties: false
+        CreateTypedNumber:
+          type: object
+          required:
+            - type
+            - translations
+            - type_descriptor
+            - fixed_quantity
+          properties:
+            type:
+              const: typed_number
+            translations:
+              type: array
+              items:
+                $ref: '#/components/schemas/definitions-TranslatedLabel'
+              minItems: 1
+            price:
+              type:
+                - integer
+                - 'null'
+              minimum: 0
+            type_descriptor:
+              type: string
+              enum:
+                - nb_ticket
+              description: Number descriptor for fixed quantities
+            fixed_quantity:
+              type: integer
+              minimum: 1
+              description: Fixed quantity that cannot be modified by users
+          additionalProperties: false
+        CreateTypedSelectable:
+          type: object
+          required:
+            - type
+            - translations
+            - type_descriptor
+            - selectable_values
+          properties:
+            type:
+              const: typed_selectable
+            translations:
+              type: array
+              items:
+                $ref: '#/components/schemas/definitions-TranslatedLabel'
+              minItems: 1
+            price:
+              type:
+                - integer
+                - 'null'
+              minimum: 0
+            type_descriptor:
+              type: string
+              enum:
+                - booth
+              description: Selectable descriptor for predefined choices
+            selectable_values:
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateSelectableValue'
+              minItems: 1
+              description: Predefined values with individual pricing that users can select from
+          additionalProperties: false
+        CreateSelectableValue:
+          type: object
+          required:
+            - value
+            - price
+          properties:
+            value:
+              type: string
+              maxLength: 255
+              description: Display value for the selectable option
+            price:
+              type: integer
+              minimum: 0
+              description: Individual price for this selectable value in cents
+          additionalProperties: false
     create_sponsoring_pack.schema:
       $id: create_sponsoring_pack.schema.json
       type: object
@@ -4669,21 +5214,55 @@ components:
         - id
         - location
     suggest_partnership.schema:
+      $schema: http://json-schema.org/draft-07/schema#
       $id: suggest_partnership.schema.json
+      title: SuggestPartnership
+      description: Partnership suggestion request with enhanced option selections
       type: object
       properties:
         pack_id:
           type: string
-        option_ids:
-          type: array
-          items:
-            type: string
-          default: []
+          format: uuid
+          description: UUID of the sponsoring pack to suggest
         language:
           type: string
+          pattern: ^[a-z]{2}$
+          description: Two-letter language code (e.g., 'en', 'fr')
+        option_selections:
+          type: array
+          items:
+            $ref: '#/components/schemas/PartnershipOptionSelection'
+          default: []
+          description: Array of selected sponsoring options with type-specific selections
       required:
         - pack_id
         - language
+      additionalProperties: false
+      definitions:
+        PartnershipOptionSelection:
+          type: object
+          required:
+            - type
+            - option_id
+          properties:
+            type:
+              type: string
+              enum:
+                - text_selection
+                - quantitative_selection
+                - number_selection
+                - selectable_selection
+            option_id:
+              type: string
+              format: uuid
+            selected_quantity:
+              type: integer
+              minimum: 0
+              description: Required for quantitative_selection, 0 means exclude option
+            selected_value_id:
+              type: string
+              format: uuid
+              description: Required for selectable_selection
     publication_date_request.schema:
       $id: publication_date_request.schema.json
       type: object
@@ -4823,3 +5402,18 @@ components:
         - submission_end_time
         - address
         - contact
+    translated_label.schema:
+      $id: translated_label.schema.json
+      type: object
+      properties:
+        language:
+          type: string
+        name:
+          type: string
+        description:
+          type:
+            - string
+            - 'null'
+      required:
+        - language
+        - name

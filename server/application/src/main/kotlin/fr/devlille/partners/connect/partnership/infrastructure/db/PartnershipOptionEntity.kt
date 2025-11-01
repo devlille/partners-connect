@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.partnership.infrastructure.db
 
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.SelectableValueEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
@@ -13,6 +14,8 @@ class PartnershipOptionEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var partnership by PartnershipEntity referencedOn PartnershipOptionsTable.partnershipId
     var packId by PartnershipOptionsTable.packId
     var option by SponsoringOptionEntity referencedOn PartnershipOptionsTable.optionId
+    var selectedQuantity by PartnershipOptionsTable.selectedQuantity
+    var selectedValue by SelectableValueEntity optionalReferencedOn PartnershipOptionsTable.selectedValueId
 }
 
 fun UUIDEntityClass<PartnershipOptionEntity>.listByPartnershipAndPack(
