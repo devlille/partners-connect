@@ -1,0 +1,418 @@
+openapi: 3.1.0
+info:
+  title: Enhanced Sponsoring Options API
+  version: 1.0.0
+  description: API contracts for four-type sponsoring options functionality
+
+paths:
+  /orgs/{orgSlug}/events/{eventSlug}/options:
+    post:
+      summary: Create sponsoring option with type support
+      operationId: createSponsoringOptionWithType
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSponsoringOptionExtended'
+      responses:
+        '201':
+          description: Option created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Identifier'
+        '400':
+          description: Invalid request data
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - insufficient permissions
+
+  /orgs/{orgSlug}/events/{eventSlug}/options/{optionId}:
+    put:
+      summary: Update sponsoring option with type support
+      operationId: updateSponsoringOptionWithType
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: optionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSponsoringOptionExtended'
+      responses:
+        '200':
+          description: Option updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Identifier'
+        '400':
+          description: Invalid request data
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - insufficient permissions
+        '404':
+          description: Option not found
+        '409':
+          description: Cannot update - option in use by partnerships
+
+    get:
+      summary: Get sponsoring option with type details
+      operationId: getSponsoringOptionWithType
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: optionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: Accept-Language
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "en"
+      responses:
+        '200':
+          description: Option details with type information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SponsoringOptionExtended'
+        '400':
+          description: Missing Accept-Language header
+        '404':
+          description: Option not found
+
+  /events/{eventSlug}/partnerships:
+    post:
+      summary: Create partnership with option selections
+      operationId: createPartnershipWithSelections
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterPartnershipExtended'
+      responses:
+        '201':
+          description: Partnership created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Identifier'
+        '400':
+          description: Invalid selections or missing required selections
+        '404':
+          description: Pack or options not found
+        '409':
+          description: Invalid option selections for partnership
+
+  /events/{eventSlug}/partnerships/{partnershipId}:
+    get:
+      summary: Get partnership with option selections
+      operationId: getPartnershipWithSelections
+      parameters:
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: Accept-Language
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "en"
+      responses:
+        '200':
+          description: Partnership details with selections
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnershipExtended'
+        '400':
+          description: Missing Accept-Language header
+        '404':
+          description: Partnership not found
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    CreateSponsoringOptionExtended:
+      type: object
+      required:
+        - translations
+      properties:
+        translations:
+          type: array
+          items:
+            $ref: '#/components/schemas/TranslatedLabel'
+        price:
+          type: ["integer", "null"]
+          minimum: 0
+        type:
+          type: string
+          enum: ["text", "typed_quantitative", "typed_number", "typed_selectable"]
+          default: "text"
+        type_descriptor:
+          type: string
+          enum: ["job_offer", "nb_ticket", "booth"]
+          description: Required for enhanced types - enum value based on option type
+        fixed_quantity:
+          type: ["integer", "null"]
+          minimum: 1
+          description: Required for typed_number type
+        selectable_values:
+          type: array
+          items:
+            type: string
+            maxLength: 255
+          minItems: 0
+          description: Required (min 1 item) for typed_selectable type
+
+    SponsoringOptionExtended:
+      type: object
+      required:
+        - id
+        - name
+        - type
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+        price:
+          type: ["integer", "null"]
+        type:
+          type: string
+          enum: ["text", "typed_quantitative", "typed_number", "typed_selectable"]
+        type_descriptor:
+          type: ["string", "null"]
+          enum: ["job_offer", "nb_ticket", "booth"]
+        fixed_quantity:
+          type: ["integer", "null"]
+        selectable_values:
+          type: array
+          items:
+            type: string
+
+    RegisterPartnershipExtended:
+      type: object
+      required:
+        - company_id
+        - pack_id
+        - contact_name
+        - contact_role
+        - language
+      properties:
+        company_id:
+          type: string
+          format: uuid
+        pack_id:
+          type: string
+          format: uuid
+        option_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        option_selections:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/OptionSelection'
+        contact_name:
+          type: string
+        contact_role:
+          type: string
+        language:
+          type: string
+        phone:
+          type: ["string", "null"]
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+
+    OptionSelection:
+      type: object
+      properties:
+        quantity:
+          type: ["integer", "null"]
+          minimum: 1
+          description: For typed_quantitative options
+        value:
+          type: ["string", "null"]
+          description: For typed_selectable options (must be from selectableValues)
+
+    PartnershipExtended:
+      type: object
+      required:
+        - id
+        - company
+        - pack
+        - options
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        company:
+          $ref: '#/components/schemas/CompanyInfo'
+        pack:
+          $ref: '#/components/schemas/PackInfo'
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/PartnershipOptionExtended'
+        status:
+          type: string
+          enum: ["pending", "approved", "declined"]
+        totalPrice:
+          type: integer
+          description: Calculated total including quantity multipliers
+
+    PartnershipOptionExtended:
+      type: object
+      required:
+        - id
+        - name
+        - type
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+        price:
+          type: ["integer", "null"]
+        type:
+          type: string
+          enum: ["text", "typed_quantitative", "typed_number", "typed_selectable"]
+        type_descriptor:
+          type: ["string", "null"]
+          enum: ["job_offer", "nb_ticket", "booth"]
+        selected_quantity:
+          type: ["integer", "null"]
+          description: For typed_quantitative and typed_number
+        selected_value:
+          type: ["string", "null"]
+          description: For typed_selectable
+        fixed_quantity:
+          type: ["integer", "null"]
+          description: For typed_number (copied from original option)
+        calculated_price:
+          type: ["integer", "null"]
+          description: price * selected_quantity for quantitative options
+
+    TranslatedLabel:
+      type: object
+      required:
+        - language
+        - name
+      properties:
+        language:
+          type: string
+          minLength: 2
+          maxLength: 5
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: ["string", "null"]
+
+    Identifier:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          format: uuid
+
+    CompanyInfo:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+
+    PackInfo:
+      type: object
+      required:
+        - id
+        - name
+        - base_price
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        base_price:
+          type: integer
