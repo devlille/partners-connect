@@ -7,7 +7,6 @@ import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.sponsoring.domain.AttachOptionsToPack
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringPack
-import fr.devlille.partners.connect.sponsoring.domain.EventPackRepository
 import fr.devlille.partners.connect.sponsoring.domain.OptionRepository
 import fr.devlille.partners.connect.sponsoring.domain.PackRepository
 import io.ktor.http.HttpStatusCode
@@ -25,17 +24,36 @@ fun Route.sponsoringRoutes() {
     publicPackRoutes()
 
     // Authenticated organizational routes
-    route("/orgs/{orgSlug}/events/{eventSlug}") {
-        packRoutes()
-        optionRoutes()
+    orgsPackRoutes()
+    orgsOptionRoutes()
+}
+
+/**
+ * Public routes for sponsoring packages without authentication.
+ *
+ * These routes provide read-only access to sponsoring packages for public consumption,
+ * allowing potential sponsors to view available packages and options without authentication.
+ */
+private fun Route.publicPackRoutes() {
+    val eventPackRepository by inject<PackRepository>()
+
+    route("/events/{eventSlug}/sponsoring/packs") {
+        get {
+            val eventSlug = call.parameters.eventSlug
+            val acceptLanguage = call.request.headers["Accept-Language"]
+                ?.lowercase()
+                ?: throw MissingRequestHeaderException("accept-language")
+            val packs = eventPackRepository.findPacksByEvent(eventSlug = eventSlug, language = acceptLanguage)
+            call.respond(HttpStatusCode.OK, packs)
+        }
     }
 }
 
-private fun Route.packRoutes() {
+private fun Route.orgsPackRoutes() {
     val repository by inject<PackRepository>()
     val optRepository by inject<OptionRepository>()
 
-    route("/packs") {
+    route("/orgs/{orgSlug}/events/{eventSlug}/packs") {
         install(AuthorizedOrganisationPlugin)
         get {
             val eventSlug = call.parameters.eventSlug
@@ -48,18 +66,18 @@ private fun Route.packRoutes() {
             val packId = repository.createPack(eventSlug, input)
             call.respond(HttpStatusCode.Created, mapOf("id" to packId.toString()))
         }
-        delete("/{packId}") {
-            val eventSlug = call.parameters.eventSlug
-            val packId = call.parameters.packId
-            repository.deletePack(eventSlug, packId)
-            call.respond(HttpStatusCode.NoContent)
-        }
         put("/{packId}") {
             val eventSlug = call.parameters.eventSlug
             val packId = call.parameters.packId
             val input = call.receive<CreateSponsoringPack>(schema = "create_sponsoring_pack.schema.json")
             val updatedId = repository.updatePack(eventSlug, packId, input)
             call.respond(HttpStatusCode.OK, mapOf("id" to updatedId.toString()))
+        }
+        delete("/{packId}") {
+            val eventSlug = call.parameters.eventSlug
+            val packId = call.parameters.packId
+            repository.deletePack(eventSlug, packId)
+            call.respond(HttpStatusCode.NoContent)
         }
         post("/{packId}/options") {
             val eventSlug = call.parameters.eventSlug
@@ -78,10 +96,10 @@ private fun Route.packRoutes() {
     }
 }
 
-private fun Route.optionRoutes() {
+private fun Route.orgsOptionRoutes() {
     val repository by inject<OptionRepository>()
 
-    route("/options") {
+    route("/orgs/{orgSlug}/events/{eventSlug}/options") {
         install(AuthorizedOrganisationPlugin)
         get {
             val eventSlug = call.parameters.eventSlug
@@ -112,32 +130,6 @@ private fun Route.optionRoutes() {
             val optionId = call.parameters.optionId
             repository.deleteOption(eventSlug = eventSlug, optionId = optionId)
             call.respond(HttpStatusCode.NoContent)
-        }
-    }
-}
-
-/**
- * Public routes for sponsoring packages without authentication.
- *
- * These routes provide read-only access to sponsoring packages for public consumption,
- * allowing potential sponsors to view available packages and options without authentication.
- */
-private fun Route.publicPackRoutes() {
-    val eventPackRepository by inject<EventPackRepository>()
-
-    route("/events/{eventSlug}/sponsoring/packs") {
-        get {
-            val eventSlug = call.parameters.eventSlug
-
-            val acceptLanguage = call.request.headers["Accept-Language"]
-                ?.lowercase()
-                ?: throw MissingRequestHeaderException("accept-language")
-
-            val packs = eventPackRepository.findPublicPacksByEvent(
-                eventSlug = eventSlug,
-                language = acceptLanguage,
-            )
-            call.respond(HttpStatusCode.OK, packs)
         }
     }
 }

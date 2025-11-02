@@ -36,21 +36,6 @@ class PackRepositoryExposed : PackRepository {
         }
     }
 
-    override fun getById(eventSlug: String, packId: UUID, language: String): SponsoringPack = transaction {
-        val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
-        val pack = SponsoringPackEntity.singlePackById(event.id.value, packId)
-        pack.toDomain(
-            language = language,
-            requiredOptionIds = PackOptionsTable.listOptionsByPack(packId)
-                .filter { it[PackOptionsTable.required] }
-                .map { it[PackOptionsTable.option].value },
-            optionalOptions = PackOptionsTable.listOptionsByPack(packId)
-                .filterNot { it[PackOptionsTable.required] }
-                .map { it[PackOptionsTable.option].value },
-        )
-    }
-
     override fun createPack(eventSlug: String, input: CreateSponsoringPack): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
@@ -99,22 +84,5 @@ class PackRepositoryExposed : PackRepository {
                     .map { it[PackOptionsTable.option].value },
             )
         }
-    }
-
-    override fun getByIdWithAllTranslations(
-        eventSlug: String,
-        packId: UUID,
-    ): SponsoringPackWithTranslations = transaction {
-        val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
-        val pack = SponsoringPackEntity.singlePackById(event.id.value, packId)
-        pack.toDomainWithAllTranslations(
-            requiredOptionIds = PackOptionsTable.listOptionsByPack(packId)
-                .filter { it[PackOptionsTable.required] }
-                .map { it[PackOptionsTable.option].value },
-            optionalOptions = PackOptionsTable.listOptionsByPack(packId)
-                .filterNot { it[PackOptionsTable.required] }
-                .map { it[PackOptionsTable.option].value },
-        )
     }
 }
