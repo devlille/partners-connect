@@ -51,7 +51,7 @@ class PartnershipListRoutesTest {
             )
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventSlug/partnership") {
+        val response = client.get("/orgs/$orgId/events/$eventSlug/partnerships") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -105,7 +105,7 @@ class PartnershipListRoutesTest {
             )
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventSlug/partnership") {
+        val response = client.get("/orgs/$orgId/events/$eventSlug/partnerships") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -163,7 +163,7 @@ class PartnershipListRoutesTest {
             )
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventSlug/partnership?filter[pack_id]=$goldPackId") {
+        val response = client.get("/orgs/$orgId/events/$eventSlug/partnerships?filter[pack_id]=$goldPackId") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -209,7 +209,7 @@ class PartnershipListRoutesTest {
             )
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventSlug/partnership?filter[validated]=true") {
+        val response = client.get("/orgs/$orgId/events/$eventSlug/partnerships?filter[validated]=true") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -254,7 +254,7 @@ class PartnershipListRoutesTest {
             )
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventSlug/partnership?filter[validated]=false") {
+        val response = client.get("/orgs/$orgId/events/$eventSlug/partnerships?filter[validated]=false") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -301,7 +301,7 @@ class PartnershipListRoutesTest {
             )
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventSlug/partnership?filter[suggestion]=true") {
+        val response = client.get("/orgs/$orgId/events/$eventSlug/partnerships?filter[suggestion]=true") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -355,7 +355,7 @@ class PartnershipListRoutesTest {
             insertMockedBilling(eventId, partnership2Id, status = InvoiceStatus.PENDING)
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventSlug/partnership?filter[paid]=true") {
+        val response = client.get("/orgs/$orgId/events/$eventSlug/partnerships?filter[paid]=true") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -400,7 +400,7 @@ class PartnershipListRoutesTest {
             )
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventSlug/partnership?filter[agreement-generated]=true") {
+        val response = client.get("/orgs/$orgId/events/$eventSlug/partnerships?filter[agreement-generated]=true") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -444,11 +444,11 @@ class PartnershipListRoutesTest {
             )
         }
 
-        val responseAsc = client.get("/orgs/$orgId/events/$eventSlug/partnership?sort=created&direction=asc") {
+        val responseAsc = client.get("/orgs/$orgId/events/$eventSlug/partnerships?sort=created&direction=asc") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
-        val responseDesc = client.get("/orgs/$orgId/events/$eventSlug/partnership?sort=created&direction=desc") {
+        val responseDesc = client.get("/orgs/$orgId/events/$eventSlug/partnerships?sort=created&direction=desc") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -507,7 +507,7 @@ class PartnershipListRoutesTest {
         }
 
         val response = client.get(
-            "/orgs/$orgId/events/$eventSlug/partnership?filter[pack_id]=$goldPackId&filter[suggestion]=true",
+            "/orgs/$orgId/events/$eventSlug/partnerships?filter[pack_id]=$goldPackId&filter[suggestion]=true",
         ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -536,7 +536,7 @@ class PartnershipListRoutesTest {
             val pack = insertMockedSponsoringPack(packId, eventId)
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventSlug/partnership?filter[pack_id]=$nonExistentPackId") {
+        val response = client.get("/orgs/$orgId/events/$eventSlug/partnerships?filter[pack_id]=$nonExistentPackId") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -557,7 +557,7 @@ class PartnershipListRoutesTest {
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventSlug/partnership")
+        val response = client.get("/orgs/$orgId/events/$eventSlug/partnerships")
 
         assertEquals(HttpStatusCode.Unauthorized, response.status)
     }
@@ -643,7 +643,7 @@ class PartnershipListRoutesTest {
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventSlug/partnership") {
+        val response = client.get("/orgs/$orgId/events/$eventSlug/partnerships") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -679,7 +679,7 @@ class PartnershipListRoutesTest {
             )
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventSlug/partnership") {
+        val response = client.get("/orgs/$orgId/events/$eventSlug/partnerships") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 

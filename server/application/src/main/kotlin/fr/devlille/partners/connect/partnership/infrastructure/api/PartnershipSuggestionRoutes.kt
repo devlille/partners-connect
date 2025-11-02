@@ -27,7 +27,7 @@ fun Route.partnershipSuggestionRoutes() {
     val notificationRepository by inject<NotificationRepository>()
     val webhookRepository by inject<WebhookRepository>()
 
-    route("/events/{eventSlug}/partnership/{partnershipId}") {
+    route("/events/{eventSlug}/partnerships/{partnershipId}") {
         post("/suggestion-approve") {
             val eventSlug = call.parameters.eventSlug
             val partnershipId = call.parameters.partnershipId
@@ -71,7 +71,7 @@ fun Route.partnershipSuggestionRoutes() {
         }
     }
 
-    route("/orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}") {
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}") {
         install(AuthorizedOrganisationPlugin)
 
         @Suppress("ThrowsCount")

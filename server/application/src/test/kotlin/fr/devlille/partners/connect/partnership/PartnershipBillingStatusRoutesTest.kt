@@ -40,7 +40,7 @@ class PartnershipBillingStatusRoutesTest {
         }
 
         val response = client.post(
-            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/billing/PAID",
+            "/orgs/test-organization/events/$eventSlug/partnerships/$partnershipId/billing/PAID",
         ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -73,7 +73,7 @@ class PartnershipBillingStatusRoutesTest {
         }
 
         val response = client.post(
-            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/billing/sent",
+            "/orgs/test-organization/events/$eventSlug/partnerships/$partnershipId/billing/sent",
         ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -102,7 +102,7 @@ class PartnershipBillingStatusRoutesTest {
         }
 
         val response = client.post(
-            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/billing/UNKNOWN_STATUS",
+            "/orgs/test-organization/events/$eventSlug/partnerships/$partnershipId/billing/UNKNOWN_STATUS",
         ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -128,7 +128,7 @@ class PartnershipBillingStatusRoutesTest {
             insertMockedOrgaPermission(orgId = org.id.value, user = admin)
         }
 
-        val response = client.post("/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/billing/PAID")
+        val response = client.post("/orgs/test-organization/events/$eventSlug/partnerships/$partnershipId/billing/PAID")
 
         assertEquals(HttpStatusCode.Unauthorized, response.status)
     }
@@ -152,7 +152,7 @@ class PartnershipBillingStatusRoutesTest {
         }
 
         val response = client.post(
-            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/billing/PAID",
+            "/orgs/test-organization/events/$eventSlug/partnerships/$partnershipId/billing/PAID",
         ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -179,7 +179,7 @@ class PartnershipBillingStatusRoutesTest {
         }
 
         val response = client.post(
-            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/billing/PAID",
+            "/orgs/test-organization/events/$eventSlug/partnerships/$partnershipId/billing/PAID",
         ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }

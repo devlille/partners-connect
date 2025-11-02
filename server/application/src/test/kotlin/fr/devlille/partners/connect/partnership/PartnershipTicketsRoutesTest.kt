@@ -68,7 +68,7 @@ class PartnershipTicketsRoutesTest {
             insertMockedPartnershipTicket(ticketId = ticketId, partnershipId = partnershipId)
         }
 
-        val response = client.get("/events/$eventSlug/partnership/$partnershipId/tickets")
+        val response = client.get("/events/$eventSlug/partnerships/$partnershipId/tickets")
         assertEquals(HttpStatusCode.OK, response.status)
         val body = json.decodeFromString<List<Ticket>>(response.bodyAsText())
         assertEquals(1, body.size)
@@ -125,7 +125,7 @@ class PartnershipTicketsRoutesTest {
         }
 
         val tickets = listOf(TicketData(firstName = "John", lastName = "Doe"))
-        val response = client.post("/events/$eventSlug/partnership/$partnershipId/tickets") {
+        val response = client.post("/events/$eventSlug/partnerships/$partnershipId/tickets") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(tickets))
         }
@@ -165,7 +165,7 @@ class PartnershipTicketsRoutesTest {
         }
 
         val tickets = listOf(TicketData(firstName = "John", lastName = "Doe"))
-        val response = client.post("/events/$eventSlug/partnership/$partnershipId/tickets") {
+        val response = client.post("/events/$eventSlug/partnerships/$partnershipId/tickets") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(tickets))
         }
@@ -210,7 +210,7 @@ class PartnershipTicketsRoutesTest {
         }
 
         val tickets = listOf(TicketData(firstName = "John", lastName = "Doe"))
-        val response = client.post("/events/$eventSlug/partnership/$partnershipId/tickets") {
+        val response = client.post("/events/$eventSlug/partnerships/$partnershipId/tickets") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(tickets))
         }
@@ -256,7 +256,7 @@ class PartnershipTicketsRoutesTest {
         }
 
         val tickets = listOf(TicketData(firstName = "John", lastName = "Doe"))
-        val response = client.post("/events/$eventSlug/partnership/$partnershipId/tickets") {
+        val response = client.post("/events/$eventSlug/partnerships/$partnershipId/tickets") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(tickets))
         }
@@ -302,7 +302,7 @@ class PartnershipTicketsRoutesTest {
             insertBilletWebIntegration(eventId = eventId)
         }
 
-        val response = client.put("/events/$eventSlug/partnership/$partnershipId/tickets/$ticketId") {
+        val response = client.put("/events/$eventSlug/partnerships/$partnershipId/tickets/$ticketId") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(TicketData(firstName = "Jeanne", lastName = "Doe")))
         }
@@ -323,7 +323,7 @@ class PartnershipTicketsRoutesTest {
             insertMockedEventWithOrga(eventId, slug = eventSlug)
         }
 
-        val response = client.get("/events/$eventSlug/partnership/$partnershipId/tickets")
+        val response = client.get("/events/$eventSlug/partnerships/$partnershipId/tickets")
         assertEquals(HttpStatusCode.NoContent, response.status)
     }
 
@@ -345,7 +345,7 @@ class PartnershipTicketsRoutesTest {
             )
         }
 
-        val response = client.put("/events/$eventSlug/partnership/$partnershipId/tickets/${UUID.randomUUID()}") {
+        val response = client.put("/events/$eventSlug/partnerships/$partnershipId/tickets/${UUID.randomUUID()}") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(TicketData(firstName = "Jeanne", lastName = "Doe")))
         }

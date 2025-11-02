@@ -82,7 +82,7 @@ class PartnershipJobOfferTest {
         }
 
         val approveResponse = client.post(
-            "/orgs/$orgSlug/events/$eventSlug/partnership/$partnershipId/job-offers/$promotionId/approve",
+            "/orgs/$orgSlug/events/$eventSlug/partnerships/$partnershipId/job-offers/$promotionId/approve",
         ) {
             header(HttpHeaders.Authorization, "Bearer valid")
             contentType(ContentType.Application.Json)
@@ -141,7 +141,7 @@ class PartnershipJobOfferTest {
             DeclineJobOfferRequest(reason = declineReason),
         )
         val declineResponse = client.post(
-            "/orgs/$orgSlug/events/$eventSlug/partnership/$partnershipId/job-offers/$promotionId/decline",
+            "/orgs/$orgSlug/events/$eventSlug/partnerships/$partnershipId/job-offers/$promotionId/decline",
         ) {
             header(HttpHeaders.Authorization, "Bearer valid")
             contentType(ContentType.Application.Json)
@@ -203,7 +203,7 @@ class PartnershipJobOfferTest {
 
         // Attempt to approve WITHOUT Authorization header
         val approveResponse = client.post(
-            "/orgs/$orgSlug/events/$eventSlug/partnership/$partnershipId/job-offers/$promotionId/approve",
+            "/orgs/$orgSlug/events/$eventSlug/partnerships/$partnershipId/job-offers/$promotionId/approve",
         ) {
             // No Authorization header
             contentType(ContentType.Application.Json)
@@ -267,7 +267,7 @@ class PartnershipJobOfferTest {
             DeclineJobOfferRequest(reason = declineReason),
         )
         val declineResponse = client.post(
-            "/orgs/$orgSlug/events/$eventSlug/partnership/$partnershipId/job-offers/$promotionId/decline",
+            "/orgs/$orgSlug/events/$eventSlug/partnerships/$partnershipId/job-offers/$promotionId/decline",
         ) {
             contentType(ContentType.Application.Json)
             setBody(input)

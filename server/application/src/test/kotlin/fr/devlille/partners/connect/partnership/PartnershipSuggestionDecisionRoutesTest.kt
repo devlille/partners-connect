@@ -29,7 +29,7 @@ class PartnershipSuggestionDecisionRoutesTest {
             insertMockedPartnership(id = partnerId, eventId = eventId, companyId = companyId)
         }
 
-        val response = client.post("/events/$eventSlug/partnership/$partnerId/suggestion-approve")
+        val response = client.post("/events/$eventSlug/partnerships/$partnerId/suggestion-approve")
         assertEquals(HttpStatusCode.OK, response.status)
 
         transaction {
@@ -52,7 +52,7 @@ class PartnershipSuggestionDecisionRoutesTest {
             insertMockedPartnership(id = partnerId, eventId = eventId, companyId = companyId)
         }
 
-        val response = client.post("/events/$eventSlug/partnership/$partnerId/suggestion-decline")
+        val response = client.post("/events/$eventSlug/partnerships/$partnerId/suggestion-decline")
         assertEquals(HttpStatusCode.OK, response.status)
 
         transaction {
@@ -67,7 +67,7 @@ class PartnershipSuggestionDecisionRoutesTest {
     fun `POST approve returns 404 for unknown partnership`() = testApplication {
         val randomUUID = UUID.randomUUID()
         val response = client.post(
-            "/events/$randomUUID/partnership/$randomUUID/suggestion-approve",
+            "/events/$randomUUID/partnerships/$randomUUID/suggestion-approve",
         )
         assertEquals(HttpStatusCode.NotFound, response.status)
     }
@@ -76,7 +76,7 @@ class PartnershipSuggestionDecisionRoutesTest {
     fun `POST decline returns 404 for unknown partnership`() = testApplication {
         val randomUUID = UUID.randomUUID()
         val response = client.post(
-            "/events/$randomUUID/partnership/$randomUUID/suggestion-decline",
+            "/events/$randomUUID/partnerships/$randomUUID/suggestion-decline",
         )
         assertEquals(HttpStatusCode.NotFound, response.status)
     }

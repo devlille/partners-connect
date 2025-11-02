@@ -57,7 +57,7 @@ fun Route.partnershipRoutes() {
         }
     }
 
-    route("/orgs/{orgSlug}/events/{eventSlug}/partnership") {
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships") {
         install(AuthorizedOrganisationPlugin)
 
         get {
@@ -81,7 +81,7 @@ fun Route.partnershipRoutes() {
         }
     }
 
-    route("/orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}") {
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}") {
         route("/validate") {
             install(AuthorizedOrganisationPlugin)
 

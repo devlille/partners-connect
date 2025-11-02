@@ -41,7 +41,7 @@ class PartnershipBoothLocationRoutesTest {
         }
 
         val response = client.put(
-            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/booth-location",
+            "/orgs/test-organization/events/$eventSlug/partnerships/$partnershipId/booth-location",
         ) {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
@@ -73,7 +73,7 @@ class PartnershipBoothLocationRoutesTest {
 
         // First assignment
         val response1 = client.put(
-            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/booth-location",
+            "/orgs/test-organization/events/$eventSlug/partnerships/$partnershipId/booth-location",
         ) {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
@@ -84,7 +84,7 @@ class PartnershipBoothLocationRoutesTest {
 
         // Reassign to different location
         val response2 = client.put(
-            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/booth-location",
+            "/orgs/test-organization/events/$eventSlug/partnerships/$partnershipId/booth-location",
         ) {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
@@ -119,7 +119,7 @@ class PartnershipBoothLocationRoutesTest {
 
         // Assign location to first partnership
         val response1 = client.put(
-            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId1/booth-location",
+            "/orgs/test-organization/events/$eventSlug/partnerships/$partnershipId1/booth-location",
         ) {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
@@ -130,7 +130,7 @@ class PartnershipBoothLocationRoutesTest {
 
         // Try to assign same location to second partnership
         val response2 = client.put(
-            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId2/booth-location",
+            "/orgs/test-organization/events/$eventSlug/partnerships/$partnershipId2/booth-location",
         ) {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
@@ -169,7 +169,7 @@ class PartnershipBoothLocationRoutesTest {
 
         // Assign location to partnership in first event
         val response1 = client.put(
-            "/orgs/test-organization/events/$eventSlug1/partnership/$partnershipId1/booth-location",
+            "/orgs/test-organization/events/$eventSlug1/partnerships/$partnershipId1/booth-location",
         ) {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
@@ -180,7 +180,7 @@ class PartnershipBoothLocationRoutesTest {
 
         // Assign same location to partnership in second event (should succeed)
         val response2 = client.put(
-            "/orgs/test-organization/events/$eventSlug2/partnership/$partnershipId2/booth-location",
+            "/orgs/test-organization/events/$eventSlug2/partnerships/$partnershipId2/booth-location",
         ) {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
@@ -210,7 +210,7 @@ class PartnershipBoothLocationRoutesTest {
         }
 
         val response = client.put(
-            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/booth-location",
+            "/orgs/test-organization/events/$eventSlug/partnerships/$partnershipId/booth-location",
         ) {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
@@ -240,7 +240,7 @@ class PartnershipBoothLocationRoutesTest {
         }
 
         val response = client.put(
-            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/booth-location",
+            "/orgs/test-organization/events/$eventSlug/partnerships/$partnershipId/booth-location",
         ) {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
@@ -268,7 +268,7 @@ class PartnershipBoothLocationRoutesTest {
         }
 
         val response = client.put(
-            "/orgs/test-organization/events/$eventSlug/partnership/$partnershipId/booth-location",
+            "/orgs/test-organization/events/$eventSlug/partnerships/$partnershipId/booth-location",
         ) {
             contentType(ContentType.Application.Json)
             setBody("""{"location": "F-9"}""")
@@ -291,7 +291,7 @@ class PartnershipBoothLocationRoutesTest {
         }
 
         val response = client.put(
-            "/orgs/test-organization/events/non-existent-event/partnership/$partnershipId/booth-location",
+            "/orgs/test-organization/events/non-existent-event/partnerships/$partnershipId/booth-location",
         ) {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
@@ -316,7 +316,7 @@ class PartnershipBoothLocationRoutesTest {
         }
 
         val response = client.put(
-            "/orgs/test-organization/events/$eventSlug/partnership/$nonExistentPartnershipId/booth-location",
+            "/orgs/test-organization/events/$eventSlug/partnerships/$nonExistentPartnershipId/booth-location",
         ) {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")

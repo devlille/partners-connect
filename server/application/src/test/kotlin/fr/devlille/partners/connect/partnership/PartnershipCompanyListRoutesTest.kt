@@ -89,7 +89,7 @@ class PartnershipCompanyListRoutesTest {
             }
         }
 
-        val response = client.get("/companies/$companyId/partnership")
+        val response = client.get("/companies/$companyId/partnerships")
         assertEquals(HttpStatusCode.OK, response.status)
 
         val partnerships = json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
@@ -140,7 +140,7 @@ class PartnershipCompanyListRoutesTest {
             insertMockedCompany(companyId, name = "TestCompany")
         }
 
-        val response = client.get("/companies/$companyId/partnership")
+        val response = client.get("/companies/$companyId/partnerships")
         assertEquals(HttpStatusCode.OK, response.status)
 
         val partnerships = json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
@@ -184,7 +184,7 @@ class PartnershipCompanyListRoutesTest {
             )
         }
 
-        val response = client.get("/companies/$companyId/partnership")
+        val response = client.get("/companies/$companyId/partnerships")
         assertEquals(HttpStatusCode.OK, response.status)
 
         val partnerships = json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
@@ -201,7 +201,7 @@ class PartnershipCompanyListRoutesTest {
 
         application { moduleMocked() }
 
-        val response = client.get("/companies/$randomCompanyId/partnership")
+        val response = client.get("/companies/$randomCompanyId/partnerships")
         assertEquals(HttpStatusCode.NotFound, response.status)
     }
 
@@ -209,7 +209,7 @@ class PartnershipCompanyListRoutesTest {
     fun `GET returns 400 when company ID is invalid UUID`() = testApplication {
         application { moduleMocked() }
 
-        val response = client.get("/companies/not-a-uuid/partnership")
+        val response = client.get("/companies/not-a-uuid/partnerships")
         assertEquals(HttpStatusCode.BadRequest, response.status)
     }
 }

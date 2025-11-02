@@ -312,7 +312,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Media"
-  /companies/{companyId}/partnership:
+  /companies/{companyId}/partnerships:
     get:
       summary: "List partnerships"
       operationId: "getCompaniesPartnership"
@@ -762,7 +762,7 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/SponsoringPack"
-  /events/{eventSlug}/partnership:
+  /events/{eventSlug}/partnerships:
     post:
       summary: "Create resource"
       operationId: "postEventsPartnership"
@@ -800,7 +800,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Identifier"
-  /events/{eventSlug}/partnership/{partnershipId}/billing:
+  /events/{eventSlug}/partnerships/{partnershipId}/billing:
     get:
       summary: "Get partnership billing information"
       operationId: "getEventsPartnershipBilling"
@@ -903,7 +903,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Identifier"
-  /events/{eventSlug}/partnership/{partnershipId}/billing/invoice:
+  /events/{eventSlug}/partnerships/{partnershipId}/billing/invoice:
     post:
       summary: "Generate partnership invoice"
       operationId: "postEventsPartnershipBillingInvoice"
@@ -934,7 +934,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Identifier"
-  /events/{eventSlug}/partnership/{partnershipId}/billing/quote:
+  /events/{eventSlug}/partnerships/{partnershipId}/billing/quote:
     post:
       summary: "Generate partnership quote"
       operationId: "postEventsPartnershipBillingQuote"
@@ -965,7 +965,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Identifier"
-  /events/{eventSlug}/partnership/{partnershipId}/signed-agreement:
+  /events/{eventSlug}/partnerships/{partnershipId}/signed-agreement:
     post:
       summary: "Upload signed partnership agreement"
       operationId: "postEventsPartnershipSignedAgreement"
@@ -1007,7 +1007,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Identifier"
-  /events/{eventSlug}/partnership/{partnershipId}/suggestion-approve:
+  /events/{eventSlug}/partnerships/{partnershipId}/suggestion-approve:
     post:
       summary: "Approve partnership suggestion"
       operationId: "postEventsPartnershipSuggestionApprove"
@@ -1038,7 +1038,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Identifier"
-  /events/{eventSlug}/partnership/{partnershipId}/suggestion-decline:
+  /events/{eventSlug}/partnerships/{partnershipId}/suggestion-decline:
     post:
       summary: "Decline partnership suggestion"
       operationId: "postEventsPartnershipSuggestionDecline"
@@ -1069,7 +1069,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Identifier"
-  /events/{eventSlug}/partnership/{partnershipId}/tickets:
+  /events/{eventSlug}/partnerships/{partnershipId}/tickets:
     get:
       summary: "Get partnership tickets"
       operationId: "getEventsPartnershipTickets"
@@ -1140,7 +1140,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/TicketOrder"
-  /events/{eventSlug}/partnership/{partnershipId}/tickets/{ticketId}:
+  /events/{eventSlug}/partnerships/{partnershipId}/tickets/{ticketId}:
     put:
       summary: "Update partnership ticket"
       operationId: "putEventsPartnershipTickets"
@@ -1182,7 +1182,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Ticket"
-  /events/{eventSlug}/partnership/{partnershipId}/job-offers:
+  /events/{eventSlug}/partnerships/{partnershipId}/job-offers:
     get:
       summary: "List job offers for partnership"
       operationId: "getPartnershipJobOffers"
@@ -2221,7 +2221,7 @@ paths:
                 type: "string"
         "204":
           description: "No Content - External link deleted successfully"
-  /orgs/{orgSlug}/events/{eventSlug}/partnership:
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships:
     get:
       summary: "Get partnership list"
       operationId: "getOrgsEventsPartnership"
@@ -2312,7 +2312,7 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/PartnershipItem"
-  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/agreement:
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/agreement:
     post:
       summary: "Generate partnership agreement"
       operationId: "postOrgsEventsPartnershipAgreement"
@@ -2360,7 +2360,7 @@ paths:
                     description: "URL to the generated agreement PDF"
                 required:
                   - "url"
-  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/billing/{billingStatus}:
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/billing/{billingStatus}:
     post:
       summary: "Update partnership billing status"
       operationId: "postOrgsEventsPartnershipBilling"
@@ -2401,7 +2401,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Identifier"
-  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/booth-location:
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/booth-location:
     put:
       summary: "Update organization"
       operationId: "putOrgsEventsPartnershipBoothLocation"
@@ -2461,7 +2461,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BoothLocationResponse"
-  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/suggestion:
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/suggestion:
     post:
       summary: "Create partnership suggestion"
       operationId: "postOrgsEventsPartnershipSuggestion"
@@ -2509,7 +2509,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Identifier"
-  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/validate:
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/validate:
     post:
       summary: "Validate partnership"
       operationId: "postOrgsEventsPartnershipValidate"
@@ -2551,7 +2551,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Identifier"
-  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/decline:
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/decline:
     post:
       summary: "Decline partnership"
       operationId: "postOrgsEventsPartnershipDecline"
@@ -2593,7 +2593,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Identifier"
-  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/communication/publication:
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/communication/publication:
     put:
       summary: "Update organization"
       operationId: "putOrgsEventsPartnershipCommunicationPublication"
@@ -2647,7 +2647,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PublicationDateResponse"
-  /orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/communication/support:
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/communication/support:
     put:
       summary: "Update organization"
       operationId: "putOrgsEventsPartnershipCommunicationSupport"

@@ -51,7 +51,7 @@ class PartnershipSuggestionRoutesTest {
             insertMockedPackOptions(packId, optionId, required = false)
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/suggestion") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnerships/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(
@@ -86,7 +86,7 @@ class PartnershipSuggestionRoutesTest {
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$fakeId/suggestion") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnerships/$fakeId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(SuggestPartnership(packId = UUID.randomUUID().toString(), language = "en")))
@@ -112,7 +112,7 @@ class PartnershipSuggestionRoutesTest {
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/suggestion") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnerships/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(SuggestPartnership(packId = UUID.randomUUID().toString(), language = "en")))
@@ -143,7 +143,7 @@ class PartnershipSuggestionRoutesTest {
             insertMockedPackOptions(packId, optionId)
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/suggestion") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnerships/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(
@@ -183,7 +183,7 @@ class PartnershipSuggestionRoutesTest {
             insertMockedPackOptions(packId, optionId, required = false)
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/suggestion") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnerships/$partnershipId/suggestion") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(

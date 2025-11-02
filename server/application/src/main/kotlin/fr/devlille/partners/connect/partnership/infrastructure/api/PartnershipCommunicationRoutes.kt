@@ -21,7 +21,7 @@ fun Route.partnershipCommunicationRoutes() {
     val partnershipRepository by inject<PartnershipRepository>()
     val storageRepository by inject<PartnershipStorageRepository>()
 
-    route("/orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/communication") {
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/communication") {
         install(AuthorizedOrganisationPlugin)
 
         route("/publication") {

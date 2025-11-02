@@ -35,7 +35,7 @@ fun Route.partnershipJobOfferRoutes() {
     val partnershipRepository by inject<PartnershipRepository>()
     val eventRepository by inject<EventRepository>()
 
-    route("/events/{eventSlug}/partnership/{partnershipId}/job-offers") {
+    route("/events/{eventSlug}/partnerships/{partnershipId}/job-offers") {
         get {
             val eventSlug = call.parameters.eventSlug
             val partnershipId = call.parameters.partnershipId
@@ -68,7 +68,7 @@ private fun Route.partnershipOrgJobOfferRoutes() {
 
     route("/orgs/{orgSlug}/events/{eventSlug}") {
         install(AuthorizedOrganisationPlugin)
-        route("/partnership/{partnershipId}/job-offers/{promotionId}") {
+        route("/partnerships/{partnershipId}/job-offers/{promotionId}") {
             post("/approve") {
                 val promotionId = call.parameters.getValue("promotionId").toUUID()
                 val eventSlug = call.parameters.eventSlug

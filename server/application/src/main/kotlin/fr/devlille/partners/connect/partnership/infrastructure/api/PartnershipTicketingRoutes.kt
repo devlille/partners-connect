@@ -16,7 +16,7 @@ import org.koin.ktor.ext.inject
 fun Route.partnershipTicketingRoutes() {
     val ticketingRepository by inject<TicketRepository>()
 
-    route("/events/{eventSlug}/partnership/{partnershipId}/tickets") {
+    route("/events/{eventSlug}/partnerships/{partnershipId}/tickets") {
         get {
             val partnershipId = call.parameters.partnershipId
             val tickets = ticketingRepository.listTickets(partnershipId)

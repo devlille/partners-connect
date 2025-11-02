@@ -27,7 +27,7 @@ data class BoothLocationResponse(
 fun Route.partnershipBoothLocationRoutes() {
     val partnershipRepository by inject<PartnershipRepository>()
 
-    route("/orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/booth-location") {
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/booth-location") {
         install(AuthorizedOrganisationPlugin)
 
         put {
