@@ -64,6 +64,7 @@ fun Route.orgsPartnershipAgreementRoutes() {
             val agreement = agreementRepository.agreement(eventSlug, partnershipId)
             val pdfBinary = agreementRepository.generatePDF(agreement, pricing)
             val agreementUrl = storageRepository.uploadAgreement(eventSlug, partnershipId, pdfBinary)
+            agreementRepository.updateAgreementUrl(eventSlug, partnershipId, agreementUrl)
             call.respond(HttpStatusCode.OK, mapOf("url" to agreementUrl))
         }
     }
