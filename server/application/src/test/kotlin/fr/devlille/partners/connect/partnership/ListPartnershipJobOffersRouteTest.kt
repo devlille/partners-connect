@@ -56,7 +56,7 @@ class ListPartnershipJobOffersRouteTest {
             }
         }
 
-        val response = client.get("/events/$eventSlug/partnership/$partnershipId/job-offers")
+        val response = client.get("/events/$eventSlug/partnerships/$partnershipId/job-offers")
 
         assertEquals(HttpStatusCode.OK, response.status)
         val body = response.bodyAsText()
@@ -105,7 +105,7 @@ class ListPartnershipJobOffersRouteTest {
         }
 
         val response = client.get(
-            "/events/$eventSlug/partnership/$partnershipId/job-offers?page=1&page_size=10",
+            "/events/$eventSlug/partnerships/$partnershipId/job-offers?page=1&page_size=10",
         )
 
         assertEquals(HttpStatusCode.OK, response.status)
@@ -132,7 +132,7 @@ class ListPartnershipJobOffersRouteTest {
         }
 
         val response = client.get(
-            "/events/$eventSlug/partnership/$nonExistentPartnershipId/job-offers",
+            "/events/$eventSlug/partnerships/$nonExistentPartnershipId/job-offers",
         )
 
         assertEquals(HttpStatusCode.NotFound, response.status)
@@ -154,7 +154,7 @@ class ListPartnershipJobOffersRouteTest {
         }
 
         val response = client.get(
-            "/events/non-existent-event/partnership/$partnershipId/job-offers",
+            "/events/non-existent-event/partnerships/$partnershipId/job-offers",
         )
 
         assertEquals(HttpStatusCode.NotFound, response.status)

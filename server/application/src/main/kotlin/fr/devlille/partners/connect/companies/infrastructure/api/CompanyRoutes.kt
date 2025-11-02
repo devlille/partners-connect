@@ -122,7 +122,7 @@ private fun Route.companyLogoRoutes(
 }
 
 private fun Route.companyPartnershipRoutes(partnershipRepository: PartnershipRepository) {
-    get("/{companyId}/partnership") {
+    get("/{companyId}/partnerships") {
         val companyId = call.parameters.companyUUID
         val items = partnershipRepository.listByCompany(companyId)
         call.respond(HttpStatusCode.OK, items)

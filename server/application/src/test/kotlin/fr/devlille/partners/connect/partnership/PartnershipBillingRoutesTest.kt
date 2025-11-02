@@ -42,7 +42,7 @@ class PartnershipBillingRoutesTest {
             insertMockedBilling(eventId, partnershipId, name = "DevLille SAS", status = InvoiceStatus.SENT)
         }
 
-        val response = client.get("/events/$eventSlug/partnership/$partnershipId/billing")
+        val response = client.get("/events/$eventSlug/partnerships/$partnershipId/billing")
 
         assertEquals(HttpStatusCode.OK, response.status)
         val body = response.bodyAsText()
@@ -62,7 +62,7 @@ class PartnershipBillingRoutesTest {
             insertMockedCompany(companyId)
         }
 
-        val response = client.get("/events/$eventSlug/partnership/$partnershipId/billing")
+        val response = client.get("/events/$eventSlug/partnerships/$partnershipId/billing")
 
         assertEquals(HttpStatusCode.NotFound, response.status)
         assertTrue(response.bodyAsText().contains("Billing not found"))
@@ -83,7 +83,7 @@ class PartnershipBillingRoutesTest {
             insertQontoIntegration(eventId)
         }
 
-        val response = client.post("/events/$eventSlug/partnership/$partnershipId/billing") {
+        val response = client.post("/events/$eventSlug/partnerships/$partnershipId/billing") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(CompanyBillingData.serializer(), createCompanyBillingData()))
         }
@@ -109,7 +109,7 @@ class PartnershipBillingRoutesTest {
             insertMockedBilling(eventId, partnershipId, status = InvoiceStatus.PENDING)
         }
 
-        val response = client.put("/events/$eventSlug/partnership/$partnershipId/billing") {
+        val response = client.put("/events/$eventSlug/partnerships/$partnershipId/billing") {
             contentType(ContentType.Application.Json)
             setBody(
                 json.encodeToString(
@@ -135,7 +135,7 @@ class PartnershipBillingRoutesTest {
             insertMockedEventWithOrga(eventId, slug = eventSlug)
         }
 
-        val response = client.post("/events/$eventSlug/partnership/$partnershipId/billing") {
+        val response = client.post("/events/$eventSlug/partnerships/$partnershipId/billing") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(CompanyBillingData.serializer(), createCompanyBillingData()))
         }
@@ -155,7 +155,7 @@ class PartnershipBillingRoutesTest {
             insertMockedEventWithOrga(eventId, slug = eventSlug)
         }
 
-        val response = client.put("/events/$eventSlug/partnership/$partnershipId/billing") {
+        val response = client.put("/events/$eventSlug/partnerships/$partnershipId/billing") {
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(CompanyBillingData.serializer(), createCompanyBillingData()))
         }

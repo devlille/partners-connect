@@ -27,7 +27,7 @@ fun Route.partnershipBillingRoutes() {
     val partnershipRepository by inject<PartnershipRepository>()
     val notificationRepository by inject<NotificationRepository>()
 
-    route("/events/{eventSlug}/partnership/{partnershipId}/billing") {
+    route("/events/{eventSlug}/partnerships/{partnershipId}/billing") {
         get {
             val eventSlug = call.parameters.eventSlug
             val partnershipId = call.parameters.partnershipId
@@ -81,7 +81,7 @@ private fun Route.organizationProtectedBillingRoutes() {
     val partnershipBillingRepository by inject<PartnershipBillingRepository>()
 
     // Organization-protected routes for organizers
-    route("/orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/billing") {
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/billing") {
         install(AuthorizedOrganisationPlugin)
 
         post("/{billingStatus}") {

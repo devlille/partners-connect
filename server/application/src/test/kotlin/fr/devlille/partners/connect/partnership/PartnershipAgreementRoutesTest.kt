@@ -66,7 +66,7 @@ class PartnershipAgreementRoutesTest {
             )
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/agreement") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnerships/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -96,7 +96,7 @@ class PartnershipAgreementRoutesTest {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
         }
 
-        val response = client.post("/events/$eventSlug/partnership/$partnershipId/agreement") {
+        val response = client.post("/events/$eventSlug/partnerships/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -123,7 +123,7 @@ class PartnershipAgreementRoutesTest {
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/agreement") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnerships/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -153,7 +153,7 @@ class PartnershipAgreementRoutesTest {
             insertMockedCompany(companyId)
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/agreement") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnerships/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -187,7 +187,7 @@ class PartnershipAgreementRoutesTest {
             )
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/agreement") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnerships/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -220,7 +220,7 @@ class PartnershipAgreementRoutesTest {
             )
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/agreement") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnerships/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -256,7 +256,7 @@ class PartnershipAgreementRoutesTest {
             )
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/agreement") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnerships/$partnershipId/agreement") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -294,7 +294,7 @@ class PartnershipAgreementRoutesTest {
         }
 
         val response = client.submitFormWithBinaryData(
-            url = "/events/$eventSlug/partnership/$partnershipId/signed-agreement",
+            url = "/events/$eventSlug/partnerships/$partnershipId/signed-agreement",
             formData = formData {
                 append(
                     "file",
@@ -331,7 +331,7 @@ class PartnershipAgreementRoutesTest {
         }
 
         val response = client.submitFormWithBinaryData(
-            url = "/events/$eventSlug/partnership/$partnershipId/signed-agreement",
+            url = "/events/$eventSlug/partnerships/$partnershipId/signed-agreement",
             formData = formData {
                 append(
                     "file",
@@ -370,7 +370,7 @@ class PartnershipAgreementRoutesTest {
         }
 
         val response = client.submitFormWithBinaryData(
-            url = "/events/$eventSlug/partnership/$partnershipId/signed-agreement",
+            url = "/events/$eventSlug/partnerships/$partnershipId/signed-agreement",
             formData = formData {
                 // Intentionally not appending the file part to simulate the error
             },
@@ -403,7 +403,7 @@ class PartnershipAgreementRoutesTest {
         }
 
         val response = client.submitFormWithBinaryData(
-            url = "/events/$eventSlug/partnership/$partnershipId/signed-agreement",
+            url = "/events/$eventSlug/partnerships/$partnershipId/signed-agreement",
             formData = formData {
                 append(
                     "file",

@@ -27,7 +27,7 @@ fun Route.partnershipAgreementRoutes() {
     val storageRepository by inject<PartnershipStorageRepository>()
     val notificationRepository by inject<NotificationRepository>()
 
-    route("/orgs/{orgSlug}/events/{eventSlug}/partnership/{partnershipId}/agreement") {
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/agreement") {
         install(AuthorizedOrganisationPlugin)
 
         post {
@@ -39,7 +39,7 @@ fun Route.partnershipAgreementRoutes() {
         }
     }
 
-    route("/events/{eventSlug}/partnership/{partnershipId}/signed-agreement") {
+    route("/events/{eventSlug}/partnerships/{partnershipId}/signed-agreement") {
         post {
             val eventSlug = call.parameters.eventSlug
             val partnershipId = call.parameters.partnershipId

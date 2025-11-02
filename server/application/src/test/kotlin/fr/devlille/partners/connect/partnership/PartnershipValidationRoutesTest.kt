@@ -46,7 +46,7 @@ class PartnershipValidationRoutesTest {
             )
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/validate") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnerships/$partnershipId/validate") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -69,7 +69,7 @@ class PartnershipValidationRoutesTest {
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/validate") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnerships/$partnershipId/validate") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -94,7 +94,7 @@ class PartnershipValidationRoutesTest {
             insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/decline") {
+        val response = client.post("/orgs/$orgId/events/$eventSlug/partnerships/$partnershipId/decline") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -117,7 +117,7 @@ class PartnershipValidationRoutesTest {
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
         }
 
-        val response = client.delete("/orgs/$orgId/events/$eventSlug/partnership/$partnershipId/decline") {
+        val response = client.delete("/orgs/$orgId/events/$eventSlug/partnerships/$partnershipId/decline") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
         }

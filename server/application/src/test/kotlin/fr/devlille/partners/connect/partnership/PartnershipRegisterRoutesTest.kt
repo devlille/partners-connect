@@ -263,7 +263,7 @@ class PartnershipRegisterRoutesTest {
             language = "en",
             optionSelections = listOf(),
         )
-        val response = client.post("/events/${UUID.randomUUID()}/partnership") {
+        val response = client.post("/events/${UUID.randomUUID()}/partnerships") {
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
