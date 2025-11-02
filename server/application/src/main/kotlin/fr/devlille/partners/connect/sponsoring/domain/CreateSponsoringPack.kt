@@ -7,10 +7,6 @@ import kotlinx.serialization.Serializable
 class CreateSponsoringPack(
     val name: String,
     val price: Int,
-    @SerialName("with_booth")
-    val withBooth: Boolean = false,
-    @SerialName("nb_tickets")
-    val nbTickets: Int,
     @SerialName("max_quantity")
     val maxQuantity: Int? = null,
 )

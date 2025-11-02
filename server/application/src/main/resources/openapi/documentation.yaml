@@ -5114,11 +5114,6 @@ components:
           type: string
         price:
           type: integer
-        with_booth:
-          type: boolean
-          default: false
-        nb_tickets:
-          type: integer
         max_quantity:
           type:
             - integer
@@ -5126,7 +5121,6 @@ components:
       required:
         - name
         - price
-        - nb_tickets
     attach_options_to_pack.schema:
       $id: attach_options_to_pack.schema.json
       type: object

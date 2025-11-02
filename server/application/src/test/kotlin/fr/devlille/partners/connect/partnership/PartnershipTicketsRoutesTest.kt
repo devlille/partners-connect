@@ -9,7 +9,11 @@ import fr.devlille.partners.connect.partnership.factories.insertMockedBilling
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnershipTicket
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipTicketEntity
+import fr.devlille.partners.connect.sponsoring.domain.OptionType
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedPackOptions
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringOption
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
 import fr.devlille.partners.connect.tickets.domain.Ticket
 import fr.devlille.partners.connect.tickets.domain.TicketData
@@ -91,18 +95,33 @@ class PartnershipTicketsRoutesTest {
                     }
                 },
             )
-            insertMockedEventWithOrga(eventId, slug = eventSlug)
-            val company = insertMockedCompany()
-            val selectedPack = insertMockedSponsoringPack(event = eventId)
-            insertMockedPartnership(
-                id = partnershipId,
-                eventId = eventId,
-                companyId = company.id.value,
-                selectedPackId = selectedPack.id.value,
-                validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
-            )
-            insertMockedBilling(eventId, partnershipId)
-            insertBilletWebIntegration(eventId = eventId)
+            transaction {
+                insertMockedEventWithOrga(eventId, slug = eventSlug)
+                val company = insertMockedCompany()
+                val selectedPack = insertMockedSponsoringPack(event = eventId)
+                val selectedOption = insertMockedSponsoringOption(
+                    eventId = eventId,
+                    optionType = OptionType.TYPED_NUMBER,
+                )
+                insertMockedPackOptions(
+                    packId = selectedPack.id.value,
+                    optionId = selectedOption.id.value,
+                )
+                val partnership = insertMockedPartnership(
+                    id = partnershipId,
+                    eventId = eventId,
+                    companyId = company.id.value,
+                    selectedPackId = selectedPack.id.value,
+                    validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
+                )
+                PartnershipOptionEntity.new {
+                    this.partnership = partnership
+                    this.packId = selectedPack.id
+                    this.option = selectedOption
+                }
+                insertMockedBilling(eventId, partnershipId)
+                insertBilletWebIntegration(eventId = eventId)
+            }
         }
 
         val tickets = listOf(TicketData(firstName = "John", lastName = "Doe"))
@@ -178,7 +197,7 @@ class PartnershipTicketsRoutesTest {
             )
             insertMockedEventWithOrga(eventId, slug = eventSlug)
             val company = insertMockedCompany()
-            val selectedPack = insertMockedSponsoringPack(event = eventId, nbTickets = 0)
+            val selectedPack = insertMockedSponsoringPack(event = eventId)
             insertMockedPartnership(
                 id = partnershipId,
                 eventId = eventId,
