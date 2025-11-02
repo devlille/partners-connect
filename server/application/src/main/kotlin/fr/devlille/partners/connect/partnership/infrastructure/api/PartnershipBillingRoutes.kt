@@ -19,8 +19,7 @@ import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
-@Suppress("LongMethod")
-fun Route.partnershipBillingRoutes() {
+fun Route.publicPartnershipBillingRoutes() {
     val partnershipBillingRepository by inject<PartnershipBillingRepository>()
     val billingRepository by inject<BillingRepository>()
     val eventRepository by inject<EventRepository>()
@@ -73,18 +72,15 @@ fun Route.partnershipBillingRoutes() {
             call.respond(HttpStatusCode.Created, mapOf("url" to quoteUrl))
         }
     }
-
-    organizationProtectedBillingRoutes()
 }
 
-private fun Route.organizationProtectedBillingRoutes() {
+fun Route.orgsPartnershipBillingRoutes() {
     val partnershipBillingRepository by inject<PartnershipBillingRepository>()
 
-    // Organization-protected routes for organizers
-    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/billing") {
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/billing/{billingStatus}") {
         install(AuthorizedOrganisationPlugin)
 
-        post("/{billingStatus}") {
+        post {
             val eventSlug = call.parameters.eventSlug
             val partnershipId = call.parameters.partnershipId
             val status = call.parameters.billingStatus

@@ -3,13 +3,14 @@ package fr.devlille.partners.connect.partnership.infrastructure.api
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
-import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
+import fr.devlille.partners.connect.partnership.domain.PartnershipCommunicationRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipStorageRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.contentType
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
+import io.ktor.server.routing.get
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import kotlinx.datetime.LocalDateTime
@@ -17,9 +18,19 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
 
-fun Route.partnershipCommunicationRoutes() {
-    val partnershipRepository by inject<PartnershipRepository>()
+fun Route.orgsPartnershipCommunicationRoutes() {
+    val partnershipCommunicationRepository by inject<PartnershipCommunicationRepository>()
     val storageRepository by inject<PartnershipStorageRepository>()
+
+    route("/orgs/{orgSlug}/events/{eventSlug}/communication") {
+        install(AuthorizedOrganisationPlugin)
+
+        get {
+            val eventSlug = call.parameters.eventSlug
+            val communicationPlan = partnershipCommunicationRepository.listCommunicationPlan(eventSlug)
+            call.respond(HttpStatusCode.OK, communicationPlan)
+        }
+    }
 
     route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/communication") {
         install(AuthorizedOrganisationPlugin)
@@ -31,7 +42,7 @@ fun Route.partnershipCommunicationRoutes() {
                 val publicationDate = call
                     .receive<PublicationDateRequest>(schema = "publication_date_request.schema.json")
                     .publicationDate
-                val id = partnershipRepository
+                val id = partnershipCommunicationRepository
                     .updateCommunicationPublicationDate(eventSlug, partnershipId, publicationDate)
                 call.respond(
                     status = HttpStatusCode.OK,
@@ -48,7 +59,7 @@ fun Route.partnershipCommunicationRoutes() {
                 val bytes = call.receive<ByteArray>()
                 val supportUrl = storageRepository
                     .uploadCommunicationSupport(eventSlug, partnershipId, bytes, contentType.toString())
-                val id = partnershipRepository
+                val id = partnershipCommunicationRepository
                     .updateCommunicationSupportUrl(eventSlug, partnershipId, supportUrl)
                 call.respond(
                     status = HttpStatusCode.OK,

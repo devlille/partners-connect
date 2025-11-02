@@ -4,14 +4,74 @@ import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import kotlinx.datetime.LocalDateTime
+import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.isNotNull
+import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.isNull
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.UUIDEntity
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
+import org.jetbrains.exposed.v1.jdbc.SizedIterable
 import java.util.UUID
 
 class PartnershipEntity(id: EntityID<UUID>) : UUIDEntity(id) {
-    companion object : UUIDEntityClass<PartnershipEntity>(PartnershipsTable)
+    companion object : UUIDEntityClass<PartnershipEntity>(PartnershipsTable) {
+        @Suppress("LongParameterList")
+        fun filters(
+            eventId: UUID,
+            packId: UUID?,
+            validated: Boolean?,
+            suggestion: Boolean?,
+            agreementGenerated: Boolean?,
+            agreementSigned: Boolean?,
+        ): SizedIterable<PartnershipEntity> {
+            var op = PartnershipsTable.eventId eq eventId
+            if (packId != null) {
+                op = op and (PartnershipsTable.selectedPackId eq packId)
+            }
+            if (validated != null) {
+                op = if (validated) {
+                    op and (PartnershipsTable.validatedAt.isNotNull())
+                } else {
+                    op and (PartnershipsTable.validatedAt.isNull())
+                }
+            }
+            if (suggestion != null) {
+                op = if (suggestion) {
+                    op and (PartnershipsTable.suggestionPackId.isNotNull())
+                } else {
+                    op and (PartnershipsTable.suggestionPackId.isNull())
+                }
+            }
+            if (agreementGenerated != null) {
+                op = if (agreementGenerated) {
+                    op and (PartnershipsTable.agreementUrl.isNotNull())
+                } else {
+                    op and (PartnershipsTable.agreementUrl.isNull())
+                }
+            }
+            if (agreementSigned != null) {
+                op = if (agreementSigned) {
+                    op and (PartnershipsTable.agreementSignedUrl.isNotNull())
+                } else {
+                    op and (PartnershipsTable.agreementSignedUrl.isNull())
+                }
+            }
+            return find { op }
+        }
+
+        fun singleByEventAndCompany(eventId: UUID, companyId: UUID): PartnershipEntity? = this
+            .find { (PartnershipsTable.eventId eq eventId) and (PartnershipsTable.companyId eq companyId) }
+            .singleOrNull()
+
+        fun singleByEventAndPartnership(eventId: UUID, partnershipId: UUID): PartnershipEntity? = this
+            .find { (PartnershipsTable.eventId eq eventId) and (PartnershipsTable.id eq partnershipId) }
+            .singleOrNull()
+
+        fun singleByCompanyAndPartnership(companyId: UUID, partnershipId: UUID): PartnershipEntity? = this
+            .find { (PartnershipsTable.companyId eq companyId) and (PartnershipsTable.id eq partnershipId) }
+            .singleOrNull()
+    }
 
     var event by EventEntity referencedOn PartnershipsTable.eventId
     var company by CompanyEntity referencedOn PartnershipsTable.companyId
@@ -60,24 +120,3 @@ private fun LocalDateTime?.compareToNull(other: LocalDateTime?): Int {
         this.compareTo(other)
     }
 }
-
-fun UUIDEntityClass<PartnershipEntity>.singleByEventAndCompany(
-    eventId: UUID,
-    companyId: UUID,
-): PartnershipEntity? = this
-    .find { (PartnershipsTable.eventId eq eventId) and (PartnershipsTable.companyId eq companyId) }
-    .singleOrNull()
-
-fun UUIDEntityClass<PartnershipEntity>.singleByEventAndPartnership(
-    eventId: UUID,
-    partnershipId: UUID,
-): PartnershipEntity? = this
-    .find { (PartnershipsTable.eventId eq eventId) and (PartnershipsTable.id eq partnershipId) }
-    .singleOrNull()
-
-fun UUIDEntityClass<PartnershipEntity>.singleByCompanyAndPartnership(
-    companyId: UUID,
-    partnershipId: UUID,
-): PartnershipEntity? = this
-    .find { (PartnershipsTable.companyId eq companyId) and (PartnershipsTable.id eq partnershipId) }
-    .singleOrNull()

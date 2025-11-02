@@ -8,7 +8,6 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipBillingReposit
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
-import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndPartnership
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
@@ -28,9 +27,9 @@ class PartnershipBillingRepositoryExposed : PartnershipBillingRepository {
             ?: throw NotFoundException("Event with slug $eventSlug not found")
         val eventId = event.id.value
         val existing = BillingEntity.singleByEventAndPartnership(eventId, partnershipId)
-        val partnership = PartnershipEntity.singleByEventAndPartnership(eventId, partnershipId)
-            ?: throw NotFoundException("Partnership not found")
         if (existing == null) {
+            val partnership = PartnershipEntity.singleByEventAndPartnership(eventId, partnershipId)
+                ?: throw NotFoundException("Partnership not found")
             BillingEntity.new {
                 this.event = partnership.event
                 this.partnership = partnership
@@ -43,7 +42,7 @@ class PartnershipBillingRepositoryExposed : PartnershipBillingRepository {
             }
         } else {
             existing.apply {
-                this.name = input.name ?: partnership.company.name
+                this.name = input.name ?: existing.partnership.company.name
                 this.contactFirstName = input.contact.firstName
                 this.contactLastName = input.contact.lastName
                 this.contactEmail = input.contact.email

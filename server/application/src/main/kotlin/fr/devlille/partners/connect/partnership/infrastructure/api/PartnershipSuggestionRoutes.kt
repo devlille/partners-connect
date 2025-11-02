@@ -19,8 +19,7 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
-@Suppress("LongMethod")
-fun Route.partnershipSuggestionRoutes() {
+fun Route.publicPartnershipSuggestionDecisionRoutes() {
     val eventRepository by inject<EventRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
     val suggestionRepository by inject<PartnershipSuggestionRepository>()
@@ -70,12 +69,19 @@ fun Route.partnershipSuggestionRoutes() {
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
         }
     }
+}
 
-    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}") {
+fun Route.orgsPartnershipSuggestionRoutes() {
+    val eventRepository by inject<EventRepository>()
+    val partnershipRepository by inject<PartnershipRepository>()
+    val suggestionRepository by inject<PartnershipSuggestionRepository>()
+    val notificationRepository by inject<NotificationRepository>()
+    val webhookRepository by inject<WebhookRepository>()
+
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/suggestion") {
         install(AuthorizedOrganisationPlugin)
 
-        @Suppress("ThrowsCount")
-        post("/suggestion") {
+        post {
             val eventSlug = call.parameters.eventSlug
             val partnershipId = call.parameters.partnershipId
             val input = call.receive<SuggestPartnership>(schema = "suggest_partnership.schema.json")

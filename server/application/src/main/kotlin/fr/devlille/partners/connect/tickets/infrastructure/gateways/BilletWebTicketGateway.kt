@@ -6,7 +6,6 @@ import fr.devlille.partners.connect.integrations.infrastructure.db.BilletWebInte
 import fr.devlille.partners.connect.integrations.infrastructure.db.get
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipTicketEntity
-import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndPartnership
 import fr.devlille.partners.connect.tickets.domain.Ticket
 import fr.devlille.partners.connect.tickets.domain.TicketData
 import fr.devlille.partners.connect.tickets.domain.TicketGateway

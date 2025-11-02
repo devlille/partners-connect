@@ -2268,14 +2268,6 @@ paths:
           schema:
             type: "boolean"
           description: "Filter by agreement signature status"
-        - name: "sort"
-          in: "query"
-          required: false
-          schema:
-            type: "string"
-            default: "created"
-            enum: ["created", "updated"]
-          description: "Sort field"
         - name: "direction"
           in: "query"
           required: false

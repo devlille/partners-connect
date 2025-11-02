@@ -11,8 +11,6 @@ import fr.devlille.partners.connect.organisations.infrastructure.db.Organisation
 import fr.devlille.partners.connect.partnership.domain.PartnershipAgreementRepository
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
-import fr.devlille.partners.connect.partnership.infrastructure.db.listByPartnershipAndPack
-import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity

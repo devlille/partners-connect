@@ -7,5 +7,5 @@ interface TicketRepository {
 
     suspend fun createTickets(eventSlug: String, partnershipId: UUID, tickets: List<TicketData>): TicketOrder
 
-    suspend fun updateTicket(eventSlug: String, partnershipId: UUID, ticketId: String, data: TicketData): Ticket
+    suspend fun updateTicket(eventSlug: String, partnershipId: UUID, ticketId: String, input: TicketData): Ticket
 }

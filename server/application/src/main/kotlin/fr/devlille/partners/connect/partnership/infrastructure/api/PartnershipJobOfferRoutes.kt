@@ -28,12 +28,8 @@ import org.koin.ktor.ext.inject
  * Routes for partnership job offer promotions.
  * Separates public endpoints (listPartnershipJobOffers) from protected endpoints.
  */
-fun Route.partnershipJobOfferRoutes() {
+fun Route.publicPartnershipJobOfferRoutes() {
     val repository by inject<PartnershipJobOfferRepository>()
-    val authRepository by inject<AuthRepository>()
-    val notificationRepository by inject<NotificationRepository>()
-    val partnershipRepository by inject<PartnershipRepository>()
-    val eventRepository by inject<EventRepository>()
 
     route("/events/{eventSlug}/partnerships/{partnershipId}/job-offers") {
         get {
@@ -54,78 +50,16 @@ fun Route.partnershipJobOfferRoutes() {
             call.respond(HttpStatusCode.OK, promotions)
         }
     }
-
-    partnershipOrgJobOfferRoutes()
 }
 
 @Suppress("LongMethod")
-private fun Route.partnershipOrgJobOfferRoutes() {
+fun Route.orgsPartnershipJobOfferRoutes() {
     val repository by inject<PartnershipJobOfferRepository>()
-    val authRepository by inject<AuthRepository>()
-    val notificationRepository by inject<NotificationRepository>()
-    val partnershipRepository by inject<PartnershipRepository>()
-    val eventRepository by inject<EventRepository>()
 
-    route("/orgs/{orgSlug}/events/{eventSlug}") {
+    route("/orgs/{orgSlug}/events/{eventSlug}/job-offers") {
         install(AuthorizedOrganisationPlugin)
-        route("/partnerships/{partnershipId}/job-offers/{promotionId}") {
-            post("/approve") {
-                val promotionId = call.parameters.getValue("promotionId").toUUID()
-                val eventSlug = call.parameters.eventSlug
-                val userInfo = authRepository.getUserInfo(call.token)
-                val promotion = repository.approvePromotion(
-                    promotionId = promotionId,
-                    reviewer = userInfo,
-                )
 
-                // Send notification after successful approval
-                val partnershipId = promotion.partnershipId.toUUID()
-                val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
-                val partnership = partnershipRepository.getById(eventSlug, partnershipId)
-                val event = eventRepository.getBySlug(eventSlug)
-                val variables = NotificationVariables.JobOfferApproved(
-                    language = partnership.language,
-                    event = event,
-                    company = company,
-                    partnership = partnership,
-                    jobOffer = promotion.jobOffer,
-                )
-                notificationRepository.sendMessage(eventSlug, variables)
-
-                call.respond(HttpStatusCode.OK, promotion)
-            }
-
-            post("/decline") {
-                val promotionId = call.parameters.getValue("promotionId").toUUID()
-                val eventSlug = call.parameters.eventSlug
-                val request = call.receive<DeclineJobOfferRequest>(schema = "decline_job_offer_promotion.schema.json")
-                val userInfo = authRepository.getUserInfo(call.token)
-                val promotion = repository.declinePromotion(
-                    promotionId = promotionId,
-                    reviewer = userInfo,
-                    reason = request.reason,
-                )
-
-                // Send notification after successful decline
-                val partnershipId = promotion.partnershipId.toUUID()
-                val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
-                val partnership = partnershipRepository.getById(eventSlug, partnershipId)
-                val event = eventRepository.getBySlug(eventSlug)
-                val variables = NotificationVariables.JobOfferDeclined(
-                    language = partnership.language,
-                    event = event,
-                    company = company,
-                    partnership = partnership,
-                    jobOffer = promotion.jobOffer,
-                    declineReason = request.reason,
-                )
-                notificationRepository.sendMessage(eventSlug, variables)
-
-                call.respond(HttpStatusCode.OK, promotion)
-            }
-        }
-
-        get("/job-offers") {
+        get {
             val orgSlug = call.parameters.orgSlug
             val eventSlug = call.parameters.eventSlug
             val statusParam = call.request.queryParameters["status"]
@@ -141,6 +75,72 @@ private fun Route.partnershipOrgJobOfferRoutes() {
                 pageSize = pageSize,
             )
             call.respond(HttpStatusCode.OK, promotions)
+        }
+    }
+}
+
+fun Route.orgsPartnershipJobOfferDecisionRoutes() {
+    val repository by inject<PartnershipJobOfferRepository>()
+    val authRepository by inject<AuthRepository>()
+    val notificationRepository by inject<NotificationRepository>()
+    val partnershipRepository by inject<PartnershipRepository>()
+    val eventRepository by inject<EventRepository>()
+
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/job-offers/{promotionId}") {
+        install(AuthorizedOrganisationPlugin)
+        post("/approve") {
+            val promotionId = call.parameters.getValue("promotionId").toUUID()
+            val eventSlug = call.parameters.eventSlug
+            val userInfo = authRepository.getUserInfo(call.token)
+            val promotion = repository.approvePromotion(
+                promotionId = promotionId,
+                reviewer = userInfo,
+            )
+
+            // Send notification after successful approval
+            val partnershipId = promotion.partnershipId.toUUID()
+            val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
+            val partnership = partnershipRepository.getById(eventSlug, partnershipId)
+            val event = eventRepository.getBySlug(eventSlug)
+            val variables = NotificationVariables.JobOfferApproved(
+                language = partnership.language,
+                event = event,
+                company = company,
+                partnership = partnership,
+                jobOffer = promotion.jobOffer,
+            )
+            notificationRepository.sendMessage(eventSlug, variables)
+
+            call.respond(HttpStatusCode.OK, promotion)
+        }
+
+        post("/decline") {
+            val promotionId = call.parameters.getValue("promotionId").toUUID()
+            val eventSlug = call.parameters.eventSlug
+            val request = call.receive<DeclineJobOfferRequest>(schema = "decline_job_offer_promotion.schema.json")
+            val userInfo = authRepository.getUserInfo(call.token)
+            val promotion = repository.declinePromotion(
+                promotionId = promotionId,
+                reviewer = userInfo,
+                reason = request.reason,
+            )
+
+            // Send notification after successful decline
+            val partnershipId = promotion.partnershipId.toUUID()
+            val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
+            val partnership = partnershipRepository.getById(eventSlug, partnershipId)
+            val event = eventRepository.getBySlug(eventSlug)
+            val variables = NotificationVariables.JobOfferDeclined(
+                language = partnership.language,
+                event = event,
+                company = company,
+                partnership = partnership,
+                jobOffer = promotion.jobOffer,
+                declineReason = request.reason,
+            )
+            notificationRepository.sendMessage(eventSlug, variables)
+
+            call.respond(HttpStatusCode.OK, promotion)
         }
     }
 }

@@ -9,18 +9,11 @@ import fr.devlille.partners.connect.internal.infrastructure.api.ConflictExceptio
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.application.mappers.toDomain
-import fr.devlille.partners.connect.partnership.domain.CommunicationItem
-import fr.devlille.partners.connect.partnership.domain.CommunicationPlan
-import fr.devlille.partners.connect.partnership.domain.Contact
-import fr.devlille.partners.connect.partnership.domain.NumberSelection
 import fr.devlille.partners.connect.partnership.domain.Partnership
 import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
 import fr.devlille.partners.connect.partnership.domain.PartnershipItem
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
-import fr.devlille.partners.connect.partnership.domain.QuantitativeSelection
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
-import fr.devlille.partners.connect.partnership.domain.SelectableSelection
-import fr.devlille.partners.connect.partnership.domain.TextSelection
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
@@ -28,9 +21,6 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEma
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
-import fr.devlille.partners.connect.partnership.infrastructure.db.listByPartnershipAndPack
-import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndCompany
-import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndPartnership
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
@@ -38,34 +28,21 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackE
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionalOptionsByPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listTranslationsByOptionAndLanguage
 import io.ktor.server.plugins.NotFoundException
-import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.v1.core.SortOrder
-import org.jetbrains.exposed.v1.core.and
-import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
-@Suppress("TooManyFunctions")
-class PartnershipRepositoryExposed(
-    private val partnershipEntity: UUIDEntityClass<PartnershipEntity> = PartnershipEntity,
-    private val packEntity: UUIDEntityClass<SponsoringPackEntity> = SponsoringPackEntity,
-    private val translationEntity: UUIDEntityClass<OptionTranslationEntity> = OptionTranslationEntity,
-    private val packOptionTable: PackOptionsTable = PackOptionsTable,
-) : PartnershipRepository {
-    @Suppress("LongMethod", "CyclomaticComplexMethod")
+class PartnershipRepositoryExposed : PartnershipRepository {
     override fun register(eventSlug: String, register: RegisterPartnership): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
         val companyId = register.companyId.toUUID()
         val company = CompanyEntity.findById(companyId)
             ?: throw NotFoundException("Company $companyId not found")
-        val pack = packEntity.findById(register.packId.toUUID())
+        val pack = SponsoringPackEntity.findById(register.packId.toUUID())
             ?: throw NotFoundException("Pack ${register.packId} not found")
 
-        val existing = partnershipEntity.singleByEventAndCompany(event.id.value, companyId)
+        val existing = PartnershipEntity.singleByEventAndCompany(event.id.value, companyId)
         if (existing != null) {
             throw ConflictException("Company already subscribed to this event")
         }
@@ -87,7 +64,7 @@ class PartnershipRepositoryExposed(
             }
         }
 
-        val optionalOptionIds = packOptionTable
+        val optionalOptionIds = PackOptionsTable
             .listOptionalOptionsByPack(pack.id.value)
             .map { it[PackOptionsTable.option].value }
 
@@ -103,7 +80,7 @@ class PartnershipRepositoryExposed(
             val option = SponsoringOptionEntity.findById(optionId)
                 ?: throw NotFoundException("Option $optionId not found")
 
-            val noTranslations = translationEntity
+            val noTranslations = OptionTranslationEntity
                 .listTranslationsByOptionAndLanguage(optionId, register.language)
                 .isEmpty()
 
@@ -114,42 +91,7 @@ class PartnershipRepositoryExposed(
             }
 
             // Create partnership option with selection data based on selection type
-            PartnershipOptionEntity.new {
-                this.partnership = partnership
-                this.packId = pack.id
-                this.option = option
-
-                // Set selection data based on the polymorphic selection type
-                when (selection) {
-                    is TextSelection -> {
-                        // No additional data needed for text selections
-                    }
-
-                    is QuantitativeSelection -> {
-                        this.selectedQuantity = selection.selectedQuantity
-                    }
-
-                    is NumberSelection -> {
-                        // For number selections, the quantity is the fixed quantity from the option
-                        this.selectedQuantity = option.fixedQuantity
-                    }
-
-                    is SelectableSelection -> {
-                        // Validate that the selected value ID exists for this option
-                        val selectedValueUUID = selection.selectedValueId.toUUID()
-                        val selectedValueEntity = option.selectableValues.find { it.id.value == selectedValueUUID }
-
-                        if (selectedValueEntity == null) {
-                            val validValueIds = option.selectableValues.map { "${it.value} (${it.id.value})" }
-                            throw ForbiddenException(
-                                "Selected value ID '${selection.selectedValueId}' is not valid for option $optionId. " +
-                                    "Valid values: ${validValueIds.joinToString(", ")}",
-                            )
-                        }
-                        this.selectedValue = selectedValueEntity
-                    }
-                }
-            }
+            PartnershipOptionEntity.create(selection, partnership, pack, option)
         }
 
         partnership.id.value
@@ -158,7 +100,9 @@ class PartnershipRepositoryExposed(
     override fun getById(eventSlug: String, partnershipId: UUID): Partnership = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
-        val partnership = findPartnership(event.id.value, partnershipId)
+        val partnership = PartnershipEntity
+            .singleByEventAndPartnership(event.id.value, partnershipId)
+            ?: throw NotFoundException("Partnership not found")
         Partnership(
             id = partnership.id.value.toString(),
             language = partnership.language,
@@ -186,216 +130,52 @@ class PartnershipRepositoryExposed(
     override fun getCompanyByPartnershipId(eventSlug: String, partnershipId: UUID): Company = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
-        findPartnership(event.id.value, partnershipId).company.toDomain()
-    }
-
-    override fun validate(eventSlug: String, partnershipId: UUID): UUID = transaction {
-        val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
-        val partnership = findPartnership(event.id.value, partnershipId)
-        partnership.validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
-        partnership.id.value
-    }
-
-    override fun decline(eventSlug: String, partnershipId: UUID): UUID = transaction {
-        val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
-        val partnership = findPartnership(event.id.value, partnershipId)
-        partnership.declinedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC)
-        partnership.id.value
+        val partnership = PartnershipEntity
+            .singleByEventAndPartnership(event.id.value, partnershipId)
+            ?: throw NotFoundException("Partnership not found")
+        partnership.company.toDomain()
     }
 
     override fun listByEvent(
         eventSlug: String,
         filters: PartnershipFilters,
-        sort: String,
         direction: String,
     ): List<PartnershipItem> = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
         val eventId = event.id.value
-        val allPartnerships = PartnershipEntity.find { PartnershipsTable.eventId eq eventId }
-        val filteredPartnerships = allPartnerships.filter { partnership ->
-            matchesBasicFilters(partnership, filters) &&
-                matchesAdvancedFilters(partnership, filters, eventId)
+        val sort = if (direction == "asc") SortOrder.ASC else SortOrder.DESC
+        val partnerships = PartnershipEntity
+            .filters(
+                eventId = eventId,
+                packId = filters.packId?.toUUID(),
+                validated = filters.validated,
+                suggestion = filters.suggestion,
+                agreementGenerated = filters.agreementGenerated,
+                agreementSigned = filters.agreementSigned,
+            )
+            .orderBy(PartnershipsTable.createdAt to sort)
+        val filteredPartnerships = if (filters.paid != null) {
+            partnerships.filter {
+                val billing = BillingEntity.singleByEventAndPartnership(eventId, it.id.value)
+                if (filters.paid) billing?.status == InvoiceStatus.PAID else billing?.status != InvoiceStatus.PAID
+            }
+        } else {
+            partnerships
         }
-        filteredPartnerships.map { partnership -> mapToPartnershipItem(partnership) }
+        filteredPartnerships.map { partnership ->
+            partnership.toDomain(PartnershipEmailEntity.emails(partnership.id.value))
+        }
     }
 
     override fun listByCompany(companyId: UUID): List<PartnershipItem> = transaction {
-        // Check if the company exists first
         CompanyEntity.findById(companyId)
             ?: throw NotFoundException("Company $companyId not found")
-
         PartnershipEntity
             .find { PartnershipsTable.companyId eq companyId }
             .orderBy(PartnershipsTable.createdAt to SortOrder.DESC)
             .map { partnership ->
-                val emails = PartnershipEmailEntity
-                    .find { PartnershipEmailsTable.partnershipId eq partnership.id }
-                    .map { it.email }
-
-                PartnershipItem(
-                    id = partnership.id.value.toString(),
-                    contact = Contact(
-                        displayName = partnership.contactName,
-                        role = partnership.contactRole,
-                    ),
-                    companyName = partnership.company.name,
-                    eventName = partnership.event.name,
-                    packName = partnership.selectedPack?.name,
-                    suggestedPackName = partnership.suggestionPack?.name,
-                    language = partnership.language,
-                    phone = partnership.phone,
-                    emails = emails,
-                    createdAt = partnership.createdAt,
-                )
+                partnership.toDomain(PartnershipEmailEntity.emails(partnership.id.value))
             }
-    }
-
-    private fun matchesBasicFilters(partnership: PartnershipEntity, filters: PartnershipFilters): Boolean {
-        val packMatches = filters.packId?.let {
-            partnership.selectedPack?.id?.value == it.toUUID()
-        } ?: true
-
-        val validatedMatches = filters.validated?.let {
-            if (it) partnership.validatedAt != null else partnership.validatedAt == null
-        } ?: true
-
-        val suggestionMatches = filters.suggestion?.let {
-            if (it) partnership.suggestionPack != null else partnership.suggestionPack == null
-        } ?: true
-
-        return packMatches && validatedMatches && suggestionMatches
-    }
-
-    private fun matchesAdvancedFilters(
-        partnership: PartnershipEntity,
-        filters: PartnershipFilters,
-        eventId: UUID,
-    ): Boolean {
-        val paidMatches = filters.paid?.let {
-            val billing = BillingEntity.singleByEventAndPartnership(eventId, partnership.id.value)
-            if (it) billing?.status == InvoiceStatus.PAID else billing?.status != InvoiceStatus.PAID
-        } ?: true
-
-        val agreementGeneratedMatches = filters.agreementGenerated?.let {
-            if (it) partnership.agreementUrl != null else partnership.agreementUrl == null
-        } ?: true
-
-        val agreementSignedMatches = filters.agreementSigned?.let {
-            if (it) partnership.agreementSignedUrl != null else partnership.agreementSignedUrl == null
-        } ?: true
-
-        return paidMatches && agreementGeneratedMatches && agreementSignedMatches
-    }
-
-    private fun mapToPartnershipItem(partnership: PartnershipEntity): PartnershipItem {
-        val emails = PartnershipEmailEntity
-            .find { PartnershipEmailsTable.partnershipId eq partnership.id }
-            .map { it.email }
-
-        return PartnershipItem(
-            id = partnership.id.toString(),
-            contact = Contact(
-                displayName = partnership.contactName,
-                role = partnership.contactRole,
-            ),
-            companyName = partnership.company.name,
-            packName = partnership.selectedPack?.name,
-            suggestedPackName = partnership.suggestionPack?.name,
-            eventName = partnership.event.name,
-            language = partnership.language,
-            phone = partnership.phone,
-            emails = emails,
-            createdAt = partnership.createdAt,
-        )
-    }
-
-    private fun findPartnership(eventId: UUID, partnershipId: UUID): PartnershipEntity = partnershipEntity
-        .singleByEventAndPartnership(eventId, partnershipId)
-        ?: throw NotFoundException("Partnership not found")
-
-    override fun updateBoothLocation(
-        eventSlug: String,
-        partnershipId: UUID,
-        location: String,
-    ): Unit = transaction {
-        val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
-
-        // Check if location is already taken by another partnership for this event
-        val existingPartnership = partnershipEntity.find {
-            (PartnershipsTable.eventId eq event.id) and
-                (PartnershipsTable.boothLocation eq location) and
-                (PartnershipsTable.id neq partnershipId)
-        }.firstOrNull()
-
-        if (existingPartnership != null) {
-            val companyName = existingPartnership.company.name
-            throw ForbiddenException(
-                "Location '$location' is already assigned to another partnership " +
-                    "for this event by company '$companyName'",
-            )
-        }
-
-        val partnership = findPartnership(event.id.value, partnershipId)
-        partnership.boothLocation = location
-    }
-
-    override fun updateCommunicationPublicationDate(
-        eventSlug: String,
-        partnershipId: UUID,
-        publicationDate: LocalDateTime,
-    ): UUID = transaction {
-        val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
-        val partnership = findPartnership(event.id.value, partnershipId)
-        partnership.communicationPublicationDate = publicationDate
-        partnership.id.value
-    }
-
-    override fun updateCommunicationSupportUrl(
-        eventSlug: String,
-        partnershipId: UUID,
-        supportUrl: String,
-    ): UUID = transaction {
-        val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
-        val partnership = findPartnership(event.id.value, partnershipId)
-        partnership.communicationSupportUrl = supportUrl
-        partnership.id.value
-    }
-
-    override fun listCommunicationPlan(eventSlug: String): CommunicationPlan = transaction {
-        val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
-
-        val eventId = event.id.value
-        val partnerships = PartnershipEntity.find { PartnershipsTable.eventId eq eventId }
-
-        val communicationItems = partnerships.map { partnership ->
-            CommunicationItem(
-                partnershipId = partnership.id.value.toString(),
-                companyName = partnership.company.name,
-                publicationDate = partnership.communicationPublicationDate,
-                supportUrl = partnership.communicationSupportUrl,
-            )
-        }
-
-        val now = Clock.System.now().toLocalDateTime(TimeZone.UTC)
-        val done = communicationItems
-            .filter { it.publicationDate != null && it.publicationDate < now }
-            .sortedByDescending { it.publicationDate }
-
-        val planned = communicationItems
-            .filter { it.publicationDate != null && it.publicationDate >= now }
-            .sortedBy { it.publicationDate }
-
-        val unplanned = communicationItems
-            .filter { it.publicationDate == null }
-            .sortedBy { it.companyName }
-
-        CommunicationPlan(done = done, planned = planned, unplanned = unplanned)
     }
 }
