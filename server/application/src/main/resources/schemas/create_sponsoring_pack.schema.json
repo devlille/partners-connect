@@ -8,13 +8,6 @@
     "price": {
       "type": "integer"
     },
-    "with_booth": {
-      "type": "boolean",
-      "default": false
-    },
-    "nb_tickets": {
-      "type": "integer"
-    },
     "max_quantity": {
       "type": [
         "integer",
@@ -24,7 +17,6 @@
   },
   "required": [
     "name",
-    "price",
-    "nb_tickets"
+    "price"
   ]
 }

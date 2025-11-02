@@ -16,6 +16,7 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventA
 import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.hasBoothFromOptions
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
@@ -163,7 +164,7 @@ internal fun PartnershipEntity.toAgreementPartnership(
     return Partnership(
         amount = "$amount",
         options = optionTranslations,
-        hasBooth = pack.withBooth,
+        hasBooth = pack.hasBoothFromOptions(),
         contact = Contact(name = this.contactName, role = this.contactRole),
     )
 }

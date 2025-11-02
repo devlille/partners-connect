@@ -13,6 +13,7 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipTic
 import fr.devlille.partners.connect.partnership.infrastructure.db.listByPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.singleByEventAndPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.getTotalTicketsFromOptions
 import fr.devlille.partners.connect.tickets.domain.Ticket
 import fr.devlille.partners.connect.tickets.domain.TicketData
 import fr.devlille.partners.connect.tickets.domain.TicketGateway
@@ -60,15 +61,18 @@ class TicketRepositoryExposed(
         if (billing.status != InvoiceStatus.PAID) {
             throw ForbiddenException("Invoice status ${billing.status} is not PAID")
         }
-        val validatedPack = transaction { billing.partnership.validatedPack() }
         val partnership = transaction { billing.partnership }
+        val validatedPack = transaction { partnership.validatedPack() }
         if (validatedPack == null) {
             throw NotFoundException("No validated pack found for partnership ${partnership.id}")
-        } else if (validatedPack.nbTickets < tickets.size) {
-            val message = """
-Not enough tickets in the validated pack: ${validatedPack.nbTickets} available, ${tickets.size} requested
-            """.trimIndent()
-            throw ForbiddenException(message)
+        } else {
+            val nbTickets = transaction { validatedPack.getTotalTicketsFromOptions() }
+            if (tickets.size > nbTickets) {
+                val message = """
+    Not enough tickets in the validated pack: $nbTickets available, ${tickets.size} requested
+                """.trimIndent()
+                throw ForbiddenException(message)
+            }
         }
         val order = gateway.createTickets(integrationId, eventId, partnershipId, tickets)
         transaction {
