@@ -20,24 +20,12 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
-fun Route.partnershipAgreementRoutes() {
+fun Route.publicPartnershipAgreementRoutes() {
     val eventRepository by inject<EventRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
     val agreementRepository by inject<PartnershipAgreementRepository>()
     val storageRepository by inject<PartnershipStorageRepository>()
     val notificationRepository by inject<NotificationRepository>()
-
-    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/agreement") {
-        install(AuthorizedOrganisationPlugin)
-
-        post {
-            val eventSlug = call.parameters.eventSlug
-            val partnershipId = call.parameters.partnershipId
-            val pdfBinary = agreementRepository.generateAgreement(eventSlug, partnershipId)
-            val agreementUrl = storageRepository.uploadAgreement(eventSlug, partnershipId, pdfBinary)
-            call.respond(HttpStatusCode.OK, mapOf("url" to agreementUrl))
-        }
-    }
 
     route("/events/{eventSlug}/partnerships/{partnershipId}/signed-agreement") {
         post {
@@ -56,6 +44,23 @@ fun Route.partnershipAgreementRoutes() {
             val variables = NotificationVariables.PartnershipAgreementSigned(partnership.language, event, company)
             notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.OK, mapOf("url" to url))
+        }
+    }
+}
+
+fun Route.orgsPartnershipAgreementRoutes() {
+    val agreementRepository by inject<PartnershipAgreementRepository>()
+    val storageRepository by inject<PartnershipStorageRepository>()
+
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/agreement") {
+        install(AuthorizedOrganisationPlugin)
+
+        post {
+            val eventSlug = call.parameters.eventSlug
+            val partnershipId = call.parameters.partnershipId
+            val pdfBinary = agreementRepository.generateAgreement(eventSlug, partnershipId)
+            val agreementUrl = storageRepository.uploadAgreement(eventSlug, partnershipId, pdfBinary)
+            call.respond(HttpStatusCode.OK, mapOf("url" to agreementUrl))
         }
     }
 }

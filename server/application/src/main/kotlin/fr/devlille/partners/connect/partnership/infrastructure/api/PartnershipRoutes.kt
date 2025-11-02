@@ -4,7 +4,6 @@ import fr.devlille.partners.connect.companies.domain.CompanyRepository
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
-import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
@@ -23,8 +22,26 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
-@Suppress("LongMethod")
 fun Route.partnershipRoutes() {
+    publicPartnershipRoutes()
+    publicPartnershipSuggestionDecisionRoutes()
+    publicPartnershipAgreementRoutes()
+    publicPartnershipBillingRoutes()
+    publicPartnershipTicketingRoutes()
+    publicPartnershipJobOfferRoutes()
+
+    orgsPartnershipRoutes()
+    orgsPartnershipDecisionRoutes()
+    orgsPartnershipSuggestionRoutes()
+    orgsPartnershipAgreementRoutes()
+    orgsPartnershipBillingRoutes()
+    orgsPartnershipCommunicationRoutes()
+    orgsPartnershipBoothLocationRoutes()
+    orgsPartnershipJobOfferRoutes()
+    orgsPartnershipJobOfferDecisionRoutes()
+}
+
+private fun Route.publicPartnershipRoutes() {
     val eventRepository by inject<EventRepository>()
     val companyRepository by inject<CompanyRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
@@ -56,6 +73,10 @@ fun Route.partnershipRoutes() {
             call.respond(HttpStatusCode.Created, mapOf("id" to id.toString()))
         }
     }
+}
+
+private fun Route.orgsPartnershipRoutes() {
+    val repository by inject<PartnershipRepository>()
 
     route("/orgs/{orgSlug}/events/{eventSlug}/partnerships") {
         install(AuthorizedOrganisationPlugin)
@@ -73,66 +94,10 @@ fun Route.partnershipRoutes() {
                 agreementSigned = call.request.queryParameters["filter[agreement-signed]"]?.toBoolean(),
             )
 
-            val sort = call.request.queryParameters["sort"] ?: "created"
             val direction = call.request.queryParameters["direction"] ?: "asc"
 
-            val partnerships = partnershipRepository.listByEvent(eventSlug, filters, sort, direction)
+            val partnerships = repository.listByEvent(eventSlug, filters, direction)
             call.respond(HttpStatusCode.OK, partnerships)
-        }
-    }
-
-    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}") {
-        route("/validate") {
-            install(AuthorizedOrganisationPlugin)
-
-            post {
-                val eventSlug = call.parameters.eventSlug
-                val partnershipId = call.parameters.partnershipId
-                val id = partnershipRepository.validate(eventSlug, partnershipId)
-                val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
-                val partnership = partnershipRepository.getById(eventSlug, partnershipId)
-                val pack = partnership.selectedPack
-                    ?: throw ForbiddenException("Partnership does not have a selected pack")
-                val event = eventRepository.getBySlug(eventSlug)
-                val variables = NotificationVariables.PartnershipValidated(
-                    partnership.language,
-                    event,
-                    company,
-                    partnership,
-                    pack,
-                )
-                notificationRepository.sendMessage(eventSlug, variables)
-
-                // Send webhook notification for partnership validation
-                webhookRepository.sendWebhooks(eventSlug, partnershipId, WebhookEventType.UPDATED)
-
-                call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
-            }
-        }
-
-        route("/decline") {
-            install(AuthorizedOrganisationPlugin)
-
-            post {
-                val eventSlug = call.parameters.eventSlug
-                val partnershipId = call.parameters.partnershipId
-                val id = partnershipRepository.decline(eventSlug, partnershipId)
-                val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
-                val partnership = partnershipRepository.getById(eventSlug, partnershipId)
-                val event = eventRepository.getBySlug(eventSlug)
-                val variables = NotificationVariables.PartnershipDeclined(
-                    partnership.language,
-                    event,
-                    company,
-                    partnership,
-                )
-                notificationRepository.sendMessage(eventSlug, variables)
-
-                // Send webhook notification for partnership decline
-                webhookRepository.sendWebhooks(eventSlug, partnershipId, WebhookEventType.UPDATED)
-
-                call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
-            }
         }
     }
 }

@@ -4,7 +4,7 @@ import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.api.EmptyStringValidationException
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
-import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
+import fr.devlille.partners.connect.partnership.domain.PartnershipBoothRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -24,8 +24,8 @@ data class BoothLocationResponse(
     val location: String,
 )
 
-fun Route.partnershipBoothLocationRoutes() {
-    val partnershipRepository by inject<PartnershipRepository>()
+fun Route.orgsPartnershipBoothLocationRoutes() {
+    val repository by inject<PartnershipBoothRepository>()
 
     route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/booth-location") {
         install(AuthorizedOrganisationPlugin)
@@ -38,7 +38,7 @@ fun Route.partnershipBoothLocationRoutes() {
             if (location.isBlank()) {
                 throw EmptyStringValidationException("location")
             }
-            partnershipRepository.updateBoothLocation(eventSlug, partnershipId, location)
+            repository.updateBoothLocation(eventSlug, partnershipId, location)
             call.respond(
                 status = HttpStatusCode.OK,
                 message = BoothLocationResponse(id = partnershipId.toString(), location = location),

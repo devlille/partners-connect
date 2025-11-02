@@ -8,7 +8,11 @@ import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import java.util.UUID
 
 class BillingEntity(id: EntityID<UUID>) : UUIDEntity(id) {
-    companion object : UUIDEntityClass<BillingEntity>(BillingsTable)
+    companion object : UUIDEntityClass<BillingEntity>(BillingsTable) {
+        fun singleByEventAndPartnership(eventId: UUID, partnershipId: UUID): BillingEntity? = this
+            .find { (BillingsTable.eventId eq eventId) and (BillingsTable.partnershipId eq partnershipId) }
+            .singleOrNull()
+    }
 
     var event by EventEntity referencedOn BillingsTable.eventId
     var partnership by PartnershipEntity referencedOn BillingsTable.partnershipId
@@ -22,10 +26,3 @@ class BillingEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var status by BillingsTable.status
     var createdAt by BillingsTable.createdAt
 }
-
-fun UUIDEntityClass<BillingEntity>.singleByEventAndPartnership(
-    eventId: UUID,
-    partnershipId: UUID,
-): BillingEntity? = this
-    .find { (BillingsTable.eventId eq eventId) and (BillingsTable.partnershipId eq partnershipId) }
-    .singleOrNull()

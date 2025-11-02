@@ -1,11 +1,16 @@
 package fr.devlille.partners.connect.companies.infrastructure.db
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.internal.infrastructure.db.PromotionStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
+import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.UUIDEntity
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
+import org.jetbrains.exposed.v1.jdbc.SizedIterable
 import java.util.UUID
 
 /**
@@ -40,7 +45,33 @@ import java.util.UUID
  * - Index on status for filtering pending reviews
  */
 class CompanyJobOfferPromotionEntity(id: EntityID<UUID>) : UUIDEntity(id) {
-    companion object : UUIDEntityClass<CompanyJobOfferPromotionEntity>(CompanyJobOfferPromotionsTable)
+    companion object : UUIDEntityClass<CompanyJobOfferPromotionEntity>(CompanyJobOfferPromotionsTable) {
+        fun listByPartnershipAndStatus(
+            partnershipId: UUID,
+            status: PromotionStatus?,
+        ): SizedIterable<CompanyJobOfferPromotionEntity> {
+            val baseQuery = CompanyJobOfferPromotionsTable.partnershipId eq partnershipId
+            val query = if (status != null) {
+                baseQuery and (CompanyJobOfferPromotionsTable.status eq status)
+            } else {
+                baseQuery
+            }
+            return find { query }.orderBy(CompanyJobOfferPromotionsTable.promotedAt to SortOrder.DESC)
+        }
+
+        fun listByEventAndStatus(
+            eventId: UUID,
+            status: PromotionStatus?,
+        ): SizedIterable<CompanyJobOfferPromotionEntity> {
+            val baseQuery = CompanyJobOfferPromotionsTable.eventId eq eventId
+            val query = if (status != null) {
+                baseQuery and (CompanyJobOfferPromotionsTable.status eq status)
+            } else {
+                baseQuery
+            }
+            return find { query }.orderBy(CompanyJobOfferPromotionsTable.promotedAt to SortOrder.ASC)
+        }
+    }
 
     /** The job offer being promoted (CASCADE DELETE) */
     var jobOffer by CompanyJobOfferEntity referencedOn CompanyJobOfferPromotionsTable.jobOfferId
