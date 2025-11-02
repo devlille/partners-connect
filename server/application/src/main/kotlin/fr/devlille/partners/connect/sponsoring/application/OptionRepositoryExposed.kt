@@ -5,7 +5,6 @@ import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionsTable
-import fr.devlille.partners.connect.sponsoring.application.mappers.toDomain
 import fr.devlille.partners.connect.sponsoring.application.mappers.toDomainWithAllTranslations
 import fr.devlille.partners.connect.sponsoring.domain.AttachOptionsToPack
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
@@ -15,7 +14,6 @@ import fr.devlille.partners.connect.sponsoring.domain.CreateTypedQuantitative
 import fr.devlille.partners.connect.sponsoring.domain.CreateTypedSelectable
 import fr.devlille.partners.connect.sponsoring.domain.OptionRepository
 import fr.devlille.partners.connect.sponsoring.domain.OptionType
-import fr.devlille.partners.connect.sponsoring.domain.SponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringOptionWithTranslations
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationsTable
@@ -29,7 +27,6 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionsAtta
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.singlePackById
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
@@ -41,12 +38,6 @@ import java.util.UUID
 class OptionRepositoryExposed(
     private val optionEntity: UUIDEntityClass<SponsoringOptionEntity> = SponsoringOptionEntity,
 ) : OptionRepository {
-    override fun listOptionsByEvent(eventSlug: String, language: String): List<SponsoringOption> = transaction {
-        val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
-        optionEntity.allByEvent(event.id.value).map { option -> option.toDomain(language) }
-    }
-
     override fun createOption(eventSlug: String, input: CreateSponsoringOption): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")

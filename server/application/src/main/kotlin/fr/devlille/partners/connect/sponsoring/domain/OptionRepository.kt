@@ -3,8 +3,6 @@ package fr.devlille.partners.connect.sponsoring.domain
 import java.util.UUID
 
 interface OptionRepository {
-    fun listOptionsByEvent(eventSlug: String, language: String): List<SponsoringOption>
-
     fun createOption(eventSlug: String, input: CreateSponsoringOption): UUID
 
     fun updateOption(eventSlug: String, optionId: UUID, input: CreateSponsoringOption): UUID
