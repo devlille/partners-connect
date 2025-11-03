@@ -6,7 +6,6 @@ import fr.devlille.partners.connect.companies.domain.JobOfferPromotionResponse
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyJobOfferEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyJobOfferPromotionEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyJobOfferPromotionsTable
-import fr.devlille.partners.connect.companies.infrastructure.db.singleByCompanyAndJobOffer
 import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedResponse
@@ -94,19 +93,15 @@ class CompanyJobOfferPromotionRepositoryExposed : CompanyJobOfferPromotionReposi
     ): PaginatedResponse<JobOfferPromotionResponse> = transaction {
         CompanyJobOfferEntity.singleByCompanyAndJobOffer(companyId, jobOfferId)
             ?: throw NotFoundException("Job offer $jobOfferId not found for company $companyId")
-
         val baseQuery = CompanyJobOfferPromotionsTable.jobOfferId eq jobOfferId
         val query = if (partnershipId != null) {
             baseQuery and (CompanyJobOfferPromotionsTable.partnershipId eq partnershipId)
         } else {
             baseQuery
         }
-
         val promotions = CompanyJobOfferPromotionEntity.find { query }
             .orderBy(CompanyJobOfferPromotionsTable.promotedAt to SortOrder.DESC)
-
         val total = promotions.count()
-
         promotions
             .paginated(page, pageSize)
             .map { entity ->
