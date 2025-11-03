@@ -8,11 +8,16 @@ import fr.devlille.partners.connect.internal.infrastructure.pdf.renderMarkdownTo
 import fr.devlille.partners.connect.internal.infrastructure.resources.readResourceFile
 import fr.devlille.partners.connect.internal.infrastructure.templating.templating
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
+import fr.devlille.partners.connect.partnership.domain.Company
+import fr.devlille.partners.connect.partnership.domain.ContactInfo
+import fr.devlille.partners.connect.partnership.domain.Event
+import fr.devlille.partners.connect.partnership.domain.Organisation
+import fr.devlille.partners.connect.partnership.domain.PartnershipAgreement
 import fr.devlille.partners.connect.partnership.domain.PartnershipAgreementRepository
+import fr.devlille.partners.connect.partnership.domain.PartnershipInfo
+import fr.devlille.partners.connect.partnership.domain.PartnershipPricing
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
-import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.hasBoothFromOptions
 import io.ktor.server.plugins.NotFoundException
@@ -33,38 +38,32 @@ import kotlin.time.Duration.Companion.days
 
 class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
     @OptIn(FormatStringsInDatetimeFormats::class)
-    override fun generateAgreement(eventSlug: String, partnershipId: UUID): ByteArray = transaction {
+    override fun agreement(eventSlug: String, partnershipId: UUID): PartnershipAgreement = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
-        val partnership = PartnershipEntity.findById(partnershipId) ?: throw NotFoundException("Partnership not found")
-
-        // Eager load relationships to avoid lazy loading outside transaction
-        val organisation = event.organisation
-        val representativeUser = organisation.representativeUser
-        val company = partnership.company
+        val partnership = PartnershipEntity.findById(partnershipId)
+            ?: throw NotFoundException("Partnership not found")
         val pack = partnership.validatedPack()
             ?: throw NotFoundException("Validated pack not found for partnership")
-        val options = PartnershipOptionEntity.listByPartnershipAndPack(partnership.id.value, pack.id.value)
-
-        // Preload option translations to avoid lazy loading
-        val optionData = options.map { partnershipOption ->
-            val sponsoringOption = partnershipOption.option
-            val translations = sponsoringOption.translations.toList() // Force load translations
-            Pair(partnershipOption, translations)
-        }
-
-        val template = readResourceFile("/agreement/${partnership.language}.md")
         val formatter = LocalDate.Format { byUnicodePattern("yyyy/MM/dd") }
-        val agreement = Agreement(
-            organisation = organisation.toAgreementOrganisation(formatter),
+        PartnershipAgreement(
+            path = "/agreement/${partnership.language}.md",
+            organisation = event.organisation.toAgreementOrganisation(formatter),
             event = event.toAgreementEvent(formatter),
-            company = company.toAgreementCompany(),
-            partnership = partnership.toAgreementPartnership(pack, optionData),
+            company = partnership.company.toAgreementCompany(),
+            partnership = partnership.toAgreementPartnership(pack),
             createdAt = Clock.System.now().toLocalDateTime(TimeZone.UTC).date.format(formatter),
             location = "Lille, France",
         )
-        val markdown = templating(template, agreement)
-        renderMarkdownToPdf(markdown)
+    }
+
+    override fun generatePDF(
+        agreement: PartnershipAgreement,
+        pricing: PartnershipPricing,
+    ): ByteArray {
+        val template = readResourceFile(agreement.path)
+        val markdown = templating(template, AgreementScope(agreement, pricing))
+        return renderMarkdownToPdf(markdown)
     }
 
     override fun updateAgreementUrl(eventSlug: String, partnershipId: UUID, agreementUrl: String): UUID = transaction {
@@ -89,6 +88,8 @@ class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
         partnership.id.value
     }
 }
+
+private class AgreementScope(val agreement: PartnershipAgreement, val pricing: PartnershipPricing)
 
 @Suppress("ThrowsCount")
 internal fun OrganisationEntity.toAgreementOrganisation(formatter: DateTimeFormat<LocalDate>): Organisation {
@@ -117,7 +118,7 @@ internal fun OrganisationEntity.toAgreementOrganisation(formatter: DateTimeForma
         creationLocation = this.creationLocation!!,
         createdAt = this.createdAt!!.date.format(formatter),
         publishedAt = this.publishedAt!!.date.format(formatter),
-        representative = Contact(
+        representative = ContactInfo(
             name = this.representativeUser!!.name ?: throw NotFoundException("Representative not found"),
             role = this.representativeRole!!,
         ),
@@ -150,67 +151,7 @@ internal fun CompanyEntity.toAgreementCompany(): Company = Company(
 @Suppress("ThrowsCount")
 internal fun PartnershipEntity.toAgreementPartnership(
     pack: SponsoringPackEntity,
-    optionData: List<Pair<PartnershipOptionEntity, List<OptionTranslationEntity>>>,
-): Partnership {
-    // Use preloaded option translations to avoid lazy loading outside transaction
-    val optionTranslations = optionData.map { (partnershipOption, translations) ->
-        val translation = translations.firstOrNull { it.language == this.language }
-            ?: throw NotFoundException("Translation not found for option ${partnershipOption.id} in language $language")
-        Option(name = translation.name)
-    }
-    val amount = pack.basePrice + optionData.filter { it.first.option.price != null }.sumOf { it.first.option.price!! }
-    return Partnership(
-        amount = "$amount",
-        options = optionTranslations,
-        hasBooth = pack.hasBoothFromOptions(),
-        contact = Contact(name = this.contactName, role = this.contactRole),
-    )
-}
-
-class Agreement(
-    val organisation: Organisation,
-    val event: Event,
-    val company: Company,
-    val partnership: Partnership,
-    val location: String,
-    val createdAt: String,
-)
-
-class Event(
-    val name: String,
-    val paymentDeadline: String,
-    val endDate: String,
-)
-
-data class Organisation(
-    val name: String,
-    val headOffice: String,
-    val iban: String,
-    val bic: String,
-    val creationLocation: String,
-    val createdAt: String,
-    val publishedAt: String,
-    val representative: Contact,
-)
-
-class Contact(
-    val name: String,
-    val role: String,
-)
-
-class Company(
-    val name: String,
-    val siret: String,
-    val headOffice: String,
-)
-
-class Partnership(
-    val amount: String,
-    val options: List<Option>,
-    val hasBooth: Boolean,
-    val contact: Contact,
-)
-
-class Option(
-    val name: String,
+): PartnershipInfo = PartnershipInfo(
+    hasBooth = pack.hasBoothFromOptions(),
+    contact = ContactInfo(name = this.contactName, role = this.contactRole),
 )

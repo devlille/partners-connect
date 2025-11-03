@@ -2,21 +2,22 @@
 
 **Between the undersigned :**
 
-The **{{organisation.name}}** association -hereafter referred as the Association-, ruled by French law  1901, declared 
-at the prefectural office of {{organisation.creationLocation}} on {{organisation.createdAt}} and published on the 
-"Journal Officiel" on {{organisation.publishedAt}}, with social head-quarters located at {{organisation.headOffice}}. 
-Represented by **{{organisation.representative.name}}** , in the condition of **{{organisation.representative.role}}** 
-as one of the Parties,
+The **{{agreement.organisation.name}}** association -hereafter referred as the Association-, ruled by French law  1901, 
+declared at the prefectural office of {{agreement.organisation.creationLocation}} on {{agreement.organisation.createdAt}} 
+and published on the "Journal Officiel" on {{agreement.organisation.publishedAt}}, with social head-quarters located 
+at {{agreement.organisation.headOffice}}. Represented by **{{agreement.organisation.representative.name}}** , in the 
+condition of **{{agreement.organisation.representative.role}}** as one of the Parties,
 
-and **{{company.name}}** here referred as the Partner (register number: {{company.siret}}) with head-quarters located 
-at **{{company.headOffice}}**. Represented by **{{partnership.contact.name}}**, **{{partnership.contact.role}}**.
+and **{{agreement.company.name}}** here referred as the Partner (register number: {{agreement.company.siret}}) with 
+head-quarters located at **{{agreement.company.headOffice}}**. Represented by **{{agreement.partnership.contact.name}}**, 
+**{{agreement.partnership.contact.role}}**.
 
 **It has been decided and agreed-upon the following terms:**
 
 ## I - PURPOSE OF THE AGREEMENT
 
 The purpose of the present Agreement is to thoroughly regulate the Partnership concluded between the Association and 
-the Partner in relation with the organization of the **{{event.name}}** conference.
+the Partner in relation with the organization of the **{{agreement.event.name}}** conference.
 
 This Agreement defines, in a non-exhaustive manner, the main rights and obligations of the two Parties, given the 
 unanimous consent that the former may evolve in time; the main purpose being to develop a strong Partnership for the 
@@ -26,17 +27,20 @@ best interest of both Parties.
 
 Broadly, the Association is committed to give the Partner a large visibility on the Association's communication supports:
 
-{{#partnership.options}}
-- {{name}}
-{{/partnership.options}}
+{{#pricing.requiredOptions}}
+- {{label}}
+{{/pricing.requiredOptions}}
+{{#pricing.optionalOptions}}
+- {{label}}
+{{/pricing.optionalOptions}}
 
-{{#partnership.hasBooth}}
+{{#agreement.partnership.hasBooth}}
 The Association is committed to provide to the Partner an electrical power strip, a table and two chairs. The rest will 
 be the responsibility of the Partner.
-{{/partnership.hasBooth}}
+{{/agreement.partnership.hasBooth}}
 
 The previous items will be applied after the association receive the payment. The payment has to be done before
-{{event.paymentDeadline}}.
+{{agreement.event.paymentDeadline}}.
 
 Furthermore, any communication project by the Association related to the Event shall be carried out subject to the 
 Association’s compliance with: (i) the Partner’s brand image and (ii) the graphic charter provided by the Partner.
@@ -49,15 +53,15 @@ duration of this Agreement, and do not result in any transfer of ownership right
 ## III - OBLIGATIONS OF THE PARTNER
 
 The Partner is committed to allocate to the Association the amount hereafter, in order to comply with the Agreement 
-purpose: {{partnership.amount}} euros TTC. The payment has to be done respecting the following conditions: payment of 
+purpose: {{pricing.totalAmount}} euros TTC. The payment has to be done respecting the following conditions: payment of 
 the total amount at the Partnership Agreement signature and within a period of 45 days. If this deadline is exceeded, 
 we would be obliged to terminate our partnership.
 
 As indicated in the invoice, here are the Banking Information of the association :
-- IBAN {{organisation.iban}}
-- BIC {{organisation.bic}}
+- IBAN {{agreement.organisation.iban}}
+- BIC {{agreement.organisation.bic}}
 
-{{#partnership.hasBooth}}
+{{#agreement.partnership.hasBooth}}
 The Partner agrees to set up their booth on the afternoon of the day before the first day of the event between 2:00PM 
 and 6:00 PM. A security team will be present overnight to monitor the exhibition area.
 
@@ -67,13 +71,13 @@ The booth must comply with the following constraints:
 - The side panels must not exceed a height of 1.2m.
 
 Dismantling will take place during last day starting at 4:30 PM.
-{{/partnership.hasBooth}}
+{{/agreement.partnership.hasBooth}}
 
 ## IV DURATION OF THE AGREEMENT
 
 The present Partnership Agreement settled between the Association and the Partner starts the day this convention has 
-be signed by the Partner and it concludes plainly and with no further formalities the {{event.endDate}}, subject to 
-the possible application of the 'Agreement withdrawal' clause.
+be signed by the Partner and it concludes plainly and with no further formalities the {{agreement.event.endDate}}, 
+subject to the possible application of the 'Agreement withdrawal' clause.
 
 ## V - AGREEMENT WITHDRAWAL
 
@@ -109,7 +113,7 @@ and to not communicate them to third parties without written and express consent
 Both Parties are committed to settle in good will any eventual conflict that may outcome from the
 present Agreement. In case of failure, the jurisdiction of Lille will be the only competent channel.
 
-Done in {{location}}, the {{createdAt}} in two original exemplar.
+Done in {{agreement.location}}, the {{agreement.createdAt}} in two original exemplar.
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L'Association&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Le Partenaire
 

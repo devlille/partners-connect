@@ -3,7 +3,9 @@ package fr.devlille.partners.connect.partnership.domain
 import java.util.UUID
 
 interface PartnershipAgreementRepository {
-    fun generateAgreement(eventSlug: String, partnershipId: UUID): ByteArray
+    fun agreement(eventSlug: String, partnershipId: UUID): PartnershipAgreement
+
+    fun generatePDF(agreement: PartnershipAgreement, pricing: PartnershipPricing): ByteArray
 
     fun updateAgreementUrl(eventSlug: String, partnershipId: UUID, agreementUrl: String): UUID
 
