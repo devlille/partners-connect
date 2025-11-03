@@ -25,7 +25,7 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslati
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionalOptionsByPack
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionsByPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listTranslationsByOptionAndLanguage
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.SortOrder
@@ -33,6 +33,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
 class PartnershipRepositoryExposed : PartnershipRepository {
+    @Suppress("LongMethod")
     override fun register(eventSlug: String, register: RegisterPartnership): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
@@ -64,33 +65,43 @@ class PartnershipRepositoryExposed : PartnershipRepository {
             }
         }
 
-        val optionalOptionIds = PackOptionsTable
-            .listOptionalOptionsByPack(pack.id.value)
+        val options = PackOptionsTable.listOptionsByPack(pack.id.value)
+        val optionalOptionIds = options
+            .filter { it[PackOptionsTable.required].not() }
+            .map { it[PackOptionsTable.option].value }
+        val requiredOptionIds = options
+            .filter { it[PackOptionsTable.required] }
             .map { it[PackOptionsTable.option].value }
 
-        val optionsUUID = register.optionSelections.map { it.optionId.toUUID() }
-        val unknownOptions = optionsUUID.filterNot { it in optionalOptionIds }
-
+        val unknownOptions = register.optionSelections
+            .map { it.optionId.toUUID() }
+            .filterNot { it in optionalOptionIds }
         if (unknownOptions.isNotEmpty()) {
             throw ForbiddenException("Some options are not optional in the selected pack: $unknownOptions")
+        }
+
+        requiredOptionIds.forEach { optionId ->
+            val option = SponsoringOptionEntity.findById(optionId)
+                ?: throw NotFoundException("Option $optionId not found")
+            PartnershipOptionEntity.new {
+                this.partnership = partnership
+                this.option = option
+                this.packId = pack.id
+            }
         }
 
         register.optionSelections.forEach { selection ->
             val optionId = selection.optionId.toUUID()
             val option = SponsoringOptionEntity.findById(optionId)
                 ?: throw NotFoundException("Option $optionId not found")
-
             val noTranslations = OptionTranslationEntity
                 .listTranslationsByOptionAndLanguage(optionId, register.language)
                 .isEmpty()
-
             if (noTranslations) {
                 throw ForbiddenException(
                     "Option $optionId does not have a translation for language ${register.language}",
                 )
             }
-
-            // Create partnership option with selection data based on selection type
             PartnershipOptionEntity.create(selection, partnership, pack, option)
         }
 

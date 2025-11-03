@@ -41,10 +41,10 @@ fun UUIDEntityClass<SponsoringPackEntity>.singlePackById(eventId: UUID, packId: 
  *
  * @return true if the pack has at least one booth-related option or legacy withBooth is true
  */
-fun SponsoringPackEntity.hasBoothFromOptions(): Boolean = options?.any { option ->
+fun SponsoringPackEntity.hasBoothFromOptions(): Boolean = options.any { option ->
     option.optionType == OptionType.TYPED_SELECTABLE &&
         option.selectableDescriptor == SelectableDescriptor.BOOTH
-} ?: false
+}
 
 /**
  * Calculates the total number of tickets available in this pack based on attached sponsoring options.

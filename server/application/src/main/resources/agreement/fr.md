@@ -2,15 +2,17 @@
 
 **Entre les soussignés :**
 
-L'association **{{organisation.name}}**, régie par la loi 1901, déclarée à la Préfecture de 
-{{organisation.creationLocation}} le {{organisation.createdAt}} et publiée au Journal Officiel du 
-{{organisation.publishedAt}}, dont le siège social est à {{organisation.headOffice}}. Représentée par 
-**{{organisation.representative.name}}**, en sa qualité de **{{organisation.representative.role}}** d'une part,
+L'association **{{agreement.organisation.name}}**, régie par la loi 1901, déclarée à la Préfecture de 
+{{agreement.organisation.creationLocation}} le {{agreement.organisation.createdAt}} et publiée au Journal Officiel du 
+{{agreement.organisation.publishedAt}}, dont le siège social est à {{agreement.organisation.headOffice}}. Représentée par 
+**{{agreement.organisation.representative.name}}**, en sa qualité de **{{agreement.organisation.representative.role}}** 
+d'une part,
 
 Ci-après "L'Association".
 
-Et d'autre part l'entreprise : **{{company.name}}**, société inscrite sous le n° {{company.siret}}, dont le siège 
-social est **{{company.headOffice}}**. Représentée par **{{partnership.contact.name}}**, **{{partnership.contact.role}}**.
+Et d'autre part l'entreprise : **{{agreement.company.name}}**, société inscrite sous le n° {{agreement.company.siret}}, 
+dont le siège social est **{{agreement.company.headOffice}}**. Représentée par **{{agreement.partnership.contact.name}}**, 
+**{{agreement.partnership.contact.role}}**.
 
 Ci-après "le Partenaire".
 
@@ -22,7 +24,7 @@ Désignées ensemble les "Parties", et individuellement la "Partie",
 
 Cette convention (ci-après "Convention") est destinée à régir, de la manière la plus complète possible, la relation de 
 partenariat conclue entre l'association et le partenaire, en vue principalement de l’organisation de l'évènement 
-**{{event.name}}** (ci-après "l’Evénement").
+**{{agreement.event.name}}** (ci-après "l’Evénement").
 
 Elle précise de façon exhaustive les droits et les obligations principaux des deux Parties, étant entendu que ceux-ci 
 peuvent évoluer au fil du temps conformément à l'article VI - Modifications ; l’objectif principal étant que le 
@@ -33,12 +35,15 @@ partenariat qui unit les deux Parties se développe au maximum et dans le sens d
 L'Association s’engage à donner une forte visibilité du partenaire sur les supports de communication Internet de 
 l’Association :
 
-{{#partnership.options}}
-- {{name}}
-{{/partnership.options}}
+{{#pricing.requiredOptions}}
+- {{label}}
+{{/pricing.requiredOptions}}
+{{#pricing.optionalOptions}}
+- {{label}}
+{{/pricing.optionalOptions}}
 
 Les obligations citées précédemment seront appliquées à la reception du paiement réalisé par le Partenaire. Le paiement 
-devra être réalisé avant le {{event.paymentDeadline}}.
+devra être réalisé avant le {{agreement.event.paymentDeadline}}.
 
 En outre, tout projet de communication de l'Association relatif à l'Evénement se fera sous réserve du respect par 
 l'Association : i) de l'image de marque du Partenaire et ii) du respecter la charte graphique communiquée par le 
@@ -53,15 +58,15 @@ propriété du Partenaire à l'égard de l'Association.
 ## III - OBLIGATIONS DU PARTENAIRE
 
 Le Partenaire s’engage en contrepartie à verser à l'Association le montant suivant, en vue de la réalisation de l’objet 
-de la convention : {{partnership.amount}} euros TTC. Le paiement du montant sera fait selon les conditions suivantes : 
+de la convention : {{pricing.totalAmount}} euros TTC. Le paiement du montant sera fait selon les conditions suivantes : 
 paiement à la signature de la convention de partenariat et dans un délai de 45 jours. Ce délai dépassé, nous serions 
 dans l'obligation de rompre notre partenariat.
 
 Comme indiqué sur le devis, vous trouverez ci-dessous les informations bancaires de l'association :
-- IBAN {{organisation.iban}}
-- BIC {{organisation.bic}}
+- IBAN {{agreement.organisation.iban}}
+- BIC {{agreement.organisation.bic}}
 
-{{#partnership.hasBooth}}
+{{#agreement.partnership.hasBooth}}
 Le partenaire s'engage à installer son stand la veille du premier jour de l'événement dans l'après-midi entre 14h et 18h.
 Une équipe de sécurité sera présente la nuit pour surveiller la zone d'expositions. 
 
@@ -70,13 +75,13 @@ Le stand doit respecter les contraintes suivante :
 - ne pas dépasser 1.2m de hauteur sur les côtés.
 
 La désinstallation aura lieu sur le dernier jour à partir de 16h30.
-{{/partnership.hasBooth}}
+{{/agreement.partnership.hasBooth}}
 
 ## IV - DUREE DE LA CONVENTION
 
 Le présent partenariat conclu entre l'association et partenaire débutera à la signature de la présente Convention et 
-s’achèvera de plein droit et sans formalité le {{event.endDate}}, sous réserve de l'application éventuelle de l'article 
-"Résiliation".
+s’achèvera de plein droit et sans formalité le {{agreement.event.endDate}}, sous réserve de l'application éventuelle de 
+l'article "Résiliation".
 
 ## V - RESILIATION
 
@@ -111,7 +116,7 @@ ne pas les communiquer à des tiers sans l’accord exprès et écrit de l’aut
 La présente Convention est soumise à la loi française. Les deux parties s’engagent à régler à l’amiable tout différent 
 éventuel qui pourrait résulter de la présente Convention. En cas d’échec, les tribunaux de Lille seront seuls compétents.
 
-Fait à {{location}} le {{createdAt}} en deux exemplaires originaux
+Fait à {{agreement.location}} le {{agreement.createdAt}} en deux exemplaires originaux
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L'Association&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Le Partenaire
 
