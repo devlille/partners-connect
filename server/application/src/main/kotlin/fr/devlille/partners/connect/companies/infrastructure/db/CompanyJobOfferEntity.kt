@@ -11,7 +11,11 @@ import java.util.UUID
  * Provides object-relational mapping for job offer data.
  */
 class CompanyJobOfferEntity(id: EntityID<UUID>) : UUIDEntity(id) {
-    companion object : UUIDEntityClass<CompanyJobOfferEntity>(CompanyJobOfferTable)
+    companion object : UUIDEntityClass<CompanyJobOfferEntity>(CompanyJobOfferTable) {
+        fun singleByCompanyAndJobOffer(companyId: UUID, jobOfferId: UUID): CompanyJobOfferEntity? = this
+            .find { (CompanyJobOfferTable.id eq jobOfferId) and (CompanyJobOfferTable.companyId eq companyId) }
+            .singleOrNull()
+    }
 
     /** URL to the detailed job posting */
     var url by CompanyJobOfferTable.url
@@ -46,10 +50,3 @@ class CompanyJobOfferEntity(id: EntityID<UUID>) : UUIDEntity(id) {
      */
     var company by CompanyEntity referencedOn CompanyJobOfferTable.companyId
 }
-
-fun UUIDEntityClass<CompanyJobOfferEntity>.singleByCompanyAndJobOffer(
-    companyId: UUID,
-    jobOfferId: UUID,
-): CompanyJobOfferEntity? = this
-    .find { (CompanyJobOfferTable.id eq jobOfferId) and (CompanyJobOfferTable.companyId eq companyId) }
-    .singleOrNull()

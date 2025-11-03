@@ -11,7 +11,27 @@ import org.jetbrains.exposed.v1.jdbc.SizedIterable
 import java.util.UUID
 
 class CompanyEntity(id: EntityID<UUID>) : UUIDEntity(id) {
-    companion object : UUIDEntityClass<CompanyEntity>(CompaniesTable)
+    companion object : UUIDEntityClass<CompanyEntity>(CompaniesTable) {
+        fun listByQueryAndStatus(query: String?, status: CompanyStatus?): SizedIterable<CompanyEntity> {
+            val companies = if (query.isNullOrBlank() && status == null) {
+                // Default: all companies
+                all()
+            } else if (query.isNullOrBlank() && status != null) {
+                // Filter by status only
+                find { CompaniesTable.status eq status }
+            } else if (!query.isNullOrBlank() && status == null) {
+                // Search query only (existing behavior)
+                find { CompaniesTable.name.lowerCase() like "%${query.lowercase()}%" }
+            } else {
+                // Both query and status
+                find {
+                    val query = query!!.lowercase()
+                    (CompaniesTable.name.lowerCase() like "%$query%") and (CompaniesTable.status eq status!!)
+                }
+            }
+            return companies.orderBy(CompaniesTable.name to SortOrder.ASC)
+        }
+    }
 
     var name by CompaniesTable.name
     var description by CompaniesTable.description
@@ -28,26 +48,4 @@ class CompanyEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var logoUrl250 by CompaniesTable.logoUrl250
     var createdAt by CompaniesTable.createdAt
     var status by CompaniesTable.status
-}
-
-fun UUIDEntityClass<CompanyEntity>.listByQueryAndStatus(
-    query: String?,
-    status: CompanyStatus?,
-): SizedIterable<CompanyEntity> {
-    val companies = if (query.isNullOrBlank() && status == null) {
-        // Default: all companies
-        all()
-    } else if (query.isNullOrBlank() && status != null) {
-        // Filter by status only
-        find { CompaniesTable.status eq status }
-    } else if (!query.isNullOrBlank() && status == null) {
-        // Search query only (existing behavior)
-        find { CompaniesTable.name.lowerCase() like "%${query.lowercase()}%" }
-    } else {
-        // Both query and status
-        find {
-            (CompaniesTable.name.lowerCase() like "%${query!!.lowercase()}%") and (CompaniesTable.status eq status!!)
-        }
-    }
-    return companies.orderBy(CompaniesTable.name to SortOrder.ASC)
 }

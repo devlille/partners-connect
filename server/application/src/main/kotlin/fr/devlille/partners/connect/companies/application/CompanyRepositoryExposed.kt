@@ -10,8 +10,6 @@ import fr.devlille.partners.connect.companies.domain.UpdateCompany
 import fr.devlille.partners.connect.companies.infrastructure.db.CompaniesTable
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanySocialEntity
-import fr.devlille.partners.connect.companies.infrastructure.db.deleteAllByCompanyId
-import fr.devlille.partners.connect.companies.infrastructure.db.listByQueryAndStatus
 import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedResponse
 import fr.devlille.partners.connect.internal.infrastructure.api.paginated

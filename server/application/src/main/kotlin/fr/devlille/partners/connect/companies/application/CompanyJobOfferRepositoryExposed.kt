@@ -10,10 +10,12 @@ import fr.devlille.partners.connect.companies.infrastructure.db.CompanyJobOfferP
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyJobOfferPromotionsTable
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyJobOfferTable
 import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedResponse
+import fr.devlille.partners.connect.internal.infrastructure.api.ValidationException
 import fr.devlille.partners.connect.internal.infrastructure.api.paginated
 import fr.devlille.partners.connect.internal.infrastructure.api.toPaginatedResponse
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.v1.core.SortOrder
@@ -27,6 +29,8 @@ import java.util.UUID
  */
 class CompanyJobOfferRepositoryExposed : CompanyJobOfferRepository {
     override suspend fun create(companyId: UUID, jobOffer: CreateJobOffer): UUID = transaction {
+        validatePublicationDate(jobOffer.publicationDate)
+
         // Verify company exists first
         val company = CompanyEntity.findById(companyId)
             ?: throw NotFoundException("Company not found: $companyId")
@@ -105,6 +109,8 @@ class CompanyJobOfferRepositoryExposed : CompanyJobOfferRepository {
         jobOffer: UpdateJobOffer,
         companyId: UUID,
     ) = transaction {
+        jobOffer.publicationDate?.let { validatePublicationDate(jobOffer.publicationDate) }
+
         val entity = CompanyJobOfferEntity.find {
             CompanyJobOfferTable.id eq jobOfferId and (CompanyJobOfferTable.companyId eq companyId)
         }.singleOrNull() ?: throw NotFoundException("Job offer not found or not owned by company: $jobOfferId")
@@ -141,5 +147,17 @@ class CompanyJobOfferRepositoryExposed : CompanyJobOfferRepository {
         !CompanyJobOfferEntity.find {
             CompanyJobOfferTable.id eq jobOfferId and (CompanyJobOfferTable.companyId eq companyId)
         }.empty()
+    }
+
+    /**
+     * Validates publication date is not in the future.
+     * @param publicationDate ISO format publication date
+     * @throws ValidationException if date is in the future
+     */
+    private fun validatePublicationDate(publicationDate: LocalDateTime) {
+        val now = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+        if (publicationDate > now) {
+            throw ValidationException("publication_date", "cannot be in the future")
+        }
     }
 }
