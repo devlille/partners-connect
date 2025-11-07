@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.internal
 
 import fr.devlille.partners.connect.billing.domain.BillingGateway
 import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
+import fr.devlille.partners.connect.partnership.domain.PartnershipPricing
 import java.util.UUID
 
 class FakeBillingGateway : BillingGateway {
@@ -10,13 +11,11 @@ class FakeBillingGateway : BillingGateway {
 
     override suspend fun createInvoice(
         integrationId: UUID,
-        eventId: UUID,
-        partnershipId: UUID,
+        pricing: PartnershipPricing,
     ): String = "https://fake-invoice-url.com/invoice/${UUID.randomUUID()}"
 
     override suspend fun createQuote(
         integrationId: UUID,
-        eventId: UUID,
-        partnershipId: UUID,
+        pricing: PartnershipPricing,
     ): String = "https://fake-quote-url.com/quote/${UUID.randomUUID()}"
 }
