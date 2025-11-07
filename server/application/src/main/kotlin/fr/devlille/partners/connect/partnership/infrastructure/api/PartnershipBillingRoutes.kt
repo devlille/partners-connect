@@ -50,7 +50,8 @@ fun Route.publicPartnershipBillingRoutes() {
         post("invoice") {
             val eventSlug = call.parameters.eventSlug
             val partnershipId = call.parameters.partnershipId
-            val invoiceUrl = billingRepository.createInvoice(eventSlug, partnershipId)
+            val pricing = partnershipBillingRepository.computePricing(eventSlug, partnershipId)
+            val invoiceUrl = billingRepository.createInvoice(pricing)
             partnershipBillingRepository.updateInvoiceUrl(eventSlug, partnershipId, invoiceUrl)
             val event = eventRepository.getBySlug(eventSlug)
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
@@ -62,7 +63,8 @@ fun Route.publicPartnershipBillingRoutes() {
         post("quote") {
             val eventSlug = call.parameters.eventSlug
             val partnershipId = call.parameters.partnershipId
-            val quoteUrl = billingRepository.createQuote(eventSlug, partnershipId)
+            val pricing = partnershipBillingRepository.computePricing(eventSlug, partnershipId)
+            val quoteUrl = billingRepository.createQuote(pricing)
             partnershipBillingRepository.updateQuoteUrl(eventSlug, partnershipId, quoteUrl)
             val event = eventRepository.getBySlug(eventSlug)
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)

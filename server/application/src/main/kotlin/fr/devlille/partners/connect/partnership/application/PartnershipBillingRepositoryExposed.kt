@@ -85,6 +85,7 @@ class PartnershipBillingRepositoryExposed : PartnershipBillingRepository {
         existing.id.value
     }
 
+    @Suppress("LongMethod", "CyclomaticComplexMethod")
     override fun computePricing(eventSlug: String, partnershipId: UUID): PartnershipPricing = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
@@ -104,32 +105,48 @@ class PartnershipBillingRepositoryExposed : PartnershipBillingRepository {
                 ?: throw NotFoundException("Translation not found for option ${option.id} in language $language")
             val required = optionalOptionIds.contains(option.id.value).not()
             when (option.optionType) {
-                OptionType.TEXT -> OptionPricing(label = label.name, amount = option.price ?: 0, required = required)
-                OptionType.TYPED_QUANTITATIVE -> OptionPricing(
+                OptionType.TEXT -> OptionPricing(
                     label = label.name,
                     amount = option.price ?: 0,
+                    unitAmount = option.price ?: 0,
+                    quantity = 1,
+                    required = required,
+                )
+                OptionType.TYPED_QUANTITATIVE -> OptionPricing(
+                    label = label.name,
+                    amount = (option.price ?: 0) * (it.selectedQuantity ?: 0),
+                    unitAmount = option.price ?: 0,
                     selectedValue = it.selectedQuantity?.toString(),
+                    quantity = it.selectedQuantity ?: 0,
                     required = required,
                 )
 
                 OptionType.TYPED_NUMBER -> OptionPricing(
                     label = label.name,
-                    amount = option.price ?: 0,
+                    amount = (option.price ?: 0) * (option.fixedQuantity ?: 0),
+                    unitAmount = option.fixedQuantity ?: 0,
                     selectedValue = option.fixedQuantity?.toString(),
+                    quantity = option.fixedQuantity ?: 0,
                     required = required,
                 )
 
                 OptionType.TYPED_SELECTABLE -> OptionPricing(
                     label = label.name,
                     amount = it.selectedValue?.price ?: option.price ?: 0,
+                    unitAmount = it.selectedValue?.price ?: option.price ?: 0,
                     selectedValue = it.selectedValue?.value,
+                    quantity = 1,
                     required = required,
                 )
             }
         }
         val optionalOptions = optionsPricing.filter { it.required.not() }
         PartnershipPricing(
+            eventId = event.id.value.toString(),
+            partnershipId = partnershipId.toString(),
+            packName = pack.name,
             basePrice = pack.basePrice,
+            currency = "EUR",
             totalAmount = pack.basePrice + optionalOptions.map { it.amount }.sumOf { it },
             requiredOptions = optionsPricing.filter { it.required },
             optionalOptions = optionalOptions,

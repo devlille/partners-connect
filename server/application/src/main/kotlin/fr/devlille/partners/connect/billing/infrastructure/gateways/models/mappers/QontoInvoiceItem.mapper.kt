@@ -2,29 +2,23 @@ package fr.devlille.partners.connect.billing.infrastructure.gateways.models.mapp
 
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoInvoiceItem
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoMoneyAmount
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
-import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
-import io.ktor.server.plugins.NotFoundException
+import fr.devlille.partners.connect.partnership.domain.PartnershipPricing
 
 @Suppress("SpreadOperator")
 internal fun invoiceItems(
-    language: String,
-    pack: SponsoringPackEntity,
-    options: List<SponsoringOptionEntity>,
+    pricing: PartnershipPricing,
 ): List<QontoInvoiceItem> = listOf(
     QontoInvoiceItem(
-        title = "Sponsoring ${pack.name}",
+        title = "Sponsoring ${pricing.packName}",
         quantity = "1",
-        unitPrice = QontoMoneyAmount(value = "${pack.basePrice}", currency = "EUR"),
+        unitPrice = QontoMoneyAmount(value = "${pricing.basePrice}", currency = pricing.currency),
         vatRate = "0",
     ),
-    *options.map { option ->
-        val translation = option.translations.firstOrNull { it.language == language }
-            ?: throw NotFoundException("Translation not found for option ${option.id} in language $language")
+    *pricing.optionalOptions.map { option ->
         QontoInvoiceItem(
-            title = translation.name,
-            quantity = "1",
-            unitPrice = QontoMoneyAmount(value = "${option.price}", currency = "EUR"),
+            title = option.label,
+            quantity = "${option.quantity}",
+            unitPrice = QontoMoneyAmount(value = "${option.unitAmount}", currency = pricing.currency),
             vatRate = "0",
         )
     }.toTypedArray(),

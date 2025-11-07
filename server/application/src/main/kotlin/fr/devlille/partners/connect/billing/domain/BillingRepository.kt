@@ -1,9 +1,9 @@
 package fr.devlille.partners.connect.billing.domain
 
-import java.util.UUID
+import fr.devlille.partners.connect.partnership.domain.PartnershipPricing
 
 interface BillingRepository {
-    suspend fun createInvoice(eventSlug: String, partnershipId: UUID): String
+    suspend fun createInvoice(pricing: PartnershipPricing): String
 
-    suspend fun createQuote(eventSlug: String, partnershipId: UUID): String
+    suspend fun createQuote(pricing: PartnershipPricing): String
 }

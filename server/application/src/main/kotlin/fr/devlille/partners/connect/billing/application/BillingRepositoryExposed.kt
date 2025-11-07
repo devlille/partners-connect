@@ -2,11 +2,11 @@ package fr.devlille.partners.connect.billing.application
 
 import fr.devlille.partners.connect.billing.domain.BillingGateway
 import fr.devlille.partners.connect.billing.domain.BillingRepository
-import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
-import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.findByEventIdAndUsage
+import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
+import fr.devlille.partners.connect.partnership.domain.PartnershipPricing
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.jdbc.transactions.experimental.newSuspendedTransaction
@@ -16,28 +16,22 @@ import java.util.UUID
 class BillingRepositoryExposed(
     private val billingGateways: List<BillingGateway>,
 ) : BillingRepository {
-    override suspend fun createInvoice(eventSlug: String, partnershipId: UUID): String = newSuspendedTransaction {
-        val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
-        val eventId = event.id.value
-        val integration = singleIntegration(eventId)
+    override suspend fun createInvoice(pricing: PartnershipPricing): String = newSuspendedTransaction {
+        val integration = singleIntegration(pricing.eventId.toUUID())
         val provider = integration[IntegrationsTable.provider]
         val integrationId = integration[IntegrationsTable.id].value
         val gateway = billingGateways.find { it.provider == provider }
             ?: throw NotFoundException("No gateway for provider $provider")
-        gateway.createInvoice(integrationId, eventId, partnershipId)
+        gateway.createInvoice(integrationId, pricing)
     }
 
-    override suspend fun createQuote(eventSlug: String, partnershipId: UUID): String = newSuspendedTransaction {
-        val event = EventEntity.findBySlug(eventSlug)
-            ?: throw NotFoundException("Event with slug $eventSlug not found")
-        val eventId = event.id.value
-        val integration = singleIntegration(eventId)
+    override suspend fun createQuote(pricing: PartnershipPricing): String = newSuspendedTransaction {
+        val integration = singleIntegration(pricing.eventId.toUUID())
         val provider = integration[IntegrationsTable.provider]
         val integrationId = integration[IntegrationsTable.id].value
         val gateway = billingGateways.find { it.provider == provider }
             ?: throw NotFoundException("No gateway for provider $provider")
-        gateway.createQuote(integrationId, eventId, partnershipId)
+        gateway.createQuote(integrationId, pricing)
     }
 
     private fun singleIntegration(eventId: UUID): ResultRow = transaction {
