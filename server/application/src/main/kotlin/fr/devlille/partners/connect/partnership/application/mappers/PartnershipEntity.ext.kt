@@ -8,6 +8,7 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipProcessStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 
 fun PartnershipEntity.toDomain(emails: List<String>): PartnershipItem = PartnershipItem(
     id = id.toString(),
@@ -17,8 +18,11 @@ fun PartnershipEntity.toDomain(emails: List<String>): PartnershipItem = Partners
     ),
     companyName = company.name,
     eventName = event.name,
-    packName = selectedPack?.name,
+    selectedPackId = selectedPack?.id?.value?.toString(),
+    selectedPackName = selectedPack?.name,
+    suggestedPackId = suggestionPack?.id?.value?.toString(),
     suggestedPackName = suggestionPack?.name,
+    validatedPackId = validatedPack()?.id?.value?.toString(),
     language = language,
     phone = phone,
     emails = emails,

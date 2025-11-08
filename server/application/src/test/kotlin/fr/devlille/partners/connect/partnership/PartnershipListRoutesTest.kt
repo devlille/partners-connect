@@ -63,7 +63,7 @@ class PartnershipListRoutesTest {
         assertEquals("John Doe", partnership.contact.displayName)
         assertEquals("Manager", partnership.contact.role)
         assertEquals("Test Company", partnership.companyName)
-        assertEquals("Test Pack", partnership.packName)
+        assertEquals("Test Pack", partnership.selectedPackName)
     }
 
     @Test
@@ -117,7 +117,7 @@ class PartnershipListRoutesTest {
         val partnership1 = partnerships.find { it.contact.displayName == "John Doe" }!!
         assertEquals("Manager", partnership1.contact.role)
         assertEquals("Company One", partnership1.companyName)
-        assertEquals("Gold Pack", partnership1.packName)
+        assertEquals("Gold Pack", partnership1.selectedPackName)
         assertNull(partnership1.suggestedPackName)
         assertEquals("en", partnership1.language)
 
@@ -125,7 +125,7 @@ class PartnershipListRoutesTest {
         val partnership2 = partnerships.find { it.contact.displayName == "Jane Smith" }!!
         assertEquals("Director", partnership2.contact.role)
         assertEquals("Company Two", partnership2.companyName)
-        assertEquals("Gold Pack", partnership2.packName)
+        assertEquals("Gold Pack", partnership2.selectedPackName)
     }
 
     @Test
@@ -171,7 +171,7 @@ class PartnershipListRoutesTest {
         val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
         assertEquals(1, partnerships.size)
         assertEquals("John Doe", partnerships[0].contact.displayName)
-        assertEquals("Gold Pack", partnerships[0].packName)
+        assertEquals("Gold Pack", partnerships[0].selectedPackName)
     }
 
     @Test
@@ -516,7 +516,7 @@ class PartnershipListRoutesTest {
         val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
         assertEquals(1, partnerships.size)
         assertEquals("John Doe", partnerships[0].contact.displayName)
-        assertEquals("Gold Pack", partnerships[0].packName)
+        assertEquals("Gold Pack", partnerships[0].selectedPackName)
         assertEquals("Bronze Pack", partnerships[0].suggestedPackName)
     }
 
@@ -692,7 +692,7 @@ class PartnershipListRoutesTest {
         assertEquals("John Doe", partnership.contact.displayName)
         assertEquals("Manager", partnership.contact.role)
         assertEquals("Test Company", partnership.companyName)
-        assertEquals("Test Pack", partnership.packName)
+        assertEquals("Test Pack", partnership.selectedPackName)
         assertNull(partnership.suggestedPackName)
         assertEquals("Test Event", partnership.eventName)
         assertEquals("fr", partnership.language)

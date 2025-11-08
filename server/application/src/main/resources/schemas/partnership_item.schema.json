@@ -14,13 +14,31 @@
     "event_name": {
       "type": "string"
     },
-    "pack_name": {
+    "selected_pack_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "selected_pack_name": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "suggested_pack_id": {
       "type": [
         "string",
         "null"
       ]
     },
     "suggested_pack_name": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "validated_pack_id": {
       "type": [
         "string",
         "null"
