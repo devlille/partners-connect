@@ -1,0 +1,20 @@
+{
+  "$id": "detailed_partnership_response.schema.json",
+  "type": "object",
+  "properties": {
+    "partnership": {
+      "$ref": "partnership_detail.schema.json"
+    },
+    "company": {
+      "$ref": "company.schema.json"
+    },
+    "event": {
+      "$ref": "event_with_organisation.schema.json"
+    }
+  },
+  "required": [
+    "partnership",
+    "company", 
+    "event"
+  ]
+}

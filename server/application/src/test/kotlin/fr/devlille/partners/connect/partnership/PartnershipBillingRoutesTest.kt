@@ -5,10 +5,10 @@ import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.events.factories.insertMockedEventWithOrga
 import fr.devlille.partners.connect.internal.insertQontoIntegration
 import fr.devlille.partners.connect.internal.moduleMocked
+import fr.devlille.partners.connect.partnership.domain.InvoiceStatus
 import fr.devlille.partners.connect.partnership.factories.createCompanyBillingData
 import fr.devlille.partners.connect.partnership.factories.insertMockedBilling
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
-import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.put

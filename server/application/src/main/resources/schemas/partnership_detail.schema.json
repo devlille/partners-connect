@@ -1,0 +1,65 @@
+{
+  "$id": "partnership_detail.schema.json",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "phone": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "contact_name": {
+      "type": "string"
+    },
+    "contact_role": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string"
+    },
+    "emails": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "email"
+      }
+    },
+    "selected_pack": {
+      "anyOf": [
+        { "$ref": "sponsoring_pack.schema.json" },
+        { "type": "null" }
+      ]
+    },
+    "suggestion_pack": {
+      "anyOf": [
+        { "$ref": "sponsoring_pack.schema.json" },
+        { "type": "null" }
+      ]
+    },
+    "validated_pack": {
+      "anyOf": [
+        { "$ref": "sponsoring_pack.schema.json" },
+        { "type": "null" }
+      ]
+    },
+    "process_status": {
+      "$ref": "partnership_process_status.schema.json"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "id",
+    "contact_name",
+    "contact_role", 
+    "language",
+    "emails",
+    "process_status",
+    "created_at"
+  ]
+}

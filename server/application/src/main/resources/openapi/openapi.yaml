@@ -800,6 +800,46 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Identifier"
+  /events/{eventSlug}/partnerships/{partnershipId}:
+    get:
+      summary: "Get detailed partnership information"
+      operationId: "getEventsPartnershipDetailed"
+      security:
+        - {}
+      description: "Retrieve comprehensive partnership information including company, event, and process status details"
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug identifier"
+        - name: "partnershipId"
+          in: "path" 
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "Partnership unique identifier"
+      responses:
+        "200":
+          description: "OK - Partnership details successfully retrieved"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DetailedPartnershipResponse"
+        "400":
+          description: "Bad Request - Invalid partnership ID format"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found - Partnership or event not found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
   /events/{eventSlug}/partnerships/{partnershipId}/billing:
     get:
       summary: "Get partnership billing information"
@@ -3454,3 +3494,11 @@ components:
       $ref: "../schemas/job_offer_promotion_response.schema.json"
     DeclineJobOfferRequest:
       $ref: "../schemas/decline_job_offer_promotion.schema.json"
+    DetailedPartnershipResponse:
+      $ref: "../schemas/detailed_partnership_response.schema.json"
+    PartnershipDetail:
+      $ref: "../schemas/partnership_detail.schema.json" 
+    PartnershipProcessStatus:
+      $ref: "../schemas/partnership_process_status.schema.json"
+    PartnershipPhases:
+      $ref: "../schemas/partnership_phases.schema.json"

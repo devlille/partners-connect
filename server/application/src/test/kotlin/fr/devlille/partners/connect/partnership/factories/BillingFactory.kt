@@ -1,8 +1,8 @@
 package fr.devlille.partners.connect.partnership.factories
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.partnership.domain.InvoiceStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
-import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID

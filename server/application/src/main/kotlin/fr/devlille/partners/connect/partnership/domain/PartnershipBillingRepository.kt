@@ -1,7 +1,6 @@
 package fr.devlille.partners.connect.partnership.domain
 
 import fr.devlille.partners.connect.companies.domain.CompanyBillingData
-import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import java.util.UUID
 
 interface PartnershipBillingRepository {

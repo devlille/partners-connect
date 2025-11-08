@@ -8,6 +8,7 @@ import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
+import fr.devlille.partners.connect.partnership.domain.DetailedPartnershipResponse
 import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
@@ -71,6 +72,23 @@ private fun Route.publicPartnershipRoutes() {
             webhookRepository.sendWebhooks(eventSlug, id, WebhookEventType.CREATED)
 
             call.respond(HttpStatusCode.Created, mapOf("id" to id.toString()))
+        }
+
+        get("/{partnershipId}") {
+            val eventSlug = call.parameters.eventSlug
+            val partnershipId = call.parameters.partnershipId
+
+            val partnershipDetail = partnershipRepository.getByIdDetailed(eventSlug, partnershipId)
+            val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
+            val event = eventRepository.getBySlug(eventSlug)
+
+            val response = DetailedPartnershipResponse(
+                partnership = partnershipDetail,
+                company = company,
+                event = event,
+            )
+
+            call.respond(HttpStatusCode.OK, response)
         }
     }
 }

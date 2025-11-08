@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.partnership.infrastructure.db
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
+import fr.devlille.partners.connect.partnership.domain.InvoiceStatus
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -21,10 +22,4 @@ object BillingsTable : UUIDTable("billings") {
     val createdAt = datetime("created_at").clientDefault {
         Clock.System.now().toLocalDateTime(TimeZone.UTC)
     }
-}
-
-enum class InvoiceStatus {
-    PENDING,
-    SENT,
-    PAID,
 }

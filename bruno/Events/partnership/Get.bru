@@ -1,0 +1,16 @@
+meta {
+  name: Get
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{scheme}}://{{base_url}}/events/:event_slug/partnerships/:partnership_id
+  body: none
+  auth: none
+}
+
+params:path {
+  partnership_id: {{partnership_id}}
+  event_slug: {{event_slug}}
+}
