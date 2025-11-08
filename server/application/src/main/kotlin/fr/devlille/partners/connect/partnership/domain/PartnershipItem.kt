@@ -12,10 +12,16 @@ data class PartnershipItem(
     val companyName: String,
     @SerialName("event_name")
     val eventName: String,
-    @SerialName("pack_name")
-    val packName: String? = null,
+    @SerialName("selected_pack_id")
+    val selectedPackId: String? = null,
+    @SerialName("selected_pack_name")
+    val selectedPackName: String? = null,
+    @SerialName("suggested_pack_id")
+    val suggestedPackId: String? = null,
     @SerialName("suggested_pack_name")
     val suggestedPackName: String? = null,
+    @SerialName("validated_pack_id")
+    val validatedPackId: String? = null,
     val language: String,
     val phone: String? = null,
     val emails: List<String> = emptyList(),
