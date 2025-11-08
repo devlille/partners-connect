@@ -2398,39 +2398,58 @@ paths:
       operationId: "postOrgsEventsPartnershipBilling"
       security:
         - bearerAuth: []
-      description: ""
+      description: "Update the billing status of a partnership."
       parameters:
         - name: "eventSlug"
           in: "path"
           required: true
           schema:
             type: "string"
+          description: "Event slug identifier"
         - name: "partnershipId"
           in: "path"
           required: true
           schema:
             type: "string"
+            format: "uuid"
+          description: "Partnership unique identifier"
         - name: "billingStatus"
           in: "path"
           required: true
           schema:
             type: "string"
+            enum: ["pending", "sent", "paid"]
+          description: "New billing status for the partnership"
         - name: "orgSlug"
           in: "path"
           required: true
           schema:
             type: "string"
+          description: "Organization slug identifier"
       responses:
         "400":
-          description: "Bad Request"
+          description: "Bad Request - Invalid billing status value, partnership ID format, or event slug."
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                example: "Request parameter billingStatus couldn't be parsed/converted to InvoiceStatus"
+        "401":
+          description: "Unauthorized - Authentication required or user not authorized for this organization"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found - Partnership, event, or organization not found"
           content:
             text/plain:
               schema:
                 type: "string"
         "200":
-          description: "OK"
+          description: "OK - Billing status updated successfully"
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/Identifier"
   /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/booth-location:
