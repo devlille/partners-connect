@@ -4721,11 +4721,14 @@ components:
         company:
           $ref: '#/components/schemas/company.schema'
         event:
-          $ref: '#/components/schemas/event_with_organisation.schema'
+          $ref: '#/components/schemas/event_display.schema'
+        organisation:
+          $ref: '#/components/schemas/organisation_item.schema'
       required:
         - partnership
         - company
         - event
+        - organisation
     billing_contact.schema:
       $id: billing_contact.schema.json
       type: object

@@ -139,7 +139,7 @@ class PartnershipDetailIntegrationTest {
         assertEquals("https://www.techsolutions.com", companyData["site_url"]!!.jsonPrimitive.content)
 
         // Validate event information
-        val eventData = json["event"]!!.jsonObject["event"]!!.jsonObject
+        val eventData = json["event"]!!.jsonObject
         assertEquals("DevLille 2025", eventData["name"]!!.jsonPrimitive.content)
         assertEquals(eventSlug, eventData["slug"]!!.jsonPrimitive.content)
         assertEquals("2025-06-13T18:00", eventData["start_time"]!!.jsonPrimitive.content)

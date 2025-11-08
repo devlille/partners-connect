@@ -82,6 +82,7 @@ class PartnershipDetailedGetRouteTest {
         assertTrue(responseBody.contains("partnership"))
         assertTrue(responseBody.contains("company"))
         assertTrue(responseBody.contains("event"))
+        assertTrue(responseBody.contains("organisation"))
         assertTrue(responseBody.contains("process_status"))
     }
 

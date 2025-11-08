@@ -85,7 +85,8 @@ private fun Route.publicPartnershipRoutes() {
             val response = DetailedPartnershipResponse(
                 partnership = partnershipDetail,
                 company = company,
-                event = event,
+                event = event.event,
+                organisation = event.organisation,
             )
 
             call.respond(HttpStatusCode.OK, response)

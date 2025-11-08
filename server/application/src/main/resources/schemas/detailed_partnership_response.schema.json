@@ -9,12 +9,16 @@
       "$ref": "company.schema.json"
     },
     "event": {
-      "$ref": "event_with_organisation.schema.json"
+      "$ref": "event_display.schema.json"
+    },
+    "organisation": {
+      "$ref": "organisation_item.schema.json"
     }
   },
   "required": [
     "partnership",
     "company", 
-    "event"
+    "event",
+    "organisation"
   ]
 }
