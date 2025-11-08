@@ -8,19 +8,22 @@ import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
+import fr.devlille.partners.connect.partnership.application.mappers.toDetailedDomain
 import fr.devlille.partners.connect.partnership.application.mappers.toDomain
+import fr.devlille.partners.connect.partnership.domain.InvoiceStatus
 import fr.devlille.partners.connect.partnership.domain.Partnership
+import fr.devlille.partners.connect.partnership.domain.PartnershipDetail
 import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
 import fr.devlille.partners.connect.partnership.domain.PartnershipItem
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
-import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
+import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
@@ -129,6 +132,41 @@ class PartnershipRepositoryExposed : PartnershipRepository {
                 )
             },
             suggestionPack = partnership.suggestionPack?.let { pack ->
+                pack.toDomain(
+                    language = partnership.language,
+                    optionIds = PartnershipOptionEntity.listByPartnershipAndPack(partnershipId, pack.id.value)
+                        .map { it.id.value },
+                )
+            },
+        )
+    }
+
+    override fun getByIdDetailed(eventSlug: String, partnershipId: UUID): PartnershipDetail = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val partnership = PartnershipEntity
+            .singleByEventAndPartnership(event.id.value, partnershipId)
+            ?: throw NotFoundException("Partnership not found")
+        val billing = BillingEntity
+            .singleByEventAndPartnership(event.id.value, partnershipId)
+
+        partnership.toDetailedDomain(
+            billing = billing,
+            selectedPack = partnership.selectedPack?.let { pack ->
+                pack.toDomain(
+                    language = partnership.language,
+                    optionIds = PartnershipOptionEntity.listByPartnershipAndPack(partnershipId, pack.id.value)
+                        .map { it.id.value },
+                )
+            },
+            suggestionPack = partnership.suggestionPack?.let { pack ->
+                pack.toDomain(
+                    language = partnership.language,
+                    optionIds = PartnershipOptionEntity.listByPartnershipAndPack(partnershipId, pack.id.value)
+                        .map { it.id.value },
+                )
+            },
+            validatedPack = partnership.validatedPack()?.let { pack ->
                 pack.toDomain(
                     language = partnership.language,
                     optionIds = PartnershipOptionEntity.listByPartnershipAndPack(partnershipId, pack.id.value)

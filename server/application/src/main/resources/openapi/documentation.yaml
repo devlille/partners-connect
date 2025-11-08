@@ -802,6 +802,46 @@ paths:
             text/plain:
               schema:
                 type: string
+  /events/{eventSlug}/partnerships/{partnershipId}:
+    get:
+      summary: Get detailed partnership information
+      operationId: getEventsPartnershipDetailed
+      security:
+        - {}
+      description: Retrieve comprehensive partnership information including company, event, and process status details
+      parameters:
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug identifier
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Partnership unique identifier
+      responses:
+        '200':
+          description: OK - Partnership details successfully retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/detailed_partnership_response.schema'
+        '400':
+          description: Bad Request - Invalid partnership ID format
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Not Found - Partnership or event not found
+          content:
+            text/plain:
+              schema:
+                type: string
   /events/{eventSlug}/partnerships/{partnershipId}/billing:
     get:
       summary: Get partnership billing information
@@ -3479,6 +3519,14 @@ components:
       $ref: '#/components/schemas/job_offer_promotion_response.schema'
     DeclineJobOfferRequest:
       $ref: '#/components/schemas/decline_job_offer_promotion.schema'
+    DetailedPartnershipResponse:
+      $ref: '#/components/schemas/detailed_partnership_response.schema'
+    PartnershipDetail:
+      $ref: '#/components/schemas/partnership_detail.schema'
+    PartnershipProcessStatus:
+      $ref: '#/components/schemas/partnership_process_status.schema'
+    PartnershipPhases:
+      $ref: '#/components/schemas/partnership_phases.schema'
     user_session.schema:
       $id: user_session.schema.json
       type: object
@@ -4563,6 +4611,121 @@ components:
               type: string
               format: uuid
               description: Required for selectable_selection
+    partnership_process_status.schema:
+      $id: partnership_process_status.schema.json
+      type: object
+      properties:
+        suggestion_sent_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
+        suggestion_approved_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
+        suggestion_declined_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
+        validated_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
+        declined_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
+        agreement_url:
+          type:
+            - string
+            - 'null'
+        agreement_signed_url:
+          type:
+            - string
+            - 'null'
+        communication_publication_date:
+          type:
+            - string
+            - 'null'
+          format: date-time
+        communication_support_url:
+          type:
+            - string
+            - 'null'
+        billing_status:
+          type:
+            - string
+            - 'null'
+          enum:
+            - pending
+            - sent
+            - paid
+            - null
+    partnership_detail.schema:
+      $id: partnership_detail.schema.json
+      type: object
+      properties:
+        id:
+          type: string
+        phone:
+          type:
+            - string
+            - 'null'
+        contact_name:
+          type: string
+        contact_role:
+          type: string
+        language:
+          type: string
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+        selected_pack:
+          anyOf:
+            - $ref: '#/components/schemas/sponsoring_pack.schema'
+            - type: 'null'
+        suggestion_pack:
+          anyOf:
+            - $ref: '#/components/schemas/sponsoring_pack.schema'
+            - type: 'null'
+        validated_pack:
+          anyOf:
+            - $ref: '#/components/schemas/sponsoring_pack.schema'
+            - type: 'null'
+        process_status:
+          $ref: '#/components/schemas/partnership_process_status.schema'
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - contact_name
+        - contact_role
+        - language
+        - emails
+        - process_status
+        - created_at
+    detailed_partnership_response.schema:
+      $id: detailed_partnership_response.schema.json
+      type: object
+      properties:
+        partnership:
+          $ref: '#/components/schemas/partnership_detail.schema'
+        company:
+          $ref: '#/components/schemas/company.schema'
+        event:
+          $ref: '#/components/schemas/event_with_organisation.schema'
+      required:
+        - partnership
+        - company
+        - event
     billing_contact.schema:
       $id: billing_contact.schema.json
       type: object
@@ -5401,3 +5564,32 @@ components:
       required:
         - language
         - name
+    partnership_phases.schema:
+      $id: partnership_phases.schema.json
+      type: object
+      properties:
+        suggestion_sent:
+          type: boolean
+        suggestion_approved:
+          type: boolean
+        agreement_generated:
+          type: boolean
+        agreement_signed:
+          type: boolean
+        validated:
+          type: boolean
+        communication_published:
+          type: boolean
+        invoice_generated:
+          type: boolean
+        paid:
+          type: boolean
+      required:
+        - suggestion_sent
+        - suggestion_approved
+        - agreement_generated
+        - agreement_signed
+        - validated
+        - communication_published
+        - invoice_generated
+        - paid

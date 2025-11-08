@@ -1,0 +1,40 @@
+{
+  "$id": "partnership_phases.schema.json", 
+  "type": "object",
+  "properties": {
+    "suggestion_sent": {
+      "type": "boolean"
+    },
+    "suggestion_approved": {
+      "type": "boolean"
+    },
+    "agreement_generated": {
+      "type": "boolean"
+    },
+    "agreement_signed": {
+      "type": "boolean"
+    },
+    "validated": {
+      "type": "boolean"
+    },
+    "communication_published": {
+      "type": "boolean"
+    },
+    "invoice_generated": {
+      "type": "boolean"
+    },
+    "paid": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "suggestion_sent",
+    "suggestion_approved", 
+    "agreement_generated",
+    "agreement_signed",
+    "validated",
+    "communication_published",
+    "invoice_generated",
+    "paid"
+  ]
+}

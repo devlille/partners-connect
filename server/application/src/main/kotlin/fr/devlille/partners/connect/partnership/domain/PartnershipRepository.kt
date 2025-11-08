@@ -8,6 +8,8 @@ interface PartnershipRepository {
 
     fun getById(eventSlug: String, partnershipId: UUID): Partnership
 
+    fun getByIdDetailed(eventSlug: String, partnershipId: UUID): PartnershipDetail
+
     fun getCompanyByPartnershipId(eventSlug: String, partnershipId: UUID): Company
 
     fun listByEvent(

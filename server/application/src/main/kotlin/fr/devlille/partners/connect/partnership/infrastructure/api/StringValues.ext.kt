@@ -2,7 +2,7 @@ package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.internal.infrastructure.api.getValue
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
-import fr.devlille.partners.connect.partnership.infrastructure.db.InvoiceStatus
+import fr.devlille.partners.connect.partnership.domain.InvoiceStatus
 import io.ktor.server.plugins.ParameterConversionException
 import io.ktor.util.StringValues
 import java.util.UUID

@@ -1,0 +1,73 @@
+{
+  "$id": "partnership_process_status.schema.json",
+  "type": "object",
+  "properties": {
+    "suggestion_sent_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "suggestion_approved_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "suggestion_declined_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "validated_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "declined_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "agreement_url": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "agreement_signed_url": {
+      "type": [
+        "string", 
+        "null"
+      ]
+    },
+    "communication_publication_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "communication_support_url": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "billing_status": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": ["pending", "sent", "paid", null]
+    }
+  }
+}
