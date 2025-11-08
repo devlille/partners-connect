@@ -1,0 +1,49 @@
+{
+  "$id": "provider.schema.json",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "website": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "phone": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "email": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "org_slug": {
+      "type": "string",
+      "description": "Organisation slug that owns this provider"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "datetime"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "type",
+    "org_slug",
+    "created_at"
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "$id": "update_provider.schema.json",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "type": {
+      "type": [
+        "string", 
+        "null"
+      ],
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "website": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "phone": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "maxLength": 30
+    },
+    "email": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": false
+}
