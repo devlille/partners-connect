@@ -1,12 +1,12 @@
 meta {
-  name: Attach
+  name: List
   type: http
-  seq: 2
+  seq: 1
 }
 
-post {
+get {
   url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/providers
-  body: json
+  body: none
   auth: none
 }
 
@@ -17,10 +17,4 @@ params:path {
 
 headers {
   Authorization: Bearer {{token}}
-}
-
-body:json {
-  [
-    "{{provider_id}}"
-  ]
 }

@@ -1,0 +1,30 @@
+meta {
+  name: Update
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/providers/:provider_id
+  body: json
+  auth: none
+}
+
+params:path {
+  provider_id: {{provider_id}}
+  org_slug: {{org_slug}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "name": "MVD location",
+    "type": "mobilier",
+    "website": "https://www.mvd-location.com/",
+    "phone": "0609553611",
+    "email": "mvd.location@icloud.com"
+  }
+}
