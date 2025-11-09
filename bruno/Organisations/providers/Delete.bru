@@ -1,0 +1,20 @@
+meta {
+  name: Delete
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/providers/:provider_id
+  body: none
+  auth: none
+}
+
+params:path {
+  provider_id: {{provider_id}}
+  org_slug: {{org_slug}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
