@@ -4,7 +4,6 @@ import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.internal.moduleMocked
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.provider.domain.CreateProvider
-import fr.devlille.partners.connect.provider.factories.createMockedProviderInput
 import fr.devlille.partners.connect.provider.factories.insertMockedProvider
 import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
 import fr.devlille.partners.connect.users.factories.insertMockedUser
@@ -47,8 +46,9 @@ class ProviderRoutesTest {
     fun `GET providers returns all providers`() = testApplication {
         application {
             moduleMocked()
-            insertMockedProvider(name = "Provider 1", type = "Tech")
-            insertMockedProvider(name = "Provider 2", type = "Catering")
+            val orgEntity = insertMockedOrganisationEntity(name = "test-org")
+            insertMockedProvider(name = "Provider 1", type = "Tech", organisation = orgEntity)
+            insertMockedProvider(name = "Provider 2", type = "Catering", organisation = orgEntity)
         }
 
         val response = client.get("/providers")
@@ -70,17 +70,18 @@ class ProviderRoutesTest {
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val orgSlug = "test-org"
         val email = "john.doe@contact.com" // Must match the mock auth email
 
         application {
             moduleMocked()
             val user = insertMockedUser(userId, email = email)
-            insertMockedOrganisationEntity(id = orgId)
+            insertMockedOrganisationEntity(id = orgId, name = orgSlug)
             insertMockedEvent(id = eventId, orgId = orgId, slug = "test-event")
             insertMockedOrgaPermission(orgId = orgId, user = user, canEdit = true)
         }
 
-        val providerInput = createMockedProviderInput(
+        val providerInput = CreateProvider(
             name = "New Provider",
             type = "Technology",
             website = "https://newprovider.com",
@@ -88,7 +89,7 @@ class ProviderRoutesTest {
             email = "contact@newprovider.com",
         )
 
-        val response = client.post("/providers") {
+        val response = client.post("/orgs/$orgSlug/providers") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(CreateProvider.serializer(), providerInput))
@@ -107,9 +108,15 @@ class ProviderRoutesTest {
     fun `POST providers fails with 401 when not authenticated`() = testApplication {
         application { moduleMocked() }
 
-        val providerInput = createMockedProviderInput()
+        val providerInput = CreateProvider(
+            name = "Test Provider",
+            type = "Technology",
+            website = "https://testprovider.com",
+            phone = "+33123456789",
+            email = "contact@testprovider.com",
+        )
 
-        val response = client.post("/providers") {
+        val response = client.post("/orgs/test-org/providers") {
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(CreateProvider.serializer(), providerInput))
         }
@@ -120,23 +127,32 @@ class ProviderRoutesTest {
     @Test
     fun `POST providers fails with 401 when user has no organizer permissions`() = testApplication {
         val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val orgSlug = "test-org"
         val email = "john.doe@contact.com" // Must match the mock auth email
 
         application {
             moduleMocked()
             insertMockedUser(userId, email = email) // User without organizer permissions
+            insertMockedOrganisationEntity(id = orgId, name = orgSlug) // Create org but don't give user permissions
         }
 
-        val providerInput = createMockedProviderInput()
+        val providerInput = CreateProvider(
+            name = "Test Provider",
+            type = "Technology",
+            website = "https://testprovider.com",
+            phone = "+33123456789",
+            email = "contact@testprovider.com",
+        )
 
-        val response = client.post("/providers") {
+        val response = client.post("/orgs/$orgSlug/providers") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(Json.encodeToString(CreateProvider.serializer(), providerInput))
         }
 
         assertEquals(HttpStatusCode.Unauthorized, response.status)
-        assertTrue(response.bodyAsText().contains("organizer permissions"))
+        assertTrue(response.bodyAsText().contains("not allowed to edit"))
     }
 
     @Test
@@ -144,17 +160,18 @@ class ProviderRoutesTest {
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val orgSlug = "test-org"
         val email = "john.doe@contact.com" // Must match the mock auth email
 
         application {
             moduleMocked()
             val user = insertMockedUser(userId, email = email)
-            insertMockedOrganisationEntity(id = orgId)
+            insertMockedOrganisationEntity(id = orgId, name = orgSlug)
             insertMockedEvent(id = eventId, orgId = orgId, slug = "test-event")
             insertMockedOrgaPermission(orgId = orgId, user = user, canEdit = true)
         }
 
-        val response = client.post("/providers") {
+        val response = client.post("/orgs/$orgSlug/providers") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody("{\"invalid\": \"json\"}")

@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "ErrorResponse",
+  "description": "Standardized error response format used across the application",
+  "properties": {
+    "message": {
+      "type": "string",
+      "description": "Human-readable error message describing what went wrong"
+    },
+    "errors": {
+      "type": "array",
+      "description": "Optional array of additional error details (e.g., validation errors)",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "stack": {
+      "type": ["string", "null"],
+      "description": "Optional stack trace for debugging (only in development/debug mode)"
+    }
+  },
+  "required": ["message"],
+  "additionalProperties": false,
+  "examples": [
+    {
+      "message": "Provider is still attached to events and cannot be deleted"
+    },
+    {
+      "message": "User does not have permission to access this organisation"
+    },
+    {
+      "message": "Validation failed",
+      "errors": ["Name is required", "Email format is invalid"]
+    },
+    {
+      "message": "Internal server error",
+      "stack": "java.lang.NullPointerException: ...\n\tat ..."
+    }
+  ]
+}

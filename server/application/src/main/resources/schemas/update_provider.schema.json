@@ -1,18 +1,18 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema#",
-  "$id": "create_provider.schema.json",
-  "title": "Create Provider Request",
-  "description": "Schema for creating a new provider within an organisation",
+  "$id": "update_provider.schema.json",
+  "title": "Update Provider Request",
+  "description": "Schema for updating an existing provider within an organisation",
   "type": "object",
   "properties": {
     "name": {
-      "type": "string",
+      "type": ["string", "null"],
       "minLength": 1,
       "maxLength": 255,
       "description": "Provider name"
     },
     "type": {
-      "type": "string",
+      "type": ["string", "null"],
       "minLength": 1,
       "maxLength": 100,
       "description": "Provider type (free text)"
@@ -34,6 +34,6 @@
       "description": "Provider email address"
     }
   },
-  "required": ["name", "type"],
+  "required": [],
   "additionalProperties": false
 }

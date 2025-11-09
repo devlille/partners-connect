@@ -1297,6 +1297,12 @@ paths:
         - {}
       description: "List all providers with optional filtering and sorting"
       parameters:
+        - name: "org_slug"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+          description: "Filter providers by organization slug"
         - name: "query"
           in: "query"
           required: false
@@ -1470,6 +1476,156 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Organisation"
+  /orgs/{orgSlug}/providers:
+    post:
+      summary: "Create provider"
+      operationId: "postOrgsProviders"
+      description: "Create a new provider within organization scope (requires organization membership)"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organization slug"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProvider"
+        required: true
+      responses:
+        "201":
+          description: "Created - Provider created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Provider"
+        "400":
+          description: "Bad Request - Invalid request body"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "Unauthorized - Missing or invalid authentication"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Forbidden - User not member of organization"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /orgs/{orgSlug}/providers/{providerId}:
+    put:
+      summary: "Update provider"
+      operationId: "putOrgsProviders"
+      description: "Update provider within organization scope (requires organization membership)"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organization slug"
+        - name: "providerId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "Provider UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProvider"
+        required: true
+      responses:
+        "200":
+          description: "OK - Provider updated successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Provider"
+        "400":
+          description: "Bad Request - Invalid request body"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "Unauthorized - Missing or invalid authentication"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Forbidden - User not member of organization"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Not Found - Provider not found or not owned by organization"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      summary: "Delete provider"
+      operationId: "deleteOrgsProviders"
+      description: "Delete provider after detaching from all events (requires organization membership)"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organization slug"
+        - name: "providerId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "Provider UUID"
+      responses:
+        "204":
+          description: "No Content - Provider deleted successfully"
+        "401":
+          description: "Unauthorized - Missing or invalid authentication"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Forbidden - User not member of organization"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Not Found - Provider not found or not owned by organization"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: "Conflict - Provider still attached to events (must detach first)"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /orgs/{orgSlug}/events:
     get:
       summary: "Get organization details"
@@ -3122,6 +3278,67 @@ paths:
               schema:
                 type: "string"
   /orgs/{orgSlug}/events/{eventSlug}/providers:
+    get:
+      summary: "List event providers"
+      operationId: "getOrgsEventsProviders"
+      description: "List providers attached to an event with pagination (requires organization membership)"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organization slug"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug"
+        - name: "page"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            minimum: 1
+            default: 1
+          description: "Page number (must be >= 1)"
+        - name: "page_size"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: "Number of items per page (must be between 1 and 100)"
+      responses:
+        "200":
+          description: "OK - Paginated list of event providers"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedProvider"
+        "401":
+          description: "Unauthorized - Missing or invalid authentication"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Forbidden - User not member of organization"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Not Found - Event or organization not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
     post:
       summary: "Create new provider"
       operationId: "postOrgsEventsProviders"
@@ -3161,27 +3378,27 @@ paths:
         "400":
           description: "Bad Request - Invalid provider IDs or empty list"
           content:
-            text/plain:
+            application/json:
               schema:
-                type: "string"
+                $ref: "#/components/schemas/ErrorResponse"
         "401":
           description: "Unauthorized - Missing or invalid authentication"
           content:
-            text/plain:
+            application/json:
               schema:
-                type: "string"
+                $ref: "#/components/schemas/ErrorResponse"
         "403":
           description: "Forbidden - No write access to the event"
           content:
-            text/plain:
+            application/json:
               schema:
-                type: "string"
+                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: "Not Found - Event or organization not found"
           content:
-            text/plain:
+            application/json:
               schema:
-                type: "string"
+                $ref: "#/components/schemas/ErrorResponse"
     delete:
       summary: "Remove providers from event"
       operationId: "deleteOrgsEventsProviders"
@@ -3221,27 +3438,27 @@ paths:
         "400":
           description: "Bad Request - Invalid provider IDs or empty list"
           content:
-            text/plain:
+            application/json:
               schema:
-                type: "string"
+                $ref: "#/components/schemas/ErrorResponse"
         "401":
           description: "Unauthorized - Missing or invalid authentication"
           content:
-            text/plain:
+            application/json:
               schema:
-                type: "string"
+                $ref: "#/components/schemas/ErrorResponse"
         "403":
           description: "Forbidden - No write access to the event"
           content:
-            text/plain:
+            application/json:
               schema:
-                type: "string"
+                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: "Not Found - Event or organization not found"
           content:
-            text/plain:
+            application/json:
               schema:
-                type: "string"
+                $ref: "#/components/schemas/ErrorResponse"
   /orgs/{orgSlug}/users:
     get:
       summary: "Get organization details"
@@ -3475,6 +3692,10 @@ components:
       $ref: "../schemas/provider.schema.json"
     CreateProvider:
       $ref: "../schemas/create_provider.schema.json"
+    UpdateProvider:
+      $ref: "../schemas/update_provider.schema.json"
+    ErrorResponse:
+      $ref: "../schemas/error_response.schema.json"
     BoothLocationRequest:
       $ref: "../schemas/booth_location_request.schema.json"
     BoothLocationResponse:
