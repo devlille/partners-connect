@@ -120,7 +120,7 @@ class EventRepositoryExposed(
         val providers = EventProviderEntity.find {
             EventProvidersTable.eventId eq eventEntity.id
         }.map { eventProvider ->
-            val provider = ProviderEntity.findById(eventProvider.providerId)!!
+            val provider = ProviderEntity.findById(eventProvider.provider.id)!!
             Provider(
                 id = provider.id.value.toString(),
                 name = provider.name,
@@ -128,6 +128,7 @@ class EventRepositoryExposed(
                 website = provider.website,
                 phone = provider.phone,
                 email = provider.email,
+                orgSlug = provider.organisation.slug,
                 createdAt = provider.createdAt,
             )
         }

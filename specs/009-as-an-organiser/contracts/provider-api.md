@@ -22,8 +22,6 @@ Content-Type: application/json
 
 **Response 201:**
 ```json
-**Response 201:**
-```json
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
   "name": "TechCorp Solutions",

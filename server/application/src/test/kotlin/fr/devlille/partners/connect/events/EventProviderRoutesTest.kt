@@ -41,13 +41,13 @@ class EventProviderRoutesTest {
         application {
             moduleMocked()
             val user = insertMockedUser(userId, email = email)
-            insertMockedOrganisationEntity(id = orgId, name = testOrgSlug)
+            val orgEntity = insertMockedOrganisationEntity(id = orgId, name = testOrgSlug)
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug, name = "Test Event")
             insertMockedOrgaPermission(orgId = orgId, user = user, canEdit = true)
 
             // Create providers with fixed IDs
-            insertMockedProvider(id = provider1Id, name = "Provider A")
-            insertMockedProvider(id = provider2Id, name = "Provider B")
+            insertMockedProvider(id = provider1Id, name = "Provider A", organisation = orgEntity)
+            insertMockedProvider(id = provider2Id, name = "Provider B", organisation = orgEntity)
         }
 
         val providerIds = listOf(provider1Id.toString(), provider2Id.toString())
@@ -232,11 +232,11 @@ class EventProviderRoutesTest {
         application {
             moduleMocked()
             val user = insertMockedUser(userId, email = email)
-            insertMockedOrganisationEntity(id = orgId, name = testOrgSlug)
+            val orgEntity = insertMockedOrganisationEntity(id = orgId, name = testOrgSlug)
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug, name = "Test Event")
             insertMockedOrgaPermission(orgId = orgId, user = user, canEdit = true)
 
-            insertMockedProvider(id = providerId, name = "Test Provider")
+            insertMockedProvider(id = providerId, name = "Test Provider", organisation = orgEntity)
         }
 
         val providerIds = listOf(providerId.toString())

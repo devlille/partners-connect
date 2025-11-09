@@ -450,13 +450,13 @@ class EventRoutesTest {
         application {
             moduleMocked()
             val user = insertMockedUser(userId, email = email)
-            insertMockedOrganisationEntity(id = orgId, name = testOrgSlug)
+            val orgEntity = insertMockedOrganisationEntity(id = orgId, name = testOrgSlug)
             insertMockedEvent(id = eventId, orgId = orgId, slug = testEventSlug, name = "Test Event")
             insertMockedOrgaPermission(orgId = orgId, user = user, canEdit = true)
 
             // Create providers
-            insertMockedProvider(id = providerId1, name = "Provider A", type = "Technology")
-            insertMockedProvider(id = providerId2, name = "Provider B", type = "Consulting")
+            insertMockedProvider(id = providerId1, name = "Provider A", type = "Technology", organisation = orgEntity)
+            insertMockedProvider(id = providerId2, name = "Provider B", type = "Consulting", organisation = orgEntity)
         }
 
         // Attach providers to event using the API
