@@ -33,18 +33,7 @@
         <p v-if="validationErrors.base_price" id="price-error" class="mt-1 text-sm text-red-600" role="alert">{{ validationErrors.base_price }}</p>
       </div>
 
-      <div>
-        <label for="nb_tickets" class="block text-sm font-medium text-gray-700 mb-1">Nombre de billets*</label>
-        <UInput
-          id="nb_tickets"
-          v-model.number="form.nb_tickets"
-          type="number"
-          required
-          :min="0"
-          placeholder="Nombre de billets inclus"
-        />
-      </div>
-
+      
       <div>
         <label for="max_quantity" class="block text-sm font-medium text-gray-700 mb-1">Quantité maximale</label>
         <UInput
@@ -56,13 +45,7 @@
         />
       </div>
 
-      <div class="flex items-center">
-        <UCheckbox
-          id="with_booth"
-          v-model="form.with_booth"
-          label="Inclut un stand"
-        />
-      </div>
+     
     </div>
 
     <!-- Section des options -->
@@ -149,8 +132,6 @@ const { handleError } = useErrorHandler();
 const form = ref<PackFormData>({
   name: props.data.name || "",
   price: props.data.price || 0,
-  with_booth: props.data.with_booth || false,
-  nb_tickets: props.data.nb_tickets || 0,
   max_quantity: props.data.max_quantity || undefined,
   requiredOptions: props.initialRequiredOptions || [],
   optionalOptions: props.initialOptionalOptions || []
@@ -206,8 +187,6 @@ function onSave() {
     name: packData.name,
     base_price: packData.price,
     max_quantity: packData.max_quantity,
-    nb_tickets: packData.nb_tickets,
-    with_booth: packData.with_booth,
   });
 
   if (!packValidation.success) {

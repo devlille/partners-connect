@@ -65,8 +65,6 @@ const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
 const initialData: Partial<CreateSponsoringPack> = {
   name: '',
   price: 0,
-  with_booth: false,
-  nb_tickets: 0,
   max_quantity: undefined
 };
 

@@ -1,5 +1,24 @@
 <template>
   <form @submit.prevent="onSave" novalidate>
+    <!-- Sélecteur de type d'option -->
+    <div class="mb-6">
+      <label for="option-type" class="block text-sm font-medium text-gray-700 mb-2">
+        Type d'option*
+      </label>
+      <select
+        id="option-type"
+        v-model="form.type"
+        class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+      >
+        <option v-for="type in optionTypes" :key="type.value" :value="type.value">
+          {{ type.label }}
+        </option>
+      </select>
+      <p class="mt-1 text-sm text-gray-500">
+        Sélectionnez le type d'option qui correspond à votre besoin
+      </p>
+    </div>
+
     <!-- Onglets de langues avec bouton d'ajout -->
     <div class="mb-6">
       <div class="flex gap-2 border-b items-center" role="tablist" aria-label="Langues disponibles">
@@ -49,7 +68,7 @@
 
     <!-- Formulaire pour la langue sélectionnée -->
     <div
-      v-if="form.translations[currentLanguage]"
+      v-if="currentTranslation"
       :id="`panel-${currentLanguage}`"
       role="tabpanel"
       :aria-labelledby="`tab-${currentLanguage}`"
@@ -61,10 +80,11 @@
         </label>
         <UInput
           :id="`name-${currentLanguage}`"
-          v-model="form.translations[currentLanguage].name"
+          v-model="currentTranslation.name"
           type="text"
           required
           placeholder="Ex: Logo sur T-shirt, Stand premium..."
+          class="w-full"
           :class="{ 'border-red-500': validationErrors[`translations.${currentLanguage}.name`] }"
           :aria-invalid="!!validationErrors[`translations.${currentLanguage}.name`]"
           :aria-describedby="validationErrors[`translations.${currentLanguage}.name`] ? `name-${currentLanguage}-error` : undefined"
@@ -80,15 +100,16 @@
         </label>
         <UTextarea
           :id="`description-${currentLanguage}`"
-          v-model="form.translations[currentLanguage].description"
+          v-model="currentTranslation.description"
           :rows="4"
           placeholder="Description détaillée de l'option de sponsoring"
+          class="w-full"
         />
       </div>
     </div>
 
-    <!-- Prix (commun à toutes les langues) -->
-    <div class="border-t pt-4 mb-6">
+    <!-- Prix (commun à toutes les langues, sauf pour typed_selectable) -->
+    <div v-if="form.type !== 'typed_selectable'" class="border-t pt-4 mb-6">
       <div>
         <label for="price" class="block text-sm font-medium text-gray-700 mb-1">Prix (€)</label>
         <UInput
@@ -98,11 +119,82 @@
           :min="0"
           :step="0.01"
           placeholder="0.00 (laisser vide si gratuit)"
+          class="w-full"
           :class="{ 'border-red-500': validationErrors.price }"
           :aria-invalid="!!validationErrors.price"
           :aria-describedby="validationErrors.price ? 'price-error' : undefined"
         />
         <p v-if="validationErrors.price" id="price-error" class="mt-1 text-sm text-red-600" role="alert">{{ validationErrors.price }}</p>
+      </div>
+    </div>
+
+    <!-- Champs spécifiques pour typed_number -->
+    <div v-if="form.type === 'typed_number'" class="border-t pt-4 mb-6">
+      <div>
+        <label for="fixed-quantity" class="block text-sm font-medium text-gray-700 mb-1">
+          Quantité fixe*
+        </label>
+        <UInput
+          id="fixed-quantity"
+          v-model.number="form.fixedQuantity"
+          type="number"
+          :min="1"
+          :step="1"
+          placeholder="Ex: 10"
+          class="w-full"
+          required
+        />
+        <p class="mt-1 text-sm text-gray-500">
+          Cette quantité ne pourra pas être modifiée par les sponsors
+        </p>
+      </div>
+    </div>
+
+    <!-- Champs spécifiques pour typed_selectable -->
+    <div v-if="form.type === 'typed_selectable'" class="border-t pt-4 mb-6">
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Valeurs sélectionnables*
+        </label>
+        <p class="text-sm text-gray-500 mb-3">
+          Ajoutez les différentes options disponibles avec leurs prix individuels
+        </p>
+
+        <!-- Liste des valeurs -->
+        <div v-for="(selectableValue, index) in form.selectableValues" :key="index" class="flex gap-2 mb-2">
+          <UInput
+            v-model="selectableValue.value"
+            type="text"
+            placeholder="Ex: Stand 3x3m"
+            class="flex-1"
+            required
+          />
+          <UInput
+            v-model.number="selectableValue.price"
+            type="number"
+            :min="0"
+            :step="0.01"
+            placeholder="Prix (€)"
+            class="w-32"
+            required
+          />
+          <button
+            type="button"
+            class="px-3 py-2 text-red-600 hover:text-red-800 font-bold"
+            @click="removeSelectableValue(index)"
+          >
+            ×
+          </button>
+        </div>
+
+        <!-- Bouton d'ajout -->
+        <button
+          type="button"
+          class="mt-2 px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
+          @click="addSelectableValue"
+        >
+          + Ajouter une valeur
+        </button>
       </div>
     </div>
 
@@ -136,8 +228,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { CreateSponsoringOption, SponsoringPack } from "~/utils/api";
-import { sponsoringOptionSchema } from "~/utils/validation/schemas";
+import type { CreateSponsoringOptionSchema, SponsoringPack, CreateSelectableValue } from "~/utils/api";
 
 // Toutes les langues disponibles
 const allAvailableLanguages = [
@@ -155,17 +246,40 @@ const allAvailableLanguages = [
   { code: 'ar', label: 'العربية' }
 ];
 
+// Types d'options disponibles
+const optionTypes = [
+  { value: 'text', label: 'Texte libre' },
+  { value: 'typed_quantitative', label: 'Quantité (ex: offres d\'emploi)' },
+  { value: 'typed_number', label: 'Nombre fixe (ex: billets)' },
+  { value: 'typed_selectable', label: 'Sélection (ex: stands)' }
+];
+
 // Type pour les traductions dans le formulaire
 type TranslationForm = {
   name: string;
   description: string;
 };
 
+// Type pour les valeurs sélectionnables
+type SelectableValueForm = {
+  value: string;
+  price: number;
+};
+
 // Type pour les données du formulaire
 type OptionFormData = {
+  type: 'text' | 'typed_quantitative' | 'typed_number' | 'typed_selectable';
   translations: Record<string, TranslationForm>;
   price: number | undefined;
   selectedPacks: string[];
+  // Champs spécifiques pour typed_quantitative
+  typeDescriptorQuantitative?: string;
+  // Champs spécifiques pour typed_number
+  typeDescriptorNumber?: string;
+  fixedQuantity?: number;
+  // Champs spécifiques pour typed_selectable
+  typeDescriptorSelectable?: string;
+  selectableValues: SelectableValueForm[];
 };
 
 const props = defineProps<{
@@ -177,28 +291,76 @@ const emit = defineEmits<{
   (e: 'save', payload: any): void
 }>()
 
-const { t } = useI18n();
-const { handleError } = useErrorHandler();
-
 // Langues actives (commence avec français uniquement)
 const activeLanguages = ref<Array<{ code: string, label: string }>>([
-  allAvailableLanguages[0] // Français
+  allAvailableLanguages[0]! // Français
 ]);
 
 // Langue courante sélectionnée
 const currentLanguage = ref('fr');
 
-// Initialiser le formulaire avec le français uniquement
-const form = ref<OptionFormData>({
-  translations: {
-    fr: {
-      name: props.data?.name || '',
-      description: props.data?.description || ''
+// Computed pour la traduction courante
+const currentTranslation = computed(() => form.value.translations[currentLanguage.value]);
+
+// Fonction pour initialiser le formulaire en fonction des données
+function initializeForm(): OptionFormData {
+  const baseForm: OptionFormData = {
+    type: props.data?.type || 'text',
+    translations: {
+      fr: {
+        name: props.data?.name || '',
+        description: props.data?.description || ''
+      }
+    },
+    price: props.data?.price || undefined,
+    selectedPacks: props.data?.selectedPacks || [],
+    typeDescriptorQuantitative: 'job_offer',
+    typeDescriptorNumber: 'nb_ticket',
+    fixedQuantity: 1,
+    typeDescriptorSelectable: 'booth',
+    selectableValues: []
+  };
+
+  // Si on a des données existantes, initialiser selon le type
+  if (props.data) {
+    switch (props.data.type) {
+      case 'typed_number':
+        baseForm.fixedQuantity = props.data.fixed_quantity || 1;
+        baseForm.typeDescriptorNumber = props.data.type_descriptor || 'nb_ticket';
+        break;
+
+      case 'typed_quantitative':
+        baseForm.typeDescriptorQuantitative = props.data.type_descriptor || 'job_offer';
+        break;
+
+      case 'typed_selectable':
+        baseForm.typeDescriptorSelectable = props.data.type_descriptor || 'booth';
+        // Convertir les valeurs sélectionnables
+        if (props.data.selectable_values && Array.isArray(props.data.selectable_values)) {
+          baseForm.selectableValues = props.data.selectable_values.map((v: any) => {
+            // Si v est un objet avec price (format CreateSelectableValue)
+            if (typeof v === 'object' && 'price' in v) {
+              return {
+                value: v.value,
+                price: v.price / 100 // Convertir centimes -> euros
+              };
+            }
+            // Si v est juste une string (format SponsoringOptionSchema)
+            return {
+              value: typeof v === 'string' ? v : v.value || '',
+              price: 0 // Prix par défaut à 0, l'utilisateur devra le saisir
+            };
+          });
+        }
+        break;
     }
-  },
-  price: props.data?.price || undefined,
-  selectedPacks: props.data?.selectedPacks || []
-})
+  }
+
+  return baseForm;
+}
+
+// Initialiser le formulaire
+const form = ref<OptionFormData>(initializeForm())
 
 const validationErrors = ref<Record<string, string>>({});
 
@@ -237,6 +399,17 @@ function removeLanguage(langCode: string) {
   }
 }
 
+function addSelectableValue() {
+  form.value.selectableValues.push({
+    value: '',
+    price: 0
+  });
+}
+
+function removeSelectableValue(index: number) {
+  form.value.selectableValues.splice(index, 1);
+}
+
 function onSave() {
   validationErrors.value = {};
 
@@ -255,44 +428,79 @@ function onSave() {
       };
     });
 
-  // Préparer les données pour la validation
-  const translationsForValidation: Record<string, { name: string; description?: string }> = {};
-  activeLanguages.value.forEach(lang => {
-    const translation = form.value.translations[lang.code];
-    if (translation && translation.name.trim() !== '') {
-      translationsForValidation[lang.code] = {
-        name: translation.name,
-        description: translation.description || undefined
-      };
-    }
-  });
-
-  // Valider avec Zod
-  const validation = sponsoringOptionSchema.safeParse({
-    translations: translationsForValidation,
-    price: form.value.price || 0,
-    is_free: !form.value.price || form.value.price === 0
-  });
-
-  if (!validation.success) {
-    validation.error.issues.forEach((err: any) => {
-      const field = err.path.join('.');
-      validationErrors.value[field] = t(err.message);
-    });
-    console.error('Validation errors:', validationErrors.value);
-    return;
-  }
-
   // Vérifier qu'au moins une traduction existe
   if (translations.length === 0) {
-    validationErrors.value['translations'] = t('errors.validation');
+    validationErrors.value['translations'] = 'Au moins une traduction est requise';
     return;
   }
 
-  const formattedData: CreateSponsoringOption = {
-    translations,
-    price: form.value.price || null
-  };
+  // Construire les données selon le type
+  let formattedData: CreateSponsoringOptionSchema;
+
+  switch (form.value.type) {
+    case 'text':
+      formattedData = {
+        type: 'text',
+        translations,
+        price: form.value.price ?? null
+      };
+      break;
+
+    case 'typed_quantitative':
+      formattedData = {
+        type: 'typed_quantitative',
+        translations,
+        price: form.value.price ?? null,
+        type_descriptor: form.value.typeDescriptorQuantitative as 'job_offer'
+      };
+      break;
+
+    case 'typed_number':
+      if (!form.value.fixedQuantity || form.value.fixedQuantity < 1) {
+        validationErrors.value['fixedQuantity'] = 'La quantité fixe doit être au moins 1';
+        return;
+      }
+      formattedData = {
+        type: 'typed_number',
+        translations,
+        price: form.value.price ?? null,
+        type_descriptor: form.value.typeDescriptorNumber as 'nb_ticket',
+        fixed_quantity: form.value.fixedQuantity
+      };
+      break;
+
+    case 'typed_selectable':
+      if (form.value.selectableValues.length === 0) {
+        validationErrors.value['selectableValues'] = 'Au moins une valeur sélectionnable est requise';
+        return;
+      }
+
+      // Valider les valeurs sélectionnables
+      const hasEmptyValues = form.value.selectableValues.some(v => !v.value.trim());
+      if (hasEmptyValues) {
+        validationErrors.value['selectableValues'] = 'Toutes les valeurs doivent avoir un nom';
+        return;
+      }
+
+      // Convertir les prix en centimes
+      const selectableValues: CreateSelectableValue[] = form.value.selectableValues.map(v => ({
+        value: v.value,
+        price: Math.round(v.price * 100) // Convertir en centimes
+      }));
+
+      formattedData = {
+        type: 'typed_selectable',
+        translations,
+        price: null, // Pour typed_selectable, le prix est dans les valeurs
+        type_descriptor: form.value.typeDescriptorSelectable as 'booth',
+        selectable_values: selectableValues
+      };
+      break;
+
+    default:
+      validationErrors.value['type'] = 'Type d\'option invalide';
+      return;
+  }
 
   emit('save', {
     option: formattedData,

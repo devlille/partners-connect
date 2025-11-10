@@ -1,6 +1,6 @@
 export default {
   api: {
-    input: "https://partners-connect-server-486924521070.europe-west1.run.app/swagger/documentation.yaml",
+    input: "https://app-9603f7fd-d8c8-45ce-80f3-1f1d9f3fc367.cleverapps.io/swagger/documentation.yaml",
     output: {
       target: "./utils/api.ts",
       override: {

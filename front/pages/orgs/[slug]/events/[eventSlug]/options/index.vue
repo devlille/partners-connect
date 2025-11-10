@@ -39,6 +39,7 @@
           <thead class="bg-gray-50">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix</th>
               <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
@@ -48,8 +49,13 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 cursor-pointer" @click="onRowClick(option)">
                 {{ getOptionName(option) }}
               </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                <span :class="getTypeClass(option.type)"> {{ option.type }}
+                  {{ getTypeLabel(option.type) }}
+                </span>
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {{ option.price ? `${option.price}€` : 'Gratuit' }}
+                {{ formatPrice(option) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <UButton
@@ -170,6 +176,41 @@ onMounted(() => {
 watch([orgSlug, eventSlug], () => {
   loadOptions();
 });
+
+function getTypeLabel(type: string): string {
+  const typeLabels: Record<string, string> = {
+    text: 'Texte libre',
+    typed_quantitative: 'Quantité',
+    typed_number: 'Nombre fixe',
+    typed_selectable: 'Sélection'
+  };
+  return typeLabels[type] || type;
+}
+
+function getTypeClass(type: string): string {
+  const defaultClass = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800';
+  const typeClasses: Record<string, string> = {
+    text: defaultClass,
+    typed_quantitative: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800',
+    typed_number: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800',
+    typed_selectable: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800'
+  };
+  return typeClasses[type] || defaultClass;
+}
+
+function formatPrice(option: SponsoringOption): string {
+  // Pour typed_selectable, afficher "Variable" car le prix dépend de la sélection
+  if (option.type === 'typed_selectable') {
+    return 'Variable';
+  }
+  // Pour typed_number, afficher le prix avec la quantité
+  if (option.type === 'typed_number' && 'fixed_quantity' in option) {
+    const price = option.price ? `${option.price}€` : 'Gratuit';
+    return `${price} (×${option.fixed_quantity})`;
+  }
+  // Pour les autres types
+  return option.price ? `${option.price}€` : 'Gratuit';
+}
 
 function onRowClick(row: SponsoringOption) {
   navigateTo(`/orgs/${orgSlug.value}/events/${eventSlug.value}/options/${row.id}`);

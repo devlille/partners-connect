@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { getEventBySlug, postOrgsEventsOptions, type CreateSponsoringOption } from "~/utils/api";
+import { getEventBySlug, postOrgsEventsOptions, type CreateSponsoringOptionSchema } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 
 const route = useRoute();
@@ -70,8 +70,8 @@ async function onSave(data: any) {
     error.value = null;
     success.value = false;
 
-    // Le formulaire envoie { option: CreateSponsoringOption, selectedPacks: string[] }
-    const optionData: CreateSponsoringOption = data.option;
+    // Le formulaire envoie { option: CreateSponsoringOptionSchema, selectedPacks: string[] }
+    const optionData: CreateSponsoringOptionSchema = data.option;
 
     await postOrgsEventsOptions(orgSlug.value, eventSlug.value, optionData);
     success.value = true;
