@@ -27,7 +27,6 @@ object MigrationRegistry {
         MakeOrganisationFieldsNullableMigration,
         AddBoothManagementFieldsMigration,
         AddPartnershipCommunicationFieldsMigration,
-        AddProviderManagementMigration,
         AddEventExternalLinksMigration,
         AddIntegrationCreatedAtMigration,
         AddEventWebhooksMigration,
@@ -35,6 +34,7 @@ object MigrationRegistry {
         CreateJobOfferPromotionsTableMigration,
         AddCompanyStatusColumnMigration(),
         AddPolymorphicSponsoringOptionsMigration,
+        AddProviderManagementMigration,
     )
 
     /**
