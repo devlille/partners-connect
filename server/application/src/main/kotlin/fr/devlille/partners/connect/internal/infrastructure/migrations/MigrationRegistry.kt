@@ -8,6 +8,7 @@ import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPartnershipCommunicationFieldsMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPolymorphicSponsoringOptionsMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddProviderManagementMigration
+import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddSelectableValuePricingMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateCompanyJobOffersTableMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateJobOfferPromotionsTableMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.InitialSchemaMigration
@@ -35,6 +36,7 @@ object MigrationRegistry {
         AddCompanyStatusColumnMigration(),
         AddPolymorphicSponsoringOptionsMigration,
         AddProviderManagementMigration,
+        AddSelectableValuePricingMigration,
     )
 
     /**
