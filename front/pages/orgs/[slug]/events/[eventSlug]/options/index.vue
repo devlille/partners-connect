@@ -23,56 +23,129 @@
         {{ error }}
       </div>
 
-      <div v-else-if="options.length === 0" class="text-center py-12">
-        <div class="text-gray-500 mb-4">Aucune option pour le moment</div>
-        <UButton
-          :to="`/orgs/${orgSlug}/events/${eventSlug}/options/create`"
-          icon="i-heroicons-plus"
-          color="primary"
-        >
-          Créer une option
-        </UButton>
-      </div>
+      <template v-else>
+        <!-- Zone de recherche et filtres -->
+        <div class="mb-6 bg-white rounded-lg shadow p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Recherche par libellé -->
+            <div>
+              <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
+                Rechercher par nom
+              </label>
+              <UInput
+                id="search"
+                v-model="searchQuery"
+                type="text"
+                placeholder="Ex: Logo, Stand, Tickets..."
+                icon="i-heroicons-magnifying-glass"
+                class="w-full"
+              />
+            </div>
 
-      <div v-else class="bg-white rounded-lg shadow overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix</th>
-              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="option in options" :key="option.id" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 cursor-pointer" @click="onRowClick(option)">
-                {{ getOptionName(option) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                <span :class="getTypeClass(option.type)">
-                  {{ getTypeLabel(option.type) }}
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {{ formatPrice(option) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <UButton
-                  color="error"
-                  variant="ghost"
-                  size="sm"
-                  icon="i-heroicons-trash"
-                  :loading="deletingOptionId === option.id"
-                  @click.stop="confirmDelete(option)"
-                >
-                  Supprimer
-                </UButton>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+            <!-- Filtre par type -->
+            <div>
+              <label for="type-filter" class="block text-sm font-medium text-gray-700 mb-2">
+                Filtrer par type
+              </label>
+              <select
+                id="type-filter"
+                v-model="selectedType"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="">Tous les types</option>
+                <option value="text">Texte libre</option>
+                <option value="typed_quantitative">Quantité</option>
+                <option value="typed_number">Nombre fixe</option>
+                <option value="typed_selectable">Sélection</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Bouton de réinitialisation -->
+          <div v-if="searchQuery || selectedType" class="mt-4">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              size="sm"
+              icon="i-heroicons-x-mark"
+              @click="clearFilters"
+            >
+              Réinitialiser les filtres
+            </UButton>
+          </div>
+        </div>
+
+        <!-- Compteur de résultats -->
+        <div class="text-sm text-gray-600 mb-4" role="status" aria-live="polite">
+          {{ filteredOptions.length }} option(s) trouvée(s)
+          <span v-if="searchQuery || selectedType" class="text-gray-500">
+            (sur {{ options.length }} au total)
+          </span>
+        </div>
+
+        <div v-if="filteredOptions.length === 0" class="text-center py-12">
+          <div class="text-gray-500 mb-4">
+            {{ searchQuery || selectedType ? 'Aucune option ne correspond à votre recherche' : 'Aucune option pour le moment' }}
+          </div>
+          <UButton
+            v-if="!searchQuery && !selectedType"
+            :to="`/orgs/${orgSlug}/events/${eventSlug}/options/create`"
+            icon="i-heroicons-plus"
+            color="primary"
+          >
+            Créer une option
+          </UButton>
+          <UButton
+            v-else
+            variant="ghost"
+            color="neutral"
+            icon="i-heroicons-x-mark"
+            @click="clearFilters"
+          >
+            Réinitialiser les filtres
+          </UButton>
+        </div>
+
+        <div v-else class="bg-white rounded-lg shadow overflow-hidden">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix</th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="option in filteredOptions" :key="option.id" class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 cursor-pointer" @click="onRowClick(option)">
+                  {{ getOptionName(option) }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  <span :class="getTypeClass(option.type)">
+                    {{ getTypeLabel(option.type) }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {{ formatPrice(option) }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <UButton
+                    color="error"
+                    variant="ghost"
+                    size="sm"
+                    icon="i-heroicons-trash"
+                    :loading="deletingOptionId === option.id"
+                    @click.stop="confirmDelete(option)"
+                  >
+                    Supprimer
+                  </UButton>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
     </div>
 
     <!-- Modal de confirmation de suppression -->
@@ -142,12 +215,43 @@ const loading = ref(true);
 const error = ref<string | null>(null);
 const eventName = ref<string>('');
 
+// Filtres
+const searchQuery = ref('');
+const selectedType = ref('');
+
 const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
 const { getOptionName } = useOptionTranslation();
 
 const isDeleteModalOpen = ref(false);
 const optionToDelete = ref<SponsoringOption | null>(null);
 const deletingOptionId = ref<string | null>(null);
+
+// Options filtrées
+const filteredOptions = computed(() => {
+  let filtered = options.value;
+
+  // Filtre par recherche textuelle
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase().trim();
+    filtered = filtered.filter(option => {
+      const name = getOptionName(option).toLowerCase();
+      return name.includes(query);
+    });
+  }
+
+  // Filtre par type
+  if (selectedType.value) {
+    filtered = filtered.filter(option => option.type === selectedType.value);
+  }
+
+  return filtered;
+});
+
+// Fonction pour réinitialiser les filtres
+function clearFilters() {
+  searchQuery.value = '';
+  selectedType.value = '';
+}
 
 async function loadOptions() {
   try {
