@@ -50,7 +50,7 @@
                 {{ getOptionName(option) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                <span :class="getTypeClass(option.type)"> {{ option.type }}
+                <span :class="getTypeClass(option.type)">
                   {{ getTypeLabel(option.type) }}
                 </span>
               </td>
@@ -156,11 +156,11 @@ async function loadOptions() {
 
     const [optionsResponse, eventResponse] = await Promise.all([
       getOrgsEventsOptions(orgSlug.value, eventSlug.value),
-      getEventBySlug(eventSlug.value)
+      //getEventBySlug(eventSlug.value)
     ]);
 
     options.value = optionsResponse.data;
-    eventName.value = eventResponse.data.event.name;
+    eventName.value = "DevLille";
   } catch (err) {
     console.error('Failed to load options:', err);
     error.value = 'Impossible de charger les options';

@@ -291,27 +291,59 @@ const emit = defineEmits<{
   (e: 'save', payload: any): void
 }>()
 
-// Langues actives (commence avec français uniquement)
-const activeLanguages = ref<Array<{ code: string, label: string }>>([
-  allAvailableLanguages[0]! // Français
-]);
+// Fonction pour initialiser les langues actives
+function initializeActiveLanguages(): Array<{ code: string, label: string }> {
+  if (props.data?.translations && typeof props.data.translations === 'object') {
+    const langs = Object.keys(props.data.translations);
+    return langs.map(code => {
+      const lang = allAvailableLanguages.find(l => l.code === code);
+      return lang || { code, label: code.toUpperCase() };
+    });
+  }
+  // Par défaut, français uniquement
+  return [allAvailableLanguages[0]!];
+}
+
+// Langues actives
+const activeLanguages = ref<Array<{ code: string, label: string }>>(initializeActiveLanguages());
 
 // Langue courante sélectionnée
-const currentLanguage = ref('fr');
+const currentLanguage = ref(activeLanguages.value[0]?.code || 'fr');
 
 // Computed pour la traduction courante
 const currentTranslation = computed(() => form.value.translations[currentLanguage.value]);
 
 // Fonction pour initialiser le formulaire en fonction des données
 function initializeForm(): OptionFormData {
+  // Initialiser les traductions
+  let initialTranslations: Record<string, TranslationForm> = {
+    fr: {
+      name: '',
+      description: ''
+    }
+  };
+
+  // Si on a des données avec translations (format objet dictionnaire)
+  if (props.data?.translations && typeof props.data.translations === 'object') {
+    initialTranslations = {};
+    Object.entries(props.data.translations).forEach(([lang, translation]: [string, any]) => {
+      initialTranslations[lang] = {
+        name: translation.name || '',
+        description: translation.description || ''
+      };
+    });
+  }
+  // Sinon, fallback sur name/description directs
+  else if (props.data?.name) {
+    initialTranslations.fr = {
+      name: props.data.name || '',
+      description: props.data.description || ''
+    };
+  }
+
   const baseForm: OptionFormData = {
     type: props.data?.type || 'text',
-    translations: {
-      fr: {
-        name: props.data?.name || '',
-        description: props.data?.description || ''
-      }
-    },
+    translations: initialTranslations,
     price: props.data?.price || undefined,
     selectedPacks: props.data?.selectedPacks || [],
     typeDescriptorQuantitative: 'job_offer',
@@ -325,19 +357,19 @@ function initializeForm(): OptionFormData {
   if (props.data) {
     switch (props.data.type) {
       case 'typed_number':
-        baseForm.fixedQuantity = props.data.fixed_quantity || 1;
-        baseForm.typeDescriptorNumber = props.data.type_descriptor || 'nb_ticket';
+        baseForm.fixedQuantity = (props.data as any).fixed_quantity || 1;
+        baseForm.typeDescriptorNumber = (props.data as any).type_descriptor || 'nb_ticket';
         break;
 
       case 'typed_quantitative':
-        baseForm.typeDescriptorQuantitative = props.data.type_descriptor || 'job_offer';
+        baseForm.typeDescriptorQuantitative = (props.data as any).type_descriptor || 'job_offer';
         break;
 
       case 'typed_selectable':
-        baseForm.typeDescriptorSelectable = props.data.type_descriptor || 'booth';
+        baseForm.typeDescriptorSelectable = (props.data as any).type_descriptor || 'booth';
         // Convertir les valeurs sélectionnables
-        if (props.data.selectable_values && Array.isArray(props.data.selectable_values)) {
-          baseForm.selectableValues = props.data.selectable_values.map((v: any) => {
+        if ((props.data as any).selectable_values && Array.isArray((props.data as any).selectable_values)) {
+          baseForm.selectableValues = (props.data as any).selectable_values.map((v: any) => {
             // Si v est un objet avec price (format CreateSelectableValue)
             if (typeof v === 'object' && 'price' in v) {
               return {

@@ -20,6 +20,8 @@ export type Social = SocialSchema;
 
 export type CreateCompany = CreateCompanySchema;
 
+export type UpdateCompany = UpdateCompanySchema;
+
 export type Identifier = IdentifierSchema;
 
 export type Contact = ContactSchema;
@@ -27,6 +29,8 @@ export type Contact = ContactSchema;
 export type PartnershipItem = PartnershipItemSchema;
 
 export type EventSummary = EventSummarySchema;
+
+export type CreateEvent = CreateEventSchema;
 
 export type Event = EventSchema;
 
@@ -66,11 +70,19 @@ export type User = UserSchema;
 
 export type GrantPermissionRequest = GrantPermissionRequestSchema;
 
+export type RevokePermissionRequest = RevokePermissionRequestSchema;
+
+export type RevokeUsersResult = RevokeUsersResultSchema;
+
 export type OrganisationItem = OrganisationItemSchema;
 
 export type Provider = ProviderSchema;
 
 export type CreateProvider = CreateProviderSchema;
+
+export type UpdateProvider = UpdateProviderSchema;
+
+export type ErrorResponse = ErrorResponseSchema;
 
 export type BoothLocationRequest = BoothLocationRequestSchema;
 
@@ -94,6 +106,8 @@ export type PaginatedProvider = PaginatedProviderSchema;
 
 export type PaginatedJobOffer = PaginatedJobOfferSchema;
 
+export type PaginatedJobOfferPromotion = PaginatedJobOfferPromotionSchema;
+
 export type CreateJobOffer = CreateJobOfferSchema;
 
 export type UpdateJobOffer = UpdateJobOfferSchema;
@@ -101,6 +115,20 @@ export type UpdateJobOffer = UpdateJobOfferSchema;
 export type JobOfferResponse = JobOfferResponseSchema;
 
 export type CreateByIdentifiers = CreateByIdentifiersSchema;
+
+export type PromoteJobOfferRequest = PromoteJobOfferSchema;
+
+export type JobOfferPromotionResponse = JobOfferPromotionResponseSchema;
+
+export type DeclineJobOfferRequest = DeclineJobOfferPromotionSchema;
+
+export type DetailedPartnershipResponse = DetailedPartnershipResponseSchema;
+
+export type PartnershipDetail = PartnershipDetailSchema;
+
+export type PartnershipProcessStatus = PartnershipProcessStatusSchema;
+
+export type PartnershipPhases = PartnershipPhasesSchema;
 
 export interface UserSessionSchema {
   state: string;
@@ -173,7 +201,9 @@ export type CreateCompanySchemaDescription = string | null;
 export interface CreateCompanySchema {
   name: string;
   head_office: AddressSchema;
+  /** @pattern ^\d{14}$ */
   siret: string;
+  /** @pattern ^[A-Z]{2}[0-9A-Z]+$ */
   vat: string;
   description?: CreateCompanySchemaDescription;
   site_url: string;
@@ -184,14 +214,44 @@ export interface IdentifierSchema {
   id: string;
 }
 
+export type UpdateCompanySchemaName = string | null;
+
+export type UpdateCompanySchemaHeadOffice = AddressSchema | null;
+
+export type UpdateCompanySchemaSiret = string | null;
+
+export type UpdateCompanySchemaVat = string | null;
+
+export type UpdateCompanySchemaDescription = string | null;
+
+export type UpdateCompanySchemaSiteUrl = string | null;
+
+export type UpdateCompanySchemaSocials = SocialSchema[] | null;
+
+export interface UpdateCompanySchema {
+  name?: UpdateCompanySchemaName;
+  head_office?: UpdateCompanySchemaHeadOffice;
+  siret?: UpdateCompanySchemaSiret;
+  vat?: UpdateCompanySchemaVat;
+  description?: UpdateCompanySchemaDescription;
+  site_url?: UpdateCompanySchemaSiteUrl;
+  socials?: UpdateCompanySchemaSocials;
+}
+
 export interface ContactSchema {
   display_name: string;
   role: string;
 }
 
-export type PartnershipItemSchemaPackName = string | null;
+export type PartnershipItemSchemaSelectedPackId = string | null;
+
+export type PartnershipItemSchemaSelectedPackName = string | null;
+
+export type PartnershipItemSchemaSuggestedPackId = string | null;
 
 export type PartnershipItemSchemaSuggestedPackName = string | null;
+
+export type PartnershipItemSchemaValidatedPackId = string | null;
 
 export type PartnershipItemSchemaPhone = string | null;
 
@@ -200,8 +260,11 @@ export interface PartnershipItemSchema {
   contact: ContactSchema;
   company_name: string;
   event_name: string;
-  pack_name?: PartnershipItemSchemaPackName;
+  selected_pack_id?: PartnershipItemSchemaSelectedPackId;
+  selected_pack_name?: PartnershipItemSchemaSelectedPackName;
+  suggested_pack_id?: PartnershipItemSchemaSuggestedPackId;
   suggested_pack_name?: PartnershipItemSchemaSuggestedPackName;
+  validated_pack_id?: PartnershipItemSchemaValidatedPackId;
   language: string;
   phone?: PartnershipItemSchemaPhone;
   emails?: string;
@@ -365,6 +428,88 @@ export interface UpdateJobOfferSchema {
   salary?: UpdateJobOfferSchemaSalary;
 }
 
+export interface PromoteJobOfferSchema {
+  /** UUID of the job offer to promote */
+  job_offer_id: string;
+}
+
+/**
+ * Current promotion status
+ */
+export type JobOfferPromotionResponseSchemaStatus = typeof JobOfferPromotionResponseSchemaStatus[keyof typeof JobOfferPromotionResponseSchemaStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const JobOfferPromotionResponseSchemaStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  declined: 'declined',
+} as const;
+
+/**
+ * Timestamp when organizer approved/declined (ISO format, null if pending)
+ */
+export type JobOfferPromotionResponseSchemaReviewedAt = string | null;
+
+/**
+ * User ID of organizer who reviewed (null if pending)
+ */
+export type JobOfferPromotionResponseSchemaReviewedBy = string | null;
+
+/**
+ * Optional reason provided when declining promotion
+ * @maxLength 500
+ */
+export type JobOfferPromotionResponseSchemaDeclineReason = string | null;
+
+/**
+ * Embedded job offer entity
+ */
+export type JobOfferPromotionResponseSchemaJobOffer = {
+  /** Job offer identifier */
+  id: string;
+  /**
+   * Job offer title
+   * @maxLength 255
+   */
+  title: string;
+  /** External URL to the full job offer page */
+  url: string;
+};
+
+/**
+ * Response containing complete job offer promotion details with embedded job offer data
+ */
+export interface JobOfferPromotionResponseSchema {
+  /** Unique promotion identifier */
+  id: string;
+  /** ID of the promoted job offer */
+  job_offer_id: string;
+  /** Partnership through which promotion was requested */
+  partnership_id: string;
+  /** Human-readable event identifier */
+  event_slug: string;
+  /** Current promotion status */
+  status: JobOfferPromotionResponseSchemaStatus;
+  /** Timestamp when promotion was initially requested (ISO format) */
+  promoted_at: string;
+  /** Timestamp when organizer approved/declined (ISO format, null if pending) */
+  reviewed_at?: JobOfferPromotionResponseSchemaReviewedAt;
+  /** User ID of organizer who reviewed (null if pending) */
+  reviewed_by?: JobOfferPromotionResponseSchemaReviewedBy;
+  /**
+   * Optional reason provided when declining promotion
+   * @maxLength 500
+   */
+  decline_reason?: JobOfferPromotionResponseSchemaDeclineReason;
+  /** Embedded job offer entity */
+  job_offer: JobOfferPromotionResponseSchemaJobOffer;
+  /** Record creation timestamp (ISO format) */
+  created_at: string;
+  /** Record last modification timestamp (ISO format) */
+  updated_at: string;
+}
+
 export interface EventSummarySchema {
   slug: string;
   name: string;
@@ -440,16 +585,123 @@ export interface EventWithOrganisationSchema {
   organisation: OrganisationItemSchema;
 }
 
-export type SponsoringOptionSchemaDescription = string | null;
+export type TextDescription = string | null;
 
-export type SponsoringOptionSchemaPrice = number | null;
+/**
+ * @minimum 0
+ */
+export type TextPrice = number | null;
 
-export interface SponsoringOptionSchema {
+export interface Text {
+  type: 'text';
   id: string;
   name: string;
-  description?: SponsoringOptionSchemaDescription;
-  price?: SponsoringOptionSchemaPrice;
+  description?: TextDescription;
+  /** @minimum 0 */
+  price?: TextPrice;
 }
+
+export type TypedQuantitativeDescription = string | null;
+
+/**
+ * @minimum 0
+ */
+export type TypedQuantitativePrice = number | null;
+
+/**
+ * Quantitative descriptor for user-defined quantities
+ */
+export type TypedQuantitativeTypeDescriptor = typeof TypedQuantitativeTypeDescriptor[keyof typeof TypedQuantitativeTypeDescriptor];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TypedQuantitativeTypeDescriptor = {
+  job_offer: 'job_offer',
+} as const;
+
+export interface TypedQuantitative {
+  type: 'typed_quantitative';
+  id: string;
+  name: string;
+  description?: TypedQuantitativeDescription;
+  /** @minimum 0 */
+  price?: TypedQuantitativePrice;
+  /** Quantitative descriptor for user-defined quantities */
+  type_descriptor: TypedQuantitativeTypeDescriptor;
+}
+
+export type TypedNumberDescription = string | null;
+
+/**
+ * @minimum 0
+ */
+export type TypedNumberPrice = number | null;
+
+/**
+ * Number descriptor for fixed quantities
+ */
+export type TypedNumberTypeDescriptor = typeof TypedNumberTypeDescriptor[keyof typeof TypedNumberTypeDescriptor];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TypedNumberTypeDescriptor = {
+  nb_ticket: 'nb_ticket',
+} as const;
+
+export interface TypedNumber {
+  type: 'typed_number';
+  id: string;
+  name: string;
+  description?: TypedNumberDescription;
+  /** @minimum 0 */
+  price?: TypedNumberPrice;
+  /** Number descriptor for fixed quantities */
+  type_descriptor: TypedNumberTypeDescriptor;
+  /**
+   * Fixed quantity that cannot be modified by users
+   * @minimum 1
+   */
+  fixed_quantity: number;
+}
+
+export type TypedSelectableDescription = string | null;
+
+/**
+ * @minimum 0
+ */
+export type TypedSelectablePrice = number | null;
+
+/**
+ * Selectable descriptor for predefined choices
+ */
+export type TypedSelectableTypeDescriptor = typeof TypedSelectableTypeDescriptor[keyof typeof TypedSelectableTypeDescriptor];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const TypedSelectableTypeDescriptor = {
+  booth: 'booth',
+} as const;
+
+export interface TypedSelectable {
+  type: 'typed_selectable';
+  id: string;
+  name: string;
+  description?: TypedSelectableDescription;
+  /** @minimum 0 */
+  price?: TypedSelectablePrice;
+  /** Selectable descriptor for predefined choices */
+  type_descriptor: TypedSelectableTypeDescriptor;
+  /**
+   * Predefined values that users can select from
+   * @minItems 1
+   */
+  selectable_values: string[];
+}
+
+/**
+ * Polymorphic sealed class hierarchy for sponsoring options
+ */
+export type SponsoringOptionSchema = Text | TypedQuantitative | TypedNumber | TypedSelectable;
 
 export type SponsoringPackSchemaMaxQuantity = number | null;
 
@@ -462,17 +714,102 @@ export interface SponsoringPackSchema {
   optional_options: SponsoringOptionSchema[];
 }
 
+export type PartnershipOptionSelectionType = typeof PartnershipOptionSelectionType[keyof typeof PartnershipOptionSelectionType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PartnershipOptionSelectionType = {
+  text_selection: 'text_selection',
+  quantitative_selection: 'quantitative_selection',
+  number_selection: 'number_selection',
+  selectable_selection: 'selectable_selection',
+} as const;
+
+export interface PartnershipOptionSelection {
+  type: PartnershipOptionSelectionType;
+  option_id: string;
+  /**
+   * Required for quantitative_selection, 0 means exclude option
+   * @minimum 0
+   */
+  selected_quantity?: number;
+  /** Required for selectable_selection */
+  selected_value_id?: string;
+}
+
 export type RegisterPartnershipSchemaPhone = string | null;
 
 export interface RegisterPartnershipSchema {
   company_id: string;
   pack_id: string;
-  option_ids?: string[];
+  option_selections?: PartnershipOptionSelection[];
   contact_name: string;
   contact_role: string;
   language: string;
   phone?: RegisterPartnershipSchemaPhone;
   emails?: string[];
+}
+
+export type PartnershipProcessStatusSchemaSuggestionSentAt = string | null;
+
+export type PartnershipProcessStatusSchemaSuggestionApprovedAt = string | null;
+
+export type PartnershipProcessStatusSchemaSuggestionDeclinedAt = string | null;
+
+export type PartnershipProcessStatusSchemaValidatedAt = string | null;
+
+export type PartnershipProcessStatusSchemaDeclinedAt = string | null;
+
+export type PartnershipProcessStatusSchemaAgreementUrl = string | null;
+
+export type PartnershipProcessStatusSchemaAgreementSignedUrl = string | null;
+
+export type PartnershipProcessStatusSchemaCommunicationPublicationDate = string | null;
+
+export type PartnershipProcessStatusSchemaCommunicationSupportUrl = string | null;
+
+export type PartnershipProcessStatusSchemaBillingStatus = 'pending' | 'sent' | 'paid' | null;
+
+export interface PartnershipProcessStatusSchema {
+  suggestion_sent_at?: PartnershipProcessStatusSchemaSuggestionSentAt;
+  suggestion_approved_at?: PartnershipProcessStatusSchemaSuggestionApprovedAt;
+  suggestion_declined_at?: PartnershipProcessStatusSchemaSuggestionDeclinedAt;
+  validated_at?: PartnershipProcessStatusSchemaValidatedAt;
+  declined_at?: PartnershipProcessStatusSchemaDeclinedAt;
+  agreement_url?: PartnershipProcessStatusSchemaAgreementUrl;
+  agreement_signed_url?: PartnershipProcessStatusSchemaAgreementSignedUrl;
+  communication_publication_date?: PartnershipProcessStatusSchemaCommunicationPublicationDate;
+  communication_support_url?: PartnershipProcessStatusSchemaCommunicationSupportUrl;
+  billing_status?: PartnershipProcessStatusSchemaBillingStatus;
+}
+
+export type PartnershipDetailSchemaPhone = string | null;
+
+export type PartnershipDetailSchemaSelectedPack = SponsoringPackSchema | null;
+
+export type PartnershipDetailSchemaSuggestionPack = SponsoringPackSchema | null;
+
+export type PartnershipDetailSchemaValidatedPack = SponsoringPackSchema | null;
+
+export interface PartnershipDetailSchema {
+  id: string;
+  phone?: PartnershipDetailSchemaPhone;
+  contact_name: string;
+  contact_role: string;
+  language: string;
+  emails: string[];
+  selected_pack?: PartnershipDetailSchemaSelectedPack;
+  suggestion_pack?: PartnershipDetailSchemaSuggestionPack;
+  validated_pack?: PartnershipDetailSchemaValidatedPack;
+  process_status: PartnershipProcessStatusSchema;
+  created_at: string;
+}
+
+export interface DetailedPartnershipResponseSchema {
+  partnership: PartnershipDetailSchema;
+  company: CompanySchema;
+  event: EventDisplaySchema;
+  organisation: OrganisationItemSchema;
 }
 
 export interface BillingContactSchema {
@@ -508,6 +845,30 @@ export interface TicketOrderSchema {
   tickets: TicketSchema[];
 }
 
+/**
+ * Paginated response containing job offer promotions and pagination metadata
+ */
+export interface PaginatedJobOfferPromotionSchema {
+  /** Array of job offer promotions for the current page */
+  items: JobOfferPromotionResponseSchema[];
+  /**
+   * Current page number (1-indexed)
+   * @minimum 1
+   */
+  page: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size: number;
+  /**
+   * Total number of job offer promotions across all pages
+   * @minimum 0
+   */
+  total: number;
+}
+
 export interface PaginatedProviderSchema {
   items: ProviderSchema[];
   page: number;
@@ -515,17 +876,50 @@ export interface PaginatedProviderSchema {
   total: number;
 }
 
+/**
+ * Provider website URL
+ */
 export type CreateProviderSchemaWebsite = string | null;
 
+/**
+ * Provider phone number
+ * @maxLength 30
+ */
 export type CreateProviderSchemaPhone = string | null;
 
+/**
+ * Provider email address
+ * @maxLength 255
+ */
 export type CreateProviderSchemaEmail = string | null;
 
+/**
+ * Schema for creating a new provider within an organisation
+ */
 export interface CreateProviderSchema {
+  /**
+   * Provider name
+   * @minLength 1
+   * @maxLength 255
+   */
   name: string;
+  /**
+   * Provider type (free text)
+   * @minLength 1
+   * @maxLength 100
+   */
   type: string;
+  /** Provider website URL */
   website?: CreateProviderSchemaWebsite;
+  /**
+   * Provider phone number
+   * @maxLength 30
+   */
   phone?: CreateProviderSchemaPhone;
+  /**
+   * Provider email address
+   * @maxLength 255
+   */
   email?: CreateProviderSchemaEmail;
 }
 
@@ -581,7 +975,85 @@ export interface OrganisationSchema {
   published_at?: OrganisationSchemaPublishedAt;
 }
 
-export interface EventSchema {
+/**
+ * Optional stack trace for debugging (only in development/debug mode)
+ */
+export type ErrorResponseSchemaStack = string | null;
+
+/**
+ * Standardized error response format used across the application
+ */
+export interface ErrorResponseSchema {
+  /** Human-readable error message describing what went wrong */
+  message: string;
+  /** Optional array of additional error details (e.g., validation errors) */
+  errors?: string[];
+  /** Optional stack trace for debugging (only in development/debug mode) */
+  stack?: ErrorResponseSchemaStack;
+}
+
+/**
+ * Provider name
+ * @minLength 1
+ * @maxLength 255
+ */
+export type UpdateProviderSchemaName = string | null;
+
+/**
+ * Provider type (free text)
+ * @minLength 1
+ * @maxLength 100
+ */
+export type UpdateProviderSchemaType = string | null;
+
+/**
+ * Provider website URL
+ */
+export type UpdateProviderSchemaWebsite = string | null;
+
+/**
+ * Provider phone number
+ * @maxLength 30
+ */
+export type UpdateProviderSchemaPhone = string | null;
+
+/**
+ * Provider email address
+ * @maxLength 255
+ */
+export type UpdateProviderSchemaEmail = string | null;
+
+/**
+ * Schema for updating an existing provider within an organisation
+ */
+export interface UpdateProviderSchema {
+  /**
+   * Provider name
+   * @minLength 1
+   * @maxLength 255
+   */
+  name?: UpdateProviderSchemaName;
+  /**
+   * Provider type (free text)
+   * @minLength 1
+   * @maxLength 100
+   */
+  type?: UpdateProviderSchemaType;
+  /** Provider website URL */
+  website?: UpdateProviderSchemaWebsite;
+  /**
+   * Provider phone number
+   * @maxLength 30
+   */
+  phone?: UpdateProviderSchemaPhone;
+  /**
+   * Provider email address
+   * @maxLength 255
+   */
+  email?: UpdateProviderSchemaEmail;
+}
+
+export interface CreateEventSchema {
   name: string;
   start_time: string;
   end_time: string;
@@ -591,28 +1063,143 @@ export interface EventSchema {
   contact: EventContactSchema;
 }
 
-export type TranslatedLabelSchemaDescription = string | null;
+export type DefinitionsTranslatedLabelDescription = string | null;
 
-export interface TranslatedLabelSchema {
+export interface DefinitionsTranslatedLabel {
+  /**
+   * @minLength 2
+   * @maxLength 5
+   */
   language: string;
+  /** @minLength 1 */
   name: string;
-  description?: TranslatedLabelSchemaDescription;
+  description?: DefinitionsTranslatedLabelDescription;
 }
 
-export type CreateSponsoringOptionSchemaPrice = number | null;
-
-export interface CreateSponsoringOptionSchema {
-  translations: TranslatedLabelSchema[];
-  price?: CreateSponsoringOptionSchemaPrice;
+export interface CreateSelectableValue {
+  /**
+   * Display value for the selectable option
+   * @maxLength 255
+   */
+  value: string;
+  /**
+   * Individual price for this selectable value in cents
+   * @minimum 0
+   */
+  price: number;
 }
+
+/**
+ * @minimum 0
+ */
+export type CreateTextPrice = number | null;
+
+export interface CreateText {
+  type: 'text';
+  /** @minItems 1 */
+  translations: DefinitionsTranslatedLabel[];
+  /** @minimum 0 */
+  price?: CreateTextPrice;
+}
+
+/**
+ * @minimum 0
+ */
+export type CreateTypedQuantitativePrice = number | null;
+
+/**
+ * Quantitative descriptor for user-defined quantities
+ */
+export type CreateTypedQuantitativeTypeDescriptor = typeof CreateTypedQuantitativeTypeDescriptor[keyof typeof CreateTypedQuantitativeTypeDescriptor];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateTypedQuantitativeTypeDescriptor = {
+  job_offer: 'job_offer',
+} as const;
+
+export interface CreateTypedQuantitative {
+  type: 'typed_quantitative';
+  /** @minItems 1 */
+  translations: DefinitionsTranslatedLabel[];
+  /** @minimum 0 */
+  price?: CreateTypedQuantitativePrice;
+  /** Quantitative descriptor for user-defined quantities */
+  type_descriptor: CreateTypedQuantitativeTypeDescriptor;
+}
+
+/**
+ * @minimum 0
+ */
+export type CreateTypedNumberPrice = number | null;
+
+/**
+ * Number descriptor for fixed quantities
+ */
+export type CreateTypedNumberTypeDescriptor = typeof CreateTypedNumberTypeDescriptor[keyof typeof CreateTypedNumberTypeDescriptor];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateTypedNumberTypeDescriptor = {
+  nb_ticket: 'nb_ticket',
+} as const;
+
+export interface CreateTypedNumber {
+  type: 'typed_number';
+  /** @minItems 1 */
+  translations: DefinitionsTranslatedLabel[];
+  /** @minimum 0 */
+  price?: CreateTypedNumberPrice;
+  /** Number descriptor for fixed quantities */
+  type_descriptor: CreateTypedNumberTypeDescriptor;
+  /**
+   * Fixed quantity that cannot be modified by users
+   * @minimum 1
+   */
+  fixed_quantity: number;
+}
+
+/**
+ * @minimum 0
+ */
+export type CreateTypedSelectablePrice = number | null;
+
+/**
+ * Selectable descriptor for predefined choices
+ */
+export type CreateTypedSelectableTypeDescriptor = typeof CreateTypedSelectableTypeDescriptor[keyof typeof CreateTypedSelectableTypeDescriptor];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateTypedSelectableTypeDescriptor = {
+  booth: 'booth',
+} as const;
+
+export interface CreateTypedSelectable {
+  type: 'typed_selectable';
+  /** @minItems 1 */
+  translations: DefinitionsTranslatedLabel[];
+  /** @minimum 0 */
+  price?: CreateTypedSelectablePrice;
+  /** Selectable descriptor for predefined choices */
+  type_descriptor: CreateTypedSelectableTypeDescriptor;
+  /**
+   * Predefined values with individual pricing that users can select from
+   * @minItems 1
+   */
+  selectable_values: CreateSelectableValue[];
+}
+
+/**
+ * Polymorphic sealed class for creating sponsoring options
+ */
+export type CreateSponsoringOptionSchema = CreateText | CreateTypedQuantitative | CreateTypedNumber | CreateTypedSelectable;
 
 export type CreateSponsoringPackSchemaMaxQuantity = number | null;
 
 export interface CreateSponsoringPackSchema {
   name: string;
   price: number;
-  with_booth?: boolean;
-  nb_tickets: number;
   max_quantity?: CreateSponsoringPackSchemaMaxQuantity;
 }
 
@@ -652,10 +1239,19 @@ export interface BoothLocationResponseSchema {
   location: string;
 }
 
+/**
+ * Partnership suggestion request with enhanced option selections
+ */
 export interface SuggestPartnershipSchema {
+  /** UUID of the sponsoring pack to suggest */
   pack_id: string;
-  option_ids?: string[];
+  /**
+   * Two-letter language code (e.g., 'en', 'fr')
+   * @pattern ^[a-z]{2}$
+   */
   language: string;
+  /** Array of selected sponsoring options with type-specific selections */
+  option_selections?: PartnershipOptionSelection[];
 }
 
 export interface PublicationDateRequestSchema {
@@ -670,6 +1266,20 @@ export interface PublicationDateResponseSchema {
 export interface SupportUploadResponseSchema {
   id: string;
   url: string;
+}
+
+/**
+ * Optional reason for declining the job offer promotion
+ * @maxLength 500
+ */
+export type DeclineJobOfferPromotionSchemaReason = string | null;
+
+export interface DeclineJobOfferPromotionSchema {
+  /**
+   * Optional reason for declining the job offer promotion
+   * @maxLength 500
+   */
+  reason?: DeclineJobOfferPromotionSchemaReason;
 }
 
 export type CreateByIdentifiersSchema = string[];
@@ -688,10 +1298,64 @@ export interface GrantPermissionRequestSchema {
   user_emails: string[];
 }
 
+export interface RevokePermissionRequestSchema {
+  /** List of user email addresses to revoke access from */
+  user_emails: string[];
+}
+
+/**
+ * Result of a user permission revocation operation
+ */
+export interface RevokeUsersResultSchema {
+  /**
+   * Number of users whose permissions were successfully revoked
+   * @minimum 0
+   */
+  revoked_count: number;
+  /** List of email addresses that were not found in the system */
+  not_found_emails: string[];
+}
+
+export interface EventSchema {
+  name: string;
+  start_time: string;
+  end_time: string;
+  submission_start_time: string;
+  submission_end_time: string;
+  address: string;
+  contact: EventContactSchema;
+}
+
+export type TranslatedLabelSchemaDescription = string | null;
+
+export interface TranslatedLabelSchema {
+  language: string;
+  name: string;
+  description?: TranslatedLabelSchemaDescription;
+}
+
+export interface PartnershipPhasesSchema {
+  suggestion_sent: boolean;
+  suggestion_approved: boolean;
+  agreement_generated: boolean;
+  agreement_signed: boolean;
+  validated: boolean;
+  communication_published: boolean;
+  invoice_generated: boolean;
+  paid: boolean;
+}
+
 export type GetAuthCallback404 = { [key: string]: unknown };
 
 export type GetCompaniesParams = {
+/**
+ * Search companies by name
+ */
 query?: string;
+/**
+ * Filter companies by status
+ */
+'filter[status]'?: GetCompaniesFilterStatus;
 /**
  * Page number (must be >= 1)
  * @minimum 1
@@ -703,6 +1367,44 @@ page?: number;
  * @maximum 100
  */
 page_size?: number;
+};
+
+export type GetCompaniesFilterStatus = typeof GetCompaniesFilterStatus[keyof typeof GetCompaniesFilterStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GetCompaniesFilterStatus = {
+  active: 'active',
+  inactive: 'inactive',
+} as const;
+
+export type GetCompanyById400 = {
+  message?: string;
+};
+
+export type GetCompanyById404 = {
+  message?: string;
+};
+
+export type PutCompanyById400 = {
+  message?: string;
+  errors?: string[];
+};
+
+export type PutCompanyById404 = {
+  message?: string;
+};
+
+export type PutCompanyById409 = {
+  message?: string;
+};
+
+export type DeleteCompanyById400 = {
+  message?: string;
+};
+
+export type DeleteCompanyById404 = {
+  message?: string;
 };
 
 export type PostCompaniesLogoBody = {
@@ -732,6 +1434,35 @@ export type PostCompaniesJobOffers400 = {
   message?: string;
 };
 
+export type PromoteJobOfferToPartnership201 = {
+  id?: string;
+};
+
+export type ListJobOfferPromotionsParams = {
+/**
+ * Filter by partnership ID
+ */
+partnership_id?: string;
+/**
+ * Page number for pagination
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Items per page
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
+};
+
+export type ListJobOfferPromotions200 = {
+  items?: JobOfferPromotionResponseSchema[];
+  total?: number;
+  page?: number;
+  page_size?: number;
+};
+
 export type GetEventsParams = {
 /**
  * Page number (must be >= 1)
@@ -751,7 +1482,39 @@ export type PostEventsPartnershipSignedAgreementBody = {
   file?: Blob;
 };
 
+export type GetPartnershipJobOffersParams = {
+/**
+ * Filter by promotion status
+ */
+status?: GetPartnershipJobOffersStatus;
+/**
+ * Page number (1-indexed)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
+};
+
+export type GetPartnershipJobOffersStatus = typeof GetPartnershipJobOffersStatus[keyof typeof GetPartnershipJobOffersStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GetPartnershipJobOffersStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  declined: 'declined',
+} as const;
+
 export type GetProvidersParams = {
+/**
+ * Filter providers by organization slug
+ */
+org_slug?: string;
 /**
  * Search providers by name (case-insensitive)
  */
@@ -865,23 +1628,10 @@ export type GetOrgsEventsPartnershipParams = {
  */
 'filter[agreement-signed]'?: boolean;
 /**
- * Sort field
- */
-sort?: GetOrgsEventsPartnershipSort;
-/**
  * Sort direction
  */
 direction?: GetOrgsEventsPartnershipDirection;
 };
-
-export type GetOrgsEventsPartnershipSort = typeof GetOrgsEventsPartnershipSort[keyof typeof GetOrgsEventsPartnershipSort];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const GetOrgsEventsPartnershipSort = {
-  created: 'created',
-  updated: 'updated',
-} as const;
 
 export type GetOrgsEventsPartnershipDirection = typeof GetOrgsEventsPartnershipDirection[keyof typeof GetOrgsEventsPartnershipDirection];
 
@@ -895,6 +1645,102 @@ export const GetOrgsEventsPartnershipDirection = {
 export type PostOrgsEventsPartnershipAgreement200 = {
   /** URL to the generated agreement PDF */
   url: string;
+};
+
+export type ListPartnershipJobOffersParams = {
+/**
+ * Filter by promotion status
+ */
+status?: ListPartnershipJobOffersStatus;
+/**
+ * Page number (1-indexed)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
+};
+
+export type ListPartnershipJobOffersStatus = typeof ListPartnershipJobOffersStatus[keyof typeof ListPartnershipJobOffersStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ListPartnershipJobOffersStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  declined: 'declined',
+} as const;
+
+export type ListPartnershipJobOffers200 = {
+  items?: JobOfferPromotionResponseSchema[];
+  /** @minimum 1 */
+  page?: number;
+  /** @minimum 1 */
+  pageSize?: number;
+  /** @minimum 0 */
+  totalItems?: number;
+  /** @minimum 0 */
+  totalPages?: number;
+};
+
+export type ListEventJobOfferPromotionsParams = {
+/**
+ * Filter by promotion status
+ */
+status?: ListEventJobOfferPromotionsStatus;
+/**
+ * Page number (1-indexed)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
+};
+
+export type ListEventJobOfferPromotionsStatus = typeof ListEventJobOfferPromotionsStatus[keyof typeof ListEventJobOfferPromotionsStatus];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ListEventJobOfferPromotionsStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  declined: 'declined',
+} as const;
+
+export type ListEventJobOfferPromotions200 = {
+  items?: JobOfferPromotionResponseSchema[];
+  /** @minimum 1 */
+  page?: number;
+  /** @minimum 1 */
+  pageSize?: number;
+  /** @minimum 0 */
+  totalItems?: number;
+  /** @minimum 0 */
+  totalPages?: number;
+};
+
+export type ApproveJobOfferPromotionBody = { [key: string]: unknown };
+
+export type GetOrgsEventsProvidersParams = {
+/**
+ * Page number (must be >= 1)
+ * @minimum 1
+ */
+page?: number;
+/**
+ * Number of items per page (must be between 1 and 100)
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
 };
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -981,6 +1827,48 @@ export const postCompanies = (
     }
   
 /**
+ * Retrieve a specific company by its UUID
+ * @summary Get company by ID
+ */
+export const getCompanyById = (
+    companyId: string,
+ options?: SecondParameter<typeof customFetch<CompanySchema>>,) => {
+      return customFetch<CompanySchema>(
+      {url: `/companies/${companyId}`, method: 'GET'
+    },
+      options);
+    }
+  
+/**
+ * Update an existing company with partial or complete data
+ * @summary Update company
+ */
+export const putCompanyById = (
+    companyId: string,
+    updateCompanySchema: UpdateCompanySchema,
+ options?: SecondParameter<typeof customFetch<CompanySchema>>,) => {
+      return customFetch<CompanySchema>(
+      {url: `/companies/${companyId}`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: updateCompanySchema
+    },
+      options);
+    }
+  
+/**
+ * Soft delete a company by setting its status to inactive
+ * @summary Delete company (soft delete)
+ */
+export const deleteCompanyById = (
+    companyId: string,
+ options?: SecondParameter<typeof customFetch<void>>,) => {
+      return customFetch<void>(
+      {url: `/companies/${companyId}`, method: 'DELETE'
+    },
+      options);
+    }
+  
+/**
  * Upload a logo for a company
  * @summary Create resource
  */
@@ -1007,7 +1895,7 @@ export const getCompaniesPartnership = (
     companyId: string,
  options?: SecondParameter<typeof customFetch<PartnershipItemSchema[]>>,) => {
       return customFetch<PartnershipItemSchema[]>(
-      {url: `/companies/${companyId}/partnership`, method: 'GET'
+      {url: `/companies/${companyId}/partnerships`, method: 'GET'
     },
       options);
     }
@@ -1089,6 +1977,39 @@ export const deleteCompaniesJobOffersById = (
     }
   
 /**
+ * Company owner promotes a job offer to an active partnership with an event
+ * @summary Promote job offer to partnership
+ */
+export const promoteJobOfferToPartnership = (
+    companyId: string,
+    partnershipId: string,
+    promoteJobOfferSchema: PromoteJobOfferSchema,
+ options?: SecondParameter<typeof customFetch<PromoteJobOfferToPartnership201>>,) => {
+      return customFetch<PromoteJobOfferToPartnership201>(
+      {url: `/companies/${companyId}/partnerships/${partnershipId}/promote`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: promoteJobOfferSchema
+    },
+      options);
+    }
+  
+/**
+ * List all promotions for a specific job offer across all partnerships
+ * @summary List job offer promotions
+ */
+export const listJobOfferPromotions = (
+    companyId: string,
+    jobOfferId: string,
+    params?: ListJobOfferPromotionsParams,
+ options?: SecondParameter<typeof customFetch<ListJobOfferPromotions200>>,) => {
+      return customFetch<ListJobOfferPromotions200>(
+      {url: `/companies/${companyId}/job-offers/${jobOfferId}/promotions`, method: 'GET',
+        params
+    },
+      options);
+    }
+  
+/**
  * List events with paging support
  * @summary List organization events
  */
@@ -1136,9 +2057,23 @@ export const postEventsPartnership = (
     registerPartnershipSchema: RegisterPartnershipSchema,
  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
       return customFetch<IdentifierSchema>(
-      {url: `/events/${eventSlug}/partnership`, method: 'POST',
+      {url: `/events/${eventSlug}/partnerships`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: registerPartnershipSchema
+    },
+      options);
+    }
+  
+/**
+ * Retrieve comprehensive partnership information including company, event, and process status details
+ * @summary Get detailed partnership information
+ */
+export const getEventsPartnershipDetailed = (
+    eventSlug: string,
+    partnershipId: string,
+ options?: SecondParameter<typeof customFetch<DetailedPartnershipResponseSchema>>,) => {
+      return customFetch<DetailedPartnershipResponseSchema>(
+      {url: `/events/${eventSlug}/partnerships/${partnershipId}`, method: 'GET'
     },
       options);
     }
@@ -1151,7 +2086,7 @@ export const getEventsPartnershipBilling = (
     partnershipId: string,
  options?: SecondParameter<typeof customFetch<CompanyBillingDataSchema>>,) => {
       return customFetch<CompanyBillingDataSchema>(
-      {url: `/events/${eventSlug}/partnership/${partnershipId}/billing`, method: 'GET'
+      {url: `/events/${eventSlug}/partnerships/${partnershipId}/billing`, method: 'GET'
     },
       options);
     }
@@ -1165,7 +2100,7 @@ export const postEventsPartnershipBilling = (
     companyBillingDataSchema: CompanyBillingDataSchema,
  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
       return customFetch<IdentifierSchema>(
-      {url: `/events/${eventSlug}/partnership/${partnershipId}/billing`, method: 'POST',
+      {url: `/events/${eventSlug}/partnerships/${partnershipId}/billing`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: companyBillingDataSchema
     },
@@ -1181,7 +2116,7 @@ export const putEventsPartnershipBilling = (
     companyBillingDataSchema: CompanyBillingDataSchema,
  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
       return customFetch<IdentifierSchema>(
-      {url: `/events/${eventSlug}/partnership/${partnershipId}/billing`, method: 'PUT',
+      {url: `/events/${eventSlug}/partnerships/${partnershipId}/billing`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: companyBillingDataSchema
     },
@@ -1196,7 +2131,7 @@ export const postEventsPartnershipBillingInvoice = (
     partnershipId: string,
  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
       return customFetch<IdentifierSchema>(
-      {url: `/events/${eventSlug}/partnership/${partnershipId}/billing/invoice`, method: 'POST'
+      {url: `/events/${eventSlug}/partnerships/${partnershipId}/billing/invoice`, method: 'POST'
     },
       options);
     }
@@ -1209,7 +2144,7 @@ export const postEventsPartnershipBillingQuote = (
     partnershipId: string,
  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
       return customFetch<IdentifierSchema>(
-      {url: `/events/${eventSlug}/partnership/${partnershipId}/billing/quote`, method: 'POST'
+      {url: `/events/${eventSlug}/partnerships/${partnershipId}/billing/quote`, method: 'POST'
     },
       options);
     }
@@ -1228,7 +2163,7 @@ if(postEventsPartnershipSignedAgreementBody.file !== undefined) {
  }
 
       return customFetch<IdentifierSchema>(
-      {url: `/events/${eventSlug}/partnership/${partnershipId}/signed-agreement`, method: 'POST',
+      {url: `/events/${eventSlug}/partnerships/${partnershipId}/signed-agreement`, method: 'POST',
       headers: {'Content-Type': 'multipart/form-data', },
        data: formData
     },
@@ -1243,7 +2178,7 @@ export const postEventsPartnershipSuggestionApprove = (
     partnershipId: string,
  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
       return customFetch<IdentifierSchema>(
-      {url: `/events/${eventSlug}/partnership/${partnershipId}/suggestion-approve`, method: 'POST'
+      {url: `/events/${eventSlug}/partnerships/${partnershipId}/suggestion-approve`, method: 'POST'
     },
       options);
     }
@@ -1256,7 +2191,7 @@ export const postEventsPartnershipSuggestionDecline = (
     partnershipId: string,
  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
       return customFetch<IdentifierSchema>(
-      {url: `/events/${eventSlug}/partnership/${partnershipId}/suggestion-decline`, method: 'POST'
+      {url: `/events/${eventSlug}/partnerships/${partnershipId}/suggestion-decline`, method: 'POST'
     },
       options);
     }
@@ -1269,7 +2204,7 @@ export const getEventsPartnershipTickets = (
     partnershipId: string,
  options?: SecondParameter<typeof customFetch<TicketSchema[]>>,) => {
       return customFetch<TicketSchema[]>(
-      {url: `/events/${eventSlug}/partnership/${partnershipId}/tickets`, method: 'GET'
+      {url: `/events/${eventSlug}/partnerships/${partnershipId}/tickets`, method: 'GET'
     },
       options);
     }
@@ -1283,7 +2218,7 @@ export const postEventsPartnershipTickets = (
     ticketDataSchema: TicketDataSchema[],
  options?: SecondParameter<typeof customFetch<TicketOrderSchema>>,) => {
       return customFetch<TicketOrderSchema>(
-      {url: `/events/${eventSlug}/partnership/${partnershipId}/tickets`, method: 'POST',
+      {url: `/events/${eventSlug}/partnerships/${partnershipId}/tickets`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: ticketDataSchema
     },
@@ -1300,9 +2235,25 @@ export const putEventsPartnershipTickets = (
     ticketDataSchema: TicketDataSchema,
  options?: SecondParameter<typeof customFetch<TicketSchema>>,) => {
       return customFetch<TicketSchema>(
-      {url: `/events/${eventSlug}/partnership/${partnershipId}/tickets/${ticketId}`, method: 'PUT',
+      {url: `/events/${eventSlug}/partnerships/${partnershipId}/tickets/${ticketId}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: ticketDataSchema
+    },
+      options);
+    }
+  
+/**
+ * Get paginated list of job offer promotions for a specific partnership. Public endpoint accessible without authentication.
+ * @summary List job offers for partnership
+ */
+export const getPartnershipJobOffers = (
+    eventSlug: string,
+    partnershipId: string,
+    params?: GetPartnershipJobOffersParams,
+ options?: SecondParameter<typeof customFetch<PaginatedJobOfferPromotionSchema>>,) => {
+      return customFetch<PaginatedJobOfferPromotionSchema>(
+      {url: `/events/${eventSlug}/partnerships/${partnershipId}/job-offers`, method: 'GET',
+        params
     },
       options);
     }
@@ -1378,6 +2329,53 @@ export const putOrgs = (
     }
   
 /**
+ * Create a new provider within organization scope (requires organization membership)
+ * @summary Create provider
+ */
+export const postOrgsProviders = (
+    orgSlug: string,
+    createProviderSchema: CreateProviderSchema,
+ options?: SecondParameter<typeof customFetch<ProviderSchema>>,) => {
+      return customFetch<ProviderSchema>(
+      {url: `/orgs/${orgSlug}/providers`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createProviderSchema
+    },
+      options);
+    }
+  
+/**
+ * Update provider within organization scope (requires organization membership)
+ * @summary Update provider
+ */
+export const putOrgsProviders = (
+    orgSlug: string,
+    providerId: string,
+    updateProviderSchema: UpdateProviderSchema,
+ options?: SecondParameter<typeof customFetch<ProviderSchema>>,) => {
+      return customFetch<ProviderSchema>(
+      {url: `/orgs/${orgSlug}/providers/${providerId}`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: updateProviderSchema
+    },
+      options);
+    }
+  
+/**
+ * Delete provider after detaching from all events (requires organization membership)
+ * @summary Delete provider
+ */
+export const deleteOrgsProviders = (
+    orgSlug: string,
+    providerId: string,
+ options?: SecondParameter<typeof customFetch<void>>,) => {
+      return customFetch<void>(
+      {url: `/orgs/${orgSlug}/providers/${providerId}`, method: 'DELETE'
+    },
+      options);
+    }
+  
+/**
  * List events for an organization (paginated)
  * @summary Get organization details
  */
@@ -1398,12 +2396,12 @@ export const getOrgsEvents = (
  */
 export const postOrgsEvents = (
     orgSlug: string,
-    eventSchema: EventSchema,
+    createEventSchema: CreateEventSchema,
  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
       return customFetch<IdentifierSchema>(
       {url: `/orgs/${orgSlug}/events`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: eventSchema
+      data: createEventSchema
     },
       options);
     }
@@ -1414,12 +2412,12 @@ export const postOrgsEvents = (
 export const putOrgsEvents = (
     orgSlug: string,
     eventSlug: string,
-    eventSchema: EventSchema,
+    createEventSchema: CreateEventSchema,
  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
       return customFetch<IdentifierSchema>(
       {url: `/orgs/${orgSlug}/events/${eventSlug}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
-      data: eventSchema
+      data: createEventSchema
     },
       options);
     }
@@ -1676,7 +2674,7 @@ export const getOrgsEventsPartnership = (
     params?: GetOrgsEventsPartnershipParams,
  options?: SecondParameter<typeof customFetch<PartnershipItemSchema[]>>,) => {
       return customFetch<PartnershipItemSchema[]>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnership`, method: 'GET',
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships`, method: 'GET',
         params
     },
       options);
@@ -1692,22 +2690,23 @@ export const postOrgsEventsPartnershipAgreement = (
     partnershipId: string,
  options?: SecondParameter<typeof customFetch<PostOrgsEventsPartnershipAgreement200>>,) => {
       return customFetch<PostOrgsEventsPartnershipAgreement200>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnership/${partnershipId}/agreement`, method: 'POST'
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/agreement`, method: 'POST'
     },
       options);
     }
   
 /**
+ * Update the billing status of a partnership.
  * @summary Update partnership billing status
  */
 export const postOrgsEventsPartnershipBilling = (
     orgSlug: string,
     eventSlug: string,
     partnershipId: string,
-    billingStatus: string,
+    billingStatus: 'pending' | 'sent' | 'paid',
  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
       return customFetch<IdentifierSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnership/${partnershipId}/billing/${billingStatus}`, method: 'POST'
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/billing/${billingStatus}`, method: 'POST'
     },
       options);
     }
@@ -1723,7 +2722,7 @@ export const putOrgsEventsPartnershipBoothLocation = (
     boothLocationRequestSchema: BoothLocationRequestSchema,
  options?: SecondParameter<typeof customFetch<BoothLocationResponseSchema>>,) => {
       return customFetch<BoothLocationResponseSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnership/${partnershipId}/booth-location`, method: 'PUT',
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/booth-location`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: boothLocationRequestSchema
     },
@@ -1740,7 +2739,7 @@ export const postOrgsEventsPartnershipSuggestion = (
     suggestPartnershipSchema: SuggestPartnershipSchema,
  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
       return customFetch<IdentifierSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnership/${partnershipId}/suggestion`, method: 'POST',
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/suggestion`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: suggestPartnershipSchema
     },
@@ -1757,7 +2756,7 @@ export const postOrgsEventsPartnershipValidate = (
     partnershipId: string,
  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
       return customFetch<IdentifierSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnership/${partnershipId}/validate`, method: 'POST'
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/validate`, method: 'POST'
     },
       options);
     }
@@ -1772,7 +2771,7 @@ export const postOrgsEventsPartnershipDecline = (
     partnershipId: string,
  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
       return customFetch<IdentifierSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnership/${partnershipId}/decline`, method: 'POST'
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/decline`, method: 'POST'
     },
       options);
     }
@@ -1788,7 +2787,7 @@ export const putOrgsEventsPartnershipCommunicationPublication = (
     publicationDateRequestSchema: PublicationDateRequestSchema,
  options?: SecondParameter<typeof customFetch<PublicationDateResponseSchema>>,) => {
       return customFetch<PublicationDateResponseSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnership/${partnershipId}/communication/publication`, method: 'PUT',
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/communication/publication`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: publicationDateRequestSchema
     },
@@ -1806,9 +2805,96 @@ export const putOrgsEventsPartnershipCommunicationSupport = (
     putOrgsEventsPartnershipCommunicationSupportBody: Blob,
  options?: SecondParameter<typeof customFetch<SupportUploadResponseSchema>>,) => {
       return customFetch<SupportUploadResponseSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnership/${partnershipId}/communication/support`, method: 'PUT',
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/communication/support`, method: 'PUT',
       headers: {'Content-Type': 'image/png', },
       data: putOrgsEventsPartnershipCommunicationSupportBody
+    },
+      options);
+    }
+  
+/**
+ * Get paginated list of job offer promotions for a specific partnership. Public endpoint accessible without authentication.
+ * @summary List job offers for partnership
+ */
+export const listPartnershipJobOffers = (
+    orgSlug: string,
+    eventSlug: string,
+    partnershipId: string,
+    params?: ListPartnershipJobOffersParams,
+ options?: SecondParameter<typeof customFetch<ListPartnershipJobOffers200>>,) => {
+      return customFetch<ListPartnershipJobOffers200>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/job-offers`, method: 'GET',
+        params
+    },
+      options);
+    }
+  
+/**
+ * Get paginated list of all job offer promotions for an event. Requires organization edit permissions.
+ * @summary List all job offers for event
+ */
+export const listEventJobOfferPromotions = (
+    orgSlug: string,
+    eventSlug: string,
+    params?: ListEventJobOfferPromotionsParams,
+ options?: SecondParameter<typeof customFetch<ListEventJobOfferPromotions200>>,) => {
+      return customFetch<ListEventJobOfferPromotions200>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/job-offers`, method: 'GET',
+        params
+    },
+      options);
+    }
+  
+/**
+ * Approve a pending job offer promotion. Requires organization edit permissions. Sends notification to company.
+ * @summary Approve job offer promotion
+ */
+export const approveJobOfferPromotion = (
+    orgSlug: string,
+    eventSlug: string,
+    partnershipId: string,
+    promotionId: string,
+    approveJobOfferPromotionBody: ApproveJobOfferPromotionBody,
+ options?: SecondParameter<typeof customFetch<JobOfferPromotionResponseSchema>>,) => {
+      return customFetch<JobOfferPromotionResponseSchema>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/job-offers/${promotionId}/approve`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: approveJobOfferPromotionBody
+    },
+      options);
+    }
+  
+/**
+ * Decline a pending job offer promotion with optional reason. Requires organization edit permissions. Sends notification to company.
+ * @summary Decline job offer promotion
+ */
+export const declineJobOfferPromotion = (
+    orgSlug: string,
+    eventSlug: string,
+    partnershipId: string,
+    promotionId: string,
+    declineJobOfferPromotionSchema: DeclineJobOfferPromotionSchema,
+ options?: SecondParameter<typeof customFetch<JobOfferPromotionResponseSchema>>,) => {
+      return customFetch<JobOfferPromotionResponseSchema>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/job-offers/${promotionId}/decline`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: declineJobOfferPromotionSchema
+    },
+      options);
+    }
+  
+/**
+ * List providers attached to an event with pagination (requires organization membership)
+ * @summary List event providers
+ */
+export const getOrgsEventsProviders = (
+    orgSlug: string,
+    eventSlug: string,
+    params?: GetOrgsEventsProvidersParams,
+ options?: SecondParameter<typeof customFetch<PaginatedProviderSchema>>,) => {
+      return customFetch<PaginatedProviderSchema>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/providers`, method: 'GET',
+        params
     },
       options);
     }
@@ -1875,6 +2961,22 @@ export const postOrgsUsersGrant = (
     }
   
 /**
+ * Revoke edit permissions for multiple users on an organisation
+ * @summary Revoke user permissions
+ */
+export const postOrgsUsersRevoke = (
+    orgSlug: string,
+    revokePermissionRequestSchema: RevokePermissionRequestSchema,
+ options?: SecondParameter<typeof customFetch<RevokeUsersResultSchema>>,) => {
+      return customFetch<RevokeUsersResultSchema>(
+      {url: `/orgs/${orgSlug}/users/revoke`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: revokePermissionRequestSchema
+    },
+      options);
+    }
+  
+/**
  * @summary List organization events
  */
 export const getUsersMeEvents = (
@@ -1904,6 +3006,9 @@ export type GetAuthLogoutResult = NonNullable<Awaited<ReturnType<typeof getAuthL
 export type GetAuthMeResult = NonNullable<Awaited<ReturnType<typeof getAuthMe>>>
 export type GetCompaniesResult = NonNullable<Awaited<ReturnType<typeof getCompanies>>>
 export type PostCompaniesResult = NonNullable<Awaited<ReturnType<typeof postCompanies>>>
+export type GetCompanyByIdResult = NonNullable<Awaited<ReturnType<typeof getCompanyById>>>
+export type PutCompanyByIdResult = NonNullable<Awaited<ReturnType<typeof putCompanyById>>>
+export type DeleteCompanyByIdResult = NonNullable<Awaited<ReturnType<typeof deleteCompanyById>>>
 export type PostCompaniesLogoResult = NonNullable<Awaited<ReturnType<typeof postCompaniesLogo>>>
 export type GetCompaniesPartnershipResult = NonNullable<Awaited<ReturnType<typeof getCompaniesPartnership>>>
 export type GetCompaniesJobOffersResult = NonNullable<Awaited<ReturnType<typeof getCompaniesJobOffers>>>
@@ -1911,10 +3016,13 @@ export type PostCompaniesJobOffersResult = NonNullable<Awaited<ReturnType<typeof
 export type GetCompaniesJobOffersByIdResult = NonNullable<Awaited<ReturnType<typeof getCompaniesJobOffersById>>>
 export type PutCompaniesJobOffersByIdResult = NonNullable<Awaited<ReturnType<typeof putCompaniesJobOffersById>>>
 export type DeleteCompaniesJobOffersByIdResult = NonNullable<Awaited<ReturnType<typeof deleteCompaniesJobOffersById>>>
+export type PromoteJobOfferToPartnershipResult = NonNullable<Awaited<ReturnType<typeof promoteJobOfferToPartnership>>>
+export type ListJobOfferPromotionsResult = NonNullable<Awaited<ReturnType<typeof listJobOfferPromotions>>>
 export type GetEventsResult = NonNullable<Awaited<ReturnType<typeof getEvents>>>
 export type GetEventBySlugResult = NonNullable<Awaited<ReturnType<typeof getEventBySlug>>>
 export type GetEventsSponsoringPacksResult = NonNullable<Awaited<ReturnType<typeof getEventsSponsoringPacks>>>
 export type PostEventsPartnershipResult = NonNullable<Awaited<ReturnType<typeof postEventsPartnership>>>
+export type GetEventsPartnershipDetailedResult = NonNullable<Awaited<ReturnType<typeof getEventsPartnershipDetailed>>>
 export type GetEventsPartnershipBillingResult = NonNullable<Awaited<ReturnType<typeof getEventsPartnershipBilling>>>
 export type PostEventsPartnershipBillingResult = NonNullable<Awaited<ReturnType<typeof postEventsPartnershipBilling>>>
 export type PutEventsPartnershipBillingResult = NonNullable<Awaited<ReturnType<typeof putEventsPartnershipBilling>>>
@@ -1926,11 +3034,15 @@ export type PostEventsPartnershipSuggestionDeclineResult = NonNullable<Awaited<R
 export type GetEventsPartnershipTicketsResult = NonNullable<Awaited<ReturnType<typeof getEventsPartnershipTickets>>>
 export type PostEventsPartnershipTicketsResult = NonNullable<Awaited<ReturnType<typeof postEventsPartnershipTickets>>>
 export type PutEventsPartnershipTicketsResult = NonNullable<Awaited<ReturnType<typeof putEventsPartnershipTickets>>>
+export type GetPartnershipJobOffersResult = NonNullable<Awaited<ReturnType<typeof getPartnershipJobOffers>>>
 export type GetProvidersResult = NonNullable<Awaited<ReturnType<typeof getProviders>>>
 export type PostProvidersResult = NonNullable<Awaited<ReturnType<typeof postProviders>>>
 export type PostOrgsResult = NonNullable<Awaited<ReturnType<typeof postOrgs>>>
 export type GetOrgsResult = NonNullable<Awaited<ReturnType<typeof getOrgs>>>
 export type PutOrgsResult = NonNullable<Awaited<ReturnType<typeof putOrgs>>>
+export type PostOrgsProvidersResult = NonNullable<Awaited<ReturnType<typeof postOrgsProviders>>>
+export type PutOrgsProvidersResult = NonNullable<Awaited<ReturnType<typeof putOrgsProviders>>>
+export type DeleteOrgsProvidersResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsProviders>>>
 export type GetOrgsEventsResult = NonNullable<Awaited<ReturnType<typeof getOrgsEvents>>>
 export type PostOrgsEventsResult = NonNullable<Awaited<ReturnType<typeof postOrgsEvents>>>
 export type PutOrgsEventsResult = NonNullable<Awaited<ReturnType<typeof putOrgsEvents>>>
@@ -1958,9 +3070,15 @@ export type PostOrgsEventsPartnershipValidateResult = NonNullable<Awaited<Return
 export type PostOrgsEventsPartnershipDeclineResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsPartnershipDecline>>>
 export type PutOrgsEventsPartnershipCommunicationPublicationResult = NonNullable<Awaited<ReturnType<typeof putOrgsEventsPartnershipCommunicationPublication>>>
 export type PutOrgsEventsPartnershipCommunicationSupportResult = NonNullable<Awaited<ReturnType<typeof putOrgsEventsPartnershipCommunicationSupport>>>
+export type ListPartnershipJobOffersResult = NonNullable<Awaited<ReturnType<typeof listPartnershipJobOffers>>>
+export type ListEventJobOfferPromotionsResult = NonNullable<Awaited<ReturnType<typeof listEventJobOfferPromotions>>>
+export type ApproveJobOfferPromotionResult = NonNullable<Awaited<ReturnType<typeof approveJobOfferPromotion>>>
+export type DeclineJobOfferPromotionResult = NonNullable<Awaited<ReturnType<typeof declineJobOfferPromotion>>>
+export type GetOrgsEventsProvidersResult = NonNullable<Awaited<ReturnType<typeof getOrgsEventsProviders>>>
 export type PostOrgsEventsProvidersResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsProviders>>>
 export type DeleteOrgsEventsProvidersResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsEventsProviders>>>
 export type GetOrgsUsersResult = NonNullable<Awaited<ReturnType<typeof getOrgsUsers>>>
 export type PostOrgsUsersGrantResult = NonNullable<Awaited<ReturnType<typeof postOrgsUsersGrant>>>
+export type PostOrgsUsersRevokeResult = NonNullable<Awaited<ReturnType<typeof postOrgsUsersRevoke>>>
 export type GetUsersMeEventsResult = NonNullable<Awaited<ReturnType<typeof getUsersMeEvents>>>
 export type GetUsersMeOrgsResult = NonNullable<Awaited<ReturnType<typeof getUsersMeOrgs>>>

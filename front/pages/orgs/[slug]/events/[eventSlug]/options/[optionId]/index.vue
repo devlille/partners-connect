@@ -65,14 +65,9 @@ const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
 const optionFormData = computed(() => {
   if (!option.value) return {};
 
-  // L'API retourne translations.fr.name, pas name directement
-  const frTranslation = option.value.translations?.fr;
-
-  return {
-    name: frTranslation?.name || '',
-    description: frTranslation?.description || '',
-    price: option.value.price || 0
-  };
+  // Passer toutes les données de l'option au formulaire
+  // Le formulaire gérera l'initialisation des traductions et des champs spécifiques
+  return option.value;
 });
 
 async function loadOption() {
