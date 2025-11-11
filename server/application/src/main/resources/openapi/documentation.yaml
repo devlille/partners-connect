@@ -31,7 +31,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/error_response.schema'
   /auth/login:
     get:
       summary: Get resource
@@ -75,9 +75,9 @@ paths:
         '401':
           description: Unauthorized - No valid session
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /companies:
     get:
       summary: Get resource
@@ -171,19 +171,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found - Company with specified ID not found
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: '#/components/schemas/error_response.schema'
     put:
       summary: Update company
       operationId: putCompanyById
@@ -216,32 +210,19 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  errors:
-                    type: array
-                    items:
-                      type: string
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found - Company with specified ID not found
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: '#/components/schemas/error_response.schema'
         '409':
           description: Conflict - SIRET already exists for another company
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: '#/components/schemas/error_response.schema'
     delete:
       summary: Delete company (soft delete)
       operationId: deleteCompanyById
@@ -264,19 +245,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found - Company with specified ID not found
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: '#/components/schemas/error_response.schema'
   /companies/{companyId}/logo:
     post:
       summary: Create resource
@@ -311,9 +286,9 @@ paths:
         '400':
           description: Bad Request - Invalid company ID or unsupported file type
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /companies/{companyId}/partnerships:
     get:
       summary: List partnerships
@@ -339,9 +314,9 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /companies/{companyId}/job-offers:
     get:
       summary: List job offers for company
@@ -390,10 +365,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: '#/components/schemas/error_response.schema'
     post:
       summary: Create job offer
       operationId: postCompaniesJobOffers
@@ -426,10 +398,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
         '403':
@@ -720,9 +689,42 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
+  /events/{eventSlug}/agenda:
+    get:
+      summary: Get public event agenda
+      operationId: getEventAgendaPublic
+      description: Retrieve event agenda with sessions and speakers for public consumption. No authentication required.
+      security:
+        - {}
+      parameters:
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug identifier
+      responses:
+        '200':
+          description: OK - Agenda retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/agenda_response.schema'
+        '404':
+          description: Not Found - Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /events/{eventSlug}/sponsoring/packs:
     get:
       summary: List public sponsoring packages
@@ -755,15 +757,15 @@ paths:
         '400':
           description: Bad Request - Missing Accept-Language header or invalid request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found - Event with specified slug does not exist
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /events/{eventSlug}/partnerships:
     post:
       summary: Create resource
@@ -793,15 +795,15 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /events/{eventSlug}/partnerships/{partnershipId}:
     get:
       summary: Get detailed partnership information
@@ -833,15 +835,15 @@ paths:
         '400':
           description: Bad Request - Invalid partnership ID format
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found - Partnership or event not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /events/{eventSlug}/partnerships/{partnershipId}/billing:
     get:
       summary: Get partnership billing information
@@ -870,9 +872,9 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
     post:
       summary: Create partnership billing
       description: ''
@@ -906,9 +908,9 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
     put:
       summary: Update partnership billing
       description: ''
@@ -942,9 +944,9 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /events/{eventSlug}/partnerships/{partnershipId}/billing/invoice:
     post:
       summary: Generate partnership invoice
@@ -973,9 +975,9 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /events/{eventSlug}/partnerships/{partnershipId}/billing/quote:
     post:
       summary: Generate partnership quote
@@ -1004,9 +1006,9 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /events/{eventSlug}/partnerships/{partnershipId}/signed-agreement:
     post:
       summary: Upload signed partnership agreement
@@ -1046,9 +1048,9 @@ paths:
         '400':
           description: Bad Request - Invalid file type or missing parameters
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /events/{eventSlug}/partnerships/{partnershipId}/suggestion-approve:
     post:
       summary: Approve partnership suggestion
@@ -1077,9 +1079,9 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /events/{eventSlug}/partnerships/{partnershipId}/suggestion-decline:
     post:
       summary: Decline partnership suggestion
@@ -1108,9 +1110,9 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /events/{eventSlug}/partnerships/{partnershipId}/tickets:
     get:
       summary: Get partnership tickets
@@ -1141,9 +1143,9 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
     post:
       summary: Create partnership tickets
       description: ''
@@ -1179,9 +1181,9 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /events/{eventSlug}/partnerships/{partnershipId}/tickets/{ticketId}:
     put:
       summary: Update partnership ticket
@@ -1221,9 +1223,9 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /events/{eventSlug}/partnerships/{partnershipId}/job-offers:
     get:
       summary: List job offers for partnership
@@ -1285,15 +1287,116 @@ paths:
         '400':
           description: Bad Request - Invalid query parameters
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found - Partnership or event not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
+  /events/{eventSlug}/partnerships/{partnershipId}/speakers/{speakerId}:
+    post:
+      summary: Attach speaker to partnership
+      operationId: attachSpeakerToPartnership
+      description: Associate a speaker with a partnership. Partnership must be validated first.
+      tags:
+        - partnerships
+        - speakers
+      security:
+        - {}
+      parameters:
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug identifier
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Partnership unique identifier
+        - name: speakerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Speaker unique identifier
+      responses:
+        '201':
+          description: Created - Speaker successfully attached to partnership
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/speaker_partnership.schema'
+        '400':
+          description: Bad Request - Invalid partnership ID format or speaker and partnership from different events
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '403':
+          description: Forbidden - Partnership not validated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Not Found - Partnership or speaker not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '409':
+          description: Conflict - Speaker already attached to this partnership
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+    delete:
+      summary: Detach speaker from partnership
+      operationId: detachSpeakerFromPartnership
+      description: Remove association between a speaker and a partnership.
+      tags:
+        - partnerships
+        - speakers
+      security:
+        - {}
+      parameters:
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug identifier
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Partnership unique identifier
+        - name: speakerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Speaker unique identifier
+      responses:
+        '204':
+          description: No Content - Speaker successfully detached from partnership
+        '404':
+          description: Not Found - Partnership, speaker, or association not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /providers:
     get:
       summary: List providers
@@ -1389,21 +1492,21 @@ paths:
         '400':
           description: Bad Request - Invalid input data
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized - Missing or invalid authentication
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '403':
           description: Forbidden - User is not an organizer of any event
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs:
     post:
       summary: Create new organization
@@ -1447,9 +1550,9 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
     put:
       summary: Update organization
       operationId: putOrgs
@@ -1478,15 +1581,15 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/providers:
     post:
       summary: Create provider
@@ -1677,15 +1780,15 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
     post:
       summary: Create organization event
       description: Create a new event for an organization
@@ -1714,15 +1817,15 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}:
     put:
       summary: Update event
@@ -1757,9 +1860,9 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/booth-plan:
     post:
       summary: Upload booth plan
@@ -1805,21 +1908,21 @@ paths:
         '400':
           description: Bad Request - Invalid event slug or missing file
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '415':
           description: Unsupported Media Type - Invalid file format
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/integrations/{provider}/{usage}:
     post:
       summary: Create event integration
@@ -1873,15 +1976,15 @@ paths:
         '400':
           description: Bad Request - Invalid provider, usage, or configuration
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/options:
     get:
       summary: Get organization details
@@ -1917,15 +2020,15 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
     post:
       summary: Create sponsoring option
       description: Create a new sponsoring option
@@ -1959,15 +2062,15 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/options/{optionId}:
     delete:
       summary: Delete sponsoring option
@@ -2001,9 +2104,9 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
     put:
       summary: Update sponsoring option
       description: ''
@@ -2042,9 +2145,9 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/packs:
     get:
       summary: Get organization details
@@ -2081,15 +2184,15 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
     post:
       summary: Create sponsoring pack
       operationId: postOrgsEventsPacks
@@ -2123,15 +2226,15 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}:
     delete:
       summary: Delete sponsoring pack
@@ -2165,9 +2268,9 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
     put:
       summary: Update sponsoring pack
       operationId: putOrgsEventsPacks
@@ -2206,9 +2309,9 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}/options:
     post:
       summary: Create sponsoring option
@@ -2248,9 +2351,9 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}/options/{optionId}:
     delete:
       summary: Delete sponsoring option
@@ -2289,9 +2392,9 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/communication:
     get:
       summary: Get organization details
@@ -2322,21 +2425,21 @@ paths:
         '400':
           description: Bad Request - Missing or invalid parameters
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found - Event not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/external-link:
     post:
       summary: Add external link
@@ -2365,29 +2468,29 @@ paths:
         '201':
           description: Created - External link created successfully
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
                 format: uuid
                 description: UUID of the created external link
         '400':
           description: Bad Request - Invalid input or validation error
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized - Authentication required
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found - Event or organization not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/external-link/{linkId}:
     delete:
       summary: Delete external link
@@ -2419,21 +2522,68 @@ paths:
         '400':
           description: Bad Request - Invalid UUID format
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized - Authentication required
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found - External link, event or organization not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
+  /orgs/{orgSlug}/events/{eventSlug}/agenda:
+    post:
+      summary: Fetch and update agenda from agenda integration
+      operationId: updateEventAgenda
+      description: Trigger fetch and storage of event agenda data from agenda integration. Requires organization write permissions.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug
+      responses:
+        '201':
+          description: Created - Agenda fetched and updated successfully
+        '401':
+          description: Unauthorized - Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '403':
+          description: Forbidden - Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Not Found - Event or organization not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '500':
+          description: Internal Server Error - Failed to fetch agenda from OpenPlanner
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/partnerships:
     get:
       summary: Get partnership list
@@ -2510,15 +2660,15 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/agreement:
     post:
       summary: Generate partnership agreement
@@ -2558,15 +2708,15 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/billing/{billingStatus}:
     post:
       summary: Update partnership billing status
@@ -2614,22 +2764,22 @@ paths:
         '400':
           description: Bad Request - Invalid billing status value, partnership ID format, or event slug.
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
                 example: Request parameter billingStatus couldn't be parsed/converted to InvoiceStatus
         '401':
           description: Unauthorized - Authentication required or user not authorized for this organization
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found - Partnership, event, or organization not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/booth-location:
     put:
       summary: Update organization
@@ -2669,27 +2819,27 @@ paths:
         '400':
           description: Bad Request - Invalid parameters or empty location
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '403':
           description: Forbidden - Booth location already assigned to another partnership
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found - Partnership or event not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/suggestion:
     post:
       summary: Create partnership suggestion
@@ -2729,15 +2879,15 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/validate:
     post:
       summary: Validate partnership
@@ -2771,15 +2921,15 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/decline:
     post:
       summary: Decline partnership
@@ -2813,15 +2963,15 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/communication/publication:
     put:
       summary: Update organization
@@ -2861,21 +3011,21 @@ paths:
         '400':
           description: Bad Request - Invalid date format or missing parameters
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found - Partnership not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/communication/support:
     put:
       summary: Update organization
@@ -2932,27 +3082,27 @@ paths:
         '400':
           description: Bad Request - Missing parameters or empty content
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found - Partnership not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '415':
           description: Unsupported Media Type - Invalid image format
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/job-offers:
     get:
       summary: List job offers for partnership
@@ -3037,15 +3187,15 @@ paths:
         '400':
           description: Bad Request - Invalid query parameters
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found - Partnership or event not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/job-offers:
     get:
       summary: List all job offers for event
@@ -3123,27 +3273,27 @@ paths:
         '400':
           description: Bad Request - Invalid query parameters
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '403':
           description: Forbidden - User does not have edit permissions
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found - Event not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/job-offers/{promotionId}/approve:
     post:
       summary: Approve job offer promotion
@@ -3198,33 +3348,33 @@ paths:
         '400':
           description: Bad Request - Invalid promotion state or parameters
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '403':
           description: Forbidden - User does not have edit permissions
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found - Promotion, partnership, or event not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '409':
           description: Conflict - Promotion already processed
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/job-offers/{promotionId}/decline:
     post:
       summary: Decline job offer promotion
@@ -3278,33 +3428,33 @@ paths:
         '400':
           description: Bad Request - Invalid promotion state or parameters
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '403':
           description: Forbidden - User does not have edit permissions
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found - Promotion, partnership, or event not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '409':
           description: Conflict - Promotion already processed
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/providers:
     get:
       summary: List event providers
@@ -3512,9 +3662,9 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/users/grant:
     post:
       summary: Create resource
@@ -3547,15 +3697,15 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/users/revoke:
     post:
       summary: Revoke user permissions
@@ -3585,27 +3735,27 @@ paths:
         '400':
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
         '409':
           description: Conflict - Cannot revoke last editor's own access
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/error_response.schema'
   /users/me/events:
     get:
       summary: List organization events
@@ -3770,6 +3920,14 @@ components:
       $ref: '#/components/schemas/partnership_process_status.schema'
     PartnershipPhases:
       $ref: '#/components/schemas/partnership_phases.schema'
+    Session:
+      $ref: '#/components/schemas/session.schema'
+    Speaker:
+      $ref: '#/components/schemas/speaker.schema'
+    AgendaResponse:
+      $ref: '#/components/schemas/agenda_response.schema'
+    SpeakerPartnership:
+      $ref: '#/components/schemas/speaker_partnership.schema'
     user_session.schema:
       $id: user_session.schema.json
       type: object
@@ -3781,6 +3939,38 @@ components:
       required:
         - state
         - token
+    error_response.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      type: object
+      title: ErrorResponse
+      description: Standardized error response format used across the application
+      properties:
+        message:
+          type: string
+          description: Human-readable error message describing what went wrong
+        errors:
+          type: array
+          description: Optional array of additional error details (e.g., validation errors)
+          items:
+            type: string
+          default: []
+        stack:
+          type:
+            - string
+            - 'null'
+          description: Optional stack trace for debugging (only in development/debug mode)
+      required:
+        - message
+      additionalProperties: false
+      examples:
+        - message: Provider is still attached to events and cannot be deleted
+        - message: User does not have permission to access this organisation
+        - message: Validation failed
+          errors:
+            - Name is required
+            - Email format is invalid
+        - message: Internal server error
+          stack: "java.lang.NullPointerException: ...\n\tat ..."
     user_info.schema:
       $id: user_info.schema.json
       type: object
@@ -4496,6 +4686,123 @@ components:
       required:
         - event
         - organisation
+    session.schema:
+      $id: session.schema.json
+      type: object
+      title: Session
+      description: Conference session information
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Session unique identifier
+        name:
+          type: string
+          description: Session name/title
+        abstract:
+          type:
+            - string
+            - 'null'
+          description: Session abstract/description
+        start_time:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          description: Session start time (ISO 8601)
+        end_time:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          description: Session end time (ISO 8601)
+        track_name:
+          type:
+            - string
+            - 'null'
+          description: Track or theme name
+        language:
+          type:
+            - string
+            - 'null'
+          description: Session language code
+      required:
+        - id
+        - name
+      additionalProperties: false
+    speaker.schema:
+      $id: speaker.schema.json
+      type: object
+      title: Speaker
+      description: Speaker from event agenda
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Speaker unique identifier
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+        name:
+          type: string
+          description: Full name of the speaker
+          examples:
+            - Jane Doe
+        biography:
+          type:
+            - string
+            - 'null'
+          description: Biography or description of the speaker
+          examples:
+            - Senior Software Engineer at TechCorp with 10 years of experience in distributed systems.
+        job_title:
+          type:
+            - string
+            - 'null'
+          description: Professional title or job position
+          examples:
+            - Senior Software Engineer
+            - CTO
+        photo_url:
+          type:
+            - string
+            - 'null'
+          format: uri
+          description: URL to the speaker's photo
+          examples:
+            - https://example.com/photo.jpg
+        pronouns:
+          type:
+            - string
+            - 'null'
+          description: Speaker's preferred pronouns
+          examples:
+            - she/her
+            - he/him
+            - they/them
+      required:
+        - id
+        - name
+      additionalProperties: false
+    agenda_response.schema:
+      $id: agenda_response.schema.json
+      type: object
+      title: AgendaResponse
+      description: Response for retrieving imported agenda data
+      properties:
+        sessions:
+          type: array
+          description: List of conference sessions
+          items:
+            $ref: '#/components/schemas/session.schema'
+        speakers:
+          type: array
+          description: List of conference speakers
+          items:
+            $ref: '#/components/schemas/speaker.schema'
+      required:
+        - sessions
+        - speakers
+      additionalProperties: false
     Text:
       type: object
       required:
@@ -4956,6 +5263,11 @@ components:
             - type: 'null'
         process_status:
           $ref: '#/components/schemas/partnership_process_status.schema'
+        speakers:
+          type: array
+          description: List of speakers attached to this partnership
+          items:
+            $ref: '#/components/schemas/speaker.schema'
         created_at:
           type: string
           format: date-time
@@ -4966,6 +5278,7 @@ components:
         - language
         - emails
         - process_status
+        - speakers
         - created_at
     detailed_partnership_response.schema:
       $id: detailed_partnership_response.schema.json
@@ -4979,6 +5292,11 @@ components:
           $ref: '#/components/schemas/event_display.schema'
         organisation:
           $ref: '#/components/schemas/organisation_item.schema'
+        speakers:
+          type: array
+          items:
+            $ref: '#/components/schemas/speaker.schema'
+          description: Array of speakers associated with this partnership
       required:
         - partnership
         - company
@@ -5084,6 +5402,42 @@ components:
         - page
         - page_size
         - total
+      additionalProperties: false
+    speaker_partnership.schema:
+      $id: speaker_partnership.schema.json
+      type: object
+      title: SpeakerPartnership
+      description: Association between a speaker and a partnership
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the speaker-partnership association
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+        speaker_id:
+          type: string
+          format: uuid
+          description: Identifier of the associated speaker
+          examples:
+            - 123e4567-e89b-12d3-a456-426614174000
+        partnership_id:
+          type: string
+          format: uuid
+          description: Identifier of the associated partnership
+          examples:
+            - 456e7890-e89b-12d3-a456-426614174111
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the association was created
+          examples:
+            - '2025-11-11T10:30:00'
+      required:
+        - id
+        - speaker_id
+        - partnership_id
+        - created_at
       additionalProperties: false
     paginated_provider.schema:
       $id: paginated_provider.schema.json
@@ -5218,38 +5572,6 @@ components:
           format: datetime
       required:
         - name
-    error_response.schema:
-      $schema: http://json-schema.org/draft-07/schema#
-      type: object
-      title: ErrorResponse
-      description: Standardized error response format used across the application
-      properties:
-        message:
-          type: string
-          description: Human-readable error message describing what went wrong
-        errors:
-          type: array
-          description: Optional array of additional error details (e.g., validation errors)
-          items:
-            type: string
-          default: []
-        stack:
-          type:
-            - string
-            - 'null'
-          description: Optional stack trace for debugging (only in development/debug mode)
-      required:
-        - message
-      additionalProperties: false
-      examples:
-        - message: Provider is still attached to events and cannot be deleted
-        - message: User does not have permission to access this organisation
-        - message: Validation failed
-          errors:
-            - Name is required
-            - Email format is invalid
-        - message: Internal server error
-          stack: "java.lang.NullPointerException: ...\n\tat ..."
     update_provider.schema:
       $schema: https://json-schema.org/draft-07/schema#
       $id: update_provider.schema.json
