@@ -13,6 +13,7 @@
 **Languages**: Kotlin (JVM 21), TypeScript/Vue.js, Docker
 **Build Tools**: Gradle 8.13, pnpm/npm/Node.js
 **Testing**: 95+ Kotlin tests, Vitest for frontend, oxlint for linting
+**Key Integrations**: Orval for API client generation, Koin for DI, Exposed ORM, Pinia for state management
 
 ## Essential Build & Validation Commands
 
@@ -97,19 +98,47 @@ pnpm test  # or npm run test
 - Build outputs to `.output/` directory
 - **Do not commit** `.nuxt/`, `.output/`, `node_modules/`
 
+**Server Quality Gates (NON-NEGOTIABLE):**
+- **ALWAYS use `--no-daemon`** flag to avoid timeout issues
+- **ktlint + detekt**: MUST pass with zero violations before any commit
+- **OpenAPI validation**: Run `npm run validate` for schema compliance  
+- **Testing**: Contract tests for API schemas + Integration tests for business logic
+
 ## CI/CD Pipeline Validation
 
-**GitHub Actions** (`.github/workflows/pr.yaml`):
-- Triggers on PR changes to `server/**` paths only
-- Runs: `./gradlew check` with Java 21 and Gradle 8.13
-- Uploads build reports as artifacts
+**GitHub Actions**:
+- **PR validation** (`.github/workflows/pr.yaml`): Triggers on `server/**` changes only
+- **Server CI** (`.github/workflows/ci-server.yaml`): Builds and pushes container images
+- **Frontend CI** (`.github/workflows/ci-front.yaml`): Frontend-specific pipeline
+- Runs: `./gradlew check` with Java 21 and Gradle 8.13, includes OpenAPI validation
 - **Expected runtime**: 3-4 minutes
 
 **To replicate CI locally:**
 ```bash
 cd server
-./gradlew check --no-daemon
+npm install && npm run validate  # OpenAPI validation
+./gradlew check --no-daemon      # Full server validation
 ```
+
+## Testing Strategy (CRITICAL)
+
+**Contract Tests** (API Schema Validation):
+- **MUST be written BEFORE implementation** (TDD approach)
+- Focus on request/response schema validation ONLY, not business logic
+- Use `call.receive<T>(schema)` pattern with JSON schemas in `/schemas/` directory
+- Use mock factory functions for entities: `insertMockedCompany()`, `insertMockedEvent()`, `insertMockedPartnership()`
+- Create new factories for missing entities following existing naming conventions
+
+**Integration Tests** (Business Logic):
+- HTTP route testing with H2 in-memory database (NOT repository tests)
+- End-to-end validation including serialization, validation, error handling
+- Cross-domain operations, notifications, complex workflows
+- **Minimum 80% coverage** for new features
+
+**Schema Files** (Required for all new endpoints):
+- Create in `server/application/src/main/resources/schemas/{name}.schema.json`
+- OpenAPI 3.1.0 compatible (use union types, not `nullable: true`)
+- Reference in `openapi.yaml` components, then use in route operations
 
 ## Architecture & Project Layout
 
@@ -230,11 +259,56 @@ Before submitting changes, **always run**:
 - **Build font warnings**: Normal, ignore external font API failures
 - **Type errors**: Run `npm run postinstall` to regenerate types
 - **Lint errors**: Use `_` prefix for unused parameters
+- **API client sync**: Run `pnpm orval` after backend OpenAPI changes
 
 **Docker Issues:**
 - Local development uses `docker-compose.yml` 
 - Production uses multi-stage `Dockerfile`
 - Database initialization via Exposed schema creation
+
+## Project-Specific Patterns
+
+**Server Domain Architecture:**
+Each domain module follows Clean Architecture structure:
+- `domain/` - Core business logic and entities
+- `application/` - Use cases and application services  
+- `infrastructure/api/` - REST API routes and DTOs
+- `infrastructure/db/` - Database tables and repositories
+- `infrastructure/bindings/` - Koin dependency injection modules
+
+**Key Architectural Decisions:**
+- **Modular design**: 15 domain modules with clear boundaries (`auth/`, `billing/`, `companies/`, etc.)
+- **Dependency Injection**: Koin-based DI configured in `App.kt` 
+- **Database**: Exposed DSL with automatic migrations via `MigrationRegistry`
+- **API-First**: OpenAPI spec at `/swagger` drives frontend client generation
+- **Authentication**: Google OAuth with cookie-based sessions (`UserSession`)
+
+**Frontend Type Safety:**
+- **API client auto-generation**: Backend OpenAPI spec → Orval → `utils/api.ts`
+- **Custom Axios instance**: `custom-instance.ts` handles auth tokens and error interceptors
+- **Runtime config**: Environment-specific API URLs via `nuxt.config.ts.runtimeConfig`
+
+**Error Handling Patterns:**
+- Backend: Custom exceptions (`UnauthorizedException`, `ConflictException`) mapped to HTTP status codes
+- Frontend: Axios interceptors handle 401 redirects and token refresh
+- Testing: H2 in-memory DB with transaction rollback for isolation
+
+**Repository Architecture (NON-NEGOTIABLE):**
+- **Repository implementations MUST NOT depend on other repositories**
+- **Notification sending happens in route layer, NEVER in repositories**
+- **Repositories return data; routes orchestrate cross-cutting concerns**
+- Pattern: Routes inject multiple repositories, fetch data separately, then orchestrate notifications
+
+**Database Patterns (CRITICAL):**
+- **Tables**: MUST extend `UUIDTable`, use `datetime()` (NEVER `timestamp()`), use `enumerationByName<EnumType>()`
+- **Entities**: MUST extend `UUIDEntity`, companion object pattern, property delegation via `by TableName.columnName`
+- **Dual structure**: Table objects define schema, Entity classes provide ORM mapping
+
+**API Implementation Standards (CRITICAL):**
+- **JSON Schema Validation**: Use `call.receive<T>(schema)` pattern for automatic validation
+- **Authorization**: Use `AuthorizedOrganisationPlugin` for org-protected routes (NO manual permission checks)
+- **Parameter Extraction**: Use `call.parameters.eventSlug` extensions (NO manual null checks)
+- **Exception Handling**: Throw domain exceptions, let StatusPages handle HTTP mapping (NO try-catch in routes)
 
 ## File Locations Quick Reference
 
@@ -249,5 +323,43 @@ Before submitting changes, **always run**:
 - Server: `server/application/src/main/kotlin/fr/devlille/partners/connect/`
 - Frontend: `front/pages/`, `front/components/`, `front/layouts/`
 - Tests: `server/application/src/test/kotlin/`
+
+## Development Patterns Reference
+
+**Route Implementation Example** (Partnership approval):
+```kotlin
+post("/{id}/approve") {
+    val id = call.parameters.id
+    val partnership = partnershipRepository.approve(id)
+    val event = eventRepository.findById(partnership.eventId)
+    val variables = NotificationVariables.PartnershipApproved(...)
+    notificationRepository.sendMessage(event.orgSlug, variables)
+    call.respond(HttpStatusCode.OK, partnership)
+}
+```
+
+**Database Entity Pattern**:
+```kotlin
+// Table definition
+object CompaniesTable : UUIDTable() {
+    val name = varchar("name", 255)
+    val createdAt = datetime("created_at").clientDefault { Clock.System.now().toLocalDateTime(TimeZone.UTC) }
+}
+
+// Entity class  
+class CompanyEntity(id: EntityID<UUID>) : UUIDEntity(id) {
+    companion object : UUIDEntityClass<CompanyEntity>(CompaniesTable)
+    var name by CompaniesTable.name
+    var createdAt by CompaniesTable.createdAt
+}
+```
+
+**Authorization Pattern**:
+```kotlin
+route("/orgs/{orgSlug}/events/{eventSlug}/resource") {
+    install(AuthorizedOrganisationPlugin)  // Handles all permission checking
+    post { /* No manual auth needed */ }
+}
+```
 
 **Trust these instructions** - they are validated and complete. Only search for additional information if you encounter specific errors not covered here.
