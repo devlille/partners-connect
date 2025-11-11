@@ -7,6 +7,7 @@ import fr.devlille.partners.connect.partnership.application.PartnershipCommunica
 import fr.devlille.partners.connect.partnership.application.PartnershipDecisionRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipJobOfferRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipRepositoryExposed
+import fr.devlille.partners.connect.partnership.application.PartnershipSpeakerRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipStorageRepositoryGoogleStorage
 import fr.devlille.partners.connect.partnership.application.PartnershipSuggestionRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipTicketRepositoryExposed
@@ -17,6 +18,7 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipCommunicationR
 import fr.devlille.partners.connect.partnership.domain.PartnershipDecisionRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipJobOfferRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
+import fr.devlille.partners.connect.partnership.domain.PartnershipSpeakerRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipStorageRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipSuggestionRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipTicketRepository
@@ -52,5 +54,8 @@ val partnershipModule = module {
     }
     single<PartnershipBoothRepository> {
         PartnershipBoothRepositoryExposed()
+    }
+    single<PartnershipSpeakerRepository> {
+        PartnershipSpeakerRepositoryExposed()
     }
 }

@@ -6,6 +6,7 @@ import fr.devlille.partners.connect.integrations.infrastructure.api.DefaultInteg
 import fr.devlille.partners.connect.integrations.infrastructure.api.IntegrationDeserializerRegistry
 import fr.devlille.partners.connect.integrations.infrastructure.db.BilletWebRegistrar
 import fr.devlille.partners.connect.integrations.infrastructure.db.MailjetRegistrar
+import fr.devlille.partners.connect.integrations.infrastructure.db.OpenPlannerRegistrar
 import fr.devlille.partners.connect.integrations.infrastructure.db.QontoRegistrar
 import fr.devlille.partners.connect.integrations.infrastructure.db.SlackRegistrar
 import fr.devlille.partners.connect.integrations.infrastructure.db.WebhookRegistrar
@@ -22,6 +23,7 @@ val integrationModule = module {
                 QontoRegistrar(),
                 BilletWebRegistrar(),
                 WebhookRegistrar(),
+                OpenPlannerRegistrar(),
             ),
         )
     }

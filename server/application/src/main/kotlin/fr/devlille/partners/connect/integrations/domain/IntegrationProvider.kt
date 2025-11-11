@@ -6,4 +6,5 @@ enum class IntegrationProvider {
     QONTO,
     BILLETWEB,
     WEBHOOK,
+    OPENPLANNER,
 }

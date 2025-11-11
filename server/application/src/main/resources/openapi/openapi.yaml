@@ -721,6 +721,39 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EventWithOrganisation"
+  /events/{eventSlug}/agenda:
+    get:
+      summary: "Get public event agenda"
+      operationId: "getEventAgendaPublic"
+      description: "Retrieve event agenda with sessions and speakers for public consumption. No authentication required."
+      security:
+        - {}
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug identifier"
+      responses:
+        "200":
+          description: "OK - Agenda retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgendaResponse"
+        "404":
+          description: "Not Found - Event not found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "500":
+          description: "Internal Server Error"
+          content:
+            text/plain:
+              schema:
+                type: "string"
   /events/{eventSlug}/sponsoring/packs:
     get:
       summary: "List public sponsoring packages"
@@ -1285,6 +1318,107 @@ paths:
                 type: "string"
         "404":
           description: "Not Found - Partnership or event not found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+  /events/{eventSlug}/partnerships/{partnershipId}/speakers/{speakerId}:
+    post:
+      summary: "Attach speaker to partnership"
+      operationId: "attachSpeakerToPartnership"
+      description: "Associate a speaker with a partnership. Partnership must be validated first."
+      tags:
+        - partnerships
+        - speakers
+      security:
+        - {}
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug identifier"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "Partnership unique identifier"
+        - name: "speakerId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "Speaker unique identifier"
+      responses:
+        "201":
+          description: "Created - Speaker successfully attached to partnership"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpeakerPartnership"
+        "400":
+          description: "Bad Request - Invalid partnership ID format or speaker and partnership from different events"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "403":
+          description: "Forbidden - Partnership not validated"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found - Partnership or speaker not found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "409":
+          description: "Conflict - Speaker already attached to this partnership"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+    delete:
+      summary: "Detach speaker from partnership"
+      operationId: "detachSpeakerFromPartnership"
+      description: "Remove association between a speaker and a partnership."
+      tags:
+        - partnerships
+        - speakers
+      security:
+        - {}
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug identifier"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "Partnership unique identifier"
+        - name: "speakerId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "Speaker unique identifier"
+      responses:
+        "204":
+          description: "No Content - Speaker successfully detached from partnership"
+        "404":
+          description: "Not Found - Partnership, speaker, or association not found"
           content:
             text/plain:
               schema:
@@ -2417,6 +2551,53 @@ paths:
                 type: "string"
         "204":
           description: "No Content - External link deleted successfully"
+  /orgs/{orgSlug}/events/{eventSlug}/agenda:
+    post:
+      summary: "Fetch and update agenda from agenda integration"
+      operationId: "updateEventAgenda"
+      description: "Trigger fetch and storage of event agenda data from agenda integration. Requires organization write permissions."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organization slug"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug"
+      responses:
+        "201":
+          description: "Created - Agenda fetched and updated successfully"
+        "401":
+          description: "Unauthorized - Authentication required"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "403":
+          description: "Forbidden - Insufficient permissions"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "404":
+          description: "Not Found - Event or organization not found"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+        "500":
+          description: "Internal Server Error - Failed to fetch agenda from OpenPlanner"
+          content:
+            text/plain:
+              schema:
+                type: "string"
   /orgs/{orgSlug}/events/{eventSlug}/partnerships:
     get:
       summary: "Get partnership list"
@@ -3742,3 +3923,11 @@ components:
       $ref: "../schemas/partnership_process_status.schema.json"
     PartnershipPhases:
       $ref: "../schemas/partnership_phases.schema.json"
+    Session:
+      $ref: "../schemas/session.schema.json"
+    Speaker:
+      $ref: "../schemas/speaker.schema.json"
+    AgendaResponse:
+      $ref: "../schemas/agenda_response.schema.json"
+    SpeakerPartnership:
+      $ref: "../schemas/speaker_partnership.schema.json"

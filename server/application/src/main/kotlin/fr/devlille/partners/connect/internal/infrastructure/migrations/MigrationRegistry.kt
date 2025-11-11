@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.internal.infrastructure.migrations
 
+import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddAgendaTablesMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddBoothManagementFieldsMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddCompanyStatusColumnMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddEventExternalLinksMigration
@@ -37,6 +38,7 @@ object MigrationRegistry {
         AddPolymorphicSponsoringOptionsMigration,
         AddProviderManagementMigration,
         AddSelectableValuePricingMigration,
+        AddAgendaTablesMigration,
     )
 
     /**

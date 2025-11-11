@@ -41,4 +41,12 @@ sealed interface CreateIntegration {
         @SerialName("partnership_id")
         val partnershipId: String? = null,
     ) : CreateIntegration
+
+    @Serializable
+    class CreateOpenPlannerIntegration(
+        @SerialName("event_id")
+        val eventId: String,
+        @SerialName("api_key")
+        val apiKey: String,
+    ) : CreateIntegration
 }
