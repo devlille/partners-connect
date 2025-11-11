@@ -1,0 +1,35 @@
+{
+  "$id": "speaker.schema.json",
+  "type": "object",
+  "title": "Speaker",
+  "description": "Conference speaker information",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Speaker unique identifier"
+    },
+    "name": {
+      "type": "string",
+      "description": "Speaker full name"
+    },
+    "biography": {
+      "type": ["string", "null"],
+      "description": "Speaker biography"
+    },
+    "job_title": {
+      "type": ["string", "null"],
+      "description": "Speaker job title"
+    },
+    "photo_url": {
+      "type": ["string", "null"],
+      "description": "Speaker photo URL"
+    },
+    "pronouns": {
+      "type": ["string", "null"],
+      "description": "Speaker preferred pronouns"
+    }
+  },
+  "required": ["id", "name"],
+  "additionalProperties": false
+}

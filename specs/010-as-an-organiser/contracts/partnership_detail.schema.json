@@ -1,0 +1,84 @@
+{
+  "$id": "partnership_detail.schema.json",
+  "type": "object", 
+  "title": "PartnershipDetailsResponse",
+  "description": "Enhanced partnership details response including attached speakers",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Partnership unique identifier"
+    },
+    "phone": {
+      "type": ["string", "null"],
+      "description": "Contact phone number"
+    },
+    "contact_name": {
+      "type": "string",
+      "description": "Primary contact name"
+    },
+    "contact_role": {
+      "type": "string", 
+      "description": "Primary contact role"
+    },
+    "language": {
+      "type": "string",
+      "description": "Partnership communication language"
+    },
+    "emails": {
+      "type": "array",
+      "description": "Contact email addresses",
+      "items": {
+        "type": "string",
+        "format": "email"
+      }
+    },
+    "selected_pack": {
+      "anyOf": [
+        { "$ref": "sponsoring_pack.schema.json" },
+        { "type": "null" }
+      ],
+      "description": "Company selected sponsoring pack"
+    },
+    "suggestion_pack": {
+      "anyOf": [
+        { "$ref": "sponsoring_pack.schema.json" },
+        { "type": "null" }
+      ],
+      "description": "Organizer suggested sponsoring pack"
+    },
+    "validated_pack": {
+      "anyOf": [
+        { "$ref": "sponsoring_pack.schema.json" },
+        { "type": "null" }
+      ],
+      "description": "Organizer validated sponsoring pack"
+    },
+    "process_status": {
+      "$ref": "partnership_process_status.schema.json",
+      "description": "Partnership approval status and workflow stage"
+    },
+    "speakers": {
+      "type": "array",
+      "description": "List of speakers attached to this partnership (NEW)",
+      "items": {
+        "$ref": "speaker.schema.json"
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Partnership creation timestamp"
+    }
+  },
+  "required": [
+    "id",
+    "contact_name",
+    "contact_role",
+    "language", 
+    "emails",
+    "process_status",
+    "speakers",
+    "created_at"
+  ],
+  "additionalProperties": false
+}
