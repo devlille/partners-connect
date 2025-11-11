@@ -1,0 +1,23 @@
+meta {
+  name: Detech
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/partnerships/:partnership_id/speakers/:speaker_id
+  body: none
+  auth: none
+}
+
+params:path {
+  speaker_id: 
+  event_slug: {{event_slug}}
+  org_slug: {{org_slug}}
+  partnership_id: {{partnership_id}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
