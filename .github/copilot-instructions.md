@@ -9,10 +9,10 @@
 - **Database**: PostgreSQL with Exposed ORM
 - **Integration**: Google Cloud Storage, Slack notifications, BilletWeb for ticketing, Mailjet for mailing, Qonto for billing
 
-**Repository Size**: ~200 files, primarily Kotlin backend (~13 domain modules) and Vue frontend (~15 components/pages)
+**Repository Size**: ~200 files, primarily Kotlin backend (~14 domain modules) and Vue frontend (~15 components/pages)
 **Languages**: Kotlin (JVM 21), TypeScript/Vue.js, Docker
-**Build Tools**: Gradle 8.13, npm/Node.js
-**Testing**: 95+ Kotlin tests, oxlint for frontend
+**Build Tools**: Gradle 8.13, pnpm/npm/Node.js
+**Testing**: 95+ Kotlin tests, Vitest for frontend, oxlint for linting
 
 ## Essential Build & Validation Commands
 
@@ -59,32 +59,41 @@
 
 **Dependencies:**
 - Node.js 18+
-- npm (lockfile: package-lock.json)
+- pnpm (preferred, lockfile: pnpm-lock.yaml) or npm (fallback: package-lock.json)
 
 **Core Commands:**
 ```bash
 # Install dependencies (4+ minutes first time)
-npm install
+pnpm install  # or npm install
 
 # Development server (http://localhost:3000)
-npm run dev
+pnpm dev  # or npm run dev
 
 # Production build (~2 minutes, font warnings are normal)
-npm run build
+pnpm build  # or npm run build
 
 # Preview production build
-npm run preview  
+pnpm preview  # or npm run preview
 
 # Linting (oxlint - very fast)
-npm run lint
+pnpm lint  # or npm run lint
 
 # Type checking and prepare
-npm run postinstall
+pnpm postinstall  # or npm run postinstall
+
+# Generate API client from server OpenAPI spec
+pnpm orval  # or npm run orval
+
+# Run tests (Vitest)
+pnpm test  # or npm run test
 ```
 
 **Critical Frontend Notes:**
+- Uses **pnpm** as preferred package manager (with npm as fallback)
 - Font loading warnings during build are **normal** (external font APIs)
+- API client auto-generated from server OpenAPI spec via **Orval** (`pnpm orval`)
 - Lint warnings about unused parameters should use `_` prefix
+- Frontend runs on port **3000** in dev, backend on port **8080**
 - Build outputs to `.output/` directory
 - **Do not commit** `.nuxt/`, `.output/`, `node_modules/`
 
@@ -108,7 +117,7 @@ cd server
 
 **Main Application**: `application/src/main/kotlin/fr/devlille/partners/connect/`
 - **App.kt**: Main entry point, configures Ktor server modules
-- **Domain Modules** (13 total):
+- **Domain Modules** (14 total):
   - `auth/` - Google OAuth authentication  
   - `billing/` - Invoice/quote generation
   - `companies/` - Company management
@@ -117,9 +126,11 @@ cd server
   - `organisations/` - Organisations handling
   - `notifications/` - Slack notifications  
   - `partnership/` - Core partnership workflows
+  - `provider/` - Provider management and integrations
   - `sponsoring/` - Sponsorship packages
   - `tickets/` - Ticket generation
   - `users/` - User permissions
+  - `webhooks/` - Webhook handling for external services
   - `internal/` - Shared infrastructure
 
 **Key Configuration:**
@@ -141,10 +152,14 @@ cd server
 - `layouts/` - Page layouts (default, minimal)
 - `public/` - Static assets and custom CSS
 - `server/` - Server-side middleware
+- `utils/` - API client (auto-generated via Orval)
+- `stores/` - Pinia state management
 
 **Key Configuration:**
-- `nuxt.config.ts` - Main Nuxt configuration
-- `eslint.config.mjs` - ESLint setup via @nuxt/eslint
+- `nuxt.config.ts` - Main Nuxt configuration (i18n, modules, runtime config)
+- `orval.config.ts` - API client generation from server OpenAPI spec
+- `vitest.config.ts` - Vitest testing configuration
+- `oxlint.json` - Linting rules
 - `tsconfig.json` - TypeScript configuration
 
 ### External Dependencies
@@ -189,9 +204,10 @@ Before submitting changes, **always run**:
 2. **Frontend validation**:
    ```bash
    cd front  
-   npm install  # if package.json changed
-   npm run lint
-   npm run build
+   pnpm install  # if package.json changed
+   pnpm lint
+   pnpm build
+   pnpm test  # if tests exist
    ```
 
 3. **Integration test**: Start both services and verify functionality
@@ -200,7 +216,7 @@ Before submitting changes, **always run**:
    cd server && ./gradlew run --no-daemon
    
    # Terminal 2 - Frontend  
-   cd front && npm run dev
+   cd front && pnpm dev
    ```
 
 ## Common Pitfalls & Solutions
