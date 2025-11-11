@@ -1,0 +1,32 @@
+meta {
+  name: OpenPlanner integration
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/integrations/openplanner/agenda
+  body: json
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  org_slug: {{org_slug}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "event_id": "{{op_event_id}}",
+    "api_key": "{{op_api_key}}"
+  }
+}
+
+script:post-response {
+  let data = res.getBody();
+  bru.setEnvVar("integration_id", data.id)
+}

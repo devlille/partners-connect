@@ -1,16 +1,17 @@
 meta {
-  name: Booth plan
+  name: Agenda
   type: http
-  seq: 5
+  seq: 4
 }
 
 post {
-  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/booth-plan
-  body: multipartForm
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/agenda
+  body: none
   auth: none
 }
 
 params:path {
+  event_slug: {{event_slug}}
   org_slug: {{org_slug}}
 }
 

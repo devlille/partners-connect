@@ -1,0 +1,15 @@
+meta {
+  name: Get
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{scheme}}://{{base_url}}/events/:event_slug/agenda
+  body: none
+  auth: none
+}
+
+params:path {
+  event_slug: {{event_slug}}
+}
