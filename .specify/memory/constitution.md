@@ -150,8 +150,8 @@ All API endpoints that accept request bodies MUST use JSON schema validation thr
 
 **Required Implementation**:
 - Generate JSON schemas for all request/response types in `server/application/src/main/resources/schemas/`
-- Schema files MUST follow naming convention: `{RequestType}.json`, `{ResponseType}.json`
-- Update `openapi.yaml` to reference schema files using `$ref: "schemas/{SchemaName}.json"`
+- Schema files MUST follow naming convention: `{snake_case_name}.schema.json` (e.g., `attach_speaker_request.schema.json`, `speaker_partnership_response.schema.json`)
+- Update `openapi.yaml` to reference schema files using `$ref: "schemas/{schema_name}.schema.json"`
 - Use `call.receive<T>(schema)` in route handlers for automatic validation
 - JSON schemas enable automatic 400 Bad Request responses for validation failures
 
@@ -187,8 +187,14 @@ MUST emit structured logs with correlation IDs for request tracing. Performance 
 be collected for all critical business operations. Resource usage MUST be monitored in production 
 with alerting on thresholds.
 
+**CRITICAL**: Performance testing and load testing are NOT part of the implementation phase. 
+Feature specifications and quickstart guides MUST focus on functional validation only. 
+Performance requirements are production concerns handled by infrastructure and operations teams.
+
 **Rationale**: Partnership operations involve financial transactions and time-sensitive event 
-management requiring high performance and comprehensive monitoring for operational excellence.
+management requiring high performance and comprehensive monitoring for operational excellence. 
+However, performance testing is a separate concern from feature implementation and should 
+not be included in development specifications.
 
 ## Code Quality Standards
 
@@ -248,39 +254,57 @@ and descriptive documentation. Header requirements (especially Accept-Language) 
 with correct `required` flags.
 
 #### Schema Integration Requirements (CRITICAL)
-OpenAPI documentation MUST reference external JSON schema files to prevent duplication and ensure consistency:
+OpenAPI documentation MUST reference dedicated schema components to prevent duplication and ensure consistency:
 
-**Schema Reference Pattern**:
-- Create JSON schemas in `server/application/src/main/resources/schemas/{SchemaName}.json`
-- Reference schemas in `openapi.yaml` using: `$ref: "schemas/{SchemaName}.json"`
+**Schema Component Pattern**:
+- Create external JSON schema files in `server/application/src/main/resources/schemas/{schema_name}.schema.json` first
+- Define schema components in `openapi.yaml` under `components/schemas` section by referencing external files
+- Reference schemas using: `$ref: "#/components/schemas/SchemaName"` for internal component references
+- Use `npm run bundle` to resolve and bundle external schema references during build process
 - Schema files MUST be OpenAPI 3.1.0 compatible (use union types, not `nullable: true`)
-- Polymorphic request/response types MUST have dedicated schema files
+- All schema components MUST reference external JSON schema files, never define schemas inline
 
-**Required Schema Files for New Features**:
-- Request schemas: `Create{Entity}Request.json`, `Update{Entity}Request.json`
-- Response schemas: `{Entity}Response.json`, `{Entity}ListResponse.json`
-- Polymorphic schemas: One schema per discriminated union variant
-- Update `openapi.yaml` requestBody and responses to reference these schemas
+**Required Schema Components for New Features**:
+- Create JSON schema files first: `create_{entity}_request.schema.json`, `update_{entity}_request.schema.json`
+- Create response schema files: `{entity}_response.schema.json`, `{entity}_list_response.schema.json` 
+- Reference external schema files in `components/schemas`: each component MUST use `$ref: "schemas/{filename}.schema.json"`
+- Update `openapi.yaml` requestBody and responses to reference schema components (not external files directly)
+- Use `npm run bundle` to resolve external schema references and update documentation.yaml
 
 **Validation Integration**:
 - JSON schemas enable `call.receive<T>(schema)` validation in route handlers
 - Schema validation errors automatically return HTTP 400 with descriptive messages
 - Reduces manual validation code and ensures OpenAPI documentation accuracy
+- Use `npm run validate` to verify schema correctness and reference resolution
 
 **Example**:
 ```yaml
-# In openapi.yaml
+# In openapi.yaml - Reference external schema files in components
+components:
+  schemas:
+    CreateSponsoringOptionRequest:
+      $ref: "schemas/create_sponsoring_option_request.schema.json"
+
+# Then reference components in operations
 requestBody:
   required: true
   content:
     application/json:
       schema:
-        $ref: "schemas/CreateSponsoringOptionRequest.json"
+        $ref: "#/components/schemas/CreateSponsoringOptionRequest"
 ```
 
-**Rationale**: External schema references eliminate duplication between validation logic and 
-documentation, ensure consistency between API implementation and documentation, and enable 
-automatic validation through `call.receive<T>(schema)` pattern.
+**NPM Script Integration**:
+- Use `npm run validate` to check schema correctness and OpenAPI specification validity
+- Use `npm run bundle` to resolve and generate final documentation.yaml
+- External schema files can be bundled using the npm run bundle command
+
+**Rationale**: Schema components in OpenAPI MUST always reference external JSON schema files to maintain 
+single source of truth for validation logic. External schema files enable `call.receive<T>(schema)` 
+validation in route handlers and are resolved via `npm run bundle` during build process. This 
+approach eliminates duplication between validation logic and documentation, ensures consistency 
+between API implementation and documentation, and prevents inline schema definitions that can 
+drift from actual validation logic while maintaining clean separation of concerns.
 
 ### Authorization Pattern (CRITICAL)
 Routes requiring organization-level permissions MUST use the `AuthorizedOrganisationPlugin` Ktor plugin 

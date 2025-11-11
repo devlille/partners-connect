@@ -1,0 +1,24 @@
+{
+  "$id": "agenda_response.schema.json",
+  "type": "object",
+  "title": "AgendaResponse",
+  "description": "Complete agenda response with sessions and speakers",
+  "properties": {
+    "sessions": {
+      "type": "array",
+      "description": "List of conference sessions",
+      "items": {
+        "$ref": "session.schema.json"
+      }
+    },
+    "speakers": {
+      "type": "array",
+      "description": "List of conference speakers",
+      "items": {
+        "$ref": "speaker.schema.json"
+      }
+    }
+  },
+  "required": ["sessions", "speakers"],
+  "additionalProperties": false
+}

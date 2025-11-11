@@ -1,0 +1,41 @@
+{
+  "$id": "session.schema.json",
+  "type": "object",
+  "title": "Session",
+  "description": "Conference session information",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Session unique identifier"
+    },
+    "name": {
+      "type": "string",
+      "description": "Session name/title"
+    },
+    "abstract": {
+      "type": ["string", "null"],
+      "description": "Session abstract/description"
+    },
+    "start_time": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Session start time (ISO 8601)"
+    },
+    "end_time": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Session end time (ISO 8601)"
+    },
+    "track_name": {
+      "type": ["string", "null"],
+      "description": "Track or theme name"
+    },
+    "language": {
+      "type": ["string", "null"],
+      "description": "Session language code"
+    }
+  },
+  "required": ["id", "name"],
+  "additionalProperties": false
+}
