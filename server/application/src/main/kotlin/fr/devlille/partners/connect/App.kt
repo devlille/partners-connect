@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect
 
+import fr.devlille.partners.connect.agenda.infrastructure.bindings.agendaModule
 import fr.devlille.partners.connect.auth.infrastructure.api.authRoutes
 import fr.devlille.partners.connect.auth.infrastructure.bindings.authModule
 import fr.devlille.partners.connect.auth.infrastructure.plugins.configureSecurity
@@ -94,6 +95,7 @@ data class ApplicationConfig(
         notificationModule,
         billingModule,
         ticketingModule,
+        agendaModule,
         integrationModule,
         providerModule,
         webhookModule,

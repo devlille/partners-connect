@@ -5,4 +5,5 @@ enum class IntegrationUsage {
     BILLING,
     TICKETING,
     WEBHOOK,
+    AGENDA,
 }

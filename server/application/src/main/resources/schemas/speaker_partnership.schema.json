@@ -1,0 +1,39 @@
+{
+  "$id": "speaker_partnership.schema.json",
+  "type": "object",
+  "title": "SpeakerPartnership",
+  "description": "Association between a speaker and a partnership",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for the speaker-partnership association",
+      "examples": ["123e4567-e89b-12d3-a456-426614174000"]
+    },
+    "speaker_id": {
+      "type": "string", 
+      "format": "uuid",
+      "description": "Identifier of the associated speaker",
+      "examples": ["123e4567-e89b-12d3-a456-426614174000"]
+    },
+    "partnership_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Identifier of the associated partnership", 
+      "examples": ["456e7890-e89b-12d3-a456-426614174111"]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the association was created",
+      "examples": ["2025-11-11T10:30:00"]
+    }
+  },
+  "required": [
+    "id",
+    "speaker_id", 
+    "partnership_id",
+    "created_at"
+  ],
+  "additionalProperties": false
+}

@@ -32,44 +32,44 @@
 - Include exact file paths in descriptions
 
 ## Phase 3.1: Setup & Database Schema
-- [ ] T001 [P] Create SpeakerPartnershipTable in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/SpeakerPartnershipTable.kt
-- [ ] T002 [P] Create SpeakerPartnershipEntity in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/SpeakerPartnershipEntity.kt
-- [ ] T003 [P] Generate agenda_response.schema.json in server/application/src/main/resources/schemas/agenda_response.schema.json
-- [ ] T004 [P] Generate session.schema.json in server/application/src/main/resources/schemas/session.schema.json
-- [ ] T005 [P] Generate speaker.schema.json in server/application/src/main/resources/schemas/speaker.schema.json
-- [ ] T006 [P] Generate speaker_partnership_response.schema.json in server/application/src/main/resources/schemas/speaker_partnership_response.schema.json
-- [ ] T007 [P] Update partnership_detail.schema.json with speakers array in server/application/src/main/resources/schemas/partnership_detail.schema.json
+- [x] T001 [P] Create SpeakerPartnershipTable in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/SpeakerPartnershipTable.kt
+- [x] T002 [P] Create SpeakerPartnershipEntity in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/SpeakerPartnershipEntity.kt
+- [x] T003 [P] Generate agenda_response.schema.json in server/application/src/main/resources/schemas/agenda_response.schema.json
+- [x] T004 [P] Generate session.schema.json in server/application/src/main/resources/schemas/session.schema.json
+- [x] T005 [P] Generate speaker.schema.json in server/application/src/main/resources/schemas/speaker.schema.json
+- [x] T006 [P] Generate speaker_partnership_response.schema.json in server/application/src/main/resources/schemas/speaker_partnership_response.schema.json
+- [x] T007 [P] Update partnership_detail.schema.json with speakers array in server/application/src/main/resources/schemas/partnership_detail.schema.json
 
 ## Phase 3.2: Tests First (TDD) ⚠️ MUST COMPLETE BEFORE 3.3
 **CRITICAL: These tests MUST be written and MUST FAIL before ANY implementation**
 **Use existing mock factory functions or create them if needed for test data setup**
-- [ ] T008 [P] Contract test GET /orgs/{orgSlug}/events/{eventSlug}/agenda in server/application/src/test/kotlin/fr/devlille/partners/connect/events/api/AgendaRoutesContractTest.kt
-- [ ] T009 [P] Contract test POST /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/speakers/{speakerId} in server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/api/SpeakerPartnershipRoutesContractTest.kt
-- [ ] T010 [P] Contract test DELETE /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/speakers/{speakerId} in same file as T009
-- [ ] T011 [P] Contract test enhanced GET /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId} with speakers in server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/api/PartnershipRoutesContractTest.kt
-- [ ] T012 [P] Create mockSpeaker factory in server/application/src/test/kotlin/fr/devlille/partners/connect/testing/MockFactories.kt
-- [ ] T013 [P] Create mockSession factory in same file as T012
-- [ ] T014 [P] Create mockSpeakerPartnership factory in same file as T012
-- [ ] T015 [P] Integration test import and attachment workflow in server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/SpeakerPartnershipIntegrationTest.kt
-- [ ] T016 [P] Integration test error handling scenarios in server/application/src/test/kotlin/fr/devlille/partners/connect/agenda/AgendaErrorHandlingTest.kt
-- [ ] T017 [P] Integration test authorization boundaries in server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/SpeakerPartnershipAuthorizationTest.kt
+- [x] T008 [P] Contract test GET /orgs/{orgSlug}/events/{eventSlug}/agenda in server/application/src/test/kotlin/fr/devlille/partners/connect/events/api/AgendaRoutesContractTest.kt
+- [x] T009 [P] Contract test POST /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/speakers/{speakerId} in server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/api/SpeakerPartnershipRoutesContractTest.kt
+- [x] T010 [P] Contract test DELETE /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/speakers/{speakerId} in same file as T009
+- [x] T011 [P] Contract test enhanced GET /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId} with speakers in server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/api/EnhancedPartnershipDetailContractTest.kt
+- [x] T012 [P] Create mockSpeaker factory in server/application/src/test/kotlin/fr/devlille/partners/connect/testing/MockFactories.kt
+- [x] T013 [P] Create mockSession factory in same file as T012
+- [x] T014 [P] Create mockSpeakerPartnership factory in same file as T012
+- [x] T015 [P] Integration test import and attachment workflow in server/application/src/test/kotlin/fr/devlille/partners/connect/integration/SpeakerPartnershipWorkflowIntegrationTest.kt
+- [x] T016 [P] Integration test error handling scenarios in server/application/src/test/kotlin/fr/devlille/partners/connect/integration/SpeakerPartnershipAuthorizationIntegrationTest.kt
+- [x] T017 [P] Integration test authorization boundaries in server/application/src/test/kotlin/fr/devlille/partners/connect/integration/SpeakerPartnershipDataConsistencyIntegrationTest.kt
 
 ## Phase 3.3: Core Implementation (ONLY after tests are failing)
-- [ ] T018 [P] SpeakerPartnershipRepository interface in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/SpeakerPartnershipRepository.kt
-- [ ] T019 [P] SpeakerPartnership domain model in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/SpeakerPartnership.kt
-- [ ] T020 [P] Session domain model in server/application/src/main/kotlin/fr/devlille/partners/connect/events/domain/Session.kt
-- [ ] T021 [P] Speaker domain model in server/application/src/main/kotlin/fr/devlille/partners/connect/events/domain/Speaker.kt
-- [ ] T022 [P] AgendaResponse domain model in server/application/src/main/kotlin/fr/devlille/partners/connect/events/domain/AgendaResponse.kt
-- [ ] T023 SpeakerPartnershipRepositoryExposed implementation in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/SpeakerPartnershipRepositoryExposed.kt
-- [ ] T024 Configure SpeakerPartnershipTable in SchemaUtils.createMissingTablesAndColumns in server/application/src/main/kotlin/fr/devlille/partners/connect/App.kt
-- [ ] T025 Configure SpeakerPartnershipRepository in Koin dependency injection in server/application/src/main/kotlin/fr/devlille/partners/connect/App.kt
+- [x] T018 [P] SpeakerPartnershipRepository interface in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/SpeakerPartnershipRepository.kt
+- [x] T019 [P] SpeakerPartnership domain model in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/SpeakerPartnership.kt
+- [x] T020 [P] Session domain model in server/application/src/main/kotlin/fr/devlille/partners/connect/events/domain/Session.kt
+- [x] T021 [P] Speaker domain model in server/application/src/main/kotlin/fr/devlille/partners/connect/events/domain/Speaker.kt
+- [x] T022 [P] AgendaResponse domain model in server/application/src/main/kotlin/fr/devlille/partners/connect/events/domain/AgendaResponse.kt
+- [x] T023 SpeakerPartnershipRepositoryExposed implementation in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/SpeakerPartnershipRepositoryExposed.kt
+- [x] T024 Configure SpeakerPartnershipTable in SchemaUtils.createMissingTablesAndColumns in server/application/src/main/kotlin/fr/devlille/partners/connect/App.kt
+- [x] T025 Configure SpeakerPartnershipRepository in Koin dependency injection in server/application/src/main/kotlin/fr/devlille/partners/connect/App.kt
 
 ## Phase 3.4: API Routes Implementation
-- [ ] T026 POST /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/speakers/{speakerId} endpoint in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/api/SpeakerPartnershipRoutes.kt
-- [ ] T027 DELETE /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/speakers/{speakerId} endpoint in same file as T026
-- [ ] T028 Configure SpeakerPartnershipRoutes in Application.configure() in server/application/src/main/kotlin/fr/devlille/partners/connect/App.kt
-- [ ] T029 Enhance GET /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId} to include speakers in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/api/PartnershipRoutes.kt
-- [ ] T030 Enhance GET /orgs/{orgSlug}/events/{eventSlug}/agenda endpoint in server/application/src/main/kotlin/fr/devlille/partners/connect/events/api/EventAgendaRoutes.kt
+- [x] T026 POST /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/speakers/{speakerId} endpoint in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/api/SpeakerPartnershipRoutes.kt
+- [x] T027 DELETE /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/speakers/{speakerId} endpoint in same file as T026
+- [x] T028 Configure SpeakerPartnershipRoutes in Application.configure() in server/application/src/main/kotlin/fr/devlille/partners/connect/App.kt
+- [x] T029 Enhance GET /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId} to include speakers in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipRoutes.kt
+- [x] T030 Enhance GET /orgs/{orgSlug}/events/{eventSlug}/agenda endpoint in server/application/src/main/kotlin/fr/devlille/partners/connect/events/infrastructure/api/EventAgendaRoutes.kt
 
 ## Phase 3.5: Schema & API Documentation
 - [ ] T031 [P] Add schema components for Session, Speaker, AgendaResponse, SpeakerPartnershipResponse in server/application/src/main/resources/openapi/openapi.yaml

@@ -3,6 +3,7 @@ package fr.devlille.partners.connect.integrations.infrastructure.db
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
+import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -24,3 +25,17 @@ object IntegrationsTable : UUIDTable("integrations") {
 fun IntegrationsTable.findByEventIdAndUsage(eventId: UUID, usage: IntegrationUsage) = this
     .selectAll()
     .where { (IntegrationsTable.eventId eq eventId) and (IntegrationsTable.usage eq usage) }
+
+fun IntegrationsTable.singleIntegration(eventId: UUID, usage: IntegrationUsage): Pair<IntegrationProvider, UUID> {
+    val integrations = findByEventIdAndUsage(eventId, usage).toList()
+    if (integrations.isEmpty()) {
+        throw NotFoundException("No $usage integration found for event $eventId")
+    }
+    if (integrations.size > 1) {
+        throw NotFoundException("Multiple $usage integrations found for event $eventId")
+    }
+    val integration = integrations.single()
+    val provider = integration[IntegrationsTable.provider]
+    val integrationId = integration[IntegrationsTable.id].value
+    return Pair(provider, integrationId)
+}

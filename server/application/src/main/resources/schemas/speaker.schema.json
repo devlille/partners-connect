@@ -1,0 +1,45 @@
+{
+  "$id": "speaker.schema.json",
+  "type": "object",
+  "title": "Speaker",
+  "description": "Speaker from event agenda",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Speaker unique identifier",
+      "examples": ["123e4567-e89b-12d3-a456-426614174000"]
+    },
+    "name": {
+      "type": "string",
+      "description": "Full name of the speaker",
+      "examples": ["Jane Doe"]
+    },
+    "biography": {
+      "type": ["string", "null"],
+      "description": "Biography or description of the speaker",
+      "examples": ["Senior Software Engineer at TechCorp with 10 years of experience in distributed systems."]
+    },
+    "job_title": {
+      "type": ["string", "null"],
+      "description": "Professional title or job position",
+      "examples": ["Senior Software Engineer", "CTO"]
+    },
+    "photo_url": {
+      "type": ["string", "null"],
+      "format": "uri",
+      "description": "URL to the speaker's photo",
+      "examples": ["https://example.com/photo.jpg"]
+    },
+    "pronouns": {
+      "type": ["string", "null"],
+      "description": "Speaker's preferred pronouns",
+      "examples": ["she/her", "he/him", "they/them"]
+    }
+  },
+  "required": [
+    "id",
+    "name"
+  ],
+  "additionalProperties": false
+}

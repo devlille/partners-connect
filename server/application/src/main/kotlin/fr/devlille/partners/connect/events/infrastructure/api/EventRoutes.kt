@@ -65,4 +65,7 @@ fun Route.eventRoutes() {
             )
         }
     }
+
+    publicEventAgendaRoutes()
+    orgsEventAgendaRoutes()
 }

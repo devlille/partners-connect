@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.partnership.domain
 
+import fr.devlille.partners.connect.agenda.domain.Speaker
 import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.events.domain.EventDisplay
 import fr.devlille.partners.connect.organisations.domain.OrganisationItem
@@ -11,4 +12,5 @@ data class DetailedPartnershipResponse(
     val company: Company,
     val event: EventDisplay,
     val organisation: OrganisationItem,
+    val speakers: List<Speaker>,
 )

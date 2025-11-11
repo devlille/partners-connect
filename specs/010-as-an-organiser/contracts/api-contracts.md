@@ -18,12 +18,12 @@
 - **401 Unauthorized**: Invalid or missing JWT token
 - **403 Forbidden**: User lacks edit permission for organization
 
-### GET /orgs/{orgSlug}/events/{eventSlug}/agenda
+### GET /events/{eventSlug}/agenda
 **Purpose**: Retrieve imported agenda data (sessions and speakers)
 
 **Request**:
 - Method: GET
-- Path: `/orgs/{orgSlug}/events/{eventSlug}/agenda`
+- Path: `/events/{eventSlug}/agenda`
 - Headers: `Authorization: Bearer {jwt_token}` (optional - public endpoint)
 - Body: None
 

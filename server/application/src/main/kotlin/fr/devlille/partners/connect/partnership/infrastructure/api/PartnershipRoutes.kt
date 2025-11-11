@@ -11,6 +11,7 @@ import fr.devlille.partners.connect.notifications.domain.NotificationVariables
 import fr.devlille.partners.connect.partnership.domain.DetailedPartnershipResponse
 import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
+import fr.devlille.partners.connect.partnership.domain.PartnershipSpeakerRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
 import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
 import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
@@ -30,6 +31,7 @@ fun Route.partnershipRoutes() {
     publicPartnershipBillingRoutes()
     publicPartnershipTicketingRoutes()
     publicPartnershipJobOfferRoutes()
+    publicPartnershipSpeakersRoutes()
 
     orgsPartnershipRoutes()
     orgsPartnershipDecisionRoutes()
@@ -45,6 +47,7 @@ fun Route.partnershipRoutes() {
 private fun Route.publicPartnershipRoutes() {
     val eventRepository by inject<EventRepository>()
     val companyRepository by inject<CompanyRepository>()
+    val speakerRepository by inject<PartnershipSpeakerRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
     val notificationRepository by inject<NotificationRepository>()
     val webhookRepository by inject<WebhookRepository>()
@@ -80,6 +83,7 @@ private fun Route.publicPartnershipRoutes() {
 
             val partnershipDetail = partnershipRepository.getByIdDetailed(eventSlug, partnershipId)
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
+            val speakers = speakerRepository.getSpeakersByPartnership(partnershipId)
             val event = eventRepository.getBySlug(eventSlug)
 
             val response = DetailedPartnershipResponse(
@@ -87,6 +91,7 @@ private fun Route.publicPartnershipRoutes() {
                 company = company,
                 event = event.event,
                 organisation = event.organisation,
+                speakers = speakers,
             )
 
             call.respond(HttpStatusCode.OK, response)

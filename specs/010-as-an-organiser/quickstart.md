@@ -57,7 +57,7 @@ curl "http://localhost:8080/orgs/devlille/events/devlille-2025/agenda" \
 **Test Request**:
 ```bash
 # Get imported agenda data (sessions and speakers)
-curl "http://localhost:8080/orgs/devlille/events/devlille-2025/agenda" \
+curl "http://localhost:8080/events/devlille-2025/agenda" \
   -H "Authorization: Bearer {jwt_token}"
 ```
 

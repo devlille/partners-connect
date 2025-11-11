@@ -16,6 +16,7 @@ class DefaultIntegrationDeserializerRegistry : IntegrationDeserializerRegistry {
         IntegrationProvider.QONTO to CreateIntegration.CreateQontoIntegration.serializer(),
         IntegrationProvider.BILLETWEB to CreateIntegration.CreateBilletWebIntegration.serializer(),
         IntegrationProvider.WEBHOOK to CreateIntegration.CreateWebhookIntegration.serializer(),
+        IntegrationProvider.OPENPLANNER to CreateIntegration.CreateOpenPlannerIntegration.serializer(),
     )
 
     override fun serializerFor(provider: IntegrationProvider): KSerializer<out CreateIntegration> {

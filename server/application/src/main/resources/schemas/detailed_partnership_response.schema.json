@@ -13,6 +13,13 @@
     },
     "organisation": {
       "$ref": "organisation_item.schema.json"
+    },
+    "speakers": {
+      "type": "array",
+      "items": {
+        "$ref": "speaker.schema.json"
+      },
+      "description": "Array of speakers associated with this partnership"
     }
   },
   "required": [
