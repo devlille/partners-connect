@@ -11,7 +11,7 @@
             class="mb-2"
             label="Retour"
           />
-          <h1 class="text-2xl font-bold text-gray-900">Événements - {{ organisationName }}</h1>
+          <PageTitle>Événements - {{ organisationName }}</PageTitle>
         </div>
         <UButton
           :to="`/orgs/${slug}/events/create`"

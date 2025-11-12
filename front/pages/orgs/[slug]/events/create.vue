@@ -4,7 +4,7 @@
       <div class="flex items-center justify-between">
         <div>
           <BackButton :to="`/orgs/${slug}/events`" label="Retour" />
-          <h1 class="text-2xl font-bold text-gray-900">Créer un événement - {{ organisationName }}</h1>
+          <PageTitle>Créer un événement - {{ organisationName }}</PageTitle>
         </div>
       </div>
     </div>

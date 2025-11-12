@@ -4,7 +4,7 @@
       <div class="flex items-center justify-between">
         <div>
           <BackButton to="/hall" label="Retour" />
-          <h1 class="text-2xl font-bold text-gray-900">{{ companyName || 'Gestion de l\'entreprise' }}</h1>
+          <PageTitle>{{ companyName || 'Gestion de l\'entreprise' }}</PageTitle>
           <p class="mt-1 text-sm text-gray-500">
             Gérez les informations et les offres d'emploi de votre entreprise
           </p>

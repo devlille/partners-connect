@@ -3,15 +3,26 @@
     <div class="bg-white p-6">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900">{{ partnership?.company_name || 'Sponsor' }}</h1>
+          <PageTitle>{{ partnership?.company_name || 'Sponsor' }}</PageTitle>
           <p class="text-sm text-gray-600 mt-1">Partenariat</p>
         </div>
         <div v-if="partnership" class="flex gap-3">
           <UButton
+            color="neutral"
+            variant="outline"
+            :loading="isSuggesting"
+            :disabled="isValidating || isDeclining"
+            :aria-label="`Proposer un autre pack à ${partnership.company_name}`"
+            @click="handleSuggestPack"
+          >
+            <i class="i-heroicons-arrow-path mr-2" aria-hidden="true" />
+            Proposer un autre pack
+          </UButton>
+          <UButton
             color="error"
             variant="outline"
             :loading="isDeclining"
-            :disabled="isValidating"
+            :disabled="isValidating || isSuggesting"
             :aria-label="`Refuser le partenariat avec ${partnership.company_name}`"
             @click="handleDeclinePartnership"
           >
@@ -21,7 +32,7 @@
           <UButton
             color="primary"
             :loading="isValidating"
-            :disabled="isDeclining"
+            :disabled="isDeclining || isSuggesting"
             :aria-label="`Valider le partenariat avec ${partnership.company_name}`"
             @click="handleValidatePartnership"
           >
@@ -62,11 +73,20 @@
       @confirm="handleConfirm"
       @cancel="handleCancel"
     />
+
+    <!-- Modale de suggestion de pack -->
+    <SuggestPackModal
+      v-model:is-open="isSuggestModalOpen"
+      :event-slug="eventSlug"
+      :current-pack-id="partnership?.pack_id"
+      :current-language="partnership?.language"
+      @submit="handleSuggestPackSubmit"
+    />
   </Dashboard>
 </template>
 
 <script setup lang="ts">
-import { getOrgsEventsPartnership } from "~/utils/api";
+import { getOrgsEventsPartnership, postOrgsEventsPartnershipSuggestion } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 import type { ExtendedPartnershipItem } from "~/types/partnership";
 import { PARTNERSHIP_CONFIRM } from "~/constants/partnership";
@@ -105,6 +125,10 @@ const error = ref<string | null>(null);
 // États pour validation/refus de partenariat
 const isValidating = ref(false);
 const isDeclining = ref(false);
+const isSuggesting = ref(false);
+
+// État pour la modale de suggestion
+const isSuggestModalOpen = ref(false);
 
 // Menu contextuel pour la page du sponsor
 const { sponsorLinks } = useSponsorLinks(orgSlug.value, eventSlug.value, sponsorId.value);
@@ -231,6 +255,57 @@ function handleConfirm() {
  */
 function handleCancel() {
   confirmModalCancel();
+}
+
+/**
+ * Ouvre la modale pour proposer un autre pack
+ */
+function handleSuggestPack() {
+  isSuggestModalOpen.value = true;
+}
+
+/**
+ * Gère la soumission de la suggestion de pack
+ */
+async function handleSuggestPackSubmit(data: { packId: string; language: string; optionIds: string[] }) {
+  if (!partnership.value) return;
+
+  try {
+    isSuggesting.value = true;
+    error.value = null;
+
+    // Créer les option_selections à partir des optionIds
+    const option_selections = data.optionIds.map(optionId => ({
+      option_id: optionId,
+      selections: []
+    }));
+
+    await postOrgsEventsPartnershipSuggestion(
+      orgSlug.value,
+      eventSlug.value,
+      sponsorId.value,
+      {
+        pack_id: data.packId,
+        language: data.language,
+        option_selections
+      }
+    );
+
+    // Fermer la modale
+    isSuggestModalOpen.value = false;
+
+    // Recharger les données du partenariat
+    await loadPartnership();
+
+    // TODO: Afficher un message de succès à l'utilisateur
+    console.log('Suggestion de pack envoyée avec succès');
+
+  } catch (err) {
+    console.error('Failed to suggest pack:', err);
+    error.value = 'Impossible d\'envoyer la suggestion de pack';
+  } finally {
+    isSuggesting.value = false;
+  }
 }
 
 onMounted(() => {

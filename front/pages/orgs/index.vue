@@ -2,7 +2,7 @@
   <Dashboard :main-links="mainLinks" :footer-links="footerLinks">
     <div class="bg-white border-b border-gray-200 p-6">
       <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-gray-900">Liste des Organisations</h1>
+        <PageTitle>Liste des Organisations</PageTitle>
         <UButton
           to="/orgs/create"
           label="Créer une organisation"

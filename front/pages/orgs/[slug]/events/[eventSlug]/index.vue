@@ -11,7 +11,7 @@
             class="mb-2"
             label="Retour"
           />
-          <h1 class="text-2xl font-bold text-gray-900">{{ event?.name }} - {{ organisationName }}</h1>
+          <PageTitle>{{ event?.name }} - {{ organisationName }}</PageTitle>
         </div>
       </div>
     </div>

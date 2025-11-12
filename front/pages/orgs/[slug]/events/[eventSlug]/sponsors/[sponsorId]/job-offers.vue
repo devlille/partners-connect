@@ -3,7 +3,7 @@
     <div class="bg-white border-b border-gray-200 p-6">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900">Offres d'emploi</h1>
+          <PageTitle>Offres d'emploi</PageTitle>
           <p class="mt-1 text-sm text-gray-500">
             Gérez les offres d'emploi de {{ companyName }}
           </p>

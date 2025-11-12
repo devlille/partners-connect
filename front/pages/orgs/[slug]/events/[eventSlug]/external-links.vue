@@ -4,7 +4,7 @@
       <div class="flex items-center justify-between">
         <div>
           <BackButton :to="`/orgs/${orgSlug}/events/${eventSlug}`" label="Retour" />
-          <h1 class="text-2xl font-bold text-gray-900">Liens externes - {{ eventName }}</h1>
+          <PageTitle>Liens externes - {{ eventName }}</PageTitle>
         </div>
         <UButton
           color="primary"

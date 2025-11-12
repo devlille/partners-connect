@@ -11,7 +11,7 @@
             class="mb-2"
             label="Retour"
           />
-          <h1 class="text-2xl font-bold text-gray-900">Événements Favoris</h1>
+          <PageTitle>Événements Favoris</PageTitle>
         </div>
       </div>
     </div>

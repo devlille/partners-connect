@@ -4,7 +4,7 @@
       <div class="flex items-center justify-between">
         <div>
           <BackButton :to="`/orgs/${orgSlug}/events/${eventSlug}/sponsors`" label="Retour aux sponsors" />
-          <h1 class="text-2xl font-bold text-gray-900">Créer un sponsor - {{ eventName }}</h1>
+          <PageTitle>Créer un sponsor - {{ eventName }}</PageTitle>
         </div>
       </div>
     </div>

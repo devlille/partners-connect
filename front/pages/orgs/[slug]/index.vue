@@ -4,7 +4,7 @@
       <div class="flex items-center justify-between">
         <div>
           <BackButton to="/orgs" label="Retour" />
-          <h1 class="text-2xl font-bold text-gray-900">{{ organisation?.name }}</h1>
+          <PageTitle>{{ organisation?.name }}</PageTitle>
         </div>
       </div>
     </div>

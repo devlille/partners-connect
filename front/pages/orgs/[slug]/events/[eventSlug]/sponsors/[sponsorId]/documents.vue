@@ -2,7 +2,7 @@
   <Dashboard :main-links="sponsorLinks" :footer-links="footerLinks">
     <div class="bg-white p-6">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">{{ partnership?.company_name || 'Sponsor' }}</h1>
+        <PageTitle>{{ partnership?.company_name || 'Sponsor' }}</PageTitle>
         <p class="text-sm text-gray-600 mt-1">Documents</p>
       </div>
     </div>

@@ -1,7 +1,7 @@
 <template>
   <Dashboard :main-links="mainLinks" :footer-links="footerLinks">
     <div class="bg-white border-b border-gray-200 p-6">
-      <h1 class="text-2xl font-bold text-gray-900">Espace partenaire</h1>
+      <PageTitle>Espace partenaire</PageTitle>
       <p class="mt-1 text-sm text-gray-500">
         Gérez vos partenariats et vos offres d'emploi
       </p>

@@ -11,7 +11,7 @@
             class="mb-2"
             label="Retour"
           />
-          <h1 class="text-2xl font-bold text-gray-900">Intégrations - {{ eventSlug }}</h1>
+          <PageTitle>Intégrations - {{ eventSlug }}</PageTitle>
           <p class="text-gray-600 mt-1">Configurez les intégrations tierces pour cet événement</p>
         </div>
       </div>
