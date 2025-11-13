@@ -54,7 +54,7 @@
           Pack
         </label>
         <UInput
-          v-model="form.pack_name"
+          v-model="selectedPackName"
           placeholder="Pack de sponsoring"
           disabled
           class="w-full"
@@ -129,6 +129,7 @@
 
 <script setup lang="ts">
 import type { ExtendedPartnershipItem } from "~/types/partnership";
+import { getEventsSponsoringPacks, type SponsoringPack } from "~/utils/api";
 
 interface Props {
   partnership?: ExtendedPartnershipItem | null;
@@ -144,12 +145,43 @@ const emit = defineEmits<{
   cancel: [];
 }>();
 
+const route = useRoute();
+const eventSlug = computed(() => {
+  const params = route.params.eventSlug;
+  return Array.isArray(params) ? params[1] as string : params as string;
+});
+
+const packs = ref<SponsoringPack[]>([]);
+const selectedPackName = ref('');
+
+// Charger les packs disponibles
+async function loadPacks() {
+  try {
+    const response = await getEventsSponsoringPacks(eventSlug.value);
+    packs.value = response.data;
+    updateSelectedPackName();
+  } catch (error) {
+    console.error('Failed to load packs:', error);
+  }
+}
+
+// Mettre à jour le nom du pack sélectionné
+function updateSelectedPackName() {
+  if (props.partnership?.selected_pack_id) {
+    const pack = packs.value.find(p => p.id === props.partnership?.selected_pack_id);
+    selectedPackName.value = pack?.name || '';
+  } else if (props.partnership?.suggested_pack_name) {
+    selectedPackName.value = `${props.partnership.suggested_pack_name} (suggéré)`;
+  } else {
+    selectedPackName.value = '';
+  }
+}
+
 const form = ref({
   company_name: props.partnership?.company_name || '',
   event_name: props.partnership?.event_name || '',
   contact_name: props.partnership?.contact.display_name || '',
   contact_role: props.partnership?.contact.role || '',
-  pack_name: props.partnership?.pack_name || props.partnership?.suggested_pack_name || '',
   language: props.partnership?.language || 'fr',
   emails: props.partnership?.emails || '',
   phone: props.partnership?.phone || ''
@@ -163,13 +195,17 @@ watch(() => props.partnership, (newPartnership) => {
       event_name: newPartnership.event_name,
       contact_name: newPartnership.contact.display_name,
       contact_role: newPartnership.contact.role,
-      pack_name: newPartnership.pack_name || newPartnership.suggested_pack_name || '',
       language: newPartnership.language,
       emails: newPartnership.emails || '',
       phone: newPartnership.phone || ''
     };
+    updateSelectedPackName();
   }
 }, { deep: true });
+
+onMounted(() => {
+  loadPacks();
+});
 
 function onSubmit() {
   emit('save', {

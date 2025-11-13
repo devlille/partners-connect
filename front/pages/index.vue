@@ -149,8 +149,8 @@ const handleSubmit = async () => {
         zip_code: '',
         country: '',
       },
-      siret: '',
-      vat: '',
+      siret: '00000000000000',
+      vat: 'FR123456789',
       site_url: '',
     };
 

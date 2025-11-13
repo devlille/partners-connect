@@ -143,13 +143,13 @@ const columns = [
   },
   {
     header: 'Pack',
-    accessorKey: 'pack_name',
+    accessorKey: 'selected_pack_name',
     cell: (info: any) => {
-      const packName = info.getValue('pack_name');
+      const selectedPackName = info.getValue('selected_pack_name');
       const suggestedPackName = info.row.original.suggested_pack_name;
 
-      if (packName) {
-        return packName;
+      if (selectedPackName) {
+        return selectedPackName;
       } else if (suggestedPackName) {
         return `${suggestedPackName} (suggéré)`;
       }
@@ -191,8 +191,8 @@ function getPackPartnershipCount(packId: string): number {
   const pack = packs.value.find(p => p.id === packId);
   if (!pack) return 0;
 
-  // Compter les partnerships qui ont ce pack_name
-  return partnerships.value.filter(p => p.pack_name === pack.name).length;
+  // Compter les partnerships qui ont ce selected_pack_name
+  return partnerships.value.filter(p => p.selected_pack_name === pack.name).length;
 }
 
 // Calculer le pourcentage de remplissage
