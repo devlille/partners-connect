@@ -65,11 +65,11 @@
         <label class="block text-sm font-medium text-gray-700 mb-2">
           Options
         </label>
-        <div v-if="partnership?.option_ids && partnership.option_ids.length > 0" class="bg-gray-50 rounded-lg p-3">
+        <div v-if="selectedOptions.length > 0" class="bg-gray-50 rounded-lg p-3">
           <ul class="space-y-1 text-sm text-gray-700">
-            <li v-for="optionId in partnership.option_ids" :key="optionId" class="flex items-center">
+            <li v-for="option in selectedOptions" :key="option.id" class="flex items-center">
               <i class="i-heroicons-check-circle mr-2 text-green-600" />
-              {{ optionId }}
+              {{ option.name }}
             </li>
           </ul>
         </div>
@@ -153,6 +153,7 @@ const eventSlug = computed(() => {
 
 const packs = ref<SponsoringPack[]>([]);
 const selectedPackName = ref('');
+const selectedOptions = ref<Array<{ id: string; name: string }>>([]);
 
 // Charger les packs disponibles
 async function loadPacks() {
@@ -160,6 +161,7 @@ async function loadPacks() {
     const response = await getEventsSponsoringPacks(eventSlug.value);
     packs.value = response.data;
     updateSelectedPackName();
+    updateSelectedOptions();
   } catch (error) {
     console.error('Failed to load packs:', error);
   }
@@ -175,6 +177,27 @@ function updateSelectedPackName() {
   } else {
     selectedPackName.value = '';
   }
+}
+
+// Mettre à jour les options sélectionnées
+function updateSelectedOptions() {
+  selectedOptions.value = [];
+
+  if (!props.partnership?.option_ids || props.partnership.option_ids.length === 0) {
+    return;
+  }
+
+  // Trouver le pack pour accéder à ses options
+  const packId = props.partnership.selected_pack_id || props.partnership.suggested_pack_id;
+  if (!packId) return;
+
+  const pack = packs.value.find(p => p.id === packId);
+  if (!pack || !pack.optional_options) return;
+
+  // Filtrer les options qui sont dans option_ids
+  selectedOptions.value = pack.optional_options
+    .filter(opt => props.partnership?.option_ids?.includes(opt.id))
+    .map(opt => ({ id: opt.id, name: opt.name }));
 }
 
 const form = ref({
@@ -200,6 +223,7 @@ watch(() => props.partnership, (newPartnership) => {
       phone: newPartnership.phone || ''
     };
     updateSelectedPackName();
+    updateSelectedOptions();
   }
 }, { deep: true });
 

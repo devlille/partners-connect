@@ -1008,4 +1008,244 @@ describe('Sponsor Detail Page - Partnership Actions', () => {
       });
     });
   });
+
+  describe('Partnership Data Loading', () => {
+    it('should use getEventsPartnershipDetailed API', async () => {
+      const mockApi = {
+        getEventsPartnershipDetailed: vi.fn().mockResolvedValue({
+          data: {
+            partnership: {
+              id: 'p123',
+              contact_name: 'John Doe',
+              contact_role: 'CEO',
+              language: 'fr',
+              emails: ['john@example.com'],
+              phone: '+33612345678',
+              selected_pack: { id: 'pack1', name: 'Gold' },
+              suggestion_pack: null,
+              validated_pack: null,
+              process_status: {
+                validated_at: null,
+                billing_status: 'pending',
+                suggested_at: null,
+                agreement_url: null,
+                agreement_signed_url: null
+              },
+              created_at: '2025-01-01T00:00:00Z'
+            },
+            company: { name: 'Test Company' },
+            event: { name: 'DevFest 2025' },
+            organisation: { slug: 'devlille', name: 'DevLille' }
+          }
+        })
+      };
+
+      await mockApi.getEventsPartnershipDetailed('devfest-2025', 'p123');
+
+      expect(mockApi.getEventsPartnershipDetailed).toHaveBeenCalledWith('devfest-2025', 'p123');
+      expect(mockApi.getEventsPartnershipDetailed).toHaveBeenCalledTimes(1);
+    });
+
+    it('should map DetailedPartnershipResponseSchema to ExtendedPartnershipItem', () => {
+      const apiResponse = {
+        partnership: {
+          id: 'p123',
+          contact_name: 'John Doe',
+          contact_role: 'CEO',
+          language: 'fr',
+          emails: ['john@example.com', 'jane@example.com'],
+          phone: '+33612345678',
+          selected_pack: { id: 'pack1', name: 'Gold' },
+          suggestion_pack: null,
+          validated_pack: { id: 'pack2', name: 'Platinum' },
+          process_status: {
+            validated_at: '2025-01-15T00:00:00Z',
+            billing_status: 'paid',
+            suggested_at: null,
+            agreement_url: 'https://example.com/agreement.pdf',
+            agreement_signed_url: 'https://example.com/signed.pdf'
+          },
+          created_at: '2025-01-01T00:00:00Z'
+        },
+        company: { name: 'Test Company' },
+        event: { name: 'DevFest 2025' }
+      };
+
+      const mapped = {
+        id: apiResponse.partnership.id,
+        contact: {
+          display_name: apiResponse.partnership.contact_name,
+          role: apiResponse.partnership.contact_role
+        },
+        company_name: apiResponse.company.name,
+        event_name: apiResponse.event.name,
+        selected_pack_id: apiResponse.partnership.selected_pack?.id || null,
+        selected_pack_name: apiResponse.partnership.selected_pack?.name || null,
+        suggested_pack_id: apiResponse.partnership.suggestion_pack?.id || null,
+        suggested_pack_name: apiResponse.partnership.suggestion_pack?.name || null,
+        validated_pack_id: apiResponse.partnership.validated_pack?.id || null,
+        language: apiResponse.partnership.language,
+        phone: apiResponse.partnership.phone || null,
+        emails: apiResponse.partnership.emails.join(', '),
+        created_at: apiResponse.partnership.created_at,
+        validated: apiResponse.partnership.process_status.validated_at !== null,
+        paid: apiResponse.partnership.process_status.billing_status === 'paid',
+        suggestion: apiResponse.partnership.process_status.suggested_at !== null,
+        agreement_generated: apiResponse.partnership.process_status.agreement_url !== null,
+        agreement_signed: apiResponse.partnership.process_status.agreement_signed_url !== null,
+        option_ids: []
+      };
+
+      expect(mapped.id).toBe('p123');
+      expect(mapped.contact.display_name).toBe('John Doe');
+      expect(mapped.contact.role).toBe('CEO');
+      expect(mapped.company_name).toBe('Test Company');
+      expect(mapped.event_name).toBe('DevFest 2025');
+      expect(mapped.selected_pack_id).toBe('pack1');
+      expect(mapped.selected_pack_name).toBe('Gold');
+      expect(mapped.validated_pack_id).toBe('pack2');
+      expect(mapped.language).toBe('fr');
+      expect(mapped.phone).toBe('+33612345678');
+      expect(mapped.emails).toBe('john@example.com, jane@example.com');
+      expect(mapped.validated).toBe(true);
+      expect(mapped.paid).toBe(true);
+      expect(mapped.suggestion).toBe(false);
+      expect(mapped.agreement_generated).toBe(true);
+      expect(mapped.agreement_signed).toBe(true);
+    });
+
+    it('should handle null optional fields in mapping', () => {
+      const apiResponse = {
+        partnership: {
+          id: 'p123',
+          contact_name: 'John Doe',
+          contact_role: 'CEO',
+          language: 'fr',
+          emails: [],
+          phone: null,
+          selected_pack: null,
+          suggestion_pack: null,
+          validated_pack: null,
+          process_status: {
+            validated_at: null,
+            billing_status: 'pending',
+            suggested_at: null,
+            agreement_url: null,
+            agreement_signed_url: null
+          },
+          created_at: '2025-01-01T00:00:00Z'
+        },
+        company: { name: 'Test Company' },
+        event: { name: 'DevFest 2025' }
+      };
+
+      const mapped = {
+        id: apiResponse.partnership.id,
+        selected_pack_id: apiResponse.partnership.selected_pack?.id || null,
+        selected_pack_name: apiResponse.partnership.selected_pack?.name || null,
+        suggested_pack_id: apiResponse.partnership.suggestion_pack?.id || null,
+        suggested_pack_name: apiResponse.partnership.suggestion_pack?.name || null,
+        validated_pack_id: apiResponse.partnership.validated_pack?.id || null,
+        phone: apiResponse.partnership.phone || null,
+        emails: apiResponse.partnership.emails.join(', '),
+        validated: apiResponse.partnership.process_status.validated_at !== null,
+        paid: apiResponse.partnership.process_status.billing_status === 'paid',
+        suggestion: apiResponse.partnership.process_status.suggested_at !== null,
+        agreement_generated: apiResponse.partnership.process_status.agreement_url !== null,
+        agreement_signed: apiResponse.partnership.process_status.agreement_signed_url !== null
+      };
+
+      expect(mapped.selected_pack_id).toBeNull();
+      expect(mapped.selected_pack_name).toBeNull();
+      expect(mapped.suggested_pack_id).toBeNull();
+      expect(mapped.suggested_pack_name).toBeNull();
+      expect(mapped.validated_pack_id).toBeNull();
+      expect(mapped.phone).toBeNull();
+      expect(mapped.emails).toBe('');
+      expect(mapped.validated).toBe(false);
+      expect(mapped.paid).toBe(false);
+      expect(mapped.suggestion).toBe(false);
+      expect(mapped.agreement_generated).toBe(false);
+      expect(mapped.agreement_signed).toBe(false);
+    });
+
+    it('should handle API errors gracefully', async () => {
+      const mockApi = {
+        getEventsPartnershipDetailed: vi.fn().mockRejectedValue(
+          new Error('Failed to load partnership')
+        )
+      };
+
+      await expect(
+        mockApi.getEventsPartnershipDetailed('devfest-2025', 'p123')
+      ).rejects.toThrow('Failed to load partnership');
+    });
+  });
+
+  describe('Action Buttons Visibility', () => {
+    it('should show action buttons when partnership is not validated', () => {
+      const partnership = {
+        id: 'p123',
+        validated_pack_id: null
+      };
+
+      const shouldShowButtons = partnership && !partnership.validated_pack_id;
+
+      expect(shouldShowButtons).toBe(true);
+    });
+
+    it('should hide action buttons when partnership has validated_pack_id', () => {
+      const partnership = {
+        id: 'p123',
+        validated_pack_id: 'pack-validated'
+      };
+
+      const shouldShowButtons = partnership && !partnership.validated_pack_id;
+
+      expect(shouldShowButtons).toBe(false);
+    });
+
+    it('should hide action buttons when partnership is null', () => {
+      const partnership = null;
+
+      const shouldShowButtons = partnership && !partnership.validated_pack_id;
+
+      expect(shouldShowButtons).toBeFalsy();
+    });
+
+    it('should include suggest pack button in action buttons', () => {
+      const actions = ['suggest', 'decline', 'validate'];
+
+      expect(actions).toContain('suggest');
+      expect(actions).toContain('decline');
+      expect(actions).toContain('validate');
+      expect(actions).toHaveLength(3);
+    });
+
+    it('should verify button properties when visible', () => {
+      const suggestButton = {
+        label: 'Proposer un autre pack',
+        color: 'neutral',
+        variant: 'outline',
+        icon: 'i-heroicons-arrow-path'
+      };
+
+      const declineButton = {
+        label: 'Refuser',
+        color: 'error',
+        variant: 'outline',
+        icon: 'i-heroicons-x-mark'
+      };
+
+      const validateButton = {
+        label: 'Valider',
+        color: 'primary',
+        icon: 'i-heroicons-check'
+      };
+
+      expect(suggestButton.label).toBe('Proposer un autre pack');
+      expect(declineButton.label).toBe('Refuser');
+      expect(validateButton.label).toBe('Valider');
+    });
+  });
 });

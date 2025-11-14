@@ -6,7 +6,7 @@
           <PageTitle>{{ partnership?.company_name || 'Sponsor' }}</PageTitle>
           <p class="text-sm text-gray-600 mt-1">Partenariat</p>
         </div>
-        <div v-if="partnership" class="flex gap-3">
+        <div v-if="partnership && !partnership.validated_pack_id" class="flex gap-3">
           <UButton
             color="neutral"
             variant="outline"
@@ -76,9 +76,9 @@
 
     <!-- Modale de suggestion de pack -->
     <SuggestPackModal
-      v-model:is-open="isSuggestModalOpen"
+      v-model="isSuggestModalOpen"
       :event-slug="eventSlug"
-      :current-pack-id="partnership?.pack_id"
+      :current-pack-id="partnership?.selected_pack_id"
       :current-language="partnership?.language"
       @submit="handleSuggestPackSubmit"
     />
@@ -86,7 +86,7 @@
 </template>
 
 <script setup lang="ts">
-import { getOrgsEventsPartnership, postOrgsEventsPartnershipSuggestion } from "~/utils/api";
+import { getEventsPartnershipDetailed, postOrgsEventsPartnershipSuggestion } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 import type { ExtendedPartnershipItem } from "~/types/partnership";
 import { PARTNERSHIP_CONFIRM } from "~/constants/partnership";
@@ -138,22 +138,53 @@ async function loadPartnership() {
     loading.value = true;
     error.value = null;
 
-    // Charger toutes les partnerships et trouver celle qui correspond à l'ID
-    const response = await getOrgsEventsPartnership(orgSlug.value, eventSlug.value);
-    const found = response.data.find(p => p.id === sponsorId.value);
+    // Charger directement le partenariat par son ID
+    const response = await getEventsPartnershipDetailed(eventSlug.value, sponsorId.value);
+    const { partnership: p, company, event } = response.data;
 
-    if (!found) {
-      error.value = 'Sponsor non trouvé';
-      return;
-    }
-
-    partnership.value = found;
+    // Mapper les données de DetailedPartnershipResponseSchema vers ExtendedPartnershipItem
+    partnership.value = {
+      id: p.id,
+      contact: {
+        display_name: p.contact_name,
+        role: p.contact_role
+      },
+      company_name: company.name,
+      event_name: event.name,
+      selected_pack_id: p.selected_pack?.id || null,
+      selected_pack_name: p.selected_pack?.name || null,
+      suggested_pack_id: p.suggestion_pack?.id || null,
+      suggested_pack_name: p.suggestion_pack?.name || null,
+      validated_pack_id: p.validated_pack?.id || null,
+      language: p.language,
+      phone: p.phone || null,
+      emails: p.emails.join(', '),
+      created_at: p.created_at,
+      // Champs étendus depuis ExtendedPartnershipItem
+      validated: p.process_status.validated_at !== null,
+      paid: p.process_status.billing_status === 'paid',
+      suggestion: p.process_status.suggested_at !== null,
+      agreement_generated: p.process_status.agreement_url !== null,
+      agreement_signed: p.process_status.agreement_signed_url !== null,
+      option_ids: extractOptionIds(p)
+    };
   } catch (err) {
     console.error('Failed to load partnership:', err);
     error.value = 'Impossible de charger les informations du sponsor';
   } finally {
     loading.value = false;
   }
+}
+
+/**
+ * Extrait les IDs des options depuis les packs sélectionnés/suggérés
+ * Note: DetailedPartnershipResponseSchema ne contient pas les options sélectionnées
+ * Pour l'instant, on retourne un tableau vide
+ */
+function extractOptionIds(partnership: any): string[] {
+  // TODO: Trouver comment récupérer les option_ids depuis l'API
+  // DetailedPartnershipResponseSchema ne semble pas inclure cette information
+  return [];
 }
 
 async function onSave(data: any) {
@@ -275,9 +306,11 @@ async function handleSuggestPackSubmit(data: { packId: string; language: string;
     error.value = null;
 
     // Créer les option_selections à partir des optionIds
+    // Par défaut, on utilise quantitative_selection avec une quantité de 1
     const option_selections = data.optionIds.map(optionId => ({
+      type: 'quantitative_selection' as const,
       option_id: optionId,
-      selections: []
+      selected_quantity: 1
     }));
 
     await postOrgsEventsPartnershipSuggestion(
