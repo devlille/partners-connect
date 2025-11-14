@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "CreateCompanyRequest",
+  "description": "Schema for creating a new company",
+  "required": ["name", "site_url", "head_office", "siret", "vat"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "description": "Company name"
+    },
+    "site_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Company website URL"
+    },
+    "head_office": {
+      "type": "object",
+      "required": ["address", "city", "zip_code", "country"],
+      "properties": {
+        "address": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "city": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "zip_code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        "country": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 2,
+          "description": "ISO 3166-1 alpha-2 country code"
+        }
+      }
+    },
+    "siret": {
+      "type": "string",
+      "pattern": "^[0-9]{14}$",
+      "description": "French SIRET number (14 digits)"
+    },
+    "vat": {
+      "type": "string",
+      "pattern": "^[A-Z]{2}[0-9A-Z]{8,12}$",
+      "description": "VAT number"
+    },
+    "description": {
+      "type": ["string", "null"],
+      "maxLength": 2000,
+      "description": "Company description"
+    },
+    "socials": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "url"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["LINKEDIN", "TWITTER", "FACEBOOK", "INSTAGRAM", "YOUTUBE", "GITHUB", "WEBSITE"]
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

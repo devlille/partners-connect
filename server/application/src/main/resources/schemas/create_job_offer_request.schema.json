@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "CreateJobOfferRequest",
+  "description": "Schema for creating a new job offer",
+  "required": ["title", "description", "location", "contract_type"],
+  "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "description": "Job offer title"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 5000,
+      "description": "Job offer description"
+    },
+    "location": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "description": "Job location"
+    },
+    "contract_type": {
+      "type": "string",
+      "enum": ["CDI", "CDD", "FREELANCE", "INTERNSHIP", "APPRENTICESHIP"],
+      "description": "Type of contract"
+    },
+    "salary_min": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "description": "Minimum salary in euros per year"
+    },
+    "salary_max": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "description": "Maximum salary in euros per year"
+    },
+    "remote_work": {
+      "type": ["boolean", "null"],
+      "description": "Whether remote work is possible"
+    },
+    "experience_level": {
+      "type": ["string", "null"],
+      "enum": ["JUNIOR", "INTERMEDIATE", "SENIOR", "LEAD"],
+      "description": "Required experience level"
+    }
+  }
+}

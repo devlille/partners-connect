@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "CompanyResponse",
+  "description": "Schema for company response data",
+  "required": ["id", "name", "address", "city", "zip_code", "country", "siret", "vat", "site_url", "status", "created_at", "updated_at"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Company unique identifier"
+    },
+    "name": {
+      "type": "string",
+      "description": "Company name"
+    },
+    "address": {
+      "type": "string",
+      "description": "Company address"
+    },
+    "city": {
+      "type": "string", 
+      "description": "Company city"
+    },
+    "zip_code": {
+      "type": "string",
+      "description": "Company postal code"
+    },
+    "country": {
+      "type": "string",
+      "description": "Company country code"
+    },
+    "siret": {
+      "type": "string",
+      "description": "French SIRET number"
+    },
+    "vat": {
+      "type": "string",
+      "description": "VAT number"
+    },
+    "description": {
+      "type": ["string", "null"],
+      "description": "Company description"
+    },
+    "site_url": {
+      "type": "string",
+      "description": "Company website URL"
+    },
+    "logo_url_original": {
+      "type": ["string", "null"],
+      "description": "Original logo URL"
+    },
+    "logo_url_1000": {
+      "type": ["string", "null"],
+      "description": "Logo URL for 1000px resolution"
+    },
+    "logo_url_500": {
+      "type": ["string", "null"],
+      "description": "Logo URL for 500px resolution"
+    },
+    "logo_url_250": {
+      "type": ["string", "null"],
+      "description": "Logo URL for 250px resolution"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["ACTIVE", "INACTIVE", "PENDING"],
+      "description": "Company status"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Company creation timestamp"
+    },
+    "updated_at": {
+      "type": "string", 
+      "format": "date-time",
+      "description": "Company last update timestamp"
+    }
+  }
+}

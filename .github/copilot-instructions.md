@@ -363,3 +363,10 @@ route("/orgs/{orgSlug}/events/{eventSlug}/resource") {
 ```
 
 **Trust these instructions** - they are validated and complete. Only search for additional information if you encounter specific errors not covered here.
+
+## Active Technologies
+- Kotlin (JVM 21) + Ktor, Exposed ORM, JUnit, Mockk, H2 in-memory database (009-refactor-company-tests)
+- H2 in-memory database for test isolation with transaction rollback (009-refactor-company-tests)
+
+## Recent Changes
+- 009-refactor-company-tests: Added Kotlin (JVM 21) + Ktor, Exposed ORM, JUnit, Mockk, H2 in-memory database

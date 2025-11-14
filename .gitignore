@@ -1,0 +1,35 @@
+# Kotlin/JVM
+build/
+out/
+.gradle/
+.idea/
+*.class
+*.jar
+*.iml
+*.log
+.env*
+
+# Gradle
+gradle/
+!gradle/wrapper/
+!gradle/libs.versions.toml
+
+# Node.js (for frontend)
+node_modules/
+dist/
+*.log
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Universal
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+
+# Test output
+coverage/
+*.test
+test-results/
