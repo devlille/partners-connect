@@ -39,29 +39,23 @@ const columns = [
   {
     header: 'Nom',
     accessorKey: 'name',
-    cell: (info: TableRow<OrganisationItem>) => info.getValue('name')
+    cell: (info: TableRow<OrganisationItem>) => {
+      const org = info.row.original;
+      return h('div', {
+        onClick: () => navigateTo(`/orgs/${org.slug}`),
+        class: 'cursor-pointer hover:underline'
+      }, info.getValue('name'));
+    }
   },
   {
     header: 'Siège social',
     accessorKey: 'head_office',
-    cell: (info: TableRow<OrganisationItem>) => info.getValue('head_office')
-  },
-  {
-    header: 'Actions',
-    accessorKey: 'slug',
-    cell: (info: any) => {
+    cell: (info: TableRow<OrganisationItem>) => {
       const org = info.row.original;
-      return h(resolveComponent('UButton'), {
-        onClick: () => {
-          navigateTo(`/orgs/${org.slug}`);
-        },
-        icon: 'i-heroicons-arrow-right-circle',
-        size: 'md',
-        color: 'primary',
-        variant: 'ghost',
-        square: true,
-        title: 'Voir l\'organisation'
-      });
+      return h('div', {
+        onClick: () => navigateTo(`/orgs/${org.slug}`),
+        class: 'cursor-pointer'
+      }, info.getValue('head_office'));
     }
   }
 ];

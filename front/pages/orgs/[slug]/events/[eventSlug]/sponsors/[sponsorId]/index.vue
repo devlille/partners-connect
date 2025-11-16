@@ -78,7 +78,7 @@
     <SuggestPackModal
       v-model="isSuggestModalOpen"
       :event-slug="eventSlug"
-      :current-pack-id="partnership?.selected_pack_id"
+      :current-pack-id="partnership?.selected_pack_id || undefined"
       :current-language="partnership?.language"
       @submit="handleSuggestPackSubmit"
     />
@@ -142,6 +142,15 @@ async function loadPartnership() {
     const response = await getEventsPartnershipDetailed(eventSlug.value, sponsorId.value);
     const { partnership: p, company, event } = response.data;
 
+    // Extraire les options du pack sélectionné avec leurs informations complètes
+    // Note: L'API retourne "options" alors que le schéma TypeScript définit "optional_options"
+    const packOptions = ((p.selected_pack as any)?.options || p.selected_pack?.optional_options || []).map((opt: any) => ({
+      id: opt.id,
+      name: opt.name,
+      description: opt.description || null
+    }));
+    const optionIds = packOptions.map(opt => opt.id);
+
     // Mapper les données de DetailedPartnershipResponseSchema vers ExtendedPartnershipItem
     partnership.value = {
       id: p.id,
@@ -161,12 +170,13 @@ async function loadPartnership() {
       emails: p.emails.join(', '),
       created_at: p.created_at,
       // Champs étendus depuis ExtendedPartnershipItem
-      validated: p.process_status.validated_at !== null,
-      paid: p.process_status.billing_status === 'paid',
-      suggestion: p.process_status.suggested_at !== null,
-      agreement_generated: p.process_status.agreement_url !== null,
-      agreement_signed: p.process_status.agreement_signed_url !== null,
-      option_ids: extractOptionIds(p)
+      validated: p.process_status?.validated_at !== null && p.process_status?.validated_at !== undefined,
+      paid: p.process_status?.billing_status === 'paid',
+      suggestion: false, // suggested_at n'existe pas dans PartnershipProcessStatusSchema
+      agreement_generated: p.process_status?.agreement_url !== null && p.process_status?.agreement_url !== undefined,
+      agreement_signed: p.process_status?.agreement_signed_url !== null && p.process_status?.agreement_signed_url !== undefined,
+      option_ids: optionIds,
+      pack_options: packOptions
     };
   } catch (err) {
     console.error('Failed to load partnership:', err);
@@ -176,16 +186,6 @@ async function loadPartnership() {
   }
 }
 
-/**
- * Extrait les IDs des options depuis les packs sélectionnés/suggérés
- * Note: DetailedPartnershipResponseSchema ne contient pas les options sélectionnées
- * Pour l'instant, on retourne un tableau vide
- */
-function extractOptionIds(partnership: any): string[] {
-  // TODO: Trouver comment récupérer les option_ids depuis l'API
-  // DetailedPartnershipResponseSchema ne semble pas inclure cette information
-  return [];
-}
 
 async function onSave(data: any) {
   try {

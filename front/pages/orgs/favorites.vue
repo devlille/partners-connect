@@ -51,23 +51,39 @@ const columns = [
   {
     header: 'Événement',
     accessorKey: 'eventName',
-    cell: (info: TableRow<FavoriteEvent>) => info.getValue('eventName')
+    cell: (info: TableRow<FavoriteEvent>) => {
+      const fav = info.row.original;
+      return h('div', {
+        onClick: () => navigateTo(`/orgs/${fav.orgSlug}/events/${fav.eventSlug}`),
+        class: 'cursor-pointer hover:underline'
+      }, info.getValue('eventName'));
+    }
   },
   {
     header: 'Organisation',
     accessorKey: 'orgName',
-    cell: (info: TableRow<FavoriteEvent>) => info.getValue('orgName')
+    cell: (info: TableRow<FavoriteEvent>) => {
+      const fav = info.row.original;
+      return h('div', {
+        onClick: () => navigateTo(`/orgs/${fav.orgSlug}/events/${fav.eventSlug}`),
+        class: 'cursor-pointer'
+      }, info.getValue('orgName'));
+    }
   },
   {
     header: 'Ajouté le',
     accessorKey: 'addedAt',
     cell: (info: TableRow<FavoriteEvent>) => {
+      const fav = info.row.original;
       const date = new Date(info.getValue('addedAt') as string);
-      return date.toLocaleDateString('fr-FR', {
+      return h('div', {
+        onClick: () => navigateTo(`/orgs/${fav.orgSlug}/events/${fav.eventSlug}`),
+        class: 'cursor-pointer'
+      }, date.toLocaleDateString('fr-FR', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
-      });
+      }));
     }
   },
   {
@@ -75,32 +91,18 @@ const columns = [
     accessorKey: 'eventSlug',
     cell: (info: any) => {
       const fav = info.row.original;
-      const container = h('div', { class: 'flex gap-2 items-center' }, [
-        h(resolveComponent('UButton'), {
-          onClick: () => {
-            navigateTo(`/orgs/${fav.orgSlug}/events/${fav.eventSlug}`);
-          },
-          icon: 'i-heroicons-arrow-right-circle',
-          size: 'md',
-          color: 'primary',
-          variant: 'ghost',
-          square: true,
-          title: 'Voir l\'événement'
-        }),
-        h(resolveComponent('UButton'), {
-          onClick: (e: Event) => {
-            e.stopPropagation();
-            removeFavorite(fav.orgSlug, fav.eventSlug);
-          },
-          icon: 'i-heroicons-trash',
-          size: 'md',
-          color: 'red',
-          variant: 'ghost',
-          square: true,
-          title: 'Retirer des favoris'
-        })
-      ]);
-      return container;
+      return h(resolveComponent('UButton'), {
+        onClick: (e: Event) => {
+          e.stopPropagation();
+          removeFavorite(fav.orgSlug, fav.eventSlug);
+        },
+        icon: 'i-heroicons-trash',
+        size: 'md',
+        color: 'red',
+        variant: 'ghost',
+        square: true,
+        title: 'Retirer des favoris'
+      });
     }
   }
 ];

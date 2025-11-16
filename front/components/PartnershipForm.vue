@@ -66,12 +66,30 @@
           Options
         </label>
         <div v-if="selectedOptions.length > 0" class="bg-gray-50 rounded-lg p-3">
-          <ul class="space-y-1 text-sm text-gray-700">
-            <li v-for="option in selectedOptions" :key="option.id" class="flex items-center">
-              <i class="i-heroicons-check-circle mr-2 text-green-600" />
-              {{ option.name }}
-            </li>
-          </ul>
+          <div class="space-y-3">
+            <div
+              v-for="option in selectedOptions"
+              :key="option.id"
+              class="flex items-start gap-3"
+            >
+              <input
+                type="checkbox"
+                :id="`form-option-${option.id}`"
+                checked
+                disabled
+                class="mt-1 h-4 w-4 rounded border-gray-300 text-primary-600 cursor-not-allowed opacity-60"
+              >
+              <label
+                :for="`form-option-${option.id}`"
+                class="flex-1 cursor-not-allowed"
+              >
+                <span class="block text-sm font-medium text-gray-900">{{ option.name }}</span>
+                <span v-if="option.description" class="block text-sm text-gray-500 mt-1">
+                  {{ option.description }}
+                </span>
+              </label>
+            </div>
+          </div>
         </div>
         <p v-else class="text-sm text-gray-500 italic">Aucune option sélectionnée</p>
       </div>
@@ -153,7 +171,7 @@ const eventSlug = computed(() => {
 
 const packs = ref<SponsoringPack[]>([]);
 const selectedPackName = ref('');
-const selectedOptions = ref<Array<{ id: string; name: string }>>([]);
+const selectedOptions = ref<Array<{ id: string; name: string; description?: string | null }>>([]);
 
 // Charger les packs disponibles
 async function loadPacks() {
@@ -183,6 +201,14 @@ function updateSelectedPackName() {
 function updateSelectedOptions() {
   selectedOptions.value = [];
 
+  // Si pack_options est fourni directement (nouveau format depuis getEventsPartnershipDetailed),
+  // on l'utilise directement
+  if (props.partnership?.pack_options && props.partnership.pack_options.length > 0) {
+    selectedOptions.value = props.partnership.pack_options;
+    return;
+  }
+
+  // Sinon, on garde l'ancienne méthode de chargement via l'API getEventsSponsoringPacks
   if (!props.partnership?.option_ids || props.partnership.option_ids.length === 0) {
     return;
   }
@@ -192,12 +218,20 @@ function updateSelectedOptions() {
   if (!packId) return;
 
   const pack = packs.value.find(p => p.id === packId);
-  if (!pack || !pack.optional_options) return;
+  if (!pack) return;
+
+  // Gérer les deux formats possibles: "optional_options" (schéma) ou "options" (API)
+  const packOptions = (pack as any).options || pack.optional_options || [];
+  if (packOptions.length === 0) return;
 
   // Filtrer les options qui sont dans option_ids
-  selectedOptions.value = pack.optional_options
-    .filter(opt => props.partnership?.option_ids?.includes(opt.id))
-    .map(opt => ({ id: opt.id, name: opt.name }));
+  selectedOptions.value = packOptions
+    .filter((opt: any) => props.partnership?.option_ids?.includes(opt.id))
+    .map((opt: any) => ({
+      id: opt.id,
+      name: opt.name,
+      description: opt.description || null
+    }));
 }
 
 const form = ref({

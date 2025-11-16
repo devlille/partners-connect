@@ -63,27 +63,57 @@ const columns = computed(() => [
   {
     header: 'Nom',
     accessorKey: 'name',
-    cell: (info: TableRow<EventSummary>) => info.getValue('name')
+    cell: (info: TableRow<EventSummary>) => {
+      const event = info.row.original;
+      return h('div', {
+        onClick: () => navigateTo(`/orgs/${slug.value}/events/${event.slug}`),
+        class: 'cursor-pointer hover:underline'
+      }, info.getValue('name'));
+    }
   },
   {
     header: 'Date de début',
     accessorKey: 'start_time',
-    cell: (info: TableRow<EventSummary>) => formatDate(info.getValue('start_time'))
+    cell: (info: TableRow<EventSummary>) => {
+      const event = info.row.original;
+      return h('div', {
+        onClick: () => navigateTo(`/orgs/${slug.value}/events/${event.slug}`),
+        class: 'cursor-pointer'
+      }, formatDate(info.getValue('start_time')));
+    }
   },
   {
     header: 'Date de fin',
     accessorKey: 'end_time',
-    cell: (info: TableRow<EventSummary>) => formatDate(info.getValue('end_time'))
+    cell: (info: TableRow<EventSummary>) => {
+      const event = info.row.original;
+      return h('div', {
+        onClick: () => navigateTo(`/orgs/${slug.value}/events/${event.slug}`),
+        class: 'cursor-pointer'
+      }, formatDate(info.getValue('end_time')));
+    }
   },
   {
     header: 'Date de début CFP',
     accessorKey: 'submission_start_time',
-    cell: (info: TableRow<EventSummary>) => formatDate(info.getValue('submission_start_time'))
+    cell: (info: TableRow<EventSummary>) => {
+      const event = info.row.original;
+      return h('div', {
+        onClick: () => navigateTo(`/orgs/${slug.value}/events/${event.slug}`),
+        class: 'cursor-pointer'
+      }, formatDate(info.getValue('submission_start_time')));
+    }
   },
   {
     header: 'Date de fin CFP',
     accessorKey: 'submission_end_time',
-    cell: (info: TableRow<EventSummary>) => formatDate(info.getValue('submission_end_time'))
+    cell: (info: TableRow<EventSummary>) => {
+      const event = info.row.original;
+      return h('div', {
+        onClick: () => navigateTo(`/orgs/${slug.value}/events/${event.slug}`),
+        class: 'cursor-pointer'
+      }, formatDate(info.getValue('submission_end_time')));
+    }
   },
   {
     header: 'Favori',
@@ -103,24 +133,6 @@ const columns = computed(() => [
         class: 'text-2xl hover:scale-110 transition-transform',
         title: isFavorite(slug.value, event.slug) ? 'Retirer des favoris' : 'Ajouter aux favoris'
       }, isFavorite(slug.value, event.slug) ? '⭐' : '☆');
-    }
-  },
-  {
-    header: 'Actions',
-    accessorKey: 'slug',
-    cell: (info: any) => {
-      const event = info.row.original;
-      return h(resolveComponent('UButton'), {
-        onClick: () => {
-          navigateTo(`/orgs/${slug.value}/events/${event.slug}`);
-        },
-        icon: 'i-heroicons-arrow-right-circle',
-        size: 'md',
-        color: 'primary',
-        variant: 'ghost',
-        square: true,
-        title: 'Voir l\'événement'
-      });
     }
   }
 ]);

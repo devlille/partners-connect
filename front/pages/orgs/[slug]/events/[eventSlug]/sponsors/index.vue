@@ -139,39 +139,33 @@ const columns = [
   {
     header: 'Nom de l\'entreprise',
     accessorKey: 'company_name',
-    cell: (info: TableRow<PartnershipItem>) => info.getValue('company_name')
+    cell: (info: TableRow<PartnershipItem>) => {
+      const partnership = info.row.original;
+      return h('div', {
+        onClick: () => navigateTo(`/orgs/${orgSlug.value}/events/${eventSlug.value}/sponsors/${partnership.id}`),
+        class: 'cursor-pointer hover:underline'
+      }, info.getValue('company_name'));
+    }
   },
   {
     header: 'Pack',
     accessorKey: 'selected_pack_name',
     cell: (info: any) => {
-      const selectedPackName = info.getValue('selected_pack_name');
-      const suggestedPackName = info.row.original.suggested_pack_name;
-
-      if (selectedPackName) {
-        return selectedPackName;
-      } else if (suggestedPackName) {
-        return `${suggestedPackName} (suggéré)`;
-      }
-      return '-';
-    }
-  },
-  {
-    header: 'Actions',
-    accessorKey: 'id',
-    cell: (info: any) => {
       const partnership = info.row.original;
-      return h(resolveComponent('UButton'), {
-        onClick: () => {
-          navigateTo(`/orgs/${orgSlug.value}/events/${eventSlug.value}/sponsors/${partnership.id}`);
-        },
-        icon: 'i-heroicons-arrow-right-circle',
-        size: 'md',
-        color: 'primary',
-        variant: 'ghost',
-        square: true,
-        title: 'Voir le sponsor'
-      });
+      const selectedPackName = info.getValue('selected_pack_name');
+      const suggestedPackName = partnership.suggested_pack_name;
+
+      let displayText = '-';
+      if (selectedPackName) {
+        displayText = selectedPackName;
+      } else if (suggestedPackName) {
+        displayText = `${suggestedPackName} (suggéré)`;
+      }
+
+      return h('div', {
+        onClick: () => navigateTo(`/orgs/${orgSlug.value}/events/${eventSlug.value}/sponsors/${partnership.id}`),
+        class: 'cursor-pointer'
+      }, displayText);
     }
   }
 ];

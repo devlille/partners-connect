@@ -4,19 +4,13 @@
       {{ label }}
     </label>
     <USelectMenu
-      :model-value="modelValue"
-      :options="languages"
-      value-attribute="value"
-      option-attribute="label"
+      :model-value="selectedLanguage"
+      :items="languages"
       :placeholder="placeholder"
       :disabled="disabled"
       class="w-full"
       @update:model-value="handleUpdate"
-    >
-      <template #label>
-        {{ selectedLabel }}
-      </template>
-    </USelectMenu>
+    />
   </div>
 </template>
 
@@ -48,14 +42,13 @@ const languages = [
   { label: 'Nederlands', value: 'nl' }
 ];
 
-const selectedLabel = computed(() => {
-  const found = languages.find(lang => lang.value === props.modelValue);
-  return found ? found.label : props.placeholder || 'Sélectionner une langue';
+const selectedLanguage = computed(() => {
+  return languages.find(lang => lang.value === props.modelValue);
 });
 
-function handleUpdate(value: any) {
-  if (typeof value === 'string') {
-    emit('update:modelValue', value);
+function handleUpdate(selected: any) {
+  if (selected && selected.value) {
+    emit('update:modelValue', selected.value);
   }
 }
 </script>

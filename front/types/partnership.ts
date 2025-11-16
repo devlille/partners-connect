@@ -17,4 +17,6 @@ export interface ExtendedPartnershipItem extends PartnershipItemSchema {
   agreement_signed?: boolean;
   /** IDs des options de sponsoring choisies par le sponsor */
   option_ids?: string[];
+  /** Options complètes du pack sélectionné (avec nom et description) */
+  pack_options?: Array<{ id: string; name: string; description?: string | null }>;
 }
