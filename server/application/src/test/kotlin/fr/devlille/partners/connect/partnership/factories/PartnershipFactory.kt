@@ -3,6 +3,8 @@ package fr.devlille.partners.connect.partnership.factories
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -47,5 +49,17 @@ fun insertMockedPartnership(
         this.validatedAt = validatedAt
         this.communicationPublicationDate = communicationPublicationDate
         this.communicationSupportUrl = communicationSupportUrl
+    }
+}
+
+fun insertMockedOptionPartnership(
+    partnershipId: UUID,
+    packId: UUID,
+    optionId: UUID,
+) = transaction {
+    PartnershipOptionEntity.new {
+        this.partnership = PartnershipEntity[partnershipId]
+        this.option = SponsoringOptionEntity[optionId]
+        this.packId = SponsoringPackEntity[packId].id
     }
 }

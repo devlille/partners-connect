@@ -156,21 +156,21 @@ class PartnershipRepositoryExposed : PartnershipRepository {
                 pack.toDomain(
                     language = partnership.language,
                     optionIds = PartnershipOptionEntity.listByPartnershipAndPack(partnershipId, pack.id.value)
-                        .map { it.id.value },
+                        .map { it.option.id.value },
                 )
             },
             suggestionPack = partnership.suggestionPack?.let { pack ->
                 pack.toDomain(
                     language = partnership.language,
                     optionIds = PartnershipOptionEntity.listByPartnershipAndPack(partnershipId, pack.id.value)
-                        .map { it.id.value },
+                        .map { it.option.id.value },
                 )
             },
             validatedPack = partnership.validatedPack()?.let { pack ->
                 pack.toDomain(
                     language = partnership.language,
                     optionIds = PartnershipOptionEntity.listByPartnershipAndPack(partnershipId, pack.id.value)
-                        .map { it.id.value },
+                        .map { it.option.id.value },
                 )
             },
         )
