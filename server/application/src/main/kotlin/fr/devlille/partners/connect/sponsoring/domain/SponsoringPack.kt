@@ -55,7 +55,7 @@ sealed class SponsoringOption {
  * }
  */
 @Serializable
-@SerialName("TEXT")
+@SerialName("text")
 data class Text(
     override val id: String,
     override val name: String,
@@ -83,7 +83,7 @@ data class Text(
  * }
  */
 @Serializable
-@SerialName("TYPED_QUANTITATIVE")
+@SerialName("typed_quantitative")
 data class TypedQuantitative(
     override val id: String,
     override val name: String,
@@ -115,7 +115,7 @@ data class TypedQuantitative(
  * }
  */
 @Serializable
-@SerialName("TYPED_NUMBER")
+@SerialName("typed_number")
 data class TypedNumber(
     override val id: String,
     override val name: String,
@@ -152,7 +152,7 @@ data class TypedNumber(
  * }
  */
 @Serializable
-@SerialName("TYPED_SELECTABLE")
+@SerialName("typed_selectable")
 data class TypedSelectable(
     override val id: String,
     override val name: String,
