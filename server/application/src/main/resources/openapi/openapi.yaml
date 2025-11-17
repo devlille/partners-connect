@@ -1928,13 +1928,13 @@ paths:
           required: true
           schema:
             type: "string"
-            enum: ["BILLING", "MAILING", "TICKETING"]
+            enum: ["notification", "billing", "ticketing", "webhook", "agenda"]
         - name: "provider"
           in: "path"
           required: true
           schema:
             type: "string"
-            enum: ["QONTO", "MAILJET", "BILLETWEB"]
+            enum: ["mailjet", "slack", "qonto", "billetweb", "webhook", "openplanner"]
         - name: "orgSlug"
           in: "path"
           required: true

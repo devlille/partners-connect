@@ -1940,18 +1940,23 @@ paths:
           schema:
             type: string
             enum:
-              - BILLING
-              - MAILING
-              - TICKETING
+              - notification
+              - billing
+              - ticketing
+              - webhook
+              - agenda
         - name: provider
           in: path
           required: true
           schema:
             type: string
             enum:
-              - QONTO
-              - MAILJET
-              - BILLETWEB
+              - mailjet
+              - slack
+              - qonto
+              - billetweb
+              - webhook
+              - openplanner
         - name: orgSlug
           in: path
           required: true
@@ -5263,11 +5268,6 @@ components:
             - type: 'null'
         process_status:
           $ref: '#/components/schemas/partnership_process_status.schema'
-        speakers:
-          type: array
-          description: List of speakers attached to this partnership
-          items:
-            $ref: '#/components/schemas/speaker.schema'
         created_at:
           type: string
           format: date-time
@@ -5278,7 +5278,6 @@ components:
         - language
         - emails
         - process_status
-        - speakers
         - created_at
     detailed_partnership_response.schema:
       $id: detailed_partnership_response.schema.json
