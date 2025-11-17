@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.internal.infrastructure.bucket
 
+import com.google.cloud.storage.Acl
 import com.google.cloud.storage.BlobId
 import com.google.cloud.storage.BlobInfo
 import com.google.cloud.storage.StorageException
@@ -19,13 +20,15 @@ internal class GoogleCloudStorage(
         val blobId = BlobId.of(bucketName, filename)
         val blobInfo = BlobInfo
             .newBuilder(blobId)
+            .setAcl(arrayListOf(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)))
+            .setCacheControl("public")
             .setContentType(mimeType.value)
             .build()
         storage.create(blobInfo, content)
         return Upload(
             bucketName = bucketName,
             filename = filename,
-            url = "https://storage.cloud.google.com/$bucketName/$filename",
+            url = "https://storage.googleapis.com/$bucketName/$filename",
         )
     }
 
