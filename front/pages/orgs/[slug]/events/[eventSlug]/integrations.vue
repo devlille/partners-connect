@@ -35,23 +35,34 @@
         <form @submit.prevent="saveQontoIntegration" class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">
-              Organization Slug
+              API Key
             </label>
             <UInput
-              v-model="qontoConfig.organization_slug"
-              placeholder="mon-organisation"
+              v-model="qontoConfig.api_key"
+              placeholder="votre-api-key"
               :disabled="savingQonto"
             />
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">
-              Secret Key
+              Secret
             </label>
             <UInput
-              v-model="qontoConfig.secret_key"
+              v-model="qontoConfig.secret"
               type="password"
-              placeholder="sk_live_..."
+              placeholder="votre-secret"
+              :disabled="savingQonto"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Sandbox Token
+            </label>
+            <UInput
+              v-model="qontoConfig.sandbox_token"
+              placeholder="votre-sandbox-token"
               :disabled="savingQonto"
             />
           </div>
@@ -63,7 +74,7 @@
           <UButton
             type="submit"
             :loading="savingQonto"
-            :disabled="!qontoConfig.organization_slug || !qontoConfig.secret_key"
+            :disabled="!qontoConfig.api_key || !qontoConfig.secret || !qontoConfig.sandbox_token"
             label="Enregistrer Qonto"
             icon="i-heroicons-check"
           />
@@ -98,12 +109,12 @@
 
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">
-              API Secret
+              Secret
             </label>
             <UInput
-              v-model="mailjetConfig.api_secret"
+              v-model="mailjetConfig.secret"
               type="password"
-              placeholder="votre-api-secret"
+              placeholder="votre-secret"
               :disabled="savingMailjet"
             />
           </div>
@@ -138,7 +149,7 @@
           <UButton
             type="submit"
             :loading="savingMailjet"
-            :disabled="!mailjetConfig.api_key || !mailjetConfig.api_secret || !mailjetConfig.from_email || !mailjetConfig.from_name"
+            :disabled="!mailjetConfig.api_key || !mailjetConfig.secret || !mailjetConfig.from_email || !mailjetConfig.from_name"
             label="Enregistrer Mailjet"
             icon="i-heroicons-check"
           />
@@ -162,11 +173,12 @@
         <form @submit.prevent="saveBilletwebIntegration" class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">
-              API Key
+              Basic Auth
             </label>
             <UInput
-              v-model="billetwebConfig.api_key"
-              placeholder="votre-api-key"
+              v-model="billetwebConfig.basic"
+              placeholder="votre-basic-auth"
+              type="password"
               :disabled="savingBilletweb"
             />
           </div>
@@ -182,6 +194,17 @@
             />
           </div>
 
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Rate ID
+            </label>
+            <UInput
+              v-model="billetwebConfig.rate_id"
+              placeholder="67890"
+              :disabled="savingBilletweb"
+            />
+          </div>
+
           <div v-if="billetwebError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
             {{ billetwebError }}
           </div>
@@ -189,7 +212,7 @@
           <UButton
             type="submit"
             :loading="savingBilletweb"
-            :disabled="!billetwebConfig.api_key || !billetwebConfig.event_id"
+            :disabled="!billetwebConfig.basic || !billetwebConfig.event_id || !billetwebConfig.rate_id"
             label="Enregistrer Billetweb"
             icon="i-heroicons-check"
           />
@@ -229,8 +252,9 @@ const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
 
 // Qonto state
 const qontoConfig = ref<QontoConfig>({
-  organization_slug: '',
-  secret_key: ''
+  api_key: '',
+  secret: '',
+  sandbox_token: ''
 });
 const savingQonto = ref(false);
 const qontoError = ref<string | null>(null);
@@ -238,7 +262,7 @@ const qontoError = ref<string | null>(null);
 // Mailjet state
 const mailjetConfig = ref<MailjetConfig>({
   api_key: '',
-  api_secret: '',
+  secret: '',
   from_email: '',
   from_name: ''
 });
@@ -247,8 +271,9 @@ const mailjetError = ref<string | null>(null);
 
 // Billetweb state
 const billetwebConfig = ref<BilletwebConfig>({
-  api_key: '',
-  event_id: ''
+  basic: '',
+  event_id: '',
+  rate_id: ''
 });
 const savingBilletweb = ref(false);
 const billetwebError = ref<string | null>(null);
@@ -289,7 +314,7 @@ async function saveMailjetIntegration() {
       orgSlug.value,
       eventSlug.value,
       'MAILJET',
-      'MAILING',
+      'NOTIFICATION',
       mailjetConfig.value
     );
 

@@ -1,5 +1,5 @@
 export type IntegrationProvider = 'QONTO' | 'MAILJET' | 'BILLETWEB';
-export type IntegrationUsage = 'BILLING' | 'MAILING' | 'TICKETING';
+export type IntegrationUsage = 'NOTIFICATION' | 'BILLING' | 'MAILING' | 'TICKETING' | 'WEBHOOK' | 'AGENDA';
 
 export interface IntegrationConfig {
   provider: IntegrationProvider;
@@ -8,18 +8,20 @@ export interface IntegrationConfig {
 }
 
 export interface QontoConfig {
-  organization_slug: string;
-  secret_key: string;
+  api_key: string;
+  secret: string;
+  sandbox_token: string;
 }
 
 export interface MailjetConfig {
   api_key: string;
-  api_secret: string;
+  secret: string;
   from_email: string;
   from_name: string;
 }
 
 export interface BilletwebConfig {
-  api_key: string;
+  basic: string;
   event_id: string;
+  rate_id: string;
 }

@@ -130,9 +130,34 @@ export type PartnershipProcessStatus = PartnershipProcessStatusSchema;
 
 export type PartnershipPhases = PartnershipPhasesSchema;
 
+export type Session = SessionSchema;
+
+export type Speaker = SpeakerSchema;
+
+export type AgendaResponse = AgendaResponseSchema;
+
+export type SpeakerPartnership = SpeakerPartnershipSchema;
+
 export interface UserSessionSchema {
   state: string;
   token: string;
+}
+
+/**
+ * Optional stack trace for debugging (only in development/debug mode)
+ */
+export type ErrorResponseSchemaStack = string | null;
+
+/**
+ * Standardized error response format used across the application
+ */
+export interface ErrorResponseSchema {
+  /** Human-readable error message describing what went wrong */
+  message: string;
+  /** Optional array of additional error details (e.g., validation errors) */
+  errors?: string[];
+  /** Optional stack trace for debugging (only in development/debug mode) */
+  stack?: ErrorResponseSchemaStack;
 }
 
 export type UserInfoSchemaPictureUrl = string | null;
@@ -585,6 +610,99 @@ export interface EventWithOrganisationSchema {
   organisation: OrganisationItemSchema;
 }
 
+/**
+ * Session abstract/description
+ */
+export type SessionSchemaAbstract = string | null;
+
+/**
+ * Session start time (ISO 8601)
+ */
+export type SessionSchemaStartTime = string | null;
+
+/**
+ * Session end time (ISO 8601)
+ */
+export type SessionSchemaEndTime = string | null;
+
+/**
+ * Track or theme name
+ */
+export type SessionSchemaTrackName = string | null;
+
+/**
+ * Session language code
+ */
+export type SessionSchemaLanguage = string | null;
+
+/**
+ * Conference session information
+ */
+export interface SessionSchema {
+  /** Session unique identifier */
+  id: string;
+  /** Session name/title */
+  name: string;
+  /** Session abstract/description */
+  abstract?: SessionSchemaAbstract;
+  /** Session start time (ISO 8601) */
+  start_time?: SessionSchemaStartTime;
+  /** Session end time (ISO 8601) */
+  end_time?: SessionSchemaEndTime;
+  /** Track or theme name */
+  track_name?: SessionSchemaTrackName;
+  /** Session language code */
+  language?: SessionSchemaLanguage;
+}
+
+/**
+ * Biography or description of the speaker
+ */
+export type SpeakerSchemaBiography = string | null;
+
+/**
+ * Professional title or job position
+ */
+export type SpeakerSchemaJobTitle = string | null;
+
+/**
+ * URL to the speaker's photo
+ */
+export type SpeakerSchemaPhotoUrl = string | null;
+
+/**
+ * Speaker's preferred pronouns
+ */
+export type SpeakerSchemaPronouns = string | null;
+
+/**
+ * Speaker from event agenda
+ */
+export interface SpeakerSchema {
+  /** Speaker unique identifier */
+  id: string;
+  /** Full name of the speaker */
+  name: string;
+  /** Biography or description of the speaker */
+  biography?: SpeakerSchemaBiography;
+  /** Professional title or job position */
+  job_title?: SpeakerSchemaJobTitle;
+  /** URL to the speaker's photo */
+  photo_url?: SpeakerSchemaPhotoUrl;
+  /** Speaker's preferred pronouns */
+  pronouns?: SpeakerSchemaPronouns;
+}
+
+/**
+ * Response for retrieving imported agenda data
+ */
+export interface AgendaResponseSchema {
+  /** List of conference sessions */
+  sessions: SessionSchema[];
+  /** List of conference speakers */
+  speakers: SpeakerSchema[];
+}
+
 export type TextDescription = string | null;
 
 /**
@@ -810,6 +928,8 @@ export interface DetailedPartnershipResponseSchema {
   company: CompanySchema;
   event: EventDisplaySchema;
   organisation: OrganisationItemSchema;
+  /** Array of speakers associated with this partnership */
+  speakers?: SpeakerSchema[];
 }
 
 export interface BillingContactSchema {
@@ -867,6 +987,20 @@ export interface PaginatedJobOfferPromotionSchema {
    * @minimum 0
    */
   total: number;
+}
+
+/**
+ * Association between a speaker and a partnership
+ */
+export interface SpeakerPartnershipSchema {
+  /** Unique identifier for the speaker-partnership association */
+  id: string;
+  /** Identifier of the associated speaker */
+  speaker_id: string;
+  /** Identifier of the associated partnership */
+  partnership_id: string;
+  /** Timestamp when the association was created */
+  created_at: string;
 }
 
 export interface PaginatedProviderSchema {
@@ -973,23 +1107,6 @@ export interface OrganisationSchema {
   creation_location?: OrganisationSchemaCreationLocation;
   created_at?: OrganisationSchemaCreatedAt;
   published_at?: OrganisationSchemaPublishedAt;
-}
-
-/**
- * Optional stack trace for debugging (only in development/debug mode)
- */
-export type ErrorResponseSchemaStack = string | null;
-
-/**
- * Standardized error response format used across the application
- */
-export interface ErrorResponseSchema {
-  /** Human-readable error message describing what went wrong */
-  message: string;
-  /** Optional array of additional error details (e.g., validation errors) */
-  errors?: string[];
-  /** Optional stack trace for debugging (only in development/debug mode) */
-  stack?: ErrorResponseSchemaStack;
 }
 
 /**
@@ -1345,8 +1462,6 @@ export interface PartnershipPhasesSchema {
   paid: boolean;
 }
 
-export type GetAuthCallback404 = { [key: string]: unknown };
-
 export type GetCompaniesParams = {
 /**
  * Search companies by name
@@ -1378,35 +1493,6 @@ export const GetCompaniesFilterStatus = {
   inactive: 'inactive',
 } as const;
 
-export type GetCompanyById400 = {
-  message?: string;
-};
-
-export type GetCompanyById404 = {
-  message?: string;
-};
-
-export type PutCompanyById400 = {
-  message?: string;
-  errors?: string[];
-};
-
-export type PutCompanyById404 = {
-  message?: string;
-};
-
-export type PutCompanyById409 = {
-  message?: string;
-};
-
-export type DeleteCompanyById400 = {
-  message?: string;
-};
-
-export type DeleteCompanyById404 = {
-  message?: string;
-};
-
 export type PostCompaniesLogoBody = {
   /** Logo file (SVG, PNG, or JPEG) */
   file?: Blob;
@@ -1424,14 +1510,6 @@ page?: number;
  * @maximum 100
  */
 page_size?: number;
-};
-
-export type GetCompaniesJobOffers404 = {
-  message?: string;
-};
-
-export type PostCompaniesJobOffers400 = {
-  message?: string;
 };
 
 export type PromoteJobOfferToPartnership201 = {
@@ -2037,6 +2115,19 @@ export const getEventBySlug = (
     }
   
 /**
+ * Retrieve event agenda with sessions and speakers for public consumption. No authentication required.
+ * @summary Get public event agenda
+ */
+export const getEventAgendaPublic = (
+    eventSlug: string,
+ options?: SecondParameter<typeof customFetch<AgendaResponseSchema>>,) => {
+      return customFetch<AgendaResponseSchema>(
+      {url: `/events/${eventSlug}/agenda`, method: 'GET'
+    },
+      options);
+    }
+  
+/**
  * List public sponsoring packages for an event with embedded and optional options (authentication optional - publicly accessible)
  * @summary List public sponsoring packages
  */
@@ -2259,6 +2350,36 @@ export const getPartnershipJobOffers = (
     }
   
 /**
+ * Associate a speaker with a partnership. Partnership must be validated first.
+ * @summary Attach speaker to partnership
+ */
+export const attachSpeakerToPartnership = (
+    eventSlug: string,
+    partnershipId: string,
+    speakerId: string,
+ options?: SecondParameter<typeof customFetch<SpeakerPartnershipSchema>>,) => {
+      return customFetch<SpeakerPartnershipSchema>(
+      {url: `/events/${eventSlug}/partnerships/${partnershipId}/speakers/${speakerId}`, method: 'POST'
+    },
+      options);
+    }
+  
+/**
+ * Remove association between a speaker and a partnership.
+ * @summary Detach speaker from partnership
+ */
+export const detachSpeakerFromPartnership = (
+    eventSlug: string,
+    partnershipId: string,
+    speakerId: string,
+ options?: SecondParameter<typeof customFetch<void>>,) => {
+      return customFetch<void>(
+      {url: `/events/${eventSlug}/partnerships/${partnershipId}/speakers/${speakerId}`, method: 'DELETE'
+    },
+      options);
+    }
+  
+/**
  * List all providers with optional filtering and sorting
  * @summary List providers
  */
@@ -2450,8 +2571,8 @@ if(postOrgsEventsBoothPlanBody.file !== undefined) {
 export const postOrgsEventsIntegrations = (
     orgSlug: string,
     eventSlug: string,
-    provider: 'QONTO' | 'MAILJET' | 'BILLETWEB',
-    usage: 'BILLING' | 'MAILING' | 'TICKETING',
+    provider: 'mailjet' | 'slack' | 'qonto' | 'billetweb' | 'webhook' | 'openplanner',
+    usage: 'notification' | 'billing' | 'ticketing' | 'webhook' | 'agenda',
     postOrgsEventsIntegrationsBody: PostOrgsEventsIntegrationsBody,
  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
       return customFetch<IdentifierSchema>(
@@ -2640,8 +2761,8 @@ export const postOrgsEventsExternalLink = (
     orgSlug: string,
     eventSlug: string,
     createEventExternalLinkSchema: CreateEventExternalLinkSchema,
- options?: SecondParameter<typeof customFetch<string>>,) => {
-      return customFetch<string>(
+ options?: SecondParameter<typeof customFetch<ErrorResponseSchema>>,) => {
+      return customFetch<ErrorResponseSchema>(
       {url: `/orgs/${orgSlug}/events/${eventSlug}/external-link`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: createEventExternalLinkSchema
@@ -2660,6 +2781,20 @@ export const deleteOrgsEventsExternalLink = (
  options?: SecondParameter<typeof customFetch<void>>,) => {
       return customFetch<void>(
       {url: `/orgs/${orgSlug}/events/${eventSlug}/external-link/${linkId}`, method: 'DELETE'
+    },
+      options);
+    }
+  
+/**
+ * Trigger fetch and storage of event agenda data from agenda integration. Requires organization write permissions.
+ * @summary Fetch and update agenda from agenda integration
+ */
+export const updateEventAgenda = (
+    orgSlug: string,
+    eventSlug: string,
+ options?: SecondParameter<typeof customFetch<void>>,) => {
+      return customFetch<void>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/agenda`, method: 'POST'
     },
       options);
     }
@@ -3020,6 +3155,7 @@ export type PromoteJobOfferToPartnershipResult = NonNullable<Awaited<ReturnType<
 export type ListJobOfferPromotionsResult = NonNullable<Awaited<ReturnType<typeof listJobOfferPromotions>>>
 export type GetEventsResult = NonNullable<Awaited<ReturnType<typeof getEvents>>>
 export type GetEventBySlugResult = NonNullable<Awaited<ReturnType<typeof getEventBySlug>>>
+export type GetEventAgendaPublicResult = NonNullable<Awaited<ReturnType<typeof getEventAgendaPublic>>>
 export type GetEventsSponsoringPacksResult = NonNullable<Awaited<ReturnType<typeof getEventsSponsoringPacks>>>
 export type PostEventsPartnershipResult = NonNullable<Awaited<ReturnType<typeof postEventsPartnership>>>
 export type GetEventsPartnershipDetailedResult = NonNullable<Awaited<ReturnType<typeof getEventsPartnershipDetailed>>>
@@ -3035,6 +3171,8 @@ export type GetEventsPartnershipTicketsResult = NonNullable<Awaited<ReturnType<t
 export type PostEventsPartnershipTicketsResult = NonNullable<Awaited<ReturnType<typeof postEventsPartnershipTickets>>>
 export type PutEventsPartnershipTicketsResult = NonNullable<Awaited<ReturnType<typeof putEventsPartnershipTickets>>>
 export type GetPartnershipJobOffersResult = NonNullable<Awaited<ReturnType<typeof getPartnershipJobOffers>>>
+export type AttachSpeakerToPartnershipResult = NonNullable<Awaited<ReturnType<typeof attachSpeakerToPartnership>>>
+export type DetachSpeakerFromPartnershipResult = NonNullable<Awaited<ReturnType<typeof detachSpeakerFromPartnership>>>
 export type GetProvidersResult = NonNullable<Awaited<ReturnType<typeof getProviders>>>
 export type PostProvidersResult = NonNullable<Awaited<ReturnType<typeof postProviders>>>
 export type PostOrgsResult = NonNullable<Awaited<ReturnType<typeof postOrgs>>>
@@ -3061,6 +3199,7 @@ export type DeleteOrgsEventsPacksOptionsResult = NonNullable<Awaited<ReturnType<
 export type GetOrgsEventsCommunicationResult = NonNullable<Awaited<ReturnType<typeof getOrgsEventsCommunication>>>
 export type PostOrgsEventsExternalLinkResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsExternalLink>>>
 export type DeleteOrgsEventsExternalLinkResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsEventsExternalLink>>>
+export type UpdateEventAgendaResult = NonNullable<Awaited<ReturnType<typeof updateEventAgenda>>>
 export type GetOrgsEventsPartnershipResult = NonNullable<Awaited<ReturnType<typeof getOrgsEventsPartnership>>>
 export type PostOrgsEventsPartnershipAgreementResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsPartnershipAgreement>>>
 export type PostOrgsEventsPartnershipBillingResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsPartnershipBilling>>>

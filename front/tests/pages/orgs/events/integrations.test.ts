@@ -1,37 +1,52 @@
 import { describe, it, expect } from 'vitest';
 import type { QontoConfig, MailjetConfig, BilletwebConfig } from '~/types/integration';
+import { createMailjetConfig, createQontoConfig, createBilletwebConfig } from '../../../helpers/integrationFactory';
 
 describe('Integrations Page - Helper Functions', () => {
   describe('Qonto Configuration Validation', () => {
     function isValidQontoConfig(config: Partial<QontoConfig>): boolean {
       return !!(
-        config.organization_slug &&
-        config.organization_slug.trim() !== '' &&
-        config.secret_key &&
-        config.secret_key.trim() !== ''
+        config.api_key &&
+        config.api_key.trim() !== '' &&
+        config.secret &&
+        config.secret.trim() !== '' &&
+        config.sandbox_token &&
+        config.sandbox_token.trim() !== ''
       );
     }
 
     it('should validate complete Qonto config', () => {
-      const config: QontoConfig = {
-        organization_slug: 'my-org',
-        secret_key: 'sk_live_1234567890'
-      };
+      const config = createQontoConfig({
+        api_key: 'my-api-key',
+        secret: 'my-secret',
+        sandbox_token: 'my-sandbox-token'
+      });
 
       expect(isValidQontoConfig(config)).toBe(true);
     });
 
-    it('should invalidate Qonto config without organization_slug', () => {
+    it('should invalidate Qonto config without api_key', () => {
       const config: Partial<QontoConfig> = {
-        secret_key: 'sk_live_1234567890'
+        secret: 'my-secret',
+        sandbox_token: 'my-sandbox-token'
       };
 
       expect(isValidQontoConfig(config)).toBe(false);
     });
 
-    it('should invalidate Qonto config without secret_key', () => {
+    it('should invalidate Qonto config without secret', () => {
       const config: Partial<QontoConfig> = {
-        organization_slug: 'my-org'
+        api_key: 'my-api-key',
+        sandbox_token: 'my-sandbox-token'
+      };
+
+      expect(isValidQontoConfig(config)).toBe(false);
+    });
+
+    it('should invalidate Qonto config without sandbox_token', () => {
+      const config: Partial<QontoConfig> = {
+        api_key: 'my-api-key',
+        secret: 'my-secret'
       };
 
       expect(isValidQontoConfig(config)).toBe(false);
@@ -39,8 +54,9 @@ describe('Integrations Page - Helper Functions', () => {
 
     it('should invalidate Qonto config with empty strings', () => {
       const config: QontoConfig = {
-        organization_slug: '',
-        secret_key: 'sk_live_1234567890'
+        api_key: '',
+        secret: 'my-secret',
+        sandbox_token: 'my-sandbox-token'
       };
 
       expect(isValidQontoConfig(config)).toBe(false);
@@ -48,8 +64,9 @@ describe('Integrations Page - Helper Functions', () => {
 
     it('should invalidate Qonto config with whitespace-only strings', () => {
       const config: QontoConfig = {
-        organization_slug: '   ',
-        secret_key: 'sk_live_1234567890'
+        api_key: '   ',
+        secret: 'my-secret',
+        sandbox_token: 'my-sandbox-token'
       };
 
       expect(isValidQontoConfig(config)).toBe(false);
@@ -63,8 +80,8 @@ describe('Integrations Page - Helper Functions', () => {
       return !!(
         config.api_key &&
         config.api_key.trim() !== '' &&
-        config.api_secret &&
-        config.api_secret.trim() !== '' &&
+        config.secret &&
+        config.secret.trim() !== '' &&
         config.from_email &&
         emailRegex.test(config.from_email) &&
         config.from_name &&
@@ -73,19 +90,19 @@ describe('Integrations Page - Helper Functions', () => {
     }
 
     it('should validate complete Mailjet config', () => {
-      const config: MailjetConfig = {
+      const config = createMailjetConfig({
         api_key: 'api_key_123',
-        api_secret: 'api_secret_456',
+        secret: 'secret_456',
         from_email: 'contact@example.com',
         from_name: 'My Event'
-      };
+      });
 
       expect(isValidMailjetConfig(config)).toBe(true);
     });
 
     it('should invalidate Mailjet config without api_key', () => {
       const config: Partial<MailjetConfig> = {
-        api_secret: 'api_secret_456',
+        secret: 'secret_456',
         from_email: 'contact@example.com',
         from_name: 'My Event'
       };
@@ -93,7 +110,7 @@ describe('Integrations Page - Helper Functions', () => {
       expect(isValidMailjetConfig(config)).toBe(false);
     });
 
-    it('should invalidate Mailjet config without api_secret', () => {
+    it('should invalidate Mailjet config without secret', () => {
       const config: Partial<MailjetConfig> = {
         api_key: 'api_key_123',
         from_email: 'contact@example.com',
@@ -104,12 +121,9 @@ describe('Integrations Page - Helper Functions', () => {
     });
 
     it('should invalidate Mailjet config with invalid email', () => {
-      const config: MailjetConfig = {
-        api_key: 'api_key_123',
-        api_secret: 'api_secret_456',
-        from_email: 'invalid-email',
-        from_name: 'My Event'
-      };
+      const config = createMailjetConfig({
+        from_email: 'invalid-email'
+      });
 
       expect(isValidMailjetConfig(config)).toBe(false);
     });
@@ -117,7 +131,7 @@ describe('Integrations Page - Helper Functions', () => {
     it('should invalidate Mailjet config without from_name', () => {
       const config: Partial<MailjetConfig> = {
         api_key: 'api_key_123',
-        api_secret: 'api_secret_456',
+        secret: 'secret_456',
         from_email: 'contact@example.com'
       };
 
@@ -133,12 +147,9 @@ describe('Integrations Page - Helper Functions', () => {
       ];
 
       validEmails.forEach(email => {
-        const config: MailjetConfig = {
-          api_key: 'api_key_123',
-          api_secret: 'api_secret_456',
-          from_email: email,
-          from_name: 'My Event'
-        };
+        const config = createMailjetConfig({
+          from_email: email
+        });
 
         expect(isValidMailjetConfig(config)).toBe(true);
       });
@@ -148,25 +159,29 @@ describe('Integrations Page - Helper Functions', () => {
   describe('Billetweb Configuration Validation', () => {
     function isValidBilletwebConfig(config: Partial<BilletwebConfig>): boolean {
       return !!(
-        config.api_key &&
-        config.api_key.trim() !== '' &&
+        config.basic &&
+        config.basic.trim() !== '' &&
         config.event_id &&
-        config.event_id.trim() !== ''
+        config.event_id.trim() !== '' &&
+        config.rate_id &&
+        config.rate_id.trim() !== ''
       );
     }
 
     it('should validate complete Billetweb config', () => {
       const config: BilletwebConfig = {
-        api_key: 'bw_api_key_123',
-        event_id: '12345'
+        basic: 'basic-auth-token',
+        event_id: '12345',
+        rate_id: '67890'
       };
 
       expect(isValidBilletwebConfig(config)).toBe(true);
     });
 
-    it('should invalidate Billetweb config without api_key', () => {
+    it('should invalidate Billetweb config without basic', () => {
       const config: Partial<BilletwebConfig> = {
-        event_id: '12345'
+        event_id: '12345',
+        rate_id: '67890'
       };
 
       expect(isValidBilletwebConfig(config)).toBe(false);
@@ -174,7 +189,17 @@ describe('Integrations Page - Helper Functions', () => {
 
     it('should invalidate Billetweb config without event_id', () => {
       const config: Partial<BilletwebConfig> = {
-        api_key: 'bw_api_key_123'
+        basic: 'basic-auth-token',
+        rate_id: '67890'
+      };
+
+      expect(isValidBilletwebConfig(config)).toBe(false);
+    });
+
+    it('should invalidate Billetweb config without rate_id', () => {
+      const config: Partial<BilletwebConfig> = {
+        basic: 'basic-auth-token',
+        event_id: '12345'
       };
 
       expect(isValidBilletwebConfig(config)).toBe(false);
@@ -182,17 +207,19 @@ describe('Integrations Page - Helper Functions', () => {
 
     it('should invalidate Billetweb config with empty strings', () => {
       const config: BilletwebConfig = {
-        api_key: '',
-        event_id: '12345'
+        basic: '',
+        event_id: '12345',
+        rate_id: '67890'
       };
 
       expect(isValidBilletwebConfig(config)).toBe(false);
     });
 
-    it('should validate Billetweb config with numeric event_id', () => {
+    it('should validate Billetweb config with numeric ids', () => {
       const config: BilletwebConfig = {
-        api_key: 'bw_api_key_123',
-        event_id: '9876543210'
+        basic: 'basic-auth-token',
+        event_id: '9876543210',
+        rate_id: '1234567890'
       };
 
       expect(isValidBilletwebConfig(config)).toBe(true);
@@ -219,13 +246,16 @@ describe('Integrations Page - Helper Functions', () => {
   });
 
   describe('Integration Usage Detection', () => {
-    type IntegrationUsage = 'BILLING' | 'MAILING' | 'TICKETING';
+    type IntegrationUsage = 'NOTIFICATION' | 'BILLING' | 'MAILING' | 'TICKETING' | 'WEBHOOK' | 'AGENDA';
 
     function getUsageDisplayName(usage: IntegrationUsage): string {
       const names: Record<IntegrationUsage, string> = {
+        NOTIFICATION: 'Notifications',
         BILLING: 'Facturation',
         MAILING: 'Envoi d\'emails',
-        TICKETING: 'Billetterie'
+        TICKETING: 'Billetterie',
+        WEBHOOK: 'Webhook',
+        AGENDA: 'Agenda'
       };
       return names[usage];
     }

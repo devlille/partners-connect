@@ -1089,7 +1089,7 @@ describe('Sponsor Detail Page - Partnership Actions', () => {
         emails: apiResponse.partnership.emails.join(', '),
         created_at: apiResponse.partnership.created_at,
         validated: apiResponse.partnership.process_status.validated_at !== null,
-        paid: apiResponse.partnership.process_status.billing_status === 'paid',
+        paid: apiResponse.partnership.process_status.billing_status?.toLowerCase() === 'paid',
         suggestion: apiResponse.partnership.process_status.suggested_at !== null,
         agreement_generated: apiResponse.partnership.process_status.agreement_url !== null,
         agreement_signed: apiResponse.partnership.process_status.agreement_signed_url !== null,
@@ -1149,7 +1149,7 @@ describe('Sponsor Detail Page - Partnership Actions', () => {
         phone: apiResponse.partnership.phone || null,
         emails: apiResponse.partnership.emails.join(', '),
         validated: apiResponse.partnership.process_status.validated_at !== null,
-        paid: apiResponse.partnership.process_status.billing_status === 'paid',
+        paid: apiResponse.partnership.process_status.billing_status?.toLowerCase() === 'paid',
         suggestion: apiResponse.partnership.process_status.suggested_at !== null,
         agreement_generated: apiResponse.partnership.process_status.agreement_url !== null,
         agreement_signed: apiResponse.partnership.process_status.agreement_signed_url !== null
@@ -1167,6 +1167,101 @@ describe('Sponsor Detail Page - Partnership Actions', () => {
       expect(mapped.suggestion).toBe(false);
       expect(mapped.agreement_generated).toBe(false);
       expect(mapped.agreement_signed).toBe(false);
+    });
+
+    it('should handle billing_status in both uppercase and lowercase', () => {
+      // Test avec PAID en majuscules (comme retourné par l'API)
+      const apiResponseUppercase = {
+        partnership: {
+          id: 'p123',
+          contact_name: 'John Doe',
+          contact_role: 'CEO',
+          language: 'fr',
+          emails: ['john@example.com'],
+          phone: '+33612345678',
+          selected_pack: { id: 'pack1', name: 'Gold' },
+          suggestion_pack: null,
+          validated_pack: null,
+          process_status: {
+            validated_at: null,
+            billing_status: 'PAID',
+            suggested_at: null,
+            agreement_url: null,
+            agreement_signed_url: null
+          },
+          created_at: '2025-01-01T00:00:00Z'
+        },
+        company: { name: 'Test Company' },
+        event: { name: 'DevFest 2025' }
+      };
+
+      const mappedUppercase = {
+        paid: apiResponseUppercase.partnership.process_status.billing_status?.toLowerCase() === 'paid'
+      };
+
+      expect(mappedUppercase.paid).toBe(true);
+
+      // Test avec paid en minuscules
+      const apiResponseLowercase = {
+        partnership: {
+          id: 'p456',
+          contact_name: 'Jane Smith',
+          contact_role: 'CTO',
+          language: 'en',
+          emails: ['jane@example.com'],
+          phone: '+33612345679',
+          selected_pack: { id: 'pack2', name: 'Silver' },
+          suggestion_pack: null,
+          validated_pack: null,
+          process_status: {
+            validated_at: null,
+            billing_status: 'paid',
+            suggested_at: null,
+            agreement_url: null,
+            agreement_signed_url: null
+          },
+          created_at: '2025-01-02T00:00:00Z'
+        },
+        company: { name: 'Another Company' },
+        event: { name: 'TechConf 2025' }
+      };
+
+      const mappedLowercase = {
+        paid: apiResponseLowercase.partnership.process_status.billing_status?.toLowerCase() === 'paid'
+      };
+
+      expect(mappedLowercase.paid).toBe(true);
+
+      // Test avec PENDING en majuscules
+      const apiResponsePending = {
+        partnership: {
+          id: 'p789',
+          contact_name: 'Bob Johnson',
+          contact_role: 'CFO',
+          language: 'fr',
+          emails: ['bob@example.com'],
+          phone: '+33612345680',
+          selected_pack: { id: 'pack3', name: 'Bronze' },
+          suggestion_pack: null,
+          validated_pack: null,
+          process_status: {
+            validated_at: null,
+            billing_status: 'PENDING',
+            suggested_at: null,
+            agreement_url: null,
+            agreement_signed_url: null
+          },
+          created_at: '2025-01-03T00:00:00Z'
+        },
+        company: { name: 'Third Company' },
+        event: { name: 'CodeCamp 2025' }
+      };
+
+      const mappedPending = {
+        paid: apiResponsePending.partnership.process_status.billing_status?.toLowerCase() === 'paid'
+      };
+
+      expect(mappedPending.paid).toBe(false);
     });
 
     it('should handle API errors gracefully', async () => {

@@ -6,39 +6,59 @@
           <PageTitle>{{ partnership?.company_name || 'Sponsor' }}</PageTitle>
           <p class="text-sm text-gray-600 mt-1">Partenariat</p>
         </div>
-        <div v-if="partnership && !partnership.validated_pack_id" class="flex gap-3">
+        <div class="flex gap-3">
+          <div v-if="partnership && !partnership.validated_pack_id" class="flex gap-3">
+            <UButton
+              color="neutral"
+              variant="outline"
+              :loading="isSuggesting"
+              :disabled="isValidating || isDeclining"
+              :aria-label="`Proposer un autre pack à ${partnership.company_name}`"
+              @click="handleSuggestPack"
+            >
+              <i class="i-heroicons-arrow-path mr-2" aria-hidden="true" />
+              Proposer un autre pack
+            </UButton>
+            <UButton
+              color="error"
+              variant="outline"
+              :loading="isDeclining"
+              :disabled="isValidating || isSuggesting"
+              :aria-label="`Refuser le partenariat avec ${partnership.company_name}`"
+              @click="handleDeclinePartnership"
+            >
+              <i class="i-heroicons-x-mark mr-2" aria-hidden="true" />
+              Refuser
+            </UButton>
+            <UButton
+              color="primary"
+              :loading="isValidating"
+              :disabled="isDeclining || isSuggesting"
+              :aria-label="`Valider le partenariat avec ${partnership.company_name}`"
+              @click="handleValidatePartnership"
+            >
+              <i class="i-heroicons-check mr-2" aria-hidden="true" />
+              Valider
+            </UButton>
+          </div>
           <UButton
-            color="neutral"
+            v-if="partnership && !partnership.paid"
+            color="success"
             variant="outline"
-            :loading="isSuggesting"
-            :disabled="isValidating || isDeclining"
-            :aria-label="`Proposer un autre pack à ${partnership.company_name}`"
-            @click="handleSuggestPack"
+            :loading="isMarkingPaid"
+            :aria-label="`Marquer comme payé le partenariat avec ${partnership.company_name}`"
+            @click="handleMarkAsPaid"
           >
-            <i class="i-heroicons-arrow-path mr-2" aria-hidden="true" />
-            Proposer un autre pack
+            <i class="i-heroicons-currency-dollar mr-2" aria-hidden="true" />
+            Marquer comme payé
           </UButton>
-          <UButton
-            color="error"
-            variant="outline"
-            :loading="isDeclining"
-            :disabled="isValidating || isSuggesting"
-            :aria-label="`Refuser le partenariat avec ${partnership.company_name}`"
-            @click="handleDeclinePartnership"
+          <div
+            v-else-if="partnership && partnership.paid"
+            class="flex items-center gap-2 px-3 py-2 bg-green-50 text-green-700 rounded-md border border-green-200"
           >
-            <i class="i-heroicons-x-mark mr-2" aria-hidden="true" />
-            Refuser
-          </UButton>
-          <UButton
-            color="primary"
-            :loading="isValidating"
-            :disabled="isDeclining || isSuggesting"
-            :aria-label="`Valider le partenariat avec ${partnership.company_name}`"
-            @click="handleValidatePartnership"
-          >
-            <i class="i-heroicons-check mr-2" aria-hidden="true" />
-            Valider
-          </UButton>
+            <i class="i-heroicons-check-circle" aria-hidden="true" />
+            <span class="text-sm font-medium">Payé</span>
+          </div>
         </div>
       </div>
     </div>
@@ -50,14 +70,33 @@
         {{ error }}
       </div>
 
-      <div v-else class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations du partenariat</h2>
-        <PartnershipForm
-          :partnership="partnership"
-          :loading="saving"
-          @save="onSave"
-          @cancel="onCancel"
-        />
+      <div v-else class="space-y-6">
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations du partenariat</h2>
+          <PartnershipForm
+            :partnership="partnership"
+            :loading="saving"
+            @save="onSave"
+            @cancel="onCancel"
+          />
+        </div>
+
+        <div v-if="company" class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations de l'entreprise</h2>
+          <CompanyForm
+            :company="company"
+            @saved="handleCompanySaved"
+          />
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations de facturation</h2>
+          <BillingForm
+            :event-slug="eventSlug"
+            :partnership-id="sponsorId"
+            @saved="handleBillingSaved"
+          />
+        </div>
       </div>
     </div>
 
@@ -86,7 +125,7 @@
 </template>
 
 <script setup lang="ts">
-import { getEventsPartnershipDetailed, postOrgsEventsPartnershipSuggestion } from "~/utils/api";
+import { getEventsPartnershipDetailed, postOrgsEventsPartnershipSuggestion, postOrgsEventsPartnershipBilling } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 import type { ExtendedPartnershipItem } from "~/types/partnership";
 import { PARTNERSHIP_CONFIRM } from "~/constants/partnership";
@@ -118,6 +157,7 @@ const sponsorId = computed(() => {
 });
 
 const partnership = ref<ExtendedPartnershipItem | null>(null);
+const company = ref<any | null>(null);
 const loading = ref(true);
 const saving = ref(false);
 const error = ref<string | null>(null);
@@ -126,6 +166,7 @@ const error = ref<string | null>(null);
 const isValidating = ref(false);
 const isDeclining = ref(false);
 const isSuggesting = ref(false);
+const isMarkingPaid = ref(false);
 
 // État pour la modale de suggestion
 const isSuggestModalOpen = ref(false);
@@ -140,7 +181,10 @@ async function loadPartnership() {
 
     // Charger directement le partenariat par son ID
     const response = await getEventsPartnershipDetailed(eventSlug.value, sponsorId.value);
-    const { partnership: p, company, event } = response.data;
+    const { partnership: p, company: c, event } = response.data;
+
+    // Stocker les données de la company
+    company.value = c;
 
     // Extraire les options du pack sélectionné avec leurs informations complètes
     // Note: L'API retourne "options" alors que le schéma TypeScript définit "optional_options"
@@ -158,7 +202,7 @@ async function loadPartnership() {
         display_name: p.contact_name,
         role: p.contact_role
       },
-      company_name: company.name,
+      company_name: c.name,
       event_name: event.name,
       selected_pack_id: p.selected_pack?.id || null,
       selected_pack_name: p.selected_pack?.name || null,
@@ -171,7 +215,7 @@ async function loadPartnership() {
       created_at: p.created_at,
       // Champs étendus depuis ExtendedPartnershipItem
       validated: p.process_status?.validated_at !== null && p.process_status?.validated_at !== undefined,
-      paid: p.process_status?.billing_status === 'paid',
+      paid: p.process_status?.billing_status?.toLowerCase() === 'paid',
       suggestion: false, // suggested_at n'existe pas dans PartnershipProcessStatusSchema
       agreement_generated: p.process_status?.agreement_url !== null && p.process_status?.agreement_url !== undefined,
       agreement_signed: p.process_status?.agreement_signed_url !== null && p.process_status?.agreement_signed_url !== undefined,
@@ -272,6 +316,49 @@ async function handleDeclinePartnership() {
   }
 
   isDeclining.value = false;
+}
+
+/**
+ * Gère le marquage du partenariat comme payé
+ */
+async function handleMarkAsPaid() {
+  if (!partnership.value) return;
+
+  isMarkingPaid.value = true;
+  error.value = null;
+
+  try {
+    await postOrgsEventsPartnershipBilling(
+      orgSlug.value,
+      eventSlug.value,
+      sponsorId.value,
+      'paid'
+    );
+
+    // Recharger les données pour mettre à jour l'affichage
+    await loadPartnership();
+  } catch (err) {
+    console.error('Failed to mark partnership as paid:', err);
+    error.value = 'Impossible de marquer le partenariat comme payé';
+  } finally {
+    isMarkingPaid.value = false;
+  }
+}
+
+/**
+ * Gère la sauvegarde des informations de l'entreprise
+ */
+function handleCompanySaved() {
+  // Recharger les données du partenariat pour mettre à jour les informations de l'entreprise
+  loadPartnership();
+}
+
+/**
+ * Gère la sauvegarde des informations de facturation
+ */
+function handleBillingSaved() {
+  // Recharger les données du partenariat pour mettre à jour le statut
+  loadPartnership();
 }
 
 /**
