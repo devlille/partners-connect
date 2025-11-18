@@ -6,6 +6,11 @@ export const useSponsorLinks = (orgSlug: string, eventSlug: string, sponsorId: s
       to: `/orgs/${orgSlug}/events/${eventSlug}/sponsors`
     },
     {
+      label: 'Entreprise',
+      icon: 'i-heroicons-building-office',
+      to: `/orgs/${orgSlug}/events/${eventSlug}/sponsors/${sponsorId}/company`
+    },
+    {
       label: 'Partenariat',
       icon: 'i-heroicons-hand-raised',
       to: `/orgs/${orgSlug}/events/${eventSlug}/sponsors/${sponsorId}`
@@ -24,11 +29,6 @@ export const useSponsorLinks = (orgSlug: string, eventSlug: string, sponsorId: s
       label: 'Documents',
       icon: 'i-heroicons-document-text',
       to: `/orgs/${orgSlug}/events/${eventSlug}/sponsors/${sponsorId}/documents`
-    },
-    {
-      label: 'Entreprise',
-      icon: 'i-heroicons-building-office',
-      to: `/orgs/${orgSlug}/events/${eventSlug}/sponsors/${sponsorId}/company`
     },
     {
       label: 'Offres d\'emploi',

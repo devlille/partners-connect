@@ -1,0 +1,258 @@
+<template>
+  <form @submit.prevent="onSubmit" class="space-y-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Nom du contact
+        </label>
+        <UInput
+          v-model="form.contact_name"
+          placeholder="Nom du contact"
+          required
+          :disabled="readonly"
+          class="w-full"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Rôle du contact
+        </label>
+        <UInput
+          v-model="form.contact_role"
+          placeholder="Rôle"
+          required
+          :disabled="readonly"
+          class="w-full"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Pack
+        </label>
+        <UInput
+          v-model="selectedPackName"
+          placeholder="Pack de sponsoring"
+          disabled
+          class="w-full"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Options
+        </label>
+        <div v-if="selectedOptions.length > 0" class="bg-gray-50 rounded-lg p-3">
+          <div class="space-y-3">
+            <div
+              v-for="option in selectedOptions"
+              :key="option.id"
+              class="flex items-start gap-3"
+            >
+              <input
+                type="checkbox"
+                :id="`form-option-${option.id}`"
+                checked
+                disabled
+                class="mt-1 h-4 w-4 rounded border-gray-300 text-primary-600 cursor-not-allowed opacity-60"
+              >
+              <label
+                :for="`form-option-${option.id}`"
+                class="flex-1 cursor-not-allowed"
+              >
+                <span class="block text-sm font-medium text-gray-900">{{ option.name }}</span>
+                <span v-if="option.description" class="block text-sm text-gray-500 mt-1">
+                  {{ option.description }}
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <p v-else class="text-sm text-gray-500 italic">Aucune option sélectionnée</p>
+      </div>
+
+      <div>
+        <LanguageSelect
+          v-model="form.language"
+          label="Langue"
+          :disabled="readonly"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Email(s)
+        </label>
+        <UInput
+          v-model="form.emails"
+          placeholder="email@example.com"
+          type="email"
+          :disabled="readonly"
+          class="w-full"
+        />
+        <p class="text-xs text-gray-500 mt-1">Séparer plusieurs emails par des virgules</p>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Téléphone
+        </label>
+        <UInput
+          v-model="form.phone"
+          placeholder="+33 6 12 34 56 78"
+          type="tel"
+          :disabled="readonly"
+          class="w-full"
+        />
+      </div>
+    </div>
+
+    <div v-if="!readonly" class="flex justify-end gap-3 pt-4 ">
+      <UButton
+        type="button"
+        color="neutral"
+        variant="ghost"
+        label="Annuler"
+        @click="$emit('cancel')"
+      />
+      <UButton
+        type="submit"
+        color="primary"
+        label="Enregistrer"
+        :loading="loading"
+      />
+    </div>
+  </form>
+</template>
+
+<script setup lang="ts">
+import type { ExtendedPartnershipItem } from "~/types/partnership";
+import { getEventsSponsoringPacks, type SponsoringPack } from "~/utils/api";
+
+interface Props {
+  partnership?: ExtendedPartnershipItem | null;
+  loading?: boolean;
+  showAdminActions?: boolean;
+  readonly?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  loading: false,
+  showAdminActions: true,
+  readonly: false
+});
+
+const emit = defineEmits<{
+  save: [data: any];
+  cancel: [];
+}>();
+
+const route = useRoute();
+const eventSlug = computed(() => {
+  const params = route.params.eventSlug;
+  return Array.isArray(params) ? params[1] as string : params as string;
+});
+
+const packs = ref<SponsoringPack[]>([]);
+const selectedPackName = ref('');
+const selectedOptions = ref<Array<{ id: string; name: string; description?: string | null }>>([]);
+
+// Charger les packs disponibles
+async function loadPacks() {
+  try {
+    const response = await getEventsSponsoringPacks(eventSlug.value);
+    packs.value = response.data;
+    updateSelectedPackName();
+    updateSelectedOptions();
+  } catch (error) {
+    console.error('Failed to load packs:', error);
+  }
+}
+
+// Mettre à jour le nom du pack sélectionné
+function updateSelectedPackName() {
+  if (props.partnership?.selected_pack_id) {
+    const pack = packs.value.find(p => p.id === props.partnership?.selected_pack_id);
+    selectedPackName.value = pack?.name || '';
+  } else if (props.partnership?.suggested_pack_name) {
+    selectedPackName.value = `${props.partnership.suggested_pack_name} (suggéré)`;
+  } else {
+    selectedPackName.value = '';
+  }
+}
+
+// Mettre à jour les options sélectionnées
+function updateSelectedOptions() {
+  selectedOptions.value = [];
+
+  // Si pack_options est fourni directement (nouveau format depuis getEventsPartnershipDetailed),
+  // on l'utilise directement
+  if (props.partnership?.pack_options && props.partnership.pack_options.length > 0) {
+    selectedOptions.value = props.partnership.pack_options;
+    return;
+  }
+
+  // Sinon, on garde l'ancienne méthode de chargement via l'API getEventsSponsoringPacks
+  if (!props.partnership?.option_ids || props.partnership.option_ids.length === 0) {
+    return;
+  }
+
+  // Trouver le pack pour accéder à ses options
+  const packId = props.partnership.selected_pack_id || props.partnership.suggested_pack_id;
+  if (!packId) return;
+
+  const pack = packs.value.find(p => p.id === packId);
+  if (!pack) return;
+
+  // Gérer les deux formats possibles: "optional_options" (schéma) ou "options" (API)
+  const packOptions = (pack as any).options || pack.optional_options || [];
+  if (packOptions.length === 0) return;
+
+  // Filtrer les options qui sont dans option_ids
+  selectedOptions.value = packOptions
+    .filter((opt: any) => props.partnership?.option_ids?.includes(opt.id))
+    .map((opt: any) => ({
+      id: opt.id,
+      name: opt.name,
+      description: opt.description || null
+    }));
+}
+
+const form = ref({
+  contact_name: props.partnership?.contact.display_name || '',
+  contact_role: props.partnership?.contact.role || '',
+  language: props.partnership?.language || 'fr',
+  emails: props.partnership?.emails || '',
+  phone: props.partnership?.phone || ''
+});
+
+// Mettre à jour le formulaire si les props changent
+watch(() => props.partnership, (newPartnership) => {
+  if (newPartnership) {
+    form.value = {
+      contact_name: newPartnership.contact.display_name,
+      contact_role: newPartnership.contact.role,
+      language: newPartnership.language,
+      emails: newPartnership.emails || '',
+      phone: newPartnership.phone || ''
+    };
+    updateSelectedPackName();
+    updateSelectedOptions();
+  }
+}, { deep: true });
+
+onMounted(() => {
+  loadPacks();
+});
+
+function onSubmit() {
+  emit('save', {
+    contact_name: form.value.contact_name,
+    contact_role: form.value.contact_role,
+    language: form.value.language,
+    emails: form.value.emails ? form.value.emails.split(',').map(e => e.trim()) : [],
+    phone: form.value.phone || null
+  });
+}
+</script>

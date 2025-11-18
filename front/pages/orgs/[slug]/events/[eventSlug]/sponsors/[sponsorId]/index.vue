@@ -81,14 +81,6 @@
           />
         </div>
 
-        <div v-if="company" class="bg-white rounded-lg shadow p-6">
-          <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations de l'entreprise</h2>
-          <CompanyForm
-            :company="company"
-            @saved="handleCompanySaved"
-          />
-        </div>
-
         <div class="bg-white rounded-lg shadow p-6">
           <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations de facturation</h2>
           <BillingForm
@@ -157,7 +149,6 @@ const sponsorId = computed(() => {
 });
 
 const partnership = ref<ExtendedPartnershipItem | null>(null);
-const company = ref<any | null>(null);
 const loading = ref(true);
 const saving = ref(false);
 const error = ref<string | null>(null);
@@ -182,9 +173,6 @@ async function loadPartnership() {
     // Charger directement le partenariat par son ID
     const response = await getEventsPartnershipDetailed(eventSlug.value, sponsorId.value);
     const { partnership: p, company: c, event } = response.data;
-
-    // Stocker les données de la company
-    company.value = c;
 
     // Extraire les options du pack sélectionné avec leurs informations complètes
     // Note: L'API retourne "options" alors que le schéma TypeScript définit "optional_options"
@@ -343,14 +331,6 @@ async function handleMarkAsPaid() {
   } finally {
     isMarkingPaid.value = false;
   }
-}
-
-/**
- * Gère la sauvegarde des informations de l'entreprise
- */
-function handleCompanySaved() {
-  // Recharger les données du partenariat pour mettre à jour les informations de l'entreprise
-  loadPartnership();
 }
 
 /**

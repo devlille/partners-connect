@@ -182,26 +182,6 @@ export interface MediaSchema {
   png_250: string;
 }
 
-export type CompanySchemaDescription = string | null;
-
-export interface CompanySchema {
-  id: string;
-  name: string;
-  head_office: AddressSchema;
-  siret: string;
-  vat: string;
-  description?: CompanySchemaDescription;
-  site_url: string;
-  medias?: MediaSchema;
-}
-
-export interface PaginatedCompanySchema {
-  items: CompanySchema[];
-  page: number;
-  page_size: number;
-  total: number;
-}
-
 export type SocialSchemaType = typeof SocialSchemaType[keyof typeof SocialSchemaType];
 
 
@@ -219,6 +199,27 @@ export const SocialSchemaType = {
 export interface SocialSchema {
   type: SocialSchemaType;
   url: string;
+}
+
+export type CompanySchemaDescription = string | null;
+
+export interface CompanySchema {
+  id: string;
+  name: string;
+  head_office: AddressSchema;
+  siret: string;
+  vat: string;
+  description?: CompanySchemaDescription;
+  site_url: string;
+  medias?: MediaSchema;
+  socials: SocialSchema[];
+}
+
+export interface PaginatedCompanySchema {
+  items: CompanySchema[];
+  page: number;
+  page_size: number;
+  total: number;
 }
 
 export type CreateCompanySchemaDescription = string | null;
