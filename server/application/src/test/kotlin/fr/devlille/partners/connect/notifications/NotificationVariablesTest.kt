@@ -94,6 +94,7 @@ class NotificationVariablesTest {
         siteUrl = "https://testcompany.com",
         medias = null,
         status = CompanyStatus.ACTIVE,
+        socials = emptyList(),
     )
 
     private fun createPack() = PartnershipPack(

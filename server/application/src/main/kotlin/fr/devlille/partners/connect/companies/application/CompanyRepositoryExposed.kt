@@ -29,12 +29,15 @@ class CompanyRepositoryExposed : CompanyRepository {
         val total = companies.count()
         companies
             .paginated(page, pageSize)
-            .map(CompanyEntity::toDomain)
+            .map { companyEntity ->
+                companyEntity.toDomain(companyEntity.socials.map(CompanySocialEntity::toDomain))
+            }
             .toPaginatedResponse(total, page, pageSize)
     }
 
     override fun getById(id: UUID): Company = transaction {
-        CompanyEntity.findById(id)?.toDomain()
+        val company = CompanyEntity.findById(id)
+        company?.toDomain(company.socials.map(CompanySocialEntity::toDomain))
             ?: throw NotFoundException("Company with id $id not found")
     }
 
@@ -112,7 +115,7 @@ class CompanyRepositoryExposed : CompanyRepository {
             }
         }
 
-        company.toDomain()
+        company.toDomain(company.socials.map(CompanySocialEntity::toDomain))
     }
 
     override fun softDelete(id: UUID): UUID = transaction {

@@ -31,6 +31,12 @@
       "type": [
         "null"
       ]
+    },
+    "socials": {
+      "type": "array",
+      "items": {
+        "$ref": "social.schema.json"
+      }
     }
   },
   "required": [
@@ -39,6 +45,7 @@
     "head_office",
     "siret",
     "vat",
-    "site_url"
+    "site_url",
+    "socials"
   ]
 }

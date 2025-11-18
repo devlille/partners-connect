@@ -16,6 +16,7 @@ data class Company(
     val siteUrl: String,
     val medias: Media?,
     val status: CompanyStatus,
+    val socials: List<Social>,
 )
 
 @Serializable

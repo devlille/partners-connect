@@ -48,4 +48,6 @@ class CompanyEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var logoUrl250 by CompaniesTable.logoUrl250
     var createdAt by CompaniesTable.createdAt
     var status by CompaniesTable.status
+
+    val socials by CompanySocialEntity referrersOn CompanySocialsTable.companyId
 }
