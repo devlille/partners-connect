@@ -3,9 +3,13 @@ package fr.devlille.partners.connect.companies.application.mappers
 import fr.devlille.partners.connect.companies.domain.Address
 import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.companies.domain.Media
+import fr.devlille.partners.connect.companies.domain.Social
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
+import fr.devlille.partners.connect.companies.infrastructure.db.CompanySocialEntity
 
-internal fun CompanyEntity.toDomain(): Company {
+internal fun CompanyEntity.toDomain(
+    socials: List<Social>,
+): Company {
     val hasMedia =
         logoUrlOriginal != null && logoUrl1000 != null && logoUrl500 != null && logoUrl250 != null
     return Company(
@@ -32,5 +36,8 @@ internal fun CompanyEntity.toDomain(): Company {
             null
         },
         status = status,
+        socials = socials,
     )
 }
+
+internal fun CompanySocialEntity.toDomain(): Social = Social(type = type, url = url)

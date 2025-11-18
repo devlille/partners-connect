@@ -3,6 +3,7 @@ package fr.devlille.partners.connect.partnership.application
 import fr.devlille.partners.connect.companies.application.mappers.toDomain
 import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
+import fr.devlille.partners.connect.companies.infrastructure.db.CompanySocialEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
@@ -182,7 +183,7 @@ class PartnershipRepositoryExposed : PartnershipRepository {
         val partnership = PartnershipEntity
             .singleByEventAndPartnership(event.id.value, partnershipId)
             ?: throw NotFoundException("Partnership not found")
-        partnership.company.toDomain()
+        partnership.company.toDomain(partnership.company.socials.map(CompanySocialEntity::toDomain))
     }
 
     override fun listByEvent(

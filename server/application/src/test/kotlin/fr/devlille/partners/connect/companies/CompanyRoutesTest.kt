@@ -1,10 +1,12 @@
 package fr.devlille.partners.connect.companies
 
 import fr.devlille.partners.connect.companies.domain.Address
+import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.companies.domain.CreateCompany
 import fr.devlille.partners.connect.companies.domain.Social
 import fr.devlille.partners.connect.companies.domain.SocialType
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
+import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedResponse
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Upload
 import fr.devlille.partners.connect.internal.moduleMocked
@@ -89,10 +91,11 @@ class CompanyRoutesTest {
 
         val response = client.get("/companies")
         assertEquals(HttpStatusCode.OK, response.status)
-        val responseBody = response.bodyAsText()
-        val paginated = Json.parseToJsonElement(responseBody).jsonObject
-        val items = paginated["items"]!!.jsonArray
-        assertTrue(items.any { it.toString().contains(id!!) })
+        val paginated = json.decodeFromString<PaginatedResponse<Company>>(response.bodyAsText())
+        assertTrue(paginated.items.any { it.toString().contains(id!!) })
+        assertEquals(1, paginated.items.first().socials.size)
+        assertEquals(SocialType.LINKEDIN, paginated.items.first().socials.first().type)
+        assertEquals(1, paginated.total)
     }
 
     @Test

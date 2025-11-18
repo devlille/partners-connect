@@ -4025,6 +4025,24 @@ components:
         - png_1000
         - png_500
         - png_250
+    social.schema:
+      $id: social.schema.json
+      type: object
+      properties:
+        type:
+          enum:
+            - LINKEDIN
+            - X
+            - BLUESKY
+            - MASTODON
+            - INSTAGRAM
+            - FACEBOOK
+            - YOUTUBE
+        url:
+          type: string
+      required:
+        - type
+        - url
     company.schema:
       $id: company.schema.json
       type: object
@@ -4049,6 +4067,10 @@ components:
           $ref: '#/components/schemas/media.schema'
           type:
             - 'null'
+        socials:
+          type: array
+          items:
+            $ref: '#/components/schemas/social.schema'
       required:
         - id
         - name
@@ -4056,6 +4078,7 @@ components:
         - siret
         - vat
         - site_url
+        - socials
     paginated_company.schema:
       $id: paginated_company.schema.json
       type: object
@@ -4075,24 +4098,6 @@ components:
         - page
         - page_size
         - total
-    social.schema:
-      $id: social.schema.json
-      type: object
-      properties:
-        type:
-          enum:
-            - LINKEDIN
-            - X
-            - BLUESKY
-            - MASTODON
-            - INSTAGRAM
-            - FACEBOOK
-            - YOUTUBE
-        url:
-          type: string
-      required:
-        - type
-        - url
     create_company.schema:
       $id: create_company.schema.json
       type: object
