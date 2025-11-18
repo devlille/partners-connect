@@ -21,7 +21,9 @@
     "@nuxt/ui": "^4.1.0",
     "@nuxtjs/i18n": "^10.1.2",
     "@pinia/nuxt": "^0.11.2",
+    "@sentry/nuxt": "^10.25.0",
     "axios": "^1.13.1",
+    "import-in-the-middle": "^2.0.0",
     "nuxt": "^4.2.0",
     "pinia": "^3.0.3",
     "tailwindcss": "^4.1.16",
@@ -39,5 +41,10 @@
     "happy-dom": "^20.0.10",
     "oxlint": "^1.24.0",
     "vitest": "^4.0.4"
+  },
+  "pnpm": {
+    "overrides": {
+      "@vercel/nft": "^0.27.4"
+    }
   }
 }

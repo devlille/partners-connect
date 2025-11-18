@@ -2,7 +2,8 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-05-15",
   devtools: { enabled: true },
-  modules: ["@nuxt/ui", "@nuxt/test-utils", "@nuxtjs/i18n", "@pinia/nuxt"],
+  modules: ["@nuxt/ui", "@nuxt/test-utils", "@nuxtjs/i18n", "@pinia/nuxt", "@sentry/nuxt/module"],
+
   app: {
     head: {
       htmlAttrs: {
@@ -10,6 +11,7 @@ export default defineNuxtConfig({
       },
     },
   },
+
   i18n: {
     locales: ["fr", "en", "es"],
     defaultLocale: "fr",
@@ -131,6 +133,7 @@ export default defineNuxtConfig({
       },
     },
   },
+
   runtimeConfig: {
     API_BASE_URL: "http://localhost:8080",
     public: {
@@ -138,5 +141,16 @@ export default defineNuxtConfig({
       defaultOrgSlug: process.env.NUXT_PUBLIC_DEFAULT_ORG_SLUG || "devedinburgh",
       defaultEventSlug: process.env.NUXT_PUBLIC_DEFAULT_EVENT_SLUG || "devedinbirtgh-2026",
     },
+  },
+
+  sentry: {
+    sourceMapsUploadOptions: {
+      org: "philibert-consulting",
+      project: "partners-connect",
+    },
+  },
+
+  sourcemap: {
+    client: "hidden",
   },
 });
