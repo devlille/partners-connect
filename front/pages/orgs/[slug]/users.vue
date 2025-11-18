@@ -288,9 +288,29 @@ async function handleAddEmails() {
     // Fermer le modal et réinitialiser
     isAddModalOpen.value = false;
     newEmails.value = '';
-  } catch (err) {
+  } catch (err: any) {
     console.error('Failed to add emails:', err);
-    addError.value = 'Impossible d\'ajouter les emails. Vérifiez les informations.';
+    console.error('Error response:', err.response);
+    console.error('Error data:', err.response?.data);
+
+    // Extraire le message d'erreur du serveur
+    const serverMessage = err.response?.data?.message || '';
+    console.log('Server message:', serverMessage);
+
+    // Détecter si c'est une erreur d'utilisateur non trouvé
+    const notFoundMatch = serverMessage.match(/User with email: (.+?) not found/);
+    console.log('Not found match:', notFoundMatch);
+
+    if (notFoundMatch) {
+      const unknownEmail = notFoundMatch[1];
+      addError.value = `L'adresse email "${unknownEmail}" n'est pas enregistrée dans le système. L'utilisateur doit d'abord se connecter au moins une fois avant de pouvoir être ajouté à une organisation.`;
+    } else if (serverMessage) {
+      addError.value = serverMessage;
+    } else {
+      addError.value = 'Impossible d\'ajouter les emails. Vérifiez les informations.';
+    }
+
+    console.log('Final error message:', addError.value);
   } finally {
     isSubmitting.value = false;
   }

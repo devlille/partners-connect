@@ -39,7 +39,7 @@ const createCustomAxiosInstance = (baseUrl: string): AxiosInstance => {
           if (typeof window !== 'undefined') {
             localStorage.removeItem('auth_token');
             localStorage.removeItem('user_info');
-            
+
             const config = useRuntimeConfig();
             const redirectUrl = encodeURIComponent(
               `${process.env.NODE_ENV === "development" ? "http://localhost:8080" : window.location.origin}${
@@ -49,7 +49,11 @@ const createCustomAxiosInstance = (baseUrl: string): AxiosInstance => {
             window.location.href = `${config.public.apiBaseUrl}/auth/login?redirectUrl=${redirectUrl}`;
           }
         }
-        throw new Error(`HTTP error! Status: ${error.response.status}`);
+
+        // Créer une erreur personnalisée qui préserve les données de la réponse
+        const customError = new Error(`HTTP error! Status: ${error.response.status}`) as Error & { response?: typeof error.response };
+        customError.response = error.response;
+        throw customError;
       }
       throw error;
     }
