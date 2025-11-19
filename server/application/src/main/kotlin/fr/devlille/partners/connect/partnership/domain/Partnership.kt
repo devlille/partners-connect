@@ -29,4 +29,4 @@ class PartnershipPack(
 
 fun Partnership.link(
     event: EventWithOrganisation,
-) = "${SystemVarEnv.frontendBaseUrl}/${event.organisation.slug}/${event.event.slug}/$id"
+) = "${SystemVarEnv.frontendBaseUrl}/${event.event.slug}/$id"

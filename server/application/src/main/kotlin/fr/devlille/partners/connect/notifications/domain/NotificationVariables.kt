@@ -133,37 +133,52 @@ sealed interface NotificationVariables {
         override val language: String,
         override val event: EventWithOrganisation,
         override val company: Company,
+        val partnership: Partnership,
     ) : NotificationVariables {
         override val usageName: String = "partnership_agreement_signed"
 
-        override fun populate(content: String): String = content
-            .replace("{{company_name}}", company.name)
+        override fun populate(content: String): String {
+            val partnershipLink = partnership.link(event)
+            return content
+                .replace("{{company_name}}", company.name)
+                .replace("{{partnership_link}}", partnershipLink)
+        }
     }
 
     data class NewInvoice(
         override val language: String,
         override val event: EventWithOrganisation,
         override val company: Company,
+        val partnership: Partnership,
     ) : NotificationVariables {
         override val usageName: String = "new_invoice"
 
-        override fun populate(content: String): String = content
-            .replace("{{event_name}}", event.event.name)
-            .replace("{{event_contact}}", event.event.contact.email)
-            .replace("{{company_name}}", company.name)
+        override fun populate(content: String): String {
+            val partnershipLink = partnership.link(event)
+            return content
+                .replace("{{event_name}}", event.event.name)
+                .replace("{{event_contact}}", event.event.contact.email)
+                .replace("{{company_name}}", company.name)
+                .replace("{{partnership_link}}", partnershipLink)
+        }
     }
 
     data class NewQuote(
         override val language: String,
         override val event: EventWithOrganisation,
         override val company: Company,
+        val partnership: Partnership,
     ) : NotificationVariables {
         override val usageName: String = "new_quote"
 
-        override fun populate(content: String): String = content
-            .replace("{{event_name}}", event.event.name)
-            .replace("{{event_contact}}", event.event.contact.email)
-            .replace("{{company_name}}", company.name)
+        override fun populate(content: String): String {
+            val partnershipLink = partnership.link(event)
+            return content
+                .replace("{{event_name}}", event.event.name)
+                .replace("{{event_contact}}", event.event.contact.email)
+                .replace("{{company_name}}", company.name)
+                .replace("{{partnership_link}}", partnershipLink)
+        }
     }
 
     data class JobOfferPromoted(

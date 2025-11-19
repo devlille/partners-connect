@@ -126,7 +126,7 @@ class NotificationVariablesTest {
         val content = "Test content with {{partnership_link}} placeholder."
         val populated = variables.populate(content)
 
-        val expectedLink = "${SystemVarEnv.frontendBaseUrl}/test-org/test-event/$partnershipId"
+        val expectedLink = "${SystemVarEnv.frontendBaseUrl}/test-event/$partnershipId"
         assertTrue(populated.contains(expectedLink), "Partnership link should be replaced in content. Got: $populated")
         assertTrue(!populated.contains("{{partnership_link}}"), "Placeholder should be replaced")
     }
@@ -144,7 +144,7 @@ class NotificationVariablesTest {
         val content = "Partnership validated. View: {{partnership_link}}"
         val populated = variables.populate(content)
 
-        val expectedLink = "${SystemVarEnv.frontendBaseUrl}/test-org/test-event/$partnershipId"
+        val expectedLink = "${SystemVarEnv.frontendBaseUrl}/test-event/$partnershipId"
         assertTrue(populated.contains(expectedLink), "Partnership link should be replaced in content")
     }
 
@@ -160,7 +160,7 @@ class NotificationVariablesTest {
         val content = "Suggestion approved! Check: {{partnership_link}}"
         val populated = variables.populate(content)
 
-        val expectedLink = "${SystemVarEnv.frontendBaseUrl}/test-org/test-event/$partnershipId"
+        val expectedLink = "${SystemVarEnv.frontendBaseUrl}/test-event/$partnershipId"
         assertTrue(populated.contains(expectedLink), "Partnership link should be replaced in content")
     }
 }

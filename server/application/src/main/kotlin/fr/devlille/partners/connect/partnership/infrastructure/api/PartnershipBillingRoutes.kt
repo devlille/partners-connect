@@ -56,7 +56,7 @@ fun Route.publicPartnershipBillingRoutes() {
             val event = eventRepository.getBySlug(eventSlug)
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
-            val variables = NotificationVariables.NewInvoice(partnership.language, event, company)
+            val variables = NotificationVariables.NewInvoice(partnership.language, event, company, partnership)
             notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.Created, mapOf("url" to invoiceUrl))
         }
@@ -69,7 +69,7 @@ fun Route.publicPartnershipBillingRoutes() {
             val event = eventRepository.getBySlug(eventSlug)
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
-            val variables = NotificationVariables.NewInvoice(partnership.language, event, company)
+            val variables = NotificationVariables.NewQuote(partnership.language, event, company, partnership)
             notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.Created, mapOf("url" to quoteUrl))
         }
