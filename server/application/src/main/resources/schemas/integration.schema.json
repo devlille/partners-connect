@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Integration",
+  "description": "Integration configuration for an event",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for the integration"
+    },
+    "provider": {
+      "type": "string",
+      "enum": [
+        "slack",
+        "mailjet",
+        "qonto",
+        "billetweb",
+        "webhook",
+        "openplanner"
+      ],
+      "description": "Integration provider type"
+    },
+    "usage": {
+      "type": "string",
+      "enum": [
+        "notification",
+        "billing",
+        "ticketing",
+        "webhook",
+        "agenda"
+      ],
+      "description": "Purpose of the integration"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the integration was created"
+    }
+  },
+  "required": [
+    "id",
+    "provider",
+    "usage",
+    "created_at"
+  ],
+  "additionalProperties": false
+}

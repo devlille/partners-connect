@@ -179,8 +179,8 @@ class IntegrationRoutesTest {
         assertEquals(2, integrations.size, "Expected 2 integrations")
 
         val integrationsData = integrations.map { it.jsonObject }
-        assertTrue(integrationsData.any { it["provider"]?.toString()?.contains("SLACK") == true })
-        assertTrue(integrationsData.any { it["provider"]?.toString()?.contains("MAILJET") == true })
+        assertTrue(integrationsData.any { it["provider"]?.toString()?.contains("slack") == true })
+        assertTrue(integrationsData.any { it["provider"]?.toString()?.contains("mailjet") == true })
     }
 
     @Test
