@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { QontoConfig, MailjetConfig, BilletwebConfig } from '~/types/integration';
-import { createMailjetConfig, createQontoConfig, createBilletwebConfig } from '../../../helpers/integrationFactory';
+import { createMailjetConfig, createQontoConfig } from "../../../helpers/integrationFactory";
 
 describe('Integrations Page - Helper Functions', () => {
   describe('Qonto Configuration Validation', () => {

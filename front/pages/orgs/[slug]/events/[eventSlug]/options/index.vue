@@ -258,10 +258,7 @@ async function loadOptions() {
     loading.value = true;
     error.value = null;
 
-    const [optionsResponse, eventResponse] = await Promise.all([
-      getOrgsEventsOptions(orgSlug.value, eventSlug.value),
-      //getEventBySlug(eventSlug.value)
-    ]);
+    const optionsResponse = await getOrgsEventsOptions(orgSlug.value, eventSlug.value)
 
     options.value = optionsResponse.data;
     eventName.value = "DevLille";

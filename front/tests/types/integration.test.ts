@@ -1,12 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type {
-  IntegrationProvider,
-  IntegrationUsage,
-  QontoConfig,
-  MailjetConfig,
-  BilletwebConfig,
-  IntegrationConfig
-} from '~/types/integration';
+import type { IntegrationProvider, IntegrationUsage, IntegrationConfig } from "~/types/integration";
 import { createMailjetConfig, createQontoConfig, createBilletwebConfig } from '../helpers/integrationFactory';
 
 describe('Integration Types', () => {

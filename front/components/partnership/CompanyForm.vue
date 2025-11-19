@@ -1,5 +1,18 @@
 <template>
   <div class="space-y-6">
+    <!-- Logo Upload -->
+    <div v-if="!readonly">
+      <LogoUpload
+        :company-id="company.id"
+        :company-name="company.name"
+        :current-logo-media="company.medias || null"
+        :disabled="loading"
+        @uploaded="handleLogoUploaded"
+        @deleted="handleLogoDeleted"
+        @error="handleLogoError"
+      />
+    </div>
+
     <form @submit.prevent="handleSubmit" class="space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
@@ -201,8 +214,9 @@
 </template>
 
 <script setup lang="ts">
-import type { UpdateCompanySchema, CompanySchema, SocialSchema } from '~/utils/api';
+import type { UpdateCompanySchema, CompanySchema, SocialSchema, MediaSchema } from '~/utils/api';
 import { SocialSchemaType as SocialTypes } from '~/utils/api';
+import LogoUpload from '~/components/LogoUpload.vue';
 
 interface Props {
   company: CompanySchema;
@@ -327,4 +341,28 @@ watch(() => props.company, (newCompany) => {
 onMounted(() => {
   initializeSocials();
 });
+
+/**
+ * Handle logo upload success
+ */
+function handleLogoUploaded(media: MediaSchema) {
+  console.log('Logo uploaded successfully:', media);
+  // Reload company data could be done via emit to parent
+  emit('save' as any, form.value); // Trigger parent reload
+}
+
+/**
+ * Handle logo deletion
+ */
+function handleLogoDeleted() {
+  console.log('Logo deleted successfully');
+  emit('save' as any, form.value); // Trigger parent reload
+}
+
+/**
+ * Handle logo upload error
+ */
+function handleLogoError(message: string) {
+  console.error('Logo upload error:', message);
+}
 </script>
