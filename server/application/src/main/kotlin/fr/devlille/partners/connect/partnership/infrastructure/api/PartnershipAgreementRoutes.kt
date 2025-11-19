@@ -42,7 +42,8 @@ fun Route.publicPartnershipAgreementRoutes() {
             val event = eventRepository.getBySlug(eventSlug)
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
-            val variables = NotificationVariables.PartnershipAgreementSigned(partnership.language, event, company)
+            val variables = NotificationVariables
+                .PartnershipAgreementSigned(partnership.language, event, company, partnership)
             notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.OK, mapOf("url" to url))
         }
