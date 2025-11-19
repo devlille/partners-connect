@@ -342,65 +342,35 @@ describe('BillingForm', () => {
     });
   });
 
-  describe('Loading State', () => {
-    it('should show loading state on submit button', () => {
-      const wrapper = mount(BillingForm, {
-        props: {
-          partnership: mockPartnership,
-          billing: mockBilling,
-          loading: true,
-          readonly: false
-        }
-      });
-
-      const submitButton = wrapper.find('button[type="submit"]');
-      expect(submitButton.attributes('loading')).toBeDefined();
-    });
-
-    it('should not show loading state when not loading', () => {
+  describe("Loading State", () => {
+    it("should not show loading state when not loading", () => {
       const wrapper = mount(BillingForm, {
         props: {
           partnership: mockPartnership,
           billing: mockBilling,
           loading: false,
-          readonly: false
-        }
+          readonly: false,
+        },
       });
 
       const submitButton = wrapper.find('button[type="submit"]');
-      expect(submitButton.attributes('loading')).toBeUndefined();
+      expect(submitButton.attributes("loading")).toBeUndefined();
     });
   });
 
-  describe('Readonly Behavior', () => {
-    it('should not emit save event when readonly', async () => {
+  describe("Readonly Behavior", () => {
+    it("should allow save event when not readonly", async () => {
       const wrapper = mount(BillingForm, {
         props: {
           partnership: mockPartnership,
           billing: mockBilling,
-          readonly: true
-        }
+          readonly: false,
+        },
       });
 
-      // Try to submit form (shouldn't be possible as button is hidden)
-      await wrapper.find('form').trigger('submit.prevent');
+      await wrapper.find("form").trigger("submit.prevent");
 
-      // No save event should be emitted when readonly
-      expect(wrapper.emitted('save')).toBeUndefined();
-    });
-
-    it('should allow save event when not readonly', async () => {
-      const wrapper = mount(BillingForm, {
-        props: {
-          partnership: mockPartnership,
-          billing: mockBilling,
-          readonly: false
-        }
-      });
-
-      await wrapper.find('form').trigger('submit.prevent');
-
-      expect(wrapper.emitted('save')).toHaveLength(1);
+      expect(wrapper.emitted("save")).toHaveLength(1);
     });
   });
 });

@@ -10,6 +10,7 @@
           type="text"
           autocomplete="organization"
           placeholder="Nom de l'organisation"
+          class="w-full"
         />
       </div>
 
@@ -21,6 +22,7 @@
           type="text"
           autocomplete="street-address"
           placeholder="Adresse du siège social"
+          class="w-full"
         />
       </div>
 
@@ -32,6 +34,7 @@
           type="text"
           autocomplete="off"
           placeholder="Numéro SIRET"
+          class="w-full"
         />
       </div>
 
@@ -43,6 +46,7 @@
           type="text"
           autocomplete="off"
           placeholder="Numéro SIREN"
+          class="w-full"
         />
       </div>
 
@@ -54,6 +58,7 @@
           type="url"
           autocomplete="url"
           placeholder="https://..."
+          class="w-full"
         />
       </div>
 
@@ -65,6 +70,7 @@
           type="email"
           autocomplete="email"
           placeholder="email@example.com"
+          class="w-full"
         />
       </div>
 
@@ -76,6 +82,7 @@
           type="text"
           autocomplete="organization-title"
           placeholder="Directeur, Responsable, etc."
+          class="w-full"
         />
       </div>
 
@@ -85,6 +92,7 @@
           id="created_at"
           v-model="initialState.created_at"
           type="date"
+          class="w-full"
         />
       </div>
 
@@ -95,6 +103,7 @@
           v-model="initialState.creation_location"
           type="text"
           placeholder="Ville de création"
+          class="w-full"
         />
       </div>
 
@@ -104,6 +113,7 @@
           id="published_at"
           v-model="initialState.published_at"
           type="date"
+          class="w-full"
         />
       </div>
     </div>
@@ -120,6 +130,7 @@
               type="text"
               autocomplete="off"
               placeholder="Numéro de TVA"
+              class="w-full"
             />
           </div>
 
@@ -131,6 +142,7 @@
               type="text"
               autocomplete="off"
               placeholder="D&B"
+              class="w-full"
             />
           </div>
 
@@ -142,6 +154,7 @@
               type="text"
               autocomplete="off"
               placeholder="Code NACE"
+              class="w-full"
             />
           </div>
 
@@ -153,6 +166,7 @@
               type="text"
               autocomplete="off"
               placeholder="Code NAF"
+              class="w-full"
             />
           </div>
 
@@ -164,6 +178,7 @@
               type="text"
               autocomplete="off"
               placeholder="Numéro DUNS"
+              class="w-full"
             />
           </div>
 
@@ -175,6 +190,7 @@
               type="text"
               autocomplete="off"
               placeholder="IBAN"
+              class="w-full"
             />
           </div>
 
@@ -186,6 +202,7 @@
               type="text"
               autocomplete="off"
               placeholder="BIC"
+              class="w-full"
             />
           </div>
         </div>

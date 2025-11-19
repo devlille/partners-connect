@@ -3,30 +3,6 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">
-          Nom de la compagnie
-        </label>
-        <UInput
-          v-model="form.company_name"
-          placeholder="Nom de la compagnie"
-          disabled
-          class="w-full"
-        />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">
-          Nom de l'événement
-        </label>
-        <UInput
-          v-model="form.event_name"
-          placeholder="Nom de l'événement"
-          disabled
-          class="w-full"
-        />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">
           Nom du contact
         </label>
         <UInput
@@ -235,8 +211,6 @@ function updateSelectedOptions() {
 }
 
 const form = ref({
-  company_name: props.partnership?.company_name || '',
-  event_name: props.partnership?.event_name || '',
   contact_name: props.partnership?.contact.display_name || '',
   contact_role: props.partnership?.contact.role || '',
   language: props.partnership?.language || 'fr',
@@ -248,8 +222,6 @@ const form = ref({
 watch(() => props.partnership, (newPartnership) => {
   if (newPartnership) {
     form.value = {
-      company_name: newPartnership.company_name,
-      event_name: newPartnership.event_name,
       contact_name: newPartnership.contact.display_name,
       contact_role: newPartnership.contact.role,
       language: newPartnership.language,
