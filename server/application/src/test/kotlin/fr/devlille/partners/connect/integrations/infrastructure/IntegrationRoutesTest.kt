@@ -417,4 +417,45 @@ class IntegrationRoutesTest {
         assertEquals(HttpStatusCode.NotFound, response.status)
         assertTrue(response.bodyAsText().contains("not found"), "Expected not found error")
     }
+
+    @Test
+    fun `POST integration - fails when duplicate integration exists with same provider and usage`() = testApplication {
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val testOrgSlug = "test-org-15"
+        val testEventSlug = "test-event-15"
+
+        application {
+            moduleMocked()
+            insertMockedOrganisationEntity(orgId, name = testOrgSlug)
+            insertMockedEvent(eventId, orgId = orgId, slug = testEventSlug, name = "Test Event 15")
+            insertMockedOrgaPermission(orgId = orgId, user = insertMockedAdminUser())
+
+            // Add existing Slack integration with NOTIFICATION usage
+            insertMockedIntegration(
+                eventId = eventId,
+                provider = IntegrationProvider.SLACK,
+                usage = IntegrationUsage.NOTIFICATION,
+            )
+        }
+
+        val requestBody = Json.encodeToString(
+            CreateIntegration.CreateSlackIntegration(
+                token = "xoxb-test-token-2",
+                channel = "#test-2",
+            ),
+        )
+
+        val response = client.post("/orgs/$testOrgSlug/events/$testEventSlug/integrations/slack/notification") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(requestBody)
+        }
+
+        assertEquals(HttpStatusCode.Conflict, response.status)
+        assertTrue(
+            actual = response.bodyAsText().contains("already exists"),
+            message = "Expected conflict error about existing integration",
+        )
+    }
 }

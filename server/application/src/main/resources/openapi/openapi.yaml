@@ -2025,6 +2025,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: "Conflict - Integration with same provider and usage already exists for this event"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /orgs/{orgSlug}/events/{eventSlug}/integrations/{provider}/{usage}/{integrationId}:
     delete:
       summary: "Delete event integration"
