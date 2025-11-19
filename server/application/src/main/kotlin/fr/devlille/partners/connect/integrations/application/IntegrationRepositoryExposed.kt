@@ -9,6 +9,7 @@ import fr.devlille.partners.connect.integrations.domain.IntegrationRepository
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationEntity
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
+import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.and
@@ -28,6 +29,21 @@ class IntegrationRepositoryExposed(
         }
         val registrar = registrars.find { it.supports(input) && usage in it.supportedUsages }
             ?: throw NotFoundException("No registrar found for input ${input::class.simpleName} and usage $usage")
+
+        // Check if integration with same provider and usage already exists for this event
+        val existingIntegration = transaction {
+            IntegrationEntity
+                .find { (IntegrationsTable.eventId eq eventId) and (IntegrationsTable.usage eq usage) }
+                .firstOrNull()
+        }
+
+        if (existingIntegration != null) {
+            val existingProvider = existingIntegration.provider
+            throw ConflictException(
+                "Integration with provider $existingProvider and usage $usage already exists for this event",
+            )
+        }
+
         @Suppress("UNCHECKED_CAST")
         return (registrar as IntegrationRegistrar<CreateIntegration>)
             .register(eventId, usage, input)
