@@ -172,18 +172,9 @@ const handleSubmit = async () => {
     const partnershipResponse = await postEventsPartnership(eventSlug, partnershipData);
     console.log('Partnership created:', partnershipResponse.data);
 
-    success.value = true;
-
-    // Reset form after successful submission
-    formData.value = {
-      name: '',
-      email: '',
-      phone: '',
-      packId: '',
-      contactName: '',
-      contactRole: '',
-      optionIds: [],
-    };
+    // Redirect to the partnership page
+    const partnershipId = partnershipResponse.data.id;
+    await navigateTo(`/${eventSlug}/${partnershipId}`);
   } catch (err) {
     console.error('Failed to create company or partnership:', err);
     error.value = 'Une erreur est survenue lors de la création de la demande de partenariat';
