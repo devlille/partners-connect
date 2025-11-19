@@ -1923,28 +1923,71 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
+  /orgs/{orgSlug}/events/{eventSlug}/integrations:
+    get:
+      summary: List event integrations
+      operationId: getOrgsEventsIntegrations
+      description: Retrieve all integrations configured for an event
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK - List of integrations retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/integration.schema'
+        '400':
+          description: Bad Request - Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Not Found - Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/integrations/{provider}/{usage}:
     post:
       summary: Create event integration
       operationId: postOrgsEventsIntegrations
       description: Register an integration for an event
       parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug
         - name: eventSlug
           in: path
           required: true
           schema:
             type: string
-        - name: usage
-          in: path
-          required: true
-          schema:
-            type: string
-            enum:
-              - notification
-              - billing
-              - ticketing
-              - webhook
-              - agenda
+          description: Event slug
         - name: provider
           in: path
           required: true
@@ -1957,11 +2000,19 @@ paths:
               - billetweb
               - webhook
               - openplanner
-        - name: orgSlug
+          description: Integration provider type
+        - name: usage
           in: path
           required: true
           schema:
             type: string
+            enum:
+              - notification
+              - billing
+              - ticketing
+              - webhook
+              - agenda
+          description: Integration usage purpose
       security:
         - bearerAuth: []
       requestBody:
@@ -1969,11 +2020,11 @@ paths:
           application/json:
             schema:
               type: object
-              description: Integration configuration data
+              description: Integration configuration data (varies by provider)
         required: true
       responses:
         '201':
-          description: Created
+          description: Created - Integration registered successfully
           content:
             application/json:
               schema:
@@ -1986,6 +2037,85 @@ paths:
                 $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Not Found - Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+  /orgs/{orgSlug}/events/{eventSlug}/integrations/{provider}/{usage}/{integrationId}:
+    delete:
+      summary: Delete event integration
+      operationId: deleteOrgsEventsIntegrations
+      description: Remove an integration from an event
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - mailjet
+              - slack
+              - qonto
+              - billetweb
+              - webhook
+              - openplanner
+          description: Integration provider type
+        - name: usage
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - notification
+              - billing
+              - ticketing
+              - webhook
+              - agenda
+          description: Integration usage purpose
+        - name: integrationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Integration unique identifier
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: No Content - Integration deleted successfully
+        '400':
+          description: Bad Request - Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Not Found - Integration or event not found
           content:
             application/json:
               schema:
@@ -3933,6 +4063,8 @@ components:
       $ref: '#/components/schemas/agenda_response.schema'
     SpeakerPartnership:
       $ref: '#/components/schemas/speaker_partnership.schema'
+    Integration:
+      $ref: '#/components/schemas/integration.schema'
     user_session.schema:
       $id: user_session.schema.json
       type: object
@@ -5648,6 +5780,45 @@ components:
         - submission_end_time
         - address
         - contact
+    integration.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      type: object
+      title: Integration
+      description: Integration configuration for an event
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the integration
+        provider:
+          type: string
+          enum:
+            - slack
+            - mailjet
+            - qonto
+            - billetweb
+            - webhook
+            - openplanner
+          description: Integration provider type
+        usage:
+          type: string
+          enum:
+            - notification
+            - billing
+            - ticketing
+            - webhook
+            - agenda
+          description: Purpose of the integration
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the integration was created
+      required:
+        - id
+        - provider
+        - usage
+        - created_at
+      additionalProperties: false
     definitions-TranslatedLabel:
       type: object
       required:
