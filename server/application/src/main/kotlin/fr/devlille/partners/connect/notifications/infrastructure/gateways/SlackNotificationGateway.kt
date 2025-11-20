@@ -14,7 +14,7 @@ class SlackNotificationGateway(
 ) : NotificationGateway {
     override val provider = IntegrationProvider.SLACK
 
-    override fun send(integrationId: UUID, variables: NotificationVariables): Boolean {
+    override suspend fun send(integrationId: UUID, variables: NotificationVariables): Boolean {
         val path = "/notifications/${provider.name.lowercase()}/${variables.usageName}/${variables.language}.md"
         val message = try {
             variables.populate(readResourceFile(path))

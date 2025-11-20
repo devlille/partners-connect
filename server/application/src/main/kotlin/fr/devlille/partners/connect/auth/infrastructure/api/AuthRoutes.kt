@@ -14,6 +14,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.response.respondRedirect
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
+import io.ktor.server.routing.route
 import io.ktor.server.sessions.clear
 import io.ktor.server.sessions.sessions
 import io.ktor.server.sessions.set
@@ -23,40 +24,42 @@ fun Route.authRoutes(callback: (state: String) -> String?) {
     val authRepository by inject<AuthRepository>()
     val userRepository by inject<UserRepository>()
 
-    authenticate("google-oauth") {
-        get("/login") {
-            // Redirects to 'authorizeUrl' automatically
+    route("auth") {
+        authenticate("google-oauth") {
+            get("/login") {
+                // Redirects to 'authorizeUrl' automatically
+            }
+
+            get("/callback") {
+                val currentPrincipal: OAuthAccessTokenResponse.OAuth2? = call.principal()
+                if (currentPrincipal == null || currentPrincipal.state == null) {
+                    call.respond(HttpStatusCode.NotFound)
+                    return@get
+                }
+                val state = currentPrincipal.state!!
+                val session = UserSession(state, currentPrincipal.accessToken)
+                call.sessions.set(session)
+                val userInfo = authRepository.getUserInfo("Bearer ${session.token}")
+                userRepository.createUserIfNotExist(userInfo.toDomain())
+                val redirectUrl = callback(state)
+                if (redirectUrl != null) {
+                    call.respondRedirect("$redirectUrl?token=${session.token}")
+                } else {
+                    call.respond(HttpStatusCode.OK, session)
+                }
+            }
         }
 
-        get("/callback") {
-            val currentPrincipal: OAuthAccessTokenResponse.OAuth2? = call.principal()
-            if (currentPrincipal == null || currentPrincipal.state == null) {
-                call.respond(HttpStatusCode.NotFound)
-                return@get
-            }
-            val state = currentPrincipal.state!!
-            val session = UserSession(state, currentPrincipal.accessToken)
-            call.sessions.set(session)
-            val userInfo = authRepository.getUserInfo("Bearer ${session.token}")
-            userRepository.createUserIfNotExist(userInfo.toDomain())
-            val redirectUrl = callback(state)
-            if (redirectUrl != null) {
-                call.respondRedirect("$redirectUrl?token=${session.token}")
-            } else {
-                call.respond(HttpStatusCode.OK, session)
-            }
+        get("/me") {
+            call.respond(
+                status = HttpStatusCode.OK,
+                message = authRepository.getUserInfo(call.token).toResponse(),
+            )
         }
-    }
 
-    get("/me") {
-        call.respond(
-            status = HttpStatusCode.OK,
-            message = authRepository.getUserInfo(call.token).toResponse(),
-        )
-    }
-
-    get("/logout") {
-        call.sessions.clear<UserSession>()
-        call.respond(HttpStatusCode.NoContent)
+        get("/logout") {
+            call.sessions.clear<UserSession>()
+            call.respond(HttpStatusCode.NoContent)
+        }
     }
 }

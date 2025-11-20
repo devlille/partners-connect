@@ -7,15 +7,18 @@ import fr.devlille.partners.connect.notifications.application.NotificationReposi
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.infrastructure.gateways.MailjetNotificationGateway
 import fr.devlille.partners.connect.notifications.infrastructure.gateways.SlackNotificationGateway
+import fr.devlille.partners.connect.notifications.infrastructure.providers.MailjetProvider
 import org.koin.dsl.module
 
 val notificationModule = module {
     includes(networkClientModule)
+    single { Slack.getInstance(SlackConfig()) }
+    single { MailjetProvider(httpClient = get()) }
     single<NotificationRepository> {
         NotificationRepositoryExposed(
             notificationGateways = listOf(
-                SlackNotificationGateway(Slack.getInstance(SlackConfig())),
-                MailjetNotificationGateway(httpClient = get()),
+                SlackNotificationGateway(slack = get()),
+                MailjetNotificationGateway(mailjetProvider = get()),
             ),
         )
     }

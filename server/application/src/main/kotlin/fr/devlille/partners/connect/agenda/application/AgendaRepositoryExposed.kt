@@ -12,24 +12,23 @@ import fr.devlille.partners.connect.agenda.infrastructure.db.SpeakersTable
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
-import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
-import fr.devlille.partners.connect.integrations.infrastructure.db.singleIntegration
+import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationEntity
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class AgendaRepositoryExposed(
     private val gateways: List<AgendaGateway>,
 ) : AgendaRepository {
-    override fun fetchAndStore(eventSlug: String) {
+    override suspend fun fetchAndStore(eventSlug: String) {
         val event = transaction {
             EventEntity.findBySlug(eventSlug) ?: throw NotFoundException("Event $eventSlug not found")
         }
-        val (provider, integrationId) = transaction {
-            IntegrationsTable.singleIntegration(event.id.value, IntegrationUsage.AGENDA)
+        val integration = transaction {
+            IntegrationEntity.singleIntegration(event.id.value, IntegrationUsage.AGENDA)
         }
-        val gateway = gateways.find { it.provider == provider }
-            ?: throw NotFoundException("No gateway for provider $provider")
-        gateway.fetchAndStore(integrationId, event.id.value)
+        val gateway = gateways.find { it.provider == integration.provider }
+            ?: throw NotFoundException("No gateway for provider ${integration.provider}")
+        gateway.fetchAndStore(integration.id.value, event.id.value)
     }
 
     override fun getAgendaByEventSlug(eventSlug: String): AgendaResponse = transaction {

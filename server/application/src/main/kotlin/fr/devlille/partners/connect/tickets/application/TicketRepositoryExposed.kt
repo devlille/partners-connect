@@ -2,10 +2,8 @@ package fr.devlille.partners.connect.tickets.application
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
-import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
-import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
-import fr.devlille.partners.connect.integrations.infrastructure.db.findByEventIdAndUsage
+import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationEntity
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.partnership.domain.InvoiceStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
@@ -18,7 +16,6 @@ import fr.devlille.partners.connect.tickets.domain.TicketGateway
 import fr.devlille.partners.connect.tickets.domain.TicketOrder
 import fr.devlille.partners.connect.tickets.domain.TicketRepository
 import io.ktor.server.plugins.NotFoundException
-import org.jetbrains.exposed.v1.jdbc.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
@@ -44,32 +41,34 @@ class TicketRepositoryExposed(
         eventSlug: String,
         partnershipId: UUID,
         tickets: List<TicketData>,
-    ): TicketOrder = newSuspendedTransaction {
+    ): TicketOrder {
         val event = transaction { EventEntity.findBySlug(eventSlug) }
             ?: throw NotFoundException("Event with slug $eventSlug not found")
         val eventId = event.id.value
-        val billing = BillingEntity.singleByEventAndPartnership(eventId, partnershipId)
-            ?: throw NotFoundException("Billing entity not found for event $eventId and partnership $partnershipId")
-        if (billing.status != InvoiceStatus.PAID) {
-            throw ForbiddenException("Invoice status ${billing.status} is not PAID")
-        }
-        val partnership = billing.partnership
-        val validatedPack = partnership.validatedPack()
-        if (validatedPack == null) {
-            throw NotFoundException("No validated pack found for partnership ${partnership.id}")
-        } else {
-            val nbTickets = validatedPack.getTotalTicketsFromOptions()
-            if (tickets.size > nbTickets) {
-                val message = """
-Not enough tickets in the validated pack: $nbTickets available, ${tickets.size} requested
-                """.trimIndent()
-                throw ForbiddenException(message)
+        val integration = transaction {
+            val billing = BillingEntity.singleByEventAndPartnership(eventId, partnershipId)
+                ?: throw NotFoundException("Billing entity not found for event $eventId and partnership $partnershipId")
+            if (billing.status != InvoiceStatus.PAID) {
+                throw ForbiddenException("Invoice status ${billing.status} is not PAID")
             }
+            val partnership = billing.partnership
+            val validatedPack = partnership.validatedPack()
+            if (validatedPack == null) {
+                throw NotFoundException("No validated pack found for partnership ${partnership.id}")
+            } else {
+                val nbTickets = validatedPack.getTotalTicketsFromOptions()
+                if (tickets.size > nbTickets) {
+                    val message = """
+    Not enough tickets in the validated pack: $nbTickets available, ${tickets.size} requested
+                    """.trimIndent()
+                    throw ForbiddenException(message)
+                }
+            }
+            IntegrationEntity.singleIntegration(event.id.value, IntegrationUsage.TICKETING)
         }
-        val (provider, integrationId) = singleIntegrationWithinTransaction(event.id.value)
-        val gateway = gateways.find { it.provider == provider }
-            ?: throw NotFoundException("No gateway for provider $provider")
-        gateway.createTickets(integrationId, eventId, partnershipId, tickets)
+        val gateway = gateways.find { it.provider == integration.provider }
+            ?: throw NotFoundException("No gateway for provider ${integration.provider}")
+        return gateway.createTickets(integration.id.value, eventId, partnershipId, tickets)
     }
 
     override suspend fun updateTicket(
@@ -78,30 +77,13 @@ Not enough tickets in the validated pack: $nbTickets available, ${tickets.size} 
         ticketId: String,
         input: TicketData,
     ): Ticket {
-        val (provider, integrationId) = transaction {
+        val integration = transaction {
             val event = EventEntity.findBySlug(eventSlug)
                 ?: throw NotFoundException("Event with slug $eventSlug not found")
-            singleIntegrationWithinTransaction(event.id.value)
+            IntegrationEntity.singleIntegration(event.id.value, IntegrationUsage.TICKETING)
         }
-        val gateway = gateways.find { it.provider == provider }
-            ?: throw NotFoundException("No gateway for provider $provider")
-        val ticket = gateway.updateTicket(integrationId, ticketId, input)
-        return ticket
-    }
-
-    private fun singleIntegrationWithinTransaction(eventId: UUID): Pair<IntegrationProvider, UUID> {
-        val integrations = IntegrationsTable
-            .findByEventIdAndUsage(eventId, IntegrationUsage.TICKETING)
-            .toList()
-        if (integrations.isEmpty()) {
-            throw NotFoundException("No ticketing integration found for event $eventId")
-        }
-        if (integrations.size > 1) {
-            throw NotFoundException("Multiple ticketing integrations found for event $eventId")
-        }
-        val integration = integrations.single()
-        val provider = integration[IntegrationsTable.provider]
-        val integrationId = integration[IntegrationsTable.id].value
-        return Pair(provider, integrationId)
+        val gateway = gateways.find { it.provider == integration.provider }
+            ?: throw NotFoundException("No gateway for provider ${integration.provider}")
+        return gateway.updateTicket(integration.id.value, ticketId, input)
     }
 }

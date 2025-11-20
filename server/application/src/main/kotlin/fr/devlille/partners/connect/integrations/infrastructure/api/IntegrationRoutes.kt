@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.integrations.infrastructure.api
 
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.integrations.domain.IntegrationRepository
+import fr.devlille.partners.connect.integrations.domain.IntegrationStatusRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.organisations.infrastructure.api.orgSlug
 import io.ktor.http.HttpStatusCode
@@ -17,6 +18,7 @@ import org.koin.ktor.ext.inject
 
 fun Route.integrationRoutes() {
     val integrationRepository by inject<IntegrationRepository>()
+    val statusRepository by inject<IntegrationStatusRepository>()
     val deserializerRegistry by inject<IntegrationDeserializerRegistry>()
 
     route("/orgs/{orgSlug}/events/{eventSlug}/integrations") {
@@ -29,6 +31,20 @@ fun Route.integrationRoutes() {
             call.respond(HttpStatusCode.OK, integrations)
         }
 
+        delete("/{integrationId}") {
+            val orgSlug = call.parameters.orgSlug
+            val eventSlug = call.parameters.eventSlug
+            val integrationId = call.parameters.integrationId
+            integrationRepository.deleteById(orgSlug, eventSlug, integrationId)
+            call.respond(HttpStatusCode.NoContent)
+        }
+
+        get("/{integrationId}/status") {
+            val integrationId = call.parameters.integrationId
+            val status = statusRepository.status(integrationId)
+            call.respond(HttpStatusCode.OK, mapOf("status" to status))
+        }
+
         post("/{provider}/{usage}") {
             val eventSlug = call.parameters.eventSlug
             val usage = call.parameters.usage
@@ -36,17 +52,8 @@ fun Route.integrationRoutes() {
             val serializer = deserializerRegistry.serializerFor(provider)
             val json = Json { ignoreUnknownKeys = true }
             val input = json.decodeFromString(serializer, call.receiveText())
-            val integrationId = integrationRepository.register(eventSlug, usage, input)
+            val integrationId = integrationRepository.register(eventSlug, provider, usage, input)
             call.respond(HttpStatusCode.Created, mapOf("id" to integrationId.toString()))
-        }
-
-        delete("/{provider}/{usage}/{integrationId}") {
-            val orgSlug = call.parameters.orgSlug
-            val eventSlug = call.parameters.eventSlug
-            val usage = call.parameters.usage
-            val integrationId = call.parameters.integrationId
-            integrationRepository.deleteById(orgSlug, eventSlug, usage, integrationId)
-            call.respond(HttpStatusCode.NoContent)
         }
     }
 }

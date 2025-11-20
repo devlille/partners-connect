@@ -128,7 +128,7 @@ paths:
     post:
       summary: Create company
       operationId: postCompanies
-      description: ''
+      description: Create a new company
       security:
         - {}
       requestBody:
@@ -265,6 +265,8 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
+          description: UUID of the company
       requestBody:
         content:
           multipart/form-data:
@@ -291,9 +293,9 @@ paths:
                 $ref: '#/components/schemas/error_response.schema'
   /companies/{companyId}/partnerships:
     get:
-      summary: List partnerships
+      summary: List all partnerships for a company
       operationId: getCompaniesPartnership
-      description: ''
+      description: List all partnerships for a company
       security:
         - {}
       parameters:
@@ -302,6 +304,8 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
+          description: UUID of the company
       responses:
         '200':
           description: OK
@@ -358,8 +362,16 @@ paths:
                 $ref: '#/components/schemas/paginated_job_offer.schema'
         '401':
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
         '403':
           description: Forbidden - Not authorized for this company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Company not found
           content:
@@ -436,10 +448,22 @@ paths:
                 $ref: '#/components/schemas/job_offer_response.schema'
         '401':
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
         '403':
           description: Forbidden - Not authorized for this company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Job offer not found or not owned by company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
     put:
       summary: Update job offer
       operationId: putCompaniesJobOffersById
@@ -476,12 +500,28 @@ paths:
                 $ref: '#/components/schemas/job_offer_response.schema'
         '400':
           description: Bad Request - Invalid update data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
         '401':
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
         '403':
           description: Forbidden - Not authorized for this company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Job offer not found or not owned by company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
     delete:
       summary: Delete job offer
       operationId: deleteCompaniesJobOffersById
@@ -508,19 +548,27 @@ paths:
           description: Job offer deleted successfully
         '401':
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
         '403':
           description: Forbidden - Not authorized for this company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Job offer not found or not owned by company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /companies/{companyId}/partnerships/{partnershipId}/promote:
     post:
       summary: Promote job offer to partnership
       operationId: promoteJobOfferToPartnership
       description: Company owner promotes a job offer to an active partnership with an event
-      tags:
-        - companies
-        - job-offers
-        - promotions
       security:
         - {}
       parameters:
@@ -557,21 +605,33 @@ paths:
                     format: uuid
         '400':
           description: Bad Request - Invalid request body or missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
         '403':
           description: Forbidden - Event has ended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found - Company, partnership, or job offer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
         '409':
           description: Conflict - Job offer already promoted with status pending/approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /companies/{companyId}/job-offers/{jobOfferId}/promotions:
     get:
       summary: List job offer promotions
       operationId: listJobOfferPromotions
       description: List all promotions for a specific job offer across all partnerships
-      tags:
-        - companies
-        - job-offers
-        - promotions
       security:
         - {}
       parameters:
@@ -633,6 +693,10 @@ paths:
                     type: integer
         '404':
           description: Company or job offer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /events:
     get:
       summary: List organization events
@@ -2047,7 +2111,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
-  /orgs/{orgSlug}/events/{eventSlug}/integrations/{provider}/{usage}/{integrationId}:
+        '409':
+          description: Conflict - Integration with same provider and usage already exists for this event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+  /orgs/{orgSlug}/events/{eventSlug}/integrations/{integrationId}:
     delete:
       summary: Delete event integration
       operationId: deleteOrgsEventsIntegrations
@@ -2065,31 +2135,6 @@ paths:
           schema:
             type: string
           description: Event slug
-        - name: provider
-          in: path
-          required: true
-          schema:
-            type: string
-            enum:
-              - mailjet
-              - slack
-              - qonto
-              - billetweb
-              - webhook
-              - openplanner
-          description: Integration provider type
-        - name: usage
-          in: path
-          required: true
-          schema:
-            type: string
-            enum:
-              - notification
-              - billing
-              - ticketing
-              - webhook
-              - agenda
-          description: Integration usage purpose
         - name: integrationId
           in: path
           required: true
@@ -2120,6 +2165,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
+  /orgs/{orgSlug}/events/{eventSlug}/integrations/{integrationId}/status:
+    get:
+      summary: get status of event integration
+      operationId: getStatusIntegration
+      description: Get status of event integration
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug
+        - name: integrationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Integration unique identifier
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: No Content - Integration deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
   /orgs/{orgSlug}/events/{eventSlug}/options:
     get:
       summary: Get organization details

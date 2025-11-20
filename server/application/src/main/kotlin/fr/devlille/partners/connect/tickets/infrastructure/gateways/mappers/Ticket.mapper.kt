@@ -1,4 +1,4 @@
-package fr.devlille.partners.connect.tickets.infrastructure.gateways.models.mappers
+package fr.devlille.partners.connect.tickets.infrastructure.gateways.mappers
 
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipTicketEntity
 import fr.devlille.partners.connect.tickets.domain.Ticket

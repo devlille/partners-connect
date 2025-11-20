@@ -6,5 +6,5 @@ import java.util.UUID
 interface AgendaGateway {
     val provider: IntegrationProvider
 
-    fun fetchAndStore(integrationId: UUID, eventId: UUID)
+    suspend fun fetchAndStore(integrationId: UUID, eventId: UUID)
 }
