@@ -1,4 +1,4 @@
-export type IntegrationProvider = 'QONTO' | 'MAILJET' | 'BILLETWEB';
+export type IntegrationProvider = 'QONTO' | 'MAILJET' | 'BILLETWEB' | 'OPENPLANNER' | 'SLACK' | 'WEBHOOK';
 export type IntegrationUsage = 'NOTIFICATION' | 'BILLING' | 'MAILING' | 'TICKETING' | 'WEBHOOK' | 'AGENDA';
 
 export interface IntegrationConfig {
@@ -16,12 +16,28 @@ export interface QontoConfig {
 export interface MailjetConfig {
   api_key: string;
   secret: string;
-  from_email: string;
-  from_name: string;
+  sender_email: string;
+  sender_name: string;
 }
 
 export interface BilletwebConfig {
   basic: string;
   event_id: string;
   rate_id: string;
+}
+
+export interface OpenPlannerConfig {
+  api_key: string;
+  event_id: string;
+}
+
+export interface SlackConfig {
+  token: string;
+  channel: string;
+}
+
+export interface WebhookConfig {
+  url: string;
+  secret: string;
+  type: string;
 }

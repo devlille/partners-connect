@@ -138,6 +138,8 @@ export type AgendaResponse = AgendaResponseSchema;
 
 export type SpeakerPartnership = SpeakerPartnershipSchema;
 
+export type Integration = IntegrationSchema;
+
 export interface UserSessionSchema {
   state: string;
   token: string;
@@ -1181,6 +1183,51 @@ export interface CreateEventSchema {
   contact: EventContactSchema;
 }
 
+/**
+ * Integration provider type
+ */
+export type IntegrationSchemaProvider = typeof IntegrationSchemaProvider[keyof typeof IntegrationSchemaProvider];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const IntegrationSchemaProvider = {
+  slack: 'slack',
+  mailjet: 'mailjet',
+  qonto: 'qonto',
+  billetweb: 'billetweb',
+  webhook: 'webhook',
+  openplanner: 'openplanner',
+} as const;
+
+/**
+ * Purpose of the integration
+ */
+export type IntegrationSchemaUsage = typeof IntegrationSchemaUsage[keyof typeof IntegrationSchemaUsage];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const IntegrationSchemaUsage = {
+  notification: 'notification',
+  billing: 'billing',
+  ticketing: 'ticketing',
+  webhook: 'webhook',
+  agenda: 'agenda',
+} as const;
+
+/**
+ * Integration configuration for an event
+ */
+export interface IntegrationSchema {
+  /** Unique identifier for the integration */
+  id: string;
+  /** Integration provider type */
+  provider: IntegrationSchemaProvider;
+  /** Purpose of the integration */
+  usage: IntegrationSchemaUsage;
+  /** Timestamp when the integration was created */
+  created_at: string;
+}
+
 export type DefinitionsTranslatedLabelDescription = string | null;
 
 export interface DefinitionsTranslatedLabel {
@@ -1669,7 +1716,7 @@ export type PostOrgsEventsBoothPlan201 = {
 };
 
 /**
- * Integration configuration data
+ * Integration configuration data (varies by provider)
  */
 export type PostOrgsEventsIntegrationsBody = { [key: string]: unknown };
 
@@ -2566,6 +2613,20 @@ if(postOrgsEventsBoothPlanBody.file !== undefined) {
     }
   
 /**
+ * Retrieve all integrations configured for an event
+ * @summary List event integrations
+ */
+export const getOrgsEventsIntegrations = (
+    orgSlug: string,
+    eventSlug: string,
+ options?: SecondParameter<typeof customFetch<IntegrationSchema[]>>,) => {
+      return customFetch<IntegrationSchema[]>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/integrations`, method: 'GET'
+    },
+      options);
+    }
+  
+/**
  * Register an integration for an event
  * @summary Create event integration
  */
@@ -2580,6 +2641,23 @@ export const postOrgsEventsIntegrations = (
       {url: `/orgs/${orgSlug}/events/${eventSlug}/integrations/${provider}/${usage}`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: postOrgsEventsIntegrationsBody
+    },
+      options);
+    }
+  
+/**
+ * Remove an integration from an event
+ * @summary Delete event integration
+ */
+export const deleteOrgsEventsIntegrations = (
+    orgSlug: string,
+    eventSlug: string,
+    provider: 'mailjet' | 'slack' | 'qonto' | 'billetweb' | 'webhook' | 'openplanner',
+    usage: 'notification' | 'billing' | 'ticketing' | 'webhook' | 'agenda',
+    integrationId: string,
+ options?: SecondParameter<typeof customFetch<void>>,) => {
+      return customFetch<void>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/integrations/${provider}/${usage}/${integrationId}`, method: 'DELETE'
     },
       options);
     }
@@ -3186,7 +3264,9 @@ export type GetOrgsEventsResult = NonNullable<Awaited<ReturnType<typeof getOrgsE
 export type PostOrgsEventsResult = NonNullable<Awaited<ReturnType<typeof postOrgsEvents>>>
 export type PutOrgsEventsResult = NonNullable<Awaited<ReturnType<typeof putOrgsEvents>>>
 export type PostOrgsEventsBoothPlanResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsBoothPlan>>>
+export type GetOrgsEventsIntegrationsResult = NonNullable<Awaited<ReturnType<typeof getOrgsEventsIntegrations>>>
 export type PostOrgsEventsIntegrationsResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsIntegrations>>>
+export type DeleteOrgsEventsIntegrationsResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsEventsIntegrations>>>
 export type GetOrgsEventsOptionsResult = NonNullable<Awaited<ReturnType<typeof getOrgsEventsOptions>>>
 export type PostOrgsEventsOptionsResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsOptions>>>
 export type DeleteOrgsEventsOptionsResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsEventsOptions>>>
