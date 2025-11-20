@@ -30,16 +30,6 @@
           name="ip-name"
           autocomplete="name"
         />
-        <SelectInput
-          id="sel-pack"
-          v-model="formData.packId"
-          label="Pack de sponsoring"
-          name="sel-pack"
-        >
-          <option v-for="pack in packs" :key="pack.id" :value="pack.id">
-            {{ pack.name }} - {{ pack.base_price }} €
-          </option>
-        </SelectInput>
         <TextInput
           id="ip-email"
           v-model="formData.email"
@@ -56,6 +46,13 @@
           autocomplete="tel"
         />
 
+        <RadioInput
+          v-model="formData.packId"
+          legend="Pack de sponsoring"
+          name="pack"
+          :options="packOptions"
+        />
+
         <OptionsInput
           v-model="formData.optionIds"
           legend="Options de sponsoring"
@@ -66,11 +63,6 @@
           <input type="submit" value="Valider" :disabled="isSubmitting">
         </p>
       </form>
-
-      <div v-if="!error && !success" class="auth-section">
-        <p>Vous êtes un organisateur d'événements ?</p>
-        <NuxtLink to="/login" class="login-link">Se connecter pour gérer vos organisations</NuxtLink>
-      </div>
     </main>
   </div>
 </template>
@@ -97,6 +89,14 @@ const formData = ref({
   contactName: '',
   contactRole: '',
   optionIds: [] as string[],
+});
+
+const packOptions = computed(() => {
+  return packs.value.map(pack => ({
+    value: pack.id,
+    label: pack.name,
+    price: pack.base_price
+  }));
 });
 
 onMounted(async () => {

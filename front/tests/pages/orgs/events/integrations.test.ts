@@ -82,10 +82,10 @@ describe('Integrations Page - Helper Functions', () => {
         config.api_key.trim() !== '' &&
         config.secret &&
         config.secret.trim() !== '' &&
-        config.from_email &&
-        emailRegex.test(config.from_email) &&
-        config.from_name &&
-        config.from_name.trim() !== ''
+        config.sender_email &&
+        emailRegex.test(config.sender_email) &&
+        config.sender_name &&
+        config.sender_name.trim() !== ''
       );
     }
 
@@ -93,8 +93,8 @@ describe('Integrations Page - Helper Functions', () => {
       const config = createMailjetConfig({
         api_key: 'api_key_123',
         secret: 'secret_456',
-        from_email: 'contact@example.com',
-        from_name: 'My Event'
+        sender_email: 'contact@example.com',
+        sender_name: 'My Event'
       });
 
       expect(isValidMailjetConfig(config)).toBe(true);
@@ -103,8 +103,8 @@ describe('Integrations Page - Helper Functions', () => {
     it('should invalidate Mailjet config without api_key', () => {
       const config: Partial<MailjetConfig> = {
         secret: 'secret_456',
-        from_email: 'contact@example.com',
-        from_name: 'My Event'
+        sender_email: 'contact@example.com',
+        sender_name: 'My Event'
       };
 
       expect(isValidMailjetConfig(config)).toBe(false);
@@ -113,8 +113,8 @@ describe('Integrations Page - Helper Functions', () => {
     it('should invalidate Mailjet config without secret', () => {
       const config: Partial<MailjetConfig> = {
         api_key: 'api_key_123',
-        from_email: 'contact@example.com',
-        from_name: 'My Event'
+        sender_email: 'contact@example.com',
+        sender_name: 'My Event'
       };
 
       expect(isValidMailjetConfig(config)).toBe(false);
@@ -122,17 +122,17 @@ describe('Integrations Page - Helper Functions', () => {
 
     it('should invalidate Mailjet config with invalid email', () => {
       const config = createMailjetConfig({
-        from_email: 'invalid-email'
+        sender_email: 'invalid-email'
       });
 
       expect(isValidMailjetConfig(config)).toBe(false);
     });
 
-    it('should invalidate Mailjet config without from_name', () => {
+    it('should invalidate Mailjet config without sender_name', () => {
       const config: Partial<MailjetConfig> = {
         api_key: 'api_key_123',
         secret: 'secret_456',
-        from_email: 'contact@example.com'
+        sender_email: 'contact@example.com'
       };
 
       expect(isValidMailjetConfig(config)).toBe(false);
@@ -148,7 +148,7 @@ describe('Integrations Page - Helper Functions', () => {
 
       validEmails.forEach(email => {
         const config = createMailjetConfig({
-          from_email: email
+          sender_email: email
         });
 
         expect(isValidMailjetConfig(config)).toBe(true);
