@@ -4,6 +4,7 @@ import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.integrations.domain.CreateIntegration
 import fr.devlille.partners.connect.integrations.domain.Integration
+import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.IntegrationRegistrar
 import fr.devlille.partners.connect.integrations.domain.IntegrationRepository
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
@@ -21,7 +22,12 @@ import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug a
 class IntegrationRepositoryExposed(
     private val registrars: List<IntegrationRegistrar<*>>,
 ) : IntegrationRepository {
-    override fun register(eventSlug: String, usage: IntegrationUsage, input: CreateIntegration): UUID {
+    override fun register(
+        eventSlug: String,
+        provider: IntegrationProvider,
+        usage: IntegrationUsage,
+        input: CreateIntegration,
+    ): UUID {
         val eventId = transaction {
             val event = EventEntity.findBySlug(eventSlug)
                 ?: throw NotFoundException("Event with slug $eventSlug not found")
@@ -32,9 +38,11 @@ class IntegrationRepositoryExposed(
 
         // Check if integration with same provider and usage already exists for this event
         val existingIntegration = transaction {
-            IntegrationEntity
-                .find { (IntegrationsTable.eventId eq eventId) and (IntegrationsTable.usage eq usage) }
-                .firstOrNull()
+            IntegrationEntity.find {
+                (IntegrationsTable.eventId eq eventId) and
+                    (IntegrationsTable.usage eq usage) and
+                    (IntegrationsTable.provider eq provider)
+            }.firstOrNull()
         }
 
         if (existingIntegration != null) {
@@ -76,12 +84,7 @@ class IntegrationRepositoryExposed(
             }
     }
 
-    override fun deleteById(
-        orgSlug: String,
-        eventSlug: String,
-        usage: IntegrationUsage,
-        integrationId: UUID,
-    ) = transaction {
+    override fun deleteById(orgSlug: String, eventSlug: String, integrationId: UUID) = transaction {
         // Verify organization exists
         val organisation = OrganisationEntity.orgFindBySlug(orgSlug)
             ?: throw NotFoundException("Organisation with slug $orgSlug not found")
@@ -104,7 +107,7 @@ class IntegrationRepositoryExposed(
             throw NotFoundException("Integration with id $integrationId not found")
         }
 
-        val registrars = registrars.filter { usage in it.supportedUsages }
+        val registrars = registrars.filter { integrationEntity.usage in it.supportedUsages }
         for (registrar in registrars) {
             try {
                 @Suppress("UNCHECKED_CAST")

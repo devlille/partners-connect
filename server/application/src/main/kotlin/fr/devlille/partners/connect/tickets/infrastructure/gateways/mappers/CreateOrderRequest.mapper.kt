@@ -1,10 +1,10 @@
-package fr.devlille.partners.connect.tickets.infrastructure.gateways.models.mappers
+package fr.devlille.partners.connect.tickets.infrastructure.gateways.mappers
 
 import fr.devlille.partners.connect.integrations.infrastructure.db.BilletWebConfig
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.tickets.domain.TicketData
-import fr.devlille.partners.connect.tickets.infrastructure.gateways.models.CreateOrderProduct
-import fr.devlille.partners.connect.tickets.infrastructure.gateways.models.CreateOrderRequest
+import fr.devlille.partners.connect.tickets.infrastructure.providers.models.CreateOrderProduct
+import fr.devlille.partners.connect.tickets.infrastructure.providers.models.CreateOrderRequest
 
 fun BillingEntity.toOrderRequest(
     tickets: List<TicketData>,

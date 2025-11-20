@@ -15,9 +15,8 @@ class GoogleProvider(private val httpClient: HttpClient) {
         }.body()
 }
 
-@Suppress("LongParameterList")
 @Serializable
-class GoogleUserInfo(
+data class GoogleUserInfo(
     @SerialName("given_name")
     val givenName: String? = null,
     @SerialName("family_name")

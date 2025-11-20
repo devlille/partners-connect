@@ -18,8 +18,8 @@ import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringP
 import fr.devlille.partners.connect.tickets.domain.Ticket
 import fr.devlille.partners.connect.tickets.domain.TicketData
 import fr.devlille.partners.connect.tickets.domain.TicketOrder
-import fr.devlille.partners.connect.tickets.infrastructure.gateways.models.CreateOrderResponseItem
-import fr.devlille.partners.connect.tickets.infrastructure.gateways.models.ProductDetail
+import fr.devlille.partners.connect.tickets.infrastructure.providers.models.CreateOrderResponseItem
+import fr.devlille.partners.connect.tickets.infrastructure.providers.models.ProductDetail
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond

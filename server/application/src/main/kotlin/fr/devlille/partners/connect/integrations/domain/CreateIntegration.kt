@@ -36,6 +36,8 @@ sealed interface CreateIntegration {
     class CreateWebhookIntegration(
         val url: String,
         val type: WebhookType,
+        @SerialName("health_url")
+        val healthUrl: String? = null,
         @SerialName("header_auth")
         val headerAuth: String? = null,
         @SerialName("partnership_id")

@@ -50,6 +50,7 @@ class WebhookRegistrar : IntegrationRegistrar<CreateIntegration.CreateWebhookInt
         WebhookIntegrationsTable.insert {
             it[this.integrationId] = integrationId.value
             it[this.url] = input.url
+            it[this.healthUrl] = input.healthUrl
             it[this.headerAuth] = input.headerAuth
             it[this.type] = input.type
             it[this.partnershipId] = partnershipUuid

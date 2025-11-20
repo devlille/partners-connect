@@ -267,7 +267,7 @@ class IntegrationRoutesTest {
         }
 
         val response = client.delete(
-            "/orgs/$testOrgSlug/events/$testEventSlug/integrations/slack/notification/$integrationId",
+            "/orgs/$testOrgSlug/events/$testEventSlug/integrations/$integrationId",
         ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -292,7 +292,7 @@ class IntegrationRoutesTest {
         }
 
         val response = client.delete(
-            "/orgs/$testOrgSlug/events/$testEventSlug/integrations/slack/notification/$nonExistentId",
+            "/orgs/$testOrgSlug/events/$testEventSlug/integrations/$nonExistentId",
         ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -317,7 +317,7 @@ class IntegrationRoutesTest {
         }
 
         val response = client.delete(
-            "/orgs/$testOrgSlug/events/$testEventSlug/integrations/slack/notification/$invalidId",
+            "/orgs/$testOrgSlug/events/$testEventSlug/integrations/$invalidId",
         ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -340,7 +340,7 @@ class IntegrationRoutesTest {
         }
 
         val response = client.delete(
-            "/orgs/$testOrgSlug/events/$testEventSlug/integrations/slack/notification/$integrationId",
+            "/orgs/$testOrgSlug/events/$testEventSlug/integrations/$integrationId",
         ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -374,7 +374,7 @@ class IntegrationRoutesTest {
         }
 
         val response = client.delete(
-            "/orgs/$testOrgSlug/events/$testEventSlug/integrations/slack/notification/$integrationId",
+            "/orgs/$testOrgSlug/events/$testEventSlug/integrations/$integrationId",
         ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
@@ -409,7 +409,7 @@ class IntegrationRoutesTest {
         }
 
         val response = client.delete(
-            "/orgs/$testOrgSlug/events/$testEventSlug1/integrations/slack/notification/$integrationId",
+            "/orgs/$testOrgSlug/events/$testEventSlug1/integrations/$integrationId",
         ) {
             header(HttpHeaders.Authorization, "Bearer valid")
         }

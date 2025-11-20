@@ -5,7 +5,7 @@ interface AgendaRepository {
      * Fetches agenda data from OpenPlanner and stores it in the database
      * @param eventSlug The slug of the event to fetch agenda for
      */
-    fun fetchAndStore(eventSlug: String)
+    suspend fun fetchAndStore(eventSlug: String)
 
     /**
      * Retrieves complete agenda data including sessions, speakers, and their partnerships

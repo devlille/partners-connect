@@ -1,10 +1,10 @@
-package fr.devlille.partners.connect.tickets.infrastructure.gateways.models.mappers
+package fr.devlille.partners.connect.tickets.infrastructure.gateways.mappers
 
 import fr.devlille.partners.connect.tickets.domain.Ticket
 import fr.devlille.partners.connect.tickets.domain.TicketData
 import fr.devlille.partners.connect.tickets.domain.TicketOrder
-import fr.devlille.partners.connect.tickets.infrastructure.gateways.models.CreateOrderResponseItem
-import fr.devlille.partners.connect.tickets.infrastructure.gateways.models.ProductDetail
+import fr.devlille.partners.connect.tickets.infrastructure.providers.models.CreateOrderResponseItem
+import fr.devlille.partners.connect.tickets.infrastructure.providers.models.ProductDetail
 
 fun CreateOrderResponseItem.toDomain(data: List<TicketData>): TicketOrder {
     require(data.size == productsDetails.size) { "Data size must match products details size" }

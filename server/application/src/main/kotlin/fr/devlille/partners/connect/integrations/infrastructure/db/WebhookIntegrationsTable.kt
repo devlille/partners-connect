@@ -12,14 +12,16 @@ import java.util.UUID
 
 data class WebhookConfig(
     val url: String,
-    val headerAuth: String?,
     val type: WebhookType,
+    val healthUrl: String?,
+    val headerAuth: String?,
     val partnershipId: UUID?,
 )
 
 object WebhookIntegrationsTable : Table("webhook_integrations") {
     val integrationId = uuid("integration_id").references(IntegrationsTable.id)
     val url = text("url")
+    val healthUrl = text("health_url").nullable()
     val headerAuth = encryptedVarchar(
         name = "header_auth",
         cipherTextLength = 1000,
@@ -38,8 +40,9 @@ operator fun WebhookIntegrationsTable.get(integrationId: UUID): WebhookConfig = 
         .map {
             WebhookConfig(
                 url = it[WebhookIntegrationsTable.url],
-                headerAuth = it[WebhookIntegrationsTable.headerAuth],
                 type = it[WebhookIntegrationsTable.type],
+                healthUrl = it[WebhookIntegrationsTable.healthUrl],
+                headerAuth = it[WebhookIntegrationsTable.headerAuth],
                 partnershipId = it[WebhookIntegrationsTable.partnershipId]?.value,
             )
         }

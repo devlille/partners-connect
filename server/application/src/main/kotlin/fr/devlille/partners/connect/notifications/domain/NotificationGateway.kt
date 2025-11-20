@@ -6,5 +6,5 @@ import java.util.UUID
 interface NotificationGateway {
     val provider: IntegrationProvider
 
-    fun send(integrationId: UUID, variables: NotificationVariables): Boolean
+    suspend fun send(integrationId: UUID, variables: NotificationVariables): Boolean
 }

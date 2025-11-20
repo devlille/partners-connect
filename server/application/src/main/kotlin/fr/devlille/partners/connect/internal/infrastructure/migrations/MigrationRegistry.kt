@@ -5,6 +5,7 @@ import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddCompanyStatusColumnMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddEventExternalLinksMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddEventWebhooksMigration
+import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddHealthUrlColumnMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddIntegrationCreatedAtMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPartnershipCommunicationFieldsMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPolymorphicSponsoringOptionsMigration
@@ -39,6 +40,7 @@ object MigrationRegistry {
         AddProviderManagementMigration,
         AddSelectableValuePricingMigration,
         AddAgendaTablesMigration,
+        AddHealthUrlColumnMigration,
     )
 
     /**

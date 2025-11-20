@@ -55,7 +55,6 @@ import io.ktor.server.plugins.openapi.openAPI
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.response.respond
-import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.sessions.Sessions
 import io.ktor.server.sessions.cookie
@@ -129,16 +128,14 @@ fun Application.module(config: ApplicationConfig = ApplicationConfig()) {
             openAPI(path = "openapi", swaggerFile = "openapi/documentation.yaml")
             swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml")
         }
-        route("auth") {
-            authRoutes { redirects[it] }
-        }
+        authRoutes { redirects[it] }
+        companyRoutes()
         organisationRoutes()
         eventRoutes()
         eventBoothPlanRoutes()
         eventExternalLinkRoutes()
         userRoutes()
         sponsoringRoutes()
-        companyRoutes()
         partnershipRoutes()
         integrationRoutes()
         providersRoutes()

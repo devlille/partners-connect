@@ -3,12 +3,13 @@ package fr.devlille.partners.connect.webhooks.application
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
+import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationEntity
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
-import fr.devlille.partners.connect.integrations.infrastructure.db.findByEventIdAndUsage
 import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
 import fr.devlille.partners.connect.webhooks.domain.WebhookGateway
 import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
 import io.ktor.server.plugins.NotFoundException
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
@@ -20,29 +21,19 @@ class WebhookRepositoryExposed(
         partnershipId: UUID,
         eventType: WebhookEventType,
     ) {
-        // Separate transaction to get event entity
         val eventId = transaction {
             EventEntity.findBySlug(eventSlug)?.id?.value
                 ?: throw NotFoundException("Event with slug $eventSlug not found")
         }
-
-        // Separate transaction to get integration list
-        val integrationRows = transaction {
-            IntegrationsTable.findByEventIdAndUsage(eventId, IntegrationUsage.WEBHOOK)
-                .map { row ->
-                    val provider = row[IntegrationsTable.provider]
-                    val integrationId = row[IntegrationsTable.id].value
-                    val gateway = webhookGateways.find { it.provider == provider }
-                        ?: throw NotFoundException("No gateway for provider $provider")
-                    Pair(provider, integrationId)
-                }
+        val integrations = transaction {
+            IntegrationEntity
+                .find { IntegrationsTable.eventId eq eventId and (IntegrationsTable.usage eq IntegrationUsage.WEBHOOK) }
+                .toList()
         }
-
-        for (row in integrationRows) {
-            val gateway = webhookGateways.find { it.provider == row.first }
-                ?: throw NotFoundException("No gateway for provider ${row.first}")
-
-            gateway.sendWebhook(row.second, eventId, partnershipId, eventType)
+        for (integration in integrations) {
+            val gateway = webhookGateways.find { it.provider == integration.provider }
+                ?: throw NotFoundException("No gateway for provider ${integration.provider}")
+            gateway.sendWebhook(integration.id.value, eventId, partnershipId, eventType)
         }
     }
 }

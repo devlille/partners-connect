@@ -1,4 +1,4 @@
-package fr.devlille.partners.connect.tickets.infrastructure.gateways.models
+package fr.devlille.partners.connect.tickets.infrastructure.providers.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

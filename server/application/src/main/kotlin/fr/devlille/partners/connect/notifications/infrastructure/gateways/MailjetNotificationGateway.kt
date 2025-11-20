@@ -7,51 +7,50 @@ import fr.devlille.partners.connect.internal.infrastructure.resources.readResour
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationGateway
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
+import fr.devlille.partners.connect.notifications.infrastructure.providers.Contact
+import fr.devlille.partners.connect.notifications.infrastructure.providers.MailjetBody
+import fr.devlille.partners.connect.notifications.infrastructure.providers.MailjetProvider
+import fr.devlille.partners.connect.notifications.infrastructure.providers.Message
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
-import io.ktor.client.HttpClient
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.HttpHeaders
-import io.ktor.http.isSuccess
 import io.ktor.server.plugins.NotFoundException
-import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
-import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 class MailjetNotificationGateway(
-    private val httpClient: HttpClient,
+    private val mailjetProvider: MailjetProvider,
 ) : NotificationGateway {
     override val provider = IntegrationProvider.MAILJET
 
+    @Suppress("ReturnCount")
     @OptIn(ExperimentalEncodingApi::class)
-    override fun send(integrationId: UUID, variables: NotificationVariables): Boolean = runBlocking {
+    override suspend fun send(integrationId: UUID, variables: NotificationVariables): Boolean {
+        val config = transaction { MailjetIntegrationsTable[integrationId] }
+        val emails = transaction {
+            val partnership = PartnershipEntity
+                .find { PartnershipsTable.companyId eq variables.company.id.toUUID() }
+                .singleOrNull()
+                ?: throw NotFoundException("No partnership found for company ${variables.company.id}")
+
+            PartnershipEmailEntity
+                .find { PartnershipEmailsTable.partnershipId eq partnership.id }
+                .toList()
+        }
         val pathHeader = "/notifications/email/${variables.usageName}/header.${variables.language}.txt"
         val pathContent = "/notifications/email/${variables.usageName}/content.${variables.language}.html"
         val subject = try {
             variables.populate(readResourceFile(pathHeader))
         } catch (_: IllegalArgumentException) {
-            return@runBlocking false
+            return false
         }
         val htmlPart = try {
             variables.populate(readResourceFile(pathContent))
         } catch (_: IllegalArgumentException) {
-            return@runBlocking false
+            return false
         }
-        val config = MailjetIntegrationsTable[integrationId]
-        val partnership = PartnershipEntity
-            .find { PartnershipsTable.companyId eq variables.company.id.toUUID() }
-            .singleOrNull()
-            ?: throw NotFoundException("No partnership found for company ${variables.company.id}")
-        val emails = PartnershipEmailEntity
-            .find { PartnershipEmailsTable.partnershipId eq partnership.id }
-            .toList()
         val body = MailjetBody(
             messages = listOf(
                 Message(
@@ -62,38 +61,6 @@ class MailjetNotificationGateway(
                 ),
             ),
         )
-        val basic = Base64.encode("${config.apiKey}:${config.secret}".toByteArray())
-        val response = httpClient.post("https://api.mailjet.com/v3.1/send") {
-            headers[HttpHeaders.Authorization] = "Basic $basic"
-            headers[HttpHeaders.ContentType] = "application/json"
-            setBody(Json.encodeToString(MailjetBody.serializer(), body))
-        }
-        response.status.isSuccess()
+        return mailjetProvider.send(body, config)
     }
 }
-
-@Serializable
-private class MailjetBody(
-    @SerialName("Messages")
-    val messages: List<Message>,
-)
-
-@Serializable
-private class Message(
-    @SerialName("From")
-    val from: Contact,
-    @SerialName("To")
-    val to: List<Contact>,
-    @SerialName("Subject")
-    val subject: String,
-    @SerialName("HTMLPart")
-    val htmlPart: String,
-)
-
-@Serializable
-private class Contact(
-    @SerialName("Email")
-    val email: String,
-    @SerialName("Name")
-    val name: String? = null,
-)
