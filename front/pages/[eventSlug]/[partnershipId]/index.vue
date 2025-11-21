@@ -16,6 +16,19 @@
               </p>
             </div>
           </div>
+
+          <!-- Welcome message for non-validated partnerships -->
+          <div v-if="!loading && !error && partnership && !partnership.validated" class="mt-4 pt-4 border-t border-gray-200">
+            <p class="text-sm text-gray-700 leading-relaxed">
+              Voici la page dédiée à votre partenariat avec <strong>{{ partnership.event_name }}</strong>.
+              Nous vous recommandons de l'ajouter à vos favoris pour y accéder facilement.
+              Le lien vers cette page vous sera également communiqué dans nos prochains échanges par email.
+            </p>
+            <p class="text-sm text-gray-700 leading-relaxed mt-3">
+              Votre demande de partenariat a bien été enregistrée et est actuellement en cours d'examen par l'équipe organisatrice.
+              Nous reviendrons vers vous très prochainement.
+            </p>
+          </div>
         </header>
 
         <!-- Loading State -->

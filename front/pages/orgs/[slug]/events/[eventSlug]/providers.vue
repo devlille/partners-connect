@@ -50,6 +50,7 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Site web</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Téléphone</th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
@@ -74,6 +75,17 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {{ provider.phone || '-' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <button
+                  type="button"
+                  :disabled="deletingId === provider.id"
+                  class="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                  @click="confirmDelete(provider)"
+                >
+                  <span v-if="deletingId === provider.id">Suppression...</span>
+                  <span v-else>Supprimer</span>
+                </button>
               </td>
             </tr>
           </tbody>
@@ -185,11 +197,50 @@
         </div>
       </div>
     </Teleport>
+
+    <!-- Modal de suppression -->
+    <Teleport to="body">
+      <div v-if="isDeleteModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" @click.self="isDeleteModalOpen = false; providerToDelete = null">
+        <div class="w-full max-w-md bg-white rounded-lg shadow-xl" @click.stop>
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Confirmer la suppression</h3>
+          </div>
+
+          <div class="px-6 py-4">
+            <p class="text-sm text-gray-700">
+              Êtes-vous sûr de vouloir supprimer le prestataire
+              <strong>{{ providerToDelete?.name }}</strong> ?
+            </p>
+            <p class="mt-2 text-sm text-gray-500">
+              Cette action est irréversible.
+            </p>
+          </div>
+
+          <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+            <UButton
+              color="neutral"
+              variant="ghost"
+              :disabled="deletingId !== null"
+              @click="isDeleteModalOpen = false; providerToDelete = null"
+            >
+              Annuler
+            </UButton>
+            <UButton
+              color="red"
+              :loading="deletingId !== null"
+              @click="handleDeleteConfirm"
+            >
+              Supprimer
+            </UButton>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </Dashboard>
 </template>
 
 <script setup lang="ts">
-import { getProviders, postProviders, type ProviderSchema, type CreateProviderSchema } from '~/utils/api';
+import { getOrgsEventsProviders, postOrgsEventsProviders, postOrgsProviders, deleteOrgsEventsProviders, type ProviderSchema, type CreateProviderSchema } from '~/utils/api';
 import authMiddleware from '~/middleware/auth';
 
 const route = useRoute();
@@ -228,12 +279,16 @@ const newProvider = ref<Partial<CreateProviderSchema>>({
 const isSubmitting = ref(false);
 const addError = ref<string | null>(null);
 
+const isDeleteModalOpen = ref(false);
+const providerToDelete = ref<ProviderSchema | null>(null);
+const deletingId = ref<string | null>(null);
+
 async function loadProviders() {
   try {
     loading.value = true;
     error.value = null;
 
-    const response = await getProviders();
+    const response = await getOrgsEventsProviders(orgSlug.value, eventSlug.value);
     providers.value = response.data.items;
 
     // TODO: Get event name from event API
@@ -273,6 +328,7 @@ async function handleAddProvider() {
   try {
     isSubmitting.value = true;
 
+    // Étape 1: Créer le provider pour l'organisation
     const providerData: CreateProviderSchema = {
       name: newProvider.value.name!,
       type: newProvider.value.type!,
@@ -281,7 +337,11 @@ async function handleAddProvider() {
       phone: newProvider.value.phone || null
     };
 
-    await postProviders(providerData);
+    const createResponse = await postOrgsProviders(orgSlug.value, providerData);
+    const providerId = createResponse.data.id;
+
+    // Étape 2: Associer le provider à l'événement
+    await postOrgsEventsProviders(orgSlug.value, eventSlug.value, [providerId]);
 
     // Recharger la liste
     await loadProviders();
@@ -300,6 +360,35 @@ async function handleAddProvider() {
     addError.value = 'Impossible d\'ajouter le prestataire. Vérifiez les informations.';
   } finally {
     isSubmitting.value = false;
+  }
+}
+
+function confirmDelete(provider: ProviderSchema) {
+  providerToDelete.value = provider;
+  isDeleteModalOpen.value = true;
+}
+
+async function handleDeleteConfirm() {
+  if (!providerToDelete.value) return;
+
+  try {
+    deletingId.value = providerToDelete.value.id;
+
+    await deleteOrgsEventsProviders(
+      orgSlug.value,
+      eventSlug.value,
+      [providerToDelete.value.id]
+    );
+
+    await loadProviders();
+
+    isDeleteModalOpen.value = false;
+    providerToDelete.value = null;
+  } catch (err) {
+    console.error('Failed to delete provider:', err);
+    error.value = 'Impossible de supprimer le prestataire';
+  } finally {
+    deletingId.value = null;
   }
 }
 
