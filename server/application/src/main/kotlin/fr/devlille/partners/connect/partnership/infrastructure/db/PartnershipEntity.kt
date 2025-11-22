@@ -3,6 +3,7 @@ package fr.devlille.partners.connect.partnership.infrastructure.db
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
+import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.isNotNull
@@ -91,6 +92,7 @@ class PartnershipEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var boothLocation by PartnershipsTable.boothLocation
     var communicationPublicationDate by PartnershipsTable.communicationPublicationDate
     var communicationSupportUrl by PartnershipsTable.communicationSupportUrl
+    var organiser by UserEntity optionalReferencedOn PartnershipsTable.organiserId
     var createdAt by PartnershipsTable.createdAt
 }
 

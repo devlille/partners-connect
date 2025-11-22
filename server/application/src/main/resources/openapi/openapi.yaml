@@ -3641,6 +3641,115 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/organiser:
+    post:
+      summary: "Assign organiser to partnership"
+      operationId: "postPartnershipOrganiser"
+      description: "Assign an organiser to manage a specific partnership. The organiser must be a member of the organization with edit permissions."
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organization slug"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "Partnership ID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignOrganiserRequest"
+      security:
+        - bearerAuth: []
+      responses:
+        "400":
+          description: "Bad Request - Invalid request body or email format"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "Unauthorized - No valid session"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Forbidden - User lacks edit permission or is not an organization member"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Not Found - Partnership or user not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "200":
+          description: "OK - Organiser successfully assigned"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PartnershipOrganiserResponse"
+    delete:
+      summary: "Remove organiser from partnership"
+      operationId: "deletePartnershipOrganiser"
+      description: "Remove the assigned organiser from a partnership"
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organization slug"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "Partnership ID"
+      security:
+        - bearerAuth: []
+      responses:
+        "401":
+          description: "Unauthorized - No valid session"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Not Found - Partnership not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "200":
+          description: "OK - Organiser successfully removed"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PartnershipOrganiserResponse"
   /orgs/{orgSlug}/events/{eventSlug}/providers:
     get:
       summary: "List event providers"
@@ -4102,6 +4211,10 @@ components:
       $ref: "../schemas/detailed_partnership_response.schema.json"
     PartnershipDetail:
       $ref: "../schemas/partnership_detail.schema.json" 
+    AssignOrganiserRequest:
+      $ref: "../schemas/assign_organiser_request.schema.json"
+    PartnershipOrganiserResponse:
+      $ref: "../schemas/partnership_organiser_response.schema.json"
     PartnershipProcessStatus:
       $ref: "../schemas/partnership_process_status.schema.json"
     PartnershipPhases:

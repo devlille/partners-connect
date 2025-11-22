@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.partnership.domain
 
+import fr.devlille.partners.connect.users.domain.User
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -25,6 +26,7 @@ data class PartnershipItem(
     val language: String,
     val phone: String? = null,
     val emails: List<String> = emptyList(),
+    val organiser: User? = null,
     @SerialName("created_at")
     val createdAt: LocalDateTime,
 )

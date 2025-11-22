@@ -32,10 +32,10 @@ This is a backend-only feature extending the partnership module in a Kotlin/Ktor
 
 **Purpose**: Prepare database schema and JSON schemas for organiser assignment
 
-- [ ] T001 [P] Create migration file `AddPartnershipOrganiserMigration.kt` in `server/application/src/main/kotlin/fr/devlille/partners/connect/internal/infrastructure/migrations/versions/`
-- [ ] T002 Register migration in `MigrationRegistry.kt` in `server/application/src/main/kotlin/fr/devlille/partners/connect/internal/infrastructure/migrations/`
-- [ ] T003 [P] Create JSON schema `assign_organiser_request.schema.json` in `server/application/src/main/resources/schemas/`
-- [ ] T004 [P] Create JSON schema `partnership_organiser_response.schema.json` in `server/application/src/main/resources/schemas/`
+- [X] T001 [P] Create migration file `AddPartnershipOrganiserMigration.kt` in `server/application/src/main/kotlin/fr/devlille/partners/connect/internal/infrastructure/migrations/versions/`
+- [X] T002 Register migration in `MigrationRegistry.kt` in `server/application/src/main/kotlin/fr/devlille/partners/connect/internal/infrastructure/migrations/`
+- [X] T003 [P] Create JSON schema `assign_organiser_request.schema.json` in `server/application/src/main/resources/schemas/`
+- [X] T004 [P] Create JSON schema `partnership_organiser_response.schema.json` in `server/application/src/main/resources/schemas/`
 
 ---
 
@@ -45,11 +45,11 @@ This is a backend-only feature extending the partnership module in a Kotlin/Ktor
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Add `organiserId` nullable column to `PartnershipsTable` in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/PartnershipsTable.kt`
-- [ ] T006 Add `organiser` property to `PartnershipEntity` in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/PartnershipEntity.kt`
-- [ ] T007 Extend `toPartnership()` mapping to include organiser in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/PartnershipEntity.kt`
-- [ ] T008 Add `organiser: User?` field to `Partnership` domain model in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/Partnership.kt`
-- [ ] T009 Run migration locally and verify `partnerships.organiser_id` column created (use `docker-compose up -d postgres && ./gradlew run`)
+- [X] T005 Add `organiserId` nullable column to `PartnershipsTable` in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/PartnershipsTable.kt`
+- [X] T006 Add `organiser` property to `PartnershipEntity` in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/PartnershipEntity.kt`
+- [X] T007 Extend `toPartnership()` mapping to include organiser in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/PartnershipEntity.kt`
+- [X] T008 Add `organiser: User?` field to `Partnership` domain model in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/Partnership.kt`
+- [X] T009 Run migration locally and verify `partnerships.organiser_id` column created (use `docker-compose up -d postgres && ./gradlew run`)
 
 **Checkpoint**: Foundation ready - database schema extended, entities updated, user story implementation can now begin
 
@@ -65,46 +65,46 @@ This is a backend-only feature extending the partnership module in a Kotlin/Ktor
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T010 [P] [US1] Create contract test file `PartnershipOrganiserRoutesContractTest.kt` in `server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/`
-- [ ] T011 [P] [US1] Write contract test: POST assigns organiser with valid request schema in `PartnershipOrganiserRoutesContractTest.kt`
-- [ ] T012 [P] [US1] Write contract test: POST rejects missing email field in `PartnershipOrganiserRoutesContractTest.kt`
-- [ ] T013 [P] [US1] Write contract test: POST rejects invalid email format in `PartnershipOrganiserRoutesContractTest.kt`
-- [ ] T014 [P] [US1] Write contract test: POST returns valid PartnershipOrganiserResponse schema in `PartnershipOrganiserRoutesContractTest.kt`
-- [ ] T015 [P] [US1] Write contract test: DELETE returns valid PartnershipOrganiserResponse with null organiser in `PartnershipOrganiserRoutesContractTest.kt`
+- [X] T010 [P] [US1] Create contract test file `PartnershipOrganiserRoutesContractTest.kt` in `server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/`
+- [X] T011 [P] [US1] Write contract test: POST assigns organiser with valid request schema in `PartnershipOrganiserRoutesContractTest.kt`
+- [X] T012 [P] [US1] Write contract test: POST rejects missing email field in `PartnershipOrganiserRoutesContractTest.kt`
+- [X] T013 [P] [US1] Write contract test: POST rejects invalid email format in `PartnershipOrganiserRoutesContractTest.kt`
+- [X] T014 [P] [US1] Write contract test: POST returns valid PartnershipOrganiserResponse schema in `PartnershipOrganiserRoutesContractTest.kt`
+- [X] T015 [P] [US1] Write contract test: DELETE returns valid PartnershipOrganiserResponse with null organiser in `PartnershipOrganiserRoutesContractTest.kt`
 
 ### DTOs and Request/Response Models for User Story 1
 
-- [ ] T016 [P] [US1] Create `AssignOrganiserRequest.kt` DTO in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/`
-- [ ] T017 [P] [US1] Create `PartnershipOrganiserResponse.kt` DTO in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/`
+- [X] T016 [P] [US1] Create `AssignOrganiserRequest.kt` DTO in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/`
+- [X] T017 [P] [US1] Create `PartnershipOrganiserResponse.kt` DTO in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/`
 
 ### Repository Methods for User Story 1
 
-- [ ] T018 [US1] Add `assignOrganiser(partnershipId, email)` method signature to `PartnershipRepository` interface in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipRepository.kt`
-- [ ] T019 [US1] Add `removeOrganiser(partnershipId)` method signature to `PartnershipRepository` interface in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipRepository.kt`
-- [ ] T020 [US1] Implement `assignOrganiser()` with validation in `PartnershipRepositoryExposed` in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/application/PartnershipRepositoryExposed.kt`
-- [ ] T021 [US1] Implement `removeOrganiser()` in `PartnershipRepositoryExposed` in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/application/PartnershipRepositoryExposed.kt`
+- [X] T018 [US1] Add `assignOrganiser(partnershipId, email)` method signature to `PartnershipRepository` interface in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipRepository.kt`
+- [X] T019 [US1] Add `removeOrganiser(partnershipId)` method signature to `PartnershipRepository` interface in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipRepository.kt`
+- [X] T020 [US1] Implement `assignOrganiser()` with validation in `PartnershipRepositoryExposed` in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/application/PartnershipRepositoryExposed.kt`
+- [X] T021 [US1] Implement `removeOrganiser()` in `PartnershipRepositoryExposed` in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/application/PartnershipRepositoryExposed.kt`
 
 ### API Routes for User Story 1
 
-- [ ] T022 [US1] Add POST `/organiser` endpoint in `PartnershipRoutes.kt` in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipRoutes.kt`
-- [ ] T023 [US1] Add DELETE `/organiser` endpoint in `PartnershipRoutes.kt` in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipRoutes.kt`
+- [X] T022 [US1] Add POST `/organiser` endpoint in `PartnershipRoutes.kt` in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipRoutes.kt`
+- [X] T023 [US1] Add DELETE `/organiser` endpoint in `PartnershipRoutes.kt` in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipRoutes.kt`
 
 ### Integration Tests for User Story 1 (REQUIRED - 80% Coverage)
 
-- [ ] T024 [P] [US1] Create integration test file `PartnershipOrganiserIntegrationTest.kt` in `server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/`
-- [ ] T025 [P] [US1] Write integration test: Assign organiser successfully when user is org member with edit permission in `PartnershipOrganiserIntegrationTest.kt`
-- [ ] T026 [P] [US1] Write integration test: Return 403 when user is not org member in `PartnershipOrganiserIntegrationTest.kt`
-- [ ] T027 [P] [US1] Write integration test: Return 403 when user lacks edit permission in `PartnershipOrganiserIntegrationTest.kt`
-- [ ] T028 [P] [US1] Write integration test: Return 404 when partnership not found in `PartnershipOrganiserIntegrationTest.kt`
-- [ ] T029 [P] [US1] Write integration test: Return 404 when user not found in `PartnershipOrganiserIntegrationTest.kt`
-- [ ] T030 [P] [US1] Write integration test: Return 401 when user lacks edit permission for organization in `PartnershipOrganiserIntegrationTest.kt`
-- [ ] T031 [P] [US1] Write integration test: Remove organiser successfully in `PartnershipOrganiserIntegrationTest.kt`
-- [ ] T032 [P] [US1] Write integration test: Organiser included in existing partnership GET endpoint in `PartnershipOrganiserIntegrationTest.kt`
+- [X] T024 [P] [US1] Create integration test file `PartnershipOrganiserIntegrationTest.kt` in `server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/`
+- [X] T025 [P] [US1] Write integration test: Assign organiser successfully when user is org member with edit permission in `PartnershipOrganiserIntegrationTest.kt`
+- [X] T026 [P] [US1] Write integration test: Return 403 when user is not org member in `PartnershipOrganiserIntegrationTest.kt`
+- [X] T027 [P] [US1] Write integration test: Return 403 when user lacks edit permission in `PartnershipOrganiserIntegrationTest.kt`
+- [X] T028 [P] [US1] Write integration test: Return 404 when partnership not found in `PartnershipOrganiserIntegrationTest.kt`
+- [X] T029 [P] [US1] Write integration test: Return 404 when user not found in `PartnershipOrganiserIntegrationTest.kt`
+- [X] T030 [P] [US1] Write integration test: Return 401 when user lacks edit permission for organization in `PartnershipOrganiserIntegrationTest.kt`
+- [X] T031 [P] [US1] Write integration test: Remove organiser successfully in `PartnershipOrganiserIntegrationTest.kt`
+- [X] T032 [P] [US1] Write integration test: Organiser included in existing partnership GET endpoint in `PartnershipOrganiserIntegrationTest.kt`
 
 ### Validation for User Story 1
 
-- [ ] T033 [US1] Run `./gradlew ktlintCheck detekt --no-daemon` from `server/` directory and fix violations
-- [ ] T034 [US1] Run `./gradlew test --no-daemon` from `server/` directory and verify all tests pass
+- [X] T033 [US1] Run `./gradlew ktlintCheck detekt --no-daemon` from `server/` directory and fix violations
+- [X] T034 [US1] Run `./gradlew test --no-daemon` from `server/` directory and verify all tests pass
 - [ ] T035 [US1] Manually test quickstart.md Scenario 1 (successful assignment) locally
 
 **Checkpoint**: User Story 1 complete - organiser can be assigned and removed, all tests passing, quickstart validated
@@ -155,12 +155,12 @@ This is a backend-only feature extending the partnership module in a Kotlin/Ktor
 
 **Purpose**: Update API documentation and OpenAPI specification for organiser endpoints
 
-- [ ] T045 [P] Add `AssignOrganiserRequest` schema reference to `components/schemas` in `server/application/src/main/resources/openapi/openapi.yaml`
-- [ ] T046 [P] Add `PartnershipOrganiserResponse` schema reference to `components/schemas` in `server/application/src/main/resources/openapi/openapi.yaml`
-- [ ] T047 Add POST `/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/organiser` endpoint to `paths` in `server/application/src/main/resources/openapi/openapi.yaml`
-- [ ] T048 Add DELETE `/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/organiser` endpoint to `paths` in `server/application/src/main/resources/openapi/openapi.yaml`
-- [ ] T049 Update existing partnership GET endpoint response to include `organiser` field in `server/application/src/main/resources/openapi/openapi.yaml`
-- [ ] T050 Run `npm run validate` from `server/` directory to verify OpenAPI schema compliance
+- [X] T045 [P] Add `AssignOrganiserRequest` schema reference to `components/schemas` in `server/application/src/main/resources/openapi/openapi.yaml`
+- [X] T046 [P] Add `PartnershipOrganiserResponse` schema reference to `components/schemas` in `server/application/src/main/resources/openapi/openapi.yaml`
+- [X] T047 Add POST `/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/organiser` endpoint to `paths` in `server/application/src/main/resources/openapi/openapi.yaml`
+- [X] T048 Add DELETE `/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/organiser` endpoint to `paths` in `server/application/src/main/resources/openapi/openapi.yaml`
+- [X] T049 Update existing partnership GET endpoint response to include `organiser` field in `server/application/src/main/resources/openapi/openapi.yaml`
+- [X] T050 Run `npm run validate` from `server/` directory to verify OpenAPI schema compliance
 
 ---
 
@@ -168,14 +168,14 @@ This is a backend-only feature extending the partnership module in a Kotlin/Ktor
 
 **Purpose**: Final validation and quality checks across all user stories
 
-- [ ] T051 Run `./gradlew check --no-daemon` from `server/` directory (full validation: ktlint, detekt, tests, build)
+- [X] T051 Run `./gradlew check --no-daemon` from `server/` directory (full validation: ktlint, detekt, tests, build)
 - [ ] T052 Verify test coverage ≥80% for partnership organiser feature
 - [ ] T053 Run all quickstart.md scenarios (Scenarios 1-5) and verify expected outcomes
 - [ ] T054 [P] Update feature documentation with any implementation notes or edge cases discovered
 - [ ] T055 Verify no console warnings or errors during local testing
-- [ ] T056 Check database integrity: verify foreign key constraint on `partnerships.organiser_id` references `users.id`
-- [ ] T057 Code cleanup: remove any debug logging, commented code, or TODOs
-- [ ] T058 Final ktlintFormat: run `./gradlew ktlintFormat --no-daemon` from `server/` directory
+- [X] T056 Check database integrity: verify foreign key constraint on `partnerships.organiser_id` references `users.id`
+- [X] T057 Code cleanup: remove any debug logging, commented code, or TODOs
+- [X] T058 Final ktlintFormat: run `./gradlew ktlintFormat --no-daemon` from `server/` directory
 
 ---
 

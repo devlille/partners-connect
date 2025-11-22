@@ -18,6 +18,7 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
 import fr.devlille.partners.connect.partnership.domain.PartnershipItem
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
+import fr.devlille.partners.connect.partnership.infrastructure.api.PartnershipOrganiserResponse
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailsTable
@@ -31,8 +32,15 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptio
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionsByPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listTranslationsByOptionAndLanguage
+import fr.devlille.partners.connect.users.application.toDomain
+import fr.devlille.partners.connect.users.domain.User
+import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionEntity
+import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionsTable
+import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
+import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
@@ -139,6 +147,7 @@ class PartnershipRepositoryExposed : PartnershipRepository {
                         .map { it.id.value },
                 )
             },
+            organiser = partnership.organiser?.toDomain(),
         )
     }
 
@@ -227,5 +236,59 @@ class PartnershipRepositoryExposed : PartnershipRepository {
             .map { partnership ->
                 partnership.toDomain(PartnershipEmailEntity.emails(partnership.id.value))
             }
+    }
+
+    override fun assignOrganiser(partnershipId: UUID, email: String): PartnershipOrganiserResponse = transaction {
+        val partnership = PartnershipEntity.findById(partnershipId)
+            ?: throw NotFoundException("Partnership with id $partnershipId not found")
+
+        val event = partnership.event
+        val organisation = event.organisation
+
+        // Find and validate user
+        val organiserUser = UserEntity.singleUserByEmail(email)
+            ?: throw NotFoundException("User with email $email not found")
+
+        // Validate user has organisation permission with edit access
+        val permission = OrganisationPermissionEntity.find {
+            (OrganisationPermissionsTable.userId eq organiserUser.id) and
+                (OrganisationPermissionsTable.organisationId eq organisation.id)
+        }.singleOrNull()
+
+        if (permission == null) {
+            throw ForbiddenException(
+                "User $email is not a member of this organisation",
+            )
+        }
+
+        if (!permission.canEdit) {
+            throw ForbiddenException(
+                "User $email does not have edit permission for this organisation",
+            )
+        }
+
+        // Assign organiser
+        partnership.organiser = organiserUser
+
+        PartnershipOrganiserResponse(
+            partnershipId = partnershipId.toString(),
+            organiser = User(
+                displayName = organiserUser.name,
+                pictureUrl = organiserUser.pictureUrl,
+                email = organiserUser.email,
+            ),
+        )
+    }
+
+    override fun removeOrganiser(partnershipId: UUID): PartnershipOrganiserResponse = transaction {
+        val partnership = PartnershipEntity.findById(partnershipId)
+            ?: throw NotFoundException("Partnership with id $partnershipId not found")
+
+        partnership.organiser = null
+
+        PartnershipOrganiserResponse(
+            partnershipId = partnershipId.toString(),
+            organiser = null,
+        )
     }
 }

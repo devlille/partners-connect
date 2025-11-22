@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.partnership.domain
 
+import fr.devlille.partners.connect.users.domain.User
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -19,6 +20,7 @@ data class PartnershipDetail(
     val suggestionPack: PartnershipPack? = null,
     @SerialName("validated_pack")
     val validatedPack: PartnershipPack? = null,
+    val organiser: User? = null,
     @SerialName("process_status")
     val processStatus: PartnershipProcessStatus,
     @SerialName("created_at")

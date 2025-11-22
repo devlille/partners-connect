@@ -56,6 +56,12 @@
     "emails": {
       "type": "string"
     },
+    "organiser": {
+      "anyOf": [
+        { "$ref": "user.schema.json" },
+        { "type": "null" }
+      ]
+    },
     "created_at": {
       "type": "string",
       "format": "datetime"

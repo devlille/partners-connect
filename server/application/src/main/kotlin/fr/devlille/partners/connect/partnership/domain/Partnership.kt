@@ -3,11 +3,12 @@ package fr.devlille.partners.connect.partnership.domain
 import fr.devlille.partners.connect.events.domain.EventWithOrganisation
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringOption
+import fr.devlille.partners.connect.users.domain.User
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Partnership(
+data class Partnership(
     val id: String,
     val phone: String? = null,
     val emails: List<String> = emptyList(),
@@ -16,6 +17,7 @@ class Partnership(
     val selectedPack: PartnershipPack? = null,
     @SerialName("suggestion_pack")
     val suggestionPack: PartnershipPack? = null,
+    val organiser: User? = null,
 )
 
 @Serializable

@@ -48,6 +48,12 @@
     "process_status": {
       "$ref": "partnership_process_status.schema.json"
     },
+    "organiser": {
+      "anyOf": [
+        { "$ref": "user.schema.json" },
+        { "type": "null" }
+      ]
+    },
     "created_at": {
       "type": "string",
       "format": "date-time"
