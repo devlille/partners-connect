@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "assign_organiser_request.schema.json",
+  "title": "AssignOrganiserRequest",
+  "description": "Request to assign an organiser to a partnership",
+  "type": "object",
+  "properties": {
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "Email address of the user to assign as organiser"
+    }
+  },
+  "required": ["email"],
+  "additionalProperties": false
+}

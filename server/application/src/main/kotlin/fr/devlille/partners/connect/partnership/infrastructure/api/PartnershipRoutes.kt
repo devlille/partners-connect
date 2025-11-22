@@ -19,6 +19,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
+import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
@@ -42,6 +43,7 @@ fun Route.partnershipRoutes() {
     orgsPartnershipBoothLocationRoutes()
     orgsPartnershipJobOfferRoutes()
     orgsPartnershipJobOfferDecisionRoutes()
+    orgsPartnershipOrganiserRoutes()
 }
 
 private fun Route.publicPartnershipRoutes() {
@@ -122,6 +124,27 @@ private fun Route.orgsPartnershipRoutes() {
 
             val partnerships = repository.listByEvent(eventSlug, filters, direction)
             call.respond(HttpStatusCode.OK, partnerships)
+        }
+    }
+}
+
+private fun Route.orgsPartnershipOrganiserRoutes() {
+    val repository by inject<PartnershipRepository>()
+
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/organiser") {
+        install(AuthorizedOrganisationPlugin)
+
+        post {
+            val partnershipId = call.parameters.partnershipId
+            val request = call.receive<AssignOrganiserRequest>(schema = "assign_organiser_request.schema.json")
+            val response = repository.assignOrganiser(partnershipId, request.email)
+            call.respond(HttpStatusCode.OK, response)
+        }
+
+        delete {
+            val partnershipId = call.parameters.partnershipId
+            val response = repository.removeOrganiser(partnershipId)
+            call.respond(HttpStatusCode.OK, response)
         }
     }
 }

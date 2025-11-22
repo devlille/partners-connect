@@ -9,6 +9,7 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
+import fr.devlille.partners.connect.users.application.toDomain
 
 fun PartnershipEntity.toDomain(emails: List<String>): PartnershipItem = PartnershipItem(
     id = id.toString(),
@@ -26,6 +27,7 @@ fun PartnershipEntity.toDomain(emails: List<String>): PartnershipItem = Partners
     language = language,
     phone = phone,
     emails = emails,
+    organiser = organiser?.toDomain(),
     createdAt = createdAt,
 )
 
@@ -46,6 +48,7 @@ fun PartnershipEntity.toDetailedDomain(
     validatedPack = validatedPack,
     processStatus = toProcessStatus(billing),
     createdAt = createdAt.toString(),
+    organiser = organiser?.toDomain(),
 )
 
 fun PartnershipEntity.toProcessStatus(billing: BillingEntity?): PartnershipProcessStatus = PartnershipProcessStatus(

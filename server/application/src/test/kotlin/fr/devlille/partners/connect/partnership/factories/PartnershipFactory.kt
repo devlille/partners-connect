@@ -6,6 +6,7 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEnt
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
+import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
@@ -30,6 +31,7 @@ fun insertMockedPartnership(
     validatedAt: LocalDateTime? = null,
     communicationPublicationDate: LocalDateTime? = null,
     communicationSupportUrl: String? = null,
+    organiserId: UUID? = null,
 ): PartnershipEntity = transaction {
     PartnershipEntity.new(id) {
         this.event = EventEntity[eventId]
@@ -49,6 +51,7 @@ fun insertMockedPartnership(
         this.validatedAt = validatedAt
         this.communicationPublicationDate = communicationPublicationDate
         this.communicationSupportUrl = communicationSupportUrl
+        this.organiser = organiserId?.let { UserEntity[it] }
     }
 }
 

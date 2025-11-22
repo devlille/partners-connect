@@ -3674,6 +3674,115 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/organiser:
+    post:
+      summary: Assign organiser to partnership
+      operationId: postPartnershipOrganiser
+      description: Assign an organiser to manage a specific partnership. The organiser must be a member of the organization with edit permissions.
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Partnership ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/assign_organiser_request.schema'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK - Organiser successfully assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/partnership_organiser_response.schema'
+        '400':
+          description: Bad Request - Invalid request body or email format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '401':
+          description: Unauthorized - No valid session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '403':
+          description: Forbidden - User lacks edit permission or is not an organization member
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Not Found - Partnership or user not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+    delete:
+      summary: Remove organiser from partnership
+      operationId: deletePartnershipOrganiser
+      description: Remove the assigned organiser from a partnership
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Partnership ID
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK - Organiser successfully removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/partnership_organiser_response.schema'
+        '401':
+          description: Unauthorized - No valid session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Not Found - Partnership not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/providers:
     get:
       summary: List event providers
@@ -4135,6 +4244,10 @@ components:
       $ref: '#/components/schemas/detailed_partnership_response.schema'
     PartnershipDetail:
       $ref: '#/components/schemas/partnership_detail.schema'
+    AssignOrganiserRequest:
+      $ref: '#/components/schemas/assign_organiser_request.schema'
+    PartnershipOrganiserResponse:
+      $ref: '#/components/schemas/partnership_organiser_response.schema'
     PartnershipProcessStatus:
       $ref: '#/components/schemas/partnership_process_status.schema'
     PartnershipPhases:
@@ -4400,6 +4513,22 @@ components:
       required:
         - display_name
         - role
+    user.schema:
+      $id: user.schema.json
+      type: object
+      properties:
+        display_name:
+          type:
+            - string
+            - 'null'
+        picture_url:
+          type:
+            - string
+            - 'null'
+        email:
+          type: string
+      required:
+        - email
     partnership_item.schema:
       $id: partnership_item.schema.json
       type: object
@@ -4440,6 +4569,10 @@ components:
             - 'null'
         emails:
           type: string
+        organiser:
+          anyOf:
+            - $ref: '#/components/schemas/user.schema'
+            - type: 'null'
         created_at:
           type: string
           format: datetime
@@ -5489,6 +5622,10 @@ components:
             - type: 'null'
         process_status:
           $ref: '#/components/schemas/partnership_process_status.schema'
+        organiser:
+          anyOf:
+            - $ref: '#/components/schemas/user.schema'
+            - type: 'null'
         created_at:
           type: string
           format: date-time
@@ -6383,28 +6520,46 @@ components:
           maxLength: 500
           description: Optional reason for declining the job offer promotion
       additionalProperties: false
+    assign_organiser_request.schema:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      $id: assign_organiser_request.schema.json
+      title: AssignOrganiserRequest
+      description: Request to assign an organiser to a partnership
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email address of the user to assign as organiser
+      required:
+        - email
+      additionalProperties: false
+    partnership_organiser_response.schema:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      $id: partnership_organiser_response.schema.json
+      title: PartnershipOrganiserResponse
+      description: Response containing partnership ID and organiser information
+      type: object
+      properties:
+        partnership_id:
+          type: string
+          format: uuid
+          description: UUID of the partnership
+        organiser:
+          oneOf:
+            - $ref: '#/components/schemas/user.schema'
+            - type: 'null'
+          description: Organiser user information or null if no organiser assigned
+      required:
+        - partnership_id
+        - organiser
+      additionalProperties: false
     create_by_identifiers.schema:
       $id: create_by_identifiers.schema.json
       type: array
       items:
         type: string
         format: uuid
-    user.schema:
-      $id: user.schema.json
-      type: object
-      properties:
-        display_name:
-          type:
-            - string
-            - 'null'
-        picture_url:
-          type:
-            - string
-            - 'null'
-        email:
-          type: string
-      required:
-        - email
     grant_permission_request.schema:
       $id: grant_permission_request.schema.json
       type: object

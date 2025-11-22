@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "partnership_organiser_response.schema.json",
+  "title": "PartnershipOrganiserResponse",
+  "description": "Response containing partnership ID and organiser information",
+  "type": "object",
+  "properties": {
+    "partnership_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "UUID of the partnership"
+    },
+    "organiser": {
+      "oneOf": [
+        { "$ref": "user.schema.json" },
+        { "type": "null" }
+      ],
+      "description": "Organiser user information or null if no organiser assigned"
+    }
+  },
+  "required": ["partnership_id", "organiser"],
+  "additionalProperties": false
+}

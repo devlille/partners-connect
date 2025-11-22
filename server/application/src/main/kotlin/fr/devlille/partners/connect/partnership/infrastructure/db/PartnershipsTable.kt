@@ -3,6 +3,7 @@ package fr.devlille.partners.connect.partnership.infrastructure.db
 import fr.devlille.partners.connect.companies.infrastructure.db.CompaniesTable
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPacksTable
+import fr.devlille.partners.connect.users.infrastructure.db.UsersTable
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -28,6 +29,7 @@ object PartnershipsTable : UUIDTable("partnerships") {
     val boothLocation = text("booth_location").nullable()
     val communicationPublicationDate = datetime("communication_publication_date").nullable()
     val communicationSupportUrl = text("communication_support_url").nullable()
+    val organiserId = reference("organiser_id", UsersTable).nullable()
     val createdAt = datetime("created_at").clientDefault {
         Clock.System.now().toLocalDateTime(TimeZone.UTC)
     }
