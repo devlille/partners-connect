@@ -20,7 +20,7 @@ sealed interface CreateIntegration {
         val apiKey: String,
         val secret: String,
         @SerialName("sandbox_token")
-        val sandboxToken: String,
+        val sandboxToken: String? = null,
     ) : CreateIntegration
 
     @Serializable
