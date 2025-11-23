@@ -15,6 +15,8 @@ import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissi
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
 import io.ktor.server.plugins.NotFoundException
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.atTime
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
@@ -48,8 +50,8 @@ class OrganisationRepositoryExposed : OrganisationRepository {
             this.bic = entity.bic
             this.ribUrl = entity.ribUrl
             this.creationLocation = entity.creationLocation
-            this.createdAt = entity.createdAt
-            this.publishedAt = entity.publishedAt
+            this.createdAt = entity.createdAt?.atTime(LocalTime.fromMillisecondOfDay(millisecondOfDay = 0))
+            this.publishedAt = entity.publishedAt?.atTime(LocalTime.fromMillisecondOfDay(millisecondOfDay = 0))
             this.representativeUser = user
             this.representativeRole = entity.representativeRole
         }
@@ -89,8 +91,8 @@ class OrganisationRepositoryExposed : OrganisationRepository {
             this.bic = data.bic
             this.ribUrl = data.ribUrl
             this.creationLocation = data.creationLocation
-            this.createdAt = data.createdAt
-            this.publishedAt = data.publishedAt
+            this.createdAt = data.createdAt?.atTime(LocalTime.fromMillisecondOfDay(millisecondOfDay = 0))
+            this.publishedAt = data.publishedAt?.atTime(LocalTime.fromMillisecondOfDay(millisecondOfDay = 0))
             this.representativeUser = representativeUser
             this.representativeRole = data.representativeRole
         }

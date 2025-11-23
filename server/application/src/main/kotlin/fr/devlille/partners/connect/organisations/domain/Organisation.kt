@@ -1,6 +1,6 @@
 package fr.devlille.partners.connect.organisations.domain
 
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -28,7 +28,7 @@ data class Organisation(
     @SerialName("creation_location")
     val creationLocation: String? = null,
     @SerialName("created_at")
-    val createdAt: LocalDateTime? = null,
+    val createdAt: LocalDate? = null,
     @SerialName("published_at")
-    val publishedAt: LocalDateTime? = null,
+    val publishedAt: LocalDate? = null,
 )

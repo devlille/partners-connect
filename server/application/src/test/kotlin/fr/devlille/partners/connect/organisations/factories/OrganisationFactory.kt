@@ -44,8 +44,8 @@ fun createOrganisation(
     representativeUserEmail = representativeUserEmail,
     representativeRole = representativeRole,
     creationLocation = creationLocation,
-    createdAt = createdAt,
-    publishedAt = publishedAt,
+    createdAt = createdAt?.date,
+    publishedAt = publishedAt?.date,
 )
 
 // Convenience function for creating a fully populated organisation for tests

@@ -17,8 +17,8 @@ fun OrganisationEntity.toDomain(): Organisation = Organisation(
     bic = this.bic,
     ribUrl = this.ribUrl,
     creationLocation = this.creationLocation,
-    createdAt = this.createdAt,
-    publishedAt = this.publishedAt,
+    createdAt = this.createdAt?.date,
+    publishedAt = this.publishedAt?.date,
     representativeUserEmail = this.representativeUser?.email,
     representativeRole = this.representativeRole,
 )

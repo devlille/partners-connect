@@ -5921,12 +5921,12 @@ components:
           type:
             - string
             - 'null'
-          format: datetime
+          format: date
         published_at:
           type:
             - string
             - 'null'
-          format: datetime
+          format: date
       required:
         - name
     update_provider.schema:
