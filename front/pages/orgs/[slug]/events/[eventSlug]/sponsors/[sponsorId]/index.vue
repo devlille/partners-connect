@@ -89,6 +89,73 @@
             @saved="handleBillingSaved"
           />
         </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 id="organiser-section" class="text-lg font-semibold text-gray-900 mb-4">Organisateur assigné</h2>
+          <div v-if="partnership?.organiser" class="flex items-center justify-between p-4 bg-gray-50 rounded-lg" role="region" aria-labelledby="organiser-section">
+            <div class="flex items-center gap-3">
+              <div v-if="partnership.organiser.picture_url" class="w-10 h-10 rounded-full overflow-hidden">
+                <img :src="partnership.organiser.picture_url" :alt="`Photo de profil de ${partnership.organiser.display_name || partnership.organiser.email}`" class="w-full h-full object-cover">
+              </div>
+              <div v-else class="w-10 h-10 rounded-full bg-primary-500 text-white flex items-center justify-center" role="img" :aria-label="`Initiales de ${partnership.organiser.display_name || partnership.organiser.email}`">
+                <span class="text-sm font-semibold" aria-hidden="true">{{ getInitials(partnership.organiser.display_name || partnership.organiser.email) }}</span>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-gray-900">{{ partnership.organiser.display_name || partnership.organiser.email }}</div>
+                <div class="text-xs text-gray-500">{{ partnership.organiser.email }}</div>
+              </div>
+            </div>
+            <UButton
+              color="error"
+              variant="outline"
+              size="sm"
+              :loading="isUnassigning"
+              :aria-label="`Retirer ${partnership.organiser.display_name || partnership.organiser.email} comme organisateur`"
+              @click="handleUnassignOrganiser"
+            >
+              <i class="i-heroicons-x-mark mr-1" aria-hidden="true" />
+              Retirer
+            </UButton>
+          </div>
+          <div v-else class="p-4 bg-gray-50 rounded-lg" role="region" aria-labelledby="organiser-section">
+            <p class="text-sm text-gray-600 mb-3">Aucun organisateur assigné</p>
+            <div v-if="loadingUsers" class="text-sm text-gray-500" role="status" aria-live="polite">
+              <i class="i-heroicons-arrow-path animate-spin mr-2" aria-hidden="true" />
+              Chargement des utilisateurs...
+            </div>
+            <div v-else class="flex gap-3">
+              <label for="organiser-select" class="sr-only">Sélectionner un membre de l'équipe pour gérer ce partenariat</label>
+              <select
+                id="organiser-select"
+                v-model="selectedUserEmail"
+                class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-primary-500 focus:border-primary-500"
+                aria-describedby="organiser-help"
+                :aria-invalid="!!assignError"
+              >
+                <option value="">Sélectionner un organisateur</option>
+                <option v-for="user in sortedOrgUsers" :key="user.email" :value="user.email">
+                  {{ user.display_name || user.email }}
+                </option>
+              </select>
+              <span id="organiser-help" class="sr-only">
+                Choisissez un membre de l'équipe pour gérer ce partenariat. Seuls les membres de votre organisation peuvent être assignés.
+              </span>
+              <UButton
+                color="primary"
+                :loading="isAssigning"
+                :disabled="!selectedUserEmail || loadingUsers"
+                :aria-label="selectedUserEmail ? `Assigner ${selectedUserEmail} comme organisateur` : 'Veuillez sélectionner un utilisateur pour l\'assigner'"
+                @click="handleAssignOrganiser"
+              >
+                <i class="i-heroicons-user-plus mr-1" aria-hidden="true" />
+                Assigner
+              </UButton>
+            </div>
+            <p v-if="assignError" id="organiser-error" class="text-sm text-red-600 mt-2" role="alert" aria-live="assertive">
+              {{ assignError }}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -117,7 +184,7 @@
 </template>
 
 <script setup lang="ts">
-import { getEventsPartnershipDetailed, postOrgsEventsPartnershipSuggestion, postOrgsEventsPartnershipBilling } from "~/utils/api";
+import { getEventsPartnershipDetailed, postOrgsEventsPartnershipSuggestion, postOrgsEventsPartnershipBilling, postPartnershipOrganiser, deletePartnershipOrganiser, getOrgsUsers, type UserSchema } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 import type { ExtendedPartnershipItem } from "~/types/partnership";
 import { PARTNERSHIP_CONFIRM } from "~/constants/partnership";
@@ -162,8 +229,27 @@ const isMarkingPaid = ref(false);
 // État pour la modale de suggestion
 const isSuggestModalOpen = ref(false);
 
+// États pour l'assignment d'organisateur
+const selectedUserEmail = ref('');
+const orgUsers = ref<UserSchema[]>([]);
+const loadingUsers = ref(false);
+const isAssigning = ref(false);
+const isUnassigning = ref(false);
+const assignError = ref<string | null>(null);
+
 // Menu contextuel pour la page du sponsor
 const { sponsorLinks } = useSponsorLinks(orgSlug.value, eventSlug.value, sponsorId.value);
+
+/**
+ * Utilisateurs triés par ordre alphabétique (display_name ou email)
+ */
+const sortedOrgUsers = computed(() => {
+  return [...orgUsers.value].sort((a, b) => {
+    const nameA = a.display_name || a.email;
+    const nameB = b.display_name || b.email;
+    return nameA.localeCompare(nameB);
+  });
+});
 
 async function loadPartnership() {
   try {
@@ -176,12 +262,12 @@ async function loadPartnership() {
 
     // Extraire les options du pack sélectionné avec leurs informations complètes
     // Note: L'API retourne "options" alors que le schéma TypeScript définit "optional_options"
-    const packOptions = ((p.selected_pack as any)?.options || p.selected_pack?.optional_options || []).map((opt: any) => ({
+    const packOptions = ((p.selected_pack as any)?.options || p.selected_pack?.optional_options || []).map((opt: { id: string; name: string; description?: string | null }) => ({
       id: opt.id,
       name: opt.name,
       description: opt.description || null
     }));
-    const optionIds = packOptions.map(opt => opt.id);
+    const optionIds = packOptions.map((opt: { id: string }) => opt.id);
 
     // Mapper les données de DetailedPartnershipResponseSchema vers ExtendedPartnershipItem
     partnership.value = {
@@ -201,6 +287,7 @@ async function loadPartnership() {
       phone: p.phone || null,
       emails: p.emails.join(', '),
       created_at: p.created_at,
+      organiser: p.organiser || null,
       // Champs étendus depuis ExtendedPartnershipItem
       validated: p.process_status?.validated_at !== null && p.process_status?.validated_at !== undefined,
       paid: p.process_status?.billing_status?.toLowerCase() === 'paid',
@@ -408,8 +495,90 @@ async function handleSuggestPackSubmit(data: { packId: string; language: string;
   }
 }
 
+/**
+ * Obtenir les initiales d'un nom
+ */
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) {
+    return parts[0].substring(0, 2).toUpperCase();
+  }
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+/**
+ * Charger les utilisateurs de l'organisation
+ */
+async function loadOrgUsers() {
+  try {
+    loadingUsers.value = true;
+    const response = await getOrgsUsers(orgSlug.value);
+    orgUsers.value = response.data;
+  } catch (err) {
+    console.error('Failed to load org users:', err);
+    assignError.value = 'Impossible de charger la liste des utilisateurs';
+  } finally {
+    loadingUsers.value = false;
+  }
+}
+
+/**
+ * Assigner un organisateur au partenariat
+ */
+async function handleAssignOrganiser() {
+  if (!selectedUserEmail.value) return;
+
+  try {
+    isAssigning.value = true;
+    assignError.value = null;
+
+    await postPartnershipOrganiser(
+      orgSlug.value,
+      eventSlug.value,
+      sponsorId.value,
+      { email: selectedUserEmail.value }
+    );
+
+    // Recharger les données du partenariat
+    await loadPartnership();
+
+    // Réinitialiser le champ
+    selectedUserEmail.value = '';
+  } catch (err) {
+    console.error('Failed to assign organiser:', err);
+    assignError.value = 'Impossible d\'assigner l\'organisateur. Vérifiez que l\'email est correct et que l\'utilisateur est membre de l\'organisation.';
+  } finally {
+    isAssigning.value = false;
+  }
+}
+
+/**
+ * Retirer l'organisateur assigné
+ */
+async function handleUnassignOrganiser() {
+  try {
+    isUnassigning.value = true;
+    assignError.value = null;
+
+    await deletePartnershipOrganiser(
+      orgSlug.value,
+      eventSlug.value,
+      sponsorId.value
+    );
+
+    // Recharger les données du partenariat
+    await loadPartnership();
+  } catch (err) {
+    console.error('Failed to unassign organiser:', err);
+    error.value = 'Impossible de retirer l\'organisateur';
+  } finally {
+    isUnassigning.value = false;
+  }
+}
+
 onMounted(() => {
   loadPartnership();
+  loadOrgUsers();
 });
 
 // Recharger si les slugs changent

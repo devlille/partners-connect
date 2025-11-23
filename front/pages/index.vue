@@ -21,7 +21,7 @@
         </UCard>
       </div>
 
-      <form v-else @submit.prevent="handleSubmit">
+      <form v-else @submit.prevent="handleSubmit" novalidate>
         <TextInput
           id="ip-name"
           v-model="formData.name"
@@ -29,7 +29,13 @@
           type="text"
           name="ip-name"
           autocomplete="name"
+          :aria-describedby="errors.name ? 'ip-name-error' : undefined"
+          :class="{ 'error': errors.name }"
         />
+        <div v-if="errors.name" id="ip-name-error" class="error-message" role="alert" style="color: white; margin-bottom: 1rem;">
+          {{ errors.name }}
+        </div>
+
         <TextInput
           id="ip-email"
           v-model="formData.email"
@@ -37,21 +43,38 @@
           type="email"
           name="ip-email"
           autocomplete="email"
+          :aria-describedby="errors.email ? 'ip-email-error' : undefined"
+          :class="{ 'error': errors.email }"
         />
+        <div v-if="errors.email" id="ip-email-error" class="error-message" role="alert" style="color: white; margin-bottom: 1rem;">
+          {{ errors.email }}
+        </div>
+
         <PhoneInput
           id="ip-phone"
           v-model="formData.phone"
           label="Tél."
           name="ip-phone"
           autocomplete="tel"
+          :aria-describedby="errors.phone ? 'ip-phone-error' : undefined"
+          :class="{ 'error': errors.phone }"
         />
+        <div v-if="errors.phone" id="ip-phone-error" class="error-message" role="alert" style="color: white; margin-bottom: 1rem;">
+          {{ errors.phone }}
+        </div>
 
-        <RadioInput
-          v-model="formData.packId"
-          legend="Pack de sponsoring"
-          name="pack"
-          :options="packOptions"
-        />
+        <div :class="{ 'error': errors.packId }">
+          <RadioInput
+            v-model="formData.packId"
+            legend="Pack de sponsoring"
+            name="pack"
+            :options="packOptions"
+            :aria-describedby="errors.packId ? 'pack-error' : undefined"
+          />
+        </div>
+        <div v-if="errors.packId" id="pack-error" class="error-message" role="alert" style="color: white; margin-bottom: 1rem;">
+          {{ errors.packId }}
+        </div>
 
         <OptionsInput
           v-model="formData.optionIds"
@@ -68,11 +91,23 @@
 </template>
 
 <script setup lang="ts">
+import { z } from 'zod';
 import { getEventsSponsoringPacks, postCompanies, postEventsPartnership, type SponsoringPack, type SponsoringOption, type CreateCompany, type RegisterPartnership } from "~/utils/api";
 
 definePageMeta({
   layout: "minimal",
   auth: false,
+});
+
+// Schéma de validation Zod
+const formSchema = z.object({
+  name: z.string().min(1, 'Le nom est obligatoire'),
+  email: z.string().min(1, 'L\'email est obligatoire').email({ message: 'L\'email doit être valide' }),
+  phone: z.string().min(1, 'Le téléphone est obligatoire'),
+  packId: z.string().min(1, 'Vous devez choisir au moins un pack'),
+  contactName: z.string().optional(),
+  contactRole: z.string().optional(),
+  optionIds: z.array(z.string()).optional(),
 });
 
 const packs = ref<SponsoringPack[]>([]);
@@ -89,6 +124,13 @@ const formData = ref({
   contactName: '',
   contactRole: '',
   optionIds: [] as string[],
+});
+
+const errors = ref({
+  name: '',
+  email: '',
+  phone: '',
+  packId: '',
 });
 
 const packOptions = computed(() => {
@@ -132,6 +174,28 @@ watch(() => formData.value.packId, (newPackId) => {
 });
 
 const handleSubmit = async () => {
+  // Réinitialiser les erreurs
+  errors.value = {
+    name: '',
+    email: '',
+    phone: '',
+    packId: '',
+  };
+
+  // Validation avec Zod
+  const result = formSchema.safeParse(formData.value);
+
+  if (!result.success) {
+    // Extraire les erreurs de Zod et les mapper aux champs
+    result.error.issues.forEach((issue) => {
+      const field = issue.path[0] as keyof typeof errors.value;
+      if (field in errors.value) {
+        errors.value[field] = issue.message;
+      }
+    });
+    return;
+  }
+
   isSubmitting.value = true;
   error.value = null;
   success.value = false;

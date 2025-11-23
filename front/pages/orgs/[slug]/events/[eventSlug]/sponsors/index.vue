@@ -167,6 +167,26 @@ const columns = [
         class: 'cursor-pointer'
       }, displayText);
     }
+  },
+  {
+    header: 'Organisateur',
+    accessorKey: 'organiser',
+    cell: (info: any) => {
+      const partnership = info.row.original;
+      const organiser = partnership.organiser;
+
+      if (!organiser) {
+        return h('div', {
+          onClick: () => navigateTo(`/orgs/${orgSlug.value}/events/${eventSlug.value}/sponsors/${partnership.id}`),
+          class: 'cursor-pointer text-gray-400'
+        }, '-');
+      }
+
+      return h('div', {
+        onClick: () => navigateTo(`/orgs/${orgSlug.value}/events/${eventSlug.value}/sponsors/${partnership.id}`),
+        class: 'cursor-pointer text-sm'
+      }, organiser.display_name || organiser.email);
+    }
   }
 ];
 

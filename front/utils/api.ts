@@ -126,6 +126,10 @@ export type DetailedPartnershipResponse = DetailedPartnershipResponseSchema;
 
 export type PartnershipDetail = PartnershipDetailSchema;
 
+export type AssignOrganiserRequest = AssignOrganiserRequestSchema;
+
+export type PartnershipOrganiserResponse = PartnershipOrganiserResponseSchema;
+
 export type PartnershipProcessStatus = PartnershipProcessStatusSchema;
 
 export type PartnershipPhases = PartnershipPhasesSchema;
@@ -271,6 +275,16 @@ export interface ContactSchema {
   role: string;
 }
 
+export type UserSchemaDisplayName = string | null;
+
+export type UserSchemaPictureUrl = string | null;
+
+export interface UserSchema {
+  display_name?: UserSchemaDisplayName;
+  picture_url?: UserSchemaPictureUrl;
+  email: string;
+}
+
 export type PartnershipItemSchemaSelectedPackId = string | null;
 
 export type PartnershipItemSchemaSelectedPackName = string | null;
@@ -282,6 +296,8 @@ export type PartnershipItemSchemaSuggestedPackName = string | null;
 export type PartnershipItemSchemaValidatedPackId = string | null;
 
 export type PartnershipItemSchemaPhone = string | null;
+
+export type PartnershipItemSchemaOrganiser = UserSchema | null;
 
 export interface PartnershipItemSchema {
   id: string;
@@ -296,6 +312,7 @@ export interface PartnershipItemSchema {
   language: string;
   phone?: PartnershipItemSchemaPhone;
   emails?: string;
+  organiser?: PartnershipItemSchemaOrganiser;
   created_at: string;
 }
 
@@ -912,6 +929,8 @@ export type PartnershipDetailSchemaSuggestionPack = SponsoringPackSchema | null;
 
 export type PartnershipDetailSchemaValidatedPack = SponsoringPackSchema | null;
 
+export type PartnershipDetailSchemaOrganiser = UserSchema | null;
+
 export interface PartnershipDetailSchema {
   id: string;
   phone?: PartnershipDetailSchemaPhone;
@@ -923,6 +942,7 @@ export interface PartnershipDetailSchema {
   suggestion_pack?: PartnershipDetailSchemaSuggestionPack;
   validated_pack?: PartnershipDetailSchemaValidatedPack;
   process_status: PartnershipProcessStatusSchema;
+  organiser?: PartnershipDetailSchemaOrganiser;
   created_at: string;
 }
 
@@ -1447,17 +1467,30 @@ export interface DeclineJobOfferPromotionSchema {
   reason?: DeclineJobOfferPromotionSchemaReason;
 }
 
-export type CreateByIdentifiersSchema = string[];
-
-export type UserSchemaDisplayName = string | null;
-
-export type UserSchemaPictureUrl = string | null;
-
-export interface UserSchema {
-  display_name?: UserSchemaDisplayName;
-  picture_url?: UserSchemaPictureUrl;
+/**
+ * Request to assign an organiser to a partnership
+ */
+export interface AssignOrganiserRequestSchema {
+  /** Email address of the user to assign as organiser */
   email: string;
 }
+
+/**
+ * Organiser user information or null if no organiser assigned
+ */
+export type PartnershipOrganiserResponseSchemaOrganiser = UserSchema | null;
+
+/**
+ * Response containing partnership ID and organiser information
+ */
+export interface PartnershipOrganiserResponseSchema {
+  /** UUID of the partnership */
+  partnership_id: string;
+  /** Organiser user information or null if no organiser assigned */
+  organiser: PartnershipOrganiserResponseSchemaOrganiser;
+}
+
+export type CreateByIdentifiersSchema = string[];
 
 export interface GrantPermissionRequestSchema {
   user_emails: string[];
@@ -1720,6 +1753,10 @@ export type PostOrgsEventsBoothPlan201 = {
  */
 export type PostOrgsEventsIntegrationsBody = { [key: string]: unknown };
 
+export type GetStatusIntegration401 = {
+  status?: boolean;
+};
+
 export type DeleteOrgsEventsOptions204 = { [key: string]: unknown };
 
 export type DeleteOrgsEventsPacks204 = { [key: string]: unknown };
@@ -1939,6 +1976,7 @@ export const getCompanies = (
     }
   
 /**
+ * Create a new company
  * @summary Create company
  */
 export const postCompanies = (
@@ -2015,7 +2053,8 @@ if(postCompaniesLogoBody.file !== undefined) {
     }
   
 /**
- * @summary List partnerships
+ * List all partnerships for a company
+ * @summary List all partnerships for a company
  */
 export const getCompaniesPartnership = (
     companyId: string,
@@ -2652,12 +2691,25 @@ export const postOrgsEventsIntegrations = (
 export const deleteOrgsEventsIntegrations = (
     orgSlug: string,
     eventSlug: string,
-    provider: 'mailjet' | 'slack' | 'qonto' | 'billetweb' | 'webhook' | 'openplanner',
-    usage: 'notification' | 'billing' | 'ticketing' | 'webhook' | 'agenda',
     integrationId: string,
  options?: SecondParameter<typeof customFetch<void>>,) => {
       return customFetch<void>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/integrations/${provider}/${usage}/${integrationId}`, method: 'DELETE'
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/integrations/${integrationId}`, method: 'DELETE'
+    },
+      options);
+    }
+  
+/**
+ * Get status of event integration
+ * @summary get status of event integration
+ */
+export const getStatusIntegration = (
+    orgSlug: string,
+    eventSlug: string,
+    integrationId: string,
+ options?: SecondParameter<typeof customFetch<void>>,) => {
+      return customFetch<void>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/integrations/${integrationId}/status`, method: 'GET'
     },
       options);
     }
@@ -3098,6 +3150,39 @@ export const declineJobOfferPromotion = (
     }
   
 /**
+ * Assign an organiser to manage a specific partnership. The organiser must be a member of the organization with edit permissions.
+ * @summary Assign organiser to partnership
+ */
+export const postPartnershipOrganiser = (
+    orgSlug: string,
+    eventSlug: string,
+    partnershipId: string,
+    assignOrganiserRequestSchema: AssignOrganiserRequestSchema,
+ options?: SecondParameter<typeof customFetch<PartnershipOrganiserResponseSchema>>,) => {
+      return customFetch<PartnershipOrganiserResponseSchema>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/organiser`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: assignOrganiserRequestSchema
+    },
+      options);
+    }
+  
+/**
+ * Remove the assigned organiser from a partnership
+ * @summary Remove organiser from partnership
+ */
+export const deletePartnershipOrganiser = (
+    orgSlug: string,
+    eventSlug: string,
+    partnershipId: string,
+ options?: SecondParameter<typeof customFetch<PartnershipOrganiserResponseSchema>>,) => {
+      return customFetch<PartnershipOrganiserResponseSchema>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/organiser`, method: 'DELETE'
+    },
+      options);
+    }
+  
+/**
  * List providers attached to an event with pagination (requires organization membership)
  * @summary List event providers
  */
@@ -3267,6 +3352,7 @@ export type PostOrgsEventsBoothPlanResult = NonNullable<Awaited<ReturnType<typeo
 export type GetOrgsEventsIntegrationsResult = NonNullable<Awaited<ReturnType<typeof getOrgsEventsIntegrations>>>
 export type PostOrgsEventsIntegrationsResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsIntegrations>>>
 export type DeleteOrgsEventsIntegrationsResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsEventsIntegrations>>>
+export type GetStatusIntegrationResult = NonNullable<Awaited<ReturnType<typeof getStatusIntegration>>>
 export type GetOrgsEventsOptionsResult = NonNullable<Awaited<ReturnType<typeof getOrgsEventsOptions>>>
 export type PostOrgsEventsOptionsResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsOptions>>>
 export type DeleteOrgsEventsOptionsResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsEventsOptions>>>
@@ -3294,6 +3380,8 @@ export type ListPartnershipJobOffersResult = NonNullable<Awaited<ReturnType<type
 export type ListEventJobOfferPromotionsResult = NonNullable<Awaited<ReturnType<typeof listEventJobOfferPromotions>>>
 export type ApproveJobOfferPromotionResult = NonNullable<Awaited<ReturnType<typeof approveJobOfferPromotion>>>
 export type DeclineJobOfferPromotionResult = NonNullable<Awaited<ReturnType<typeof declineJobOfferPromotion>>>
+export type PostPartnershipOrganiserResult = NonNullable<Awaited<ReturnType<typeof postPartnershipOrganiser>>>
+export type DeletePartnershipOrganiserResult = NonNullable<Awaited<ReturnType<typeof deletePartnershipOrganiser>>>
 export type GetOrgsEventsProvidersResult = NonNullable<Awaited<ReturnType<typeof getOrgsEventsProviders>>>
 export type PostOrgsEventsProvidersResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsProviders>>>
 export type DeleteOrgsEventsProvidersResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsEventsProviders>>>

@@ -4,10 +4,18 @@ import {
   getOrgsEventsIntegrations,
   postOrgsEventsIntegrations,
   deleteOrgsEventsIntegrations,
+  getStatusIntegration,
   type IntegrationSchema,
   type IntegrationSchemaProvider,
   type IntegrationSchemaUsage
 } from '~/utils/api';
+
+/**
+ * Extended integration schema with status
+ */
+export interface IntegrationWithStatus extends IntegrationSchema {
+  status?: 'success' | 'error' | 'loading' | null;
+}
 
 /**
  * Integration create data structure
@@ -30,7 +38,7 @@ export interface UseIntegrationsOptions {
  * Return type for useIntegrations composable
  */
 export interface UseIntegrationsReturn {
-  integrations: Ref<IntegrationSchema[]>;
+  integrations: Ref<IntegrationWithStatus[]>;
   loading: Ref<boolean>;
   error: Ref<string | null>;
   loadIntegrations: () => Promise<void>;
@@ -41,6 +49,7 @@ export interface UseIntegrationsReturn {
     integrationId: string
   ) => Promise<void>;
   configuredProviders: ComputedRef<IntegrationSchemaProvider[]>;
+  loadIntegrationStatus: (integrationId: string) => Promise<void>;
 }
 
 /**
@@ -69,7 +78,7 @@ export function useIntegrations(options: UseIntegrationsOptions): UseIntegration
   const { orgSlug, eventSlug } = options;
 
   // Reactive state
-  const integrations = ref<IntegrationSchema[]>([]);
+  const integrations = ref<IntegrationWithStatus[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
 
@@ -82,6 +91,31 @@ export function useIntegrations(options: UseIntegrationsOptions): UseIntegration
   });
 
   /**
+   * Load status for a specific integration
+   * Updates the status field in the integrations array
+   *
+   * @param integrationId - Integration UUID
+   */
+  async function loadIntegrationStatus(integrationId: string): Promise<void> {
+    const integration = integrations.value.find(i => i.id === integrationId);
+    if (!integration) return;
+
+    try {
+      integration.status = 'loading';
+      const response = await getStatusIntegration(orgSlug, eventSlug, integrationId);
+
+      // L'API retourne { status: boolean }
+      // true = success, false = error
+      const statusData = response.data as { status: boolean };
+      integration.status = statusData.status ? 'success' : 'error';
+    } catch (err: any) {
+      console.error(`Failed to load status for integration ${integrationId}:`, err);
+      // Si l'appel échoue (erreur réseau, 404, etc.), le statut est error
+      integration.status = 'error';
+    }
+  }
+
+  /**
    * Load all integrations for the event
    * Sets loading state and handles errors gracefully
    */
@@ -91,7 +125,15 @@ export function useIntegrations(options: UseIntegrationsOptions): UseIntegration
       error.value = null;
 
       const response = await getOrgsEventsIntegrations(orgSlug, eventSlug);
-      integrations.value = response.data;
+      integrations.value = response.data.map(integration => ({
+        ...integration,
+        status: null
+      }));
+
+      // Charger le statut de chaque intégration en parallèle
+      await Promise.all(
+        integrations.value.map(integration => loadIntegrationStatus(integration.id))
+      );
     } catch (err) {
       console.error('Failed to load integrations:', err);
       error.value = 'Impossible de charger les intégrations. Veuillez rafraîchir la page.';
@@ -164,6 +206,7 @@ export function useIntegrations(options: UseIntegrationsOptions): UseIntegration
     loadIntegrations,
     createIntegration,
     deleteIntegration,
-    configuredProviders
+    configuredProviders,
+    loadIntegrationStatus
   };
 }

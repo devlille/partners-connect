@@ -1,7 +1,7 @@
 <template>
   <div class="bg-white rounded-lg shadow">
     <!-- Loading State -->
-    <div v-if="loading" class="px-6 py-12">
+    <div v-if="loading" class="px-6 py-12" role="status" aria-live="polite" aria-label="Chargement des intégrations">
       <div class="space-y-4">
         <div v-for="i in 3" :key="i" class="animate-pulse">
           <div class="flex items-start gap-4">
@@ -15,11 +15,12 @@
           </div>
         </div>
       </div>
+      <span class="sr-only">Chargement des intégrations en cours...</span>
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="integrations.length === 0" class="px-6 py-12 text-center">
-      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div v-else-if="integrations.length === 0" class="px-6 py-12 text-center" role="region" aria-label="Aucune intégration">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
       </svg>
       <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune intégration configurée</h3>
@@ -29,12 +30,12 @@
     <!-- Integration List -->
     <div v-else>
       <div class="px-6 py-4 border-b border-gray-200">
-        <h2 class="text-lg font-semibold text-gray-900">
+        <h2 id="integrations-heading" class="text-lg font-semibold text-gray-900">
           Intégrations ({{ integrations.length }})
         </h2>
       </div>
 
-      <ul class="divide-y divide-gray-200">
+      <ul class="divide-y divide-gray-200" role="list" aria-labelledby="integrations-heading">
         <li
           v-for="integration in integrations"
           :key="integration.id"
@@ -44,26 +45,60 @@
             <div class="flex items-start gap-4 flex-1">
               <!-- Provider Icon -->
               <div
-                class="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
+                class="w-12 h-12 rounded-lg flex items-center justify-center shrink-0"
                 :class="getProviderBgClass(integration.provider)"
+                role="img"
+                :aria-label="`Icône ${getProviderName(integration.provider)}`"
               >
                 <i
                   :class="[getProviderIcon(integration.provider), 'text-2xl']"
                   :style="{ color: getProviderIconColor(integration.provider) }"
+                  aria-hidden="true"
                 />
               </div>
 
               <!-- Integration Details -->
               <div class="flex-1 min-w-0">
-                <h3 class="text-base font-semibold text-gray-900">
-                  {{ getProviderName(integration.provider) }}
-                </h3>
+                <div class="flex items-center gap-2">
+                  <h3 class="text-base font-semibold text-gray-900">
+                    {{ getProviderName(integration.provider) }}
+                  </h3>
+                  <!-- Status Badge -->
+                  <span
+                    v-if="integration.status === 'success'"
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                    role="status"
+                    aria-label="Statut de l'intégration : connecté avec succès"
+                  >
+                    <i class="i-heroicons-check-circle mr-1" aria-hidden="true" />
+                    Connecté
+                  </span>
+                  <span
+                    v-else-if="integration.status === 'error'"
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                    role="status"
+                    aria-label="Statut de l'intégration : erreur de connexion"
+                  >
+                    <i class="i-heroicons-x-circle mr-1" aria-hidden="true" />
+                    Erreur
+                  </span>
+                  <span
+                    v-else-if="integration.status === 'loading'"
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                    role="status"
+                    aria-live="polite"
+                    aria-label="Vérification du statut de l'intégration en cours"
+                  >
+                    <i class="i-heroicons-arrow-path animate-spin mr-1" aria-hidden="true" />
+                    Vérification...
+                  </span>
+                </div>
                 <div class="mt-1 space-y-1">
                   <p class="text-sm text-gray-600">
                     <span class="font-medium">Utilisation:</span> {{ getUsageName(integration.usage) }}
                   </p>
                   <p class="text-sm text-gray-600">
-                    <span class="font-medium">Créé le:</span> {{ formatDate(integration.created_at) }}
+                    <span class="font-medium">Créé le:</span> <time :datetime="integration.created_at">{{ formatDate(integration.created_at) }}</time>
                   </p>
                 </div>
               </div>
@@ -77,6 +112,7 @@
               icon="i-heroicons-trash"
               :loading="deletingId === integration.id"
               :disabled="deletingId !== null"
+              :aria-label="`Supprimer l'intégration ${getProviderName(integration.provider)} pour ${getUsageName(integration.usage)}`"
               @click="$emit('delete', integration)"
             >
               Supprimer
@@ -89,7 +125,7 @@
 </template>
 
 <script setup lang="ts">
-import type { IntegrationSchema } from '~/utils/api';
+import type { IntegrationWithStatus } from '~/composables/useIntegrations';
 import { PROVIDERS } from '~/utils/integrationProviders';
 import { USAGES } from '~/utils/integrationUsages';
 
@@ -98,7 +134,7 @@ import { USAGES } from '~/utils/integrationUsages';
  */
 interface Props {
   /** Array of integrations to display */
-  integrations: IntegrationSchema[];
+  integrations: IntegrationWithStatus[];
 
   /** Loading state for the list */
   loading: boolean;
@@ -112,7 +148,7 @@ interface Props {
  */
 interface Emits {
   /** Emitted when user clicks delete button on an integration */
-  (event: 'delete', integration: IntegrationSchema): void;
+  (event: 'delete', integration: IntegrationWithStatus): void;
 }
 
 const props = defineProps<Props>();
