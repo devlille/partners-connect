@@ -28,7 +28,7 @@ class QontoRegistrar : IntegrationRegistrar<CreateIntegration.CreateQontoIntegra
             it[this.integrationId] = integrationId.value
             it[this.apiKey] = input.apiKey
             it[this.secret] = input.secret
-            it[this.sandboxToken] = input.sandboxToken
+            it[this.sandboxToken] = input.sandboxToken ?: ""
         }
         integrationId.value
     }

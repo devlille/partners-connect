@@ -29,7 +29,7 @@ object QontoIntegrationsTable : Table("qonto_integrations") {
     override val primaryKey = PrimaryKey(integrationId)
 }
 
-data class QontoConfig(val apiKey: String, val secret: String, val sandboxToken: String)
+data class QontoConfig(val apiKey: String, val secret: String, val sandboxToken: String?)
 
 operator fun QontoIntegrationsTable.get(integrationId: UUID): QontoConfig = transaction {
     QontoIntegrationsTable
@@ -39,7 +39,7 @@ operator fun QontoIntegrationsTable.get(integrationId: UUID): QontoConfig = tran
             QontoConfig(
                 apiKey = it[QontoIntegrationsTable.apiKey],
                 secret = it[QontoIntegrationsTable.secret],
-                sandboxToken = it[QontoIntegrationsTable.sandboxToken],
+                sandboxToken = it[QontoIntegrationsTable.sandboxToken].ifBlank { null },
             )
         }
         .singleOrNull()

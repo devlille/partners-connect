@@ -41,7 +41,9 @@ class QontoProvider(
         val route = "${SystemVarEnv.QontoProvider.baseUrl}/v2/clients$taxFilter"
         val response = httpClient.get(route) {
             headers[HttpHeaders.Authorization] = "${config.apiKey}:${config.secret}"
-            headers["X-Qonto-Staging-Token"] = config.sandboxToken
+            config.sandboxToken?.let {
+                headers["X-Qonto-Staging-Token"] = it
+            }
             headers[HttpHeaders.ContentType] = "application/json"
         }
         return response.body<QontoClientsResponse>()
@@ -51,7 +53,9 @@ class QontoProvider(
         val route = "${SystemVarEnv.QontoProvider.baseUrl}/v2/clients"
         val response = httpClient.post(route) {
             headers[HttpHeaders.Authorization] = "${config.apiKey}:${config.secret}"
-            headers["X-Qonto-Staging-Token"] = config.sandboxToken
+            config.sandboxToken?.let {
+                headers["X-Qonto-Staging-Token"] = it
+            }
             headers[HttpHeaders.ContentType] = "application/json"
             setBody(Json.encodeToString(QontoClientRequest.serializer(), request))
         }
@@ -62,7 +66,9 @@ class QontoProvider(
         val route = "${SystemVarEnv.QontoProvider.baseUrl}/v2/client_invoices"
         val response = httpClient.post(route) {
             headers[HttpHeaders.Authorization] = "${config.apiKey}:${config.secret}"
-            headers["X-Qonto-Staging-Token"] = config.sandboxToken
+            config.sandboxToken?.let {
+                headers["X-Qonto-Staging-Token"] = it
+            }
             headers[HttpHeaders.ContentType] = "application/json"
             setBody(Json.encodeToString(QontoInvoiceRequest.serializer(), request))
         }
@@ -73,7 +79,9 @@ class QontoProvider(
         val route = "${SystemVarEnv.QontoProvider.baseUrl}/v2/quotes"
         val response = httpClient.post(route) {
             headers[HttpHeaders.Authorization] = "${config.apiKey}:${config.secret}"
-            headers["X-Qonto-Staging-Token"] = config.sandboxToken
+            config.sandboxToken?.let {
+                headers["X-Qonto-Staging-Token"] = it
+            }
             headers[HttpHeaders.ContentType] = "application/json"
             setBody(Json.encodeToString(QontoQuoteRequest.serializer(), request))
         }

@@ -69,6 +69,7 @@ jobs:
             echo "postgres_url=${{ secrets.EXPOSED_DB_URL }}" >> $GITHUB_OUTPUT
             echo "postgres_user=${{ secrets.EXPOSED_DB_USER }}" >> $GITHUB_OUTPUT
             echo "postgres_password=${{ secrets.EXPOSED_DB_PASSWORD }}" >> $GITHUB_OUTPUT
+            echo "qonto_base_url=https://thirdparty-sandbox.staging.qonto.co" >> $GITHUB_OUTPUT
           else
             echo "id=${{ secrets.CLEVERCLOUD_APP_ID_PP }}" >> $GITHUB_OUTPUT
             echo "url_server=${{ secrets.CLEVERCLOUD_BASE_URL_PP }}" >> $GITHUB_OUTPUT
@@ -76,6 +77,7 @@ jobs:
             echo "postgres_url=${{ secrets.EXPOSED_DB_URL_PP }}" >> $GITHUB_OUTPUT
             echo "postgres_user=${{ secrets.EXPOSED_DB_USER_PP }}" >> $GITHUB_OUTPUT
             echo "postgres_password=${{ secrets.EXPOSED_DB_PASSWORD_PP }}" >> $GITHUB_OUTPUT
+            echo "qonto_base_url=https://thirdparty.qonto.com" >> $GITHUB_OUTPUT
           fi
 
       - name: Install Clever Tools
@@ -99,6 +101,7 @@ jobs:
           EXPOSED_DB_URL: ${{ steps.app.outputs.postgres_url }}
           EXPOSED_DB_USER: ${{ steps.app.outputs.postgres_user }}
           EXPOSED_DB_PASSWORD: ${{ steps.app.outputs.postgres_password }}
+          QONTO_BASE_URL: ${{ steps.app.outputs.qonto_base_url }}
           GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
         run: |
           clever env set APP_FOLDER "server" --app $CLEVER_APP_ID
@@ -117,6 +120,7 @@ jobs:
           clever env set EXPOSED_DB_URL "$EXPOSED_DB_URL" --app $CLEVER_APP_ID
           clever env set EXPOSED_DB_USER "$EXPOSED_DB_USER" --app $CLEVER_APP_ID
           clever env set EXPOSED_DB_PASSWORD "$EXPOSED_DB_PASSWORD" --app $CLEVER_APP_ID
+          clever env set QONTO_BASE_URL "$QONTO_BASE_URL" --app $CLEVER_APP_ID
           clever env set GOOGLE_APPLICATION_CREDENTIALS_JSON "$GOOGLE_APPLICATION_CREDENTIALS_JSON" --app $CLEVER_APP_ID
 
       - name: Set image tag for deployment
