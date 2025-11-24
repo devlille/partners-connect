@@ -182,6 +182,20 @@ class OptionRepositoryExposed(
         if (deleted == 0) throw NotFoundException("Option not found")
     }
 
+    /**
+     * Synchronizes pack options by removing options not in the submitted lists,
+     * adding new options, and updating requirement status for existing options.
+     *
+     * This operation is atomic (all changes succeed or all fail) and idempotent
+     * (submitting the same configuration multiple times produces the same result).
+     *
+     * @param eventSlug The event identifier
+     * @param packId The pack identifier
+     * @param options Complete configuration of required and optional options
+     * @throws NotFoundException if event or pack not found
+     * @throws ConflictException if same option in both required and optional lists
+     * @throws ForbiddenException if any option doesn't belong to the event
+     */
     override fun attachOptionsToPack(eventSlug: String, packId: UUID, options: AttachOptionsToPack) = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
@@ -196,7 +210,7 @@ class OptionRepositoryExposed(
             .find {
                 (SponsoringOptionsTable.eventId eq event.id.value) and
                     (SponsoringOptionsTable.id inList options.required.map(UUID::fromString))
-            }
+            }.toList()
 
         val optionalOptions = SponsoringOptionEntity
             .find {
@@ -214,15 +228,10 @@ class OptionRepositoryExposed(
             throw ForbiddenException("Some options do not belong to the event")
         }
 
-        val alreadyAttached = PackOptionsTable
-            .selectAll()
-            .where { (PackOptionsTable.pack eq packId) and (PackOptionsTable.option inList allOptionIds) }
-            .map { it[PackOptionsTable.option].value }
+        // 1. Delete all existing pack options (synchronization - will re-insert desired state)
+        PackOptionsTable.deleteWhere { PackOptionsTable.pack eq packId }
 
-        if (alreadyAttached.isNotEmpty()) {
-            throw ConflictException("Option already attached to pack: ${alreadyAttached.joinToString()}")
-        }
-
+        // 2. Insert required options
         requiredOptions.forEach { option ->
             PackOptionsTable.insert {
                 it[this.pack] = pack.id
@@ -230,6 +239,8 @@ class OptionRepositoryExposed(
                 it[this.required] = true
             }
         }
+
+        // 3. Insert optional options
         optionalOptions.forEach { option ->
             PackOptionsTable.insert {
                 it[this.pack] = pack.id
