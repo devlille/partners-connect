@@ -66,6 +66,7 @@ jobs:
             echo "id=${{ secrets.CLEVERCLOUD_APP_ID }}" >> $GITHUB_OUTPUT
             echo "url_server=${{ secrets.CLEVERCLOUD_BASE_URL }}" >> $GITHUB_OUTPUT
             echo "url_front=${{ secrets.FRONTEND_BASE_URL }}" >> $GITHUB_OUTPUT
+            echo "storage_bucket=partners-connect" >> $GITHUB_OUTPUT
             echo "postgres_url=${{ secrets.EXPOSED_DB_URL }}" >> $GITHUB_OUTPUT
             echo "postgres_user=${{ secrets.EXPOSED_DB_USER }}" >> $GITHUB_OUTPUT
             echo "postgres_password=${{ secrets.EXPOSED_DB_PASSWORD }}" >> $GITHUB_OUTPUT
@@ -74,6 +75,7 @@ jobs:
             echo "id=${{ secrets.CLEVERCLOUD_APP_ID_PP }}" >> $GITHUB_OUTPUT
             echo "url_server=${{ secrets.CLEVERCLOUD_BASE_URL_PP }}" >> $GITHUB_OUTPUT
             echo "url_front=${{ secrets.FRONTEND_BASE_URL_PP }}" >> $GITHUB_OUTPUT
+            echo "storage_bucket=partners-connect-pp" >> $GITHUB_OUTPUT
             echo "postgres_url=${{ secrets.EXPOSED_DB_URL_PP }}" >> $GITHUB_OUTPUT
             echo "postgres_user=${{ secrets.EXPOSED_DB_USER_PP }}" >> $GITHUB_OUTPUT
             echo "postgres_password=${{ secrets.EXPOSED_DB_PASSWORD_PP }}" >> $GITHUB_OUTPUT
@@ -95,6 +97,8 @@ jobs:
           FRONTEND_BASE_URL: ${{ steps.app.outputs.url_front }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_STORAGE_BUCKET: ${{ steps.app.outputs.storage_bucket }}
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
           CRYPTO_KEY: ${{ secrets.CRYPTO_KEY }}
           CRYPTO_SALT: ${{ secrets.CRYPTO_SALT }}
           EXPOSED_DB_DRIVER: ${{ secrets.EXPOSED_DB_DRIVER }}
@@ -114,6 +118,8 @@ jobs:
           clever env set FRONTEND_BASE_URL "$FRONTEND_BASE_URL" --app $CLEVER_APP_ID
           clever env set GOOGLE_CLIENT_ID "$GOOGLE_CLIENT_ID" --app $CLEVER_APP_ID
           clever env set GOOGLE_CLIENT_SECRET "$GOOGLE_CLIENT_SECRET" --app $CLEVER_APP_ID
+          clever env set GOOGLE_STORAGE_BUCKET "$GOOGLE_STORAGE_BUCKET" --app $CLEVER_APP_ID
+          clever env set GOOGLE_MAPS_API_KEY "$GOOGLE_MAPS_API_KEY" --app $CLEVER_APP_ID
           clever env set CRYPTO_KEY "$CRYPTO_KEY" --app $CLEVER_APP_ID
           clever env set CRYPTO_SALT "$CRYPTO_SALT" --app $CLEVER_APP_ID
           clever env set EXPOSED_DB_DRIVER "$EXPOSED_DB_DRIVER" --app $CLEVER_APP_ID

@@ -23,6 +23,8 @@ object SystemVarEnv {
     object GoogleProvider {
         val clientId: String = System.getenv("GOOGLE_CLIENT_ID").trim()
         val clientSecret: String = System.getenv("GOOGLE_CLIENT_SECRET").trim()
+        val bucketName: String = System.getenv("GOOGLE_STORAGE_BUCKET").trim()
+        val mapsApiKey: String = System.getenv("GOOGLE_MAPS_API_KEY").trim()
     }
 
     object QontoProvider {

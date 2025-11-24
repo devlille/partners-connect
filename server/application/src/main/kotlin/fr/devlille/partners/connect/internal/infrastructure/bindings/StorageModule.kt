@@ -16,5 +16,5 @@ val storageModule = module {
             build()
         }.service
     }
-    single<Storage> { GoogleCloudStorage(get(), SystemVarEnv.projectId) }
+    single<Storage> { GoogleCloudStorage(get(), SystemVarEnv.GoogleProvider.bucketName) }
 }
