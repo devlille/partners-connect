@@ -303,9 +303,9 @@ describe('Integration Status Management', () => {
 
       try {
         // Simulate API error
-        throw new Error('Network error');
-      } catch (err) {
-        integration.status = 'error';
+        throw new Error("Network error");
+      } catch {
+        integration.status = "error";
       }
 
       expect(integration.status).toBe('error');

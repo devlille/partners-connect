@@ -43,11 +43,7 @@ export interface UseIntegrationsReturn {
   error: Ref<string | null>;
   loadIntegrations: () => Promise<void>;
   createIntegration: (data: IntegrationCreateData) => Promise<void>;
-  deleteIntegration: (
-    provider: IntegrationSchemaProvider,
-    usage: IntegrationSchemaUsage,
-    integrationId: string
-  ) => Promise<void>;
+  deleteIntegration: (integrationId: string) => Promise<void>;
   configuredProviders: ComputedRef<IntegrationSchemaProvider[]>;
   loadIntegrationStatus: (integrationId: string) => Promise<void>;
 }
@@ -106,7 +102,7 @@ export function useIntegrations(options: UseIntegrationsOptions): UseIntegration
 
       // L'API retourne { status: boolean }
       // true = success, false = error
-      const statusData = response.data as { status: boolean };
+      const statusData = response.data as unknown as { status: boolean };
       integration.status = statusData.status ? 'success' : 'error';
     } catch (err: any) {
       console.error(`Failed to load status for integration ${integrationId}:`, err);
@@ -172,22 +168,16 @@ export function useIntegrations(options: UseIntegrationsOptions): UseIntegration
    * Delete an integration
    * Automatically refreshes list on success
    *
-   * @param provider - Provider type
-   * @param usage - Usage category
    * @param integrationId - Integration UUID
    * @throws Error with user-friendly message if deletion fails
    */
   async function deleteIntegration(
-    provider: IntegrationSchemaProvider,
-    usage: IntegrationSchemaUsage,
     integrationId: string
   ): Promise<void> {
     try {
       await deleteOrgsEventsIntegrations(
         orgSlug,
         eventSlug,
-        provider,
-        usage,
         integrationId
       );
 

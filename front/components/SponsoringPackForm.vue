@@ -68,7 +68,7 @@
                 @change="handleRequiredOptionChange(option.id, ($event.target as HTMLInputElement).checked)"
               />
               <label :for="`required-${option.id}`" class="text-sm text-gray-700 cursor-pointer">
-                {{ getOptionName(option) }} ({{ option.price || 0 }}€)
+                {{ getOptionName(option) }} ({{ formatOptionPrice(option) }})
               </label>
             </div>
           </div>
@@ -90,7 +90,7 @@
                 @change="handleOptionalOptionChange(option.id, ($event.target as HTMLInputElement).checked)"
               />
               <label :for="`optional-${option.id}`" class="text-sm text-gray-700 cursor-pointer">
-                {{ getOptionName(option) }} ({{ option.price || 0 }}€)
+                {{ getOptionName(option) }} ({{ formatOptionPrice(option) }})
               </label>
             </div>
           </div>
@@ -140,6 +140,19 @@ const form = ref<PackFormData>({
 const validationErrors = ref<Record<string, string>>({});
 
 const { getOptionName } = useOptionTranslation();
+
+/**
+ * Format option price with quantity for typed_number options
+ */
+function formatOptionPrice(option: SponsoringOption): string {
+  // Pour typed_number, afficher le prix avec la quantité
+  if (option.type === 'typed_number' && 'fixed_quantity' in option) {
+    const price = option.price ? `${option.price}€` : '0€';
+    return `${price} ×${option.fixed_quantity}`;
+  }
+  // Pour les autres types
+  return option.price ? `${option.price}€` : '0€';
+}
 
 function handleRequiredOptionChange(optionId: string, checked: boolean) {
   if (checked) {

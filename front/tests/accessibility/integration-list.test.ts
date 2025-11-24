@@ -35,33 +35,30 @@ describe('Integration List - Accessibility', () => {
   });
 
   describe('Status Badges Accessibility', () => {
-    it('should announce success status to screen readers', () => {
-      const status = 'success';
-      const role = 'status';
-      const ariaLabel = 'Statut de l\'intégration : connecté avec succès';
+    it("should announce success status to screen readers", () => {
+      const role = "status";
+      const ariaLabel = "Statut de l'intégration : connecté avec succès";
 
-      expect(role).toBe('status');
-      expect(ariaLabel).toContain('connecté avec succès');
+      expect(role).toBe("status");
+      expect(ariaLabel).toContain("connecté avec succès");
     });
 
-    it('should announce error status to screen readers', () => {
-      const status = 'error';
-      const role = 'status';
-      const ariaLabel = 'Statut de l\'intégration : erreur de connexion';
+    it("should announce error status to screen readers", () => {
+      const role = "status";
+      const ariaLabel = "Statut de l'intégration : erreur de connexion";
 
-      expect(role).toBe('status');
-      expect(ariaLabel).toContain('erreur de connexion');
+      expect(role).toBe("status");
+      expect(ariaLabel).toContain("erreur de connexion");
     });
 
-    it('should announce loading status with live region', () => {
-      const status = 'loading';
-      const role = 'status';
-      const ariaLive = 'polite';
-      const ariaLabel = 'Vérification du statut de l\'intégration en cours';
+    it("should announce loading status with live region", () => {
+      const role = "status";
+      const ariaLive = "polite";
+      const ariaLabel = "Vérification du statut de l'intégration en cours";
 
-      expect(role).toBe('status');
-      expect(ariaLive).toBe('polite');
-      expect(ariaLabel).toContain('en cours');
+      expect(role).toBe("status");
+      expect(ariaLive).toBe("polite");
+      expect(ariaLabel).toContain("en cours");
     });
 
     it('should not announce null status', () => {

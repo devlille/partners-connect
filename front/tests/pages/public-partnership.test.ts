@@ -131,7 +131,33 @@ describe('Public Partnership Page - Welcome Message', () => {
   });
 
   describe('Billing Section Display', () => {
-    it('should show billing section when validated', () => {
+    it('should show billing section when validated pack exists', () => {
+      const partnership = {
+        id: '123',
+        validated_pack_id: 'pack-123'
+      };
+      const loading = false;
+      const error = null;
+
+      const shouldShowBilling = !loading && !error && partnership && partnership.validated_pack_id;
+
+      expect(shouldShowBilling).toBeTruthy();
+    });
+
+    it('should not show billing section when no validated pack', () => {
+      const partnership = {
+        id: '123',
+        validated_pack_id: null
+      };
+      const loading = false;
+      const error = null;
+
+      const shouldShowBilling = !loading && !error && partnership && partnership.validated_pack_id;
+
+      expect(shouldShowBilling).toBeFalsy();
+    });
+
+    it('should show billing section when validated (legacy)', () => {
       const partnership = {
         id: '123',
         validated: true
@@ -143,18 +169,99 @@ describe('Public Partnership Page - Welcome Message', () => {
 
       expect(shouldShowBilling).toBe(true);
     });
+  });
 
-    it('should not show billing section when not validated', () => {
+  describe('Pack Suggestion Display', () => {
+    it('should show suggestion when pack is suggested and not validated', () => {
       const partnership = {
         id: '123',
-        validated: false
+        suggested_pack_id: 'suggested-pack-123',
+        validated_pack_id: null
       };
       const loading = false;
       const error = null;
 
-      const shouldShowBilling = !loading && !error && partnership && partnership.validated;
+      const shouldShowSuggestion = !loading && !error && partnership &&
+        partnership.suggested_pack_id && !partnership.validated_pack_id;
 
-      expect(shouldShowBilling).toBe(false);
+      expect(shouldShowSuggestion).toBe(true);
+    });
+
+    it('should not show suggestion when pack is validated', () => {
+      const partnership = {
+        id: '123',
+        suggested_pack_id: 'suggested-pack-123',
+        validated_pack_id: 'validated-pack-123'
+      };
+      const loading = false;
+      const error = null;
+
+      const shouldShowSuggestion = !loading && !error && partnership &&
+        partnership.suggested_pack_id && !partnership.validated_pack_id;
+
+      expect(shouldShowSuggestion).toBe(false);
+    });
+
+    it('should not show suggestion when no suggested pack', () => {
+      const partnership = {
+        id: '123',
+        suggested_pack_id: null,
+        validated_pack_id: null
+      };
+      const loading = false;
+      const error = null;
+
+      const shouldShowSuggestion = !loading && !error && partnership &&
+        partnership.suggested_pack_id && !partnership.validated_pack_id;
+
+      expect(shouldShowSuggestion).toBeFalsy();
+    });
+
+    it('should include both pack names in suggestion message', () => {
+      const partnership = {
+        suggested_pack_name: 'Pack Gold',
+        selected_pack_name: 'Pack Silver'
+      };
+
+      const message = `L'équipe organisatrice vous propose le pack ${partnership.suggested_pack_name} en remplacement du pack ${partnership.selected_pack_name} que vous aviez sélectionné.`;
+
+      expect(message).toContain('Pack Gold');
+      expect(message).toContain('Pack Silver');
+    });
+  });
+
+  describe('Pending Validation Message Display', () => {
+    it('should show pending message when no validated pack', () => {
+      const partnership = {
+        id: '123',
+        validated_pack_id: null
+      };
+      const loading = false;
+      const error = null;
+
+      const shouldShowPending = !loading && !error && partnership && !partnership.validated_pack_id;
+
+      expect(shouldShowPending).toBe(true);
+    });
+
+    it('should not show pending message when pack is validated', () => {
+      const partnership = {
+        id: '123',
+        validated_pack_id: 'pack-123'
+      };
+      const loading = false;
+      const error = null;
+
+      const shouldShowPending = !loading && !error && partnership && !partnership.validated_pack_id;
+
+      expect(shouldShowPending).toBe(false);
+    });
+
+    it('should mention billing availability in pending message', () => {
+      const message = 'Votre demande de partenariat est en cours de traitement. Les informations de facturation seront disponibles une fois que votre partenariat aura été validé par nos équipes.';
+
+      expect(message).toContain('facturation seront disponibles');
+      expect(message).toContain('validé par nos équipes');
     });
   });
 

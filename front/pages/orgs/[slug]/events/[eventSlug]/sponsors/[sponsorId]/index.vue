@@ -7,6 +7,16 @@
           <p class="text-sm text-gray-600 mt-1">Partenariat</p>
         </div>
         <div class="flex gap-3">
+          <UButton
+            color="neutral"
+            variant="outline"
+            :to="`/${eventSlug}/${sponsorId}`"
+            target="_blank"
+            :aria-label="`Voir la page publique du partenariat avec ${partnership?.company_name || 'ce sponsor'}`"
+          >
+            <i class="i-heroicons-arrow-top-right-on-square mr-2" aria-hidden="true" />
+            Page publique
+          </UButton>
           <div v-if="partnership && !partnership.validated_pack_id" class="flex gap-3">
             <UButton
               color="neutral"

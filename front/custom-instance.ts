@@ -42,9 +42,9 @@ const createCustomAxiosInstance = (baseUrl: string): AxiosInstance => {
 
             const config = useRuntimeConfig();
             const redirectUrl = encodeURIComponent(
-              `${process.env.NODE_ENV === "development" ? "http://localhost:8080" : window.location.origin}${
-                window.location.pathname
-              }`
+              `${
+                process.env.NODE_ENV === "development" ? "http://localhost:3000" : window.location.origin
+              }/auth/callback`
             );
             window.location.href = `${config.public.apiBaseUrl}/auth/login?redirectUrl=${redirectUrl}`;
           }

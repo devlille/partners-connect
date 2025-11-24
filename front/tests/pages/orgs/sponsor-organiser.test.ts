@@ -258,10 +258,10 @@ describe('Sponsor Organiser Assignment', () => {
       let error: string | null = null;
 
       try {
-        throw new Error('Failed to load users');
-      } catch (err) {
+        throw new Error("Failed to load users");
+      } catch {
         loadingUsers = false;
-        error = 'Impossible de charger la liste des utilisateurs';
+        error = "Impossible de charger la liste des utilisateurs";
       }
 
       expect(loadingUsers).toBe(false);

@@ -47,8 +47,50 @@
           {{ error }}
         </div>
 
+        <!-- Suggested Pack Section -->
+        <section
+          v-if="!loading && !error && partnership && partnership.suggested_pack_id && !partnership.validated_pack_id"
+          class="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-6"
+          aria-labelledby="suggestion-heading"
+        >
+          <div class="flex items-start gap-3">
+            <i class="i-heroicons-light-bulb text-amber-600 text-xl flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <div class="flex-1">
+              <h3 id="suggestion-heading" class="text-sm font-semibold text-amber-900 mb-2">
+                Nouveau pack suggéré
+              </h3>
+              <p class="text-sm text-amber-700 mb-4">
+                L'équipe organisatrice vous propose le pack <strong>{{ partnership.suggested_pack_name }}</strong> en remplacement du pack <strong>{{ partnership.selected_pack_name }}</strong> que vous aviez sélectionné.
+              </p>
+              <div class="flex gap-3">
+                <UButton
+                  color="primary"
+                  size="sm"
+                  :loading="acceptingSuggestion"
+                  :disabled="rejectingSuggestion"
+                  @click="handleAcceptSuggestion"
+                >
+                  <i class="i-heroicons-check mr-1" aria-hidden="true" />
+                  Accepter cette suggestion
+                </UButton>
+                <UButton
+                  color="neutral"
+                  variant="outline"
+                  size="sm"
+                  :loading="rejectingSuggestion"
+                  :disabled="acceptingSuggestion"
+                  @click="handleRejectSuggestion"
+                >
+                  <i class="i-heroicons-x-mark mr-1" aria-hidden="true" />
+                  Refuser
+                </UButton>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- Partnership Information -->
-        <section v-else class="bg-white rounded-lg shadow p-6" aria-labelledby="partnership-heading">
+        <section v-if="!loading && !error && partnership" class="bg-white rounded-lg shadow p-6" aria-labelledby="partnership-heading">
           <h2 id="partnership-heading" class="text-lg font-semibold text-gray-900 mb-4">
             Informations du partenariat
           </h2>
@@ -62,7 +104,7 @@
 
         <!-- Billing Information -->
         <section
-          v-if="!loading && !error && partnership && partnership.validated"
+          v-if="!loading && !error && partnership && partnership.validated_pack_id"
           class="bg-white rounded-lg shadow p-6 mt-6"
           aria-labelledby="billing-heading"
           :aria-busy="savingBilling ? 'true' : 'false'"
@@ -84,7 +126,7 @@
 
         <!-- Message if not validated -->
         <section
-          v-if="!loading && !error && partnership && !partnership.validated"
+          v-if="!loading && !error && partnership && !partnership.validated_pack_id"
           class="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-6"
         >
           <div class="flex items-start gap-3">
@@ -107,6 +149,7 @@
 <script setup lang="ts">
 import PartnershipForm from "~/components/partnership/PartnershipForm.vue";
 import BillingForm from "~/components/partnership/BillingForm.vue";
+import { postEventsPartnershipSuggestionApprove, postEventsPartnershipSuggestionDecline } from "~/utils/api";
 
 definePageMeta({
   auth: false,
@@ -122,6 +165,7 @@ definePageMeta({
 });
 
 const route = useRoute();
+const toast = useToast();
 
 const {
   eventSlug,
@@ -134,6 +178,86 @@ const {
   loadPartnership,
   handleBillingSave
 } = usePublicPartnership();
+
+// États pour les actions de suggestion
+const acceptingSuggestion = ref(false);
+const rejectingSuggestion = ref(false);
+
+/**
+ * Handle accepting the suggested pack
+ */
+async function handleAcceptSuggestion() {
+  try {
+    acceptingSuggestion.value = true;
+    error.value = null;
+
+    await postEventsPartnershipSuggestionApprove(
+      eventSlug.value,
+      partnershipId.value
+    );
+
+    // Recharger les données du partenariat
+    await loadPartnership();
+
+    toast.add({
+      title: 'Suggestion acceptée',
+      description: 'Votre pack a été mis à jour avec succès',
+      color: 'success',
+      timeout: 3000
+    });
+  } catch (err: any) {
+    console.error('Failed to accept suggestion:', err);
+    const errorMessage = `Impossible d'accepter la suggestion: ${err.message || 'Erreur inconnue'}`;
+    error.value = errorMessage;
+
+    toast.add({
+      title: 'Erreur',
+      description: errorMessage,
+      color: 'error',
+      timeout: 5000
+    });
+  } finally {
+    acceptingSuggestion.value = false;
+  }
+}
+
+/**
+ * Handle rejecting the suggested pack
+ */
+async function handleRejectSuggestion() {
+  try {
+    rejectingSuggestion.value = true;
+    error.value = null;
+
+    await postEventsPartnershipSuggestionDecline(
+      eventSlug.value,
+      partnershipId.value
+    );
+
+    // Recharger les données du partenariat
+    await loadPartnership();
+
+    toast.add({
+      title: 'Suggestion refusée',
+      description: 'Vous conservez votre pack initial',
+      color: 'success',
+      timeout: 3000
+    });
+  } catch (err: any) {
+    console.error('Failed to reject suggestion:', err);
+    const errorMessage = `Impossible de refuser la suggestion: ${err.message || 'Erreur inconnue'}`;
+    error.value = errorMessage;
+
+    toast.add({
+      title: 'Erreur',
+      description: errorMessage,
+      color: 'error',
+      timeout: 5000
+    });
+  } finally {
+    rejectingSuggestion.value = false;
+  }
+}
 
 // Sidebar navigation configuration
 const sidebarLinks = computed(() => [

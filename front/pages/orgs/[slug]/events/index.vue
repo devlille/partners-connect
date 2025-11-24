@@ -153,11 +153,6 @@ const orgLinks = computed(() => [
     label: 'Utilisateurs',
     icon: 'i-heroicons-users',
     to: `/orgs/${slug.value}/users`
-  },
-  {
-    label: 'Partenariats',
-    icon: 'i-heroicons-handshake',
-    to: `/orgs/${slug.value}/partnerships`
   }
 ]);
 

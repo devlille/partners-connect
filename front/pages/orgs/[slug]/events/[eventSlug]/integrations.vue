@@ -146,11 +146,7 @@ async function handleDeleteConfirm() {
   try {
     deletingId.value = integrationToDelete.value.id;
 
-    await deleteIntegration(
-      integrationToDelete.value.provider,
-      integrationToDelete.value.usage,
-      integrationToDelete.value.id
-    );
+    await deleteIntegration(integrationToDelete.value.id);
 
     isDeleteModalOpen.value = false;
     integrationToDelete.value = null;
