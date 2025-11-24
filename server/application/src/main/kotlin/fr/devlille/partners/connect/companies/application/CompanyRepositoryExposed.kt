@@ -7,10 +7,8 @@ import fr.devlille.partners.connect.companies.domain.CompanyStatus
 import fr.devlille.partners.connect.companies.domain.CreateCompany
 import fr.devlille.partners.connect.companies.domain.Media
 import fr.devlille.partners.connect.companies.domain.UpdateCompany
-import fr.devlille.partners.connect.companies.infrastructure.db.CompaniesTable
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanySocialEntity
-import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedResponse
 import fr.devlille.partners.connect.internal.infrastructure.api.paginated
 import fr.devlille.partners.connect.internal.infrastructure.api.toPaginatedResponse
@@ -83,16 +81,6 @@ class CompanyRepositoryExposed(
     override fun update(id: UUID, input: UpdateCompany): Company = transaction {
         val company = CompanyEntity.findById(id)
             ?: throw NotFoundException("Company with id $id not found")
-
-        // Check for SIRET conflicts if provided
-        input.siret?.let { newSiret ->
-            val existingCompany = CompanyEntity
-                .find { CompaniesTable.siret eq newSiret }
-                .firstOrNull { it.id.value != id }
-            if (existingCompany != null) {
-                throw ConflictException("Company with SIRET $newSiret already exists")
-            }
-        }
 
         // Update only non-null fields (partial update)
         input.name?.let { company.name = it }

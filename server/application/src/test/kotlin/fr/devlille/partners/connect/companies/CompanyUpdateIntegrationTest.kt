@@ -126,27 +126,6 @@ class CompanyUpdateIntegrationTest {
     }
 
     @Test
-    fun `PUT should return 409 when SIRET conflicts with another company`() = testApplication {
-        val companyId1 = UUID.randomUUID()
-        val companyId2 = UUID.randomUUID()
-
-        application {
-            moduleMocked()
-            insertMockedCompany(companyId1, siret = "11111111111111")
-            insertMockedCompany(companyId2, siret = "22222222222222")
-        }
-
-        val conflictUpdate = UpdateCompany(siret = "11111111111111") // Conflicts with company1
-
-        val response = client.put("/companies/$companyId2") {
-            contentType(ContentType.Application.Json)
-            setBody(json.encodeToString(conflictUpdate))
-        }
-
-        assertEquals(HttpStatusCode.Conflict, response.status)
-    }
-
-    @Test
     fun `PUT should update company socials when provided`() = testApplication {
         val companyId = UUID.randomUUID()
 
