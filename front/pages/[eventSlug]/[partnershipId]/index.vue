@@ -124,6 +124,127 @@
           />
         </section>
 
+        <!-- Documents Section -->
+        <section
+          v-if="!loading && !error && partnership && partnership.validated_pack_id"
+          class="bg-white rounded-lg shadow p-6 mt-6"
+          aria-labelledby="documents-heading"
+        >
+          <h2 id="documents-heading" class="text-lg font-semibold text-gray-900 mb-4">
+            Documents
+          </h2>
+
+          <!-- Message if no documents available -->
+          <div
+            v-if="!partnership.quote_url && !partnership.invoice_url && !partnership.agreement_url && !partnership.agreement_signed_url"
+            class="flex items-start gap-3 p-4 bg-gray-50 rounded-lg"
+          >
+            <i class="i-heroicons-information-circle text-gray-400 text-xl shrink-0 mt-0.5" aria-hidden="true" />
+            <p class="text-sm text-gray-600">
+              Aucun document n'est disponible pour le moment. Les documents seront générés par l'équipe organisatrice.
+            </p>
+          </div>
+
+          <div v-else class="space-y-3">
+            <!-- Quote Document -->
+            <div
+              v-if="partnership.quote_url"
+              class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <div class="flex items-center gap-3">
+                <i class="i-heroicons-document-text text-gray-400 text-xl" aria-hidden="true" />
+                <div>
+                  <p class="text-sm font-medium text-gray-900">Devis</p>
+                  <p class="text-xs text-gray-500">Document de proposition commerciale</p>
+                </div>
+              </div>
+              <UButton
+                :to="partnership.quote_url"
+                target="_blank"
+                color="neutral"
+                variant="outline"
+                size="sm"
+                :aria-label="`Télécharger le devis`"
+              >
+                <i class="i-heroicons-arrow-down-tray mr-1" aria-hidden="true" />
+                Télécharger
+              </UButton>
+            </div>
+
+            <!-- Invoice Document -->
+            <div
+              v-if="partnership.invoice_url"
+              class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <div class="flex items-center gap-3">
+                <i class="i-heroicons-document-text text-gray-400 text-xl" aria-hidden="true" />
+                <div>
+                  <p class="text-sm font-medium text-gray-900">Facture</p>
+                  <p class="text-xs text-gray-500">Document de facturation</p>
+                </div>
+              </div>
+              <UButton
+                :to="partnership.invoice_url"
+                target="_blank"
+                color="neutral"
+                variant="outline"
+                size="sm"
+                :aria-label="`Télécharger la facture`"
+              >
+                <i class="i-heroicons-arrow-down-tray mr-1" aria-hidden="true" />
+                Télécharger
+              </UButton>
+            </div>
+
+            <!-- Agreement Document -->
+            <div
+              v-if="partnership.agreement_url || partnership.agreement_signed_url"
+              class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <div class="flex items-center gap-3">
+                <i class="i-heroicons-document-check text-gray-400 text-xl" aria-hidden="true" />
+                <div>
+                  <p class="text-sm font-medium text-gray-900">Convention de partenariat</p>
+                  <p class="text-xs text-gray-500">Document contractuel</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <UButton
+                  v-if="partnership.agreement_signed_url"
+                  :to="partnership.agreement_signed_url"
+                  target="_blank"
+                  color="neutral"
+                  variant="outline"
+                  size="sm"
+                  :aria-label="`Télécharger la convention signée`"
+                >
+                  <i class="i-heroicons-arrow-down-tray mr-1" aria-hidden="true" />
+                  Télécharger (signée)
+                </UButton>
+                <UButton
+                  v-else-if="partnership.agreement_url"
+                  :to="partnership.agreement_url"
+                  target="_blank"
+                  color="neutral"
+                  variant="outline"
+                  size="sm"
+                  :aria-label="`Télécharger la convention`"
+                >
+                  <i class="i-heroicons-arrow-down-tray mr-1" aria-hidden="true" />
+                  Télécharger
+                </UButton>
+                <span
+                  v-if="partnership.agreement_signed_url"
+                  class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 rounded-full"
+                >
+                  <i class="i-heroicons-check-circle" aria-hidden="true" />
+                  Signée
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- Message if not validated -->
         <section
           v-if="!loading && !error && partnership && !partnership.validated_pack_id"
@@ -270,6 +391,11 @@ const sidebarLinks = computed(() => [
     label: 'Entreprise',
     icon: 'i-heroicons-building-office',
     to: `/${eventSlug.value}/${partnershipId.value}/company`
+  },
+  {
+    label: 'Offres d\'emploi',
+    icon: 'i-heroicons-briefcase',
+    to: `/${eventSlug.value}/${partnershipId.value}/job-offers`
   }
 ]);
 

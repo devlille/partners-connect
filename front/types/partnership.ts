@@ -15,6 +15,14 @@ export interface ExtendedPartnershipItem extends PartnershipItemSchema {
   agreement_generated?: boolean;
   /** Indique si l'accord a été signé */
   agreement_signed?: boolean;
+  /** URL de la convention de partenariat */
+  agreement_url?: string | null;
+  /** URL de la convention signée */
+  agreement_signed_url?: string | null;
+  /** URL du devis */
+  quote_url?: string | null;
+  /** URL de la facture */
+  invoice_url?: string | null;
   /** IDs des options de sponsoring choisies par le sponsor */
   option_ids?: string[];
   /** Options complètes du pack sélectionné (avec nom et description) */

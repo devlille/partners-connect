@@ -82,6 +82,10 @@ export const usePublicPartnership = () => {
         suggestion: false,
         agreement_generated: p.process_status?.agreement_url !== null && p.process_status?.agreement_url !== undefined,
         agreement_signed: p.process_status?.agreement_signed_url !== null && p.process_status?.agreement_signed_url !== undefined,
+        agreement_url: p.process_status?.agreement_url || null,
+        agreement_signed_url: p.process_status?.agreement_signed_url || null,
+        quote_url: p.process_status?.quote_url || null,
+        invoice_url: p.process_status?.invoice_url || null,
         option_ids: optionIds,
         pack_options: packOptions
       };

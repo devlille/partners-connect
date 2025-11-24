@@ -1,95 +1,107 @@
 <template>
-  <Dashboard :main-links="sponsorLinks" :footer-links="footerLinks">
-    <div class="bg-white border-b border-gray-200 p-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <PageTitle>Offres d'emploi</PageTitle>
-          <p class="mt-1 text-sm text-gray-500">
-            Gérez les offres d'emploi de {{ companyName }}
-          </p>
-        </div>
-        <UButton
-          color="primary"
-          size="lg"
-          icon="i-heroicons-plus"
-          @click="isAddModalOpen = true"
-          :disabled="!companyId"
-        >
-          Ajouter une offre
-        </UButton>
-      </div>
-    </div>
-
-    <div class="p-6">
-      <!-- Loading state -->
-      <TableSkeleton v-if="loading" :columns="4" :rows="8" />
-
-      <!-- Error state -->
-      <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-        {{ error }}
-      </div>
-
-      <!-- Job offers list -->
-      <div v-else class="bg-white rounded-lg shadow">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <h2 class="text-lg font-semibold text-gray-900">
-            Offres d'emploi ({{ jobOffers.length }})
-          </h2>
-        </div>
-
-        <div v-if="jobOffers.length === 0" class="px-6 py-12 text-center">
-          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-          </svg>
-          <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune offre d'emploi</h3>
-          <p class="mt-1 text-sm text-gray-500">Commencez par ajouter une offre d'emploi.</p>
-        </div>
-
-        <ul v-else class="divide-y divide-gray-200">
-          <li v-for="job in jobOffers" :key="job.id" class="px-6 py-4 hover:bg-gray-50">
-            <div class="flex items-start justify-between">
-              <div class="flex-1">
-                <h3 class="text-base font-semibold text-gray-900">{{ job.title }}</h3>
-                <div class="mt-2 space-y-1">
-                  <p class="text-sm text-gray-600">
-                    <span class="font-medium">Localisation:</span> {{ job.location }}
-                  </p>
-                  <p v-if="job.salary" class="text-sm text-gray-600">
-                    <span class="font-medium">Salaire:</span> {{ job.salary }}
-                  </p>
-                  <p v-if="job.experience_years" class="text-sm text-gray-600">
-                    <span class="font-medium">Expérience:</span> {{ job.experience_years }} an(s)
-                  </p>
-                  <p class="text-sm text-gray-600">
-                    <span class="font-medium">Publié le:</span> {{ formatDate(job.publication_date) }}
-                  </p>
-                  <p v-if="job.end_date" class="text-sm text-gray-600">
-                    <span class="font-medium">Date limite:</span> {{ formatDate(job.end_date) }}
-                  </p>
-                  <p class="text-sm text-gray-600">
-                    <a :href="job.url" target="_blank" rel="noopener noreferrer" class="text-primary-600 hover:text-primary-800 underline">
-                      Voir l'offre complète
-                    </a>
-                  </p>
-                </div>
-              </div>
-              <UButton
-                color="error"
-                variant="ghost"
-                size="sm"
-                icon="i-heroicons-trash"
-                :loading="deletingJobId === job.id"
-                @click="confirmDelete(job)"
-              >
-                Supprimer
-              </UButton>
+  <NuxtLayout
+    name="minimal-sidebar"
+    :sidebar-title="partnership?.company_name || 'Partenariat'"
+    :sidebar-links="sidebarLinks"
+  >
+    <div class="min-h-screen bg-gray-50">
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" role="main">
+        <!-- Header -->
+        <header class="bg-white rounded-lg shadow p-6 mb-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <PageTitle>Offres d'emploi</PageTitle>
+              <p class="text-sm text-gray-600 mt-1" role="doc-subtitle">
+                Gérez les offres d'emploi de votre entreprise
+              </p>
             </div>
-          </li>
-        </ul>
-      </div>
+            <UButton
+              color="primary"
+              size="lg"
+              icon="i-heroicons-plus"
+              @click="isAddModalOpen = true"
+            >
+              Ajouter une offre
+            </UButton>
+          </div>
+        </header>
+
+        <!-- Loading State -->
+        <div v-if="loading" role="status" aria-live="polite" aria-label="Chargement des données">
+          <TableSkeleton :columns="4" :rows="6" />
+          <span class="sr-only">Chargement des offres d'emploi...</span>
+        </div>
+
+        <!-- Error State -->
+        <div
+          v-else-if="error"
+          role="alert"
+          aria-live="assertive"
+          class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded"
+        >
+          {{ error }}
+        </div>
+
+        <!-- Job Offers List -->
+        <div v-else class="bg-white rounded-lg shadow">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">
+              Offres d'emploi ({{ jobOffers.length }})
+            </h2>
+          </div>
+
+          <div v-if="jobOffers.length === 0" class="px-6 py-12 text-center">
+            <i class="i-heroicons-briefcase text-gray-400 text-5xl mx-auto block mb-4" aria-hidden="true" />
+            <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune offre d'emploi</h3>
+            <p class="mt-1 text-sm text-gray-500">Commencez par ajouter une offre d'emploi.</p>
+          </div>
+
+          <ul v-else class="divide-y divide-gray-200">
+            <li v-for="job in jobOffers" :key="job.id" class="px-6 py-4 hover:bg-gray-50">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <h3 class="text-base font-semibold text-gray-900">{{ job.title }}</h3>
+                  <div class="mt-2 space-y-1">
+                    <p class="text-sm text-gray-600">
+                      <span class="font-medium">Localisation:</span> {{ job.location }}
+                    </p>
+                    <p v-if="job.salary" class="text-sm text-gray-600">
+                      <span class="font-medium">Salaire:</span> {{ job.salary }}
+                    </p>
+                    <p v-if="job.experience_years" class="text-sm text-gray-600">
+                      <span class="font-medium">Expérience:</span> {{ job.experience_years }} an(s)
+                    </p>
+                    <p class="text-sm text-gray-600">
+                      <span class="font-medium">Publié le:</span> {{ formatDate(job.publication_date) }}
+                    </p>
+                    <p v-if="job.end_date" class="text-sm text-gray-600">
+                      <span class="font-medium">Date limite:</span> {{ formatDate(job.end_date) }}
+                    </p>
+                    <p class="text-sm text-gray-600">
+                      <a :href="job.url" target="_blank" rel="noopener noreferrer" class="text-primary-600 hover:text-primary-800 underline">
+                        Voir l'offre complète
+                      </a>
+                    </p>
+                  </div>
+                </div>
+                <UButton
+                  color="error"
+                  variant="ghost"
+                  size="sm"
+                  icon="i-heroicons-trash"
+                  :loading="deletingJobId === job.id"
+                  @click="confirmDelete(job)"
+                >
+                  Supprimer
+                </UButton>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </main>
     </div>
 
-    <!-- Modal d'ajout (identique à la page companies) -->
+    <!-- Modal d'ajout -->
     <Teleport to="body">
       <div v-if="isAddModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" @click.self="isAddModalOpen = false">
         <div class="w-full max-w-2xl bg-white rounded-lg shadow-xl max-h-[90vh] overflow-y-auto" @click.stop>
@@ -262,45 +274,61 @@
         </div>
       </div>
     </Teleport>
-  </Dashboard>
+  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import { getEventsPartnershipDetailed, getCompaniesJobOffers, postCompaniesJobOffers, deleteCompaniesJobOffersById, type JobOfferResponseSchema, type CreateJobOfferSchema } from '~/utils/api';
-import authMiddleware from '~/middleware/auth';
-
-const route = useRoute();
-const { footerLinks } = useDashboardLinks();
-const toast = useToast();
+import { getCompaniesJobOffers, postCompaniesJobOffers, deleteCompaniesJobOffersById, type JobOfferResponseSchema, type CreateJobOfferSchema } from '~/utils/api';
 
 definePageMeta({
-  middleware: authMiddleware,
-  ssr: false
+  auth: false,
+  ssr: false,
+  validate: async (route) => {
+    // Validate both eventSlug and partnershipId format (alphanumeric, hyphens, underscores)
+    const eventSlug = Array.isArray(route.params.eventSlug) ? route.params.eventSlug[0] : route.params.eventSlug;
+    const partnershipId = Array.isArray(route.params.partnershipId) ? route.params.partnershipId[0] : route.params.partnershipId;
+
+    const isValidFormat = /^[a-zA-Z0-9-_]+$/;
+    return isValidFormat.test(eventSlug) && isValidFormat.test(partnershipId);
+  }
 });
 
-const orgSlug = computed(() => {
-  const params = route.params.slug;
-  return Array.isArray(params) ? params[0] as string : params as string;
-});
+const route = useRoute();
+const toast = useToast();
 
-const eventSlug = computed(() => {
-  const params = route.params.eventSlug;
-  return Array.isArray(params) ? params[0] as string : params as string;
-});
+const {
+  eventSlug,
+  partnershipId,
+  partnership,
+  company,
+  loadPartnership
+} = usePublicPartnership();
 
-const sponsorId = computed(() => {
-  const params = route.params.sponsorId;
-  return Array.isArray(params) ? params[0] as string : params as string;
-});
+// Sidebar navigation configuration
+const sidebarLinks = computed(() => [
+  {
+    label: 'Partenariat',
+    icon: 'i-heroicons-hand-raised',
+    to: `/${eventSlug.value}/${partnershipId.value}`
+  },
+  {
+    label: 'Entreprise',
+    icon: 'i-heroicons-building-office',
+    to: `/${eventSlug.value}/${partnershipId.value}/company`
+  },
+  {
+    label: 'Offres d\'emploi',
+    icon: 'i-heroicons-briefcase',
+    to: `/${eventSlug.value}/${partnershipId.value}/job-offers`
+  }
+]);
 
-const { sponsorLinks } = useSponsorLinks(orgSlug.value, eventSlug.value, sponsorId.value);
-
-const companyId = ref<string | null>(null);
-const companyName = ref<string>('');
+// Job offers state
 const jobOffers = ref<JobOfferResponseSchema[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 
+// Add modal state
 const isAddModalOpen = ref(false);
 const newJob = ref<Partial<CreateJobOfferSchema>>({
   title: '',
@@ -314,48 +342,26 @@ const newJob = ref<Partial<CreateJobOfferSchema>>({
 const isSubmitting = ref(false);
 const addError = ref<string | null>(null);
 
+// Delete modal state
 const isDeleteModalOpen = ref(false);
 const jobToDelete = ref<JobOfferResponseSchema | null>(null);
 const deletingJobId = ref<string | null>(null);
 
-// Charger le company_id à partir du sponsorId en utilisant l'API getEventsPartnershipDetailed
-async function loadCompanyId() {
-  try {
-    loading.value = true;
-    error.value = null;
-
-    // Utiliser l'API qui retourne directement les infos du partenariat et de la company
-    const response = await getEventsPartnershipDetailed(eventSlug.value, sponsorId.value);
-    const { company } = response.data;
-
-    if (company && company.id) {
-      companyId.value = company.id;
-      companyName.value = company.name;
-    } else {
-      error.value = 'Impossible de trouver la compagnie associée à ce partenariat';
-    }
-  } catch (err: any) {
-    console.error('Failed to load company ID:', err);
-
-    if (err.response?.status === 404) {
-      error.value = 'Partenariat introuvable';
-    } else {
-      error.value = 'Impossible de charger les informations de la compagnie';
-    }
-  } finally {
-    loading.value = false;
-  }
-}
-
+/**
+ * Load job offers for the company
+ */
 async function loadJobOffers() {
-  if (!companyId.value) return;
+  if (!company.value?.id) {
+    // Wait for company data to be loaded
+    return;
+  }
 
   try {
     loading.value = true;
     error.value = null;
-    const response = await getCompaniesJobOffers(companyId.value);
+    const response = await getCompaniesJobOffers(company.value.id);
     jobOffers.value = response.data.items;
-  } catch (err) {
+  } catch (err: any) {
     console.error('Failed to load job offers:', err);
     error.value = 'Impossible de charger les offres d\'emploi';
   } finally {
@@ -363,6 +369,9 @@ async function loadJobOffers() {
   }
 }
 
+/**
+ * Format date string to French locale
+ */
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
   return date.toLocaleDateString('fr-FR', {
@@ -372,6 +381,9 @@ function formatDate(dateString: string): string {
   });
 }
 
+/**
+ * Handle adding a new job offer
+ */
 async function handleAddJob() {
   addError.value = null;
 
@@ -396,8 +408,8 @@ async function handleAddJob() {
     return;
   }
 
-  if (!companyId.value) {
-    addError.value = 'Impossible de déterminer la compagnie';
+  if (!company.value?.id) {
+    addError.value = 'Impossible de trouver les informations de l\'entreprise';
     return;
   }
 
@@ -414,9 +426,9 @@ async function handleAddJob() {
       salary: newJob.value.salary || null
     };
 
-    await postCompaniesJobOffers(companyId.value, jobData);
+    await postCompaniesJobOffers(company.value.id, jobData);
 
-    // Recharger la liste
+    // Reload job offers list
     await loadJobOffers();
 
     // Show success toast
@@ -426,7 +438,7 @@ async function handleAddJob() {
       color: 'success'
     });
 
-    // Fermer le modal et réinitialiser
+    // Close modal and reset form
     isAddModalOpen.value = false;
     newJob.value = {
       title: '',
@@ -437,7 +449,7 @@ async function handleAddJob() {
       experience_years: null,
       salary: null
     };
-  } catch (err) {
+  } catch (err: any) {
     console.error('Failed to add job offer:', err);
     addError.value = 'Impossible d\'ajouter l\'offre d\'emploi. Vérifiez les informations.';
   } finally {
@@ -445,20 +457,26 @@ async function handleAddJob() {
   }
 }
 
+/**
+ * Confirm job offer deletion
+ */
 function confirmDelete(job: JobOfferResponseSchema) {
   jobToDelete.value = job;
   isDeleteModalOpen.value = true;
 }
 
+/**
+ * Handle job offer deletion
+ */
 async function handleDelete() {
-  if (!jobToDelete.value || !companyId.value) return;
+  if (!jobToDelete.value || !company.value?.id) return;
 
   try {
     deletingJobId.value = jobToDelete.value.id;
 
-    await deleteCompaniesJobOffersById(companyId.value, jobToDelete.value.id);
+    await deleteCompaniesJobOffersById(company.value.id, jobToDelete.value.id);
 
-    // Recharger la liste
+    // Reload job offers list
     await loadJobOffers();
 
     // Show success toast
@@ -468,7 +486,7 @@ async function handleDelete() {
       color: 'success'
     });
 
-    // Fermer le modal
+    // Close modal
     isDeleteModalOpen.value = false;
     jobToDelete.value = null;
   } catch (err: any) {
@@ -485,14 +503,28 @@ async function handleDelete() {
   }
 }
 
+// Load partnership data on mount
 onMounted(async () => {
-  await loadCompanyId();
-  if (companyId.value) {
+  await loadPartnership();
+  // Once partnership is loaded, load job offers
+  if (company.value?.id) {
     await loadJobOffers();
   }
 });
 
+// Reload job offers when company changes
+watch(() => company.value?.id, (newId) => {
+  if (newId) {
+    loadJobOffers();
+  }
+});
+
+// Reload if partnership ID or event slug changes
+watch([eventSlug, partnershipId], async () => {
+  await loadPartnership();
+});
+
 useHead({
-  title: computed(() => `Offres d'emploi - ${companyName.value} | DevLille`)
+  title: computed(() => `Offres d'emploi - ${partnership.value?.company_name || 'Partenariat'} | DevLille`)
 });
 </script>

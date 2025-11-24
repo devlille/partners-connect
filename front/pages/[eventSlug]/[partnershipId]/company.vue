@@ -100,6 +100,11 @@ const sidebarLinks = computed(() => [
     label: 'Entreprise',
     icon: 'i-heroicons-building-office',
     to: `/${eventSlug.value}/${partnershipId.value}/company`
+  },
+  {
+    label: 'Offres d\'emploi',
+    icon: 'i-heroicons-briefcase',
+    to: `/${eventSlug.value}/${partnershipId.value}/job-offers`
   }
 ]);
 
