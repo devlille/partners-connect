@@ -26,9 +26,10 @@ class QontoBillingGateway(
             BillingEntity.singleByEventAndPartnership(pricing.eventId.toUUID(), pricing.partnershipId.toUUID())
                 ?: throw NotFoundException("No billing found for company ${pricing.partnershipId}")
         }
+        val event = transaction { billing.event }
         val items = invoiceItems(pricing)
         val client = qontoProvider.getClient(billing, config)
-        val request = billing.event.toQontoInvoiceRequest(
+        val request = event.toQontoInvoiceRequest(
             clientId = client.id,
             invoicePo = billing.po,
             invoiceItems = items,
@@ -42,9 +43,10 @@ class QontoBillingGateway(
             BillingEntity.singleByEventAndPartnership(pricing.eventId.toUUID(), pricing.partnershipId.toUUID())
                 ?: throw NotFoundException("No billing found for company ${pricing.partnershipId}")
         }
+        val event = transaction { billing.event }
         val items = invoiceItems(pricing)
         val client = qontoProvider.getClient(billing, config)
-        val request = billing.event.toQontoQuoteRequest(clientId = client.id, invoiceItems = items)
+        val request = event.toQontoQuoteRequest(clientId = client.id, invoiceItems = items)
         return qontoProvider.createQuote(request, config).quoteUrl
     }
 }
