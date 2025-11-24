@@ -363,3 +363,10 @@ route("/orgs/{orgSlug}/events/{eventSlug}/resource") {
 ```
 
 **Trust these instructions** - they are validated and complete. Only search for additional information if you encounter specific errors not covered here.
+
+## Active Technologies
+- Kotlin (JVM 21) with Ktor framework + Ktor 2.x, Exposed ORM, Koin (DI), kotlinx.serialization (012-sync-pack-options)
+- PostgreSQL database with Exposed ORM, H2 in-memory for tests (012-sync-pack-options)
+
+## Recent Changes
+- 012-sync-pack-options: Added Kotlin (JVM 21) with Ktor framework + Ktor 2.x, Exposed ORM, Koin (DI), kotlinx.serialization

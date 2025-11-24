@@ -2511,11 +2511,23 @@ paths:
                 $ref: "#/components/schemas/Identifier"
   /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}/options:
     post:
-      summary: "Create sponsoring option"
+      summary: "Synchronize sponsoring pack options"
       operationId: "postOrgsEventsPacksOptions"
       security:
         - bearerAuth: []
-      description: ""
+      description: |
+        Synchronizes the complete set of options for a sponsoring pack.
+        
+        This endpoint accepts a complete configuration of required and optional options
+        and ensures the pack's final state exactly matches the submitted configuration by:
+        - Removing options not included in the request
+        - Adding new options from the request
+        - Updating requirement status (required ↔ optional) for existing options
+        
+        The operation is atomic - all changes succeed or all fail. The operation is
+        idempotent - submitting the same configuration multiple times produces the same result.
+        
+        Both required and optional lists can be empty to remove all options from the pack.
       parameters:
         - name: "eventSlug"
           in: "path"
@@ -2539,18 +2551,38 @@ paths:
               $ref: "#/components/schemas/AttachOptionsToPack"
         required: true
       responses:
+        "201":
+          description: "Options synchronized successfully"
         "400":
-          description: "Bad Request"
+          description: "Bad Request - Invalid request body"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "201":
-          description: "Created"
+        "401":
+          description: "Unauthorized - Invalid or missing authentication"
           content:
-            '*/*':
+            application/json:
               schema:
-                type: "object"
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Forbidden - Options do not belong to event"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Not Found - Pack or options not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: "Conflict - Duplicate option in required and optional lists"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}/options/{optionId}:
     delete:
       summary: "Delete sponsoring option"

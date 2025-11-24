@@ -333,7 +333,7 @@ class SponsoringPackRoutesTest {
     }
 
     @Test
-    fun `POST packs options returns 409 if option is already attached to pack`() = testApplication {
+    fun `POST packs options is idempotent when option already attached`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
         val eventSlug = "test-post-packs-options-r-522"
@@ -363,8 +363,239 @@ class SponsoringPackRoutesTest {
             )
         }
 
-        assertEquals(HttpStatusCode.Conflict, response.status)
-        assertTrue { response.bodyAsText().contains("Option already attached to pack") }
+        assertEquals(HttpStatusCode.Created, response.status)
+    }
+
+    @Test
+    fun `POST pack options synchronizes by removing old and adding new options`() = testApplication {
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val eventSlug = "test-sync-pack-options-001"
+        val packId = UUID.randomUUID()
+        val optionA = UUID.randomUUID()
+        val optionB = UUID.randomUUID()
+        val optionC = UUID.randomUUID()
+        val optionD = UUID.randomUUID()
+
+        application {
+            moduleMocked()
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
+            insertMockedSponsoringPack(packId, eventId)
+            insertMockedSponsoringOption(optionA, eventId, name = "Logo")
+            insertMockedSponsoringOption(optionB, eventId, name = "Booth")
+            insertMockedSponsoringOption(optionC, eventId, name = "Talk")
+            insertMockedSponsoringOption(optionD, eventId, name = "Article")
+
+            // Attach options A and B initially
+            insertMockedPackOptions(packId, optionA, required = true)
+            insertMockedPackOptions(packId, optionB, required = false)
+        }
+
+        // Sync to options C and D (should replace A and B)
+        val response = client.post("/orgs/$orgId/events/$eventSlug/packs/$packId/options") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(
+                Json.encodeToString(
+                    AttachOptionsToPack(
+                        required = listOf(optionC.toString()),
+                        optional = listOf(optionD.toString()),
+                    ),
+                ),
+            )
+        }
+
+        assertEquals(HttpStatusCode.Created, response.status)
+
+        // Verify pack now has only C and D
+        val verifyResponse = client.get("/orgs/$orgId/events/$eventSlug/packs") {
+            header(HttpHeaders.AcceptLanguage, "en")
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+        val body = verifyResponse.bodyAsText()
+        assertTrue(body.contains("Talk")) // Option C
+        assertTrue(body.contains("Article")) // Option D
+        assertTrue(!body.contains("Logo")) // Option A removed
+        assertTrue(!body.contains("Booth")) // Option B removed
+    }
+
+    @Test
+    fun `POST pack options keeps overlapping options and removes non-overlapping`() = testApplication {
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val eventSlug = "test-sync-pack-options-002"
+        val packId = UUID.randomUUID()
+        val optionA = UUID.randomUUID()
+        val optionB = UUID.randomUUID()
+        val optionC = UUID.randomUUID()
+        val optionD = UUID.randomUUID()
+
+        application {
+            moduleMocked()
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
+            insertMockedSponsoringPack(packId, eventId)
+            insertMockedSponsoringOption(optionA, eventId, name = "Logo")
+            insertMockedSponsoringOption(optionB, eventId, name = "Booth")
+            insertMockedSponsoringOption(optionC, eventId, name = "Talk")
+            insertMockedSponsoringOption(optionD, eventId, name = "Article")
+
+            // Attach options A, B, C initially
+            insertMockedPackOptions(packId, optionA, required = true)
+            insertMockedPackOptions(packId, optionB, required = false)
+            insertMockedPackOptions(packId, optionC, required = false)
+        }
+
+        // Sync to B (optional) and D (required) - should keep B, remove A and C, add D
+        val response = client.post("/orgs/$orgId/events/$eventSlug/packs/$packId/options") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(
+                Json.encodeToString(
+                    AttachOptionsToPack(
+                        required = listOf(optionD.toString()),
+                        optional = listOf(optionB.toString()),
+                    ),
+                ),
+            )
+        }
+
+        assertEquals(HttpStatusCode.Created, response.status)
+
+        // Verify pack has only B and D
+        val verifyResponse = client.get("/orgs/$orgId/events/$eventSlug/packs") {
+            header(HttpHeaders.AcceptLanguage, "en")
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+        val body = verifyResponse.bodyAsText()
+        assertTrue(body.contains("Booth")) // Option B kept
+        assertTrue(body.contains("Article")) // Option D added
+        assertTrue(!body.contains("Logo")) // Option A removed
+        assertTrue(!body.contains("Talk")) // Option C removed
+    }
+
+    @Test
+    fun `POST pack options removes all options when empty lists submitted`() = testApplication {
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val eventSlug = "test-sync-pack-options-003"
+        val packId = UUID.randomUUID()
+        val optionA = UUID.randomUUID()
+        val optionB = UUID.randomUUID()
+
+        application {
+            moduleMocked()
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
+            insertMockedSponsoringPack(packId, eventId)
+            insertMockedSponsoringOption(optionA, eventId, name = "Logo")
+            insertMockedSponsoringOption(optionB, eventId, name = "Booth")
+
+            // Attach options initially
+            insertMockedPackOptions(packId, optionA, required = true)
+            insertMockedPackOptions(packId, optionB, required = false)
+        }
+
+        // Sync to empty configuration
+        val response = client.post("/orgs/$orgId/events/$eventSlug/packs/$packId/options") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(
+                Json.encodeToString(
+                    AttachOptionsToPack(
+                        required = emptyList(),
+                        optional = emptyList(),
+                    ),
+                ),
+            )
+        }
+
+        assertEquals(HttpStatusCode.Created, response.status)
+
+        // Verify pack has no options
+        val verifyResponse = client.get("/orgs/$orgId/events/$eventSlug/packs") {
+            header(HttpHeaders.AcceptLanguage, "en")
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+        val body = json.decodeFromString<List<SponsoringPack>>(verifyResponse.bodyAsText())
+        assertEquals(1, body.size)
+        assertTrue(body[0].requiredOptions.isEmpty())
+        assertTrue(body[0].optionalOptions.isEmpty())
+    }
+
+    @Test
+    fun `POST pack options updates requirement status from required to optional`() = testApplication {
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val eventSlug = "test-sync-pack-options-004"
+        val packId = UUID.randomUUID()
+        val optionA = UUID.randomUUID()
+
+        application {
+            moduleMocked()
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
+            insertMockedSponsoringPack(packId, eventId)
+            insertMockedSponsoringOption(optionA, eventId, name = "Logo")
+
+            // Attach option A as required initially
+            insertMockedPackOptions(packId, optionA, required = true)
+        }
+
+        // Sync with option A in optional list (changes status from required to optional)
+        val response = client.post("/orgs/$orgId/events/$eventSlug/packs/$packId/options") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(
+                Json.encodeToString(
+                    AttachOptionsToPack(
+                        required = emptyList(),
+                        optional = listOf(optionA.toString()),
+                    ),
+                ),
+            )
+        }
+
+        // Operation succeeds - status change applied
+        assertEquals(HttpStatusCode.Created, response.status)
+    }
+
+    @Test
+    fun `POST pack options updates requirement status from optional to required`() = testApplication {
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val eventSlug = "test-sync-pack-options-005"
+        val packId = UUID.randomUUID()
+        val optionB = UUID.randomUUID()
+
+        application {
+            moduleMocked()
+            insertMockedOrganisationEntity(orgId)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
+            insertMockedSponsoringPack(packId, eventId)
+            insertMockedSponsoringOption(optionB, eventId, name = "Booth")
+
+            // Attach option B as optional initially
+            insertMockedPackOptions(packId, optionB, required = false)
+        }
+
+        // Sync with option B in required list (changes status from optional to required)
+        val response = client.post("/orgs/$orgId/events/$eventSlug/packs/$packId/options") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(
+                Json.encodeToString(
+                    AttachOptionsToPack(
+                        required = listOf(optionB.toString()),
+                        optional = emptyList(),
+                    ),
+                ),
+            )
+        }
+
+        // Operation succeeds - status change applied
+        assertEquals(HttpStatusCode.Created, response.status)
     }
 
     @Test
