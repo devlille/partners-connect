@@ -8,9 +8,11 @@ import fr.devlille.partners.connect.billing.infrastructure.bindings.billingModul
 import fr.devlille.partners.connect.companies.infrastructure.bindings.companyModule
 import fr.devlille.partners.connect.events.infrastructure.bindings.eventModule
 import fr.devlille.partners.connect.integrations.infrastructure.bindings.integrationModule
+import fr.devlille.partners.connect.internal.infrastructure.bindings.mapsModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkClientModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.storageModule
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
+import fr.devlille.partners.connect.internal.infrastructure.geocode.Geocode
 import fr.devlille.partners.connect.module
 import fr.devlille.partners.connect.notifications.infrastructure.bindings.notificationModule
 import fr.devlille.partners.connect.organisations.infrastructure.bindings.organisationModule
@@ -23,6 +25,7 @@ import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
 import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.server.application.Application
+import io.mockk.every
 import io.mockk.mockk
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -34,6 +37,13 @@ fun Application.moduleMocked(
     },
     mockStorage: Module = module {
         single<Storage> { mockk() }
+    },
+    mockGeocode: Module = module {
+        single<Geocode> {
+            val geocodeApi = mockk<Geocode>()
+            every { geocodeApi.countryCode(any()) } returns "FR"
+            geocodeApi
+        }
     },
     mockBillingIntegration: Module = module {
         single<List<BillingGateway>> {
@@ -59,6 +69,7 @@ fun Application.moduleMocked(
             modules = listOf(
                 networkClientModule,
                 storageModule,
+                mapsModule,
                 authModule,
                 organisationModule,
                 eventModule,
@@ -74,6 +85,7 @@ fun Application.moduleMocked(
                 integrationModule,
                 mockNetwork,
                 mockStorage,
+                mockGeocode,
                 mockBillingIntegration,
                 mockWebhook,
             ),

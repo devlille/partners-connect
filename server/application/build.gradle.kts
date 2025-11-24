@@ -44,6 +44,7 @@ dependencies {
     implementation(libs.bundles.slack.api)
     implementation(libs.bundles.image.processing)
     implementation(libs.google.cloud.storage)
+    implementation(libs.google.maps)
     implementation(libs.flexmark)
     implementation(libs.mustache)
     implementation(libs.json.schema.validator)

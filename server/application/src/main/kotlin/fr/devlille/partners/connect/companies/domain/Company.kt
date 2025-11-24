@@ -26,7 +26,10 @@ class Address(
     @SerialName("zip_code")
     val zipCode: String,
     val country: String,
-)
+) {
+    val fullAddress: String
+        get() = "$address, $zipCode $city, $country"
+}
 
 @Serializable
 class Social(

@@ -20,6 +20,7 @@ import fr.devlille.partners.connect.internal.infrastructure.api.ResponseExceptio
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnsupportedMediaTypeException
 import fr.devlille.partners.connect.internal.infrastructure.api.UserSession
+import fr.devlille.partners.connect.internal.infrastructure.bindings.mapsModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkClientModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.networkEngineModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.storageModule
@@ -84,6 +85,7 @@ data class ApplicationConfig(
         networkEngineModule,
         networkClientModule,
         storageModule,
+        mapsModule,
         authModule,
         organisationModule,
         eventModule,

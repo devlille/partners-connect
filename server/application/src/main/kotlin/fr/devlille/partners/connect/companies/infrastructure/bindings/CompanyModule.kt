@@ -10,13 +10,14 @@ import fr.devlille.partners.connect.companies.domain.CompanyJobOfferPromotionRep
 import fr.devlille.partners.connect.companies.domain.CompanyJobOfferRepository
 import fr.devlille.partners.connect.companies.domain.CompanyMediaRepository
 import fr.devlille.partners.connect.companies.domain.CompanyRepository
+import fr.devlille.partners.connect.internal.infrastructure.bindings.mapsModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.storageModule
 import org.koin.dsl.module
 
 val companyModule = module {
-    includes(storageModule)
+    includes(storageModule, mapsModule)
     single<CompanyRepository> {
-        CompanyRepositoryExposed()
+        CompanyRepositoryExposed(get())
     }
     single<CompanyJobOfferRepository> {
         CompanyJobOfferRepositoryExposed()

@@ -14,11 +14,14 @@ import fr.devlille.partners.connect.internal.infrastructure.api.ConflictExceptio
 import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedResponse
 import fr.devlille.partners.connect.internal.infrastructure.api.paginated
 import fr.devlille.partners.connect.internal.infrastructure.api.toPaginatedResponse
+import fr.devlille.partners.connect.internal.infrastructure.geocode.Geocode
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
-class CompanyRepositoryExposed : CompanyRepository {
+class CompanyRepositoryExposed(
+    private val geocode: Geocode,
+) : CompanyRepository {
     override fun listPaginated(
         query: String?,
         status: CompanyStatus?,
@@ -42,13 +45,14 @@ class CompanyRepositoryExposed : CompanyRepository {
     }
 
     override fun createOrUpdate(input: CreateCompany): UUID = transaction {
+        val countryCode = geocode.countryCode(input.headOffice.fullAddress)
         val company = CompanyEntity.new {
             name = input.name
             siteUrl = input.siteUrl
             address = input.headOffice.address
             city = input.headOffice.city
             zipCode = input.headOffice.zipCode
-            country = input.headOffice.country
+            country = countryCode ?: input.headOffice.country
             siret = input.siret
             vat = input.vat
             description = input.description
@@ -94,10 +98,10 @@ class CompanyRepositoryExposed : CompanyRepository {
         input.name?.let { company.name = it }
         input.siteUrl?.let { company.siteUrl = it }
         input.headOffice?.let { address ->
-            company.address = address.address
-            company.city = address.city
-            company.zipCode = address.zipCode
-            company.country = address.country
+            company.address = input.headOffice.address
+            company.city = input.headOffice.city
+            company.zipCode = input.headOffice.zipCode
+            company.country = geocode.countryCode(input.headOffice.fullAddress) ?: input.headOffice.country
         }
         input.siret?.let { company.siret = it }
         input.vat?.let { company.vat = it }
