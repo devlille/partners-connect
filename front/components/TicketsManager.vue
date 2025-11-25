@@ -21,9 +21,7 @@
     <TableSkeleton v-if="loading" :columns="4" :rows="3" />
 
     <!-- Error state -->
-    <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-      {{ error }}
-    </div>
+    <AlertMessage v-else-if="error" :message="error" type="error" />
 
     <!-- Tickets list -->
     <div v-else-if="tickets.length > 0" class="bg-white rounded-lg shadow overflow-hidden">
@@ -159,9 +157,7 @@
                     />
                   </div>
 
-                  <div v-if="formError" class="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">
-                    {{ formError }}
-                  </div>
+                  <AlertMessage v-if="formError" :message="formError" type="error" class="text-sm" />
 
                   <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
                     <UButton

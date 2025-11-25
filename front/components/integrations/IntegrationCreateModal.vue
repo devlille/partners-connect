@@ -85,9 +85,7 @@
             </div>
 
             <!-- Error Message -->
-            <div v-if="error" class="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-4 py-3">
-              {{ error }}
-            </div>
+            <AlertMessage v-if="error" :message="error" type="error" class="text-sm" />
           </form>
         </div>
 

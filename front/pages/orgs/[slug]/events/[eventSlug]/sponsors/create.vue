@@ -12,15 +12,16 @@
     <div class="p-6">
       <TableSkeleton v-if="loading" :columns="4" :rows="6" />
 
-      <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-        {{ error }}
-      </div>
+      <AlertMessage v-if="error" type="error" :message="error" class="mb-4" />
 
-      <div v-else-if="success" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
-        Sponsor créé avec succès ! Redirection en cours...
-      </div>
+      <AlertMessage 
+        v-if="success" 
+        type="success" 
+        message="Sponsor créé avec succès ! Redirection en cours..." 
+        class="mb-4"
+      />
 
-      <div v-else class="bg-white rounded-lg shadow p-6">
+      <div v-if="!loading && !error && !success" class="bg-white rounded-lg shadow p-6">
         <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations du sponsor</h2>
 
         <form @submit.prevent="onSave" class="space-y-6">

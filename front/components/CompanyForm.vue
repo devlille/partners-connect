@@ -1,12 +1,8 @@
 <template>
   <div class="space-y-6">
-    <div v-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-      {{ error }}
-    </div>
+    <AlertMessage v-if="error" type="error" :message="error" />
 
-    <div v-if="success" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
-      {{ success }}
-    </div>
+    <AlertMessage v-if="success" type="success" :message="success" />
 
     <form @submit.prevent="handleSubmit" class="space-y-4">
       <div>

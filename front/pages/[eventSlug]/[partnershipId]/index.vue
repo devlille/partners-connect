@@ -38,14 +38,7 @@
         </div>
 
         <!-- Error State -->
-        <div
-          v-else-if="error"
-          role="alert"
-          aria-live="assertive"
-          class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded"
-        >
-          {{ error }}
-        </div>
+        <AlertMessage v-else-if="error" type="error" :message="error" />
 
         <!-- Suggested Pack Section -->
         <section
@@ -199,47 +192,98 @@
             <!-- Agreement Document -->
             <div
               v-if="partnership.agreement_url || partnership.agreement_signed_url"
-              class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              class="space-y-3"
             >
-              <div class="flex items-center gap-3">
-                <i class="i-heroicons-document-check text-gray-400 text-xl" aria-hidden="true" />
-                <div>
-                  <p class="text-sm font-medium text-gray-900">Convention de partenariat</p>
-                  <p class="text-xs text-gray-500">Document contractuel</p>
+              <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                <div class="flex items-center gap-3">
+                  <i class="i-heroicons-document-check text-gray-400 text-xl" aria-hidden="true" />
+                  <div>
+                    <p class="text-sm font-medium text-gray-900">Convention de partenariat</p>
+                    <p class="text-xs text-gray-500">Document contractuel</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <UButton
+                    v-if="partnership.agreement_signed_url"
+                    :to="partnership.agreement_signed_url"
+                    target="_blank"
+                    color="neutral"
+                    variant="outline"
+                    size="sm"
+                    :aria-label="`Télécharger la convention signée`"
+                  >
+                    <i class="i-heroicons-arrow-down-tray mr-1" aria-hidden="true" />
+                    Télécharger (signée)
+                  </UButton>
+                  <UButton
+                    v-else-if="partnership.agreement_url"
+                    :to="partnership.agreement_url"
+                    target="_blank"
+                    color="neutral"
+                    variant="outline"
+                    size="sm"
+                    :aria-label="`Télécharger la convention`"
+                  >
+                    <i class="i-heroicons-arrow-down-tray mr-1" aria-hidden="true" />
+                    Télécharger
+                  </UButton>
+                  <span
+                    v-if="partnership.agreement_signed_url"
+                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 rounded-full"
+                  >
+                    <i class="i-heroicons-check-circle" aria-hidden="true" />
+                    Signée
+                  </span>
                 </div>
               </div>
-              <div class="flex items-center gap-2">
-                <UButton
-                  v-if="partnership.agreement_signed_url"
-                  :to="partnership.agreement_signed_url"
-                  target="_blank"
-                  color="neutral"
-                  variant="outline"
-                  size="sm"
-                  :aria-label="`Télécharger la convention signée`"
-                >
-                  <i class="i-heroicons-arrow-down-tray mr-1" aria-hidden="true" />
-                  Télécharger (signée)
-                </UButton>
-                <UButton
-                  v-else-if="partnership.agreement_url"
-                  :to="partnership.agreement_url"
-                  target="_blank"
-                  color="neutral"
-                  variant="outline"
-                  size="sm"
-                  :aria-label="`Télécharger la convention`"
-                >
-                  <i class="i-heroicons-arrow-down-tray mr-1" aria-hidden="true" />
-                  Télécharger
-                </UButton>
-                <span
-                  v-if="partnership.agreement_signed_url"
-                  class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 rounded-full"
-                >
-                  <i class="i-heroicons-check-circle" aria-hidden="true" />
-                  Signée
-                </span>
+
+              <!-- Upload Signed Agreement -->
+              <div
+                v-if="partnership.agreement_url && !partnership.agreement_signed_url"
+                class="p-4 border border-blue-200 bg-blue-50 rounded-lg"
+              >
+                <div class="flex items-start gap-3">
+                  <i class="i-heroicons-arrow-up-tray text-blue-600 text-xl flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <div class="flex-1">
+                    <h4 class="text-sm font-semibold text-blue-900 mb-1">
+                      Uploader la convention signée
+                    </h4>
+                    <p class="text-xs text-blue-700 mb-3">
+                      Une fois la convention signée, veuillez uploader le document signé au format PDF.
+                    </p>
+
+                    <AlertMessage
+                      v-if="uploadError"
+                      type="error"
+                      :message="uploadError"
+                      class="mb-3"
+                    />
+
+                    <div class="flex items-center gap-2">
+                      <UButton
+                        color="primary"
+                        size="sm"
+                        icon="i-heroicons-arrow-up-tray"
+                        :loading="uploadingAgreement"
+                        :disabled="uploadingAgreement"
+                        @click="triggerAgreementFileInput"
+                      >
+                        Sélectionner le fichier PDF
+                      </UButton>
+                      <span v-if="uploadingAgreement" class="text-xs text-gray-600">
+                        Upload en cours...
+                      </span>
+                    </div>
+
+                    <input
+                      ref="agreementFileInput"
+                      type="file"
+                      accept=".pdf,application/pdf"
+                      class="hidden"
+                      @change="handleAgreementFileSelect"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -270,7 +314,7 @@
 <script setup lang="ts">
 import PartnershipForm from "~/components/partnership/PartnershipForm.vue";
 import BillingForm from "~/components/partnership/BillingForm.vue";
-import { postEventsPartnershipSuggestionApprove, postEventsPartnershipSuggestionDecline } from "~/utils/api";
+import { postEventsPartnershipSuggestionApprove, postEventsPartnershipSuggestionDecline, postEventsPartnershipSignedAgreement } from "~/utils/api";
 
 definePageMeta({
   auth: false,
@@ -303,6 +347,11 @@ const {
 // États pour les actions de suggestion
 const acceptingSuggestion = ref(false);
 const rejectingSuggestion = ref(false);
+
+// États pour l'upload de la convention signée
+const uploadingAgreement = ref(false);
+const uploadError = ref<string | null>(null);
+const agreementFileInput = ref<HTMLInputElement>();
 
 /**
  * Handle accepting the suggested pack
@@ -377,6 +426,95 @@ async function handleRejectSuggestion() {
     });
   } finally {
     rejectingSuggestion.value = false;
+  }
+}
+
+/**
+ * Trigger file input for signed agreement
+ */
+function triggerAgreementFileInput() {
+  uploadError.value = null;
+  agreementFileInput.value?.click();
+}
+
+/**
+ * Handle signed agreement file selection
+ */
+async function handleAgreementFileSelect(event: Event) {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  
+  if (!file) return;
+
+  // Vérifier que c'est un PDF
+  if (file.type !== 'application/pdf') {
+    uploadError.value = 'Veuillez sélectionner un fichier PDF';
+    toast.add({
+      title: 'Format invalide',
+      description: 'Seuls les fichiers PDF sont acceptés',
+      color: 'error',
+      timeout: 5000
+    });
+    return;
+  }
+
+  // Vérifier la taille (10MB max)
+  const maxSize = 10 * 1024 * 1024;
+  if (file.size > maxSize) {
+    uploadError.value = 'Le fichier ne doit pas dépasser 10MB';
+    toast.add({
+      title: 'Fichier trop volumineux',
+      description: 'Le fichier PDF ne doit pas dépasser 10MB',
+      color: 'error',
+      timeout: 5000
+    });
+    return;
+  }
+
+  await handleAgreementUpload(file);
+}
+
+/**
+ * Upload signed agreement
+ */
+async function handleAgreementUpload(file: File) {
+  try {
+    uploadingAgreement.value = true;
+    uploadError.value = null;
+
+    await postEventsPartnershipSignedAgreement(
+      eventSlug.value,
+      partnershipId.value,
+      { file }
+    );
+
+    toast.add({
+      title: 'Succès',
+      description: 'La convention signée a été uploadée avec succès',
+      color: 'success',
+      timeout: 3000
+    });
+
+    // Réinitialiser l'input
+    if (agreementFileInput.value) {
+      agreementFileInput.value.value = '';
+    }
+
+    // Recharger les données du partenariat
+    await loadPartnership();
+  } catch (err: any) {
+    console.error('Failed to upload signed agreement:', err);
+    const errorMessage = err.response?.data?.message || 'Impossible d\'uploader la convention signée';
+    uploadError.value = errorMessage;
+
+    toast.add({
+      title: 'Erreur',
+      description: errorMessage,
+      color: 'error',
+      timeout: 5000
+    });
+  } finally {
+    uploadingAgreement.value = false;
   }
 }
 

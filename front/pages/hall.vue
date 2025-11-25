@@ -12,9 +12,7 @@
       <TableSkeleton v-if="loading" :columns="3" :rows="6" />
 
       <!-- Error state -->
-      <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-        {{ error }}
-      </div>
+      <AlertMessage v-else-if="error" :message="error" type="error" />
 
       <!-- Company selection -->
       <div v-else-if="companies.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

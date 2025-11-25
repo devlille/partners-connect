@@ -10,13 +10,14 @@
     </div>
 
     <div class="p-6">
-      <div v-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-        {{ error }}
-      </div>
+      <AlertMessage v-if="error" type="error" :message="error" class="mb-4" />
 
-      <div v-if="success" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
-        Événement créé avec succès ! Redirection en cours...
-      </div>
+      <AlertMessage 
+        v-if="success" 
+        type="success" 
+        message="Événement créé avec succès ! Redirection en cours..." 
+        class="mb-4"
+      />
 
       <EventForm
         :data="initialData"
