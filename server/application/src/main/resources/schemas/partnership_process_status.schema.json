@@ -45,7 +45,19 @@
     },
     "agreement_signed_url": {
       "type": [
-        "string", 
+        "string",
+        "null"
+      ]
+    },
+    "quote_url": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "invoice_url": {
+      "type": [
+        "string",
         "null"
       ]
     },

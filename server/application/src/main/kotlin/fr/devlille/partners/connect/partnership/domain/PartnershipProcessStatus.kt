@@ -24,6 +24,10 @@ data class PartnershipProcessStatus(
     val agreementUrl: String? = null,
     @SerialName("agreement_signed_url")
     val agreementSignedUrl: String? = null,
+    @SerialName("quote_url")
+    val quoteUrl: String? = null,
+    @SerialName("invoice_url")
+    val invoiceUrl: String? = null,
     @SerialName("communication_publication_date")
     val communicationPublicationDate: String? = null,
     @SerialName("communication_support_url")

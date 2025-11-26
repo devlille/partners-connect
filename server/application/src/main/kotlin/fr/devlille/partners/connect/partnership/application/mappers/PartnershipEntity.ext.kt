@@ -59,6 +59,8 @@ fun PartnershipEntity.toProcessStatus(billing: BillingEntity?): PartnershipProce
     declinedAt = declinedAt?.toString(),
     agreementUrl = agreementUrl,
     agreementSignedUrl = agreementSignedUrl,
+    quoteUrl = billing?.quotePdfUrl,
+    invoiceUrl = billing?.invoicePdfUrl,
     communicationPublicationDate = communicationPublicationDate?.toString(),
     communicationSupportUrl = communicationSupportUrl,
     billingStatus = billing?.status?.name,
