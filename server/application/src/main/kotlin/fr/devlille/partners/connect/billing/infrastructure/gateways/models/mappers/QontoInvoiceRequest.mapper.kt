@@ -10,6 +10,7 @@ import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenExcepti
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 internal fun EventEntity.toQontoInvoiceRequest(
     clientId: String,
@@ -21,14 +22,14 @@ internal fun EventEntity.toQontoInvoiceRequest(
     val eventDay = "%02d".format(startTime.dayOfMonth)
 
     // Validate required fields for invoice generation
-    val requiredIban = organisation.iban
+    val requiredIban = transaction { organisation.iban }
         ?: throw ForbiddenException("Field iban is required to perform this operation.")
 
     return QontoInvoiceRequest(
         settings = QontoInvoiceSettings(legalCapitalShare = QontoLegalCapitalShare(currency = "EUR")),
         clientId = clientId,
-        dueDate = "${now.year}-${"%02d".format(now.monthNumber)}-${"%02d".format(now.dayOfMonth)}",
-        issueDate = "${startTime.year}-$eventMonth-$eventDay",
+        issueDate = "${now.year}-${"%02d".format(now.monthNumber)}-${"%02d".format(now.dayOfMonth)}",
+        dueDate = "${startTime.year}-$eventMonth-$eventDay",
         currency = "EUR",
         paymentMethods = QontoPaymentMethods(iban = requiredIban),
         purchaseOrder = invoicePo,

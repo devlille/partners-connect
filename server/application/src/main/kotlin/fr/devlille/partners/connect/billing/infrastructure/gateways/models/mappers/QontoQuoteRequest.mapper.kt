@@ -16,8 +16,8 @@ internal fun EventEntity.toQontoQuoteRequest(
     val eventDay = "%02d".format(startTime.dayOfMonth)
     return QontoQuoteRequest(
         clientId = clientId,
-        issueDate = "${startTime.year}-$eventMonth-$eventDay",
-        expiryDate = "${now.year}-${"%02d".format(now.monthNumber)}-${"%02d".format(now.dayOfMonth)}",
+        expiryDate = "${startTime.year}-$eventMonth-$eventDay",
+        issueDate = "${now.year}-${"%02d".format(now.monthNumber)}-${"%02d".format(now.dayOfMonth)}",
         currency = "EUR",
         items = invoiceItems,
         termsAndConditions = " ",
