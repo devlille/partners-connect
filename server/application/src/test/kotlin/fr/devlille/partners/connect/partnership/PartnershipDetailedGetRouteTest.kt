@@ -213,7 +213,6 @@ class PartnershipDetailedGetRouteTest {
             header(HttpHeaders.Accept, "application/json")
         }
 
-        println(response.bodyAsText())
         assertEquals(HttpStatusCode.OK, response.status)
         val details = Json.decodeFromString(DetailedPartnershipResponse.serializer(), response.bodyAsText())
         assertNotNull(details.partnership.validatedPack)

@@ -28,6 +28,6 @@ object SystemVarEnv {
     }
 
     object QontoProvider {
-        val baseUrl: String = System.getenv("QONTO_BASE_URL") ?: "https://thirdparty-sandbox.staging.qonto.co"
+        val baseUrl: String = System.getenv("QONTO_BASE_URL") ?: "https://thirdparty.qonto.com"
     }
 }

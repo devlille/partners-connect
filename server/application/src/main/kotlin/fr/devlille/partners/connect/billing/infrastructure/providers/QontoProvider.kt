@@ -74,7 +74,6 @@ class QontoProvider(
             headers[HttpHeaders.ContentType] = "application/json"
             setBody(Json.encodeToString(QontoQuoteRequest.serializer(), request))
         }
-        println(response.bodyAsText())
         return response.body<QontoQuoteResponse>()
     }
 }
