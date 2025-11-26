@@ -53,7 +53,7 @@ class QontoBillingGateway(
         val items = invoiceItems(pricing)
         val client = getClient(billing, company, config)
         val request = event.toQontoQuoteRequest(clientId = client.id, invoiceItems = items)
-        return qontoProvider.createQuote(request, config).quoteUrl
+        return qontoProvider.createQuote(request, config).quote.quoteUrl
     }
 
     private suspend fun getClient(billing: BillingEntity, company: CompanyEntity, config: QontoConfig): QontoClient {

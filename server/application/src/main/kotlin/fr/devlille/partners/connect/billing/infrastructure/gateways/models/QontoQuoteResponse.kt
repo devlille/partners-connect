@@ -5,6 +5,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class QontoQuoteResponse(
+    val quote: QontoQuote,
+)
+
+@Serializable
+data class QontoQuote(
     val id: String,
     val number: String,
     @SerialName("quote_url")
