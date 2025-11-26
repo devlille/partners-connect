@@ -1,11 +1,15 @@
 package fr.devlille.partners.connect.billing.infrastructure.gateways
 
 import fr.devlille.partners.connect.billing.domain.BillingGateway
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoClient
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.mappers.invoiceItems
+import fr.devlille.partners.connect.billing.infrastructure.gateways.models.mappers.toQontoClientRequest
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.mappers.toQontoInvoiceRequest
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.mappers.toQontoQuoteRequest
 import fr.devlille.partners.connect.billing.infrastructure.providers.QontoProvider
+import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
+import fr.devlille.partners.connect.integrations.infrastructure.db.QontoConfig
 import fr.devlille.partners.connect.integrations.infrastructure.db.QontoIntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.get
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
@@ -27,8 +31,9 @@ class QontoBillingGateway(
                 ?: throw NotFoundException("No billing found for company ${pricing.partnershipId}")
         }
         val event = transaction { billing.event }
+        val company = transaction { billing.partnership.company }
         val items = invoiceItems(pricing)
-        val client = qontoProvider.getClient(billing, config)
+        val client = getClient(billing, company, config)
         val request = event.toQontoInvoiceRequest(
             clientId = client.id,
             invoicePo = billing.po,
@@ -44,9 +49,19 @@ class QontoBillingGateway(
                 ?: throw NotFoundException("No billing found for company ${pricing.partnershipId}")
         }
         val event = transaction { billing.event }
+        val company = transaction { billing.partnership.company }
         val items = invoiceItems(pricing)
-        val client = qontoProvider.getClient(billing, config)
+        val client = getClient(billing, company, config)
         val request = event.toQontoQuoteRequest(clientId = client.id, invoiceItems = items)
         return qontoProvider.createQuote(request, config).quoteUrl
+    }
+
+    private suspend fun getClient(billing: BillingEntity, company: CompanyEntity, config: QontoConfig): QontoClient {
+        val clients = qontoProvider.listClients(taxId = company.siret, config = config)
+        return if (clients.clients.isEmpty()) {
+            qontoProvider.createClient(billing.toQontoClientRequest(company), config).client
+        } else {
+            clients.clients.first()
+        }
     }
 }

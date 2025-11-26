@@ -214,7 +214,6 @@ class OptionRepositoryExposed(
             throw ForbiddenException("Some options do not belong to the event")
         }
 
-
         PackOptionsTable.deleteWhere { PackOptionsTable.pack eq packId }
 
         requiredOptions.forEach { option ->

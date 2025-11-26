@@ -2,10 +2,10 @@ package fr.devlille.partners.connect.billing.infrastructure.gateways.models.mapp
 
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoBillingAddress
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoClientRequest
+import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 
-internal fun BillingEntity.toQontoClientRequest(): QontoClientRequest {
-    val company = this.partnership.company
+internal fun BillingEntity.toQontoClientRequest(company: CompanyEntity): QontoClientRequest {
     return QontoClientRequest(
         name = this.name ?: company.name,
         firstName = this.contactFirstName,

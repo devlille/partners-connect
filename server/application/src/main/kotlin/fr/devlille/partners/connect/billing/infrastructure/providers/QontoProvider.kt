@@ -1,6 +1,5 @@
 package fr.devlille.partners.connect.billing.infrastructure.providers
 
-import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoClient
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoClientInvoiceResponse
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoClientRequest
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoClientResponse
@@ -8,10 +7,8 @@ import fr.devlille.partners.connect.billing.infrastructure.gateways.models.Qonto
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoInvoiceRequest
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoQuoteRequest
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoQuoteResponse
-import fr.devlille.partners.connect.billing.infrastructure.gateways.models.mappers.toQontoClientRequest
 import fr.devlille.partners.connect.integrations.infrastructure.db.QontoConfig
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
-import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -23,15 +20,6 @@ import kotlinx.serialization.json.Json
 class QontoProvider(
     private val httpClient: HttpClient,
 ) {
-    suspend fun getClient(billing: BillingEntity, config: QontoConfig): QontoClient {
-        val clients = listClients(taxId = billing.partnership.company.siret, config = config)
-        return if (clients.clients.isEmpty()) {
-            createClient(billing.toQontoClientRequest(), config).client
-        } else {
-            clients.clients.first()
-        }
-    }
-
     suspend fun listClients(taxId: String?, config: QontoConfig): QontoClientsResponse {
         val taxFilter = if (taxId.isNullOrBlank()) {
             ""
