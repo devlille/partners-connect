@@ -6,15 +6,32 @@
       "type": "string"
     },
     "head_office": {
-      "$ref": "address.schema.json"
+      "anyOf": [
+        { "$ref": "address.schema.json" },
+        { "type": "null" }
+      ]
     },
     "siret": {
-      "type": "string",
-      "pattern": "^\\d{14}$"
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^\\d{14}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "vat": {
-      "type": "string",
-      "pattern": "^[A-Z]{2}[0-9A-Z]+$"
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[A-Z]{2}[0-9A-Z]+$"
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "description": {
       "type": [
@@ -23,7 +40,10 @@
       ]
     },
     "site_url": {
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "socials": {
       "type": "array",
@@ -33,10 +53,6 @@
     }
   },
   "required": [
-    "name",
-    "head_office",
-    "siret",
-    "vat",
-    "site_url"
+    "name"
   ]
 }

@@ -142,11 +142,25 @@ internal fun EventEntity.toAgreementEvent(formatter: DateTimeFormat<LocalDate>):
     )
 }
 
-internal fun CompanyEntity.toAgreementCompany(): Company = Company(
-    name = this.name,
-    siret = this.siret,
-    headOffice = "${this.address}, ${this.zipCode} ${this.city}, ${this.country}",
-)
+internal fun CompanyEntity.toAgreementCompany(): Company {
+    val missingFields = mutableListOf<String>()
+
+    if (this.siret == null) missingFields.add("siret")
+    if (this.address == null) missingFields.add("address")
+    if (this.zipCode == null) missingFields.add("zipCode")
+    if (this.city == null) missingFields.add("city")
+    if (this.country == null) missingFields.add("country")
+
+    // Throw single exception with all missing fields if any
+    if (missingFields.isNotEmpty()) {
+        throw ForbiddenException("Fields ${missingFields.joinToString(", ")} are required to perform this operation.")
+    }
+    return Company(
+        name = this.name,
+        siret = this.siret!!,
+        headOffice = "${this.address}, ${this.zipCode} ${this.city}, ${this.country}",
+    )
+}
 
 @Suppress("ThrowsCount")
 internal fun PartnershipEntity.toAgreementPartnership(
