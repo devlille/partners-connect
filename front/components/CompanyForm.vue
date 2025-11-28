@@ -22,17 +22,10 @@
         :disabled="isLoading"
       />
 
-      <div>
-        <label for="vat" class="block text-sm font-medium text-gray-700 mb-1">
-          TVA
-        </label>
-        <UInput
-          id="vat"
-          v-model="form.vat"
-          placeholder="FR00000000000"
-          :disabled="isLoading"
-        />
-      </div>
+      <VatInput
+        v-model="form.vat"
+        :disabled="isLoading"
+      />
 
       <UrlInput
         v-model="form.site_url"
@@ -71,17 +64,10 @@
           </div>
 
           <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label for="zipCode" class="block text-sm font-medium text-gray-700 mb-1">
-                Code postal
-              </label>
-              <UInput
-                id="zipCode"
-                v-model="form.head_office.zip_code"
-                placeholder="00000"
-                :disabled="isLoading"
-              />
-            </div>
+            <ZipCodeInput
+              v-model="form.head_office.zip_code"
+              :disabled="isLoading"
+            />
 
             <div>
               <label for="city" class="block text-sm font-medium text-gray-700 mb-1">

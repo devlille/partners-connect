@@ -108,17 +108,9 @@
     <UAccordion :items="[{ label: 'Informations complémentaires', slot: 'complementary' }]" class="mb-6">
       <template #complementary>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-          <div>
-            <label for="tva" class="block text-sm font-medium text-gray-700 mb-1">TVA intracommunautaire</label>
-            <UInput
-              id="tva"
-              v-model="initialState.tva"
-              type="text"
-              autocomplete="off"
-              placeholder="Numéro de TVA"
-              class="w-full"
-            />
-          </div>
+          <VatInput
+            v-model="initialState.tva"
+          />
 
           <div>
             <label for="d_and_b" class="block text-sm font-medium text-gray-700 mb-1">D&B</label>
