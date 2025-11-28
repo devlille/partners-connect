@@ -61,20 +61,11 @@
             />
           </div>
 
-          <div>
-            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-              Email <span class="text-red-500">*</span>
-            </label>
-            <UInput
-              id="email"
-              v-model="form.contact.email"
-              type="email"
-              placeholder="email@example.com"
-              required
-              :disabled="readonly || loading"
-              class="w-full"
-            />
-          </div>
+          <EmailInput
+            v-model="form.contact.email"
+            :required="true"
+            :disabled="readonly || loading"
+          />
         </div>
       </div>
 
