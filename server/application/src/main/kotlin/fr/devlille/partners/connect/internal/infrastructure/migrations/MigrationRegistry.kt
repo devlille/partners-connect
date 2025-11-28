@@ -16,6 +16,7 @@ import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateJobOfferPromotionsTableMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.InitialSchemaMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.MakeOrganisationFieldsNullableMigration
+import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.MigrateNullableColumnInCompanyTableMigration
 
 /**
  * Registry that contains all database migrations in the system.
@@ -43,6 +44,7 @@ object MigrationRegistry {
         AddAgendaTablesMigration,
         AddHealthUrlColumnMigration,
         AddPartnershipOrganiserMigration,
+        MigrateNullableColumnInCompanyTableMigration,
     )
 
     /**

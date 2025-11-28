@@ -8,12 +8,12 @@ data class Company(
     val id: String,
     val name: String,
     @SerialName("head_office")
-    val headOffice: Address,
-    val siret: String,
-    val vat: String,
+    val headOffice: Address?,
+    val siret: String?,
+    val vat: String?,
     val description: String?,
     @SerialName("site_url")
-    val siteUrl: String,
+    val siteUrl: String?,
     val medias: Media?,
     val status: CompanyStatus,
     val socials: List<Social>,

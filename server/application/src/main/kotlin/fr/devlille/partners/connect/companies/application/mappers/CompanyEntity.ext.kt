@@ -7,6 +7,7 @@ import fr.devlille.partners.connect.companies.domain.Social
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanySocialEntity
 
+@Suppress("ComplexCondition")
 internal fun CompanyEntity.toDomain(
     socials: List<Social>,
 ): Company {
@@ -15,12 +16,16 @@ internal fun CompanyEntity.toDomain(
     return Company(
         id = id.value.toString(),
         name = name,
-        headOffice = Address(
-            address = address,
-            city = city,
-            zipCode = zipCode,
-            country = country,
-        ),
+        headOffice = if (address != null && city != null && zipCode != null && country != null) {
+            Address(
+                address = address!!,
+                city = city!!,
+                zipCode = zipCode!!,
+                country = country!!,
+            )
+        } else {
+            null
+        },
         siret = siret,
         vat = vat,
         description = description,
