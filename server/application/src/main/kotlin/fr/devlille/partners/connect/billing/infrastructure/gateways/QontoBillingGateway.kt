@@ -12,6 +12,7 @@ import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.infrastructure.db.QontoConfig
 import fr.devlille.partners.connect.integrations.infrastructure.db.QontoIntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.get
+import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.domain.PartnershipPricing
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
@@ -57,11 +58,19 @@ class QontoBillingGateway(
     }
 
     private suspend fun getClient(billing: BillingEntity, company: CompanyEntity, config: QontoConfig): QontoClient {
+        if (company.siret == null) {
+            throw ForbiddenException("Siret is required to create or find a Qonto client")
+        }
         val clients = qontoProvider.listClients(taxId = company.siret, config = config)
         return if (clients.clients.isEmpty()) {
             qontoProvider.createClient(billing.toQontoClientRequest(company), config).client
         } else {
-            clients.clients.first()
+            val client = clients.clients.first()
+            if (client.billingAddress == null) {
+                qontoProvider.updateClient(billing.toQontoClientRequest(company), client.id, config).client
+            } else {
+                client
+            }
         }
     }
 }

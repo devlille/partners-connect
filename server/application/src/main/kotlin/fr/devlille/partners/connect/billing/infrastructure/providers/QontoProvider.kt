@@ -12,6 +12,7 @@ import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpHeaders
@@ -40,6 +41,19 @@ class QontoProvider(
     suspend fun createClient(request: QontoClientRequest, config: QontoConfig): QontoClientResponse {
         val route = "${SystemVarEnv.QontoProvider.baseUrl}/v2/clients"
         val response = httpClient.post(route) {
+            headers[HttpHeaders.Authorization] = "${config.apiKey}:${config.secret}"
+            config.sandboxToken?.let {
+                headers["X-Qonto-Staging-Token"] = it
+            }
+            headers[HttpHeaders.ContentType] = "application/json"
+            setBody(Json.encodeToString(QontoClientRequest.serializer(), request))
+        }
+        return response.body<QontoClientResponse>()
+    }
+
+    suspend fun updateClient(request: QontoClientRequest, clientId: String, config: QontoConfig): QontoClientResponse {
+        val route = "${SystemVarEnv.QontoProvider.baseUrl}/v2/clients/$clientId"
+        val response = httpClient.patch(route) {
             headers[HttpHeaders.Authorization] = "${config.apiKey}:${config.secret}"
             config.sandboxToken?.let {
                 headers["X-Qonto-Staging-Token"] = it
