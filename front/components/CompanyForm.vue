@@ -17,17 +17,10 @@
         />
       </div>
 
-      <div>
-        <label for="siret" class="block text-sm font-medium text-gray-700 mb-1">
-          SIRET
-        </label>
-        <UInput
-          id="siret"
-          v-model="form.siret"
-          placeholder="00000000000000"
-          :disabled="isLoading"
-        />
-      </div>
+      <SiretInput
+        v-model="form.siret"
+        :disabled="isLoading"
+      />
 
       <div>
         <label for="vat" class="block text-sm font-medium text-gray-700 mb-1">
@@ -41,18 +34,11 @@
         />
       </div>
 
-      <div>
-        <label for="siteUrl" class="block text-sm font-medium text-gray-700 mb-1">
-          Site web
-        </label>
-        <UInput
-          id="siteUrl"
-          v-model="form.site_url"
-          type="url"
-          placeholder="https://example.com"
-          :disabled="isLoading"
-        />
-      </div>
+      <UrlInput
+        v-model="form.site_url"
+        label="Site web"
+        :disabled="isLoading"
+      />
 
       <div>
         <label for="description" class="block text-sm font-medium text-gray-700 mb-1">

@@ -26,17 +26,9 @@
         />
       </div>
 
-      <div>
-        <label for="siret" class="block text-sm font-medium text-gray-700 mb-1">SIRET</label>
-        <UInput
-          id="siret"
-          v-model="initialState.siret"
-          type="text"
-          autocomplete="off"
-          placeholder="Numéro SIRET"
-          class="w-full"
-        />
-      </div>
+      <SiretInput
+        v-model="initialState.siret"
+      />
 
       <div>
         <label for="siren" class="block text-sm font-medium text-gray-700 mb-1">SIREN</label>
@@ -50,17 +42,11 @@
         />
       </div>
 
-      <div>
-        <label for="rib_url" class="block text-sm font-medium text-gray-700 mb-1">RIB (URL)</label>
-        <UInput
-          id="rib_url"
-          v-model="initialState.rib_url"
-          type="url"
-          autocomplete="url"
-          placeholder="https://..."
-          class="w-full"
-        />
-      </div>
+      <UrlInput
+        v-model="initialState.rib_url"
+        label="RIB (URL)"
+        placeholder="https://..."
+      />
 
       <div>
         <label for="representative_user_email" class="block text-sm font-medium text-gray-700 mb-1">Email du représentant</label>
