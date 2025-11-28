@@ -109,49 +109,25 @@ const emit = defineEmits<{
   saved: [];
 }>();
 
-const form = ref<CompanyBillingData>({
-  name: null,
-  po: null,
-  contact: {
-    first_name: '',
-    last_name: '',
-    email: ''
-  }
-});
+const { form, isFormValid, resetForm, prepareBillingData } = useBillingForm();
 
 const isLoading = ref(false);
 const error = ref<string | null>(null);
 const success = ref<string | null>(null);
 const existingBilling = ref(false);
 
-const isFormValid = computed(() => {
-  return (
-    form.value.contact.first_name.trim() !== '' &&
-    form.value.contact.last_name.trim() !== '' &&
-    form.value.contact.email.trim() !== '' &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.value.contact.email)
-  );
-});
-
 async function loadBilling() {
   try {
     const response = await getEventsPartnershipBilling(props.eventSlug, props.partnershipId);
     if (response.data) {
-      form.value = {
-        name: response.data.name || null,
-        po: response.data.po || null,
-        contact: {
-          first_name: response.data.contact.first_name,
-          last_name: response.data.contact.last_name,
-          email: response.data.contact.email
-        }
-      };
+      resetForm(response.data);
       existingBilling.value = true;
     }
   } catch (err: any) {
     // Si le billing n'existe pas encore, ce n'est pas une erreur
     if (err.response?.status !== 404) {
       console.error('Failed to load billing data:', err);
+      error.value = 'Impossible de charger les informations de facturation';
     }
   }
 }
@@ -162,15 +138,7 @@ async function handleSubmit() {
   isLoading.value = true;
 
   try {
-    const billingData: CompanyBillingData = {
-      name: form.value.name || null,
-      po: form.value.po || null,
-      contact: {
-        first_name: form.value.contact.first_name.trim(),
-        last_name: form.value.contact.last_name.trim(),
-        email: form.value.contact.email.trim()
-      }
-    };
+    const billingData = prepareBillingData();
 
     if (existingBilling.value) {
       await putEventsPartnershipBilling(props.eventSlug, props.partnershipId, billingData);

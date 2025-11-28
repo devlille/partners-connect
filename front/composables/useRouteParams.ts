@@ -36,9 +36,38 @@ export const useRouteParams = () => {
     return getParam('eventSlug', lowercase);
   }
 
+  /**
+   * Extrait l'ID du sponsor/partenariat
+   */
+  function getSponsorId(): string {
+    return getParam('sponsorId');
+  }
+
+  /**
+   * Extrait l'ID du partenariat
+   */
+  function getPartnershipId(): string {
+    return getParam('partnershipId');
+  }
+
+  /**
+   * Retourne des refs computed pour orgSlug et eventSlug
+   * Utile pour l'usage avec watch ou composables réactifs
+   */
+  const orgSlug = computed(() => getOrgSlug());
+  const eventSlug = computed(() => getEventSlug());
+  const sponsorId = computed(() => getSponsorId());
+  const partnershipId = computed(() => getPartnershipId());
+
   return {
     getParam,
     getOrgSlug,
-    getEventSlug
+    getEventSlug,
+    getSponsorId,
+    getPartnershipId,
+    orgSlug,
+    eventSlug,
+    sponsorId,
+    partnershipId
   };
 };

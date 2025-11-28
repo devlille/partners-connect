@@ -113,51 +113,17 @@ const emit = defineEmits<{
   save: [data: CompanyBillingData];
 }>();
 
-const form = ref<CompanyBillingData>({
-  name: props.billing?.name || null,
-  po: props.billing?.po || null,
-  contact: {
-    first_name: props.billing?.contact?.first_name || '',
-    last_name: props.billing?.contact?.last_name || '',
-    email: props.billing?.contact?.email || ''
-  }
-});
-
-const isFormValid = computed(() => {
-  return (
-    form.value.contact.first_name.trim() !== '' &&
-    form.value.contact.last_name.trim() !== '' &&
-    form.value.contact.email.trim() !== '' &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.value.contact.email)
-  );
-});
+const { form, isFormValid, resetForm, prepareBillingData } = useBillingForm(props.billing);
 
 function handleSubmit() {
-  const billingData: CompanyBillingData = {
-    name: form.value.name || null,
-    po: form.value.po || null,
-    contact: {
-      first_name: form.value.contact.first_name.trim(),
-      last_name: form.value.contact.last_name.trim(),
-      email: form.value.contact.email.trim()
-    }
-  };
-
+  const billingData = prepareBillingData();
   emit('save', billingData);
 }
 
 // Watch for props changes to update form
 watch(() => props.billing, (newBilling) => {
   if (newBilling) {
-    form.value = {
-      name: newBilling.name || null,
-      po: newBilling.po || null,
-      contact: {
-        first_name: newBilling.contact?.first_name || '',
-        last_name: newBilling.contact?.last_name || '',
-        email: newBilling.contact?.email || ''
-      }
-    };
+    resetForm(newBilling);
   }
 }, { deep: true });
 </script>

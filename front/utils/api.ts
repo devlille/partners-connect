@@ -902,6 +902,10 @@ export type PartnershipProcessStatusSchemaAgreementUrl = string | null;
 
 export type PartnershipProcessStatusSchemaAgreementSignedUrl = string | null;
 
+export type PartnershipProcessStatusSchemaQuoteUrl = string | null;
+
+export type PartnershipProcessStatusSchemaInvoiceUrl = string | null;
+
 export type PartnershipProcessStatusSchemaCommunicationPublicationDate = string | null;
 
 export type PartnershipProcessStatusSchemaCommunicationSupportUrl = string | null;
@@ -916,6 +920,8 @@ export interface PartnershipProcessStatusSchema {
   declined_at?: PartnershipProcessStatusSchemaDeclinedAt;
   agreement_url?: PartnershipProcessStatusSchemaAgreementUrl;
   agreement_signed_url?: PartnershipProcessStatusSchemaAgreementSignedUrl;
+  quote_url?: PartnershipProcessStatusSchemaQuoteUrl;
+  invoice_url?: PartnershipProcessStatusSchemaInvoiceUrl;
   communication_publication_date?: PartnershipProcessStatusSchemaCommunicationPublicationDate;
   communication_support_url?: PartnershipProcessStatusSchemaCommunicationSupportUrl;
   billing_status?: PartnershipProcessStatusSchemaBillingStatus;
@@ -1760,8 +1766,6 @@ export type GetStatusIntegration401 = {
 export type DeleteOrgsEventsOptions204 = { [key: string]: unknown };
 
 export type DeleteOrgsEventsPacks204 = { [key: string]: unknown };
-
-export type PostOrgsEventsPacksOptions201 = { [key: string]: unknown };
 
 export type DeleteOrgsEventsPacksOptions204 = { [key: string]: unknown };
 
@@ -2839,15 +2843,28 @@ export const putOrgsEventsPacks = (
     }
   
 /**
- * @summary Create sponsoring option
+ * Synchronizes the complete set of options for a sponsoring pack.
+
+This endpoint accepts a complete configuration of required and optional options
+and ensures the pack's final state exactly matches the submitted configuration by:
+- Removing options not included in the request
+- Adding new options from the request
+- Updating requirement status (required ↔ optional) for existing options
+
+The operation is atomic - all changes succeed or all fail. The operation is
+idempotent - submitting the same configuration multiple times produces the same result.
+
+Both required and optional lists can be empty to remove all options from the pack.
+
+ * @summary Synchronize sponsoring pack options
  */
 export const postOrgsEventsPacksOptions = (
     orgSlug: string,
     eventSlug: string,
     packId: string,
     attachOptionsToPackSchema: AttachOptionsToPackSchema,
- options?: SecondParameter<typeof customFetch<PostOrgsEventsPacksOptions201>>,) => {
-      return customFetch<PostOrgsEventsPacksOptions201>(
+ options?: SecondParameter<typeof customFetch<void>>,) => {
+      return customFetch<void>(
       {url: `/orgs/${orgSlug}/events/${eventSlug}/packs/${packId}/options`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: attachOptionsToPackSchema

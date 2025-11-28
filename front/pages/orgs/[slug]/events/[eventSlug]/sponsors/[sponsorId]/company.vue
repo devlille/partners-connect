@@ -24,16 +24,7 @@
         </div>
 
         <div v-else-if="company">
-          <div class="border-b pb-4 mb-4">
-            <LogoUpload
-              :company-id="company.id"
-              :company-name="company.name"
-              :current-logo-media="company.medias"
-              :disabled="savingCompany"
-              @uploaded="handleLogoUploaded"
-              @error="handleLogoError"
-            />
-          </div>
+         
 
           <PartnershipCompanyForm
             :company="company"
@@ -51,31 +42,16 @@
 </template>
 
 <script setup lang="ts">
-import { getOrgsEventsPartnership, getCompanies, getCompaniesPartnership, putCompanyById, type CompanySchema, type MediaSchema, type UpdateCompanySchema } from "~/utils/api";
+import { getEventsPartnershipDetailed, putCompanyById, type CompanySchema, type MediaSchema, type UpdateCompanySchema } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 import type { ExtendedPartnershipItem } from "~/types/partnership";
 
-const route = useRoute();
 const { footerLinks } = useDashboardLinks();
+const { orgSlug, eventSlug, sponsorId } = useRouteParams();
 
 definePageMeta({
   middleware: authMiddleware,
   ssr: false
-});
-
-const orgSlug = computed(() => {
-  const params = route.params.slug;
-  return Array.isArray(params) ? params[0] as string : params as string;
-});
-
-const eventSlug = computed(() => {
-  const params = route.params.eventSlug;
-  return Array.isArray(params) ? params[1] as string : params as string;
-});
-
-const sponsorId = computed(() => {
-  const params = route.params.sponsorId;
-  return Array.isArray(params) ? params[0] as string : params as string;
 });
 
 const partnership = ref<ExtendedPartnershipItem | null>(null);
@@ -95,65 +71,76 @@ const { sponsorLinks } = useSponsorLinks(orgSlug.value, eventSlug.value, sponsor
 async function loadPartnership() {
   try {
     loading.value = true;
-    error.value = null;
-
-    const response = await getOrgsEventsPartnership(orgSlug.value, eventSlug.value);
-    const found = response.data.find(p => p.id === sponsorId.value);
-
-    if (!found) {
-      error.value = 'Sponsor non trouvé';
-      return;
-    }
-
-    partnership.value = found;
-
-    await loadCompanyInfo();
-  } catch (err) {
-    console.error('Failed to load partnership:', err);
-    error.value = 'Impossible de charger les informations du sponsor';
-  } finally {
-    loading.value = false;
-  }
-}
-
-async function loadCompanyInfo() {
-  try {
     loadingCompany.value = true;
+    error.value = null;
     companyError.value = null;
 
-    const companiesResponse = await getCompanies();
-    const companies = companiesResponse.data.items;
+    // Un seul appel API pour charger le partenariat et l'entreprise
+    const response = await getEventsPartnershipDetailed(eventSlug.value, sponsorId.value);
+    const { partnership: p, company: c, event } = response.data;
 
-    const partnershipChecks = await Promise.all(
-      companies.map(async (comp) => {
-        try {
-          const partnershipsResponse = await getCompaniesPartnership(comp.id);
-          const hasPartnership = partnershipsResponse.data.find((p: any) => p.id === sponsorId.value);
-          return hasPartnership ? comp : null;
-        } catch (err) {
-          console.warn(`Failed to check partnerships for company ${comp.id}:`, err);
-          return null;
-        }
-      })
-    );
+    // Stocker l'entreprise
+    company.value = c;
 
-    const foundCompany = partnershipChecks.find(comp => comp !== null);
+    // Extraire les options du pack
+    const packOptions = ((p.selected_pack as any)?.options || p.selected_pack?.optional_options || [])
+      .map((opt: any) => ({
+        id: opt.id,
+        name: opt.name,
+        description: opt.description || null
+      }));
 
-    if (foundCompany) {
-      company.value = foundCompany;
+    // Mapper les données du partenariat
+    partnership.value = {
+      id: p.id,
+      contact: {
+        display_name: p.contact_name,
+        role: p.contact_role
+      },
+      company_name: c.name,
+      event_name: event.name,
+      selected_pack_id: p.selected_pack?.id || null,
+      selected_pack_name: p.selected_pack?.name || null,
+      suggested_pack_id: p.suggestion_pack?.id || null,
+      suggested_pack_name: p.suggestion_pack?.name || null,
+      validated_pack_id: p.validated_pack?.id || null,
+      language: p.language,
+      phone: p.phone || null,
+      emails: p.emails.join(', '),
+      created_at: p.created_at,
+      validated: p.process_status?.validated_at !== null && p.process_status?.validated_at !== undefined,
+      paid: p.process_status?.billing_status?.toLowerCase() === 'paid',
+      suggestion: false,
+      agreement_generated: p.process_status?.agreement_url !== null && p.process_status?.agreement_url !== undefined,
+      agreement_signed: p.process_status?.agreement_signed_url !== null && p.process_status?.agreement_signed_url !== undefined,
+      agreement_url: p.process_status?.agreement_url || null,
+      agreement_signed_url: p.process_status?.agreement_signed_url || null,
+      quote_url: p.process_status?.quote_url || null,
+      invoice_url: p.process_status?.invoice_url || null,
+      option_ids: packOptions.map(opt => opt.id),
+      pack_options: packOptions
+    };
+  } catch (err: any) {
+    console.error('Failed to load partnership:', err);
+
+    if (err.response?.status === 404) {
+      error.value = 'Sponsor non trouvé';
+      companyError.value = 'Partenariat ou entreprise introuvable';
     } else {
-      companyError.value = 'Entreprise non trouvée';
+      error.value = 'Impossible de charger les informations du sponsor';
+      companyError.value = 'Impossible de charger les informations de l\'entreprise';
     }
-  } catch (err) {
-    console.error('Failed to load company info:', err);
-    companyError.value = 'Impossible de charger les informations de l\'entreprise';
   } finally {
+    loading.value = false;
     loadingCompany.value = false;
   }
 }
 
 async function handleSaveCompany(updateData: UpdateCompanySchema) {
-  if (!company.value) return;
+  if (!company.value) {
+    console.warn('Cannot save: company data not loaded');
+    return;
+  }
 
   companyFormError.value = null;
 
@@ -162,8 +149,9 @@ async function handleSaveCompany(updateData: UpdateCompanySchema) {
 
     await putCompanyById(company.value.id, updateData);
 
-    // Recharger les données de l'entreprise
-    await loadCompanyInfo();
+    // Recharger uniquement les données de l'entreprise
+    const response = await getEventsPartnershipDetailed(eventSlug.value, sponsorId.value);
+    company.value = response.data.company;
 
     // Afficher un message de succès
     const toast = useCustomToast();
@@ -171,21 +159,16 @@ async function handleSaveCompany(updateData: UpdateCompanySchema) {
   } catch (err: any) {
     console.error('Failed to save company:', err);
 
-    // Essayer d'extraire le message d'erreur du serveur
-    let errorMessage: string;
-    if (err.response?.data?.message) {
-      errorMessage = err.response.data.message;
-    } else if (err.response) {
-      if (err.response.status === 404) {
-        errorMessage = 'Entreprise introuvable';
-      } else if (err.response.status === 403) {
-        errorMessage = 'Vous n\'êtes pas autorisé à modifier cette entreprise';
-      } else {
-        errorMessage = 'Impossible de sauvegarder les modifications';
-      }
-    } else {
-      errorMessage = 'Impossible de sauvegarder les modifications';
-    }
+    // Messages d'erreur par code HTTP
+    const errorMessages: Record<number, string> = {
+      404: 'Entreprise introuvable',
+      403: 'Vous n\'êtes pas autorisé à modifier cette entreprise',
+      400: 'Données invalides'
+    };
+
+    const errorMessage = err.response?.data?.message
+      || errorMessages[err.response?.status]
+      || 'Impossible de sauvegarder les modifications';
 
     companyFormError.value = errorMessage;
 

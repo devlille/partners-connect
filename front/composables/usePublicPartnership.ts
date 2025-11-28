@@ -3,18 +3,8 @@ import type { ExtendedPartnershipItem } from "~/types/partnership";
 import type { CompanyBillingData, UpdateCompanySchema } from "~/utils/api";
 
 export const usePublicPartnership = () => {
-  const route = useRoute();
   const toast = useToast();
-
-  const eventSlug = computed(() => {
-    const params = route.params.eventSlug;
-    return Array.isArray(params) ? params[0] as string : params as string;
-  });
-
-  const partnershipId = computed(() => {
-    const params = route.params.partnershipId;
-    return Array.isArray(params) ? params[0] as string : params as string;
-  });
+  const { eventSlug, partnershipId } = useRouteParams();
 
   const partnership = useState<ExtendedPartnershipItem | null>('partnership', () => null);
   const company = useState<any | null>('company', () => null);

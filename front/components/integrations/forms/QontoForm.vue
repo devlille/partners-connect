@@ -54,8 +54,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue';
-
 interface QontoConfig {
   api_key: string;
   secret: string;
@@ -78,46 +76,17 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>();
 
-const localValue = reactive<Partial<QontoConfig>>({
+// Utilise le composable pour la validation
+const { localValue, errors, handleInput } = useIntegrationFormValidation<Partial<QontoConfig>>(
+  props,
+  emit,
+  ['api_key', 'secret', 'sandbox_token']
+);
+
+// Initialiser les valeurs par défaut
+Object.assign(localValue, {
   api_key: props.modelValue.api_key || '',
   secret: props.modelValue.secret || '',
   sandbox_token: props.modelValue.sandbox_token || ''
 });
-
-const errors = reactive<Partial<Record<keyof QontoConfig, string>>>({});
-
-function validateField(field: keyof QontoConfig, showError = true) {
-  const value = localValue[field]?.trim() || '';
-
-  if (!value) {
-    if (showError) errors[field] = 'Ce champ est obligatoire';
-    return false;
-  }
-
-  if (showError) errors[field] = '';
-  return true;
-}
-
-function validateAll(showErrors = false): boolean {
-  const api_keyValid = validateField('api_key', showErrors);
-  const secretValid = validateField('secret', showErrors);
-  const sandbox_tokenValid = validateField('sandbox_token', showErrors);
-
-  return api_keyValid && secretValid && sandbox_tokenValid;
-}
-
-function handleInput() {
-  emit('update:modelValue', { ...localValue });
-  emit('update:valid', validateAll());
-}
-
-// Watch for external changes
-watch(() => props.modelValue, (newVal) => {
-  Object.assign(localValue, newVal);
-}, { deep: true });
-
-// Initial validation
-watch(() => [localValue.api_key, localValue.secret, localValue.sandbox_token], () => {
-  emit('update:valid', validateAll());
-}, { immediate: true });
 </script>

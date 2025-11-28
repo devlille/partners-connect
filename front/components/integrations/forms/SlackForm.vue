@@ -37,8 +37,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue';
-
 interface SlackConfig {
   token: string;
   channel: string;
@@ -60,49 +58,34 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>();
 
-const localValue = reactive<Partial<SlackConfig>>({
+// Validation personnalisée pour le channel (doit commencer par #)
+const customValidators = {
+  channel: (value: string) => {
+    if (value && !value.startsWith('#')) {
+      return 'Le canal doit commencer par #';
+    }
+    return null;
+  }
+};
+
+// Utilise le composable pour la validation
+const { localValue, errors, validateField, handleInput } = useIntegrationFormValidation<Partial<SlackConfig>>(
+  props,
+  emit,
+  ['token', 'channel'],
+  customValidators
+);
+
+// Initialiser les valeurs par défaut
+Object.assign(localValue, {
   token: props.modelValue.token || '',
   channel: props.modelValue.channel || ''
 });
 
-const errors = reactive<Partial<Record<keyof SlackConfig, string>>>({});
-
-function validateField(field: keyof SlackConfig, showError = true) {
-  const value = localValue[field]?.trim() || '';
-
-  if (!value) {
-    if (showError) errors[field] = 'Ce champ est obligatoire';
-    return false;
+// Auto-correction du canal pour ajouter # si manquant
+watch(() => localValue.channel, (newValue) => {
+  if (newValue && !newValue.startsWith('#')) {
+    localValue.channel = '#' + newValue;
   }
-
-  // Channel validation (ensure it starts with #)
-  if (field === 'channel') {
-    if (!value.startsWith('#')) {
-      localValue.channel = '#' + value;
-    }
-  }
-
-  if (showError) errors[field] = '';
-  return true;
-}
-
-function validateAll(showErrors = false): boolean {
-  const tokenValid = validateField('token', showErrors);
-  const channelValid = validateField('channel', showErrors);
-
-  return tokenValid && channelValid;
-}
-
-function handleInput() {
-  emit('update:modelValue', { ...localValue });
-  emit('update:valid', validateAll());
-}
-
-watch(() => props.modelValue, (newVal) => {
-  Object.assign(localValue, newVal);
-}, { deep: true });
-
-watch(() => [localValue.token, localValue.channel], () => {
-  emit('update:valid', validateAll());
-}, { immediate: true });
+});
 </script>
