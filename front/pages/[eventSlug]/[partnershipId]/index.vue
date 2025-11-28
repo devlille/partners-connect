@@ -83,15 +83,24 @@
         </section>
 
         <!-- Partnership Information -->
-        <section v-if="!loading && !error && partnership" class="bg-white rounded-lg shadow p-6" aria-labelledby="partnership-heading">
+        <section
+          v-if="!loading && !error && partnership"
+          class="bg-white rounded-lg shadow p-6"
+          aria-labelledby="partnership-heading"
+          :aria-busy="savingPartnership ? 'true' : 'false'"
+        >
           <h2 id="partnership-heading" class="text-lg font-semibold text-gray-900 mb-4">
             Informations du partenariat
           </h2>
+          <div v-if="savingPartnership" role="status" aria-live="polite" class="sr-only">
+            Enregistrement des informations du partenariat en cours...
+          </div>
           <PartnershipForm
             :partnership="partnership"
-            :loading="false"
+            :loading="savingPartnership"
             :show-admin-actions="false"
-            :readonly="true"
+            :readonly="false"
+            @save="handlePartnershipSave"
           />
         </section>
 
@@ -329,7 +338,6 @@ definePageMeta({
   }
 });
 
-const route = useRoute();
 const toast = useToast();
 
 const {
@@ -348,10 +356,44 @@ const {
 const acceptingSuggestion = ref(false);
 const rejectingSuggestion = ref(false);
 
+// État pour la sauvegarde du partenariat
+const savingPartnership = ref(false);
+
 // États pour l'upload de la convention signée
 const uploadingAgreement = ref(false);
 const uploadError = ref<string | null>(null);
 const agreementFileInput = ref<HTMLInputElement>();
+
+/**
+ * Handle partnership information save
+ */
+async function handlePartnershipSave(data: any) {
+  try {
+    savingPartnership.value = true;
+    error.value = null;
+
+    // TODO: Implement API endpoint for updating partnership
+    console.log('Partnership update data:', data);
+
+    toast.add({
+      title: 'Fonctionnalité en développement',
+      description: 'La sauvegarde des informations du partenariat sera bientôt disponible',
+      color: 'warning'
+    });
+  } catch (err: any) {
+    console.error('Failed to update partnership:', err);
+    const errorMessage = `Impossible de mettre à jour les informations du partenariat: ${err.message || 'Erreur inconnue'}`;
+    error.value = errorMessage;
+
+    toast.add({
+      title: 'Erreur',
+      description: errorMessage,
+      color: 'error'
+    });
+  } finally {
+    savingPartnership.value = false;
+  }
+}
 
 /**
  * Handle accepting the suggested pack
