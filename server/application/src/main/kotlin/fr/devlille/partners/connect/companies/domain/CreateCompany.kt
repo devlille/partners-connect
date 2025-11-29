@@ -7,11 +7,11 @@ import kotlinx.serialization.Serializable
 data class CreateCompany(
     val name: String,
     @SerialName("site_url")
-    val siteUrl: String,
+    val siteUrl: String? = null,
     @SerialName("head_office")
-    val headOffice: Address,
-    val siret: String,
-    val vat: String,
+    val headOffice: Address? = null,
+    val siret: String? = null,
+    val vat: String? = null,
     val description: String? = null,
     val socials: List<Social> = emptyList(),
 )

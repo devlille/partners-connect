@@ -43,14 +43,14 @@ class CompanyRepositoryExposed(
     }
 
     override fun createOrUpdate(input: CreateCompany): UUID = transaction {
-        val countryCode = geocode.countryCode(input.headOffice.fullAddress)
+        val countryCode = input.headOffice?.fullAddress?.let { geocode.countryCode(it) }
         val company = CompanyEntity.new {
             name = input.name
             siteUrl = input.siteUrl
-            address = input.headOffice.address
-            city = input.headOffice.city
-            zipCode = input.headOffice.zipCode
-            country = countryCode ?: input.headOffice.country
+            address = input.headOffice?.address
+            city = input.headOffice?.city
+            zipCode = input.headOffice?.zipCode
+            country = countryCode ?: input.headOffice?.country
             siret = input.siret
             vat = input.vat
             description = input.description
