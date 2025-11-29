@@ -20,11 +20,15 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.days
 
 class PartnershipRegisterRoutesTest {
     private val json = Json { ignoreUnknownKeys = true }
@@ -317,6 +321,41 @@ class PartnershipRegisterRoutesTest {
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
         assertEquals(HttpStatusCode.NotFound, response.status)
+    }
+
+    @Test
+    fun `POST returns 403 when event submission period is not started`() = testApplication {
+        val eventId = UUID.randomUUID()
+        val eventSlug = "test-post-returns-403-whe-813"
+        val companyId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val now = Clock.System.now()
+
+        application {
+            moduleMocked()
+            insertMockedEventWithOrga(
+                eventId,
+                slug = eventSlug,
+                submissionStartTime = now.plus(1.days).toLocalDateTime(TimeZone.UTC).toString(),
+                submissionEndTime = now.plus(3.days).toLocalDateTime(TimeZone.UTC).toString(),
+            )
+            insertMockedCompany(companyId)
+            insertMockedSponsoringPack(packId, eventId)
+        }
+
+        val body = RegisterPartnership(
+            companyId = companyId.toString(),
+            packId = packId.toString(),
+            contactName = "John Doe",
+            contactRole = "Marketing Manager",
+            language = "en",
+            optionSelections = listOf(),
+        )
+        val response = client.post("/events/$eventSlug/partnerships") {
+            contentType(ContentType.Application.Json)
+            setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
+        }
+        assertEquals(HttpStatusCode.Forbidden, response.status)
     }
 
     @Test

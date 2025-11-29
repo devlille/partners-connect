@@ -39,6 +39,9 @@ import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissi
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
 import io.ktor.server.plugins.NotFoundException
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -54,6 +57,11 @@ class PartnershipRepositoryExposed : PartnershipRepository {
             ?: throw NotFoundException("Company $companyId not found")
         val pack = SponsoringPackEntity.findById(register.packId.toUUID())
             ?: throw NotFoundException("Pack ${register.packId} not found")
+
+        val now = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+        if (now < event.submissionStartTime) {
+            throw ForbiddenException("Partnership submissions have not started yet")
+        }
 
         val existing = PartnershipEntity.singleByEventAndCompany(event.id.value, companyId)
         if (existing != null) {
