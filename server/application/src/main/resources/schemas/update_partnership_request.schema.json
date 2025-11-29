@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "UpdatePartnershipContactInfo",
+  "description": "Request body for updating partnership contact information. All fields are optional to support partial updates.",
+  "properties": {
+    "contact_name": {
+      "type": ["string", "null"],
+      "description": "Partner contact person's full name",
+      "minLength": 1,
+      "maxLength": 255,
+      "examples": ["John Doe", "Marie Curie"]
+    },
+    "contact_role": {
+      "type": ["string", "null"],
+      "description": "Partner contact person's role or title",
+      "minLength": 1,
+      "maxLength": 255,
+      "examples": ["Developer Relations", "Marketing Director", "CEO"]
+    },
+    "language": {
+      "type": ["string", "null"],
+      "description": "Preferred communication language using ISO 639-1 codes (2 characters)",
+      "minLength": 2,
+      "maxLength": 2,
+      "examples": ["en", "fr", "de", "nl", "es"]
+    },
+    "phone": {
+      "type": ["string", "null"],
+      "description": "Contact phone number in free-form text (1-30 characters)",
+      "minLength": 1,
+      "maxLength": 30,
+      "examples": ["+33123456789", "+1-555-0123", "0612345678"]
+    },
+    "emails": {
+      "type": ["array", "null"],
+      "description": "List of contact email addresses",
+      "items": {
+        "type": "string",
+        "format": "email",
+        "examples": ["contact@example.com", "partner@company.org"]
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "contact_name": "John Doe",
+      "contact_role": "Developer Relations",
+      "language": "en",
+      "phone": "+33123456789",
+      "emails": ["john.doe@example.com", "contact@example.com"]
+    },
+    {
+      "contact_name": "Marie Curie"
+    },
+    {
+      "language": "fr",
+      "phone": "+33612345678"
+    },
+    {
+      "emails": ["new-email@example.com"]
+    }
+  ]
+}

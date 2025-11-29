@@ -908,6 +908,63 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
+    put:
+      summary: Update partnership contact information
+      description: |
+        Updates contact information fields for an existing partnership. This is a public endpoint
+        that supports partial updates - only provided fields will be updated. All fields are optional.
+
+        Updatable fields:
+        - contact_name: Partner contact person's name
+        - contact_role: Partner contact person's role/title
+        - language: Preferred communication language (ISO 639-1)
+        - phone: Contact phone number (free-form, 1-30 chars)
+        - emails: List of contact email addresses
+      operationId: updatePartnershipContactInfo
+      security:
+        - {}
+      parameters:
+        - name: eventSlug
+          in: path
+          required: true
+          description: Unique slug identifier for the event
+          schema:
+            type: string
+          example: devlille-2025
+        - name: partnershipId
+          in: path
+          required: true
+          description: UUID of the partnership to update
+          schema:
+            type: string
+            format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+      requestBody:
+        required: true
+        description: Contact information fields to update (all optional for partial updates)
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update_partnership_request.schema'
+      responses:
+        '200':
+          description: Partnership contact information updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/detailed_partnership_response.schema'
+        '400':
+          description: Invalid request - validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Event or partnership not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /events/{eventSlug}/partnerships/{partnershipId}/billing:
     get:
       summary: Get partnership billing information
@@ -4194,6 +4251,8 @@ components:
       $ref: '#/components/schemas/event_with_organisation.schema'
     RegisterPartnership:
       $ref: '#/components/schemas/register_partnership.schema'
+    UpdatePartnershipContactInfo:
+      $ref: '#/components/schemas/update_partnership_request.schema'
     CompanyBillingData:
       $ref: '#/components/schemas/company_billing_data.schema'
     TicketData:
@@ -5534,19 +5593,51 @@ components:
             $ref: '#/components/schemas/PartnershipOptionSelection'
         contact_name:
           type: string
+          description: Partner contact person's full name
+          minLength: 1
+          maxLength: 255
+          examples:
+            - John Doe
+            - Marie Curie
         contact_role:
           type: string
+          description: Partner contact person's role or title
+          minLength: 1
+          maxLength: 255
+          examples:
+            - Developer Relations
+            - Marketing Director
+            - CEO
         language:
           type: string
+          description: Preferred communication language using ISO 639-1 codes
+          minLength: 2
+          maxLength: 2
+          examples:
+            - en
+            - fr
         phone:
           type:
             - string
             - 'null'
+          description: Contact phone number in free-form text (1-30 characters)
+          minLength: 1
+          maxLength: 30
+          examples:
+            - '+33123456789'
+            - +1-555-0123
+            - '0612345678'
         emails:
           type: array
+          description: List of contact email addresses
           items:
             type: string
             format: email
+            examples:
+              - contact@example.com
+              - partner@company.org
+          minItems: 0
+          uniqueItems: true
       definitions:
         PartnershipOptionSelection:
           type: object
@@ -6211,6 +6302,84 @@ components:
         - company
         - event
         - organisation
+    update_partnership_request.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      type: object
+      title: UpdatePartnershipContactInfo
+      description: Request body for updating partnership contact information. All fields are optional to support partial updates.
+      properties:
+        contact_name:
+          type:
+            - string
+            - 'null'
+          description: Partner contact person's full name
+          minLength: 1
+          maxLength: 255
+          examples:
+            - John Doe
+            - Marie Curie
+        contact_role:
+          type:
+            - string
+            - 'null'
+          description: Partner contact person's role or title
+          minLength: 1
+          maxLength: 255
+          examples:
+            - Developer Relations
+            - Marketing Director
+            - CEO
+        language:
+          type:
+            - string
+            - 'null'
+          description: Preferred communication language using ISO 639-1 codes (2 characters)
+          minLength: 2
+          maxLength: 2
+          examples:
+            - en
+            - fr
+            - de
+            - nl
+            - es
+        phone:
+          type:
+            - string
+            - 'null'
+          description: Contact phone number in free-form text (1-30 characters)
+          minLength: 1
+          maxLength: 30
+          examples:
+            - '+33123456789'
+            - +1-555-0123
+            - '0612345678'
+        emails:
+          type:
+            - array
+            - 'null'
+          description: List of contact email addresses
+          items:
+            type: string
+            format: email
+            examples:
+              - contact@example.com
+              - partner@company.org
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+      examples:
+        - contact_name: John Doe
+          contact_role: Developer Relations
+          language: en
+          phone: '+33123456789'
+          emails:
+            - john.doe@example.com
+            - contact@example.com
+        - contact_name: Marie Curie
+        - language: fr
+          phone: '+33612345678'
+        - emails:
+            - new-email@example.com
     billing_contact.schema:
       $id: billing_contact.schema.json
       type: object

@@ -369,6 +369,8 @@ route("/orgs/{orgSlug}/events/{eventSlug}/resource") {
 - PostgreSQL database with Exposed ORM, H2 in-memory for tests (012-sync-pack-options)
 - Kotlin with JVM 21 (Amazon Corretto) + Ktor 2.x, Exposed ORM, Koin (DI), kotlinx.serialization (013-partnership-option-display)
 - PostgreSQL with Exposed ORM (H2 in-memory for tests) (013-partnership-option-display)
+- Kotlin 1.9.x with JVM 21 (Amazon Corretto) + Ktor 2.x, Exposed ORM 0.41+, kotlinx.serialization, Koin (DI) (013-update-partnership)
+- PostgreSQL database (H2 in-memory for tests) (013-update-partnership)
 
 ## Recent Changes
 - 012-sync-pack-options: Added Kotlin (JVM 21) with Ktor framework + Ktor 2.x, Exposed ORM, Koin (DI), kotlinx.serialization

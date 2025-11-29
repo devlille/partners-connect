@@ -906,6 +906,63 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+    put:
+      summary: Update partnership contact information
+      description: |
+        Updates contact information fields for an existing partnership. This is a public endpoint
+        that supports partial updates - only provided fields will be updated. All fields are optional.
+        
+        Updatable fields:
+        - contact_name: Partner contact person's name
+        - contact_role: Partner contact person's role/title
+        - language: Preferred communication language (ISO 639-1)
+        - phone: Contact phone number (free-form, 1-30 chars)
+        - emails: List of contact email addresses
+      operationId: updatePartnershipContactInfo
+      security:
+        - {}
+      parameters:
+        - name: eventSlug
+          in: path
+          required: true
+          description: Unique slug identifier for the event
+          schema:
+            type: string
+          example: "devlille-2025"
+        - name: partnershipId
+          in: path
+          required: true
+          description: UUID of the partnership to update
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      requestBody:
+        required: true
+        description: Contact information fields to update (all optional for partial updates)
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePartnershipContactInfo"
+      responses:
+        "200":
+          description: Partnership contact information updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DetailedPartnershipResponse"
+        "400":
+          description: Invalid request - validation errors
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Event or partnership not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /events/{eventSlug}/partnerships/{partnershipId}/billing:
     get:
       summary: "Get partnership billing information"
@@ -4161,6 +4218,8 @@ components:
       $ref: "../schemas/event_with_organisation.schema.json"
     RegisterPartnership:
       $ref: "../schemas/register_partnership.schema.json"
+    UpdatePartnershipContactInfo:
+      $ref: "../schemas/update_partnership_request.schema.json"
     CompanyBillingData:
       $ref: "../schemas/company_billing_data.schema.json"
     TicketData:

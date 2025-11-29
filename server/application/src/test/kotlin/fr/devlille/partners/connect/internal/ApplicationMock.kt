@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.internal
 
+import com.slack.api.Slack
 import fr.devlille.partners.connect.ApplicationConfig
 import fr.devlille.partners.connect.agenda.infrastructure.bindings.agendaModule
 import fr.devlille.partners.connect.auth.infrastructure.bindings.authModule
@@ -31,9 +32,13 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import java.util.UUID
 
+@Suppress("LongParameterList")
 fun Application.moduleMocked(
     mockNetwork: Module = module {
         single<HttpClientEngine> { mockEngine }
+    },
+    mockSlack: Module = module {
+        single<Slack> { mockk() }
     },
     mockStorage: Module = module {
         single<Storage> { mockk() }
@@ -84,6 +89,7 @@ fun Application.moduleMocked(
                 agendaModule,
                 integrationModule,
                 mockNetwork,
+                mockSlack,
                 mockStorage,
                 mockGeocode,
                 mockBillingIntegration,
