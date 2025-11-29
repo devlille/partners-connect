@@ -65,7 +65,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="md:col-span-2">
             <label for="address" class="block text-sm font-medium text-gray-700 mb-2">
-              Adresse
+              Adresse<span class="text-red-500 ml-1">*</span>
             </label>
             <UInput
               id="address"
@@ -73,17 +73,19 @@
               placeholder="Rue, numéro..."
               :disabled="readonly || loading"
               class="w-full"
+              required
             />
           </div>
 
           <ZipCodeInput
             v-model="form.head_office!.zip_code"
             :disabled="readonly || loading"
+            required
           />
 
           <div>
             <label for="city" class="block text-sm font-medium text-gray-700 mb-2">
-              Ville
+              Ville<span class="text-red-500 ml-1">*</span>
             </label>
             <UInput
               id="city"
@@ -91,12 +93,13 @@
               placeholder="Ville"
               :disabled="readonly || loading"
               class="w-full"
+              required
             />
           </div>
 
           <div class="md:col-span-2">
             <label for="country" class="block text-sm font-medium text-gray-700 mb-2">
-              Pays
+              Pays<span class="text-red-500 ml-1">*</span>
             </label>
             <UInput
               id="country"
@@ -104,6 +107,7 @@
               placeholder="France"
               :disabled="readonly || loading"
               class="w-full"
+              required
             />
           </div>
         </div>

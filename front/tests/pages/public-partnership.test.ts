@@ -67,7 +67,7 @@ describe('Public Partnership Page - Welcome Message', () => {
       const loading = false;
       const error = null;
 
-      const shouldShowMessage = !loading && !error && partnership && !partnership.validated;
+      const shouldShowMessage = !loading && !error && partnership;
 
       expect(shouldShowMessage).toBeFalsy();
     });
@@ -479,6 +479,116 @@ describe('Public Partnership Page - Welcome Message', () => {
       const message = 'Voici la page dédiée à votre partenariat avec DevLille 2026.';
 
       expect(message.endsWith('.')).toBe(true);
+    });
+  });
+
+  describe('Validated but Unpaid Partnership Message', () => {
+    it('should show completion message when partnership is validated but not paid', () => {
+      const partnership = {
+        id: '123',
+        company_name: 'Test Company',
+        event_name: 'DevLille 2026',
+        validated: true,
+        paid: false
+      };
+      const loading = false;
+      const error = null;
+
+      const shouldShowCompletionMessage = !loading && !error && partnership &&
+        partnership.validated && !partnership.paid;
+
+      expect(shouldShowCompletionMessage).toBe(true);
+    });
+
+    it('should not show completion message when partnership is not validated', () => {
+      const partnership = {
+        id: '123',
+        company_name: 'Test Company',
+        event_name: 'DevLille 2026',
+        validated: false,
+        paid: false
+      };
+      const loading = false;
+      const error = null;
+
+      const shouldShowCompletionMessage = !loading && !error && partnership &&
+        partnership.validated && !partnership.paid;
+
+      expect(shouldShowCompletionMessage).toBe(false);
+    });
+
+    it('should not show completion message when partnership is already paid', () => {
+      const partnership = {
+        id: '123',
+        company_name: 'Test Company',
+        event_name: 'DevLille 2026',
+        validated: true,
+        paid: true
+      };
+      const loading = false;
+      const error = null;
+
+      const shouldShowCompletionMessage = !loading && !error && partnership &&
+        partnership.validated && !partnership.paid;
+
+      expect(shouldShowCompletionMessage).toBe(false);
+    });
+
+    it('should include completion title in message', () => {
+      const title = 'Complétez vos informations';
+
+      expect(title).toContain('Complétez');
+      expect(title).toContain('informations');
+    });
+
+    it('should mention partnership tab in completion message', () => {
+      const message = 'Partenariat - Vérifiez et complétez vos coordonnées de contact';
+
+      expect(message).toContain('Partenariat');
+      expect(message).toContain('coordonnées de contact');
+    });
+
+    it('should mention company tab in completion message', () => {
+      const message = 'Entreprise - Renseignez les informations de votre société';
+
+      expect(message).toContain('Entreprise');
+      expect(message).toContain('informations de votre société');
+    });
+
+    it('should create partnership link correctly', () => {
+      const eventSlug = 'devedinburgh-2026';
+      const partnershipId = '123';
+      const link = `/${eventSlug}/${partnershipId}`;
+
+      expect(link).toBe('/devedinburgh-2026/123');
+    });
+
+    it('should create company link correctly', () => {
+      const eventSlug = 'devedinburgh-2026';
+      const partnershipId = '123';
+      const link = `/${eventSlug}/${partnershipId}/company`;
+
+      expect(link).toBe('/devedinburgh-2026/123/company');
+    });
+
+    it('should use blue theme for completion message', () => {
+      const containerClasses = 'bg-blue-50 border border-blue-200 rounded-lg p-4';
+
+      expect(containerClasses).toContain('bg-blue-50');
+      expect(containerClasses).toContain('border-blue-200');
+    });
+
+    it('should include information icon in completion message', () => {
+      const iconClass = 'i-heroicons-information-circle';
+
+      expect(iconClass).toContain('information-circle');
+    });
+
+    it('should confirm validation in completion message', () => {
+      const message = 'Votre partenariat a été validé !';
+
+      expect(message).toContain('validé');
+      expect(message).toContain('!');
     });
   });
 });

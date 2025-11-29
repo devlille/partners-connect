@@ -53,13 +53,14 @@
         <div class="space-y-4">
           <div>
             <label for="address" class="block text-sm font-medium text-gray-700 mb-1">
-              Adresse
+              Adresse<span class="text-red-500 ml-1">*</span>
             </label>
             <UInput
               id="address"
               v-model="form.head_office.address"
               placeholder="Rue, numéro..."
               :disabled="isLoading"
+              required
             />
           </div>
 
@@ -67,30 +68,33 @@
             <ZipCodeInput
               v-model="form.head_office.zip_code"
               :disabled="isLoading"
+              required
             />
 
             <div>
               <label for="city" class="block text-sm font-medium text-gray-700 mb-1">
-                Ville
+                Ville<span class="text-red-500 ml-1">*</span>
               </label>
               <UInput
                 id="city"
                 v-model="form.head_office.city"
                 placeholder="Ville"
                 :disabled="isLoading"
+                required
               />
             </div>
           </div>
 
           <div>
             <label for="country" class="block text-sm font-medium text-gray-700 mb-1">
-              Pays
+              Pays<span class="text-red-500 ml-1">*</span>
             </label>
             <UInput
               id="country"
               v-model="form.head_office.country"
               placeholder="France"
               :disabled="isLoading"
+              required
             />
           </div>
         </div>

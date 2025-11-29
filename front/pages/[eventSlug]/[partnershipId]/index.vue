@@ -29,6 +29,37 @@
               Nous reviendrons vers vous très prochainement.
             </p>
           </div>
+
+          <!-- Information message for validated but unpaid partnerships -->
+          <div v-if="!loading && !error && partnership && partnership.validated && !partnership.paid" class="mt-4 pt-4 border-t border-gray-200">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div class="flex items-start gap-3">
+                <i class="i-heroicons-information-circle text-blue-600 text-xl shrink-0 mt-0.5" aria-hidden="true" />
+                <div>
+                  <h3 class="text-sm font-semibold text-blue-900 mb-2">
+                    Complétez vos informations
+                  </h3>
+                  <p class="text-sm text-blue-700 mb-3">
+                    Votre partenariat a été validé ! Pour finaliser le processus, merci de compléter les informations manquantes dans les onglets suivants :
+                  </p>
+                  <ul class="text-sm text-blue-700 space-y-1 ml-5 list-disc">
+                    <li>
+                      <NuxtLink :to="`/${eventSlug}/${partnershipId}`" class="font-medium hover:underline">
+                        Partenariat
+                      </NuxtLink>
+                      - Vérifiez et complétez vos coordonnées de contact
+                    </li>
+                    <li>
+                      <NuxtLink :to="`/${eventSlug}/${partnershipId}/company`" class="font-medium hover:underline">
+                        Entreprise
+                      </NuxtLink>
+                      - Renseignez les informations de votre société
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
         </header>
 
         <!-- Loading State -->

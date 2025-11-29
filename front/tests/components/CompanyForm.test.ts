@@ -101,6 +101,7 @@ describe('CompanyForm Component', () => {
 
   describe('Address Validation', () => {
     function isValidAddress(address: AddressSchema): boolean {
+      // Tous les champs sont obligatoires pour l'adresse du siège social
       return !!(
         address.address &&
         address.address.trim() !== '' &&
@@ -113,7 +114,7 @@ describe('CompanyForm Component', () => {
       );
     }
 
-    it('should validate complete address', () => {
+    it('should validate complete address with all required fields', () => {
       const address: AddressSchema = {
         address: '123 Main St',
         city: 'Paris',
@@ -124,7 +125,7 @@ describe('CompanyForm Component', () => {
       expect(isValidAddress(address)).toBe(true);
     });
 
-    it('should invalidate address without street', () => {
+    it('should invalidate address without street (required field)', () => {
       const address: AddressSchema = {
         address: '',
         city: 'Paris',
@@ -135,12 +136,45 @@ describe('CompanyForm Component', () => {
       expect(isValidAddress(address)).toBe(false);
     });
 
-    it('should invalidate address without city', () => {
+    it('should invalidate address without city (required field)', () => {
       const address: AddressSchema = {
         address: '123 Main St',
         city: '',
         zip_code: '75001',
         country: 'France'
+      };
+
+      expect(isValidAddress(address)).toBe(false);
+    });
+
+    it('should invalidate address without zip code (required field)', () => {
+      const address: AddressSchema = {
+        address: '123 Main St',
+        city: 'Paris',
+        zip_code: '',
+        country: 'France'
+      };
+
+      expect(isValidAddress(address)).toBe(false);
+    });
+
+    it('should invalidate address without country (required field)', () => {
+      const address: AddressSchema = {
+        address: '123 Main St',
+        city: 'Paris',
+        zip_code: '75001',
+        country: ''
+      };
+
+      expect(isValidAddress(address)).toBe(false);
+    });
+
+    it('should invalidate address with only whitespace in required fields', () => {
+      const address: AddressSchema = {
+        address: '   ',
+        city: '   ',
+        zip_code: '   ',
+        country: '   '
       };
 
       expect(isValidAddress(address)).toBe(false);
