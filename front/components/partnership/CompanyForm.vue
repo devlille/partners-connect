@@ -235,11 +235,16 @@ const form = ref<UpdateCompanySchema>({
   vat: props.company.vat,
   site_url: props.company.site_url,
   description: props.company.description || '',
-  head_office: {
+  head_office: props.company.head_office ? {
     address: props.company.head_office.address,
     city: props.company.head_office.city,
     zip_code: props.company.head_office.zip_code,
     country: props.company.head_office.country
+  } : {
+    address: '',
+    city: '',
+    zip_code: '',
+    country: ''
   }
 });
 
@@ -298,11 +303,16 @@ watch(() => props.company, (newCompany) => {
     vat: newCompany.vat,
     site_url: newCompany.site_url,
     description: newCompany.description || '',
-    head_office: {
+    head_office: newCompany.head_office ? {
       address: newCompany.head_office.address,
       city: newCompany.head_office.city,
       zip_code: newCompany.head_office.zip_code,
       country: newCompany.head_office.country
+    } : {
+      address: '',
+      city: '',
+      zip_code: '',
+      country: ''
     }
   };
   initializeSocials();
