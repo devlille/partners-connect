@@ -206,16 +206,7 @@ const handleSubmit = async () => {
 
     // Step 1: Create company
     const companyData: CreateCompany = {
-      name: formData.value.name,
-      head_office: {
-        address: '',
-        city: '',
-        zip_code: '',
-        country: '',
-      },
-      siret: '',
-      vat: '',
-      site_url: '',
+      name: formData.value.name
     };
 
     const companyResponse = await postCompanies(companyData);
