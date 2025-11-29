@@ -1,0 +1,156 @@
+# OpenAPI Specification Addition
+
+**Feature**: Update Partnership Contact Information  
+**Endpoint**: `PUT /events/{eventSlug}/partnerships/{partnershipId}`
+
+## OpenAPI YAML Addition
+
+Add this operation to `server/application/src/main/resources/openapi/openapi.yaml` under the path `/events/{eventSlug}/partnerships/{partnershipId}`:
+
+```yaml
+paths:
+  /events/{eventSlug}/partnerships/{partnershipId}:
+    get:
+      # ... existing GET operation ...
+    
+    put:
+      summary: Update partnership contact information
+      description: |
+        Updates contact information fields for an existing partnership. This is a public endpoint
+        that supports partial updates - only provided fields will be updated. All fields are optional.
+        
+        Updatable fields:
+        - contact_name: Partner contact person's name
+        - contact_role: Partner contact person's role/title
+        - language: Preferred communication language (ISO 639-1)
+        - phone: Contact phone number (free-form, 1-30 chars)
+        - emails: List of contact email addresses
+      operationId: updatePartnershipContactInfo
+      tags:
+        - Partnerships
+      security:
+        - {}  # Public endpoint - no authentication required
+      parameters:
+        - name: eventSlug
+          in: path
+          required: true
+          description: Unique slug identifier for the event
+          schema:
+            type: string
+          example: "devlille-2025"
+        - name: partnershipId
+          in: path
+          required: true
+          description: UUID of the partnership to update
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      requestBody:
+        required: true
+        description: Contact information fields to update (all optional for partial updates)
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePartnershipContactInfo"
+            examples:
+              updateAllFields:
+                summary: Update all contact fields
+                value:
+                  contact_name: "John Doe"
+                  contact_role: "Developer Relations"
+                  language: "en"
+                  phone: "+33123456789"
+                  emails: ["john.doe@example.com", "contact@example.com"]
+              updateNameOnly:
+                summary: Update only contact name
+                value:
+                  contact_name: "Jane Smith"
+              updateLanguageAndPhone:
+                summary: Update language preference and phone
+                value:
+                  language: "fr"
+                  phone: "+33612345678"
+              clearPhone:
+                summary: Clear phone number
+                value:
+                  phone: null
+      responses:
+        "200":
+          description: Partnership contact information updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DetailedPartnershipResponse"
+        "400":
+          description: Invalid request - validation errors
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalidEmail:
+                  summary: Invalid email format
+                  value:
+                    error: "Validation failed"
+                    message: "emails[0]: must be a valid email address"
+                invalidLanguage:
+                  summary: Unsupported language code
+                  value:
+                    error: "Validation failed"
+                    message: "language: must be one of [en, fr, de, nl, es]"
+                phoneTooLong:
+                  summary: Phone number exceeds maximum length
+                  value:
+                    error: "Validation failed"
+                    message: "phone: must not exceed 30 characters"
+        "404":
+          description: Event or partnership not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                partnershipNotFound:
+                  summary: Partnership does not exist
+                  value:
+                    error: "Not Found"
+                    message: "Partnership not found"
+                eventNotFound:
+                  summary: Event does not exist
+                  value:
+                    error: "Not Found"
+                    message: "Event not found"
+
+components:
+  schemas:
+    UpdatePartnershipContactInfo:
+      $ref: "schemas/update_partnership_request.schema.json"
+```
+
+## Integration Steps
+
+1. **Add Schema Component**:
+   - Add `UpdatePartnershipContactInfo` reference to `components/schemas` section
+   - Reference external schema file: `schemas/update_partnership_request.schema.json`
+
+2. **Copy Schema File**:
+   - Copy `update_partnership_request.schema.json` to `server/application/src/main/resources/schemas/`
+
+3. **Validate OpenAPI Spec**:
+   ```bash
+   cd /Users/gpaligot/Documents/workspace/partners-connect
+   npm run validate
+   ```
+
+4. **Bundle Documentation** (after validation passes):
+   ```bash
+   npm run bundle
+   ```
+
+## Notes
+
+- **Security**: Endpoint is public (`security: - {}`) per clarification - no authentication
+- **Partial Updates**: All fields optional, supports PATCH semantics
+- **Response**: Returns complete `DetailedPartnershipResponse` with updated data
+- **Error Handling**: StatusPages plugin handles exception-to-HTTP mapping automatically

@@ -42,4 +42,23 @@ interface PartnershipRepository {
      * @throws fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException if partnership not found
      */
     fun removeOrganiser(partnershipId: UUID): PartnershipOrganiserResponse
+
+    /**
+     * Updates partnership contact information fields.
+     *
+     * Supports partial updates - only provided fields are updated, others remain unchanged.
+     * All fields in UpdatePartnershipContactInfo are nullable to support this pattern.
+     *
+     * @param eventSlug Slug of the event that owns this partnership
+     * @param partnershipId UUID of the partnership to update
+     * @param update Contact information fields to update (all optional)
+     * @return Updated partnership domain object with new contact information
+     * @throws fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
+     *   if event or partnership not found
+     */
+    fun updateContactInfo(
+        eventSlug: String,
+        partnershipId: UUID,
+        update: UpdatePartnershipContactInfo,
+    ): UUID
 }

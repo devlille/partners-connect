@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.partnership.factories
 
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
@@ -64,5 +65,15 @@ fun insertMockedOptionPartnership(
         this.partnership = PartnershipEntity[partnershipId]
         this.option = SponsoringOptionEntity[optionId]
         this.packId = SponsoringPackEntity[packId].id
+    }
+}
+
+fun insertMockedPartnershipEmail(
+    partnershipId: UUID,
+    email: String,
+): PartnershipEmailEntity = transaction {
+    PartnershipEmailEntity.new {
+        this.partnership = PartnershipEntity[partnershipId]
+        this.email = email
     }
 }

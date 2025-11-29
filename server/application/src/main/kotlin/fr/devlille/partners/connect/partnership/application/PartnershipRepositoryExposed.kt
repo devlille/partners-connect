@@ -18,6 +18,7 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
 import fr.devlille.partners.connect.partnership.domain.PartnershipItem
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
+import fr.devlille.partners.connect.partnership.domain.UpdatePartnershipContactInfo
 import fr.devlille.partners.connect.partnership.infrastructure.api.PartnershipOrganiserResponse
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
@@ -293,5 +294,38 @@ class PartnershipRepositoryExposed : PartnershipRepository {
             partnershipId = partnershipId.toString(),
             organiser = null,
         )
+    }
+
+    override fun updateContactInfo(
+        eventSlug: String,
+        partnershipId: UUID,
+        update: UpdatePartnershipContactInfo,
+    ): UUID = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+
+        val partnership = PartnershipEntity.singleByEventAndPartnership(event.id.value, partnershipId)
+            ?: throw NotFoundException("Partnership not found")
+
+        // Apply partial updates - only update fields that are provided
+        update.contactName?.let { partnership.contactName = it }
+        update.contactRole?.let { partnership.contactRole = it }
+        update.language?.let { partnership.language = it }
+        update.phone?.let { partnership.phone = it }
+        update.emails?.let { newEmails ->
+            // Delete existing emails
+            PartnershipEmailEntity
+                .find { PartnershipEmailsTable.partnershipId eq partnershipId }
+                .forEach { it.delete() }
+            // Create new emails
+            newEmails.forEach { email ->
+                PartnershipEmailEntity.new {
+                    this.partnership = partnership
+                    this.email = email
+                }
+            }
+        }
+
+        partnership.id.value
     }
 }

@@ -13,6 +13,7 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipSpeakerRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
+import fr.devlille.partners.connect.partnership.domain.UpdatePartnershipContactInfo
 import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
 import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
 import io.ktor.http.HttpStatusCode
@@ -22,6 +23,7 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
+import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
@@ -46,6 +48,7 @@ fun Route.partnershipRoutes() {
     orgsPartnershipOrganiserRoutes()
 }
 
+@Suppress("LongMethod")
 private fun Route.publicPartnershipRoutes() {
     val eventRepository by inject<EventRepository>()
     val companyRepository by inject<CompanyRepository>()
@@ -83,6 +86,33 @@ private fun Route.publicPartnershipRoutes() {
             val eventSlug = call.parameters.eventSlug
             val partnershipId = call.parameters.partnershipId
 
+            val partnershipDetail = partnershipRepository.getByIdDetailed(eventSlug, partnershipId)
+            val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
+            val speakers = speakerRepository.getSpeakersByPartnership(partnershipId)
+            val event = eventRepository.getBySlug(eventSlug)
+
+            val response = DetailedPartnershipResponse(
+                partnership = partnershipDetail,
+                company = company,
+                event = event.event,
+                organisation = event.organisation,
+                speakers = speakers,
+            )
+
+            call.respond(HttpStatusCode.OK, response)
+        }
+
+        put("/{partnershipId}") {
+            val eventSlug = call.parameters.eventSlug
+            val partnershipId = call.parameters.partnershipId
+            val update = call.receive<UpdatePartnershipContactInfo>(
+                schema = "update_partnership_request.schema.json",
+            )
+
+            // Update partnership contact information
+            partnershipRepository.updateContactInfo(eventSlug, partnershipId, update)
+
+            // Fetch updated detailed partnership for response
             val partnershipDetail = partnershipRepository.getByIdDetailed(eventSlug, partnershipId)
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val speakers = speakerRepository.getSpeakersByPartnership(partnershipId)
