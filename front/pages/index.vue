@@ -227,7 +227,6 @@ const handleSubmit = async () => {
     const partnershipResponse = await postEventsPartnership(eventSlug, partnershipData);
     console.log('Partnership created:', partnershipResponse.data);
 
-    // Redirect to the partnership page
     const partnershipId = partnershipResponse.data.id;
     await navigateTo(`/${eventSlug}/${partnershipId}`);
   } catch (err) {
