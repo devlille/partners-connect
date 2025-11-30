@@ -326,6 +326,31 @@
                 </div>
               </div>
             </div>
+
+            <!-- RIB Document -->
+            <div
+              v-if="organisation && (organisation as any).rib_url"
+              class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <div class="flex items-center gap-3">
+                <i class="i-heroicons-banknotes text-gray-400 text-xl" aria-hidden="true" />
+                <div>
+                  <p class="text-sm font-medium text-gray-900">RIB (Relevé d'Identité Bancaire)</p>
+                  <p class="text-xs text-gray-500">Coordonnées bancaires de l'organisation</p>
+                </div>
+              </div>
+              <UButton
+                :to="(organisation as any).rib_url"
+                target="_blank"
+                color="neutral"
+                variant="outline"
+                size="sm"
+                :aria-label="`Télécharger le RIB`"
+              >
+                <i class="i-heroicons-arrow-down-tray mr-1" aria-hidden="true" />
+                Télécharger
+              </UButton>
+            </div>
           </div>
         </section>
 
@@ -376,6 +401,7 @@ const {
   partnershipId,
   partnership,
   billing,
+  organisation,
   loading,
   error,
   savingBilling,
@@ -607,6 +633,16 @@ const sidebarLinks = computed(() => [
     label: 'Offres d\'emploi',
     icon: 'i-heroicons-briefcase',
     to: `/${eventSlug.value}/${partnershipId.value}/job-offers`
+  },
+  {
+    label: 'Liens utiles',
+    icon: 'i-heroicons-link',
+    to: `/${eventSlug.value}/${partnershipId.value}/external-links`
+  },
+  {
+    label: 'Prestataires',
+    icon: 'i-heroicons-user-group',
+    to: `/${eventSlug.value}/${partnershipId.value}/providers`
   }
 ]);
 

@@ -1,4 +1,4 @@
-import type { PartnershipItemSchema } from '~/utils/api';
+import type { PartnershipItemSchema, PartnershipOptionSelection } from '~/utils/api';
 
 /**
  * Extension du type PartnershipItemSchema pour inclure les champs manquants de l'API
@@ -27,4 +27,6 @@ export interface ExtendedPartnershipItem extends PartnershipItemSchema {
   option_ids?: string[];
   /** Options complètes du pack sélectionné (avec nom et description) */
   pack_options?: Array<{ id: string; name: string; description?: string | null }>;
+  /** Détails des sélections d'options avec quantité et valeur sélectionnée */
+  option_selections?: PartnershipOptionSelection[];
 }

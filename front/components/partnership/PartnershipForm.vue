@@ -32,7 +32,7 @@
           Pack
         </label>
         <UInput
-          v-model="selectedPackName"
+          v-model="selectedPackDisplay"
           placeholder="Pack de sponsoring"
           disabled
           class="w-full"
@@ -61,7 +61,21 @@
                 :for="`form-option-${option.id}`"
                 class="flex-1 cursor-not-allowed"
               >
-                <span class="block text-sm font-medium text-gray-900">{{ option.name }}</span>
+                <span class="block text-sm font-medium text-gray-900">
+                  {{ option.name }}
+                  <!-- Pour les options quantitatives: afficher "2 x 10 €" -->
+                  <span v-if="option.selected_quantity && option.price !== null && option.price !== undefined" class="text-gray-600">
+                    ({{ option.selected_quantity }} x {{ option.price }} €)
+                  </span>
+                  <!-- Pour les options sélectables: afficher la valeur choisie -->
+                  <span v-else-if="option.selected_value" class="text-gray-600">
+                    ({{ option.selected_value }})
+                  </span>
+                  <!-- Pour les autres options: afficher juste le prix -->
+                  <span v-else-if="option.price !== null && option.price !== undefined" class="text-gray-600">
+                    ({{ option.price }} €)
+                  </span>
+                </span>
                 <span v-if="option.description" class="block text-sm text-gray-500 mt-1">
                   {{ option.description }}
                 </span>
@@ -156,7 +170,25 @@ const eventSlug = computed(() => {
 
 const packs = ref<SponsoringPack[]>([]);
 const selectedPackName = ref('');
-const selectedOptions = ref<Array<{ id: string; name: string; description?: string | null }>>([]);
+const selectedPackPrice = ref<number | null>(null);
+const selectedOptions = ref<Array<{
+  id: string;
+  name: string;
+  description?: string | null;
+  price?: number | null;
+  type?: string;
+  selected_quantity?: number;
+  selected_value?: string;
+}>>([]);
+
+// Computed pour afficher le pack avec son prix
+const selectedPackDisplay = computed(() => {
+  if (!selectedPackName.value) return '';
+  if (selectedPackPrice.value !== null) {
+    return `${selectedPackName.value} (${selectedPackPrice.value} €)`;
+  }
+  return selectedPackName.value;
+});
 
 // Charger les packs disponibles
 async function loadPacks() {
@@ -175,10 +207,13 @@ function updateSelectedPackName() {
   if (props.partnership?.selected_pack_id) {
     const pack = packs.value.find(p => p.id === props.partnership?.selected_pack_id);
     selectedPackName.value = pack?.name || '';
+    selectedPackPrice.value = pack?.base_price ?? null;
   } else if (props.partnership?.suggested_pack_name) {
     selectedPackName.value = `${props.partnership.suggested_pack_name} (suggéré)`;
+    selectedPackPrice.value = null;
   } else {
     selectedPackName.value = '';
+    selectedPackPrice.value = null;
   }
 }
 
@@ -186,10 +221,57 @@ function updateSelectedPackName() {
 function updateSelectedOptions() {
   selectedOptions.value = [];
 
+  const packId = props.partnership?.selected_pack_id || props.partnership?.suggested_pack_id;
+  const pack = packId ? packs.value.find(p => p.id === packId) : null;
+  const packOptions = pack ? ((pack as any).options || pack.optional_options || []) : [];
+
+  console.log('Partnership data:', props.partnership);
+  console.log('Option selections:', props.partnership?.option_selections);
+
+  // Si option_selections est disponible (avec détails quantité/valeur), on l'utilise en priorité
+  if (props.partnership?.option_selections && props.partnership.option_selections.length > 0) {
+    selectedOptions.value = props.partnership.option_selections.map(selection => {
+      const fullOption = packOptions.find((po: any) => po.id === selection.option_id);
+
+      let selectedValue = undefined;
+      if (selection.selected_value_id && fullOption) {
+        // Trouver le nom de la valeur sélectionnée
+        const selectableValues = (fullOption as any).selectable_values || [];
+        const valueObj = selectableValues.find((v: any) => {
+          if (typeof v === 'object') {
+            return (v.id || v.value) === selection.selected_value_id;
+          }
+          return v === selection.selected_value_id;
+        });
+        selectedValue = typeof valueObj === 'object' ? (valueObj.name || valueObj.label || valueObj.value) : valueObj;
+      }
+
+      return {
+        id: selection.option_id,
+        name: fullOption?.name || 'Option inconnue',
+        description: fullOption?.description || null,
+        price: fullOption?.price ?? null,
+        type: fullOption?.type,
+        selected_quantity: selection.selected_quantity,
+        selected_value: selectedValue
+      };
+    });
+    return;
+  }
+
   // Si pack_options est fourni directement (nouveau format depuis getEventsPartnershipDetailed),
   // on l'utilise directement
   if (props.partnership?.pack_options && props.partnership.pack_options.length > 0) {
-    selectedOptions.value = props.partnership.pack_options;
+    selectedOptions.value = props.partnership.pack_options.map(opt => {
+      const fullOption = packOptions.find((po: any) => po.id === opt.id);
+      return {
+        id: opt.id,
+        name: opt.name,
+        description: opt.description || null,
+        price: fullOption?.price ?? null,
+        type: fullOption?.type
+      };
+    });
     return;
   }
 
@@ -198,16 +280,7 @@ function updateSelectedOptions() {
     return;
   }
 
-  // Trouver le pack pour accéder à ses options
-  const packId = props.partnership.selected_pack_id || props.partnership.suggested_pack_id;
-  if (!packId) return;
-
-  const pack = packs.value.find(p => p.id === packId);
   if (!pack) return;
-
-  // Gérer les deux formats possibles: "optional_options" (schéma) ou "options" (API)
-  const packOptions = (pack as any).options || pack.optional_options || [];
-  if (packOptions.length === 0) return;
 
   // Filtrer les options qui sont dans option_ids
   selectedOptions.value = packOptions
@@ -215,7 +288,9 @@ function updateSelectedOptions() {
     .map((opt: any) => ({
       id: opt.id,
       name: opt.name,
-      description: opt.description || null
+      description: opt.description || null,
+      price: opt.price ?? null,
+      type: opt.type
     }));
 }
 

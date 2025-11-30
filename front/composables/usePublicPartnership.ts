@@ -9,6 +9,7 @@ export const usePublicPartnership = () => {
   const partnership = useState<ExtendedPartnershipItem | null>('partnership', () => null);
   const company = useState<any | null>('company', () => null);
   const billing = useState<CompanyBillingData | null>('billing', () => null);
+  const organisation = useState<any | null>('organisation', () => null);
   const loading = useState<boolean>('partnership-loading', () => true);
   const error = useState<string | null>('partnership-error', () => null);
   const savingCompany = useState<boolean>('saving-company', () => false);
@@ -24,10 +25,11 @@ export const usePublicPartnership = () => {
 
       // Load partnership details
       const response = await getEventsPartnershipDetailed(eventSlug.value, partnershipId.value);
-      const { partnership: p, company: c, event } = response.data;
+      const { partnership: p, company: c, event, organisation: org } = response.data;
 
-      // Store company data
+      // Store company and organisation data
       company.value = c;
+      organisation.value = org;
 
       // Load billing data
       try {
@@ -77,7 +79,8 @@ export const usePublicPartnership = () => {
         quote_url: p.process_status?.quote_url || null,
         invoice_url: p.process_status?.invoice_url || null,
         option_ids: optionIds,
-        pack_options: packOptions
+        pack_options: packOptions,
+        option_selections: (p as any).option_selections || undefined
       };
     } catch (err: any) {
       console.error('Failed to load partnership:', err);
@@ -179,6 +182,7 @@ export const usePublicPartnership = () => {
     partnership,
     company,
     billing,
+    organisation,
     loading,
     error,
     savingCompany,

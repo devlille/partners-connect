@@ -76,11 +76,44 @@
           {{ errors.packId }}
         </div>
 
-        <OptionsInput
-          v-model="formData.optionIds"
+        <SponsoringOptionsInput
+          v-model="formData.optionSelections"
           legend="Options de sponsoring"
           :options="options"
         />
+
+        <!-- Total Summary -->
+        <fieldset v-if="formData.packId" style="border: 2px solid #fbbf24; padding: 1.5rem; margin: 1.5rem 0; box-sizing: border-box; background-color: rgba(251, 191, 36, 0.1);">
+          <legend style="color: #fbbf24; font-weight: 700; font-size: 1.1rem; padding: 0 0.5rem;">Récapitulatif</legend>
+
+          <div style="color: white;">
+            <!-- Pack Price -->
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255, 255, 255, 0.2);">
+              <span>Pack {{ selectedPackName }}</span>
+              <span style="font-weight: 600;">{{ selectedPackPrice }} €</span>
+            </div>
+
+            <!-- Options Prices -->
+            <div v-if="selectedOptionsTotal > 0" style="margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255, 255, 255, 0.2);">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span>Options ({{ formData.optionSelections.length }})</span>
+                <span style="font-weight: 600;">{{ selectedOptionsTotal }} €</span>
+              </div>
+              <div v-for="(selection, index) in formData.optionSelections" :key="index" style="font-size: 0.875rem; color: #cbd5e1; margin-left: 1rem; margin-top: 0.25rem;">
+                <div style="display: flex; justify-content: space-between;">
+                  <span>• {{ getOptionName(selection.option_id) }}</span>
+                  <span>{{ getOptionTotal(selection) }} €</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total -->
+            <div style="display: flex; justify-content: space-between; font-size: 1.25rem; font-weight: 700; color: #fbbf24; margin-top: 1rem;">
+              <span>Total</span>
+              <span>{{ totalPrice }} €</span>
+            </div>
+          </div>
+        </fieldset>
 
         <p class="buttons-bar">
           <input type="submit" value="Valider" :disabled="isSubmitting">
@@ -92,7 +125,7 @@
 
 <script setup lang="ts">
 import { z } from 'zod';
-import { getEventsSponsoringPacks, postCompanies, postEventsPartnership, type SponsoringPack, type SponsoringOption, type CreateCompanySchema, type RegisterPartnershipSchema, type PartnershipOptionSelection, PartnershipOptionSelectionType } from "~/utils/api";
+import { getEventsSponsoringPacks, postCompanies, postEventsPartnership, type SponsoringPack, type SponsoringOptionSchema, type CreateCompanySchema, type RegisterPartnershipSchema, type PartnershipOptionSelection } from "~/utils/api";
 
 definePageMeta({
   layout: "minimal",
@@ -111,7 +144,7 @@ const formSchema = z.object({
 });
 
 const packs = ref<SponsoringPack[]>([]);
-const options = ref<SponsoringOption[]>([]);
+const options = ref<SponsoringOptionSchema[]>([]);
 const isSubmitting = ref(false);
 const error = ref<string | null>(null);
 const success = ref(false);
@@ -123,7 +156,7 @@ const formData = ref({
   packId: '',
   contactName: '',
   contactRole: '',
-  optionIds: [] as string[],
+  optionSelections: [] as PartnershipOptionSelection[],
 });
 
 const errors = ref({
@@ -139,6 +172,78 @@ const packOptions = computed(() => {
     label: pack.name,
     price: pack.base_price
   }));
+});
+
+// Get selected pack
+const selectedPack = computed(() => {
+  if (!formData.value.packId) return null;
+  return packs.value.find(pack => pack.id === formData.value.packId);
+});
+
+// Get selected pack name
+const selectedPackName = computed(() => {
+  return selectedPack.value?.name || '';
+});
+
+// Get selected pack price
+const selectedPackPrice = computed(() => {
+  return selectedPack.value?.base_price || 0;
+});
+
+// Get option by ID
+function getOptionById(optionId: string): SponsoringOptionSchema | undefined {
+  return options.value.find(opt => opt.id === optionId);
+}
+
+// Get option name by ID
+function getOptionName(optionId: string): string {
+  const option = getOptionById(optionId);
+  return option?.name || 'Option inconnue';
+}
+
+// Calculate total for a single option selection
+function getOptionTotal(selection: PartnershipOptionSelection): number {
+  const option = getOptionById(selection.option_id);
+  if (!option) return 0;
+
+  // For quantitative options, multiply by quantity
+  if (selection.selected_quantity && option.price) {
+    return option.price * selection.selected_quantity;
+  }
+
+  // For selectable options, check if the selected value has a price
+  if (selection.selected_value_id && option.type === 'typed_selectable') {
+    // Try to find the price in selectable_values if they are objects
+    const selectableValue = (option as any).selectable_values?.find((v: any) => {
+      if (typeof v === 'object') {
+        return (v.id || v.value) === selection.selected_value_id;
+      }
+      return v === selection.selected_value_id;
+    });
+
+    // If the value has its own price, use it
+    if (selectableValue && typeof selectableValue === 'object' && selectableValue.price) {
+      return selectableValue.price;
+    }
+
+    // Otherwise use the option's price
+    return option.price || 0;
+  }
+
+  // For other options (text, typed_number), just return the price
+  return option.price || 0;
+}
+
+// Calculate total of all selected options
+const selectedOptionsTotal = computed(() => {
+  return formData.value.optionSelections.reduce((total, selection) => {
+    return total + getOptionTotal(selection);
+  }, 0);
+});
+
+// Calculate grand total (pack + options)
+const totalPrice = computed(() => {
+  return selectedPackPrice.value + selectedOptionsTotal.value;
 });
 
 onMounted(async () => {
@@ -160,7 +265,7 @@ onMounted(async () => {
 
 watch(() => formData.value.packId, (newPackId) => {
   // Réinitialiser les options sélectionnées quand on change de pack
-  formData.value.optionIds = [];
+  formData.value.optionSelections = [];
 
   if (newPackId) {
     const selectedPack = packs.value.find(pack => pack.id === newPackId);
@@ -213,10 +318,10 @@ const handleSubmit = async () => {
     console.log('Company created:', companyResponse.data);
 
     // Step 2: Create partnership with the company
-    const partnershipData: RegisterPartnership = {
+    const partnershipData: RegisterPartnershipSchema = {
       company_id: companyResponse.data.id,
       pack_id: formData.value.packId,
-      option_ids: formData.value.optionIds,
+      option_selections: formData.value.optionSelections.length > 0 ? formData.value.optionSelections : undefined,
       contact_name: formData.value.contactName || formData.value.name,
       contact_role: formData.value.contactRole || '',
       language: 'fr',

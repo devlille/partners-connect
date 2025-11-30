@@ -105,6 +105,16 @@ const sidebarLinks = computed(() => [
     label: 'Offres d\'emploi',
     icon: 'i-heroicons-briefcase',
     to: `/${eventSlug.value}/${partnershipId.value}/job-offers`
+  },
+  {
+    label: 'Liens utiles',
+    icon: 'i-heroicons-link',
+    to: `/${eventSlug.value}/${partnershipId.value}/external-links`
+  },
+  {
+    label: 'Prestataires',
+    icon: 'i-heroicons-user-group',
+    to: `/${eventSlug.value}/${partnershipId.value}/providers`
   }
 ]);
 
