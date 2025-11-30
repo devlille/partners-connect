@@ -367,6 +367,8 @@ route("/orgs/{orgSlug}/events/{eventSlug}/resource") {
 ## Active Technologies
 - Kotlin (JVM 21) with Ktor framework + Ktor 2.x, Exposed ORM, Koin (DI), kotlinx.serialization (012-sync-pack-options)
 - PostgreSQL database with Exposed ORM, H2 in-memory for tests (012-sync-pack-options)
+- Kotlin with JVM 21 (Amazon Corretto) + Ktor 2.x, Exposed ORM, Koin (DI), kotlinx.serialization (013-partnership-option-display)
+- PostgreSQL with Exposed ORM (H2 in-memory for tests) (013-partnership-option-display)
 
 ## Recent Changes
 - 012-sync-pack-options: Added Kotlin (JVM 21) with Ktor framework + Ktor 2.x, Exposed ORM, Koin (DI), kotlinx.serialization
