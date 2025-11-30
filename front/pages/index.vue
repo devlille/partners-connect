@@ -92,7 +92,7 @@
 
 <script setup lang="ts">
 import { z } from 'zod';
-import { getEventsSponsoringPacks, postCompanies, postEventsPartnership, type SponsoringPack, type SponsoringOption, type CreateCompany, type RegisterPartnership } from "~/utils/api";
+import { getEventsSponsoringPacks, postCompanies, postEventsPartnership, type SponsoringPack, type SponsoringOption, type CreateCompanySchema, type RegisterPartnershipSchema, type PartnershipOptionSelection, PartnershipOptionSelectionType } from "~/utils/api";
 
 definePageMeta({
   layout: "minimal",
@@ -229,9 +229,19 @@ const handleSubmit = async () => {
 
     const partnershipId = partnershipResponse.data.id;
     await navigateTo(`/${eventSlug}/${partnershipId}`);
-  } catch (err) {
+  } catch (err: any) {
     console.error('Failed to create company or partnership:', err);
-    error.value = 'Une erreur est survenue lors de la création de la demande de partenariat';
+
+    // Gérer les erreurs spécifiques du backend
+    if (err.response?.data?.message === 'Partnership submissions have not started yet') {
+      error.value = 'Les inscriptions pour ce partenariat ne sont pas encore ouvertes. Veuillez réessayer ultérieurement.';
+    } else if (err.response?.data?.message === 'Partnership submissions have ended') {
+      error.value = 'Les inscriptions pour ce partenariat sont maintenant fermées.';
+    } else if (err.response?.data?.message) {
+      error.value = err.response.data.message;
+    } else {
+      error.value = 'Une erreur est survenue lors de la création de la demande de partenariat';
+    }
   } finally {
     isSubmitting.value = false;
   }
