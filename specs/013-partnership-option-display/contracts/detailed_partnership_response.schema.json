@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "detailed_partnership_response.schema.json",
+  "title": "Detailed Partnership Response",
+  "description": "Complete partnership response envelope with company, event, organization, and speakers",
+  "type": "object",
+  "required": ["partnership", "company", "event", "organisation"],
+  "properties": {
+    "partnership": {
+      "$ref": "partnership_detail.schema.json",
+      "description": "Enhanced partnership detail with options and pricing"
+    },
+    "company": {
+      "type": "object",
+      "required": ["id", "name"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Company unique identifier"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Company name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Company description"
+        },
+        "logo_url": {
+          "oneOf": [
+            { "type": "string", "format": "uri" },
+            { "type": "null" }
+          ],
+          "description": "Company logo URL"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Company associated with the partnership"
+    },
+    "event": {
+      "type": "object",
+      "required": ["id", "name", "slug"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Event unique identifier"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Event name"
+        },
+        "slug": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Event slug"
+        },
+        "start_date": {
+          "oneOf": [
+            { "type": "string", "format": "date" },
+            { "type": "null" }
+          ],
+          "description": "Event start date"
+        },
+        "end_date": {
+          "oneOf": [
+            { "type": "string", "format": "date" },
+            { "type": "null" }
+          ],
+          "description": "Event end date"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Event associated with the partnership"
+    },
+    "organisation": {
+      "type": "object",
+      "required": ["id", "name", "slug"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Organisation unique identifier"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Organisation name"
+        },
+        "slug": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Organisation slug"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Organisation hosting the event"
+    },
+    "speakers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "email"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Speaker unique identifier"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Speaker name"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Speaker email"
+          },
+          "bio": {
+            "type": "string",
+            "description": "Speaker biography"
+          }
+        },
+        "additionalProperties": false
+      },
+      "description": "Speakers associated with the partnership"
+    }
+  },
+  "additionalProperties": false
+}

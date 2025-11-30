@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "partnership_pack.schema.json",
+  "title": "Partnership Pack",
+  "description": "Enhanced partnership pack with partnership-specific options",
+  "type": "object",
+  "required": ["id", "name", "base_price", "required_options", "optional_options", "total_price"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Pack unique identifier"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Pack name (e.g., 'Gold', 'Silver', 'Bronze')"
+    },
+    "base_price": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Base price of the pack in cents (excluding optional options)"
+    },
+    "required_options": {
+      "type": "array",
+      "description": "Options included in the base pack price",
+      "items": {
+        "$ref": "partnership_option.schema.json"
+      },
+      "minItems": 0,
+      "maxItems": 100
+    },
+    "optional_options": {
+      "type": "array",
+      "description": "Additional options selected by partner (cost beyond base price)",
+      "items": {
+        "$ref": "partnership_option.schema.json"
+      },
+      "minItems": 0,
+      "maxItems": 100
+    },
+    "total_price": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total price for this pack in cents (base_price + sum of optional option costs)"
+    }
+  },
+  "additionalProperties": false
+}

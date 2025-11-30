@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "partnership_detail.schema.json",
+  "title": "Partnership Detail",
+  "description": "Enhanced partnership detail with complete option and pricing information",
+  "type": "object",
+  "required": ["id", "contact_name", "contact_role", "language", "emails", "process_status", "created_at", "currency"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Partnership unique identifier"
+    },
+    "phone": {
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        { "type": "null" }
+      ],
+      "description": "Contact phone number"
+    },
+    "contact_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Primary contact name"
+    },
+    "contact_role": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Primary contact role/title"
+    },
+    "language": {
+      "type": "string",
+      "enum": ["fr", "en"],
+      "description": "Partnership language for option translations"
+    },
+    "emails": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "email"
+      },
+      "minItems": 0,
+      "description": "Contact email addresses"
+    },
+    "selected_pack": {
+      "oneOf": [
+        { "$ref": "partnership_pack.schema.json" },
+        { "type": "null" }
+      ],
+      "description": "Pack selected by the company"
+    },
+    "suggestion_pack": {
+      "oneOf": [
+        { "$ref": "partnership_pack.schema.json" },
+        { "type": "null" }
+      ],
+      "description": "Pack suggested by organizers"
+    },
+    "validated_pack": {
+      "oneOf": [
+        { "$ref": "partnership_pack.schema.json" },
+        { "type": "null" }
+      ],
+      "description": "Pack validated and finalized"
+    },
+    "organiser": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["id", "email", "display_name"],
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "User unique identifier"
+            },
+            "email": {
+              "type": "string",
+              "format": "email",
+              "description": "User email"
+            },
+            "display_name": {
+              "type": "string",
+              "minLength": 1,
+              "description": "User display name"
+            }
+          }
+        },
+        { "type": "null" }
+      ],
+      "description": "Assigned organizer for this partnership"
+    },
+    "process_status": {
+      "$ref": "partnership_process_status.schema.json"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Partnership creation timestamp (ISO 8601)"
+    },
+    "currency": {
+      "type": "string",
+      "enum": ["EUR"],
+      "default": "EUR",
+      "description": "Currency code (always EUR per current requirements)"
+    }
+  },
+  "additionalProperties": false
+}
