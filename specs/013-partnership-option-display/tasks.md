@@ -18,9 +18,9 @@
 
 **Purpose**: Validate prerequisites and environment setup
 
-- [ ] T001 Verify Java 21 (Amazon Corretto) installation and Gradle 8.13+ availability
-- [ ] T002 [P] Run `./gradlew build --no-daemon` from server/ to verify clean build
-- [ ] T003 [P] Run `npm install` and `npm run validate` from server/ to verify OpenAPI tooling
+- [X] T001 Verify Java 21 (Amazon Corretto) installation and Gradle 8.13+ availability
+- [X] T002 [P] Run `./gradlew build --no-daemon` from server/ to verify clean build
+- [X] T003 [P] Run `npm install` and `npm run validate` from server/ to verify OpenAPI tooling
 
 ---
 
@@ -30,11 +30,11 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Create PartnershipOption sealed class in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipOption.kt with 4 subtypes (TextPartnershipOption, QuantitativePartnershipOption, NumberPartnershipOption, SelectablePartnershipOption) and SelectedValue data class
-- [ ] T005 Update PartnershipDetail domain model in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipDetail.kt to add currency: String = "EUR" field
-- [ ] T006 Update PartnershipPack domain model in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipPack.kt to replace options field with requiredOptions: List<PartnershipOption>, optionalOptions: List<PartnershipOption>, and add totalPrice: Int field
-- [ ] T007 Create PartnershipOptionEntity.toDomain() mapper extension in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/application/mappers/PartnershipOptionEntity.ext.kt to map entities to PartnershipOption with complete descriptions (parentheses format) and pricing
-- [ ] T008 Run `./gradlew compileKotlin --no-daemon` from server/ to verify domain model changes compile successfully
+- [X] T004 Create PartnershipOption sealed class in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipOption.kt with 4 subtypes (TextPartnershipOption, QuantitativePartnershipOption, NumberPartnershipOption, SelectablePartnershipOption) and SelectedValue data class
+- [X] T005 Update PartnershipDetail domain model in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipDetail.kt to add currency: String = "EUR" field
+- [X] T006 Update PartnershipPack domain model in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/Partnership.kt to replace options field with requiredOptions: List<PartnershipOption>, optionalOptions: List<PartnershipOption>, and add totalPrice: Int field
+- [X] T007 Create PartnershipOptionEntity.toDomain() mapper extension in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/application/mappers/PartnershipOptionEntity.ext.kt to map entities to PartnershipOption with complete descriptions (parentheses format) and pricing
+- [X] T008 Run `./gradlew compileKotlin --no-daemon` from server/ to verify domain model changes compile successfully
 
 **Checkpoint**: Foundation ready - domain models complete, user story implementation can now begin
 
@@ -48,11 +48,11 @@
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Update PartnershipRepository.getByIdDetailed() in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipRepository.kt to document enhanced return type with new fields
-- [ ] T010 [US1] Implement enhanced getByIdDetailed() in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/application/PartnershipRepositoryExposed.kt to fetch partnership-specific options, map to PartnershipOption domain models with complete descriptions, separate into requiredOptions/optionalOptions lists based on PackOptionsTable, validate translations exist for partnership language (throw ForbiddenException if missing)
-- [ ] T011 [US1] Update existing PartnershipDetailedGetRouteTest in server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipDetailedGetRouteTest.kt to add assertions for currency field, requiredOptions/optionalOptions lists, complete description format (parentheses), and option properties (id, name, description, completeDescription, price, quantity, totalPrice)
-- [ ] T012 [US1] Update existing mock factories in server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/ to populate partnership options data with required and optional options for test partnerships
-- [ ] T013 [US1] Run `./gradlew test --tests "*PartnershipDetailedGetRouteTest" --no-daemon` from server/ to verify US1 implementation passes
+- [X] T009 [US1] Update PartnershipRepository.getByIdDetailed() in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipRepository.kt to document enhanced return type with new fields
+- [X] T010 [US1] Implement enhanced getByIdDetailed() in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/application/PartnershipRepositoryExposed.kt to fetch partnership-specific options, map to PartnershipOption domain models with complete descriptions, separate into requiredOptions/optionalOptions lists based on PackOptionsTable, validate translations exist for partnership language (throw ForbiddenException if missing)
+- [X] T011 [US1] Update existing PartnershipDetailedGetRouteTest in server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipDetailedGetRouteTest.kt to add assertions for currency field, requiredOptions/optionalOptions lists, complete description format (parentheses), and option properties (id, name, description, completeDescription, price, quantity, totalPrice)
+- [X] T012 [US1] Update existing mock factories in server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/ to populate partnership options data with required and optional options for test partnerships
+- [X] T013 [US1] Run `./gradlew test --tests "*PartnershipDetailedGetRouteTest" --no-daemon` from server/ to verify US1 implementation passes
 
 **Checkpoint**: User Story 1 complete - partnership details display partnership-specific options with complete descriptions
 
@@ -66,12 +66,12 @@
 
 ### Implementation for User Story 2
 
-- [ ] T014 [US2] Update PartnershipRepositoryExposed.getByIdDetailed() in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/application/PartnershipRepositoryExposed.kt to calculate pack totalPrice as basePrice + sum(optionalOptions.totalPrice) for each pack (selected, suggestion, validated)
-- [ ] T015 [P] [US2] Update BillingRoutes.kt in server/application/src/main/kotlin/fr/devlille/partners/connect/billing/infrastructure/api/BillingRoutes.kt to replace partnershipBillingRepository.computePricing() calls with partnershipRepository.getByIdDetailed() and extract pricing from validatedPack
-- [ ] T016 [P] [US2] Update PartnershipAgreementRepositoryExposed.kt in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/application/PartnershipAgreementRepositoryExposed.kt to use partnershipRepository.getByIdDetailed() instead of separate option queries
-- [ ] T017 [US2] Update existing BillingRoutesTest in server/application/src/test/kotlin/fr/devlille/partners/connect/billing/infrastructure/api/BillingRoutesTest.kt to verify partnershipRepository.getByIdDetailed() is called instead of billing repository, and verify pricing data matches validatedPack values
-- [ ] T018 [US2] Update existing AgreementRoutesTest in server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/AgreementRoutesTest.kt to verify partnershipRepository.getByIdDetailed() is called and complete descriptions are passed to agreement generation
-- [ ] T019 [US2] Run `./gradlew test --tests "*BillingRoutesTest" --tests "*AgreementRoutesTest" --no-daemon` from server/ to verify US2 implementation passes
+- [X] T014 [US2] Update PartnershipRepositoryExposed.getByIdDetailed() in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/application/PartnershipRepositoryExposed.kt to calculate pack totalPrice as basePrice + sum(optionalOptions.totalPrice) for each pack (selected, suggestion, validated)
+- [X] T015 [P] [US2] Update BillingRoutes.kt in server/application/src/main/kotlin/fr/devlille/partners/connect/billing/infrastructure/api/BillingRoutes.kt to replace partnershipBillingRepository.computePricing() calls with partnershipRepository.getByIdDetailed() and extract pricing from validatedPack
+- [X] T016 [P] [US2] Update PartnershipAgreementRepositoryExposed.kt in server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/application/PartnershipAgreementRepositoryExposed.kt to use partnershipRepository.getByIdDetailed() instead of separate option queries
+- [X] T017 [US2] Update existing BillingRoutesTest in server/application/src/test/kotlin/fr/devlille/partners/connect/billing/infrastructure/api/BillingRoutesTest.kt to verify partnershipRepository.getByIdDetailed() is called instead of billing repository, and verify pricing data matches validatedPack values
+- [X] T018 [US2] Update existing AgreementRoutesTest in server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/AgreementRoutesTest.kt to verify partnershipRepository.getByIdDetailed() is called and complete descriptions are passed to agreement generation
+- [X] T019 [US2] Run `./gradlew test --tests "*BillingRoutesTest" --tests "*AgreementRoutesTest" --no-daemon` from server/ to verify US2 implementation passes
 
 **Checkpoint**: User Story 2 complete - pricing breakdown available in partnership details, billing/agreement endpoints use enhanced detail
 
@@ -85,8 +85,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T020 [US3] Verify frontend auto-regeneration via `pnpm orval` in front/ directory will consume new partnership detail structure from OpenAPI spec
-- [ ] T021 [US3] Document in quickstart.md that frontend changes are minimal (Orval auto-generates TypeScript types from OpenAPI, components consuming partnership detail will automatically receive new structure)
+- [X] T020 [US3] Verify frontend auto-regeneration via `pnpm orval` in front/ directory will consume new partnership detail structure from OpenAPI spec
+- [X] T021 [US3] Document in quickstart.md that frontend changes are minimal (Orval auto-generates TypeScript types from OpenAPI, components consuming partnership detail will automatically receive new structure)
 
 **Checkpoint**: User Story 3 complete - frontend will consume enhanced partnership detail via auto-generated client
 
@@ -96,13 +96,13 @@
 
 **Purpose**: Schema validation and API documentation updates
 
-- [ ] T022 [P] Copy partnership_option.schema.json from specs/013-partnership-option-display/contracts/ to server/application/src/main/resources/schemas/
-- [ ] T023 [P] Copy partnership_pack.schema.json from specs/013-partnership-option-display/contracts/ to server/application/src/main/resources/schemas/
-- [ ] T024 [P] Update partnership_detail.schema.json in server/application/src/main/resources/schemas/ to add currency field and reference updated partnership_pack schema
-- [ ] T025 [P] Copy detailed_partnership_response.schema.json from specs/013-partnership-option-display/contracts/ to server/application/src/main/resources/schemas/
-- [ ] T026 Update openapi.yaml in server/application/src/main/resources/openapi/ to add partnership_option schema component, update partnership_pack component, update partnership_detail component, and update GET /events/{eventSlug}/partnerships/{partnershipId} response reference
-- [ ] T027 Run `npm run validate` from server/ to verify OpenAPI spec has zero errors
-- [ ] T028 Run `npm run bundle` from server/ to generate bundled OpenAPI spec for frontend consumption
+- [X] T022 [P] Copy partnership_option.schema.json from specs/013-partnership-option-display/contracts/ to server/application/src/main/resources/schemas/
+- [X] T023 [P] Copy partnership_pack.schema.json from specs/013-partnership-option-display/contracts/ to server/application/src/main/resources/schemas/
+- [X] T024 [P] Update partnership_detail.schema.json in server/application/src/main/resources/schemas/ to add currency field and reference updated partnership_pack schema
+- [X] T025 [P] Copy detailed_partnership_response.schema.json from specs/013-partnership-option-display/contracts/ to server/application/src/main/resources/schemas/
+- [X] T026 Update openapi.yaml in server/application/src/main/resources/openapi/ to add partnership_option schema component, update partnership_pack component, update partnership_detail component, and update GET /events/{eventSlug}/partnerships/{partnershipId} response reference
+- [X] T027 Run `npm run validate` from server/ to verify OpenAPI spec has zero errors
+- [X] T028 Run `npm run bundle` from server/ to generate bundled OpenAPI spec for frontend consumption
 
 ---
 
@@ -110,12 +110,12 @@
 
 **Purpose**: Final validation and cleanup
 
-- [ ] T029 [P] Run `./gradlew ktlintCheck --no-daemon` from server/ to verify code formatting
-- [ ] T030 [P] Run `./gradlew detekt --no-daemon` from server/ to verify static analysis passes
-- [ ] T031 Run `./gradlew test --no-daemon` from server/ to verify all tests pass (95+ tests)
-- [ ] T032 Run `./gradlew build --no-daemon` from server/ to verify full build succeeds
-- [ ] T033 Manual validation: Start backend with `./gradlew run --no-daemon` and test GET /events/{eventSlug}/partnerships/{partnershipId} endpoint returns enhanced response with currency, totalPrice, requiredOptions, optionalOptions
-- [ ] T034 Run quickstart.md validation checklist to verify all quality gates pass
+- [X] T029 [P] Run `./gradlew ktlintCheck --no-daemon` from server/ to verify code formatting
+- [X] T030 [P] Run `./gradlew detekt --no-daemon` from server/ to verify static analysis passes
+- [X] T031 Run `./gradlew test --no-daemon` from server/ to verify all tests pass (95+ tests)
+- [X] T032 Run `./gradlew build --no-daemon` from server/ to verify full build succeeds
+- [X] T033 Manual validation: Start backend with `./gradlew run --no-daemon` and test GET /events/{eventSlug}/partnerships/{partnershipId} endpoint returns enhanced response with currency, totalPrice, requiredOptions, optionalOptions
+- [X] T034 Run quickstart.md validation checklist to verify all quality gates pass
 
 ---
 

@@ -144,15 +144,13 @@ class PartnershipRepositoryExposed : PartnershipRepository {
             selectedPack = partnership.selectedPack?.let { pack ->
                 pack.toDomain(
                     language = partnership.language,
-                    optionIds = PartnershipOptionEntity.listByPartnershipAndPack(partnershipId, pack.id.value)
-                        .map { it.id.value },
+                    partnershipId = partnershipId,
                 )
             },
             suggestionPack = partnership.suggestionPack?.let { pack ->
                 pack.toDomain(
                     language = partnership.language,
-                    optionIds = PartnershipOptionEntity.listByPartnershipAndPack(partnershipId, pack.id.value)
-                        .map { it.id.value },
+                    partnershipId = partnershipId,
                 )
             },
             organiser = partnership.organiser?.toDomain(),
@@ -173,22 +171,19 @@ class PartnershipRepositoryExposed : PartnershipRepository {
             selectedPack = partnership.selectedPack?.let { pack ->
                 pack.toDomain(
                     language = partnership.language,
-                    optionIds = PartnershipOptionEntity.listByPartnershipAndPack(partnershipId, pack.id.value)
-                        .map { it.option.id.value },
+                    partnershipId = partnershipId,
                 )
             },
             suggestionPack = partnership.suggestionPack?.let { pack ->
                 pack.toDomain(
                     language = partnership.language,
-                    optionIds = PartnershipOptionEntity.listByPartnershipAndPack(partnershipId, pack.id.value)
-                        .map { it.option.id.value },
+                    partnershipId = partnershipId,
                 )
             },
             validatedPack = partnership.validatedPack()?.let { pack ->
                 pack.toDomain(
                     language = partnership.language,
-                    optionIds = PartnershipOptionEntity.listByPartnershipAndPack(partnershipId, pack.id.value)
-                        .map { it.option.id.value },
+                    partnershipId = partnershipId,
                 )
             },
         )

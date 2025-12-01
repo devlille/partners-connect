@@ -57,6 +57,7 @@ class NotificationVariablesTest {
     )
 
     private fun createEventDisplay(now: LocalDateTime) = EventDisplay(
+        id = "test-event-123",
         slug = "test-event",
         name = "Test Event",
         startTime = now,
@@ -101,7 +102,9 @@ class NotificationVariablesTest {
         id = "test-pack-id",
         name = "Test Pack",
         basePrice = 1000,
-        options = emptyList(),
+        requiredOptions = emptyList(),
+        optionalOptions = emptyList(),
+        totalPrice = 1000,
     )
 
     private fun createPartnership() = Partnership(

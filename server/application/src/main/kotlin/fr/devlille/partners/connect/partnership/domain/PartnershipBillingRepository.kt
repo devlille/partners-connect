@@ -13,6 +13,4 @@ interface PartnershipBillingRepository {
     fun updateQuoteUrl(eventSlug: String, partnershipId: UUID, quoteUrl: String): UUID
 
     fun updateStatus(eventSlug: String, partnershipId: UUID, status: InvoiceStatus): UUID
-
-    fun computePricing(eventSlug: String, partnershipId: UUID): PartnershipPricing
 }

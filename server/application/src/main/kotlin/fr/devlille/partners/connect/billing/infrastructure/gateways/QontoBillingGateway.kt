@@ -14,7 +14,7 @@ import fr.devlille.partners.connect.integrations.infrastructure.db.QontoIntegrat
 import fr.devlille.partners.connect.integrations.infrastructure.db.get
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
-import fr.devlille.partners.connect.partnership.domain.PartnershipPricing
+import fr.devlille.partners.connect.partnership.domain.PartnershipDetail
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -25,15 +25,15 @@ class QontoBillingGateway(
 ) : BillingGateway {
     override val provider: IntegrationProvider = IntegrationProvider.QONTO
 
-    override suspend fun createInvoice(integrationId: UUID, pricing: PartnershipPricing): String {
+    override suspend fun createInvoice(integrationId: UUID, eventId: UUID, partnership: PartnershipDetail): String {
         val config = transaction { QontoIntegrationsTable[integrationId] }
         val billing = transaction {
-            BillingEntity.singleByEventAndPartnership(pricing.eventId.toUUID(), pricing.partnershipId.toUUID())
-                ?: throw NotFoundException("No billing found for company ${pricing.partnershipId}")
+            BillingEntity.singleByEventAndPartnership(eventId, partnership.id.toUUID())
+                ?: throw NotFoundException("No billing found for company ${partnership.id}")
         }
         val event = transaction { billing.event }
         val company = transaction { billing.partnership.company }
-        val items = invoiceItems(pricing)
+        val items = invoiceItems(partnership)
         val client = getClient(billing, company, config)
         val request = event.toQontoInvoiceRequest(
             clientId = client.id,
@@ -43,15 +43,15 @@ class QontoBillingGateway(
         return qontoProvider.createInvoice(request, config).clientInvoice.invoiceUrl
     }
 
-    override suspend fun createQuote(integrationId: UUID, pricing: PartnershipPricing): String {
+    override suspend fun createQuote(integrationId: UUID, eventId: UUID, partnership: PartnershipDetail): String {
         val config = transaction { QontoIntegrationsTable[integrationId] }
         val billing = transaction {
-            BillingEntity.singleByEventAndPartnership(pricing.eventId.toUUID(), pricing.partnershipId.toUUID())
-                ?: throw NotFoundException("No billing found for company ${pricing.partnershipId}")
+            BillingEntity.singleByEventAndPartnership(eventId, partnership.id.toUUID())
+                ?: throw NotFoundException("No billing found for company ${partnership.id}")
         }
         val event = transaction { billing.event }
         val company = transaction { billing.partnership.company }
-        val items = invoiceItems(pricing)
+        val items = invoiceItems(partnership)
         val client = getClient(billing, company, config)
         val request = event.toQontoQuoteRequest(clientId = client.id, invoiceItems = items)
         return qontoProvider.createQuote(request, config).quote.quoteUrl

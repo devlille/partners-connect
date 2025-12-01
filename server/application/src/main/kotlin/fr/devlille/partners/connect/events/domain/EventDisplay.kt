@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class EventDisplay(
+    val id: String,
     val slug: String,
     val name: String,
     @SerialName("start_time")

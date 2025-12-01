@@ -224,7 +224,7 @@ class PartnershipAgreementRoutesTest {
         }
 
         assertEquals(HttpStatusCode.NotFound, response.status)
-        assertTrue(response.bodyAsText().contains("Partnership with id $partnershipId hasn't validated pack"))
+        assertTrue(response.bodyAsText().contains("Validated pack not found for partnership"))
     }
 
     @Test

@@ -216,6 +216,8 @@ class PartnershipDetailedGetRouteTest {
         assertEquals(HttpStatusCode.OK, response.status)
         val details = Json.decodeFromString(DetailedPartnershipResponse.serializer(), response.bodyAsText())
         assertNotNull(details.partnership.validatedPack)
-        assertEquals(optionId.toString(), details.partnership.validatedPack.options.first().id)
+        val allOptions = details.partnership.validatedPack.requiredOptions +
+            details.partnership.validatedPack.optionalOptions
+        assertEquals(optionId.toString(), allOptions.first().id)
     }
 }
