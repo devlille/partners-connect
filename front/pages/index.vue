@@ -78,7 +78,7 @@
 
         <SponsoringOptionsInput
           v-model="formData.optionSelections"
-          legend="Options de sponsoring"
+          legend="Options de sponsoring supplémentaires"
           :options="options"
         />
 
