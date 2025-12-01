@@ -25,7 +25,7 @@
         <TextInput
           id="ip-name"
           v-model="formData.name"
-          label="Nom"
+          label="Nom de la société"
           type="text"
           name="ip-name"
           autocomplete="name"
