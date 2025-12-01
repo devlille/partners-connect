@@ -1,5 +1,7 @@
 package fr.devlille.partners.connect.partnership.domain
 
+import fr.devlille.partners.connect.events.domain.EventWithOrganisation
+import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.users.domain.User
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -25,4 +27,9 @@ data class PartnershipDetail(
     val processStatus: PartnershipProcessStatus,
     @SerialName("created_at")
     val createdAt: String,
+    val currency: String = "EUR",
 )
+
+fun PartnershipDetail.link(
+    event: EventWithOrganisation,
+) = "${SystemVarEnv.frontendBaseUrl}/${event.event.slug}/$id"

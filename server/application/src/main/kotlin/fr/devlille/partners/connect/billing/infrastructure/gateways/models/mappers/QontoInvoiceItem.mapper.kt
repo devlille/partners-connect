@@ -2,24 +2,27 @@ package fr.devlille.partners.connect.billing.infrastructure.gateways.models.mapp
 
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoInvoiceItem
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoMoneyAmount
-import fr.devlille.partners.connect.partnership.domain.PartnershipPricing
+import fr.devlille.partners.connect.partnership.domain.PartnershipDetail
 
 @Suppress("SpreadOperator")
 internal fun invoiceItems(
-    pricing: PartnershipPricing,
-): List<QontoInvoiceItem> = listOf(
-    QontoInvoiceItem(
-        title = "Sponsoring ${pricing.packName}",
-        quantity = "1",
-        unitPrice = QontoMoneyAmount(value = "${pricing.basePrice}", currency = pricing.currency),
-        vatRate = "0",
-    ),
-    *pricing.optionalOptions.map { option ->
+    partnership: PartnershipDetail,
+): List<QontoInvoiceItem> {
+    val pack = partnership.validatedPack ?: error("Partnership ${partnership.id} has no validated pack")
+    return listOf(
         QontoInvoiceItem(
-            title = option.label,
-            quantity = "${option.quantity}",
-            unitPrice = QontoMoneyAmount(value = "${option.unitAmount}", currency = pricing.currency),
+            title = "Sponsoring ${pack.name}",
+            quantity = "1",
+            unitPrice = QontoMoneyAmount(value = "${pack.basePrice}", currency = partnership.currency),
             vatRate = "0",
-        )
-    }.toTypedArray(),
-)
+        ),
+        *pack.optionalOptions.map { option ->
+            QontoInvoiceItem(
+                title = option.labelWithValue,
+                quantity = "${option.quantity}",
+                unitPrice = QontoMoneyAmount(value = "${option.price}", currency = partnership.currency),
+                vatRate = "0",
+            )
+        }.toTypedArray(),
+    )
+}

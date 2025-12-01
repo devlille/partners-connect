@@ -134,6 +134,7 @@ class EventRepositoryExposed(
         }
 
         val event = EventDisplay(
+            id = eventEntity.id.value.toString(),
             slug = eventEntity.slug,
             name = eventEntity.name,
             startTime = eventEntity.startTime,

@@ -4,6 +4,7 @@ import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.companies.domain.JobOffer
 import fr.devlille.partners.connect.events.domain.EventWithOrganisation
 import fr.devlille.partners.connect.partnership.domain.Partnership
+import fr.devlille.partners.connect.partnership.domain.PartnershipDetail
 import fr.devlille.partners.connect.partnership.domain.PartnershipPack
 import fr.devlille.partners.connect.partnership.domain.link
 
@@ -149,7 +150,7 @@ sealed interface NotificationVariables {
         override val language: String,
         override val event: EventWithOrganisation,
         override val company: Company,
-        val partnership: Partnership,
+        val partnership: PartnershipDetail,
     ) : NotificationVariables {
         override val usageName: String = "new_invoice"
 
@@ -167,7 +168,7 @@ sealed interface NotificationVariables {
         override val language: String,
         override val event: EventWithOrganisation,
         override val company: Company,
-        val partnership: Partnership,
+        val partnership: PartnershipDetail,
     ) : NotificationVariables {
         override val usageName: String = "new_quote"
 

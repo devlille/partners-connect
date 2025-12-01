@@ -8,7 +8,6 @@ import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
 import fr.devlille.partners.connect.partnership.domain.PartnershipAgreementRepository
-import fr.devlille.partners.connect.partnership.domain.PartnershipBillingRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipStorageRepository
 import io.ktor.http.ContentType
@@ -51,7 +50,7 @@ fun Route.publicPartnershipAgreementRoutes() {
 }
 
 fun Route.orgsPartnershipAgreementRoutes() {
-    val billingRepository by inject<PartnershipBillingRepository>()
+    val partnershipRepository by inject<PartnershipRepository>()
     val agreementRepository by inject<PartnershipAgreementRepository>()
     val storageRepository by inject<PartnershipStorageRepository>()
 
@@ -61,9 +60,9 @@ fun Route.orgsPartnershipAgreementRoutes() {
         post {
             val eventSlug = call.parameters.eventSlug
             val partnershipId = call.parameters.partnershipId
-            val pricing = billingRepository.computePricing(eventSlug, partnershipId)
+            val details = partnershipRepository.getByIdDetailed(eventSlug, partnershipId)
             val agreement = agreementRepository.agreement(eventSlug, partnershipId)
-            val pdfBinary = agreementRepository.generatePDF(agreement, pricing)
+            val pdfBinary = agreementRepository.generatePDF(agreement, details)
             val agreementUrl = storageRepository.uploadAgreement(eventSlug, partnershipId, pdfBinary)
             agreementRepository.updateAgreementUrl(eventSlug, partnershipId, agreementUrl)
             call.respond(HttpStatusCode.OK, mapOf("url" to agreementUrl))

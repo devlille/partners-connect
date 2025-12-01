@@ -27,12 +27,12 @@ best interest of both Parties.
 
 Broadly, the Association is committed to give the Partner a large visibility on the Association's communication supports:
 
-{{#pricing.requiredOptions}}
-- {{label}}
-{{/pricing.requiredOptions}}
-{{#pricing.optionalOptions}}
-- {{label}}
-{{/pricing.optionalOptions}}
+{{#partnership.validatedPack.requiredOptions}}
+- {{labelWithValue}}
+{{/partnership.validatedPack.requiredOptions}}
+{{#partnership.validatedPack.optionalOptions}}
+- {{labelWithValue}}
+{{/partnership.validatedPack.optionalOptions}}
 
 {{#agreement.partnership.hasBooth}}
 The Association is committed to provide to the Partner an electrical power strip, a table and two chairs. The rest will 
@@ -53,7 +53,7 @@ duration of this Agreement, and do not result in any transfer of ownership right
 ## III - OBLIGATIONS OF THE PARTNER
 
 The Partner is committed to allocate to the Association the amount hereafter, in order to comply with the Agreement 
-purpose: {{pricing.totalAmount}} euros TTC. The payment has to be done respecting the following conditions: payment of 
+purpose: {{partnership.validatedPack.totalPrice}} euros TTC. The payment has to be done respecting the following conditions: payment of 
 the total amount at the Partnership Agreement signature and within a period of 45 days. If this deadline is exceeded, 
 we would be obliged to terminate our partnership.
 

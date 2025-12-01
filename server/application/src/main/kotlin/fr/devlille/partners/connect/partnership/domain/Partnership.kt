@@ -2,7 +2,6 @@ package fr.devlille.partners.connect.partnership.domain
 
 import fr.devlille.partners.connect.events.domain.EventWithOrganisation
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
-import fr.devlille.partners.connect.sponsoring.domain.SponsoringOption
 import fr.devlille.partners.connect.users.domain.User
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -26,7 +25,12 @@ class PartnershipPack(
     val name: String,
     @SerialName("base_price")
     val basePrice: Int,
-    val options: List<SponsoringOption>,
+    @SerialName("required_options")
+    val requiredOptions: List<PartnershipOption>,
+    @SerialName("optional_options")
+    val optionalOptions: List<PartnershipOption>,
+    @SerialName("total_price")
+    val totalPrice: Int,
 )
 
 fun Partnership.link(

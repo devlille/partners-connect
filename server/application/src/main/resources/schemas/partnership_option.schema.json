@@ -1,0 +1,242 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "partnership_option.schema.json",
+  "title": "Partnership Option",
+  "description": "Polymorphic schema for partnership-specific options with complete descriptions and pricing",
+  "oneOf": [
+    { "$ref": "#/$defs/TextPartnershipOption" },
+    { "$ref": "#/$defs/QuantitativePartnershipOption" },
+    { "$ref": "#/$defs/NumberPartnershipOption" },
+    { "$ref": "#/$defs/SelectablePartnershipOption" }
+  ],
+  "$defs": {
+    "TextPartnershipOption": {
+      "type": "object",
+      "description": "Text-based option with no quantity or value selection",
+      "required": ["type", "id", "name", "description", "label_with_value", "price", "quantity", "total_price"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "text",
+          "description": "Discriminator field for text options"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Option unique identifier"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Translated option name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Original translated description"
+        },
+        "label_with_value": {
+          "type": "string",
+          "description": "Complete formatted description (same as description for text options)"
+        },
+        "price": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Unit price for this option in cents"
+        },
+        "quantity": {
+          "type": "integer",
+          "const": 1,
+          "description": "Always 1 for text options"
+        },
+        "total_price": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total cost for this option (same as price)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "QuantitativePartnershipOption": {
+      "type": "object",
+      "description": "Option with user-selected quantity",
+      "required": ["type", "id", "name", "description", "label_with_value", "price", "quantity", "total_price", "type_descriptor"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "typed_quantitative",
+          "description": "Discriminator field for quantitative options"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Option unique identifier"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Translated option name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Original translated description"
+        },
+        "label_with_value": {
+          "type": "string",
+          "pattern": "^.+\\s\\(\\d+\\)$",
+          "description": "Formatted as '{description} ({quantity})', e.g., 'Conference passes (5)'"
+        },
+        "price": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Unit price for this option in cents"
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "User-selected quantity for this partnership"
+        },
+        "total_price": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total cost: price × quantity"
+        },
+        "type_descriptor": {
+          "type": "string",
+          "enum": ["job_offer"],
+          "description": "Quantitative descriptor for user-defined quantities"
+        }
+      },
+      "additionalProperties": false
+    },
+    "NumberPartnershipOption": {
+      "type": "object",
+      "description": "Option with fixed quantity from definition",
+      "required": ["type", "id", "name", "description", "label_with_value", "price", "quantity", "total_price", "type_descriptor"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "typed_number",
+          "description": "Discriminator field for number options"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Option unique identifier"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Translated option name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Original translated description"
+        },
+        "label_with_value": {
+          "type": "string",
+          "pattern": "^.+\\s\\(\\d+\\)$",
+          "description": "Formatted as '{description} ({fixedQuantity})', e.g., 'Logo on website (3)'"
+        },
+        "price": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Unit price for this option in cents"
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Fixed quantity from option definition"
+        },
+        "total_price": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total cost: price × fixedQuantity"
+        },
+        "type_descriptor": {
+          "type": "string",
+          "enum": ["nb_ticket"],
+          "description": "Number descriptor for fixed quantities"
+        }
+      },
+      "additionalProperties": false
+    },
+    "SelectablePartnershipOption": {
+      "type": "object",
+      "description": "Option with user-chosen value from predefined list",
+      "required": ["type", "id", "name", "description", "label_with_value", "price", "quantity", "total_price", "type_descriptor", "selected_value"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "typed_selectable",
+          "description": "Discriminator field for selectable options"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Option unique identifier"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Translated option name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Original translated description"
+        },
+        "label_with_value": {
+          "type": "string",
+          "pattern": "^.+\\s\\(.+\\)$",
+          "description": "Formatted as '{description} ({selectedValue})', e.g., 'Booth size (3m x 3m)'"
+        },
+        "price": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Unit price for this option (from selected value) in cents"
+        },
+        "quantity": {
+          "type": "integer",
+          "const": 1,
+          "description": "Always 1 for selectable options"
+        },
+        "total_price": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total cost (same as price from selected value)"
+        },
+        "type_descriptor": {
+          "type": "string",
+          "enum": ["booth"],
+          "description": "Selectable descriptor for predefined choices"
+        },
+        "selected_value": {
+          "$ref": "#/$defs/SelectedValue"
+        }
+      },
+      "additionalProperties": false
+    },
+    "SelectedValue": {
+      "type": "object",
+      "description": "The specific value selected by the user for a selectable option",
+      "required": ["id", "value", "price"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Selected value unique identifier"
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Display name of the selected value (e.g., '3m x 3m', 'Gold')"
+        },
+        "price": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Price for this specific value in cents"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

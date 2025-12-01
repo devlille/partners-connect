@@ -6,6 +6,7 @@ import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
+import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
 import fr.devlille.partners.connect.partnership.domain.PartnershipBillingRepository
@@ -50,12 +51,11 @@ fun Route.publicPartnershipBillingRoutes() {
         post("invoice") {
             val eventSlug = call.parameters.eventSlug
             val partnershipId = call.parameters.partnershipId
-            val pricing = partnershipBillingRepository.computePricing(eventSlug, partnershipId)
-            val invoiceUrl = billingRepository.createInvoice(pricing)
-            partnershipBillingRepository.updateInvoiceUrl(eventSlug, partnershipId, invoiceUrl)
             val event = eventRepository.getBySlug(eventSlug)
+            val partnership = partnershipRepository.getByIdDetailed(eventSlug, partnershipId)
+            val invoiceUrl = billingRepository.createInvoice(event.event.id.toUUID(), partnership)
+            partnershipBillingRepository.updateInvoiceUrl(eventSlug, partnershipId, invoiceUrl)
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
-            val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             val variables = NotificationVariables.NewInvoice(partnership.language, event, company, partnership)
             notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.Created, mapOf("url" to invoiceUrl))
@@ -63,12 +63,11 @@ fun Route.publicPartnershipBillingRoutes() {
         post("quote") {
             val eventSlug = call.parameters.eventSlug
             val partnershipId = call.parameters.partnershipId
-            val pricing = partnershipBillingRepository.computePricing(eventSlug, partnershipId)
-            val quoteUrl = billingRepository.createQuote(pricing)
-            partnershipBillingRepository.updateQuoteUrl(eventSlug, partnershipId, quoteUrl)
             val event = eventRepository.getBySlug(eventSlug)
+            val partnership = partnershipRepository.getByIdDetailed(eventSlug, partnershipId)
+            val quoteUrl = billingRepository.createQuote(event.event.id.toUUID(), partnership)
+            partnershipBillingRepository.updateQuoteUrl(eventSlug, partnershipId, quoteUrl)
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
-            val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             val variables = NotificationVariables.NewQuote(partnership.language, event, company, partnership)
             notificationRepository.sendMessage(eventSlug, variables)
             call.respond(HttpStatusCode.Created, mapOf("url" to quoteUrl))

@@ -5,7 +5,7 @@ import java.util.UUID
 interface PartnershipAgreementRepository {
     fun agreement(eventSlug: String, partnershipId: UUID): PartnershipAgreement
 
-    fun generatePDF(agreement: PartnershipAgreement, pricing: PartnershipPricing): ByteArray
+    fun generatePDF(agreement: PartnershipAgreement, partnership: PartnershipDetail): ByteArray
 
     fun updateAgreementUrl(eventSlug: String, partnershipId: UUID, agreementUrl: String): UUID
 

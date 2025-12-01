@@ -29,19 +29,19 @@
     },
     "selected_pack": {
       "anyOf": [
-        { "$ref": "sponsoring_pack.schema.json" },
+        { "$ref": "partnership_pack.schema.json" },
         { "type": "null" }
       ]
     },
     "suggestion_pack": {
       "anyOf": [
-        { "$ref": "sponsoring_pack.schema.json" },
+        { "$ref": "partnership_pack.schema.json" },
         { "type": "null" }
       ]
     },
     "validated_pack": {
       "anyOf": [
-        { "$ref": "sponsoring_pack.schema.json" },
+        { "$ref": "partnership_pack.schema.json" },
         { "type": "null" }
       ]
     },
@@ -57,6 +57,11 @@
     "created_at": {
       "type": "string",
       "format": "date-time"
+    },
+    "currency": {
+      "type": "string",
+      "enum": ["EUR"],
+      "default": "EUR"
     }
   },
   "required": [
@@ -66,6 +71,7 @@
     "language",
     "emails",
     "process_status",
-    "created_at"
+    "created_at",
+    "currency"
   ]
 }

@@ -14,8 +14,8 @@ import fr.devlille.partners.connect.partnership.domain.Event
 import fr.devlille.partners.connect.partnership.domain.Organisation
 import fr.devlille.partners.connect.partnership.domain.PartnershipAgreement
 import fr.devlille.partners.connect.partnership.domain.PartnershipAgreementRepository
+import fr.devlille.partners.connect.partnership.domain.PartnershipDetail
 import fr.devlille.partners.connect.partnership.domain.PartnershipInfo
-import fr.devlille.partners.connect.partnership.domain.PartnershipPricing
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
@@ -59,10 +59,10 @@ class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
 
     override fun generatePDF(
         agreement: PartnershipAgreement,
-        pricing: PartnershipPricing,
+        partnership: PartnershipDetail,
     ): ByteArray {
         val template = readResourceFile(agreement.path)
-        val markdown = templating(template, AgreementScope(agreement, pricing))
+        val markdown = templating(template, AgreementScope(agreement, partnership))
         return renderMarkdownToPdf(markdown)
     }
 
@@ -89,7 +89,7 @@ class PartnershipAgreementRepositoryExposed : PartnershipAgreementRepository {
     }
 }
 
-private class AgreementScope(val agreement: PartnershipAgreement, val pricing: PartnershipPricing)
+private class AgreementScope(val agreement: PartnershipAgreement, val partnership: PartnershipDetail)
 
 @Suppress("ThrowsCount")
 internal fun OrganisationEntity.toAgreementOrganisation(formatter: DateTimeFormat<LocalDate>): Organisation {

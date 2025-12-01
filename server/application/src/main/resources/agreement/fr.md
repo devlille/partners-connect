@@ -35,12 +35,12 @@ partenariat qui unit les deux Parties se développe au maximum et dans le sens d
 L'Association s’engage à donner une forte visibilité du partenaire sur les supports de communication Internet de 
 l’Association :
 
-{{#pricing.requiredOptions}}
-- {{label}}
-{{/pricing.requiredOptions}}
-{{#pricing.optionalOptions}}
-- {{label}}
-{{/pricing.optionalOptions}}
+{{#partnership.validatedPack.requiredOptions}}
+- {{labelWithValue}}
+{{/partnership.validatedPack.requiredOptions}}
+{{#partnership.validatedPack.optionalOptions}}
+- {{labelWithValue}}
+{{/partnership.validatedPack.optionalOptions}}
 
 Les obligations citées précédemment seront appliquées à la reception du paiement réalisé par le Partenaire. Le paiement 
 devra être réalisé avant le {{agreement.event.paymentDeadline}}.
@@ -58,7 +58,7 @@ propriété du Partenaire à l'égard de l'Association.
 ## III - OBLIGATIONS DU PARTENAIRE
 
 Le Partenaire s’engage en contrepartie à verser à l'Association le montant suivant, en vue de la réalisation de l’objet 
-de la convention : {{pricing.totalAmount}} euros TTC. Le paiement du montant sera fait selon les conditions suivantes : 
+de la convention : {{partnership.validatedPack.totalPrice}} euros TTC. Le paiement du montant sera fait selon les conditions suivantes : 
 paiement à la signature de la convention de partenariat et dans un délai de 45 jours. Ce délai dépassé, nous serions 
 dans l'obligation de rompre notre partenariat.
 
