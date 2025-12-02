@@ -59,7 +59,21 @@
                 :for="`form-option-${option.id}`"
                 class="flex-1 cursor-not-allowed"
               >
-                <span class="block text-sm font-medium text-gray-900">{{ option.name }}</span>
+                <span class="block text-sm font-medium text-gray-900">
+                  {{ option.name }}
+                  <!-- Pour les options quantitatives: afficher "Quantité x Montant Unitaire" -->
+                  <span v-if="option.type === 'typed_quantitative' && option.quantity && option.price !== null && option.price !== undefined" class="text-gray-600">
+                    ({{ option.quantity }} x {{ option.price }} €)
+                  </span>
+                  <!-- Pour les options sélectables: afficher le texte et le prix du choix fait -->
+                  <span v-else-if="option.type === 'typed_selectable' && option.selected_value" class="text-gray-600">
+                    ({{ option.selected_value.value }} - {{ option.selected_value.price }} €)
+                  </span>
+                  <!-- Pour les autres options: afficher juste le prix -->
+                  <span v-else-if="option.price !== null && option.price !== undefined" class="text-gray-600">
+                    ({{ option.price }} €)
+                  </span>
+                </span>
                 <span v-if="option.description" class="block text-sm text-gray-500 mt-1">
                   {{ option.description }}
                 </span>
@@ -147,7 +161,16 @@ const eventSlug = computed(() => {
 
 const packs = ref<SponsoringPack[]>([]);
 const selectedPackName = ref('');
-const selectedOptions = ref<Array<{ id: string; name: string; description?: string | null }>>([]);
+const selectedOptions = ref<Array<{
+  id: string;
+  name: string;
+  description?: string | null;
+  price?: number | null;
+  type?: string;
+  quantity?: number | null;
+  total_price?: number | null;
+  selected_value?: { id: string; value: string; price: number } | null;
+}>>([]);
 
 // Charger les packs disponibles
 async function loadPacks() {
@@ -178,9 +201,18 @@ function updateSelectedOptions() {
   selectedOptions.value = [];
 
   // Si pack_options est fourni directement (nouveau format depuis getEventsPartnershipDetailed),
-  // on l'utilise directement
+  // on l'utilise directement avec toutes les informations
   if (props.partnership?.pack_options && props.partnership.pack_options.length > 0) {
-    selectedOptions.value = props.partnership.pack_options;
+    selectedOptions.value = props.partnership.pack_options.map((opt: any) => ({
+      id: opt.id,
+      name: opt.name,
+      description: opt.description || null,
+      price: opt.price ?? null,
+      type: opt.type,
+      quantity: opt.quantity ?? null,
+      total_price: opt.total_price ?? null,
+      selected_value: opt.selected_value ?? null
+    }));
     return;
   }
 
@@ -206,7 +238,12 @@ function updateSelectedOptions() {
     .map((opt: any) => ({
       id: opt.id,
       name: opt.name,
-      description: opt.description || null
+      description: opt.description || null,
+      price: opt.price ?? null,
+      type: opt.type,
+      quantity: opt.quantity ?? null,
+      total_price: opt.total_price ?? null,
+      selected_value: opt.selected_value ?? null
     }));
 }
 

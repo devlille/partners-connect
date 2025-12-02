@@ -43,11 +43,16 @@ export const usePublicPartnership = () => {
         billing.value = null;
       }
 
-      // Extract pack options
+      // Extract pack options with full details including quantity and selected values
       const packOptions = ((p.selected_pack as any)?.options || p.selected_pack?.optional_options || []).map((opt: any) => ({
         id: opt.id,
         name: opt.name,
-        description: opt.description || null
+        description: opt.description || null,
+        type: opt.type,
+        price: opt.price ?? null,
+        quantity: opt.quantity ?? null,
+        total_price: opt.total_price ?? null,
+        selected_value: opt.selected_value ?? null
       }));
       const optionIds = packOptions.map(opt => opt.id);
 

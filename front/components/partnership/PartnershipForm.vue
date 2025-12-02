@@ -63,13 +63,13 @@
               >
                 <span class="block text-sm font-medium text-gray-900">
                   {{ option.name }}
-                  <!-- Pour les options quantitatives: afficher "2 x 10 €" -->
-                  <span v-if="option.selected_quantity && option.price !== null && option.price !== undefined" class="text-gray-600">
-                    ({{ option.selected_quantity }} x {{ option.price }} €)
+                  <!-- Pour les options quantitatives: afficher "Quantité x Montant Unitaire" -->
+                  <span v-if="option.type === 'typed_quantitative' && option.quantity && option.price !== null && option.price !== undefined" class="text-gray-600">
+                    ({{ option.quantity }} x {{ option.price }} €)
                   </span>
-                  <!-- Pour les options sélectables: afficher la valeur choisie -->
-                  <span v-else-if="option.selected_value" class="text-gray-600">
-                    ({{ option.selected_value }})
+                  <!-- Pour les options sélectables: afficher le texte et le prix du choix fait -->
+                  <span v-else-if="option.type === 'typed_selectable' && option.selected_value" class="text-gray-600">
+                    ({{ option.selected_value.value }} - {{ option.selected_value.price }} €)
                   </span>
                   <!-- Pour les autres options: afficher juste le prix -->
                   <span v-else-if="option.price !== null && option.price !== undefined" class="text-gray-600">
@@ -177,8 +177,10 @@ const selectedOptions = ref<Array<{
   description?: string | null;
   price?: number | null;
   type?: string;
+  quantity?: number | null;
+  total_price?: number | null;
   selected_quantity?: number;
-  selected_value?: string;
+  selected_value?: { id: string; value: string; price: number } | string;
 }>>([]);
 
 // Computed pour afficher le pack avec son prix
@@ -225,7 +227,11 @@ function updateSelectedOptions() {
   const pack = packId ? packs.value.find(p => p.id === packId) : null;
   const packOptions = pack ? ((pack as any).options || pack.optional_options || []) : [];
 
+  console.log('=== UPDATE SELECTED OPTIONS ===');
   console.log('Partnership data:', props.partnership);
+  console.log('Has pack_options?', !!props.partnership?.pack_options);
+  console.log('pack_options length:', props.partnership?.pack_options?.length);
+  console.log('pack_options content:', props.partnership?.pack_options);
   console.log('Option selections:', props.partnership?.option_selections);
 
   // Si option_selections est disponible (avec détails quantité/valeur), on l'utilise en priorité
@@ -260,18 +266,23 @@ function updateSelectedOptions() {
   }
 
   // Si pack_options est fourni directement (nouveau format depuis getEventsPartnershipDetailed),
-  // on l'utilise directement
+  // on l'utilise directement car il contient déjà toutes les informations nécessaires
   if (props.partnership?.pack_options && props.partnership.pack_options.length > 0) {
-    selectedOptions.value = props.partnership.pack_options.map(opt => {
-      const fullOption = packOptions.find((po: any) => po.id === opt.id);
+    console.log('Using pack_options from partnership:', props.partnership.pack_options);
+    selectedOptions.value = props.partnership.pack_options.map((opt: any) => {
+      console.log('Option details:', opt);
       return {
         id: opt.id,
         name: opt.name,
         description: opt.description || null,
-        price: fullOption?.price ?? null,
-        type: fullOption?.type
+        price: opt.price ?? null,
+        type: opt.type,
+        quantity: opt.quantity ?? null,
+        total_price: opt.total_price ?? null,
+        selected_value: opt.selected_value ?? null
       };
     });
+    console.log('Final selectedOptions:', selectedOptions.value);
     return;
   }
 

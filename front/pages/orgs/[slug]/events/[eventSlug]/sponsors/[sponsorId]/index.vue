@@ -272,10 +272,15 @@ async function loadPartnership() {
 
     // Extraire les options du pack sélectionné avec leurs informations complètes
     // Note: L'API retourne "options" alors que le schéma TypeScript définit "optional_options"
-    const packOptions = ((p.selected_pack as any)?.options || p.selected_pack?.optional_options || []).map((opt: { id: string; name: string; description?: string | null }) => ({
+    const packOptions = ((p.selected_pack as any)?.options || p.selected_pack?.optional_options || []).map((opt: any) => ({
       id: opt.id,
       name: opt.name,
-      description: opt.description || null
+      description: opt.description || null,
+      type: opt.type,
+      price: opt.price ?? null,
+      quantity: opt.quantity ?? null,
+      total_price: opt.total_price ?? null,
+      selected_value: opt.selected_value ?? null
     }));
     const optionIds = packOptions.map((opt: { id: string }) => opt.id);
 
