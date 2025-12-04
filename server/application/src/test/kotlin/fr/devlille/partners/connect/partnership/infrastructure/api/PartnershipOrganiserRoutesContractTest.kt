@@ -130,31 +130,27 @@ class PartnershipOrganiserRoutesContractTest {
     }
 
     @Test
-    fun `POST returns valid PartnershipOrganiserResponse schema`() = testApplication {
-        val eventSlug = "test-event"
-        val partnershipId = UUID.randomUUID()
-        val userId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
+    fun `POST rejects to assign organiser to non-existent partnership`() = testApplication {
         val orgId = UUID.randomUUID()
-        val companyId = UUID.randomUUID()
-        val packId = UUID.randomUUID()
-        val organiserEmail = "valid@example.com"
+        val eventId = UUID.randomUUID()
+        val userId = UUID.randomUUID()
+        val orgSlug = "tech-conference"
+        val eventSlug = "devlille-2025"
+        val userEmail = "organiser@example.com"
+        val nonExistentPartnershipId = UUID.randomUUID()
 
         application {
             moduleMocked()
 
-            // Create test data
-            insertMockedOrganisationEntity(orgId)
+            insertMockedOrganisationEntity(orgId, orgSlug)
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-            insertMockedCompany(companyId)
-            val pack = insertMockedSponsoringPack(packId, eventId)
-            insertMockedPartnership(
-                id = partnershipId,
-                eventId = eventId,
-                companyId = companyId,
-                selectedPackId = pack.id.value,
+
+            val user = insertMockedUser(
+                id = userId,
+                name = "Alice Organiser",
+                email = userEmail,
+                pictureUrl = "https://example.com/alice.jpg",
             )
-            val user = insertMockedUser(userId, email = organiserEmail, name = "Test Organiser")
             insertMockedOrgaPermission(
                 orgId = orgId,
                 user = user,
@@ -162,61 +158,186 @@ class PartnershipOrganiserRoutesContractTest {
             )
         }
 
-        val response = client.post("/orgs/$orgId/events/$eventSlug/partnerships/$partnershipId/organiser") {
-            contentType(ContentType.Application.Json)
+        val requestBody = """{"email": "$userEmail"}"""
+
+        val response = client.post(
+            "/orgs/$orgSlug/events/$eventSlug/partnerships/$nonExistentPartnershipId/organiser",
+        ) {
+            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody("""{"email":"$organiserEmail"}""")
+            header(HttpHeaders.Accept, "application/json")
+            setBody(requestBody)
         }
 
-        assertEquals(HttpStatusCode.OK, response.status)
-
-        val responseBody = Json.parseToJsonElement(response.bodyAsText()).jsonObject
-
-        // Validate response schema: partnership_id and organiser fields present
-        assertNotNull(responseBody["partnership_id"])
-        assertNotNull(responseBody["organiser"])
-
-        val organiser = responseBody["organiser"]?.jsonObject
-        assertNotNull(organiser)
-        assertEquals(organiserEmail, organiser["email"]?.jsonPrimitive?.content)
+        assertEquals(HttpStatusCode.NotFound, response.status)
     }
 
     @Test
-    fun `DELETE returns valid PartnershipOrganiserResponse with null organiser`() = testApplication {
-        val eventSlug = "test-event"
-        val partnershipId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
+    fun `POST rejects to assign non-existent user as organiser`() = testApplication {
         val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
         val companyId = UUID.randomUUID()
-        val packId = UUID.randomUUID()
+        val partnershipId = UUID.randomUUID()
+        val orgSlug = "tech-conference"
+        val eventSlug = "devlille-2025"
 
         application {
             moduleMocked()
 
-            // Create test data
-            insertMockedOrganisationEntity(orgId)
+            insertMockedOrganisationEntity(orgId, orgSlug)
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-            insertMockedCompany(companyId)
-            val pack = insertMockedSponsoringPack(packId, eventId)
+            insertMockedCompany(id = companyId)
+            insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
+        }
+
+        val requestBody = """{ "email": "nonexistent@example.com"}"""
+
+        val response = client.post("/orgs/$orgSlug/events/$eventSlug/partnerships/$partnershipId/organiser") {
+            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            header(HttpHeaders.Authorization, "Bearer valid")
+            header(HttpHeaders.Accept, "application/json")
+            setBody(requestBody)
+        }
+
+        assertEquals(HttpStatusCode.NotFound, response.status)
+    }
+
+    @Test
+    fun `POST rejects to assign user without organisation membership`() = testApplication {
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val partnershipId = UUID.randomUUID()
+        val userId = UUID.randomUUID()
+        val orgSlug = "tech-conference"
+        val eventSlug = "devlille-2025"
+        val userEmail = "outsider@example.com"
+
+        application {
+            moduleMocked()
+
+            insertMockedOrganisationEntity(orgId, orgSlug)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
+            insertMockedCompany(id = companyId)
+            insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
+
+            // Create user but no organisation permission
+            insertMockedUser(
+                id = userId,
+                name = "Bob Outsider",
+                email = userEmail,
+                pictureUrl = "https://example.com/bob.jpg",
+            )
+        }
+
+        val requestBody = """{ "email": "$userEmail"}"""
+
+        val response = client.post("/orgs/$orgSlug/events/$eventSlug/partnerships/$partnershipId/organiser") {
+            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(requestBody)
+        }
+
+        assertEquals(HttpStatusCode.Forbidden, response.status)
+    }
+
+    @Test
+    fun `POST rejects to assign user without edit permission`() = testApplication {
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val partnershipId = UUID.randomUUID()
+        val userId = UUID.randomUUID()
+        val orgSlug = "tech-conference"
+        val eventSlug = "devlille-2025"
+        val userEmail = "viewer@example.com"
+
+        application {
+            moduleMocked()
+
+            insertMockedOrganisationEntity(orgId, orgSlug)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
+            insertMockedCompany(id = companyId)
+            insertMockedPartnership(id = partnershipId, eventId = eventId, companyId = companyId)
+
+            // Create user with read-only permission (canEdit = false)
+            val user = insertMockedUser(
+                id = userId,
+                name = "Charlie Viewer",
+                email = userEmail,
+                pictureUrl = "https://example.com/charlie.jpg",
+            )
+            // Create user with read-only permission (canEdit = false)
+            insertMockedOrgaPermission(
+                orgId = orgId,
+                user = user,
+                canEdit = false,
+            )
+        }
+
+        val requestBody = """{"email": "$userEmail"}"""
+
+        val response = client.post("/orgs/$orgSlug/events/$eventSlug/partnerships/$partnershipId/organiser") {
+            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(requestBody)
+        }
+
+        assertEquals(HttpStatusCode.Forbidden, response.status)
+    }
+
+    @Test
+    fun `DELETE successfully remove organiser from partnership`() = testApplication {
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val partnershipId = UUID.randomUUID()
+        val userId = UUID.randomUUID()
+        val orgSlug = "tech-conference"
+        val eventSlug = "devlille-2025"
+        val userEmail = "organiser@example.com"
+
+        application {
+            moduleMocked()
+
+            insertMockedOrganisationEntity(orgId, orgSlug)
+            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
+            insertMockedCompany(id = companyId)
+
+            // Create user with edit permissions
+            val user = insertMockedUser(
+                id = userId,
+                name = "Alice Organiser",
+                email = userEmail,
+                pictureUrl = "https://example.com/alice.jpg",
+            )
+            insertMockedOrgaPermission(
+                orgId = orgId,
+                user = user,
+                canEdit = true,
+            )
+
+            // Create partnership with organiser already assigned
             insertMockedPartnership(
                 id = partnershipId,
                 eventId = eventId,
                 companyId = companyId,
-                selectedPackId = pack.id.value,
+                organiserId = user.id.value,
             )
         }
 
-        val response = client.delete("/orgs/$orgId/events/$eventSlug/partnerships/$partnershipId/organiser") {
+        val response = client.delete("/orgs/$orgSlug/events/$eventSlug/partnerships/$partnershipId/organiser") {
+            header(HttpHeaders.Accept, "application/json")
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
 
-        val responseBody = Json.parseToJsonElement(response.bodyAsText()).jsonObject
-        assertEquals(partnershipId.toString(), responseBody["partnership_id"]?.jsonPrimitive?.content)
+        val json = Json.parseToJsonElement(response.bodyAsText()).jsonObject
+        assertEquals(partnershipId.toString(), json["partnership_id"]!!.jsonPrimitive.content)
 
-        // Validate organiser is null (JSON null, not undefined)
-        val organiserValue = responseBody["organiser"]
+        // Verify organiser is null after removal
+        val organiserValue = json["organiser"]
         assertTrue(organiserValue is JsonNull, "Expected organiser to be JsonNull, got: $organiserValue")
     }
 }
