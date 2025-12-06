@@ -61,4 +61,18 @@ interface PartnershipRepository {
         partnershipId: UUID,
         update: UpdatePartnershipContactInfo,
     ): UUID
+
+    /**
+     * Deletes an unvalidated partnership.
+     *
+     * Only partnerships where both validatedAt and declinedAt are null can be deleted.
+     * Performs a hard delete with no audit trail.
+     *
+     * @param partnershipId UUID of the partnership to delete
+     * @throws fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
+     *   if partnership not found
+     * @throws fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
+     *   if partnership has been finalized (validated or declined)
+     */
+    fun delete(partnershipId: UUID)
 }
