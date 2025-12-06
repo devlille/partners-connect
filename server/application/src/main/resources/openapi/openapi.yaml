@@ -2953,6 +2953,63 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/PartnershipItem"
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}:
+    delete:
+      operationId: "deletePartnership"
+      summary: "Delete an unvalidated partnership"
+      description: |
+        Deletes a partnership that has not been finalized (validated or declined).
+        Only partnerships where both validatedAt and declinedAt are null can be deleted.
+        Requires edit permission on the organization that owns the event.
+        Performs a hard delete with no audit trail.
+      tags:
+        - "Partnerships"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          description: "Organization slug identifier"
+          schema:
+            type: "string"
+            example: "devlille"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          description: "Event slug identifier"
+          schema:
+            type: "string"
+            example: "devlille-2025"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          description: "Partnership UUID identifier"
+          schema:
+            type: "string"
+            format: "uuid"
+            example: "650e8400-e29b-41d4-a716-446655440000"
+      responses:
+        "204":
+          description: "Partnership successfully deleted (no content returned)"
+        "401":
+          description: "Unauthorized - Missing or invalid authentication token, or user lacks edit permission"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Not Found - Partnership does not exist"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: "Conflict - Partnership is finalized (validated or declined) and cannot be deleted"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/agreement:
     post:
       summary: "Generate partnership agreement"

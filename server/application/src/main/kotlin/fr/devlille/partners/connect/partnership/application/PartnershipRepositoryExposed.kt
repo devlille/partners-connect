@@ -328,4 +328,17 @@ class PartnershipRepositoryExposed : PartnershipRepository {
 
         partnership.id.value
     }
+
+    override fun delete(partnershipId: UUID): Unit = transaction {
+        val partnership = PartnershipEntity.findById(partnershipId)
+            ?: throw NotFoundException("Partnership not found")
+
+        // Validate partnership state - only unvalidated partnerships can be deleted
+        if (partnership.validatedAt != null || partnership.declinedAt != null) {
+            throw ConflictException("Cannot delete finalized partnership")
+        }
+
+        // Hard delete the partnership
+        partnership.delete()
+    }
 }

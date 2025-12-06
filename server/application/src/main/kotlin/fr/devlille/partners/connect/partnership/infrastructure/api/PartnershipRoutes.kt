@@ -155,6 +155,12 @@ private fun Route.orgsPartnershipRoutes() {
             val partnerships = repository.listByEvent(eventSlug, filters, direction)
             call.respond(HttpStatusCode.OK, partnerships)
         }
+
+        delete("/{partnershipId}") {
+            val partnershipId = call.parameters.partnershipId
+            repository.delete(partnershipId)
+            call.respond(HttpStatusCode.NoContent)
+        }
     }
 }
 
