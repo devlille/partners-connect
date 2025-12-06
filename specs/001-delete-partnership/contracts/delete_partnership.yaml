@@ -1,0 +1,239 @@
+# DELETE Partnership Operation Contract
+
+**Endpoint**: `DELETE /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}`  
+**Purpose**: Delete an unvalidated partnership  
+**Authorization**: Required (edit permission on organization)
+
+## OpenAPI Specification
+
+```yaml
+/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}:
+  delete:
+    operationId: deletePartnership
+    summary: Delete an unvalidated partnership
+    description: |
+      Deletes a partnership that has not been finalized (validated or declined).
+      Only partnerships where both `validatedAt` and `declinedAt` are null can be deleted.
+      Requires edit permission on the organization that owns the event.
+      Performs a hard delete with no audit trail.
+    tags:
+      - Partnerships
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: orgSlug
+        in: path
+        required: true
+        description: Organization slug identifier
+        schema:
+          type: string
+          example: devlille
+      - name: eventSlug
+        in: path
+        required: true
+        description: Event slug identifier
+        schema:
+          type: string
+          example: devlille-2025
+      - name: partnershipId
+        in: path
+        required: true
+        description: Partnership UUID identifier
+        schema:
+          type: string
+          format: uuid
+          example: 650e8400-e29b-41d4-a716-446655440000
+    responses:
+      '204':
+        description: Partnership successfully deleted (no content returned)
+      '401':
+        description: Unauthorized - Missing or invalid authentication token, or user lacks edit permission
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+            example:
+              error: "Unauthorized"
+              message: "User does not have edit permission for this organization"
+      '404':
+        description: Not Found - Partnership does not exist (may have been already deleted)
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+            example:
+              error: "Not Found"
+              message: "Partnership not found"
+      '409':
+        description: Conflict - Partnership has been finalized (validated or declined) and cannot be deleted
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+            example:
+              error: "Conflict"
+              message: "Cannot delete finalized partnership"
+```
+
+## Request Specification
+
+### Path Parameters
+
+| Parameter | Type | Required | Description | Validation |
+|-----------|------|----------|-------------|------------|
+| `orgSlug` | string | Yes | Organization slug | Must match organization from JWT token permissions |
+| `eventSlug` | string | Yes | Event slug | Event must belong to specified organization |
+| `partnershipId` | UUID | Yes | Partnership identifier | Must be valid UUID format |
+
+### Headers
+
+| Header | Required | Value | Description |
+|--------|----------|-------|-------------|
+| `Authorization` | Yes | `Bearer <JWT>` | JWT token with user credentials |
+
+### Request Body
+
+**None** - DELETE operations do not include request body
+
+## Response Specification
+
+### Success Response (204 No Content)
+
+**HTTP Status**: `204 No Content`  
+**Body**: Empty (no content)  
+**Headers**: None
+
+**Conditions**:
+- Partnership exists
+- Partnership is unvalidated (`validatedAt == null` AND `declinedAt == null`)
+- User has edit permission on organization
+- Partnership successfully deleted from database
+
+### Error Responses
+
+#### 401 Unauthorized
+
+**HTTP Status**: `401 Unauthorized`  
+**Content-Type**: `application/json`
+
+**Scenarios**:
+- Missing Authorization header
+- Invalid JWT token
+- User does not have edit permission on organization
+
+**Response Body**:
+```json
+{
+  "error": "Unauthorized",
+  "message": "User does not have edit permission for this organization"
+}
+```
+
+#### 404 Not Found
+
+**HTTP Status**: `404 Not Found`  
+**Content-Type**: `application/json`
+
+**Scenarios**:
+- Partnership ID does not exist in database
+- Partnership was already deleted (concurrent deletion)
+
+**Response Body**:
+```json
+{
+  "error": "Not Found",
+  "message": "Partnership not found"
+}
+```
+
+#### 409 Conflict
+
+**HTTP Status**: `409 Conflict`  
+**Content-Type**: `application/json`
+
+**Scenarios**:
+- Partnership has `validatedAt` timestamp set (approved)
+- Partnership has `declinedAt` timestamp set (declined)
+
+**Response Body**:
+```json
+{
+  "error": "Conflict",
+  "message": "Cannot delete finalized partnership"
+}
+```
+
+## Contract Test Scenarios
+
+### Positive Test Cases
+
+1. **Successful deletion of unvalidated partnership**
+   - Given: Valid JWT with edit permission
+   - And: Partnership exists with `validatedAt == null` and `declinedAt == null`
+   - When: DELETE `/orgs/devlille/events/devlille-2025/partnerships/{id}`
+   - Then: Response is `204 No Content`
+   - And: Response body is empty
+
+### Negative Test Cases
+
+2. **Unauthorized - Missing authentication**
+   - Given: No Authorization header
+   - When: DELETE request to endpoint
+   - Then: Response is `401 Unauthorized`
+
+3. **Unauthorized - Insufficient permissions**
+   - Given: Valid JWT but user lacks edit permission
+   - When: DELETE request to endpoint
+   - Then: Response is `401 Unauthorized`
+
+4. **Not Found - Non-existent partnership**
+   - Given: Valid JWT with edit permission
+   - And: Partnership ID does not exist
+   - When: DELETE request to endpoint
+   - Then: Response is `404 Not Found`
+
+5. **Conflict - Validated partnership**
+   - Given: Valid JWT with edit permission
+   - And: Partnership has `validatedAt` timestamp set
+   - When: DELETE request to endpoint
+   - Then: Response is `409 Conflict`
+
+6. **Conflict - Declined partnership**
+   - Given: Valid JWT with edit permission
+   - And: Partnership has `declinedAt` timestamp set
+   - When: DELETE request to endpoint
+   - Then: Response is `409 Conflict`
+
+## Integration with Existing OpenAPI
+
+**File to Update**: `server/application/src/main/resources/openapi/openapi.yaml`
+
+**Location**: Add DELETE operation under existing partnership operations at path:
+```
+/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}
+```
+
+**Components to Reference**:
+- `#/components/securitySchemes/bearerAuth` - JWT authentication
+- `#/components/schemas/Error` - Standard error response format
+- `#/components/parameters/orgSlug` - Reusable org slug parameter
+- `#/components/parameters/eventSlug` - Reusable event slug parameter
+
+**No New Schemas Required**:
+- DELETE operation has no request body
+- Success response is 204 No Content (empty body)
+- Error responses use existing `Error` schema component
+
+## Validation Commands
+
+After updating `openapi.yaml`:
+
+```bash
+# Validate OpenAPI specification
+npm run validate
+
+# Bundle external schema references
+npm run bundle
+```
+
+Expected result: Zero errors, warnings acceptable
