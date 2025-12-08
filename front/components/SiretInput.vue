@@ -5,7 +5,7 @@
       :for="inputId"
       class="block text-sm font-medium text-gray-700 mb-2"
     >
-      {{ label }}
+      {{ label }}<span v-if="required" class="text-red-500 ml-1">*</span>
     </label>
     <UInput
       :id="inputId"

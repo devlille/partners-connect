@@ -1,7 +1,7 @@
 <template>
   <div>
     <label v-if="label" class="block text-sm font-medium text-gray-700 mb-2">
-      {{ label }}
+      {{ label }}<span v-if="required" class="text-red-500 ml-1">*</span>
     </label>
     <USelectMenu
       :model-value="selectedLanguage"
@@ -20,12 +20,14 @@ interface Props {
   label?: string;
   placeholder?: string;
   disabled?: boolean;
+  required?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   label: 'Langue',
   placeholder: 'Sélectionner une langue',
-  disabled: false
+  disabled: false,
+  required: false
 });
 
 const emit = defineEmits<{

@@ -3,7 +3,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">
-          Nom du contact
+          Nom du contact<span class="text-red-500 ml-1">*</span>
         </label>
         <UInput
           v-model="form.contact_name"
@@ -15,7 +15,7 @@
 
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">
-          Rôle du contact
+          Rôle du contact<span class="text-red-500 ml-1">*</span>
         </label>
         <UInput
           v-model="form.contact_role"
@@ -88,12 +88,13 @@
         <LanguageSelect
           v-model="form.language"
           label="Langue"
+          :required="true"
         />
       </div>
 
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">
-          Email(s)
+          Email(s)<span class="text-red-500 ml-1">*</span>
         </label>
         <UInput
           v-model="form.emails"
@@ -106,7 +107,7 @@
 
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">
-          Téléphone
+          Téléphone<span class="text-red-500 ml-1">*</span>
         </label>
         <UInput
           v-model="form.phone"

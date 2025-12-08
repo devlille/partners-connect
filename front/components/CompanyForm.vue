@@ -20,6 +20,8 @@
       <SiretInput
         v-model="form.siret"
         :disabled="isLoading"
+        :required="true"
+        @validation="handleSiretValidation"
       />
 
       <VatInput
@@ -30,6 +32,7 @@
       <UrlInput
         v-model="form.site_url"
         label="Site web"
+        :required="true"
         :disabled="isLoading"
       />
 
@@ -45,6 +48,7 @@
           placeholder="Description de l'entreprise"
           :disabled="isLoading"
         />
+        <p class="text-xs text-gray-500 mt-1">Cette information sera publiée sur la page dédiée au partenaire sur le site de la conférence</p>
       </div>
 
       <div class="border-t pt-4">
@@ -57,7 +61,7 @@
             </label>
             <UInput
               id="address"
-              v-model="form.head_office.address"
+              v-model="form.head_office!.address"
               placeholder="Rue, numéro..."
               :disabled="isLoading"
               required
@@ -66,7 +70,7 @@
 
           <div class="grid grid-cols-2 gap-4">
             <ZipCodeInput
-              v-model="form.head_office.zip_code"
+              v-model="form.head_office!.zip_code"
               :disabled="isLoading"
               required
             />
@@ -77,7 +81,7 @@
               </label>
               <UInput
                 id="city"
-                v-model="form.head_office.city"
+                v-model="form.head_office!.city"
                 placeholder="Ville"
                 :disabled="isLoading"
                 required
@@ -91,7 +95,7 @@
             </label>
             <UInput
               id="country"
-              v-model="form.head_office.country"
+              v-model="form.head_office!.country"
               placeholder="France"
               :disabled="isLoading"
               required
@@ -105,9 +109,14 @@
           type="submit"
           color="primary"
           :loading="isLoading"
+          :disabled="!isFormValid"
         >
           Mettre à jour les informations
         </UButton>
+      </div>
+      <div v-if="!isFormValid" class="text-sm text-red-600 pt-2">
+        <span v-if="form.siret && !isSiretValid">Le SIRET doit contenir exactement 14 chiffres</span>
+        <span v-else>Veuillez remplir tous les champs obligatoires (SIRET et adresse complète)</span>
       </div>
     </form>
   </div>
@@ -131,11 +140,16 @@ const form = ref<UpdateCompanySchema>({
   vat: props.company.vat,
   site_url: props.company.site_url,
   description: props.company.description || '',
-  head_office: {
+  head_office: props.company.head_office ? {
     address: props.company.head_office.address,
     city: props.company.head_office.city,
     zip_code: props.company.head_office.zip_code,
     country: props.company.head_office.country
+  } : {
+    address: '',
+    city: '',
+    zip_code: '',
+    country: ''
   }
 });
 
@@ -143,7 +157,39 @@ const isLoading = ref(false);
 const error = ref<string | null>(null);
 const success = ref<string | null>(null);
 
+// État de validation du SIRET (géré par le composant SiretInput)
+const siretIsValid = ref(false);
+
+// Handler pour la validation du SIRET
+function handleSiretValidation(isValid: boolean) {
+  siretIsValid.value = isValid;
+}
+
+// Vérifie si le SIRET est valide (14 chiffres)
+const isSiretValid = computed(() => {
+  if (!form.value.siret) return false;
+  return siretIsValid.value;
+});
+
+// Vérifie si le formulaire est valide (tous les champs requis sont remplis)
+const isFormValid = computed(() => {
+  return !!(
+    form.value.siret &&
+    isSiretValid.value &&
+    form.value.site_url &&
+    form.value.head_office?.address &&
+    form.value.head_office?.city &&
+    form.value.head_office?.zip_code &&
+    form.value.head_office?.country
+  );
+});
+
 async function handleSubmit() {
+  // Vérifier la validité du formulaire avant de soumettre
+  if (!isFormValid.value) {
+    return;
+  }
+
   error.value = null;
   success.value = null;
   isLoading.value = true;
@@ -188,11 +234,16 @@ watch(() => props.company, (newCompany) => {
     vat: newCompany.vat,
     site_url: newCompany.site_url,
     description: newCompany.description || '',
-    head_office: {
+    head_office: newCompany.head_office ? {
       address: newCompany.head_office.address,
       city: newCompany.head_office.city,
       zip_code: newCompany.head_office.zip_code,
       country: newCompany.head_office.country
+    } : {
+      address: '',
+      city: '',
+      zip_code: '',
+      country: ''
     }
   };
 }, { deep: true });

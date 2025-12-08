@@ -322,8 +322,6 @@ const handleSubmit = async () => {
       company_id: companyResponse.data.id,
       pack_id: formData.value.packId,
       option_selections: formData.value.optionSelections.length > 0 ? formData.value.optionSelections : undefined,
-      contact_name: formData.value.contactName || formData.value.name,
-      contact_role: formData.value.contactRole || '',
       language: 'fr',
       phone: formData.value.phone || null,
       emails: formData.value.email ? [formData.value.email] : [],

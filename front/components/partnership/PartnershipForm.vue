@@ -3,7 +3,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">
-          Nom du contact
+          Nom du contact<span class="text-red-500 ml-1">*</span>
         </label>
         <UInput
           v-model="form.contact_name"
@@ -16,7 +16,7 @@
 
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">
-          Rôle du contact
+          Rôle du contact<span class="text-red-500 ml-1">*</span>
         </label>
         <UInput
           v-model="form.contact_role"
@@ -90,13 +90,14 @@
         <LanguageSelect
           v-model="form.language"
           label="Langue"
+          :required="true"
           :disabled="readonly"
         />
       </div>
 
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">
-          Email(s)
+          Email(s)<span class="text-red-500 ml-1">*</span>
         </label>
         <UInput
           v-model="form.emails"
@@ -104,13 +105,17 @@
           type="email"
           :disabled="readonly"
           class="w-full"
+          :class="{ 'border-red-500': form.emails && !areEmailsValid }"
         />
-        <p class="text-xs text-gray-500 mt-1">Séparer plusieurs emails par des virgules</p>
+        <p v-if="form.emails && !areEmailsValid" class="text-xs text-red-600 mt-1">
+          Format d'email invalide. Exemple: nom@domaine.com
+        </p>
+        <p v-else class="text-xs text-gray-500 mt-1">Séparer plusieurs emails par des virgules</p>
       </div>
 
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">
-          Téléphone
+          Téléphone<span class="text-red-500 ml-1">*</span>
         </label>
         <UInput
           v-model="form.phone"
@@ -118,7 +123,11 @@
           type="tel"
           :disabled="readonly"
           class="w-full"
+          :class="{ 'border-red-500': form.phone && !isPhoneValid }"
         />
+        <p v-if="form.phone && !isPhoneValid" class="text-xs text-red-600 mt-1">
+          Format de téléphone invalide. Minimum 8 chiffres. Exemple: +33 6 12 34 56 78
+        </p>
       </div>
     </div>
 
@@ -135,7 +144,13 @@
         color="primary"
         label="Enregistrer"
         :loading="loading"
+        :disabled="!isFormValid"
       />
+    </div>
+    <div v-if="!readonly && !isFormValid" class="text-sm text-red-600 text-right pt-2">
+      <span v-if="form.emails && !areEmailsValid">Format d'email invalide</span>
+      <span v-else-if="form.phone && !isPhoneValid">Format de téléphone invalide</span>
+      <span v-else>Veuillez remplir tous les champs obligatoires</span>
     </div>
   </form>
 </template>
@@ -306,8 +321,8 @@ function updateSelectedOptions() {
 }
 
 const form = ref({
-  contact_name: props.partnership?.contact.display_name || '',
-  contact_role: props.partnership?.contact.role || '',
+  contact_name: props.partnership?.contact?.display_name || '',
+  contact_role: props.partnership?.contact?.role || '',
   language: props.partnership?.language || 'fr',
   emails: props.partnership?.emails || '',
   phone: props.partnership?.phone || ''
@@ -317,9 +332,9 @@ const form = ref({
 watch(() => props.partnership, (newPartnership) => {
   if (newPartnership) {
     form.value = {
-      contact_name: newPartnership.contact.display_name,
-      contact_role: newPartnership.contact.role,
-      language: newPartnership.language,
+      contact_name: newPartnership.contact?.display_name || '',
+      contact_role: newPartnership.contact?.role || '',
+      language: newPartnership.language || 'fr',
       emails: newPartnership.emails || '',
       phone: newPartnership.phone || ''
     };
@@ -328,11 +343,57 @@ watch(() => props.partnership, (newPartnership) => {
   }
 }, { deep: true });
 
+// Regex pour valider les emails
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Regex pour valider les numéros de téléphone (accepte +, chiffres, espaces, tirets, parenthèses)
+const phoneRegex = /^[\d\s\-+()]+$/;
+
+// Vérifie si un email est valide
+function isValidEmail(email: string): boolean {
+  return emailRegex.test(email.trim());
+}
+
+// Vérifie si le numéro de téléphone est valide
+const isPhoneValid = computed(() => {
+  if (!form.value.phone) return false;
+  const phone = form.value.phone.trim();
+  // Doit contenir au moins 8 chiffres et respecter le format
+  const digitsOnly = phone.replace(/[^\d]/g, '');
+  return phoneRegex.test(phone) && digitsOnly.length >= 8;
+});
+
+// Vérifie si tous les emails sont valides
+const areEmailsValid = computed(() => {
+  if (!form.value.emails) return false;
+  const emails = form.value.emails.split(',').map(e => e.trim()).filter(e => e.length > 0);
+  if (emails.length === 0) return false;
+  return emails.every(email => isValidEmail(email));
+});
+
+// Vérifie si le formulaire est valide (tous les champs requis sont remplis)
+const isFormValid = computed(() => {
+  return !!(
+    form.value.contact_name &&
+    form.value.contact_role &&
+    form.value.language &&
+    form.value.emails &&
+    areEmailsValid.value &&
+    form.value.phone &&
+    isPhoneValid.value
+  );
+});
+
 onMounted(() => {
   loadPacks();
 });
 
 function onSubmit() {
+  // Vérifier la validité du formulaire avant de soumettre
+  if (!isFormValid.value) {
+    return;
+  }
+
   emit('save', {
     contact_name: form.value.contact_name,
     contact_role: form.value.contact_role,

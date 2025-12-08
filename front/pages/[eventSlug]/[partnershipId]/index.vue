@@ -379,7 +379,7 @@
 <script setup lang="ts">
 import PartnershipForm from "~/components/partnership/PartnershipForm.vue";
 import BillingForm from "~/components/partnership/BillingForm.vue";
-import { postEventsPartnershipSuggestionApprove, postEventsPartnershipSuggestionDecline, postEventsPartnershipSignedAgreement } from "~/utils/api";
+import { updatePartnershipContactInfo, postEventsPartnershipSuggestionApprove, postEventsPartnershipSuggestionDecline, postEventsPartnershipSignedAgreement } from "~/utils/api";
 
 definePageMeta({
   auth: false,
@@ -400,6 +400,7 @@ const {
   eventSlug,
   partnershipId,
   partnership,
+  company,
   billing,
   organisation,
   loading,
@@ -408,6 +409,8 @@ const {
   loadPartnership,
   handleBillingSave
 } = usePublicPartnership();
+
+const { isPartnershipComplete, isCompanyComplete } = usePartnershipValidation();
 
 // États pour les actions de suggestion
 const acceptingSuggestion = ref(false);
@@ -429,13 +432,26 @@ async function handlePartnershipSave(data: any) {
     savingPartnership.value = true;
     error.value = null;
 
-    // TODO: Implement API endpoint for updating partnership
-    console.log('Partnership update data:', data);
+    // Appeler l'API de mise à jour
+    await updatePartnershipContactInfo(
+      eventSlug.value,
+      partnershipId.value,
+      {
+        contact_name: data.contact_name,
+        contact_role: data.contact_role,
+        language: data.language,
+        emails: data.emails,
+        phone: data.phone
+      }
+    );
+
+    // Recharger les données pour afficher les modifications
+    await loadPartnership();
 
     toast.add({
-      title: 'Fonctionnalité en développement',
-      description: 'La sauvegarde des informations du partenariat sera bientôt disponible',
-      color: 'warning'
+      title: 'Succès',
+      description: 'Les informations du partenariat ont été mises à jour',
+      color: 'success'
     });
   } catch (err: any) {
     console.error('Failed to update partnership:', err);
@@ -618,33 +634,48 @@ async function handleAgreementUpload(file: File) {
 }
 
 // Sidebar navigation configuration
-const sidebarLinks = computed(() => [
-  {
-    label: 'Partenariat',
-    icon: 'i-heroicons-hand-raised',
-    to: `/${eventSlug.value}/${partnershipId.value}`
-  },
-  {
-    label: 'Entreprise',
-    icon: 'i-heroicons-building-office',
-    to: `/${eventSlug.value}/${partnershipId.value}/company`
-  },
-  {
-    label: 'Offres d\'emploi',
-    icon: 'i-heroicons-briefcase',
-    to: `/${eventSlug.value}/${partnershipId.value}/job-offers`
-  },
-  {
-    label: 'Liens utiles',
-    icon: 'i-heroicons-link',
-    to: `/${eventSlug.value}/${partnershipId.value}/external-links`
-  },
-  {
-    label: 'Prestataires',
-    icon: 'i-heroicons-user-group',
-    to: `/${eventSlug.value}/${partnershipId.value}/providers`
-  }
-]);
+const sidebarLinks = computed(() => {
+  const partnershipComplete = isPartnershipComplete(partnership.value);
+  const companyComplete = isCompanyComplete(company.value);
+
+  return [
+    {
+      label: 'Partenariat',
+      icon: 'i-heroicons-hand-raised',
+      to: `/${eventSlug.value}/${partnershipId.value}`,
+      badge: !partnershipComplete ? {
+        label: '!',
+        color: 'error' as const,
+        title: 'Informations incomplètes'
+      } : undefined
+    },
+    {
+      label: 'Entreprise',
+      icon: 'i-heroicons-building-office',
+      to: `/${eventSlug.value}/${partnershipId.value}/company`,
+      badge: !companyComplete ? {
+        label: '!',
+        color: 'error' as const,
+        title: 'Informations incomplètes'
+      } : undefined
+    },
+    {
+      label: 'Offres d\'emploi',
+      icon: 'i-heroicons-briefcase',
+      to: `/${eventSlug.value}/${partnershipId.value}/job-offers`
+    },
+    {
+      label: 'Liens utiles',
+      icon: 'i-heroicons-link',
+      to: `/${eventSlug.value}/${partnershipId.value}/external-links`
+    },
+    {
+      label: 'Prestataires',
+      icon: 'i-heroicons-user-group',
+      to: `/${eventSlug.value}/${partnershipId.value}/providers`
+    }
+  ];
+});
 
 onMounted(() => {
   loadPartnership();

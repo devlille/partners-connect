@@ -31,6 +31,8 @@
         <SiretInput
           v-model="form.siret"
           :disabled="readonly || loading"
+          :required="true"
+          @validation="handleSiretValidation"
         />
 
         <VatInput
@@ -41,6 +43,7 @@
         <UrlInput
           v-model="form.site_url"
           label="Site web"
+          :required="true"
           :disabled="readonly || loading"
         />
 
@@ -56,6 +59,7 @@
             placeholder="Description de l'entreprise"
             :disabled="readonly || loading"
           />
+          <p class="text-xs text-gray-500 mt-1">Cette information sera publiée sur la page dédiée au partenaire sur le site de la conférence</p>
         </div>
       </div>
 
@@ -176,9 +180,14 @@
           type="submit"
           color="primary"
           :loading="loading"
+          :disabled="!isFormValid"
         >
           Mettre à jour les informations
         </UButton>
+      </div>
+      <div v-if="!readonly && !isFormValid" class="text-sm text-red-600 pt-2">
+        <span v-if="form.siret && !isSiretValid">Le SIRET doit contenir exactement 14 chiffres</span>
+        <span v-else>Veuillez remplir tous les champs obligatoires (SIRET et adresse complète)</span>
       </div>
     </form>
   </div>
@@ -273,7 +282,39 @@ function updateSocialType(index: number, selected: any) {
   }
 }
 
+// État de validation du SIRET (géré par le composant SiretInput)
+const siretIsValid = ref(false);
+
+// Handler pour la validation du SIRET
+function handleSiretValidation(isValid: boolean) {
+  siretIsValid.value = isValid;
+}
+
+// Vérifie si le SIRET est valide (14 chiffres)
+const isSiretValid = computed(() => {
+  if (!form.value.siret) return false;
+  return siretIsValid.value;
+});
+
+// Vérifie si le formulaire est valide (tous les champs requis sont remplis)
+const isFormValid = computed(() => {
+  return !!(
+    form.value.siret &&
+    isSiretValid.value &&
+    form.value.site_url &&
+    form.value.head_office?.address &&
+    form.value.head_office?.city &&
+    form.value.head_office?.zip_code &&
+    form.value.head_office?.country
+  );
+});
+
 function handleSubmit() {
+  // Vérifier la validité du formulaire avant de soumettre
+  if (!isFormValid.value) {
+    return;
+  }
+
   // Filtrer les réseaux sociaux valides (avec une URL)
   const validSocials = socials.value.filter(social => social.url.trim() !== '');
 

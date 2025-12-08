@@ -89,18 +89,34 @@ const {
   handleCompanySave
 } = usePublicPartnership();
 
+const { isPartnershipComplete, isCompanyComplete } = usePartnershipValidation();
+
 // Sidebar navigation configuration
-const sidebarLinks = computed(() => [
-  {
-    label: 'Partenariat',
-    icon: 'i-heroicons-hand-raised',
-    to: `/${eventSlug.value}/${partnershipId.value}`
-  },
-  {
-    label: 'Entreprise',
-    icon: 'i-heroicons-building-office',
-    to: `/${eventSlug.value}/${partnershipId.value}/company`
-  },
+const sidebarLinks = computed(() => {
+  const partnershipComplete = isPartnershipComplete(partnership.value);
+  const companyComplete = isCompanyComplete(company.value);
+
+  return [
+    {
+      label: 'Partenariat',
+      icon: 'i-heroicons-hand-raised',
+      to: `/${eventSlug.value}/${partnershipId.value}`,
+      badge: !partnershipComplete ? {
+        label: '!',
+        color: 'error' as const,
+        title: 'Informations incomplètes'
+      } : undefined
+    },
+    {
+      label: 'Entreprise',
+      icon: 'i-heroicons-building-office',
+      to: `/${eventSlug.value}/${partnershipId.value}/company`,
+      badge: !companyComplete ? {
+        label: '!',
+        color: 'error' as const,
+        title: 'Informations incomplètes'
+      } : undefined
+    },
   {
     label: 'Offres d\'emploi',
     icon: 'i-heroicons-briefcase',
@@ -111,12 +127,13 @@ const sidebarLinks = computed(() => [
     icon: 'i-heroicons-link',
     to: `/${eventSlug.value}/${partnershipId.value}/external-links`
   },
-  {
-    label: 'Prestataires',
-    icon: 'i-heroicons-user-group',
-    to: `/${eventSlug.value}/${partnershipId.value}/providers`
-  }
-]);
+    {
+      label: 'Prestataires',
+      icon: 'i-heroicons-user-group',
+      to: `/${eventSlug.value}/${partnershipId.value}/providers`
+    }
+  ];
+});
 
 onMounted(() => {
   loadPartnership();
