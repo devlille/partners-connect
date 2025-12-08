@@ -248,8 +248,8 @@ function updateSelectedOptions() {
 }
 
 const form = ref({
-  contact_name: props.partnership?.contact.display_name || '',
-  contact_role: props.partnership?.contact.role || '',
+  contact_name: props.partnership?.contact?.display_name || '',
+  contact_role: props.partnership?.contact?.role || '',
   language: props.partnership?.language || 'fr',
   emails: props.partnership?.emails || '',
   phone: props.partnership?.phone || ''
@@ -259,9 +259,9 @@ const form = ref({
 watch(() => props.partnership, (newPartnership) => {
   if (newPartnership) {
     form.value = {
-      contact_name: newPartnership.contact.display_name,
-      contact_role: newPartnership.contact.role,
-      language: newPartnership.language,
+      contact_name: newPartnership.contact?.display_name || '',
+      contact_role: newPartnership.contact?.role || '',
+      language: newPartnership.language || 'fr',
       emails: newPartnership.emails || '',
       phone: newPartnership.phone || ''
     };

@@ -194,7 +194,7 @@
 </template>
 
 <script setup lang="ts">
-import { getEventsPartnershipDetailed, postOrgsEventsPartnershipSuggestion, postOrgsEventsPartnershipBilling, postPartnershipOrganiser, deletePartnershipOrganiser, getOrgsUsers, type UserSchema } from "~/utils/api";
+import { getEventsPartnershipDetailed, updatePartnershipContactInfo, postOrgsEventsPartnershipSuggestion, postOrgsEventsPartnershipBilling, postPartnershipOrganiser, deletePartnershipOrganiser, getOrgsUsers, type UserSchema } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 import type { ExtendedPartnershipItem } from "~/types/partnership";
 import { PARTNERSHIP_CONFIRM } from "~/constants/partnership";
@@ -326,10 +326,20 @@ async function onSave(data: any) {
     saving.value = true;
     error.value = null;
 
-    // TODO: Appeler l'API de mise à jour quand elle sera disponible
-    console.log('Données à sauvegarder:', data);
+    // Appeler l'API de mise à jour
+    await updatePartnershipContactInfo(
+      eventSlug.value,
+      sponsorId.value,
+      {
+        contact_name: data.contact_name,
+        contact_role: data.contact_role,
+        language: data.language,
+        emails: data.emails,
+        phone: data.phone
+      }
+    );
 
-    // Pour l'instant, juste recharger les données
+    // Recharger les données pour afficher les modifications
     await loadPartnership();
 
   } catch (err) {

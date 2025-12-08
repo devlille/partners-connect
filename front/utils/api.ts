@@ -44,6 +44,8 @@ export type EventWithOrganisation = EventWithOrganisationSchema;
 
 export type RegisterPartnership = RegisterPartnershipSchema;
 
+export type UpdatePartnershipContactInfo = UpdatePartnershipRequestSchema;
+
 export type CompanyBillingData = CompanyBillingDataSchema;
 
 export type TicketData = TicketDataSchema;
@@ -207,17 +209,27 @@ export interface SocialSchema {
   url: string;
 }
 
+export type CompanySchemaHeadOffice = AddressSchema | null;
+
+export type CompanySchemaSiret = string | null;
+
+export type CompanySchemaVat = string | null;
+
 export type CompanySchemaDescription = string | null;
+
+export type CompanySchemaSiteUrl = string | null;
+
+export type CompanySchemaMedias = MediaSchema | null;
 
 export interface CompanySchema {
   id: string;
   name: string;
-  head_office: AddressSchema;
-  siret: string;
-  vat: string;
+  head_office?: CompanySchemaHeadOffice;
+  siret?: CompanySchemaSiret;
+  vat?: CompanySchemaVat;
   description?: CompanySchemaDescription;
-  site_url: string;
-  medias?: MediaSchema;
+  site_url?: CompanySchemaSiteUrl;
+  medias?: CompanySchemaMedias;
   socials: SocialSchema[];
 }
 
@@ -228,17 +240,23 @@ export interface PaginatedCompanySchema {
   total: number;
 }
 
+export type CreateCompanySchemaHeadOffice = AddressSchema | null;
+
+export type CreateCompanySchemaSiret = string | null;
+
+export type CreateCompanySchemaVat = string | null;
+
 export type CreateCompanySchemaDescription = string | null;
+
+export type CreateCompanySchemaSiteUrl = string | null;
 
 export interface CreateCompanySchema {
   name: string;
-  head_office: AddressSchema;
-  /** @pattern ^\d{14}$ */
-  siret: string;
-  /** @pattern ^[A-Z]{2}[0-9A-Z]+$ */
-  vat: string;
+  head_office?: CreateCompanySchemaHeadOffice;
+  siret?: CreateCompanySchemaSiret;
+  vat?: CreateCompanySchemaVat;
   description?: CreateCompanySchemaDescription;
-  site_url: string;
+  site_url?: CreateCompanySchemaSiteUrl;
   socials?: SocialSchema[];
 }
 
@@ -875,17 +893,283 @@ export interface PartnershipOptionSelection {
   selected_value_id?: string;
 }
 
+/**
+ * Contact phone number in free-form text (1-30 characters)
+ * @minLength 1
+ * @maxLength 30
+ */
 export type RegisterPartnershipSchemaPhone = string | null;
 
 export interface RegisterPartnershipSchema {
   company_id: string;
   pack_id: string;
   option_selections?: PartnershipOptionSelection[];
+  /**
+   * Partner contact person's full name
+   * @minLength 1
+   * @maxLength 255
+   */
   contact_name: string;
+  /**
+   * Partner contact person's role or title
+   * @minLength 1
+   * @maxLength 255
+   */
   contact_role: string;
+  /**
+   * Preferred communication language using ISO 639-1 codes
+   * @minLength 2
+   * @maxLength 2
+   */
   language: string;
+  /**
+   * Contact phone number in free-form text (1-30 characters)
+   * @minLength 1
+   * @maxLength 30
+   */
   phone?: RegisterPartnershipSchemaPhone;
+  /**
+   * List of contact email addresses
+   * @minItems 0
+   */
   emails?: string[];
+}
+
+/**
+ * The specific value selected by the user for a selectable option
+ */
+export interface SelectedValue {
+  /** Selected value unique identifier */
+  id: string;
+  /**
+   * Display name of the selected value (e.g., '3m x 3m', 'Gold')
+   * @minLength 1
+   */
+  value: string;
+  /**
+   * Price for this specific value in cents
+   * @minimum 0
+   */
+  price: number;
+}
+
+/**
+ * Text-based option with no quantity or value selection
+ */
+export interface TextPartnershipOption {
+  /** Discriminator field for text options */
+  type: 'text';
+  /** Option unique identifier */
+  id: string;
+  /**
+   * Translated option name
+   * @minLength 1
+   */
+  name: string;
+  /** Original translated description */
+  description: string;
+  /** Complete formatted description (same as description for text options) */
+  label_with_value: string;
+  /**
+   * Unit price for this option in cents
+   * @minimum 0
+   */
+  price: number;
+  /** Always 1 for text options */
+  quantity: 1;
+  /**
+   * Total cost for this option (same as price)
+   * @minimum 0
+   */
+  total_price: number;
+}
+
+/**
+ * Quantitative descriptor for user-defined quantities
+ */
+export type QuantitativePartnershipOptionTypeDescriptor = typeof QuantitativePartnershipOptionTypeDescriptor[keyof typeof QuantitativePartnershipOptionTypeDescriptor];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const QuantitativePartnershipOptionTypeDescriptor = {
+  job_offer: 'job_offer',
+} as const;
+
+/**
+ * Option with user-selected quantity
+ */
+export interface QuantitativePartnershipOption {
+  /** Discriminator field for quantitative options */
+  type: 'typed_quantitative';
+  /** Option unique identifier */
+  id: string;
+  /**
+   * Translated option name
+   * @minLength 1
+   */
+  name: string;
+  /** Original translated description */
+  description: string;
+  /**
+   * Formatted as '{description} ({quantity})', e.g., 'Conference passes (5)'
+   * @pattern ^.+\s\(\d+\)$
+   */
+  label_with_value: string;
+  /**
+   * Unit price for this option in cents
+   * @minimum 0
+   */
+  price: number;
+  /**
+   * User-selected quantity for this partnership
+   * @minimum 0
+   */
+  quantity: number;
+  /**
+   * Total cost: price × quantity
+   * @minimum 0
+   */
+  total_price: number;
+  /** Quantitative descriptor for user-defined quantities */
+  type_descriptor: QuantitativePartnershipOptionTypeDescriptor;
+}
+
+/**
+ * Number descriptor for fixed quantities
+ */
+export type NumberPartnershipOptionTypeDescriptor = typeof NumberPartnershipOptionTypeDescriptor[keyof typeof NumberPartnershipOptionTypeDescriptor];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NumberPartnershipOptionTypeDescriptor = {
+  nb_ticket: 'nb_ticket',
+} as const;
+
+/**
+ * Option with fixed quantity from definition
+ */
+export interface NumberPartnershipOption {
+  /** Discriminator field for number options */
+  type: 'typed_number';
+  /** Option unique identifier */
+  id: string;
+  /**
+   * Translated option name
+   * @minLength 1
+   */
+  name: string;
+  /** Original translated description */
+  description: string;
+  /**
+   * Formatted as '{description} ({fixedQuantity})', e.g., 'Logo on website (3)'
+   * @pattern ^.+\s\(\d+\)$
+   */
+  label_with_value: string;
+  /**
+   * Unit price for this option in cents
+   * @minimum 0
+   */
+  price: number;
+  /**
+   * Fixed quantity from option definition
+   * @minimum 0
+   */
+  quantity: number;
+  /**
+   * Total cost: price × fixedQuantity
+   * @minimum 0
+   */
+  total_price: number;
+  /** Number descriptor for fixed quantities */
+  type_descriptor: NumberPartnershipOptionTypeDescriptor;
+}
+
+/**
+ * Selectable descriptor for predefined choices
+ */
+export type SelectablePartnershipOptionTypeDescriptor = typeof SelectablePartnershipOptionTypeDescriptor[keyof typeof SelectablePartnershipOptionTypeDescriptor];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const SelectablePartnershipOptionTypeDescriptor = {
+  booth: 'booth',
+} as const;
+
+/**
+ * Option with user-chosen value from predefined list
+ */
+export interface SelectablePartnershipOption {
+  /** Discriminator field for selectable options */
+  type: 'typed_selectable';
+  /** Option unique identifier */
+  id: string;
+  /**
+   * Translated option name
+   * @minLength 1
+   */
+  name: string;
+  /** Original translated description */
+  description: string;
+  /**
+   * Formatted as '{description} ({selectedValue})', e.g., 'Booth size (3m x 3m)'
+   * @pattern ^.+\s\(.+\)$
+   */
+  label_with_value: string;
+  /**
+   * Unit price for this option (from selected value) in cents
+   * @minimum 0
+   */
+  price: number;
+  /** Always 1 for selectable options */
+  quantity: 1;
+  /**
+   * Total cost (same as price from selected value)
+   * @minimum 0
+   */
+  total_price: number;
+  /** Selectable descriptor for predefined choices */
+  type_descriptor: SelectablePartnershipOptionTypeDescriptor;
+  selected_value: SelectedValue;
+}
+
+/**
+ * Polymorphic schema for partnership-specific options with complete descriptions and pricing
+ */
+export type PartnershipOptionSchema = TextPartnershipOption | QuantitativePartnershipOption | NumberPartnershipOption | SelectablePartnershipOption;
+
+/**
+ * Enhanced partnership pack with partnership-specific options
+ */
+export interface PartnershipPackSchema {
+  /** Pack unique identifier */
+  id: string;
+  /**
+   * Pack name (e.g., 'Gold', 'Silver', 'Bronze')
+   * @minLength 1
+   */
+  name: string;
+  /**
+   * Base price of the pack in cents (excluding optional options)
+   * @minimum 0
+   */
+  base_price: number;
+  /**
+   * Options included in the base pack price
+   * @minItems 0
+   * @maxItems 100
+   */
+  required_options: PartnershipOptionSchema[];
+  /**
+   * Additional options selected by partner (cost beyond base price)
+   * @minItems 0
+   * @maxItems 100
+   */
+  optional_options: PartnershipOptionSchema[];
+  /**
+   * Total price for this pack in cents (base_price + sum of optional option costs)
+   * @minimum 0
+   */
+  total_price: number;
 }
 
 export type PartnershipProcessStatusSchemaSuggestionSentAt = string | null;
@@ -929,13 +1213,21 @@ export interface PartnershipProcessStatusSchema {
 
 export type PartnershipDetailSchemaPhone = string | null;
 
-export type PartnershipDetailSchemaSelectedPack = SponsoringPackSchema | null;
+export type PartnershipDetailSchemaSelectedPack = PartnershipPackSchema | null;
 
-export type PartnershipDetailSchemaSuggestionPack = SponsoringPackSchema | null;
+export type PartnershipDetailSchemaSuggestionPack = PartnershipPackSchema | null;
 
-export type PartnershipDetailSchemaValidatedPack = SponsoringPackSchema | null;
+export type PartnershipDetailSchemaValidatedPack = PartnershipPackSchema | null;
 
 export type PartnershipDetailSchemaOrganiser = UserSchema | null;
+
+export type PartnershipDetailSchemaCurrency = typeof PartnershipDetailSchemaCurrency[keyof typeof PartnershipDetailSchemaCurrency];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PartnershipDetailSchemaCurrency = {
+  EUR: 'EUR',
+} as const;
 
 export interface PartnershipDetailSchema {
   id: string;
@@ -950,6 +1242,7 @@ export interface PartnershipDetailSchema {
   process_status: PartnershipProcessStatusSchema;
   organiser?: PartnershipDetailSchemaOrganiser;
   created_at: string;
+  currency: PartnershipDetailSchemaCurrency;
 }
 
 export interface DetailedPartnershipResponseSchema {
@@ -959,6 +1252,75 @@ export interface DetailedPartnershipResponseSchema {
   organisation: OrganisationItemSchema;
   /** Array of speakers associated with this partnership */
   speakers?: SpeakerSchema[];
+}
+
+/**
+ * Partner contact person's full name
+ * @minLength 1
+ * @maxLength 255
+ */
+export type UpdatePartnershipRequestSchemaContactName = string | null;
+
+/**
+ * Partner contact person's role or title
+ * @minLength 1
+ * @maxLength 255
+ */
+export type UpdatePartnershipRequestSchemaContactRole = string | null;
+
+/**
+ * Preferred communication language using ISO 639-1 codes (2 characters)
+ * @minLength 2
+ * @maxLength 2
+ */
+export type UpdatePartnershipRequestSchemaLanguage = string | null;
+
+/**
+ * Contact phone number in free-form text (1-30 characters)
+ * @minLength 1
+ * @maxLength 30
+ */
+export type UpdatePartnershipRequestSchemaPhone = string | null;
+
+/**
+ * List of contact email addresses
+ * @minItems 0
+ */
+export type UpdatePartnershipRequestSchemaEmails = string[] | null;
+
+/**
+ * Request body for updating partnership contact information. All fields are optional to support partial updates.
+ */
+export interface UpdatePartnershipRequestSchema {
+  /**
+   * Partner contact person's full name
+   * @minLength 1
+   * @maxLength 255
+   */
+  contact_name?: UpdatePartnershipRequestSchemaContactName;
+  /**
+   * Partner contact person's role or title
+   * @minLength 1
+   * @maxLength 255
+   */
+  contact_role?: UpdatePartnershipRequestSchemaContactRole;
+  /**
+   * Preferred communication language using ISO 639-1 codes (2 characters)
+   * @minLength 2
+   * @maxLength 2
+   */
+  language?: UpdatePartnershipRequestSchemaLanguage;
+  /**
+   * Contact phone number in free-form text (1-30 characters)
+   * @minLength 1
+   * @maxLength 30
+   */
+  phone?: UpdatePartnershipRequestSchemaPhone;
+  /**
+   * List of contact email addresses
+   * @minItems 0
+   */
+  emails?: UpdatePartnershipRequestSchemaEmails;
 }
 
 export interface BillingContactSchema {
@@ -2261,6 +2623,32 @@ export const getEventsPartnershipDetailed = (
     }
   
 /**
+ * Updates contact information fields for an existing partnership. This is a public endpoint
+that supports partial updates - only provided fields will be updated. All fields are optional.
+
+Updatable fields:
+- contact_name: Partner contact person's name
+- contact_role: Partner contact person's role/title
+- language: Preferred communication language (ISO 639-1)
+- phone: Contact phone number (free-form, 1-30 chars)
+- emails: List of contact email addresses
+
+ * @summary Update partnership contact information
+ */
+export const updatePartnershipContactInfo = (
+    eventSlug: string,
+    partnershipId: string,
+    updatePartnershipRequestSchema: UpdatePartnershipRequestSchema,
+ options?: SecondParameter<typeof customFetch<DetailedPartnershipResponseSchema>>,) => {
+      return customFetch<DetailedPartnershipResponseSchema>(
+      {url: `/events/${eventSlug}/partnerships/${partnershipId}`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: updatePartnershipRequestSchema
+    },
+      options);
+    }
+  
+/**
  * @summary Get partnership billing information
  */
 export const getEventsPartnershipBilling = (
@@ -2964,6 +3352,25 @@ export const getOrgsEventsPartnership = (
     }
   
 /**
+ * Deletes a partnership that has not been finalized (validated or declined).
+Only partnerships where both validatedAt and declinedAt are null can be deleted.
+Requires edit permission on the organization that owns the event.
+Performs a hard delete with no audit trail.
+
+ * @summary Delete an unvalidated partnership
+ */
+export const deletePartnership = (
+    orgSlug: string,
+    eventSlug: string,
+    partnershipId: string,
+ options?: SecondParameter<typeof customFetch<void>>,) => {
+      return customFetch<void>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}`, method: 'DELETE'
+    },
+      options);
+    }
+  
+/**
  * Generate a partnership agreement PDF
  * @summary Generate partnership agreement
  */
@@ -3340,6 +3747,7 @@ export type GetEventAgendaPublicResult = NonNullable<Awaited<ReturnType<typeof g
 export type GetEventsSponsoringPacksResult = NonNullable<Awaited<ReturnType<typeof getEventsSponsoringPacks>>>
 export type PostEventsPartnershipResult = NonNullable<Awaited<ReturnType<typeof postEventsPartnership>>>
 export type GetEventsPartnershipDetailedResult = NonNullable<Awaited<ReturnType<typeof getEventsPartnershipDetailed>>>
+export type UpdatePartnershipContactInfoResult = NonNullable<Awaited<ReturnType<typeof updatePartnershipContactInfo>>>
 export type GetEventsPartnershipBillingResult = NonNullable<Awaited<ReturnType<typeof getEventsPartnershipBilling>>>
 export type PostEventsPartnershipBillingResult = NonNullable<Awaited<ReturnType<typeof postEventsPartnershipBilling>>>
 export type PutEventsPartnershipBillingResult = NonNullable<Awaited<ReturnType<typeof putEventsPartnershipBilling>>>
@@ -3385,6 +3793,7 @@ export type PostOrgsEventsExternalLinkResult = NonNullable<Awaited<ReturnType<ty
 export type DeleteOrgsEventsExternalLinkResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsEventsExternalLink>>>
 export type UpdateEventAgendaResult = NonNullable<Awaited<ReturnType<typeof updateEventAgenda>>>
 export type GetOrgsEventsPartnershipResult = NonNullable<Awaited<ReturnType<typeof getOrgsEventsPartnership>>>
+export type DeletePartnershipResult = NonNullable<Awaited<ReturnType<typeof deletePartnership>>>
 export type PostOrgsEventsPartnershipAgreementResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsPartnershipAgreement>>>
 export type PostOrgsEventsPartnershipBillingResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsPartnershipBilling>>>
 export type PutOrgsEventsPartnershipBoothLocationResult = NonNullable<Awaited<ReturnType<typeof putOrgsEventsPartnershipBoothLocation>>>
