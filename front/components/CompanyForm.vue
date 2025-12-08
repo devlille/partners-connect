@@ -116,7 +116,7 @@
       </div>
       <div v-if="!isFormValid" class="text-sm text-red-600 pt-2">
         <span v-if="form.siret && !isSiretValid">Le SIRET doit contenir exactement 14 chiffres</span>
-        <span v-else>Veuillez remplir tous les champs obligatoires (SIRET et adresse complète)</span>
+        <span v-else>Veuillez remplir tous les champs obligatoires (SIRET, site web et adresse complète)</span>
       </div>
     </form>
   </div>
