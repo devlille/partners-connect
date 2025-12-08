@@ -49,7 +49,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
 class PartnershipRepositoryExposed : PartnershipRepository {
-    @Suppress("LongMethod")
+    @Suppress("LongMethod", "CyclomaticComplexMethod")
     override fun register(eventSlug: String, register: RegisterPartnership): UUID = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
@@ -74,8 +74,8 @@ class PartnershipRepositoryExposed : PartnershipRepository {
             this.company = company
             this.selectedPack = pack
             this.phone = register.phone
-            this.contactName = register.contactName
-            this.contactRole = register.contactRole
+            this.contactName = register.contactName ?: ""
+            this.contactRole = register.contactRole ?: ""
             this.language = register.language
         }
 

@@ -41,11 +41,11 @@ data class RegisterPartnership(
     val companyId: String,
     @SerialName("pack_id")
     val packId: String,
-    @SerialName("contact_name")
-    val contactName: String,
-    @SerialName("contact_role")
-    val contactRole: String,
     val language: String,
+    @SerialName("contact_name")
+    val contactName: String? = null,
+    @SerialName("contact_role")
+    val contactRole: String? = null,
     val phone: String? = null,
     val emails: List<String> = emptyList(),
     @SerialName("option_selections")

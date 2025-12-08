@@ -5634,8 +5634,6 @@ components:
       required:
         - company_id
         - pack_id
-        - contact_name
-        - contact_role
         - language
       properties:
         company_id:
