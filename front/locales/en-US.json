@@ -13,7 +13,10 @@
     "clear": "Clear",
     "activeFilters": "Active Filters",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "actions": "Actions",
+    "confirm": "Confirm",
+    "close": "Close"
   },
   "nav": {
     "myOrganizations": "My organizations",
@@ -75,12 +78,35 @@
       "filterPanel": "Filter Sponsors"
     }
   },
+  "modals": {
+    "confirmDelete": "Confirm deletion",
+    "areYouSure": "Are you sure you want to delete",
+    "irreversible": "This action is irreversible."
+  },
   "errors": {
+    "title": "Error",
     "network": "Connection error. Check your internet connection.",
     "validation": "The provided data is invalid. Check the form.",
     "unauthorized": "You are not authorized to perform this action.",
     "notFound": "The requested resource was not found.",
     "server": "A server error occurred. Try again later.",
-    "unknown": "An unexpected error occurred."
+    "unknown": "An unexpected error occurred.",
+    "deletePartnership": "Unable to delete partnership",
+    "partnership": "An error occurred while creating the partnership request"
+  },
+  "success": {
+    "title": "Success",
+    "partnershipDeleted": "Partnership deleted successfully",
+    "partnershipUpdated": "Partnership information updated successfully",
+    "companyUpdated": "Company information updated successfully"
+  },
+  "aria": {
+    "deletePartnership": "Delete partnership",
+    "loading": "Loading",
+    "deleting": "Deleting",
+    "partnershipDeleted": "Partnership deleted. List has been updated.",
+    "validationError": "Validation error. Please check the form fields.",
+    "formIncomplete": "Form is incomplete. Some required fields are not filled.",
+    "savingInProgress": "Saving in progress..."
   }
 }

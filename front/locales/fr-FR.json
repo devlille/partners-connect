@@ -161,6 +161,7 @@
     "invalidEmails": "Emails invalides"
   },
   "errors": {
+    "title": "Erreur",
     "network": "Erreur de connexion. Vérifiez votre connexion internet.",
     "validation": "Les données fournies sont invalides. Vérifiez le formulaire.",
     "unauthorized": "Vous n'êtes pas autorisé à effectuer cette action.",
@@ -191,7 +192,23 @@
     "deleteOption": "Impossible de supprimer l'option",
     "event": "Impossible de créer l'événement. Vérifiez les données du formulaire.",
     "partnership": "Une erreur est survenue lors de la création de la demande de partenariat",
+    "deletePartnership": "Impossible de supprimer le partenariat",
     "loginError": "Erreur lors de la connexion"
+  },
+  "success": {
+    "title": "Succès",
+    "partnershipDeleted": "Le partenariat a été supprimé avec succès",
+    "partnershipUpdated": "Les informations du partenariat ont été mises à jour",
+    "companyUpdated": "Les informations de l'entreprise ont été mises à jour"
+  },
+  "aria": {
+    "deletePartnership": "Supprimer le partenariat",
+    "loading": "Chargement en cours",
+    "deleting": "Suppression en cours",
+    "partnershipDeleted": "Partenariat supprimé. La liste a été mise à jour.",
+    "validationError": "Erreur de validation. Veuillez vérifier les champs du formulaire.",
+    "formIncomplete": "Le formulaire est incomplet. Certains champs obligatoires ne sont pas remplis.",
+    "savingInProgress": "Sauvegarde en cours..."
   },
   "messages": {
     "eventCreated": "Événement créé avec succès ! Redirection en cours...",

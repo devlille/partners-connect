@@ -909,13 +909,13 @@ export interface RegisterPartnershipSchema {
    * @minLength 1
    * @maxLength 255
    */
-  contact_name: string;
+  contact_name?: string;
   /**
    * Partner contact person's role or title
    * @minLength 1
    * @maxLength 255
    */
-  contact_role: string;
+  contact_role?: string;
   /**
    * Preferred communication language using ISO 639-1 codes
    * @minLength 2

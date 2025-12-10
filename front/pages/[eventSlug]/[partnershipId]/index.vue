@@ -424,6 +424,8 @@ const uploadingAgreement = ref(false);
 const uploadError = ref<string | null>(null);
 const agreementFileInput = ref<HTMLInputElement>();
 
+const { t } = useI18n();
+
 /**
  * Handle partnership information save
  */
@@ -449,17 +451,17 @@ async function handlePartnershipSave(data: any) {
     await loadPartnership();
 
     toast.add({
-      title: 'Succès',
-      description: 'Les informations du partenariat ont été mises à jour',
+      title: t('success.title'),
+      description: t('success.partnershipUpdated'),
       color: 'success'
     });
   } catch (err: any) {
     console.error('Failed to update partnership:', err);
-    const errorMessage = `Impossible de mettre à jour les informations du partenariat: ${err.message || 'Erreur inconnue'}`;
+    const errorMessage = err.message || t('errors.partnership');
     error.value = errorMessage;
 
     toast.add({
-      title: 'Erreur',
+      title: t('errors.title'),
       description: errorMessage,
       color: 'error'
     });

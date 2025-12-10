@@ -100,17 +100,41 @@
         </div>
       </template>
     </div>
+
+    <!-- Modale de confirmation de suppression -->
+    <ConfirmModal
+      v-model="showDeleteModal"
+      :title="t('modals.confirmDelete')"
+      :message="t('modals.irreversible')"
+      type="danger"
+      :confirm-label="t('common.delete')"
+      :cancel-label="t('common.cancel')"
+      :confirming="deleting"
+      @confirm="confirmDelete"
+      @cancel="cancelDelete"
+    />
+
+    <!-- Annonce ARIA pour les lecteurs d'écran -->
+    <div
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      class="sr-only"
+    >
+      {{ ariaAnnouncement }}
+    </div>
   </Dashboard>
 </template>
 
 <script setup lang="ts">
-import { getOrgsEventsPartnership, getEventBySlug, getOrgsEventsPacks, type PartnershipItem, type SponsoringPack } from "~/utils/api";
+import { getOrgsEventsPartnership, getEventBySlug, getOrgsEventsPacks, deletePartnership, type PartnershipItem, type SponsoringPack } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 import type {TableRow} from "@nuxt/ui";
 import { useSponsorFilters } from '~/composables/useSponsorFilters'
 import FilterPanel from '~/components/sponsors/FilterPanel.vue'
 import ActiveFilters from '~/components/sponsors/ActiveFilters.vue'
 
+const { t } = useI18n();
 const { footerLinks } = useDashboardLinks();
 const { getOrgSlug, getEventSlug } = useRouteParams();
 
@@ -139,7 +163,7 @@ const columns = [
   {
     header: 'Nom de l\'entreprise',
     accessorKey: 'company_name',
-    cell: (info: TableRow<PartnershipItem>) => {
+    cell: (info: any) => {
       const partnership = info.row.original;
       return h('div', {
         onClick: () => navigateTo(`/orgs/${orgSlug.value}/events/${eventSlug.value}/sponsors/${partnership.id}`),
@@ -187,6 +211,26 @@ const columns = [
         class: 'cursor-pointer text-sm'
       }, organiser.display_name || organiser.email);
     }
+  },
+  {
+    header: t('common.actions'),
+    accessorKey: 'actions',
+    cell: (info: any) => {
+      const partnership = info.row.original;
+      return h('div', { class: 'flex gap-2' }, [
+        h(resolveComponent('UButton'), {
+          icon: 'i-heroicons-trash',
+          color: 'error',
+          variant: 'ghost',
+          size: 'sm',
+          onClick: (e: Event) => {
+            e.stopPropagation();
+            openDeleteModal(partnership);
+          },
+          'aria-label': t('aria.deletePartnership')
+        })
+      ]);
+    }
   }
 ];
 
@@ -195,6 +239,15 @@ const packs = ref<SponsoringPack[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const eventName = ref<string>('');
+
+// Gestion de la suppression
+const showDeleteModal = ref(false);
+const partnershipToDelete = ref<PartnershipItem | null>(null);
+const deleting = ref(false);
+const toast = useToast();
+
+// Annonce ARIA pour les lecteurs d'écran
+const ariaAnnouncement = ref('');
 
 // Menu contextuel pour la page des sponsors
 const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
@@ -221,6 +274,63 @@ function getProgressBarColor(packId: string, maxQuantity: number): string {
   if (percentage >= 90) return 'bg-red-500';
   if (percentage >= 70) return 'bg-yellow-500';
   return 'bg-green-500';
+}
+
+// Ouvrir la modale de suppression
+function openDeleteModal(partnership: PartnershipItem) {
+  partnershipToDelete.value = partnership;
+  showDeleteModal.value = true;
+}
+
+// Annuler la suppression
+function cancelDelete() {
+  showDeleteModal.value = false;
+  partnershipToDelete.value = null;
+}
+
+// Confirmer la suppression
+async function confirmDelete() {
+  if (!partnershipToDelete.value) return;
+
+  try {
+    deleting.value = true;
+    ariaAnnouncement.value = t('aria.deleting');
+
+    await deletePartnership(
+      orgSlug.value,
+      eventSlug.value,
+      partnershipToDelete.value.id
+    );
+
+    toast.add({
+      title: t('success.title'),
+      description: t('success.partnershipDeleted'),
+      color: 'success'
+    });
+
+    // Annonce ARIA pour les lecteurs d'écran
+    ariaAnnouncement.value = t('aria.partnershipDeleted');
+
+    // Fermer la modale
+    showDeleteModal.value = false;
+    partnershipToDelete.value = null;
+
+    // Recharger la liste
+    await loadPartnerships();
+  } catch (err: any) {
+    console.error('Failed to delete partnership:', err);
+    const errorMessage = err.response?.data?.message || t('errors.deletePartnership');
+
+    toast.add({
+      title: t('errors.title'),
+      description: errorMessage,
+      color: 'error'
+    });
+
+    ariaAnnouncement.value = `${t('errors.title')}: ${errorMessage}`;
+  } finally {
+    deleting.value = false;
+  }
 }
 
 async function loadPartnerships() {
