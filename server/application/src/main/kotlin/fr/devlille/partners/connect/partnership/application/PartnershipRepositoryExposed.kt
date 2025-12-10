@@ -21,11 +21,17 @@ import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
 import fr.devlille.partners.connect.partnership.domain.UpdatePartnershipContactInfo
 import fr.devlille.partners.connect.partnership.infrastructure.api.PartnershipOrganiserResponse
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.BillingsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionsTable
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipTicketEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipTicketsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
+import fr.devlille.partners.connect.partnership.infrastructure.db.SpeakerPartnershipEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.SpeakerPartnershipTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
@@ -337,6 +343,32 @@ class PartnershipRepositoryExposed : PartnershipRepository {
         if (partnership.validatedAt != null || partnership.declinedAt != null) {
             throw ConflictException("Cannot delete finalized partnership")
         }
+
+        // Cascade delete related records
+        // Delete partnership emails
+        PartnershipEmailEntity
+            .find { PartnershipEmailsTable.partnershipId eq partnershipId }
+            .forEach { it.delete() }
+
+        // Delete partnership options
+        PartnershipOptionEntity
+            .find { PartnershipOptionsTable.partnershipId eq partnershipId }
+            .forEach { it.delete() }
+
+        // Delete partnership tickets
+        PartnershipTicketEntity
+            .find { PartnershipTicketsTable.partnershipId eq partnershipId }
+            .forEach { it.delete() }
+
+        // Delete speaker partnerships
+        SpeakerPartnershipEntity
+            .find { SpeakerPartnershipTable.partnershipId eq partnershipId }
+            .forEach { it.delete() }
+
+        // Delete billing records if they exist
+        BillingEntity
+            .find { BillingsTable.partnershipId eq partnershipId }
+            .forEach { it.delete() }
 
         // Hard delete the partnership
         partnership.delete()
