@@ -10,9 +10,13 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
+    "check": "pnpm format:check && pnpm lint && pnpm test:run && pnpm i18n:check",
     "lint": "oxlint",
+    "format": "oxfmt --write .",
+    "format:check": "oxfmt --check .",
     "orval": "npx orval --config ./orval.config.ts",
     "test": "vitest",
+    "test:run": "vitest run",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "i18n:check": "npx tsx scripts/check-i18n.ts"
@@ -39,6 +43,7 @@
     "@vitest/ui": "^4.0.4",
     "@vue/test-utils": "^2.4.6",
     "happy-dom": "^20.0.10",
+    "oxfmt": "^0.17.0",
     "oxlint": "^1.24.0",
     "vitest": "^4.0.4"
   },

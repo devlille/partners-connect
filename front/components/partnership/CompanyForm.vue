@@ -35,10 +35,7 @@
           @validation="handleSiretValidation"
         />
 
-        <VatInput
-          v-model="form.vat"
-          :disabled="readonly || loading"
-        />
+        <VatInput v-model="form.vat" :disabled="readonly || loading" />
 
         <UrlInput
           v-model="form.site_url"
@@ -59,7 +56,10 @@
             placeholder="Description de l'entreprise"
             :disabled="readonly || loading"
           />
-          <p class="text-xs text-gray-500 mt-1">Cette information sera publiée sur la page dédiée au partenaire sur le site de la conférence</p>
+          <p class="text-xs text-gray-500 mt-1">
+            Cette information sera publiée sur la page dédiée au partenaire sur le site de la
+            conférence
+          </p>
         </div>
       </div>
 
@@ -176,18 +176,17 @@
       </div>
 
       <div v-if="!readonly" class="flex gap-3 pt-4">
-        <UButton
-          type="submit"
-          color="primary"
-          :loading="loading"
-          :disabled="!isFormValid"
-        >
+        <UButton type="submit" color="primary" :loading="loading" :disabled="!isFormValid">
           Mettre à jour les informations
         </UButton>
       </div>
       <div v-if="!readonly && !isFormValid" class="text-sm text-red-600 pt-2">
-        <span v-if="form.siret && !isSiretValid">Le SIRET doit contenir exactement 14 chiffres</span>
-        <span v-else>Veuillez remplir tous les champs obligatoires (SIRET, site web et adresse complète)</span>
+        <span v-if="form.siret && !isSiretValid"
+          >Le SIRET doit contenir exactement 14 chiffres</span
+        >
+        <span v-else
+          >Veuillez remplir tous les champs obligatoires (SIRET, site web et adresse complète)</span
+        >
       </div>
     </form>
   </div>

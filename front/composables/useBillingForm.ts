@@ -1,20 +1,19 @@
-import type { CompanyBillingData } from '~/utils/api';
-import { EMAIL_REGEX } from '~/constants/validation';
+import type { CompanyBillingData } from "~/utils/api";
+import { EMAIL_REGEX } from "~/constants/validation";
 
 /**
  * Composable pour gérer la logique du formulaire de facturation
  * Partage la validation et la gestion du formulaire entre les composants
  */
 export const useBillingForm = (initialBilling?: CompanyBillingData | null) => {
-
   const form = ref<CompanyBillingData>({
     name: initialBilling?.name || null,
     po: initialBilling?.po || null,
     contact: {
-      first_name: initialBilling?.contact?.first_name || '',
-      last_name: initialBilling?.contact?.last_name || '',
-      email: initialBilling?.contact?.email || ''
-    }
+      first_name: initialBilling?.contact?.first_name || "",
+      last_name: initialBilling?.contact?.last_name || "",
+      email: initialBilling?.contact?.email || "",
+    },
   });
 
   /**
@@ -23,9 +22,9 @@ export const useBillingForm = (initialBilling?: CompanyBillingData | null) => {
    */
   const isFormValid = computed(() => {
     return (
-      form.value.contact.first_name.trim() !== '' &&
-      form.value.contact.last_name.trim() !== '' &&
-      form.value.contact.email.trim() !== '' &&
+      form.value.contact.first_name.trim() !== "" &&
+      form.value.contact.last_name.trim() !== "" &&
+      form.value.contact.email.trim() !== "" &&
       EMAIL_REGEX.test(form.value.contact.email)
     );
   });
@@ -39,10 +38,10 @@ export const useBillingForm = (initialBilling?: CompanyBillingData | null) => {
         name: billing.name || null,
         po: billing.po || null,
         contact: {
-          first_name: billing.contact?.first_name || '',
-          last_name: billing.contact?.last_name || '',
-          email: billing.contact?.email || ''
-        }
+          first_name: billing.contact?.first_name || "",
+          last_name: billing.contact?.last_name || "",
+          email: billing.contact?.email || "",
+        },
       };
     }
   };
@@ -58,8 +57,8 @@ export const useBillingForm = (initialBilling?: CompanyBillingData | null) => {
       contact: {
         first_name: form.value.contact.first_name.trim(),
         last_name: form.value.contact.last_name.trim(),
-        email: form.value.contact.email.trim()
-      }
+        email: form.value.contact.email.trim(),
+      },
     };
   };
 
@@ -67,6 +66,6 @@ export const useBillingForm = (initialBilling?: CompanyBillingData | null) => {
     form,
     isFormValid,
     resetForm,
-    prepareBillingData
+    prepareBillingData,
   };
 };

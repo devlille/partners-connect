@@ -13,7 +13,14 @@
           :aria-invalid="!!validationErrors.name"
           :aria-describedby="validationErrors.name ? 'name-error' : undefined"
         />
-        <p v-if="validationErrors.name" id="name-error" class="mt-1 text-sm text-red-600" role="alert">{{ validationErrors.name }}</p>
+        <p
+          v-if="validationErrors.name"
+          id="name-error"
+          class="mt-1 text-sm text-red-600"
+          role="alert"
+        >
+          {{ validationErrors.name }}
+        </p>
       </div>
 
       <div>
@@ -30,12 +37,20 @@
           :aria-invalid="!!validationErrors.base_price"
           :aria-describedby="validationErrors.base_price ? 'price-error' : undefined"
         />
-        <p v-if="validationErrors.base_price" id="price-error" class="mt-1 text-sm text-red-600" role="alert">{{ validationErrors.base_price }}</p>
+        <p
+          v-if="validationErrors.base_price"
+          id="price-error"
+          class="mt-1 text-sm text-red-600"
+          role="alert"
+        >
+          {{ validationErrors.base_price }}
+        </p>
       </div>
 
-      
       <div>
-        <label for="max_quantity" class="block text-sm font-medium text-gray-700 mb-1">Quantité maximale</label>
+        <label for="max_quantity" class="block text-sm font-medium text-gray-700 mb-1"
+          >Quantité maximale</label
+        >
         <UInput
           id="max_quantity"
           v-model.number="form.max_quantity"
@@ -44,21 +59,30 @@
           placeholder="Nombre maximum de sponsors pour ce pack"
         />
       </div>
-
-     
     </div>
 
     <!-- Section des options -->
     <div v-if="options && options.length > 0" class="border-t border-gray-200 pt-6 mb-6">
       <h3 class="text-lg font-semibold text-gray-900 mb-4">Options de sponsoring</h3>
-      <p v-if="validationErrors.options" class="mb-4 text-sm text-red-600" role="alert" aria-live="polite">{{ validationErrors.options }}</p>
+      <p
+        v-if="validationErrors.options"
+        class="mb-4 text-sm text-red-600"
+        role="alert"
+        aria-live="polite"
+      >
+        {{ validationErrors.options }}
+      </p>
 
       <!-- Options obligatoires -->
       <div class="mb-6">
         <fieldset>
           <legend class="block text-sm font-medium text-gray-700 mb-3">Options obligatoires</legend>
           <div class="space-y-2" role="group" aria-label="Options obligatoires">
-            <div v-for="option in options" :key="`required-${option.id}`" class="flex items-center space-x-3">
+            <div
+              v-for="option in options"
+              :key="`required-${option.id}`"
+              class="flex items-center space-x-3"
+            >
               <input
                 :id="`required-${option.id}`"
                 :checked="form.requiredOptions.includes(option.id)"
@@ -80,7 +104,11 @@
         <fieldset>
           <legend class="block text-sm font-medium text-gray-700 mb-3">Options optionnelles</legend>
           <div class="space-y-2" role="group" aria-label="Options optionnelles">
-            <div v-for="option in options" :key="`optional-${option.id}`" class="flex items-center space-x-3">
+            <div
+              v-for="option in options"
+              :key="`optional-${option.id}`"
+              class="flex items-center space-x-3"
+            >
               <input
                 :id="`optional-${option.id}`"
                 :checked="form.optionalOptions.includes(option.id)"
@@ -99,9 +127,7 @@
     </div>
 
     <div class="flex justify-end gap-4 pt-4">
-      <UButton type="submit" color="primary" size="lg">
-        Valider
-      </UButton>
+      <UButton type="submit" color="primary" size="lg"> Valider </UButton>
     </div>
   </form>
 </template>

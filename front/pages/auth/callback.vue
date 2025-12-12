@@ -14,14 +14,14 @@ onMounted(async () => {
   try {
     const route = useRoute()
     const token = route.query.token as string
-    
+
     if (token) {
       // Create session data with the token from URL
       const sessionData = {
         token: token,
         state: 'authenticated'
       }
-      
+
       await handleAuthCallback(sessionData)
       console.log(route.query)
 
@@ -33,7 +33,7 @@ onMounted(async () => {
   } catch (err) {
     console.error('Auth callback error:', err)
     error.value = err instanceof Error ? err.message : 'Unknown error'
-    
+
     // Redirect to home page after error
     setTimeout(() => {
       navigateTo('/')

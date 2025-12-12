@@ -36,27 +36,31 @@ const createCustomAxiosInstance = (baseUrl: string): AxiosInstance => {
       if (error.response) {
         // Redirect to login only if token is invalid (401 Unauthorized)
         if (error.response.status === 401) {
-          if (typeof window !== 'undefined') {
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('user_info');
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("auth_token");
+            localStorage.removeItem("user_info");
 
             const config = useRuntimeConfig();
             const redirectUrl = encodeURIComponent(
               `${
-                process.env.NODE_ENV === "development" ? "http://localhost:3000" : window.location.origin
-              }/auth/callback`
+                process.env.NODE_ENV === "development"
+                  ? "http://localhost:3000"
+                  : window.location.origin
+              }/auth/callback`,
             );
             window.location.href = `${config.public.apiBaseUrl}/auth/login?redirectUrl=${redirectUrl}`;
           }
         }
 
         // Créer une erreur personnalisée qui préserve les données de la réponse
-        const customError = new Error(`HTTP error! Status: ${error.response.status}`) as Error & { response?: typeof error.response };
+        const customError = new Error(`HTTP error! Status: ${error.response.status}`) as Error & {
+          response?: typeof error.response;
+        };
         customError.response = error.response;
         throw customError;
       }
       throw error;
-    }
+    },
   );
 
   return instance;
@@ -70,7 +74,7 @@ export const getAxiosInstance = () => {
 
 export const customFetch = <T>(
   config: AxiosRequestConfig,
-  options?: AxiosRequestConfig
+  options?: AxiosRequestConfig,
 ): Promise<AxiosResponse<T> & { error: boolean; ok: boolean }> => {
   const axiosInstance = getAxiosInstance();
   return axiosInstance({ ...config, ...options });

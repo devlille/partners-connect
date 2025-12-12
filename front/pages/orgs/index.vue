@@ -13,10 +13,7 @@
     </div>
 
     <div class="p-6">
-      <UTable
-        :data="data"
-        :columns="columns"
-      />
+      <UTable :data="data" :columns="columns" />
     </div>
   </Dashboard>
 </template>

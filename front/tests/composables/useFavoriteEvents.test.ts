@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import {
-  useFavoriteEvents,
-  type FavoriteEvent,
-} from "~/composables/useFavoriteEvents";
+import { useFavoriteEvents, type FavoriteEvent } from "~/composables/useFavoriteEvents";
 
 describe("useFavoriteEvents", () => {
   beforeEach(() => {
@@ -38,9 +35,7 @@ describe("useFavoriteEvents", () => {
         },
       ];
 
-      vi.mocked(localStorage.getItem).mockReturnValue(
-        JSON.stringify(mockFavorites),
-      );
+      vi.mocked(localStorage.getItem).mockReturnValue(JSON.stringify(mockFavorites));
 
       const { loadFavorites, favorites } = useFavoriteEvents();
       loadFavorites();
@@ -51,9 +46,7 @@ describe("useFavoriteEvents", () => {
 
     it("should handle invalid JSON in localStorage", () => {
       vi.mocked(localStorage.getItem).mockReturnValue("invalid json");
-      const consoleErrorSpy = vi
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
+      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
       const { loadFavorites, favorites } = useFavoriteEvents();
       loadFavorites();
@@ -84,12 +77,8 @@ describe("useFavoriteEvents", () => {
         },
       ];
 
-      vi.mocked(localStorage.getItem).mockReturnValue(
-        JSON.stringify(invalidData),
-      );
-      const consoleErrorSpy = vi
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
+      vi.mocked(localStorage.getItem).mockReturnValue(JSON.stringify(invalidData));
+      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
       const { loadFavorites, favorites } = useFavoriteEvents();
       loadFavorites();
@@ -110,12 +99,8 @@ describe("useFavoriteEvents", () => {
         },
       ];
 
-      vi.mocked(localStorage.getItem).mockReturnValue(
-        JSON.stringify(invalidData),
-      );
-      const consoleErrorSpy = vi
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
+      vi.mocked(localStorage.getItem).mockReturnValue(JSON.stringify(invalidData));
+      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
       const { loadFavorites, favorites } = useFavoriteEvents();
       loadFavorites();
@@ -136,12 +121,8 @@ describe("useFavoriteEvents", () => {
         },
       ];
 
-      vi.mocked(localStorage.getItem).mockReturnValue(
-        JSON.stringify(invalidData),
-      );
-      const consoleErrorSpy = vi
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
+      vi.mocked(localStorage.getItem).mockReturnValue(JSON.stringify(invalidData));
+      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
       const { loadFavorites, favorites } = useFavoriteEvents();
       loadFavorites();
@@ -160,12 +141,8 @@ describe("useFavoriteEvents", () => {
         addedAt: "2025-01-01T00:00:00.000Z",
       }));
 
-      vi.mocked(localStorage.getItem).mockReturnValue(
-        JSON.stringify(tooManyFavorites),
-      );
-      const consoleErrorSpy = vi
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
+      vi.mocked(localStorage.getItem).mockReturnValue(JSON.stringify(tooManyFavorites));
+      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
       const { loadFavorites, favorites } = useFavoriteEvents();
       loadFavorites();
@@ -219,10 +196,7 @@ describe("useFavoriteEvents", () => {
         eventName: "Test Event",
       });
 
-      expect(localStorage.setItem).toHaveBeenCalledWith(
-        "favorite_events",
-        expect.any(String),
-      );
+      expect(localStorage.setItem).toHaveBeenCalledWith("favorite_events", expect.any(String));
     });
 
     it("should return false when adding a duplicate", () => {
@@ -244,9 +218,7 @@ describe("useFavoriteEvents", () => {
 
     it("should prevent adding more than 100 favorites", () => {
       const { addFavorite, favorites } = useFavoriteEvents();
-      const consoleWarnSpy = vi
-        .spyOn(console, "warn")
-        .mockImplementation(() => {});
+      const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
       // Add 100 favorites
       for (let i = 0; i < 100; i++) {
@@ -279,9 +251,7 @@ describe("useFavoriteEvents", () => {
 
     it("should reject invalid data when adding favorite", () => {
       const { addFavorite, favorites } = useFavoriteEvents();
-      const consoleErrorSpy = vi
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
+      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
       const result = addFavorite({
         orgSlug: "a".repeat(101), // Exceeds max length
@@ -330,10 +300,7 @@ describe("useFavoriteEvents", () => {
 
       removeFavorite("test-org", "test-event");
 
-      expect(localStorage.setItem).toHaveBeenCalledWith(
-        "favorite_events",
-        expect.any(String),
-      );
+      expect(localStorage.setItem).toHaveBeenCalledWith("favorite_events", expect.any(String));
     });
 
     it("should not throw error when removing non-existent favorite", () => {

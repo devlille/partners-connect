@@ -7,9 +7,9 @@
  * Network error - failed to connect to server
  */
 export interface NetworkError {
-  type: 'network';
+  type: "network";
   message: string;
-  i18nKey: 'errors.network';
+  i18nKey: "errors.network";
   details: TypeError;
 }
 
@@ -17,9 +17,9 @@ export interface NetworkError {
  * Validation error - invalid data (400)
  */
 export interface ValidationError {
-  type: 'validation';
+  type: "validation";
   message: string;
-  i18nKey: 'errors.validation';
+  i18nKey: "errors.validation";
   details?: unknown;
 }
 
@@ -27,9 +27,9 @@ export interface ValidationError {
  * Unauthorized error - authentication/authorization failed (401, 403)
  */
 export interface UnauthorizedError {
-  type: 'unauthorized';
+  type: "unauthorized";
   message: string;
-  i18nKey: 'errors.unauthorized';
+  i18nKey: "errors.unauthorized";
   details?: unknown;
 }
 
@@ -37,9 +37,9 @@ export interface UnauthorizedError {
  * Not found error - resource not found (404)
  */
 export interface NotFoundError {
-  type: 'not_found';
+  type: "not_found";
   message: string;
-  i18nKey: 'errors.notFound';
+  i18nKey: "errors.notFound";
   details?: unknown;
 }
 
@@ -47,9 +47,9 @@ export interface NotFoundError {
  * Server error - internal server error (500, 502, 503)
  */
 export interface ServerError {
-  type: 'server';
+  type: "server";
   message: string;
-  i18nKey: 'errors.server';
+  i18nKey: "errors.server";
   details?: unknown;
 }
 
@@ -57,9 +57,9 @@ export interface ServerError {
  * Unknown error - unhandled error type
  */
 export interface UnknownError {
-  type: 'unknown';
+  type: "unknown";
   message: string;
-  i18nKey: 'errors.unknown';
+  i18nKey: "errors.unknown";
   details?: unknown;
 }
 
@@ -92,12 +92,12 @@ export type AppError =
  * @deprecated Use discriminated union types instead
  */
 export enum ErrorType {
-  NETWORK = 'network',
-  VALIDATION = 'validation',
-  UNAUTHORIZED = 'unauthorized',
-  NOT_FOUND = 'not_found',
-  SERVER = 'server',
-  UNKNOWN = 'unknown'
+  NETWORK = "network",
+  VALIDATION = "validation",
+  UNAUTHORIZED = "unauthorized",
+  NOT_FOUND = "not_found",
+  SERVER = "server",
+  UNKNOWN = "unknown",
 }
 
 /**
@@ -112,60 +112,60 @@ export const useErrorHandler = () => {
    */
   const parseError = (error: unknown): AppError => {
     // Erreur réseau (pas de connexion)
-    if (error instanceof TypeError && error.message === 'Failed to fetch') {
+    if (error instanceof TypeError && error.message === "Failed to fetch") {
       return {
-        type: 'network',
-        message: 'Network error',
-        i18nKey: 'errors.network',
-        details: error
+        type: "network",
+        message: "Network error",
+        i18nKey: "errors.network",
+        details: error,
       } satisfies NetworkError;
     }
 
     // Erreur HTTP
-    if (typeof error === 'object' && error !== null && 'status' in error) {
+    if (typeof error === "object" && error !== null && "status" in error) {
       const httpError = error as { status: number; data?: unknown };
 
       switch (httpError.status) {
         case 400:
           return {
-            type: 'validation',
-            message: 'Validation error',
-            i18nKey: 'errors.validation',
-            details: httpError.data
+            type: "validation",
+            message: "Validation error",
+            i18nKey: "errors.validation",
+            details: httpError.data,
           } satisfies ValidationError;
         case 401:
         case 403:
           return {
-            type: 'unauthorized',
-            message: 'Unauthorized',
-            i18nKey: 'errors.unauthorized',
-            details: httpError.data
+            type: "unauthorized",
+            message: "Unauthorized",
+            i18nKey: "errors.unauthorized",
+            details: httpError.data,
           } satisfies UnauthorizedError;
         case 404:
           return {
-            type: 'not_found',
-            message: 'Not found',
-            i18nKey: 'errors.notFound',
-            details: httpError.data
+            type: "not_found",
+            message: "Not found",
+            i18nKey: "errors.notFound",
+            details: httpError.data,
           } satisfies NotFoundError;
         case 500:
         case 502:
         case 503:
           return {
-            type: 'server',
-            message: 'Server error',
-            i18nKey: 'errors.server',
-            details: httpError.data
+            type: "server",
+            message: "Server error",
+            i18nKey: "errors.server",
+            details: httpError.data,
           } satisfies ServerError;
       }
     }
 
     // Erreur inconnue
     return {
-      type: 'unknown',
-      message: 'Unknown error',
-      i18nKey: 'errors.unknown',
-      details: error
+      type: "unknown",
+      message: "Unknown error",
+      i18nKey: "errors.unknown",
+      details: error,
     } satisfies UnknownError;
   };
 
@@ -182,7 +182,7 @@ export const useErrorHandler = () => {
    */
   const logError = (error: unknown, context?: string) => {
     const appError = parseError(error);
-    const prefix = context ? `[${context}]` : '';
+    const prefix = context ? `[${context}]` : "";
     console.error(`${prefix} ${appError.type}:`, appError.message, appError.details);
   };
 
@@ -199,6 +199,6 @@ export const useErrorHandler = () => {
     getErrorMessage,
     logError,
     handleError,
-    ErrorType
+    ErrorType,
   };
 };

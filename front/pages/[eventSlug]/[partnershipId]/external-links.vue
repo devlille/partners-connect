@@ -24,7 +24,10 @@
         <AlertMessage v-else-if="eventError" type="error" :message="eventError" />
 
         <!-- Empty State -->
-        <div v-else-if="externalLinks.length === 0" class="bg-white rounded-lg shadow p-12 text-center">
+        <div
+          v-else-if="externalLinks.length === 0"
+          class="bg-white rounded-lg shadow p-12 text-center"
+        >
           <i class="i-heroicons-link text-gray-400 text-5xl mx-auto mb-4" aria-hidden="true" />
           <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun lien externe</h3>
           <p class="text-sm text-gray-500">

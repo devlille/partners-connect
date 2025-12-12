@@ -70,12 +70,7 @@
       </div>
 
       <div v-if="!readonly" class="flex gap-3 pt-4">
-        <UButton
-          type="submit"
-          color="primary"
-          :loading="loading"
-          :disabled="!isFormValid"
-        >
+        <UButton type="submit" color="primary" :loading="loading" :disabled="!isFormValid">
           Mettre à jour les informations de facturation
         </UButton>
       </div>

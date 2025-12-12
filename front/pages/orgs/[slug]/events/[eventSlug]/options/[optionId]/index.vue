@@ -18,10 +18,7 @@
 
       <div v-else-if="option" class="bg-white rounded-lg shadow p-6">
         <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations de l'option</h2>
-        <SponsoringOptionForm
-          :data="optionFormData"
-          @save="onSave"
-        />
+        <SponsoringOptionForm :data="optionFormData" @save="onSave" />
       </div>
     </div>
   </Dashboard>

@@ -8,12 +8,7 @@
             Gérez les personnes ayant accès à l'organisation {{ orgSlug }}
           </p>
         </div>
-        <UButton
-          color="primary"
-          size="lg"
-          icon="i-heroicons-plus"
-          @click="isAddModalOpen = true"
-        >
+        <UButton color="primary" size="lg" icon="i-heroicons-plus" @click="isAddModalOpen = true">
           Ajouter des emails
         </UButton>
       </div>
@@ -37,11 +32,23 @@
         </div>
 
         <div v-if="users.length === 0" class="px-6 py-12 text-center">
-          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          <svg
+            class="mx-auto h-12 w-12 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+            />
           </svg>
           <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun utilisateur</h3>
-          <p class="mt-1 text-sm text-gray-500">Commencez par ajouter des emails pour donner accès à l'organisation.</p>
+          <p class="mt-1 text-sm text-gray-500">
+            Commencez par ajouter des emails pour donner accès à l'organisation.
+          </p>
         </div>
 
         <ul v-else class="divide-y divide-gray-200">
@@ -55,11 +62,13 @@
                     :alt="user.display_name || user.email"
                     class="h-10 w-10 rounded-full object-cover"
                     @error="handleImageError($event, user)"
-                  >
+                  />
                 </div>
                 <!-- Avatar avec initiales -->
                 <div v-else class="shrink-0">
-                  <div class="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
+                  <div
+                    class="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center"
+                  >
                     <span class="text-primary-700 font-medium text-sm">
                       {{ getInitials(user.display_name || user.email) }}
                     </span>
@@ -92,7 +101,11 @@
 
     <!-- Modal d'ajout -->
     <Teleport to="body">
-      <div v-if="isAddModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" @click.self="isAddModalOpen = false">
+      <div
+        v-if="isAddModalOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+        @click.self="isAddModalOpen = false"
+      >
         <div class="w-full max-w-lg bg-white rounded-lg shadow-xl" @click.stop>
           <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-semibold text-gray-900">Ajouter des accès</h3>
@@ -112,9 +125,7 @@
                   :disabled="isSubmitting"
                   class="w-full"
                 />
-                <p class="mt-1 text-xs text-gray-500">
-                  Entrez une adresse email par ligne
-                </p>
+                <p class="mt-1 text-xs text-gray-500">Entrez une adresse email par ligne</p>
               </div>
 
               <div v-if="addError" class="text-sm text-red-600">
@@ -132,11 +143,7 @@
             >
               Annuler
             </UButton>
-            <UButton
-              color="primary"
-              :loading="isSubmitting"
-              @click="handleAddEmails"
-            >
+            <UButton color="primary" :loading="isSubmitting" @click="handleAddEmails">
               Ajouter
             </UButton>
           </div>
@@ -146,7 +153,11 @@
 
     <!-- Modal de confirmation de suppression -->
     <Teleport to="body">
-      <div v-if="isDeleteModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" @click.self="isDeleteModalOpen = false">
+      <div
+        v-if="isDeleteModalOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+        @click.self="isDeleteModalOpen = false"
+      >
         <div class="w-full max-w-lg bg-white rounded-lg shadow-xl" @click.stop>
           <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-semibold text-gray-900">Confirmer la suppression</h3>
@@ -154,7 +165,8 @@
 
           <div class="px-6 py-4 space-y-4">
             <p class="text-sm text-gray-700">
-              Êtes-vous sûr de vouloir retirer l'accès à <strong>{{ userToDelete?.email }}</strong> ?
+              Êtes-vous sûr de vouloir retirer l'accès à
+              <strong>{{ userToDelete?.email }}</strong> ?
             </p>
             <p class="text-sm text-gray-500">
               Cette personne ne pourra plus accéder à l'organisation.
@@ -170,11 +182,7 @@
             >
               Annuler
             </UButton>
-            <UButton
-              color="error"
-              :loading="!!deletingEmail"
-              @click="handleDelete"
-            >
+            <UButton color="error" :loading="!!deletingEmail" @click="handleDelete">
               Supprimer
             </UButton>
           </div>

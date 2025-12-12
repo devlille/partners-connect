@@ -24,17 +24,9 @@
         @validation="handleSiretValidation"
       />
 
-      <VatInput
-        v-model="form.vat"
-        :disabled="isLoading"
-      />
+      <VatInput v-model="form.vat" :disabled="isLoading" />
 
-      <UrlInput
-        v-model="form.site_url"
-        label="Site web"
-        :required="true"
-        :disabled="isLoading"
-      />
+      <UrlInput v-model="form.site_url" label="Site web" :required="true" :disabled="isLoading" />
 
       <div>
         <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
@@ -48,7 +40,10 @@
           placeholder="Description de l'entreprise"
           :disabled="isLoading"
         />
-        <p class="text-xs text-gray-500 mt-1">Cette information sera publiée sur la page dédiée au partenaire sur le site de la conférence</p>
+        <p class="text-xs text-gray-500 mt-1">
+          Cette information sera publiée sur la page dédiée au partenaire sur le site de la
+          conférence
+        </p>
       </div>
 
       <div class="border-t pt-4">
@@ -69,11 +64,7 @@
           </div>
 
           <div class="grid grid-cols-2 gap-4">
-            <ZipCodeInput
-              v-model="form.head_office!.zip_code"
-              :disabled="isLoading"
-              required
-            />
+            <ZipCodeInput v-model="form.head_office!.zip_code" :disabled="isLoading" required />
 
             <div>
               <label for="city" class="block text-sm font-medium text-gray-700 mb-1">
@@ -105,18 +96,17 @@
       </div>
 
       <div class="flex gap-3 pt-4">
-        <UButton
-          type="submit"
-          color="primary"
-          :loading="isLoading"
-          :disabled="!isFormValid"
-        >
+        <UButton type="submit" color="primary" :loading="isLoading" :disabled="!isFormValid">
           Mettre à jour les informations
         </UButton>
       </div>
       <div v-if="!isFormValid" class="text-sm text-red-600 pt-2">
-        <span v-if="form.siret && !isSiretValid">Le SIRET doit contenir exactement 14 chiffres</span>
-        <span v-else>Veuillez remplir tous les champs obligatoires (SIRET, site web et adresse complète)</span>
+        <span v-if="form.siret && !isSiretValid"
+          >Le SIRET doit contenir exactement 14 chiffres</span
+        >
+        <span v-else
+          >Veuillez remplir tous les champs obligatoires (SIRET, site web et adresse complète)</span
+        >
       </div>
     </form>
   </div>

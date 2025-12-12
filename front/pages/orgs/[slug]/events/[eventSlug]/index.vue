@@ -24,10 +24,7 @@
       </div>
 
       <div v-else-if="event">
-        <EventForm
-          :data="event"
-          @save="onSave"
-        />
+        <EventForm :data="event" @save="onSave" />
       </div>
     </div>
   </Dashboard>

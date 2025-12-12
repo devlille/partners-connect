@@ -27,8 +27,8 @@ export const UI_CONSTANTS = {
 
   // Forms
   MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB
-  ALLOWED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/webp'],
-  ALLOWED_DOCUMENT_TYPES: ['application/pdf', 'application/msword'],
+  ALLOWED_IMAGE_TYPES: ["image/jpeg", "image/png", "image/webp"],
+  ALLOWED_DOCUMENT_TYPES: ["application/pdf", "application/msword"],
 
   // Validation Limits
   MAX_NAME_LENGTH: 200,
@@ -51,7 +51,7 @@ export const UI_CONSTANTS = {
     MD: 768,
     LG: 1024,
     XL: 1280,
-    '2XL': 1536,
+    "2XL": 1536,
   },
 
   // Z-Index
@@ -83,28 +83,28 @@ export const UI_CONSTANTS = {
  * Constantes pour les modal sizes
  */
 export const MODAL_SIZES = {
-  SM: 'max-w-sm',
-  MD: 'max-w-md',
-  LG: 'max-w-lg',
-  XL: 'max-w-xl',
-  '2XL': 'max-w-2xl',
-  '3XL': 'max-w-3xl',
-  '4XL': 'max-w-4xl',
-  FULL: 'max-w-full',
+  SM: "max-w-sm",
+  MD: "max-w-md",
+  LG: "max-w-lg",
+  XL: "max-w-xl",
+  "2XL": "max-w-2xl",
+  "3XL": "max-w-3xl",
+  "4XL": "max-w-4xl",
+  FULL: "max-w-full",
 } as const;
 
 /**
  * Constantes pour les variants
  */
 export const VARIANTS = {
-  PRIMARY: 'primary',
-  SECONDARY: 'secondary',
-  SUCCESS: 'success',
-  ERROR: 'error',
-  DANGER: 'danger',
-  WARNING: 'warning',
-  INFO: 'info',
-  NEUTRAL: 'neutral',
+  PRIMARY: "primary",
+  SECONDARY: "secondary",
+  SUCCESS: "success",
+  ERROR: "error",
+  DANGER: "danger",
+  WARNING: "warning",
+  INFO: "info",
+  NEUTRAL: "neutral",
 } as const;
 
-export type Variant = typeof VARIANTS[keyof typeof VARIANTS];
+export type Variant = (typeof VARIANTS)[keyof typeof VARIANTS];

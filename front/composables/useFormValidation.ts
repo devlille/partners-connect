@@ -3,8 +3,8 @@
  * Provides type-safe validation with automatic TypeScript inference
  */
 
-import { ref, computed, type Ref } from 'vue';
-import { z, type ZodSchema } from 'zod';
+import { ref, computed, type Ref } from "vue";
+import { z, type ZodSchema } from "zod";
 
 /**
  * Validation result interface
@@ -58,7 +58,7 @@ export interface UseFormValidationOptions {
  */
 export function useFormValidation<T extends ZodSchema>(
   schema: T,
-  options: UseFormValidationOptions = {}
+  options: UseFormValidationOptions = {},
 ) {
   type SchemaType = z.infer<T>;
 
@@ -166,7 +166,7 @@ export function useFormValidation<T extends ZodSchema>(
       if (error instanceof z.ZodError) {
         errors.value = transformZodError(error);
       } else {
-        console.error('Unexpected validation error:', error);
+        console.error("Unexpected validation error:", error);
       }
 
       isValidating.value = false;
@@ -181,10 +181,7 @@ export function useFormValidation<T extends ZodSchema>(
   /**
    * Validate a single field
    */
-  const validateField = async (
-    field: keyof SchemaType,
-    value: unknown
-  ): Promise<boolean> => {
+  const validateField = async (field: keyof SchemaType, value: unknown): Promise<boolean> => {
     try {
       // Extract the schema for this specific field
       const schemaObject = schema as any;
@@ -199,7 +196,7 @@ export function useFormValidation<T extends ZodSchema>(
       return false;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const message = error.issues[0]?.message || 'Validation error';
+        const message = error.issues[0]?.message || "Validation error";
         const transformedMessage = options.transformErrorMessage
           ? options.transformErrorMessage(message)
           : message;
@@ -274,10 +271,9 @@ export function useFormValidation<T extends ZodSchema>(
  * ```
  */
 export function nonEmptyRecord<T extends z.ZodTypeAny>(schema: T) {
-  return z.record(z.string(), schema).refine(
-    (record) => Object.keys(record).length > 0,
-    { message: 'errors.validation.emptyRecord' }
-  );
+  return z.record(z.string(), schema).refine((record) => Object.keys(record).length > 0, {
+    message: "errors.validation.emptyRecord",
+  });
 }
 
 /**
@@ -295,10 +291,7 @@ export function nonEmptyRecord<T extends z.ZodTypeAny>(schema: T) {
  * );
  * ```
  */
-export function mutuallyExclusive<T extends Record<string, any>>(
-  field1: keyof T,
-  field2: keyof T
-) {
+export function mutuallyExclusive<T extends Record<string, any>>(field1: keyof T, field2: keyof T) {
   return (data: T) => {
     const hasField1 = data[field1] !== undefined && data[field1] !== null;
     const hasField2 = data[field2] !== undefined && data[field2] !== null;
@@ -323,11 +316,11 @@ export function mutuallyExclusive<T extends Record<string, any>>(
  */
 export function conditionalRequired<T extends Record<string, any>>(
   field: keyof T,
-  condition: (data: T) => boolean
+  condition: (data: T) => boolean,
 ) {
   return (data: T) => {
     if (condition(data)) {
-      return data[field] !== undefined && data[field] !== null && data[field] !== '';
+      return data[field] !== undefined && data[field] !== null && data[field] !== "";
     }
     return true;
   };

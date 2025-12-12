@@ -5,30 +5,18 @@
         <label class="block text-sm font-medium text-gray-700 mb-2">
           Nom du contact<span class="text-red-500 ml-1">*</span>
         </label>
-        <UInput
-          v-model="form.contact_name"
-          placeholder="Nom du contact"
-          required
-          class="w-full"
-        />
+        <UInput v-model="form.contact_name" placeholder="Nom du contact" required class="w-full" />
       </div>
 
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">
           Rôle du contact<span class="text-red-500 ml-1">*</span>
         </label>
-        <UInput
-          v-model="form.contact_role"
-          placeholder="Rôle"
-          required
-          class="w-full"
-        />
+        <UInput v-model="form.contact_role" placeholder="Rôle" required class="w-full" />
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">
-          Pack
-        </label>
+        <label class="block text-sm font-medium text-gray-700 mb-2"> Pack </label>
         <UInput
           v-model="selectedPackName"
           placeholder="Pack de sponsoring"
@@ -38,39 +26,39 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">
-          Options
-        </label>
+        <label class="block text-sm font-medium text-gray-700 mb-2"> Options </label>
         <div v-if="selectedOptions.length > 0" class="bg-gray-50 rounded-lg p-3">
           <div class="space-y-3">
-            <div
-              v-for="option in selectedOptions"
-              :key="option.id"
-              class="flex items-start gap-3"
-            >
+            <div v-for="option in selectedOptions" :key="option.id" class="flex items-start gap-3">
               <input
                 type="checkbox"
                 :id="`form-option-${option.id}`"
                 checked
                 disabled
                 class="mt-1 h-4 w-4 rounded border-gray-300 text-primary-600 cursor-not-allowed opacity-60"
-              >
-              <label
-                :for="`form-option-${option.id}`"
-                class="flex-1 cursor-not-allowed"
-              >
+              />
+              <label :for="`form-option-${option.id}`" class="flex-1 cursor-not-allowed">
                 <span class="block text-sm font-medium text-gray-900">
                   {{ option.name }}
                   <!-- Pour les options quantitatives: afficher "Quantité x Montant Unitaire" -->
-                  <span v-if="option.type === 'typed_quantitative' && option.quantity && option.price !== null && option.price !== undefined" class="text-gray-600">
+                  <span
+                    v-if="option.type === 'typed_quantitative' && option.quantity && option.price !== null && option.price !== undefined"
+                    class="text-gray-600"
+                  >
                     ({{ option.quantity }} x {{ option.price }} €)
                   </span>
                   <!-- Pour les options sélectables: afficher le texte et le prix du choix fait -->
-                  <span v-else-if="option.type === 'typed_selectable' && option.selected_value" class="text-gray-600">
+                  <span
+                    v-else-if="option.type === 'typed_selectable' && option.selected_value"
+                    class="text-gray-600"
+                  >
                     ({{ option.selected_value.value }} - {{ option.selected_value.price }} €)
                   </span>
                   <!-- Pour les autres options: afficher juste le prix -->
-                  <span v-else-if="option.price !== null && option.price !== undefined" class="text-gray-600">
+                  <span
+                    v-else-if="option.price !== null && option.price !== undefined"
+                    class="text-gray-600"
+                  >
                     ({{ option.price }} €)
                   </span>
                 </span>
@@ -85,23 +73,14 @@
       </div>
 
       <div>
-        <LanguageSelect
-          v-model="form.language"
-          label="Langue"
-          :required="true"
-        />
+        <LanguageSelect v-model="form.language" label="Langue" :required="true" />
       </div>
 
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">
           Email(s)<span class="text-red-500 ml-1">*</span>
         </label>
-        <UInput
-          v-model="form.emails"
-          placeholder="email@example.com"
-          type="email"
-          class="w-full"
-        />
+        <UInput v-model="form.emails" placeholder="email@example.com" type="email" class="w-full" />
         <p class="text-xs text-gray-500 mt-1">Séparer plusieurs emails par des virgules</p>
       </div>
 
@@ -109,12 +88,7 @@
         <label class="block text-sm font-medium text-gray-700 mb-2">
           Téléphone<span class="text-red-500 ml-1">*</span>
         </label>
-        <UInput
-          v-model="form.phone"
-          placeholder="+33 6 12 34 56 78"
-          type="tel"
-          class="w-full"
-        />
+        <UInput v-model="form.phone" placeholder="+33 6 12 34 56 78" type="tel" class="w-full" />
       </div>
     </div>
 
@@ -126,12 +100,7 @@
         label="Annuler"
         @click="$emit('cancel')"
       />
-      <UButton
-        type="submit"
-        color="primary"
-        label="Enregistrer"
-        :loading="loading"
-      />
+      <UButton type="submit" color="primary" label="Enregistrer" :loading="loading" />
     </div>
   </form>
 </template>

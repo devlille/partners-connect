@@ -1,7 +1,13 @@
 <template>
   <div class="bg-white rounded-lg shadow">
     <!-- Loading State -->
-    <div v-if="loading" class="px-6 py-12" role="status" aria-live="polite" aria-label="Chargement des intégrations">
+    <div
+      v-if="loading"
+      class="px-6 py-12"
+      role="status"
+      aria-live="polite"
+      aria-label="Chargement des intégrations"
+    >
       <div class="space-y-4">
         <div v-for="i in 3" :key="i" class="animate-pulse">
           <div class="flex items-start gap-4">
@@ -19,9 +25,25 @@
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="integrations.length === 0" class="px-6 py-12 text-center" role="region" aria-label="Aucune intégration">
-      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+    <div
+      v-else-if="integrations.length === 0"
+      class="px-6 py-12 text-center"
+      role="region"
+      aria-label="Aucune intégration"
+    >
+      <svg
+        class="mx-auto h-12 w-12 text-gray-400"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        aria-hidden="true"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M13 10V3L4 14h7v7l9-11h-7z"
+        />
       </svg>
       <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune intégration configurée</h3>
       <p class="mt-1 text-sm text-gray-500">Commencez par ajouter une intégration.</p>
@@ -95,10 +117,15 @@
                 </div>
                 <div class="mt-1 space-y-1">
                   <p class="text-sm text-gray-600">
-                    <span class="font-medium">Utilisation:</span> {{ getUsageName(integration.usage) }}
+                    <span class="font-medium">Utilisation:</span>
+                    {{ getUsageName(integration.usage) }}
                   </p>
                   <p class="text-sm text-gray-600">
-                    <span class="font-medium">Créé le:</span> <time :datetime="integration.created_at">{{ formatDate(integration.created_at) }}</time>
+                    <span class="font-medium">Créé le:</span>
+                    <time
+                      :datetime="integration.created_at"
+                      >{{ formatDate(integration.created_at) }}</time
+                    >
                   </p>
                 </div>
               </div>

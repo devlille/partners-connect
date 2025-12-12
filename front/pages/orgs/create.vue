@@ -40,11 +40,11 @@ const data = ref<Organisation>({
 async function handleSave(payload: Organisation) {
   // Filter out empty properties
   const filteredPayload = Object.fromEntries(
-    Object.entries(payload).filter(([_, value]) => 
+    Object.entries(payload).filter(([_, value]) =>
       value !== "" && value !== null && value !== undefined
     )
   ) as Organisation;
-  
+
   await postOrgs(filteredPayload).then(response => router.push(`/orgs/${response.data["slug"]}`))
 }
 

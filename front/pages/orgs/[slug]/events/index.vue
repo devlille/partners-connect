@@ -29,11 +29,7 @@
         {{ error }}
       </div>
 
-      <UTable
-        v-else
-        :data="data"
-        :columns="columns"
-      />
+      <UTable v-else :data="data" :columns="columns" />
     </div>
   </Dashboard>
 </template>

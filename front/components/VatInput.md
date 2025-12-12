@@ -21,6 +21,7 @@ VAT_REGEX = /^[A-Z]{2}[A-Z0-9]{8,12}$/
 ```
 
 Le numéro de TVA doit :
+
 - Commencer par **2 lettres majuscules** (code pays ISO 3166-1 alpha-2)
 - Suivi de **8 à 12 caractères alphanumériques**
 
@@ -47,24 +48,24 @@ const company = ref({
 
 ## Props
 
-| Prop | Type | Défaut | Description |
-|------|------|--------|-------------|
-| `modelValue` | `string \| null \| undefined` | - | Valeur du champ (v-model) |
-| `label` | `string` | `'TVA intracommunautaire'` | Texte du label |
-| `placeholder` | `string` | `'FR00000000000'` | Texte du placeholder |
-| `disabled` | `boolean` | `false` | Désactive le champ |
-| `required` | `boolean` | `false` | Marque le champ comme requis |
-| `hint` | `string` | - | Texte d'aide sous le champ |
-| `inputClass` | `string` | `'w-full'` | Classes CSS additionnelles |
-| `validate` | `boolean` | `true` | Active/désactive la validation |
-| `showErrorOnInput` | `boolean` | `false` | Affiche l'erreur pendant la saisie |
+| Prop               | Type                          | Défaut                     | Description                        |
+| ------------------ | ----------------------------- | -------------------------- | ---------------------------------- |
+| `modelValue`       | `string \| null \| undefined` | -                          | Valeur du champ (v-model)          |
+| `label`            | `string`                      | `'TVA intracommunautaire'` | Texte du label                     |
+| `placeholder`      | `string`                      | `'FR00000000000'`          | Texte du placeholder               |
+| `disabled`         | `boolean`                     | `false`                    | Désactive le champ                 |
+| `required`         | `boolean`                     | `false`                    | Marque le champ comme requis       |
+| `hint`             | `string`                      | -                          | Texte d'aide sous le champ         |
+| `inputClass`       | `string`                      | `'w-full'`                 | Classes CSS additionnelles         |
+| `validate`         | `boolean`                     | `true`                     | Active/désactive la validation     |
+| `showErrorOnInput` | `boolean`                     | `false`                    | Affiche l'erreur pendant la saisie |
 
 ## Événements
 
-| Événement | Payload | Description |
-|-----------|---------|-------------|
-| `update:modelValue` | `string \| null` | Émis quand la valeur change |
-| `validation` | `boolean` | Émis quand l'état de validation change |
+| Événement           | Payload          | Description                            |
+| ------------------- | ---------------- | -------------------------------------- |
+| `update:modelValue` | `string \| null` | Émis quand la valeur change            |
+| `validation`        | `boolean`        | Émis quand l'état de validation change |
 
 ## Exemples d'utilisation
 
@@ -169,17 +170,17 @@ Pour afficher l'erreur pendant la saisie, utilisez `show-error-on-input` :
 
 ## Exemples de valeurs
 
-| Valeur saisie | Valeur stockée | Valide | Message d'erreur |
-|---------------|----------------|--------|------------------|
-| `FR12345678901` | `FR12345678901` | ✅ Oui | - |
-| `fr12345678901` | `FR12345678901` | ✅ Oui | - (converti) |
-| `FR 12 345 678 901` | `FR12345678901` | ✅ Oui | - (nettoyé) |
-| `DE123456789` | `DE123456789` | ✅ Oui | - |
-| `FR123` | `FR123` | ❌ Non | "Numéro de TVA invalide" |
-| `12345678901` | `12345678901` | ❌ Non | "Numéro de TVA invalide" |
-| `FRXYZ` | `FRXYZ` | ❌ Non | "Numéro de TVA invalide" |
-| (vide avec required) | `null` | ❌ Non | "Ce champ est requis" |
-| (vide sans required) | `null` | ✅ Oui | - |
+| Valeur saisie        | Valeur stockée  | Valide | Message d'erreur         |
+| -------------------- | --------------- | ------ | ------------------------ |
+| `FR12345678901`      | `FR12345678901` | ✅ Oui | -                        |
+| `fr12345678901`      | `FR12345678901` | ✅ Oui | - (converti)             |
+| `FR 12 345 678 901`  | `FR12345678901` | ✅ Oui | - (nettoyé)              |
+| `DE123456789`        | `DE123456789`   | ✅ Oui | -                        |
+| `FR123`              | `FR123`         | ❌ Non | "Numéro de TVA invalide" |
+| `12345678901`        | `12345678901`   | ❌ Non | "Numéro de TVA invalide" |
+| `FRXYZ`              | `FRXYZ`         | ❌ Non | "Numéro de TVA invalide" |
+| (vide avec required) | `null`          | ❌ Non | "Ce champ est requis"    |
+| (vide sans required) | `null`          | ✅ Oui | -                        |
 
 ## Formats de TVA européens supportés
 
@@ -187,29 +188,30 @@ Le composant supporte tous les formats de numéros de TVA intracommunautaire de 
 
 ### Formats par pays
 
-| Pays | Code | Format | Exemple | Longueur |
-|------|------|--------|---------|----------|
-| 🇫🇷 France | FR | 2 lettres + 11 chiffres | `FR12345678901` | 13 |
-| 🇩🇪 Allemagne | DE | 2 lettres + 9 chiffres | `DE123456789` | 11 |
-| 🇧🇪 Belgique | BE | 2 lettres + 10 chiffres | `BE0123456789` | 12 |
-| 🇮🇹 Italie | IT | 2 lettres + 11 chiffres | `IT12345678901` | 13 |
-| 🇪🇸 Espagne | ES | 2 lettres + 9-11 car. | `ES12345678901` | 11-13 |
-| 🇳🇱 Pays-Bas | NL | 2 lettres + 9 chiffres + 3 car. | `NL123456789B01` | 14 |
-| 🇵🇹 Portugal | PT | 2 lettres + 9 chiffres | `PT123456789` | 11 |
-| 🇦🇹 Autriche | AT | 2 lettres + 'U' + 8 chiffres | `ATU12345678` | 11 |
-| 🇸🇪 Suède | SE | 2 lettres + 12 chiffres | `SE123456789001` | 14 |
-| 🇵🇱 Pologne | PL | 2 lettres + 10 chiffres | `PL1234567890` | 12 |
-| 🇬🇷 Grèce | EL | 2 lettres + 9 chiffres | `EL123456789` | 11 |
-| 🇩🇰 Danemark | DK | 2 lettres + 8 chiffres | `DK12345678` | 10 |
-| 🇫🇮 Finlande | FI | 2 lettres + 8 chiffres | `FI12345678` | 10 |
-| 🇮🇪 Irlande | IE | 2 lettres + 8-9 car. | `IE1234567A` | 10-11 |
-| 🇱🇺 Luxembourg | LU | 2 lettres + 8 chiffres | `LU12345678` | 10 |
+| Pays          | Code | Format                          | Exemple          | Longueur |
+| ------------- | ---- | ------------------------------- | ---------------- | -------- |
+| 🇫🇷 France     | FR   | 2 lettres + 11 chiffres         | `FR12345678901`  | 13       |
+| 🇩🇪 Allemagne  | DE   | 2 lettres + 9 chiffres          | `DE123456789`    | 11       |
+| 🇧🇪 Belgique   | BE   | 2 lettres + 10 chiffres         | `BE0123456789`   | 12       |
+| 🇮🇹 Italie     | IT   | 2 lettres + 11 chiffres         | `IT12345678901`  | 13       |
+| 🇪🇸 Espagne    | ES   | 2 lettres + 9-11 car.           | `ES12345678901`  | 11-13    |
+| 🇳🇱 Pays-Bas   | NL   | 2 lettres + 9 chiffres + 3 car. | `NL123456789B01` | 14       |
+| 🇵🇹 Portugal   | PT   | 2 lettres + 9 chiffres          | `PT123456789`    | 11       |
+| 🇦🇹 Autriche   | AT   | 2 lettres + 'U' + 8 chiffres    | `ATU12345678`    | 11       |
+| 🇸🇪 Suède      | SE   | 2 lettres + 12 chiffres         | `SE123456789001` | 14       |
+| 🇵🇱 Pologne    | PL   | 2 lettres + 10 chiffres         | `PL1234567890`   | 12       |
+| 🇬🇷 Grèce      | EL   | 2 lettres + 9 chiffres          | `EL123456789`    | 11       |
+| 🇩🇰 Danemark   | DK   | 2 lettres + 8 chiffres          | `DK12345678`     | 10       |
+| 🇫🇮 Finlande   | FI   | 2 lettres + 8 chiffres          | `FI12345678`     | 10       |
+| 🇮🇪 Irlande    | IE   | 2 lettres + 8-9 car.            | `IE1234567A`     | 10-11    |
+| 🇱🇺 Luxembourg | LU   | 2 lettres + 8 chiffres          | `LU12345678`     | 10       |
 
 **Note** : Le composant accepte de 8 à 12 caractères alphanumériques après le code pays, ce qui couvre tous les formats européens (sauf NL qui fait 14 caractères au total et est tronqué à 13).
 
 ## Tests
 
 Le composant est entièrement testé avec **32 tests** couvrant :
+
 - Validation du format européen
 - Numéros de TVA réels de 10 pays différents
 - Conversion automatique en majuscules
@@ -273,6 +275,7 @@ Le composant est déjà intégré dans les formulaires suivants :
 **Note importante** : Ce composant valide uniquement le **format** du numéro de TVA, pas son **existence réelle**.
 
 Pour vérifier qu'un numéro de TVA existe vraiment, vous devez :
+
 1. Utiliser l'API VIES (VAT Information Exchange System) de l'UE
 2. Effectuer cette vérification côté serveur
 3. Endpoint : `http://ec.europa.eu/taxation_customs/vies/services/checkVatService`
@@ -300,16 +303,16 @@ async function verifyVat(vatNumber: string) {
 
 ## Différences avec un input standard
 
-| Fonctionnalité | `<input type="text">` | `<VatInput>` |
-|----------------|----------------------|--------------|
-| Validation format | ❌ | ✅ |
-| Messages personnalisés | ❌ | ✅ |
-| Conversion majuscules | ❌ | ✅ |
-| Nettoyage auto | ❌ | ✅ |
-| Support multi-pays | ❌ | ✅ |
-| Limitation longueur | ❌ | ✅ |
-| Événements validation | ❌ | ✅ |
-| Styling erreur | ❌ | ✅ |
+| Fonctionnalité         | `<input type="text">` | `<VatInput>` |
+| ---------------------- | --------------------- | ------------ |
+| Validation format      | ❌                    | ✅           |
+| Messages personnalisés | ❌                    | ✅           |
+| Conversion majuscules  | ❌                    | ✅           |
+| Nettoyage auto         | ❌                    | ✅           |
+| Support multi-pays     | ❌                    | ✅           |
+| Limitation longueur    | ❌                    | ✅           |
+| Événements validation  | ❌                    | ✅           |
+| Styling erreur         | ❌                    | ✅           |
 
 ## Voir aussi
 

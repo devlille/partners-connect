@@ -1,4 +1,4 @@
-import { h, resolveComponent } from 'vue';
+import { h, resolveComponent } from "vue";
 
 /**
  * Composable pour créer une colonne "Actions" standardisée dans les tableaux
@@ -13,25 +13,25 @@ export const useTableActions = () => {
   function createActionColumn(
     accessorKey: string,
     getUrl: (row: any) => string,
-    title: string = 'Voir'
+    title: string = "Voir",
   ) {
     return {
-      header: 'Actions',
+      header: "Actions",
       accessorKey,
       cell: (info: any) => {
         const row = info.row.original;
-        return h(resolveComponent('UButton'), {
+        return h(resolveComponent("UButton"), {
           onClick: () => {
             navigateTo(getUrl(row));
           },
-          icon: 'i-heroicons-arrow-right-circle',
-          size: 'md',
-          color: 'primary',
-          variant: 'ghost',
+          icon: "i-heroicons-arrow-right-circle",
+          size: "md",
+          color: "primary",
+          variant: "ghost",
           square: true,
-          title
+          title,
         });
-      }
+      },
     };
   }
 
@@ -45,19 +45,19 @@ export const useTableActions = () => {
     color?: string;
     title?: string;
   }) {
-    return h(resolveComponent('UButton'), {
+    return h(resolveComponent("UButton"), {
       onClick: options.onClick,
-      icon: options.icon || 'i-heroicons-arrow-right-circle',
-      size: 'md',
-      color: options.color || 'primary',
-      variant: 'ghost',
+      icon: options.icon || "i-heroicons-arrow-right-circle",
+      size: "md",
+      color: options.color || "primary",
+      variant: "ghost",
       square: true,
-      title: options.title || ''
+      title: options.title || "",
     });
   }
 
   return {
     createActionColumn,
-    createActionButton
+    createActionButton,
   };
 };

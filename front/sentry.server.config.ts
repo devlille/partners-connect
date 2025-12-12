@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/nuxt";
- 
+
 Sentry.init({
   dsn: "https://4ac61844ee024160b96d38a043951500@o364590.ingest.us.sentry.io/4510385303322624",
 

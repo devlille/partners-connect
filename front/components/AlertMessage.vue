@@ -1,9 +1,5 @@
 <template>
-  <div
-    v-if="modelValue"
-    :class="alertClasses"
-    role="alert"
-  >
+  <div v-if="modelValue" :class="alertClasses" role="alert">
     <div class="flex items-start">
       <div v-if="showIcon" class="flex-shrink-0">
         <UIcon :name="iconName" :class="iconClasses" />

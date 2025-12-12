@@ -7,18 +7,12 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <!-- Validated Filter -->
       <div class="flex items-center gap-2">
-        <UCheckbox
-          v-model="internalValidated"
-          :label="$t('sponsors.filters.validated')"
-        />
+        <UCheckbox v-model="internalValidated" :label="$t('sponsors.filters.validated')" />
       </div>
 
       <!-- Paid Filter -->
       <div class="flex items-center gap-2">
-        <UCheckbox
-          v-model="internalPaid"
-          :label="$t('sponsors.filters.paid')"
-        />
+        <UCheckbox v-model="internalPaid" :label="$t('sponsors.filters.paid')" />
       </div>
 
       <!-- Agreement Generated Filter -->
@@ -39,10 +33,7 @@
 
       <!-- Suggestion Filter -->
       <div class="flex items-center gap-2">
-        <UCheckbox
-          v-model="internalSuggestion"
-          :label="$t('sponsors.filters.suggestion')"
-        />
+        <UCheckbox v-model="internalSuggestion" :label="$t('sponsors.filters.suggestion')" />
       </div>
     </div>
   </fieldset>

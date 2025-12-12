@@ -5,16 +5,9 @@
       <div class="flex items-center justify-between">
         <div>
           <PageTitle>Intégrations</PageTitle>
-          <p class="mt-1 text-sm text-gray-500">
-            Gérez les intégrations de votre événement
-          </p>
+          <p class="mt-1 text-sm text-gray-500">Gérez les intégrations de votre événement</p>
         </div>
-        <UButton
-          color="primary"
-          size="lg"
-          icon="i-heroicons-plus"
-          @click="openCreateModal"
-        >
+        <UButton color="primary" size="lg" icon="i-heroicons-plus" @click="openCreateModal">
           Ajouter une intégration
         </UButton>
       </div>

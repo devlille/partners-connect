@@ -101,17 +101,42 @@
         </div>
 
         <div class="bg-white rounded-lg shadow p-6">
-          <h2 id="organiser-section" class="text-lg font-semibold text-gray-900 mb-4">Organisateur assigné</h2>
-          <div v-if="partnership?.organiser" class="flex items-center justify-between p-4 bg-gray-50 rounded-lg" role="region" aria-labelledby="organiser-section">
+          <h2 id="organiser-section" class="text-lg font-semibold text-gray-900 mb-4">
+            Organisateur assigné
+          </h2>
+          <div
+            v-if="partnership?.organiser"
+            class="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+            role="region"
+            aria-labelledby="organiser-section"
+          >
             <div class="flex items-center gap-3">
-              <div v-if="partnership.organiser.picture_url" class="w-10 h-10 rounded-full overflow-hidden">
-                <img :src="partnership.organiser.picture_url" :alt="`Photo de profil de ${partnership.organiser.display_name || partnership.organiser.email}`" class="w-full h-full object-cover">
+              <div
+                v-if="partnership.organiser.picture_url"
+                class="w-10 h-10 rounded-full overflow-hidden"
+              >
+                <img
+                  :src="partnership.organiser.picture_url"
+                  :alt="`Photo de profil de ${partnership.organiser.display_name || partnership.organiser.email}`"
+                  class="w-full h-full object-cover"
+                />
               </div>
-              <div v-else class="w-10 h-10 rounded-full bg-primary-500 text-white flex items-center justify-center" role="img" :aria-label="`Initiales de ${partnership.organiser.display_name || partnership.organiser.email}`">
-                <span class="text-sm font-semibold" aria-hidden="true">{{ getInitials(partnership.organiser.display_name || partnership.organiser.email) }}</span>
+              <div
+                v-else
+                class="w-10 h-10 rounded-full bg-primary-500 text-white flex items-center justify-center"
+                role="img"
+                :aria-label="`Initiales de ${partnership.organiser.display_name || partnership.organiser.email}`"
+              >
+                <span
+                  class="text-sm font-semibold"
+                  aria-hidden="true"
+                  >{{ getInitials(partnership.organiser.display_name || partnership.organiser.email) }}</span
+                >
               </div>
               <div>
-                <div class="text-sm font-medium text-gray-900">{{ partnership.organiser.display_name || partnership.organiser.email }}</div>
+                <div class="text-sm font-medium text-gray-900">
+                  {{ partnership.organiser.display_name || partnership.organiser.email }}
+                </div>
                 <div class="text-xs text-gray-500">{{ partnership.organiser.email }}</div>
               </div>
             </div>
@@ -127,14 +152,21 @@
               Retirer
             </UButton>
           </div>
-          <div v-else class="p-4 bg-gray-50 rounded-lg" role="region" aria-labelledby="organiser-section">
+          <div
+            v-else
+            class="p-4 bg-gray-50 rounded-lg"
+            role="region"
+            aria-labelledby="organiser-section"
+          >
             <p class="text-sm text-gray-600 mb-3">Aucun organisateur assigné</p>
             <div v-if="loadingUsers" class="text-sm text-gray-500" role="status" aria-live="polite">
               <i class="i-heroicons-arrow-path animate-spin mr-2" aria-hidden="true" />
               Chargement des utilisateurs...
             </div>
             <div v-else class="flex gap-3">
-              <label for="organiser-select" class="sr-only">Sélectionner un membre de l'équipe pour gérer ce partenariat</label>
+              <label for="organiser-select" class="sr-only"
+                >Sélectionner un membre de l'équipe pour gérer ce partenariat</label
+              >
               <select
                 id="organiser-select"
                 v-model="selectedUserEmail"
@@ -148,7 +180,8 @@
                 </option>
               </select>
               <span id="organiser-help" class="sr-only">
-                Choisissez un membre de l'équipe pour gérer ce partenariat. Seuls les membres de votre organisation peuvent être assignés.
+                Choisissez un membre de l'équipe pour gérer ce partenariat. Seuls les membres de
+                votre organisation peuvent être assignés.
               </span>
               <UButton
                 color="primary"
@@ -161,7 +194,13 @@
                 Assigner
               </UButton>
             </div>
-            <p v-if="assignError" id="organiser-error" class="text-sm text-red-600 mt-2" role="alert" aria-live="assertive">
+            <p
+              v-if="assignError"
+              id="organiser-error"
+              class="text-sm text-red-600 mt-2"
+              role="alert"
+              aria-live="assertive"
+            >
               {{ assignError }}
             </p>
           </div>

@@ -4,9 +4,7 @@
     <div class="bg-white border-b border-gray-200 p-6">
       <div class="max-w-4xl mx-auto">
         <PageTitle>Connexion</PageTitle>
-        <p class="mt-1 text-sm text-gray-500">
-          Espace partenaires
-        </p>
+        <p class="mt-1 text-sm text-gray-500">Espace partenaires</p>
       </div>
     </div>
 
@@ -61,12 +59,7 @@
             </div>
 
             <div class="text-center">
-              <UButton
-                to="/"
-                color="gray"
-                variant="ghost"
-                size="lg"
-              >
+              <UButton to="/" color="gray" variant="ghost" size="lg">
                 <template #leading>
                   <UIcon name="i-heroicons-arrow-left" />
                 </template>

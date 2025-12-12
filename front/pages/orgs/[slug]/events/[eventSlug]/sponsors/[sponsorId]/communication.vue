@@ -19,7 +19,10 @@
 
         <TableSkeleton v-if="loadingCommunication" :columns="2" :rows="1" />
 
-        <div v-else-if="communicationError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div
+          v-else-if="communicationError"
+          class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded"
+        >
           {{ communicationError }}
         </div>
 
@@ -31,16 +34,25 @@
               </div>
               <div class="flex-1">
                 <h3 class="text-sm font-medium text-gray-900 mb-1">Date de communication prévue</h3>
-                <p v-if="communicationData?.publication_date && communicationData.publication_date !== null" class="text-2xl font-semibold text-gray-900">
+                <p
+                  v-if="communicationData?.publication_date && communicationData.publication_date !== null"
+                  class="text-2xl font-semibold text-gray-900"
+                >
                   {{ formatDateSafe(communicationData.publication_date) }}
                 </p>
-                <p v-else class="text-lg text-gray-500 italic">
-                  Aucune date planifiée
-                </p>
+                <p v-else class="text-lg text-gray-500 italic">Aucune date planifiée</p>
                 <p class="text-sm text-gray-600 mt-2">
                   Statut:
-                  <span v-if="!communicationData?.publication_date || communicationData.publication_date === null" class="text-orange-600 font-medium">Non planifié</span>
-                  <span v-else-if="isDatePassed(communicationData.publication_date)" class="text-green-600 font-medium">Effectuée</span>
+                  <span
+                    v-if="!communicationData?.publication_date || communicationData.publication_date === null"
+                    class="text-orange-600 font-medium"
+                    >Non planifié</span
+                  >
+                  <span
+                    v-else-if="isDatePassed(communicationData.publication_date)"
+                    class="text-green-600 font-medium"
+                    >Effectuée</span
+                  >
                   <span v-else class="text-blue-600 font-medium">Planifiée</span>
                 </p>
               </div>

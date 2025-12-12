@@ -7,42 +7,51 @@ Composant Vue pour gérer les différents types d'options de sponsoring lors de 
 ## Types d'options supportés
 
 ### 1. Text (`text`)
+
 Option simple avec checkbox uniquement.
 
 **Exemple d'utilisation :**
+
 - Logo sur le site web
 - Mention dans la newsletter
 
 **Propriétés :**
+
 - `name`: Nom de l'option
 - `description`: Description optionnelle
 - `price`: Prix optionnel
 
 **Rendu :**
+
 ```
 ☐ Logo sur le site web - 500 €
 ```
 
 ### 2. Typed Quantitative (`typed_quantitative`)
+
 Option avec quantité variable définie par l'utilisateur.
 
 **Exemple d'utilisation :**
+
 - Offres d'emploi (nombre variable)
 - Goodies personnalisés
 
 **Propriétés :**
+
 - `name`: Nom de l'option
 - `description`: Description optionnelle
 - `price`: Prix par unité
 - `type_descriptor`: Type de quantité (ex: `job_offer`)
 
 **Rendu :**
+
 ```
 ☐ Offres d'emploi - 100 € / unité
   Quantité : [___3___]
 ```
 
 **Données envoyées :**
+
 ```typescript
 {
   type: 'quantitative_selection',
@@ -52,13 +61,16 @@ Option avec quantité variable définie par l'utilisateur.
 ```
 
 ### 3. Typed Number (`typed_number`)
+
 Option avec quantité fixe (non modifiable par l'utilisateur).
 
 **Exemple d'utilisation :**
+
 - Pack de 10 tickets
 - 5 badges VIP
 
 **Propriétés :**
+
 - `name`: Nom de l'option
 - `description`: Description optionnelle
 - `price`: Prix total
@@ -66,11 +78,13 @@ Option avec quantité fixe (non modifiable par l'utilisateur).
 - `fixed_quantity`: Quantité fixe
 
 **Rendu :**
+
 ```
 ☐ Pack de tickets (10 unités) - 200 €
 ```
 
 **Données envoyées :**
+
 ```typescript
 {
   type: 'number_selection',
@@ -80,13 +94,16 @@ Option avec quantité fixe (non modifiable par l'utilisateur).
 ```
 
 ### 4. Typed Selectable (`typed_selectable`)
+
 Option avec choix parmi des valeurs prédéfinies.
 
 **Exemple d'utilisation :**
+
 - Emplacement de stand (A1, A2, B1, B2)
 - Taille de logo (Small, Medium, Large)
 
 **Propriétés :**
+
 - `name`: Nom de l'option
 - `description`: Description optionnelle
 - `price`: Prix
@@ -94,6 +111,7 @@ Option avec choix parmi des valeurs prédéfinies.
 - `selectable_values`: Liste des valeurs possibles
 
 **Rendu :**
+
 ```
 ☐ Emplacement de stand - 1000 €
   Choisissez : [-- Sélectionnez une option --▼]
@@ -103,6 +121,7 @@ Option avec choix parmi des valeurs prédéfinies.
 ```
 
 **Données envoyées :**
+
 ```typescript
 {
   type: 'selectable_selection',
@@ -132,16 +151,16 @@ const availableOptions = ref<SponsoringOptionSchema[]>([]);
 
 ## Props
 
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `legend` | `string` | Oui | Titre de la section d'options |
-| `options` | `SponsoringOptionSchema[]` | Oui | Liste des options disponibles |
-| `modelValue` | `PartnershipOptionSelection[]` | Oui | Sélections actuelles (v-model) |
+| Prop         | Type                           | Required | Description                    |
+| ------------ | ------------------------------ | -------- | ------------------------------ |
+| `legend`     | `string`                       | Oui      | Titre de la section d'options  |
+| `options`    | `SponsoringOptionSchema[]`     | Oui      | Liste des options disponibles  |
+| `modelValue` | `PartnershipOptionSelection[]` | Oui      | Sélections actuelles (v-model) |
 
 ## Events
 
-| Event | Payload | Description |
-|-------|---------|-------------|
+| Event               | Payload                        | Description                          |
+| ------------------- | ------------------------------ | ------------------------------------ |
 | `update:modelValue` | `PartnershipOptionSelection[]` | Émis lorsque les sélections changent |
 
 ## Format des données
@@ -192,6 +211,7 @@ const partnershipData = {
 ## Validation
 
 Le composant effectue une validation de base :
+
 - Pour les quantités : minimum 1
 - Pour les sélectables : au moins une valeur doit être choisie si l'option est cochée
 

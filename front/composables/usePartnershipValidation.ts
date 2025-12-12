@@ -19,9 +19,12 @@ export const usePartnershipValidation = () => {
    */
   function areEmailsValid(emails: string | null | undefined): boolean {
     if (!emails) return false;
-    const emailList = emails.split(',').map(e => e.trim()).filter(e => e.length > 0);
+    const emailList = emails
+      .split(",")
+      .map((e) => e.trim())
+      .filter((e) => e.length > 0);
     if (emailList.length === 0) return false;
-    return emailList.every(email => isValidEmail(email));
+    return emailList.every((email) => isValidEmail(email));
   }
 
   /**
@@ -31,7 +34,7 @@ export const usePartnershipValidation = () => {
     if (!phone) return false;
     const phoneStr = phone.trim();
     // Doit contenir au moins 8 chiffres et respecter le format
-    const digitsOnly = phoneStr.replace(/[^\d]/g, '');
+    const digitsOnly = phoneStr.replace(/[^\d]/g, "");
     return phoneRegex.test(phoneStr) && digitsOnly.length >= 8;
   }
 
@@ -71,13 +74,16 @@ export const usePartnershipValidation = () => {
   /**
    * Vérifie si toutes les informations requises sont complètes
    */
-  function isAllDataComplete(partnership: ExtendedPartnershipItem | null, company: any | null): boolean {
+  function isAllDataComplete(
+    partnership: ExtendedPartnershipItem | null,
+    company: any | null,
+  ): boolean {
     return isPartnershipComplete(partnership) && isCompanyComplete(company);
   }
 
   return {
     isPartnershipComplete,
     isCompanyComplete,
-    isAllDataComplete
+    isAllDataComplete,
   };
 };

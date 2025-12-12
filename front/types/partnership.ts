@@ -1,4 +1,4 @@
-import type { PartnershipItemSchema, PartnershipOptionSelection } from '~/utils/api';
+import type { PartnershipItemSchema, PartnershipOptionSelection } from "~/utils/api";
 
 /**
  * Extension du type PartnershipItemSchema pour inclure les champs manquants de l'API

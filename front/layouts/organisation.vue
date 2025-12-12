@@ -2,9 +2,7 @@
   <div>
     <header>
       <MainTitle />
-      <button id="toggle-nav" aria-controls="main-nav" aria-expanded="false">
-        Menu
-      </button>
+      <button id="toggle-nav" aria-controls="main-nav" aria-expanded="false">Menu</button>
     </header>
     <div id="container">
       <NavigationMenu type="organisation" />

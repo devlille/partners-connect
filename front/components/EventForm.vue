@@ -19,24 +19,14 @@
           <label for="start_time" class="block text-sm font-medium text-gray-700 mb-2">
             Début <span class="text-red-500">*</span>
           </label>
-          <UInput
-            id="start_time"
-            v-model="form.start_time"
-            type="datetime-local"
-            class="w-full"
-          />
+          <UInput id="start_time" v-model="form.start_time" type="datetime-local" class="w-full" />
         </div>
 
         <div>
           <label for="end_time" class="block text-sm font-medium text-gray-700 mb-2">
             Fin <span class="text-red-500">*</span>
           </label>
-          <UInput
-            id="end_time"
-            v-model="form.end_time"
-            type="datetime-local"
-            class="w-full"
-          />
+          <UInput id="end_time" v-model="form.end_time" type="datetime-local" class="w-full" />
         </div>
       </div>
 
@@ -112,12 +102,7 @@
       </div>
 
       <div class="flex justify-end gap-3 pt-4">
-        <UButton
-          type="submit"
-          size="lg"
-          label="Valider"
-          icon="i-heroicons-check"
-        />
+        <UButton type="submit" size="lg" label="Valider" icon="i-heroicons-check" />
       </div>
     </form>
   </UCard>
@@ -135,4 +120,3 @@ function onSave() {
   emit('save', form.value)
 }
 </script>
-

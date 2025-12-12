@@ -18,39 +18,57 @@
           </div>
 
           <!-- Welcome message for non-validated partnerships -->
-          <div v-if="!loading && !error && partnership && !partnership.validated" class="mt-4 pt-4 border-t border-gray-200">
+          <div
+            v-if="!loading && !error && partnership && !partnership.validated"
+            class="mt-4 pt-4 border-t border-gray-200"
+          >
             <p class="text-sm text-gray-700 leading-relaxed">
-              Voici la page dédiée à votre partenariat avec <strong>{{ partnership.event_name }}</strong>.
-              Nous vous recommandons de l'ajouter à vos favoris pour y accéder facilement.
-              Le lien vers cette page vous sera également communiqué dans nos prochains échanges par email.
+              Voici la page dédiée à votre partenariat avec
+              <strong>{{ partnership.event_name }}</strong
+              >. Nous vous recommandons de l'ajouter à vos favoris pour y accéder facilement. Le
+              lien vers cette page vous sera également communiqué dans nos prochains échanges par
+              email.
             </p>
             <p class="text-sm text-gray-700 leading-relaxed mt-3">
-              Votre demande de partenariat a bien été enregistrée et est actuellement en cours d'examen par l'équipe organisatrice.
-              Nous reviendrons vers vous très prochainement.
+              Votre demande de partenariat a bien été enregistrée et est actuellement en cours
+              d'examen par l'équipe organisatrice. Nous reviendrons vers vous très prochainement.
             </p>
           </div>
 
           <!-- Information message for validated but unpaid partnerships -->
-          <div v-if="!loading && !error && partnership && partnership.validated && !partnership.paid" class="mt-4 pt-4 border-t border-gray-200">
+          <div
+            v-if="!loading && !error && partnership && partnership.validated && !partnership.paid"
+            class="mt-4 pt-4 border-t border-gray-200"
+          >
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <div class="flex items-start gap-3">
-                <i class="i-heroicons-information-circle text-blue-600 text-xl shrink-0 mt-0.5" aria-hidden="true" />
+                <i
+                  class="i-heroicons-information-circle text-blue-600 text-xl shrink-0 mt-0.5"
+                  aria-hidden="true"
+                />
                 <div>
                   <h3 class="text-sm font-semibold text-blue-900 mb-2">
                     Complétez vos informations
                   </h3>
                   <p class="text-sm text-blue-700 mb-3">
-                    Votre partenariat a été validé ! Pour finaliser le processus, merci de compléter les informations manquantes dans les onglets suivants :
+                    Votre partenariat a été validé ! Pour finaliser le processus, merci de compléter
+                    les informations manquantes dans les onglets suivants :
                   </p>
                   <ul class="text-sm text-blue-700 space-y-1 ml-5 list-disc">
                     <li>
-                      <NuxtLink :to="`/${eventSlug}/${partnershipId}`" class="font-medium hover:underline">
+                      <NuxtLink
+                        :to="`/${eventSlug}/${partnershipId}`"
+                        class="font-medium hover:underline"
+                      >
                         Partenariat
                       </NuxtLink>
                       - Vérifiez et complétez vos coordonnées de contact
                     </li>
                     <li>
-                      <NuxtLink :to="`/${eventSlug}/${partnershipId}/company`" class="font-medium hover:underline">
+                      <NuxtLink
+                        :to="`/${eventSlug}/${partnershipId}/company`"
+                        class="font-medium hover:underline"
+                      >
                         Entreprise
                       </NuxtLink>
                       - Renseignez les informations de votre société
@@ -78,13 +96,18 @@
           aria-labelledby="suggestion-heading"
         >
           <div class="flex items-start gap-3">
-            <i class="i-heroicons-light-bulb text-amber-600 text-xl flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <i
+              class="i-heroicons-light-bulb text-amber-600 text-xl flex-shrink-0 mt-0.5"
+              aria-hidden="true"
+            />
             <div class="flex-1">
               <h3 id="suggestion-heading" class="text-sm font-semibold text-amber-900 mb-2">
                 Nouveau pack suggéré
               </h3>
               <p class="text-sm text-amber-700 mb-4">
-                L'équipe organisatrice vous propose le pack <strong>{{ partnership.suggested_pack_name }}</strong> en remplacement du pack <strong>{{ partnership.selected_pack_name }}</strong> que vous aviez sélectionné.
+                L'équipe organisatrice vous propose le pack
+                <strong>{{ partnership.suggested_pack_name }}</strong> en remplacement du pack
+                <strong>{{ partnership.selected_pack_name }}</strong> que vous aviez sélectionné.
               </p>
               <div class="flex gap-3">
                 <UButton
@@ -163,18 +186,20 @@
           class="bg-white rounded-lg shadow p-6 mt-6"
           aria-labelledby="documents-heading"
         >
-          <h2 id="documents-heading" class="text-lg font-semibold text-gray-900 mb-4">
-            Documents
-          </h2>
+          <h2 id="documents-heading" class="text-lg font-semibold text-gray-900 mb-4">Documents</h2>
 
           <!-- Message if no documents available -->
           <div
             v-if="!partnership.quote_url && !partnership.invoice_url && !partnership.agreement_url && !partnership.agreement_signed_url"
             class="flex items-start gap-3 p-4 bg-gray-50 rounded-lg"
           >
-            <i class="i-heroicons-information-circle text-gray-400 text-xl shrink-0 mt-0.5" aria-hidden="true" />
+            <i
+              class="i-heroicons-information-circle text-gray-400 text-xl shrink-0 mt-0.5"
+              aria-hidden="true"
+            />
             <p class="text-sm text-gray-600">
-              Aucun document n'est disponible pour le moment. Les documents seront générés par l'équipe organisatrice.
+              Aucun document n'est disponible pour le moment. Les documents seront générés par
+              l'équipe organisatrice.
             </p>
           </div>
 
@@ -234,7 +259,9 @@
               v-if="partnership.agreement_url || partnership.agreement_signed_url"
               class="space-y-3"
             >
-              <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+              <div
+                class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              >
                 <div class="flex items-center gap-3">
                   <i class="i-heroicons-document-check text-gray-400 text-xl" aria-hidden="true" />
                   <div>
@@ -283,13 +310,17 @@
                 class="p-4 border border-blue-200 bg-blue-50 rounded-lg"
               >
                 <div class="flex items-start gap-3">
-                  <i class="i-heroicons-arrow-up-tray text-blue-600 text-xl flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <i
+                    class="i-heroicons-arrow-up-tray text-blue-600 text-xl flex-shrink-0 mt-0.5"
+                    aria-hidden="true"
+                  />
                   <div class="flex-1">
                     <h4 class="text-sm font-semibold text-blue-900 mb-1">
                       Uploader la convention signée
                     </h4>
                     <p class="text-xs text-blue-700 mb-3">
-                      Une fois la convention signée, veuillez uploader le document signé au format PDF.
+                      Une fois la convention signée, veuillez uploader le document signé au format
+                      PDF.
                     </p>
 
                     <AlertMessage
@@ -360,13 +391,18 @@
           class="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-6"
         >
           <div class="flex items-start gap-3">
-            <i class="i-heroicons-information-circle text-blue-600 text-xl flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <i
+              class="i-heroicons-information-circle text-blue-600 text-xl flex-shrink-0 mt-0.5"
+              aria-hidden="true"
+            />
             <div>
               <h3 class="text-sm font-semibold text-blue-900 mb-1">
                 Partenariat en attente de validation
               </h3>
               <p class="text-sm text-blue-700">
-                Votre demande de partenariat est en cours de traitement. Les informations de facturation seront disponibles une fois que votre partenariat aura été validé par nos équipes.
+                Votre demande de partenariat est en cours de traitement. Les informations de
+                facturation seront disponibles une fois que votre partenariat aura été validé par
+                nos équipes.
               </p>
             </div>
           </div>
@@ -560,7 +596,7 @@ function triggerAgreementFileInput() {
 async function handleAgreementFileSelect(event: Event) {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
-  
+
   if (!file) return;
 
   // Vérifier que c'est un PDF

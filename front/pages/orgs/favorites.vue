@@ -17,17 +17,18 @@
     </div>
 
     <div class="p-6">
-      <div v-if="favoritesList.length === 0" class="bg-gray-50 border border-gray-200 text-gray-700 px-4 py-8 rounded text-center">
+      <div
+        v-if="favoritesList.length === 0"
+        class="bg-gray-50 border border-gray-200 text-gray-700 px-4 py-8 rounded text-center"
+      >
         <i class="i-heroicons-star text-4xl text-gray-400 mb-2" />
         <p class="text-lg font-medium mb-1">Aucun événement favori</p>
-        <p class="text-sm text-gray-500">Ajoutez des événements à vos favoris pour y accéder rapidement depuis cette page.</p>
+        <p class="text-sm text-gray-500">
+          Ajoutez des événements à vos favoris pour y accéder rapidement depuis cette page.
+        </p>
       </div>
 
-      <UTable
-        v-else
-        :data="favoritesList"
-        :columns="columns"
-      />
+      <UTable v-else :data="favoritesList" :columns="columns" />
     </div>
   </Dashboard>
 </template>

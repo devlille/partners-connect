@@ -3,7 +3,7 @@
  * Inclut gestion du focus trap, fermeture ESC, et accessibilité
  */
 
-import type { UseModalOptions, UseModalReturn, ModalSize } from '~/types/modal';
+import type { UseModalOptions, UseModalReturn, ModalSize } from "~/types/modal";
 
 export function useModal(options: UseModalOptions = {}): UseModalReturn {
   const { defaultSize = "md", autoFocus = true, closeOnEsc = true, onOpen, onClose } = options;
@@ -24,7 +24,7 @@ export function useModal(options: UseModalOptions = {}): UseModalReturn {
         const modal = document.querySelector('[role="dialog"]');
         if (modal) {
           const focusable = modal.querySelector<HTMLElement>(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
           );
           focusable?.focus();
         }
@@ -33,7 +33,7 @@ export function useModal(options: UseModalOptions = {}): UseModalReturn {
 
     // Empêcher le scroll du body
     if (import.meta.client) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     }
   }
 
@@ -46,7 +46,7 @@ export function useModal(options: UseModalOptions = {}): UseModalReturn {
 
     // Restaurer le scroll du body
     if (import.meta.client) {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
   }
 
@@ -71,26 +71,26 @@ export function useModal(options: UseModalOptions = {}): UseModalReturn {
   // Fermer avec la touche ESC
   if (closeOnEsc && import.meta.client) {
     const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && isOpen.value) {
+      if (event.key === "Escape" && isOpen.value) {
         close();
       }
     };
 
     // Ajouter l'event listener immédiatement
-    document.addEventListener('keydown', handleEscapeKey);
+    document.addEventListener("keydown", handleEscapeKey);
 
     // Cleanup au unmount
     onUnmounted(() => {
-      document.removeEventListener('keydown', handleEscapeKey);
+      document.removeEventListener("keydown", handleEscapeKey);
       if (isOpen.value) {
-        document.body.style.overflow = '';
+        document.body.style.overflow = "";
       }
     });
   } else {
     // Cleanup même sans ESC listener
     onUnmounted(() => {
       if (import.meta.client && isOpen.value) {
-        document.body.style.overflow = '';
+        document.body.style.overflow = "";
       }
     });
   }

@@ -1,13 +1,13 @@
 export default defineNuxtPlugin((nuxtApp) => {
-  const { $i18n } = nuxtApp
+  const { $i18n } = nuxtApp;
 
   if (!$i18n) {
-    console.error('i18n plugin not found')
-    return
+    console.error("i18n plugin not found");
+    return;
   }
 
   // French translations
-  $i18n.setLocaleMessage('fr', {
+  $i18n.setLocaleMessage("fr", {
     common: {
       save: "Enregistrer",
       cancel: "Annuler",
@@ -29,7 +29,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       no: "Non",
       all: "Tous",
       clear: "Effacer",
-      activeFilters: "Filtres actifs"
+      activeFilters: "Filtres actifs",
     },
     sponsors: {
       title: "Sponsors",
@@ -51,13 +51,13 @@ export default defineNuxtPlugin((nuxtApp) => {
         noResults: "Aucun sponsor ne correspond aux filtres sélectionnés",
         allPacks: "Tous les packs",
         statusFilters: "Filtres de statut",
-        filterPanel: "Filtrer les sponsors"
-      }
-    }
-  })
+        filterPanel: "Filtrer les sponsors",
+      },
+    },
+  });
 
   // English translations
-  $i18n.setLocaleMessage('en', {
+  $i18n.setLocaleMessage("en", {
     common: {
       save: "Save",
       cancel: "Cancel",
@@ -73,7 +73,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       activeFilters: "Active Filters",
       yes: "Yes",
       no: "No",
-      all: "All"
+      all: "All",
     },
     sponsors: {
       title: "Sponsors",
@@ -95,13 +95,13 @@ export default defineNuxtPlugin((nuxtApp) => {
         noResults: "No sponsors match the selected filters",
         allPacks: "All Packs",
         statusFilters: "Status Filters",
-        filterPanel: "Filter Sponsors"
-      }
-    }
-  })
+        filterPanel: "Filter Sponsors",
+      },
+    },
+  });
 
   // Spanish translations
-  $i18n.setLocaleMessage('es', {
+  $i18n.setLocaleMessage("es", {
     common: {
       save: "Guardar",
       cancel: "Cancelar",
@@ -117,7 +117,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       activeFilters: "Filtros Activos",
       yes: "Sí",
       no: "No",
-      all: "Todos"
+      all: "Todos",
     },
     sponsors: {
       title: "Patrocinadores",
@@ -139,12 +139,12 @@ export default defineNuxtPlugin((nuxtApp) => {
         noResults: "Ningún patrocinador coincide con los filtros seleccionados",
         allPacks: "Todos los Paquetes",
         statusFilters: "Filtros de Estado",
-        filterPanel: "Filtrar Patrocinadores"
-      }
-    }
-  })
+        filterPanel: "Filtrar Patrocinadores",
+      },
+    },
+  });
 
-  console.log('✓ i18n translations loaded manually via plugin')
-  console.log('Current locale:', $i18n.locale.value)
-  console.log('Test translation:', $i18n.t('sponsors.filters.validated'))
-})
+  console.log("✓ i18n translations loaded manually via plugin");
+  console.log("Current locale:", $i18n.locale.value);
+  console.log("Test translation:", $i18n.t("sponsors.filters.validated"));
+});

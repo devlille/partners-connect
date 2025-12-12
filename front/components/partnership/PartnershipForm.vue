@@ -28,9 +28,7 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">
-          Pack
-        </label>
+        <label class="block text-sm font-medium text-gray-700 mb-2"> Pack </label>
         <UInput
           v-model="selectedPackDisplay"
           placeholder="Pack de sponsoring"
@@ -40,39 +38,39 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">
-          Options
-        </label>
+        <label class="block text-sm font-medium text-gray-700 mb-2"> Options </label>
         <div v-if="selectedOptions.length > 0" class="bg-gray-50 rounded-lg p-3">
           <div class="space-y-3">
-            <div
-              v-for="option in selectedOptions"
-              :key="option.id"
-              class="flex items-start gap-3"
-            >
+            <div v-for="option in selectedOptions" :key="option.id" class="flex items-start gap-3">
               <input
                 type="checkbox"
                 :id="`form-option-${option.id}`"
                 checked
                 disabled
                 class="mt-1 h-4 w-4 rounded border-gray-300 text-primary-600 cursor-not-allowed opacity-60"
-              >
-              <label
-                :for="`form-option-${option.id}`"
-                class="flex-1 cursor-not-allowed"
-              >
+              />
+              <label :for="`form-option-${option.id}`" class="flex-1 cursor-not-allowed">
                 <span class="block text-sm font-medium text-gray-900">
                   {{ option.name }}
                   <!-- Pour les options quantitatives: afficher "Quantité x Montant Unitaire" -->
-                  <span v-if="option.type === 'typed_quantitative' && option.quantity && option.price !== null && option.price !== undefined" class="text-gray-600">
+                  <span
+                    v-if="option.type === 'typed_quantitative' && option.quantity && option.price !== null && option.price !== undefined"
+                    class="text-gray-600"
+                  >
                     ({{ option.quantity }} x {{ option.price }} €)
                   </span>
                   <!-- Pour les options sélectables: afficher le texte et le prix du choix fait -->
-                  <span v-else-if="option.type === 'typed_selectable' && option.selected_value" class="text-gray-600">
+                  <span
+                    v-else-if="option.type === 'typed_selectable' && option.selected_value"
+                    class="text-gray-600"
+                  >
                     ({{ option.selected_value.value }} - {{ option.selected_value.price }} €)
                   </span>
                   <!-- Pour les autres options: afficher juste le prix -->
-                  <span v-else-if="option.price !== null && option.price !== undefined" class="text-gray-600">
+                  <span
+                    v-else-if="option.price !== null && option.price !== undefined"
+                    class="text-gray-600"
+                  >
                     ({{ option.price }} €)
                   </span>
                 </span>

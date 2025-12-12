@@ -1,4 +1,4 @@
-import { VALIDATION_MESSAGES } from '~/constants/validation';
+import { VALIDATION_MESSAGES } from "~/constants/validation";
 
 /**
  * Composable pour gérer la validation des formulaires d'intégration
@@ -7,11 +7,11 @@ import { VALIDATION_MESSAGES } from '~/constants/validation';
 export const useIntegrationFormValidation = <T extends Record<string, any>>(
   props: { modelValue: T },
   emit: {
-    (event: 'update:modelValue', value: T): void;
-    (event: 'update:valid', value: boolean): void;
+    (event: "update:modelValue", value: T): void;
+    (event: "update:valid", value: boolean): void;
   },
   requiredFields: (keyof T)[],
-  customValidators?: Partial<Record<keyof T, (value: any) => string | null>>
+  customValidators?: Partial<Record<keyof T, (value: any) => string | null>>,
 ) => {
   const localValue = reactive<T>({ ...props.modelValue });
   const errors = reactive<Partial<Record<keyof T, string>>>({});
@@ -20,13 +20,12 @@ export const useIntegrationFormValidation = <T extends Record<string, any>>(
    * Valide un champ spécifique
    */
   function validateField(field: keyof T, showError = true): boolean {
-    const value = typeof localValue[field] === 'string'
-      ? localValue[field]?.trim()
-      : localValue[field];
+    const value =
+      typeof localValue[field] === "string" ? localValue[field]?.trim() : localValue[field];
 
     // Vérifier si le champ est requis
     if (requiredFields.includes(field)) {
-      if (!value || (typeof value === 'string' && value === '')) {
+      if (!value || (typeof value === "string" && value === "")) {
         if (showError) errors[field] = VALIDATION_MESSAGES.REQUIRED;
         return false;
       }
@@ -41,7 +40,7 @@ export const useIntegrationFormValidation = <T extends Record<string, any>>(
       }
     }
 
-    if (showError) errors[field] = '';
+    if (showError) errors[field] = "";
     return true;
   }
 
@@ -63,27 +62,31 @@ export const useIntegrationFormValidation = <T extends Record<string, any>>(
    * Gère les changements d'input
    */
   function handleInput() {
-    emit('update:modelValue', { ...localValue } as T);
-    emit('update:valid', validateAll());
+    emit("update:modelValue", { ...localValue } as T);
+    emit("update:valid", validateAll());
   }
 
   /**
    * Réinitialise les erreurs
    */
   function clearErrors() {
-    Object.keys(errors).forEach(key => {
-      errors[key as keyof T] = '';
+    Object.keys(errors).forEach((key) => {
+      errors[key as keyof T] = "";
     });
   }
 
   // Watch pour les changements externes
-  watch(() => props.modelValue, (newVal) => {
-    Object.assign(localValue, newVal);
-  }, { deep: true });
+  watch(
+    () => props.modelValue,
+    (newVal) => {
+      Object.assign(localValue, newVal);
+    },
+    { deep: true },
+  );
 
   // Validation initiale
   watchEffect(() => {
-    emit('update:valid', validateAll());
+    emit("update:valid", validateAll());
   });
 
   return {
@@ -92,6 +95,6 @@ export const useIntegrationFormValidation = <T extends Record<string, any>>(
     validateField,
     validateAll,
     handleInput,
-    clearErrors
+    clearErrors,
   };
 };

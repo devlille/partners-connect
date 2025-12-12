@@ -33,9 +33,9 @@ export interface CacheConfig {
 export type CacheKey = string | number;
 
 export type CacheInvalidationStrategy =
-  | 'exact' // Invalider uniquement la clé exacte
-  | 'prefix' // Invalider toutes les clés commençant par le pattern
-  | 'all'; // Invalider tout le cache
+  | "exact" // Invalider uniquement la clé exacte
+  | "prefix" // Invalider toutes les clés commençant par le pattern
+  | "all"; // Invalider tout le cache
 
 export interface CacheStats {
   /** Nombre total d'entrées dans le cache */

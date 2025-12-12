@@ -1,15 +1,22 @@
-import type { MailjetConfig, QontoConfig, BilletwebConfig, OpenPlannerConfig, SlackConfig, WebhookConfig } from '~/types/integration';
+import type {
+  MailjetConfig,
+  QontoConfig,
+  BilletwebConfig,
+  OpenPlannerConfig,
+  SlackConfig,
+  WebhookConfig,
+} from "~/types/integration";
 
 /**
  * Factory pour créer une configuration Mailjet de test
  */
 export function createMailjetConfig(overrides?: Partial<MailjetConfig>): MailjetConfig {
   return {
-    api_key: 'test-api-key',
-    secret: 'test-secret',
-    sender_email: 'test@example.com',
-    sender_name: 'Test Sender',
-    ...overrides
+    api_key: "test-api-key",
+    secret: "test-secret",
+    sender_email: "test@example.com",
+    sender_name: "Test Sender",
+    ...overrides,
   };
 }
 
@@ -18,10 +25,10 @@ export function createMailjetConfig(overrides?: Partial<MailjetConfig>): Mailjet
  */
 export function createQontoConfig(overrides?: Partial<QontoConfig>): QontoConfig {
   return {
-    api_key: 'test-api-key',
-    secret: 'test-secret',
-    sandbox_token: 'test-token',
-    ...overrides
+    api_key: "test-api-key",
+    secret: "test-secret",
+    sandbox_token: "test-token",
+    ...overrides,
   };
 }
 
@@ -30,10 +37,10 @@ export function createQontoConfig(overrides?: Partial<QontoConfig>): QontoConfig
  */
 export function createBilletwebConfig(overrides?: Partial<BilletwebConfig>): BilletwebConfig {
   return {
-    basic: 'basic-auth-token',
-    event_id: '12345',
-    rate_id: '67890',
-    ...overrides
+    basic: "basic-auth-token",
+    event_id: "12345",
+    rate_id: "67890",
+    ...overrides,
   };
 }
 
@@ -42,9 +49,9 @@ export function createBilletwebConfig(overrides?: Partial<BilletwebConfig>): Bil
  */
 export function createOpenPlannerConfig(overrides?: Partial<OpenPlannerConfig>): OpenPlannerConfig {
   return {
-    api_key: 'test-api-key',
-    event_id: 'event-123',
-    ...overrides
+    api_key: "test-api-key",
+    event_id: "event-123",
+    ...overrides,
   };
 }
 
@@ -53,9 +60,9 @@ export function createOpenPlannerConfig(overrides?: Partial<OpenPlannerConfig>):
  */
 export function createSlackConfig(overrides?: Partial<SlackConfig>): SlackConfig {
   return {
-    token: 'xoxb-test-token',
-    channel: '#test-channel',
-    ...overrides
+    token: "xoxb-test-token",
+    channel: "#test-channel",
+    ...overrides,
   };
 }
 
@@ -64,9 +71,9 @@ export function createSlackConfig(overrides?: Partial<SlackConfig>): SlackConfig
  */
 export function createWebhookConfig(overrides?: Partial<WebhookConfig>): WebhookConfig {
   return {
-    url: 'https://example.com/webhook',
-    secret: 'test-secret-1234567890',
-    type: 'ALL',
-    ...overrides
+    url: "https://example.com/webhook",
+    secret: "test-secret-1234567890",
+    type: "ALL",
+    ...overrides,
   };
 }

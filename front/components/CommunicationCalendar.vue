@@ -13,12 +13,7 @@
           size="sm"
           @click="previousMonth"
         />
-        <UButton
-          variant="ghost"
-          color="neutral"
-          size="sm"
-          @click="goToToday"
-        >
+        <UButton variant="ghost" color="neutral" size="sm" @click="goToToday">
           Aujourd'hui
         </UButton>
         <UButton
@@ -32,7 +27,9 @@
     </div>
 
     <!-- Grille du calendrier -->
-    <div class="grid grid-cols-7 gap-px bg-gray-200 border border-gray-200 rounded-lg overflow-hidden">
+    <div
+      class="grid grid-cols-7 gap-px bg-gray-200 border border-gray-200 rounded-lg overflow-hidden"
+    >
       <!-- En-têtes des jours -->
       <div
         v-for="day in weekDays"

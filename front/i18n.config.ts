@@ -1,7 +1,7 @@
 export default defineI18nConfig(() => ({
   legacy: false,
-  locale: 'fr',
-  fallbackLocale: 'fr',
+  locale: "fr",
+  fallbackLocale: "fr",
   messages: {
     fr: {
       common: {
@@ -24,7 +24,7 @@ export default defineI18nConfig(() => ({
         yes: "Oui",
         no: "Non",
         clear: "Effacer",
-        activeFilters: "Filtres actifs"
+        activeFilters: "Filtres actifs",
       },
       sponsors: {
         title: "Sponsors",
@@ -46,9 +46,9 @@ export default defineI18nConfig(() => ({
           noResults: "Aucun sponsor ne correspond aux filtres sélectionnés",
           allPacks: "Tous les packs",
           statusFilters: "Filtres de statut",
-          filterPanel: "Filtrer les sponsors"
-        }
-      }
+          filterPanel: "Filtrer les sponsors",
+        },
+      },
     },
     en: {
       common: {
@@ -65,7 +65,7 @@ export default defineI18nConfig(() => ({
         clear: "Clear",
         activeFilters: "Active Filters",
         yes: "Yes",
-        no: "No"
+        no: "No",
       },
       sponsors: {
         title: "Sponsors",
@@ -87,9 +87,9 @@ export default defineI18nConfig(() => ({
           noResults: "No sponsors match the selected filters",
           allPacks: "All Packs",
           statusFilters: "Status Filters",
-          filterPanel: "Filter Sponsors"
-        }
-      }
+          filterPanel: "Filter Sponsors",
+        },
+      },
     },
     es: {
       common: {
@@ -106,7 +106,7 @@ export default defineI18nConfig(() => ({
         clear: "Limpiar",
         activeFilters: "Filtros Activos",
         yes: "Sí",
-        no: "No"
+        no: "No",
       },
       sponsors: {
         title: "Patrocinadores",
@@ -128,9 +128,9 @@ export default defineI18nConfig(() => ({
           noResults: "Ningún patrocinador coincide con los filtros seleccionados",
           allPacks: "Todos los Paquetes",
           statusFilters: "Filtros de Estado",
-          filterPanel: "Filtrar Patrocinadores"
-        }
-      }
-    }
-  }
-}))
+          filterPanel: "Filtrar Patrocinadores",
+        },
+      },
+    },
+  },
+}));

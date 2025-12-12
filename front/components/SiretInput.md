@@ -44,23 +44,23 @@ const company = ref({
 
 ## Props
 
-| Prop | Type | Défaut | Description |
-|------|------|--------|-------------|
-| `modelValue` | `string \| null` | - | Valeur du champ (v-model) |
-| `label` | `string` | `'SIRET'` | Texte du label |
-| `disabled` | `boolean` | `false` | Désactive le champ |
-| `required` | `boolean` | `false` | Marque le champ comme requis |
-| `hint` | `string` | - | Texte d'aide sous le champ |
-| `inputClass` | `string` | `'w-full'` | Classes CSS additionnelles |
-| `validate` | `boolean` | `true` | Active/désactive la validation |
-| `showErrorOnInput` | `boolean` | `false` | Affiche l'erreur pendant la saisie |
+| Prop               | Type             | Défaut     | Description                        |
+| ------------------ | ---------------- | ---------- | ---------------------------------- |
+| `modelValue`       | `string \| null` | -          | Valeur du champ (v-model)          |
+| `label`            | `string`         | `'SIRET'`  | Texte du label                     |
+| `disabled`         | `boolean`        | `false`    | Désactive le champ                 |
+| `required`         | `boolean`        | `false`    | Marque le champ comme requis       |
+| `hint`             | `string`         | -          | Texte d'aide sous le champ         |
+| `inputClass`       | `string`         | `'w-full'` | Classes CSS additionnelles         |
+| `validate`         | `boolean`        | `true`     | Active/désactive la validation     |
+| `showErrorOnInput` | `boolean`        | `false`    | Affiche l'erreur pendant la saisie |
 
 ## Événements
 
-| Événement | Payload | Description |
-|-----------|---------|-------------|
-| `update:modelValue` | `string \| null` | Émis quand la valeur change |
-| `validation` | `boolean` | Émis quand l'état de validation change |
+| Événement           | Payload          | Description                            |
+| ------------------- | ---------------- | -------------------------------------- |
+| `update:modelValue` | `string \| null` | Émis quand la valeur change            |
+| `validation`        | `boolean`        | Émis quand l'état de validation change |
 
 ## Exemples d'utilisation
 
@@ -164,16 +164,16 @@ Pour afficher l'erreur pendant la saisie, utilisez `show-error-on-input` :
 
 ## Exemples de valeurs
 
-| Valeur saisie | Valeur stockée | Valide | Message d'erreur |
-|---------------|----------------|--------|------------------|
-| `12345678901234` | `12345678901234` | ✅ Oui | - |
-| `123 456 789 01234` | `12345678901234` | ✅ Oui | - |
-| `123-456-789-01234` | `12345678901234` | ✅ Oui | - |
-| `123` | `123` | ❌ Non | "Numéro SIRET invalide (14 chiffres)" |
-| `12345678901` | `12345678901` | ❌ Non | "Numéro SIRET invalide (14 chiffres)" |
-| `ABC123` | `123` | ❌ Non | "Numéro SIRET invalide (14 chiffres)" |
-| (vide avec required) | `null` | ❌ Non | "Ce champ est requis" |
-| (vide sans required) | `null` | ✅ Oui | - |
+| Valeur saisie        | Valeur stockée   | Valide | Message d'erreur                      |
+| -------------------- | ---------------- | ------ | ------------------------------------- |
+| `12345678901234`     | `12345678901234` | ✅ Oui | -                                     |
+| `123 456 789 01234`  | `12345678901234` | ✅ Oui | -                                     |
+| `123-456-789-01234`  | `12345678901234` | ✅ Oui | -                                     |
+| `123`                | `123`            | ❌ Non | "Numéro SIRET invalide (14 chiffres)" |
+| `12345678901`        | `12345678901`    | ❌ Non | "Numéro SIRET invalide (14 chiffres)" |
+| `ABC123`             | `123`            | ❌ Non | "Numéro SIRET invalide (14 chiffres)" |
+| (vide avec required) | `null`           | ❌ Non | "Ce champ est requis"                 |
+| (vide sans required) | `null`           | ✅ Oui | -                                     |
 
 ## Tests
 

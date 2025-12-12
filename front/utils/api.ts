@@ -5,7 +5,7 @@
  * partners_connect API
  * OpenAPI spec version: 1.0.0
  */
-import { customFetch } from '../custom-instance';
+import { customFetch } from "../custom-instance";
 export type UserSession = UserSessionSchema;
 
 export type UserInfo = UserInfoSchema;
@@ -190,18 +190,17 @@ export interface MediaSchema {
   png_250: string;
 }
 
-export type SocialSchemaType = typeof SocialSchemaType[keyof typeof SocialSchemaType];
-
+export type SocialSchemaType = (typeof SocialSchemaType)[keyof typeof SocialSchemaType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const SocialSchemaType = {
-  LINKEDIN: 'LINKEDIN',
-  X: 'X',
-  BLUESKY: 'BLUESKY',
-  MASTODON: 'MASTODON',
-  INSTAGRAM: 'INSTAGRAM',
-  FACEBOOK: 'FACEBOOK',
-  YOUTUBE: 'YOUTUBE',
+  LINKEDIN: "LINKEDIN",
+  X: "X",
+  BLUESKY: "BLUESKY",
+  MASTODON: "MASTODON",
+  INSTAGRAM: "INSTAGRAM",
+  FACEBOOK: "FACEBOOK",
+  YOUTUBE: "YOUTUBE",
 } as const;
 
 export interface SocialSchema {
@@ -499,14 +498,14 @@ export interface PromoteJobOfferSchema {
 /**
  * Current promotion status
  */
-export type JobOfferPromotionResponseSchemaStatus = typeof JobOfferPromotionResponseSchemaStatus[keyof typeof JobOfferPromotionResponseSchemaStatus];
-
+export type JobOfferPromotionResponseSchemaStatus =
+  (typeof JobOfferPromotionResponseSchemaStatus)[keyof typeof JobOfferPromotionResponseSchemaStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const JobOfferPromotionResponseSchemaStatus = {
-  pending: 'pending',
-  approved: 'approved',
-  declined: 'declined',
+  pending: "pending",
+  approved: "approved",
+  declined: "declined",
 } as const;
 
 /**
@@ -749,7 +748,7 @@ export type TextDescription = string | null;
 export type TextPrice = number | null;
 
 export interface Text {
-  type: 'text';
+  type: "text";
   id: string;
   name: string;
   description?: TextDescription;
@@ -767,16 +766,16 @@ export type TypedQuantitativePrice = number | null;
 /**
  * Quantitative descriptor for user-defined quantities
  */
-export type TypedQuantitativeTypeDescriptor = typeof TypedQuantitativeTypeDescriptor[keyof typeof TypedQuantitativeTypeDescriptor];
-
+export type TypedQuantitativeTypeDescriptor =
+  (typeof TypedQuantitativeTypeDescriptor)[keyof typeof TypedQuantitativeTypeDescriptor];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TypedQuantitativeTypeDescriptor = {
-  job_offer: 'job_offer',
+  job_offer: "job_offer",
 } as const;
 
 export interface TypedQuantitative {
-  type: 'typed_quantitative';
+  type: "typed_quantitative";
   id: string;
   name: string;
   description?: TypedQuantitativeDescription;
@@ -796,16 +795,16 @@ export type TypedNumberPrice = number | null;
 /**
  * Number descriptor for fixed quantities
  */
-export type TypedNumberTypeDescriptor = typeof TypedNumberTypeDescriptor[keyof typeof TypedNumberTypeDescriptor];
-
+export type TypedNumberTypeDescriptor =
+  (typeof TypedNumberTypeDescriptor)[keyof typeof TypedNumberTypeDescriptor];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TypedNumberTypeDescriptor = {
-  nb_ticket: 'nb_ticket',
+  nb_ticket: "nb_ticket",
 } as const;
 
 export interface TypedNumber {
-  type: 'typed_number';
+  type: "typed_number";
   id: string;
   name: string;
   description?: TypedNumberDescription;
@@ -830,16 +829,16 @@ export type TypedSelectablePrice = number | null;
 /**
  * Selectable descriptor for predefined choices
  */
-export type TypedSelectableTypeDescriptor = typeof TypedSelectableTypeDescriptor[keyof typeof TypedSelectableTypeDescriptor];
-
+export type TypedSelectableTypeDescriptor =
+  (typeof TypedSelectableTypeDescriptor)[keyof typeof TypedSelectableTypeDescriptor];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const TypedSelectableTypeDescriptor = {
-  booth: 'booth',
+  booth: "booth",
 } as const;
 
 export interface TypedSelectable {
-  type: 'typed_selectable';
+  type: "typed_selectable";
   id: string;
   name: string;
   description?: TypedSelectableDescription;
@@ -870,15 +869,15 @@ export interface SponsoringPackSchema {
   optional_options: SponsoringOptionSchema[];
 }
 
-export type PartnershipOptionSelectionType = typeof PartnershipOptionSelectionType[keyof typeof PartnershipOptionSelectionType];
-
+export type PartnershipOptionSelectionType =
+  (typeof PartnershipOptionSelectionType)[keyof typeof PartnershipOptionSelectionType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const PartnershipOptionSelectionType = {
-  text_selection: 'text_selection',
-  quantitative_selection: 'quantitative_selection',
-  number_selection: 'number_selection',
-  selectable_selection: 'selectable_selection',
+  text_selection: "text_selection",
+  quantitative_selection: "quantitative_selection",
+  number_selection: "number_selection",
+  selectable_selection: "selectable_selection",
 } as const;
 
 export interface PartnershipOptionSelection {
@@ -958,7 +957,7 @@ export interface SelectedValue {
  */
 export interface TextPartnershipOption {
   /** Discriminator field for text options */
-  type: 'text';
+  type: "text";
   /** Option unique identifier */
   id: string;
   /**
@@ -987,12 +986,12 @@ export interface TextPartnershipOption {
 /**
  * Quantitative descriptor for user-defined quantities
  */
-export type QuantitativePartnershipOptionTypeDescriptor = typeof QuantitativePartnershipOptionTypeDescriptor[keyof typeof QuantitativePartnershipOptionTypeDescriptor];
-
+export type QuantitativePartnershipOptionTypeDescriptor =
+  (typeof QuantitativePartnershipOptionTypeDescriptor)[keyof typeof QuantitativePartnershipOptionTypeDescriptor];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const QuantitativePartnershipOptionTypeDescriptor = {
-  job_offer: 'job_offer',
+  job_offer: "job_offer",
 } as const;
 
 /**
@@ -1000,7 +999,7 @@ export const QuantitativePartnershipOptionTypeDescriptor = {
  */
 export interface QuantitativePartnershipOption {
   /** Discriminator field for quantitative options */
-  type: 'typed_quantitative';
+  type: "typed_quantitative";
   /** Option unique identifier */
   id: string;
   /**
@@ -1037,12 +1036,12 @@ export interface QuantitativePartnershipOption {
 /**
  * Number descriptor for fixed quantities
  */
-export type NumberPartnershipOptionTypeDescriptor = typeof NumberPartnershipOptionTypeDescriptor[keyof typeof NumberPartnershipOptionTypeDescriptor];
-
+export type NumberPartnershipOptionTypeDescriptor =
+  (typeof NumberPartnershipOptionTypeDescriptor)[keyof typeof NumberPartnershipOptionTypeDescriptor];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const NumberPartnershipOptionTypeDescriptor = {
-  nb_ticket: 'nb_ticket',
+  nb_ticket: "nb_ticket",
 } as const;
 
 /**
@@ -1050,7 +1049,7 @@ export const NumberPartnershipOptionTypeDescriptor = {
  */
 export interface NumberPartnershipOption {
   /** Discriminator field for number options */
-  type: 'typed_number';
+  type: "typed_number";
   /** Option unique identifier */
   id: string;
   /**
@@ -1087,12 +1086,12 @@ export interface NumberPartnershipOption {
 /**
  * Selectable descriptor for predefined choices
  */
-export type SelectablePartnershipOptionTypeDescriptor = typeof SelectablePartnershipOptionTypeDescriptor[keyof typeof SelectablePartnershipOptionTypeDescriptor];
-
+export type SelectablePartnershipOptionTypeDescriptor =
+  (typeof SelectablePartnershipOptionTypeDescriptor)[keyof typeof SelectablePartnershipOptionTypeDescriptor];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const SelectablePartnershipOptionTypeDescriptor = {
-  booth: 'booth',
+  booth: "booth",
 } as const;
 
 /**
@@ -1100,7 +1099,7 @@ export const SelectablePartnershipOptionTypeDescriptor = {
  */
 export interface SelectablePartnershipOption {
   /** Discriminator field for selectable options */
-  type: 'typed_selectable';
+  type: "typed_selectable";
   /** Option unique identifier */
   id: string;
   /**
@@ -1135,7 +1134,11 @@ export interface SelectablePartnershipOption {
 /**
  * Polymorphic schema for partnership-specific options with complete descriptions and pricing
  */
-export type PartnershipOptionSchema = TextPartnershipOption | QuantitativePartnershipOption | NumberPartnershipOption | SelectablePartnershipOption;
+export type PartnershipOptionSchema =
+  | TextPartnershipOption
+  | QuantitativePartnershipOption
+  | NumberPartnershipOption
+  | SelectablePartnershipOption;
 
 /**
  * Enhanced partnership pack with partnership-specific options
@@ -1194,7 +1197,7 @@ export type PartnershipProcessStatusSchemaCommunicationPublicationDate = string 
 
 export type PartnershipProcessStatusSchemaCommunicationSupportUrl = string | null;
 
-export type PartnershipProcessStatusSchemaBillingStatus = 'pending' | 'sent' | 'paid' | null;
+export type PartnershipProcessStatusSchemaBillingStatus = "pending" | "sent" | "paid" | null;
 
 export interface PartnershipProcessStatusSchema {
   suggestion_sent_at?: PartnershipProcessStatusSchemaSuggestionSentAt;
@@ -1221,12 +1224,12 @@ export type PartnershipDetailSchemaValidatedPack = PartnershipPackSchema | null;
 
 export type PartnershipDetailSchemaOrganiser = UserSchema | null;
 
-export type PartnershipDetailSchemaCurrency = typeof PartnershipDetailSchemaCurrency[keyof typeof PartnershipDetailSchemaCurrency];
-
+export type PartnershipDetailSchemaCurrency =
+  (typeof PartnershipDetailSchemaCurrency)[keyof typeof PartnershipDetailSchemaCurrency];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const PartnershipDetailSchemaCurrency = {
-  EUR: 'EUR',
+  EUR: "EUR",
 } as const;
 
 export interface PartnershipDetailSchema {
@@ -1574,32 +1577,32 @@ export interface CreateEventSchema {
 /**
  * Integration provider type
  */
-export type IntegrationSchemaProvider = typeof IntegrationSchemaProvider[keyof typeof IntegrationSchemaProvider];
-
+export type IntegrationSchemaProvider =
+  (typeof IntegrationSchemaProvider)[keyof typeof IntegrationSchemaProvider];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const IntegrationSchemaProvider = {
-  slack: 'slack',
-  mailjet: 'mailjet',
-  qonto: 'qonto',
-  billetweb: 'billetweb',
-  webhook: 'webhook',
-  openplanner: 'openplanner',
+  slack: "slack",
+  mailjet: "mailjet",
+  qonto: "qonto",
+  billetweb: "billetweb",
+  webhook: "webhook",
+  openplanner: "openplanner",
 } as const;
 
 /**
  * Purpose of the integration
  */
-export type IntegrationSchemaUsage = typeof IntegrationSchemaUsage[keyof typeof IntegrationSchemaUsage];
-
+export type IntegrationSchemaUsage =
+  (typeof IntegrationSchemaUsage)[keyof typeof IntegrationSchemaUsage];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const IntegrationSchemaUsage = {
-  notification: 'notification',
-  billing: 'billing',
-  ticketing: 'ticketing',
-  webhook: 'webhook',
-  agenda: 'agenda',
+  notification: "notification",
+  billing: "billing",
+  ticketing: "ticketing",
+  webhook: "webhook",
+  agenda: "agenda",
 } as const;
 
 /**
@@ -1648,7 +1651,7 @@ export interface CreateSelectableValue {
 export type CreateTextPrice = number | null;
 
 export interface CreateText {
-  type: 'text';
+  type: "text";
   /** @minItems 1 */
   translations: DefinitionsTranslatedLabel[];
   /** @minimum 0 */
@@ -1663,16 +1666,16 @@ export type CreateTypedQuantitativePrice = number | null;
 /**
  * Quantitative descriptor for user-defined quantities
  */
-export type CreateTypedQuantitativeTypeDescriptor = typeof CreateTypedQuantitativeTypeDescriptor[keyof typeof CreateTypedQuantitativeTypeDescriptor];
-
+export type CreateTypedQuantitativeTypeDescriptor =
+  (typeof CreateTypedQuantitativeTypeDescriptor)[keyof typeof CreateTypedQuantitativeTypeDescriptor];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateTypedQuantitativeTypeDescriptor = {
-  job_offer: 'job_offer',
+  job_offer: "job_offer",
 } as const;
 
 export interface CreateTypedQuantitative {
-  type: 'typed_quantitative';
+  type: "typed_quantitative";
   /** @minItems 1 */
   translations: DefinitionsTranslatedLabel[];
   /** @minimum 0 */
@@ -1689,16 +1692,16 @@ export type CreateTypedNumberPrice = number | null;
 /**
  * Number descriptor for fixed quantities
  */
-export type CreateTypedNumberTypeDescriptor = typeof CreateTypedNumberTypeDescriptor[keyof typeof CreateTypedNumberTypeDescriptor];
-
+export type CreateTypedNumberTypeDescriptor =
+  (typeof CreateTypedNumberTypeDescriptor)[keyof typeof CreateTypedNumberTypeDescriptor];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateTypedNumberTypeDescriptor = {
-  nb_ticket: 'nb_ticket',
+  nb_ticket: "nb_ticket",
 } as const;
 
 export interface CreateTypedNumber {
-  type: 'typed_number';
+  type: "typed_number";
   /** @minItems 1 */
   translations: DefinitionsTranslatedLabel[];
   /** @minimum 0 */
@@ -1720,16 +1723,16 @@ export type CreateTypedSelectablePrice = number | null;
 /**
  * Selectable descriptor for predefined choices
  */
-export type CreateTypedSelectableTypeDescriptor = typeof CreateTypedSelectableTypeDescriptor[keyof typeof CreateTypedSelectableTypeDescriptor];
-
+export type CreateTypedSelectableTypeDescriptor =
+  (typeof CreateTypedSelectableTypeDescriptor)[keyof typeof CreateTypedSelectableTypeDescriptor];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateTypedSelectableTypeDescriptor = {
-  booth: 'booth',
+  booth: "booth",
 } as const;
 
 export interface CreateTypedSelectable {
-  type: 'typed_selectable';
+  type: "typed_selectable";
   /** @minItems 1 */
   translations: DefinitionsTranslatedLabel[];
   /** @minimum 0 */
@@ -1746,7 +1749,11 @@ export interface CreateTypedSelectable {
 /**
  * Polymorphic sealed class for creating sponsoring options
  */
-export type CreateSponsoringOptionSchema = CreateText | CreateTypedQuantitative | CreateTypedNumber | CreateTypedSelectable;
+export type CreateSponsoringOptionSchema =
+  | CreateText
+  | CreateTypedQuantitative
+  | CreateTypedNumber
+  | CreateTypedSelectable;
 
 export type CreateSponsoringPackSchemaMaxQuantity = number | null;
 
@@ -1912,34 +1919,34 @@ export interface PartnershipPhasesSchema {
 }
 
 export type GetCompaniesParams = {
-/**
- * Search companies by name
- */
-query?: string;
-/**
- * Filter companies by status
- */
-'filter[status]'?: GetCompaniesFilterStatus;
-/**
- * Page number (must be >= 1)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page (must be between 1 and 100)
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
+  /**
+   * Search companies by name
+   */
+  query?: string;
+  /**
+   * Filter companies by status
+   */
+  "filter[status]"?: GetCompaniesFilterStatus;
+  /**
+   * Page number (must be >= 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page (must be between 1 and 100)
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
-export type GetCompaniesFilterStatus = typeof GetCompaniesFilterStatus[keyof typeof GetCompaniesFilterStatus];
-
+export type GetCompaniesFilterStatus =
+  (typeof GetCompaniesFilterStatus)[keyof typeof GetCompaniesFilterStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GetCompaniesFilterStatus = {
-  active: 'active',
-  inactive: 'inactive',
+  active: "active",
+  inactive: "inactive",
 } as const;
 
 export type PostCompaniesLogoBody = {
@@ -1948,17 +1955,17 @@ export type PostCompaniesLogoBody = {
 };
 
 export type GetCompaniesJobOffersParams = {
-/**
- * Page number (must be >= 1)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page (must be between 1 and 100)
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
+  /**
+   * Page number (must be >= 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page (must be between 1 and 100)
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
 export type PromoteJobOfferToPartnership201 = {
@@ -1966,21 +1973,21 @@ export type PromoteJobOfferToPartnership201 = {
 };
 
 export type ListJobOfferPromotionsParams = {
-/**
- * Filter by partnership ID
- */
-partnership_id?: string;
-/**
- * Page number for pagination
- * @minimum 1
- */
-page?: number;
-/**
- * Items per page
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
+  /**
+   * Filter by partnership ID
+   */
+  partnership_id?: string;
+  /**
+   * Page number for pagination
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
 export type ListJobOfferPromotions200 = {
@@ -1991,17 +1998,17 @@ export type ListJobOfferPromotions200 = {
 };
 
 export type GetEventsParams = {
-/**
- * Page number (must be >= 1)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page (must be between 1 and 100)
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
+  /**
+   * Page number (must be >= 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page (must be between 1 and 100)
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
 export type PostEventsPartnershipSignedAgreementBody = {
@@ -2010,81 +2017,80 @@ export type PostEventsPartnershipSignedAgreementBody = {
 };
 
 export type GetPartnershipJobOffersParams = {
-/**
- * Filter by promotion status
- */
-status?: GetPartnershipJobOffersStatus;
-/**
- * Page number (1-indexed)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
+  /**
+   * Filter by promotion status
+   */
+  status?: GetPartnershipJobOffersStatus;
+  /**
+   * Page number (1-indexed)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
-export type GetPartnershipJobOffersStatus = typeof GetPartnershipJobOffersStatus[keyof typeof GetPartnershipJobOffersStatus];
-
+export type GetPartnershipJobOffersStatus =
+  (typeof GetPartnershipJobOffersStatus)[keyof typeof GetPartnershipJobOffersStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GetPartnershipJobOffersStatus = {
-  pending: 'pending',
-  approved: 'approved',
-  declined: 'declined',
+  pending: "pending",
+  approved: "approved",
+  declined: "declined",
 } as const;
 
 export type GetProvidersParams = {
-/**
- * Filter providers by organization slug
- */
-org_slug?: string;
-/**
- * Search providers by name (case-insensitive)
- */
-query?: string;
-/**
- * Sort by field (default: createdAt)
- */
-sort?: GetProvidersSort;
-/**
- * Sort direction (default: asc)
- */
-direction?: GetProvidersDirection;
-/**
- * Page number (must be >= 1)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page (must be between 1 and 100)
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
+  /**
+   * Filter providers by organization slug
+   */
+  org_slug?: string;
+  /**
+   * Search providers by name (case-insensitive)
+   */
+  query?: string;
+  /**
+   * Sort by field (default: createdAt)
+   */
+  sort?: GetProvidersSort;
+  /**
+   * Sort direction (default: asc)
+   */
+  direction?: GetProvidersDirection;
+  /**
+   * Page number (must be >= 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page (must be between 1 and 100)
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
-export type GetProvidersSort = typeof GetProvidersSort[keyof typeof GetProvidersSort];
-
+export type GetProvidersSort = (typeof GetProvidersSort)[keyof typeof GetProvidersSort];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GetProvidersSort = {
-  name: 'name',
-  createdAt: 'createdAt',
-  creation: 'creation',
-  created: 'created',
+  name: "name",
+  createdAt: "createdAt",
+  creation: "creation",
+  created: "created",
 } as const;
 
-export type GetProvidersDirection = typeof GetProvidersDirection[keyof typeof GetProvidersDirection];
-
+export type GetProvidersDirection =
+  (typeof GetProvidersDirection)[keyof typeof GetProvidersDirection];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GetProvidersDirection = {
-  asc: 'asc',
-  desc: 'desc',
+  asc: "asc",
+  desc: "desc",
 } as const;
 
 export type PostProviders201 = {
@@ -2093,17 +2099,17 @@ export type PostProviders201 = {
 };
 
 export type GetOrgsEventsParams = {
-/**
- * Page number (default: 1)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page (default: 20)
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
+  /**
+   * Page number (default: 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page (default: 20)
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
 export type PostOrgsEventsBoothPlanBody = {
@@ -2132,43 +2138,43 @@ export type DeleteOrgsEventsPacks204 = { [key: string]: unknown };
 export type DeleteOrgsEventsPacksOptions204 = { [key: string]: unknown };
 
 export type GetOrgsEventsPartnershipParams = {
-/**
- * Filter by sponsoring pack ID
- */
-'filter[pack_id]'?: string;
-/**
- * Filter by validation status
- */
-'filter[validated]'?: boolean;
-/**
- * Filter by suggestion status
- */
-'filter[suggestion]'?: boolean;
-/**
- * Filter by payment status
- */
-'filter[paid]'?: boolean;
-/**
- * Filter by agreement generation status
- */
-'filter[agreement-generated]'?: boolean;
-/**
- * Filter by agreement signature status
- */
-'filter[agreement-signed]'?: boolean;
-/**
- * Sort direction
- */
-direction?: GetOrgsEventsPartnershipDirection;
+  /**
+   * Filter by sponsoring pack ID
+   */
+  "filter[pack_id]"?: string;
+  /**
+   * Filter by validation status
+   */
+  "filter[validated]"?: boolean;
+  /**
+   * Filter by suggestion status
+   */
+  "filter[suggestion]"?: boolean;
+  /**
+   * Filter by payment status
+   */
+  "filter[paid]"?: boolean;
+  /**
+   * Filter by agreement generation status
+   */
+  "filter[agreement-generated]"?: boolean;
+  /**
+   * Filter by agreement signature status
+   */
+  "filter[agreement-signed]"?: boolean;
+  /**
+   * Sort direction
+   */
+  direction?: GetOrgsEventsPartnershipDirection;
 };
 
-export type GetOrgsEventsPartnershipDirection = typeof GetOrgsEventsPartnershipDirection[keyof typeof GetOrgsEventsPartnershipDirection];
-
+export type GetOrgsEventsPartnershipDirection =
+  (typeof GetOrgsEventsPartnershipDirection)[keyof typeof GetOrgsEventsPartnershipDirection];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GetOrgsEventsPartnershipDirection = {
-  asc: 'asc',
-  desc: 'desc',
+  asc: "asc",
+  desc: "desc",
 } as const;
 
 export type PostOrgsEventsPartnershipAgreement200 = {
@@ -2177,31 +2183,31 @@ export type PostOrgsEventsPartnershipAgreement200 = {
 };
 
 export type ListPartnershipJobOffersParams = {
-/**
- * Filter by promotion status
- */
-status?: ListPartnershipJobOffersStatus;
-/**
- * Page number (1-indexed)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
+  /**
+   * Filter by promotion status
+   */
+  status?: ListPartnershipJobOffersStatus;
+  /**
+   * Page number (1-indexed)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
-export type ListPartnershipJobOffersStatus = typeof ListPartnershipJobOffersStatus[keyof typeof ListPartnershipJobOffersStatus];
-
+export type ListPartnershipJobOffersStatus =
+  (typeof ListPartnershipJobOffersStatus)[keyof typeof ListPartnershipJobOffersStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListPartnershipJobOffersStatus = {
-  pending: 'pending',
-  approved: 'approved',
-  declined: 'declined',
+  pending: "pending",
+  approved: "approved",
+  declined: "declined",
 } as const;
 
 export type ListPartnershipJobOffers200 = {
@@ -2217,31 +2223,31 @@ export type ListPartnershipJobOffers200 = {
 };
 
 export type ListEventJobOfferPromotionsParams = {
-/**
- * Filter by promotion status
- */
-status?: ListEventJobOfferPromotionsStatus;
-/**
- * Page number (1-indexed)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
+  /**
+   * Filter by promotion status
+   */
+  status?: ListEventJobOfferPromotionsStatus;
+  /**
+   * Page number (1-indexed)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
-export type ListEventJobOfferPromotionsStatus = typeof ListEventJobOfferPromotionsStatus[keyof typeof ListEventJobOfferPromotionsStatus];
-
+export type ListEventJobOfferPromotionsStatus =
+  (typeof ListEventJobOfferPromotionsStatus)[keyof typeof ListEventJobOfferPromotionsStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListEventJobOfferPromotionsStatus = {
-  pending: 'pending',
-  approved: 'approved',
-  declined: 'declined',
+  pending: "pending",
+  approved: "approved",
+  declined: "declined",
 } as const;
 
 export type ListEventJobOfferPromotions200 = {
@@ -2259,369 +2265,379 @@ export type ListEventJobOfferPromotions200 = {
 export type ApproveJobOfferPromotionBody = { [key: string]: unknown };
 
 export type GetOrgsEventsProvidersParams = {
-/**
- * Page number (must be >= 1)
- * @minimum 1
- */
-page?: number;
-/**
- * Number of items per page (must be between 1 and 100)
- * @minimum 1
- * @maximum 100
- */
-page_size?: number;
+  /**
+   * Page number (must be >= 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page (must be between 1 and 100)
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-
-  /**
+/**
  * OAuth callback endpoint
  * @summary OAuth callback endpoint
  */
 export const getAuthCallback = (
-    
- options?: SecondParameter<typeof customFetch<UserSessionSchema>>,) => {
-      return customFetch<UserSessionSchema>(
-      {url: `/auth/callback`, method: 'GET'
-    },
-      options);
-    }
-  
+  options?: SecondParameter<typeof customFetch<UserSessionSchema>>,
+) => {
+  return customFetch<UserSessionSchema>({ url: `/auth/callback`, method: "GET" }, options);
+};
+
 /**
  * Start OAuth login flow - redirects to Google OAuth
  * @summary Get resource
  */
-export const getAuthLogin = (
-    
- options?: SecondParameter<typeof customFetch<string>>,) => {
-      return customFetch<string>(
-      {url: `/auth/login`, method: 'GET'
-    },
-      options);
-    }
-  
+export const getAuthLogin = (options?: SecondParameter<typeof customFetch<string>>) => {
+  return customFetch<string>({ url: `/auth/login`, method: "GET" }, options);
+};
+
 /**
  * Logout and clear session
  * @summary Get resource
  */
-export const getAuthLogout = (
-    
- options?: SecondParameter<typeof customFetch<void>>,) => {
-      return customFetch<void>(
-      {url: `/auth/logout`, method: 'GET'
-    },
-      options);
-    }
-  
+export const getAuthLogout = (options?: SecondParameter<typeof customFetch<void>>) => {
+  return customFetch<void>({ url: `/auth/logout`, method: "GET" }, options);
+};
+
 /**
  * Get current user information
  * @summary Get resource
  */
-export const getAuthMe = (
-    
- options?: SecondParameter<typeof customFetch<UserInfoSchema>>,) => {
-      return customFetch<UserInfoSchema>(
-      {url: `/auth/me`, method: 'GET'
-    },
-      options);
-    }
-  
+export const getAuthMe = (options?: SecondParameter<typeof customFetch<UserInfoSchema>>) => {
+  return customFetch<UserInfoSchema>({ url: `/auth/me`, method: "GET" }, options);
+};
+
 /**
  * List companies with paging support
  * @summary Get resource
  */
 export const getCompanies = (
-    params?: GetCompaniesParams,
- options?: SecondParameter<typeof customFetch<PaginatedCompanySchema>>,) => {
-      return customFetch<PaginatedCompanySchema>(
-      {url: `/companies`, method: 'GET',
-        params
-    },
-      options);
-    }
-  
+  params?: GetCompaniesParams,
+  options?: SecondParameter<typeof customFetch<PaginatedCompanySchema>>,
+) => {
+  return customFetch<PaginatedCompanySchema>({ url: `/companies`, method: "GET", params }, options);
+};
+
 /**
  * Create a new company
  * @summary Create company
  */
 export const postCompanies = (
-    createCompanySchema: CreateCompanySchema,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/companies`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createCompanySchema
+  createCompanySchema: CreateCompanySchema,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    {
+      url: `/companies`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: createCompanySchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Retrieve a specific company by its UUID
  * @summary Get company by ID
  */
 export const getCompanyById = (
-    companyId: string,
- options?: SecondParameter<typeof customFetch<CompanySchema>>,) => {
-      return customFetch<CompanySchema>(
-      {url: `/companies/${companyId}`, method: 'GET'
-    },
-      options);
-    }
-  
+  companyId: string,
+  options?: SecondParameter<typeof customFetch<CompanySchema>>,
+) => {
+  return customFetch<CompanySchema>({ url: `/companies/${companyId}`, method: "GET" }, options);
+};
+
 /**
  * Update an existing company with partial or complete data
  * @summary Update company
  */
 export const putCompanyById = (
-    companyId: string,
-    updateCompanySchema: UpdateCompanySchema,
- options?: SecondParameter<typeof customFetch<CompanySchema>>,) => {
-      return customFetch<CompanySchema>(
-      {url: `/companies/${companyId}`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: updateCompanySchema
+  companyId: string,
+  updateCompanySchema: UpdateCompanySchema,
+  options?: SecondParameter<typeof customFetch<CompanySchema>>,
+) => {
+  return customFetch<CompanySchema>(
+    {
+      url: `/companies/${companyId}`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: updateCompanySchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Soft delete a company by setting its status to inactive
  * @summary Delete company (soft delete)
  */
 export const deleteCompanyById = (
-    companyId: string,
- options?: SecondParameter<typeof customFetch<void>>,) => {
-      return customFetch<void>(
-      {url: `/companies/${companyId}`, method: 'DELETE'
-    },
-      options);
-    }
-  
+  companyId: string,
+  options?: SecondParameter<typeof customFetch<void>>,
+) => {
+  return customFetch<void>({ url: `/companies/${companyId}`, method: "DELETE" }, options);
+};
+
 /**
  * Upload a logo for a company
  * @summary Create resource
  */
 export const postCompaniesLogo = (
-    companyId: string,
-    postCompaniesLogoBody: PostCompaniesLogoBody,
- options?: SecondParameter<typeof customFetch<MediaSchema>>,) => {const formData = new FormData();
-if(postCompaniesLogoBody.file !== undefined) {
- formData.append(`file`, postCompaniesLogoBody.file)
- }
+  companyId: string,
+  postCompaniesLogoBody: PostCompaniesLogoBody,
+  options?: SecondParameter<typeof customFetch<MediaSchema>>,
+) => {
+  const formData = new FormData();
+  if (postCompaniesLogoBody.file !== undefined) {
+    formData.append(`file`, postCompaniesLogoBody.file);
+  }
 
-      return customFetch<MediaSchema>(
-      {url: `/companies/${companyId}/logo`, method: 'POST',
-      headers: {'Content-Type': 'multipart/form-data', },
-       data: formData
+  return customFetch<MediaSchema>(
+    {
+      url: `/companies/${companyId}/logo`,
+      method: "POST",
+      headers: { "Content-Type": "multipart/form-data" },
+      data: formData,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * List all partnerships for a company
  * @summary List all partnerships for a company
  */
 export const getCompaniesPartnership = (
-    companyId: string,
- options?: SecondParameter<typeof customFetch<PartnershipItemSchema[]>>,) => {
-      return customFetch<PartnershipItemSchema[]>(
-      {url: `/companies/${companyId}/partnerships`, method: 'GET'
-    },
-      options);
-    }
-  
+  companyId: string,
+  options?: SecondParameter<typeof customFetch<PartnershipItemSchema[]>>,
+) => {
+  return customFetch<PartnershipItemSchema[]>(
+    { url: `/companies/${companyId}/partnerships`, method: "GET" },
+    options,
+  );
+};
+
 /**
  * Retrieve all job offers for a specific company with pagination support
  * @summary List job offers for company
  */
 export const getCompaniesJobOffers = (
-    companyId: string,
-    params?: GetCompaniesJobOffersParams,
- options?: SecondParameter<typeof customFetch<PaginatedJobOfferSchema>>,) => {
-      return customFetch<PaginatedJobOfferSchema>(
-      {url: `/companies/${companyId}/job-offers`, method: 'GET',
-        params
-    },
-      options);
-    }
-  
+  companyId: string,
+  params?: GetCompaniesJobOffersParams,
+  options?: SecondParameter<typeof customFetch<PaginatedJobOfferSchema>>,
+) => {
+  return customFetch<PaginatedJobOfferSchema>(
+    { url: `/companies/${companyId}/job-offers`, method: "GET", params },
+    options,
+  );
+};
+
 /**
  * Create a new job offer for the specified company
  * @summary Create job offer
  */
 export const postCompaniesJobOffers = (
-    companyId: string,
-    createJobOfferSchema: CreateJobOfferSchema,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/companies/${companyId}/job-offers`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createJobOfferSchema
+  companyId: string,
+  createJobOfferSchema: CreateJobOfferSchema,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    {
+      url: `/companies/${companyId}/job-offers`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: createJobOfferSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Retrieve a specific job offer by its ID
  * @summary Get job offer by ID
  */
 export const getCompaniesJobOffersById = (
-    companyId: string,
-    jobOfferId: string,
- options?: SecondParameter<typeof customFetch<JobOfferResponseSchema>>,) => {
-      return customFetch<JobOfferResponseSchema>(
-      {url: `/companies/${companyId}/job-offers/${jobOfferId}`, method: 'GET'
-    },
-      options);
-    }
-  
+  companyId: string,
+  jobOfferId: string,
+  options?: SecondParameter<typeof customFetch<JobOfferResponseSchema>>,
+) => {
+  return customFetch<JobOfferResponseSchema>(
+    { url: `/companies/${companyId}/job-offers/${jobOfferId}`, method: "GET" },
+    options,
+  );
+};
+
 /**
  * Update an existing job offer with partial or complete data
  * @summary Update job offer
  */
 export const putCompaniesJobOffersById = (
-    companyId: string,
-    jobOfferId: string,
-    updateJobOfferSchema: UpdateJobOfferSchema,
- options?: SecondParameter<typeof customFetch<JobOfferResponseSchema>>,) => {
-      return customFetch<JobOfferResponseSchema>(
-      {url: `/companies/${companyId}/job-offers/${jobOfferId}`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: updateJobOfferSchema
+  companyId: string,
+  jobOfferId: string,
+  updateJobOfferSchema: UpdateJobOfferSchema,
+  options?: SecondParameter<typeof customFetch<JobOfferResponseSchema>>,
+) => {
+  return customFetch<JobOfferResponseSchema>(
+    {
+      url: `/companies/${companyId}/job-offers/${jobOfferId}`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: updateJobOfferSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Delete an existing job offer
  * @summary Delete job offer
  */
 export const deleteCompaniesJobOffersById = (
-    companyId: string,
-    jobOfferId: string,
- options?: SecondParameter<typeof customFetch<void>>,) => {
-      return customFetch<void>(
-      {url: `/companies/${companyId}/job-offers/${jobOfferId}`, method: 'DELETE'
-    },
-      options);
-    }
-  
+  companyId: string,
+  jobOfferId: string,
+  options?: SecondParameter<typeof customFetch<void>>,
+) => {
+  return customFetch<void>(
+    { url: `/companies/${companyId}/job-offers/${jobOfferId}`, method: "DELETE" },
+    options,
+  );
+};
+
 /**
  * Company owner promotes a job offer to an active partnership with an event
  * @summary Promote job offer to partnership
  */
 export const promoteJobOfferToPartnership = (
-    companyId: string,
-    partnershipId: string,
-    promoteJobOfferSchema: PromoteJobOfferSchema,
- options?: SecondParameter<typeof customFetch<PromoteJobOfferToPartnership201>>,) => {
-      return customFetch<PromoteJobOfferToPartnership201>(
-      {url: `/companies/${companyId}/partnerships/${partnershipId}/promote`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: promoteJobOfferSchema
+  companyId: string,
+  partnershipId: string,
+  promoteJobOfferSchema: PromoteJobOfferSchema,
+  options?: SecondParameter<typeof customFetch<PromoteJobOfferToPartnership201>>,
+) => {
+  return customFetch<PromoteJobOfferToPartnership201>(
+    {
+      url: `/companies/${companyId}/partnerships/${partnershipId}/promote`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: promoteJobOfferSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * List all promotions for a specific job offer across all partnerships
  * @summary List job offer promotions
  */
 export const listJobOfferPromotions = (
-    companyId: string,
-    jobOfferId: string,
-    params?: ListJobOfferPromotionsParams,
- options?: SecondParameter<typeof customFetch<ListJobOfferPromotions200>>,) => {
-      return customFetch<ListJobOfferPromotions200>(
-      {url: `/companies/${companyId}/job-offers/${jobOfferId}/promotions`, method: 'GET',
-        params
-    },
-      options);
-    }
-  
+  companyId: string,
+  jobOfferId: string,
+  params?: ListJobOfferPromotionsParams,
+  options?: SecondParameter<typeof customFetch<ListJobOfferPromotions200>>,
+) => {
+  return customFetch<ListJobOfferPromotions200>(
+    { url: `/companies/${companyId}/job-offers/${jobOfferId}/promotions`, method: "GET", params },
+    options,
+  );
+};
+
 /**
  * List events with paging support
  * @summary List organization events
  */
 export const getEvents = (
-    params?: GetEventsParams,
- options?: SecondParameter<typeof customFetch<PaginatedEventSummarySchema>>,) => {
-      return customFetch<PaginatedEventSummarySchema>(
-      {url: `/events`, method: 'GET',
-        params
-    },
-      options);
-    }
-  
+  params?: GetEventsParams,
+  options?: SecondParameter<typeof customFetch<PaginatedEventSummarySchema>>,
+) => {
+  return customFetch<PaginatedEventSummarySchema>(
+    { url: `/events`, method: "GET", params },
+    options,
+  );
+};
+
 /**
  * Get event details with organization information
  * @summary Get resource
  */
 export const getEventBySlug = (
-    eventSlug: string,
- options?: SecondParameter<typeof customFetch<EventWithOrganisationSchema>>,) => {
-      return customFetch<EventWithOrganisationSchema>(
-      {url: `/events/${eventSlug}`, method: 'GET'
-    },
-      options);
-    }
-  
+  eventSlug: string,
+  options?: SecondParameter<typeof customFetch<EventWithOrganisationSchema>>,
+) => {
+  return customFetch<EventWithOrganisationSchema>(
+    { url: `/events/${eventSlug}`, method: "GET" },
+    options,
+  );
+};
+
 /**
  * Retrieve event agenda with sessions and speakers for public consumption. No authentication required.
  * @summary Get public event agenda
  */
 export const getEventAgendaPublic = (
-    eventSlug: string,
- options?: SecondParameter<typeof customFetch<AgendaResponseSchema>>,) => {
-      return customFetch<AgendaResponseSchema>(
-      {url: `/events/${eventSlug}/agenda`, method: 'GET'
-    },
-      options);
-    }
-  
+  eventSlug: string,
+  options?: SecondParameter<typeof customFetch<AgendaResponseSchema>>,
+) => {
+  return customFetch<AgendaResponseSchema>(
+    { url: `/events/${eventSlug}/agenda`, method: "GET" },
+    options,
+  );
+};
+
 /**
  * List public sponsoring packages for an event with embedded and optional options (authentication optional - publicly accessible)
  * @summary List public sponsoring packages
  */
 export const getEventsSponsoringPacks = (
-    eventSlug: string,
- options?: SecondParameter<typeof customFetch<SponsoringPackSchema[]>>,) => {
-      return customFetch<SponsoringPackSchema[]>(
-      {url: `/events/${eventSlug}/sponsoring/packs`, method: 'GET'
-    },
-      options);
-    }
-  
+  eventSlug: string,
+  options?: SecondParameter<typeof customFetch<SponsoringPackSchema[]>>,
+) => {
+  return customFetch<SponsoringPackSchema[]>(
+    { url: `/events/${eventSlug}/sponsoring/packs`, method: "GET" },
+    options,
+  );
+};
+
 /**
  * @summary Create resource
  */
 export const postEventsPartnership = (
-    eventSlug: string,
-    registerPartnershipSchema: RegisterPartnershipSchema,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/events/${eventSlug}/partnerships`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: registerPartnershipSchema
+  eventSlug: string,
+  registerPartnershipSchema: RegisterPartnershipSchema,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    {
+      url: `/events/${eventSlug}/partnerships`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: registerPartnershipSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Retrieve comprehensive partnership information including company, event, and process status details
  * @summary Get detailed partnership information
  */
 export const getEventsPartnershipDetailed = (
-    eventSlug: string,
-    partnershipId: string,
- options?: SecondParameter<typeof customFetch<DetailedPartnershipResponseSchema>>,) => {
-      return customFetch<DetailedPartnershipResponseSchema>(
-      {url: `/events/${eventSlug}/partnerships/${partnershipId}`, method: 'GET'
-    },
-      options);
-    }
-  
+  eventSlug: string,
+  partnershipId: string,
+  options?: SecondParameter<typeof customFetch<DetailedPartnershipResponseSchema>>,
+) => {
+  return customFetch<DetailedPartnershipResponseSchema>(
+    { url: `/events/${eventSlug}/partnerships/${partnershipId}`, method: "GET" },
+    options,
+  );
+};
+
 /**
  * Updates contact information fields for an existing partnership. This is a public endpoint
 that supports partial updates - only provided fields will be updated. All fields are optional.
@@ -2636,600 +2652,707 @@ Updatable fields:
  * @summary Update partnership contact information
  */
 export const updatePartnershipContactInfo = (
-    eventSlug: string,
-    partnershipId: string,
-    updatePartnershipRequestSchema: UpdatePartnershipRequestSchema,
- options?: SecondParameter<typeof customFetch<DetailedPartnershipResponseSchema>>,) => {
-      return customFetch<DetailedPartnershipResponseSchema>(
-      {url: `/events/${eventSlug}/partnerships/${partnershipId}`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: updatePartnershipRequestSchema
+  eventSlug: string,
+  partnershipId: string,
+  updatePartnershipRequestSchema: UpdatePartnershipRequestSchema,
+  options?: SecondParameter<typeof customFetch<DetailedPartnershipResponseSchema>>,
+) => {
+  return customFetch<DetailedPartnershipResponseSchema>(
+    {
+      url: `/events/${eventSlug}/partnerships/${partnershipId}`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: updatePartnershipRequestSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * @summary Get partnership billing information
  */
 export const getEventsPartnershipBilling = (
-    eventSlug: string,
-    partnershipId: string,
- options?: SecondParameter<typeof customFetch<CompanyBillingDataSchema>>,) => {
-      return customFetch<CompanyBillingDataSchema>(
-      {url: `/events/${eventSlug}/partnerships/${partnershipId}/billing`, method: 'GET'
-    },
-      options);
-    }
-  
+  eventSlug: string,
+  partnershipId: string,
+  options?: SecondParameter<typeof customFetch<CompanyBillingDataSchema>>,
+) => {
+  return customFetch<CompanyBillingDataSchema>(
+    { url: `/events/${eventSlug}/partnerships/${partnershipId}/billing`, method: "GET" },
+    options,
+  );
+};
+
 /**
  * @summary Create partnership billing
  */
 export const postEventsPartnershipBilling = (
-    eventSlug: string,
-    partnershipId: string,
-    companyBillingDataSchema: CompanyBillingDataSchema,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/events/${eventSlug}/partnerships/${partnershipId}/billing`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: companyBillingDataSchema
+  eventSlug: string,
+  partnershipId: string,
+  companyBillingDataSchema: CompanyBillingDataSchema,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    {
+      url: `/events/${eventSlug}/partnerships/${partnershipId}/billing`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: companyBillingDataSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * @summary Update partnership billing
  */
 export const putEventsPartnershipBilling = (
-    eventSlug: string,
-    partnershipId: string,
-    companyBillingDataSchema: CompanyBillingDataSchema,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/events/${eventSlug}/partnerships/${partnershipId}/billing`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: companyBillingDataSchema
+  eventSlug: string,
+  partnershipId: string,
+  companyBillingDataSchema: CompanyBillingDataSchema,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    {
+      url: `/events/${eventSlug}/partnerships/${partnershipId}/billing`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: companyBillingDataSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * @summary Generate partnership invoice
  */
 export const postEventsPartnershipBillingInvoice = (
-    eventSlug: string,
-    partnershipId: string,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/events/${eventSlug}/partnerships/${partnershipId}/billing/invoice`, method: 'POST'
-    },
-      options);
-    }
-  
+  eventSlug: string,
+  partnershipId: string,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    { url: `/events/${eventSlug}/partnerships/${partnershipId}/billing/invoice`, method: "POST" },
+    options,
+  );
+};
+
 /**
  * @summary Generate partnership quote
  */
 export const postEventsPartnershipBillingQuote = (
-    eventSlug: string,
-    partnershipId: string,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/events/${eventSlug}/partnerships/${partnershipId}/billing/quote`, method: 'POST'
-    },
-      options);
-    }
-  
+  eventSlug: string,
+  partnershipId: string,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    { url: `/events/${eventSlug}/partnerships/${partnershipId}/billing/quote`, method: "POST" },
+    options,
+  );
+};
+
 /**
  * Upload a signed partnership agreement
  * @summary Upload signed partnership agreement
  */
 export const postEventsPartnershipSignedAgreement = (
-    eventSlug: string,
-    partnershipId: string,
-    postEventsPartnershipSignedAgreementBody: PostEventsPartnershipSignedAgreementBody,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {const formData = new FormData();
-if(postEventsPartnershipSignedAgreementBody.file !== undefined) {
- formData.append(`file`, postEventsPartnershipSignedAgreementBody.file)
- }
+  eventSlug: string,
+  partnershipId: string,
+  postEventsPartnershipSignedAgreementBody: PostEventsPartnershipSignedAgreementBody,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  const formData = new FormData();
+  if (postEventsPartnershipSignedAgreementBody.file !== undefined) {
+    formData.append(`file`, postEventsPartnershipSignedAgreementBody.file);
+  }
 
-      return customFetch<IdentifierSchema>(
-      {url: `/events/${eventSlug}/partnerships/${partnershipId}/signed-agreement`, method: 'POST',
-      headers: {'Content-Type': 'multipart/form-data', },
-       data: formData
+  return customFetch<IdentifierSchema>(
+    {
+      url: `/events/${eventSlug}/partnerships/${partnershipId}/signed-agreement`,
+      method: "POST",
+      headers: { "Content-Type": "multipart/form-data" },
+      data: formData,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * @summary Approve partnership suggestion
  */
 export const postEventsPartnershipSuggestionApprove = (
-    eventSlug: string,
-    partnershipId: string,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/events/${eventSlug}/partnerships/${partnershipId}/suggestion-approve`, method: 'POST'
+  eventSlug: string,
+  partnershipId: string,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    {
+      url: `/events/${eventSlug}/partnerships/${partnershipId}/suggestion-approve`,
+      method: "POST",
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * @summary Decline partnership suggestion
  */
 export const postEventsPartnershipSuggestionDecline = (
-    eventSlug: string,
-    partnershipId: string,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/events/${eventSlug}/partnerships/${partnershipId}/suggestion-decline`, method: 'POST'
+  eventSlug: string,
+  partnershipId: string,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    {
+      url: `/events/${eventSlug}/partnerships/${partnershipId}/suggestion-decline`,
+      method: "POST",
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * @summary Get partnership tickets
  */
 export const getEventsPartnershipTickets = (
-    eventSlug: string,
-    partnershipId: string,
- options?: SecondParameter<typeof customFetch<TicketSchema[]>>,) => {
-      return customFetch<TicketSchema[]>(
-      {url: `/events/${eventSlug}/partnerships/${partnershipId}/tickets`, method: 'GET'
-    },
-      options);
-    }
-  
+  eventSlug: string,
+  partnershipId: string,
+  options?: SecondParameter<typeof customFetch<TicketSchema[]>>,
+) => {
+  return customFetch<TicketSchema[]>(
+    { url: `/events/${eventSlug}/partnerships/${partnershipId}/tickets`, method: "GET" },
+    options,
+  );
+};
+
 /**
  * @summary Create partnership tickets
  */
 export const postEventsPartnershipTickets = (
-    eventSlug: string,
-    partnershipId: string,
-    ticketDataSchema: TicketDataSchema[],
- options?: SecondParameter<typeof customFetch<TicketOrderSchema>>,) => {
-      return customFetch<TicketOrderSchema>(
-      {url: `/events/${eventSlug}/partnerships/${partnershipId}/tickets`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: ticketDataSchema
+  eventSlug: string,
+  partnershipId: string,
+  ticketDataSchema: TicketDataSchema[],
+  options?: SecondParameter<typeof customFetch<TicketOrderSchema>>,
+) => {
+  return customFetch<TicketOrderSchema>(
+    {
+      url: `/events/${eventSlug}/partnerships/${partnershipId}/tickets`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: ticketDataSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * @summary Update partnership ticket
  */
 export const putEventsPartnershipTickets = (
-    eventSlug: string,
-    partnershipId: string,
-    ticketId: string,
-    ticketDataSchema: TicketDataSchema,
- options?: SecondParameter<typeof customFetch<TicketSchema>>,) => {
-      return customFetch<TicketSchema>(
-      {url: `/events/${eventSlug}/partnerships/${partnershipId}/tickets/${ticketId}`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: ticketDataSchema
+  eventSlug: string,
+  partnershipId: string,
+  ticketId: string,
+  ticketDataSchema: TicketDataSchema,
+  options?: SecondParameter<typeof customFetch<TicketSchema>>,
+) => {
+  return customFetch<TicketSchema>(
+    {
+      url: `/events/${eventSlug}/partnerships/${partnershipId}/tickets/${ticketId}`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: ticketDataSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Get paginated list of job offer promotions for a specific partnership. Public endpoint accessible without authentication.
  * @summary List job offers for partnership
  */
 export const getPartnershipJobOffers = (
-    eventSlug: string,
-    partnershipId: string,
-    params?: GetPartnershipJobOffersParams,
- options?: SecondParameter<typeof customFetch<PaginatedJobOfferPromotionSchema>>,) => {
-      return customFetch<PaginatedJobOfferPromotionSchema>(
-      {url: `/events/${eventSlug}/partnerships/${partnershipId}/job-offers`, method: 'GET',
-        params
-    },
-      options);
-    }
-  
+  eventSlug: string,
+  partnershipId: string,
+  params?: GetPartnershipJobOffersParams,
+  options?: SecondParameter<typeof customFetch<PaginatedJobOfferPromotionSchema>>,
+) => {
+  return customFetch<PaginatedJobOfferPromotionSchema>(
+    { url: `/events/${eventSlug}/partnerships/${partnershipId}/job-offers`, method: "GET", params },
+    options,
+  );
+};
+
 /**
  * Associate a speaker with a partnership. Partnership must be validated first.
  * @summary Attach speaker to partnership
  */
 export const attachSpeakerToPartnership = (
-    eventSlug: string,
-    partnershipId: string,
-    speakerId: string,
- options?: SecondParameter<typeof customFetch<SpeakerPartnershipSchema>>,) => {
-      return customFetch<SpeakerPartnershipSchema>(
-      {url: `/events/${eventSlug}/partnerships/${partnershipId}/speakers/${speakerId}`, method: 'POST'
+  eventSlug: string,
+  partnershipId: string,
+  speakerId: string,
+  options?: SecondParameter<typeof customFetch<SpeakerPartnershipSchema>>,
+) => {
+  return customFetch<SpeakerPartnershipSchema>(
+    {
+      url: `/events/${eventSlug}/partnerships/${partnershipId}/speakers/${speakerId}`,
+      method: "POST",
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Remove association between a speaker and a partnership.
  * @summary Detach speaker from partnership
  */
 export const detachSpeakerFromPartnership = (
-    eventSlug: string,
-    partnershipId: string,
-    speakerId: string,
- options?: SecondParameter<typeof customFetch<void>>,) => {
-      return customFetch<void>(
-      {url: `/events/${eventSlug}/partnerships/${partnershipId}/speakers/${speakerId}`, method: 'DELETE'
+  eventSlug: string,
+  partnershipId: string,
+  speakerId: string,
+  options?: SecondParameter<typeof customFetch<void>>,
+) => {
+  return customFetch<void>(
+    {
+      url: `/events/${eventSlug}/partnerships/${partnershipId}/speakers/${speakerId}`,
+      method: "DELETE",
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * List all providers with optional filtering and sorting
  * @summary List providers
  */
 export const getProviders = (
-    params?: GetProvidersParams,
- options?: SecondParameter<typeof customFetch<PaginatedProviderSchema>>,) => {
-      return customFetch<PaginatedProviderSchema>(
-      {url: `/providers`, method: 'GET',
-        params
-    },
-      options);
-    }
-  
+  params?: GetProvidersParams,
+  options?: SecondParameter<typeof customFetch<PaginatedProviderSchema>>,
+) => {
+  return customFetch<PaginatedProviderSchema>(
+    { url: `/providers`, method: "GET", params },
+    options,
+  );
+};
+
 /**
  * Create a new provider (requires authentication and organizer status)
  * @summary Create new provider
  */
 export const postProviders = (
-    createProviderSchema: CreateProviderSchema,
- options?: SecondParameter<typeof customFetch<PostProviders201>>,) => {
-      return customFetch<PostProviders201>(
-      {url: `/providers`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createProviderSchema
+  createProviderSchema: CreateProviderSchema,
+  options?: SecondParameter<typeof customFetch<PostProviders201>>,
+) => {
+  return customFetch<PostProviders201>(
+    {
+      url: `/providers`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: createProviderSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * @summary Create new organization
  */
 export const postOrgs = (
-    organisationSchema: OrganisationSchema,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/orgs`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: organisationSchema
+  organisationSchema: OrganisationSchema,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    {
+      url: `/orgs`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: organisationSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * @summary Get organization details
  */
 export const getOrgs = (
-    orgSlug: string,
- options?: SecondParameter<typeof customFetch<OrganisationSchema>>,) => {
-      return customFetch<OrganisationSchema>(
-      {url: `/orgs/${orgSlug}`, method: 'GET'
-    },
-      options);
-    }
-  
+  orgSlug: string,
+  options?: SecondParameter<typeof customFetch<OrganisationSchema>>,
+) => {
+  return customFetch<OrganisationSchema>({ url: `/orgs/${orgSlug}`, method: "GET" }, options);
+};
+
 /**
  * @summary Update organization
  */
 export const putOrgs = (
-    orgSlug: string,
-    organisationSchema: OrganisationSchema,
- options?: SecondParameter<typeof customFetch<OrganisationSchema>>,) => {
-      return customFetch<OrganisationSchema>(
-      {url: `/orgs/${orgSlug}`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: organisationSchema
+  orgSlug: string,
+  organisationSchema: OrganisationSchema,
+  options?: SecondParameter<typeof customFetch<OrganisationSchema>>,
+) => {
+  return customFetch<OrganisationSchema>(
+    {
+      url: `/orgs/${orgSlug}`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: organisationSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Create a new provider within organization scope (requires organization membership)
  * @summary Create provider
  */
 export const postOrgsProviders = (
-    orgSlug: string,
-    createProviderSchema: CreateProviderSchema,
- options?: SecondParameter<typeof customFetch<ProviderSchema>>,) => {
-      return customFetch<ProviderSchema>(
-      {url: `/orgs/${orgSlug}/providers`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createProviderSchema
+  orgSlug: string,
+  createProviderSchema: CreateProviderSchema,
+  options?: SecondParameter<typeof customFetch<ProviderSchema>>,
+) => {
+  return customFetch<ProviderSchema>(
+    {
+      url: `/orgs/${orgSlug}/providers`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: createProviderSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Update provider within organization scope (requires organization membership)
  * @summary Update provider
  */
 export const putOrgsProviders = (
-    orgSlug: string,
-    providerId: string,
-    updateProviderSchema: UpdateProviderSchema,
- options?: SecondParameter<typeof customFetch<ProviderSchema>>,) => {
-      return customFetch<ProviderSchema>(
-      {url: `/orgs/${orgSlug}/providers/${providerId}`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: updateProviderSchema
+  orgSlug: string,
+  providerId: string,
+  updateProviderSchema: UpdateProviderSchema,
+  options?: SecondParameter<typeof customFetch<ProviderSchema>>,
+) => {
+  return customFetch<ProviderSchema>(
+    {
+      url: `/orgs/${orgSlug}/providers/${providerId}`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: updateProviderSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Delete provider after detaching from all events (requires organization membership)
  * @summary Delete provider
  */
 export const deleteOrgsProviders = (
-    orgSlug: string,
-    providerId: string,
- options?: SecondParameter<typeof customFetch<void>>,) => {
-      return customFetch<void>(
-      {url: `/orgs/${orgSlug}/providers/${providerId}`, method: 'DELETE'
-    },
-      options);
-    }
-  
+  orgSlug: string,
+  providerId: string,
+  options?: SecondParameter<typeof customFetch<void>>,
+) => {
+  return customFetch<void>(
+    { url: `/orgs/${orgSlug}/providers/${providerId}`, method: "DELETE" },
+    options,
+  );
+};
+
 /**
  * List events for an organization (paginated)
  * @summary Get organization details
  */
 export const getOrgsEvents = (
-    orgSlug: string,
-    params?: GetOrgsEventsParams,
- options?: SecondParameter<typeof customFetch<PaginatedEventSummarySchema>>,) => {
-      return customFetch<PaginatedEventSummarySchema>(
-      {url: `/orgs/${orgSlug}/events`, method: 'GET',
-        params
-    },
-      options);
-    }
-  
+  orgSlug: string,
+  params?: GetOrgsEventsParams,
+  options?: SecondParameter<typeof customFetch<PaginatedEventSummarySchema>>,
+) => {
+  return customFetch<PaginatedEventSummarySchema>(
+    { url: `/orgs/${orgSlug}/events`, method: "GET", params },
+    options,
+  );
+};
+
 /**
  * Create a new event for an organization
  * @summary Create organization event
  */
 export const postOrgsEvents = (
-    orgSlug: string,
-    createEventSchema: CreateEventSchema,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/orgs/${orgSlug}/events`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createEventSchema
+  orgSlug: string,
+  createEventSchema: CreateEventSchema,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    {
+      url: `/orgs/${orgSlug}/events`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: createEventSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * @summary Update event
  */
 export const putOrgsEvents = (
-    orgSlug: string,
-    eventSlug: string,
-    createEventSchema: CreateEventSchema,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: createEventSchema
+  orgSlug: string,
+  eventSlug: string,
+  createEventSchema: CreateEventSchema,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: createEventSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Upload booth plan image for an event
  * @summary Upload booth plan
  */
 export const postOrgsEventsBoothPlan = (
-    orgSlug: string,
-    eventSlug: string,
-    postOrgsEventsBoothPlanBody: PostOrgsEventsBoothPlanBody,
- options?: SecondParameter<typeof customFetch<PostOrgsEventsBoothPlan201>>,) => {const formData = new FormData();
-if(postOrgsEventsBoothPlanBody.file !== undefined) {
- formData.append(`file`, postOrgsEventsBoothPlanBody.file)
- }
+  orgSlug: string,
+  eventSlug: string,
+  postOrgsEventsBoothPlanBody: PostOrgsEventsBoothPlanBody,
+  options?: SecondParameter<typeof customFetch<PostOrgsEventsBoothPlan201>>,
+) => {
+  const formData = new FormData();
+  if (postOrgsEventsBoothPlanBody.file !== undefined) {
+    formData.append(`file`, postOrgsEventsBoothPlanBody.file);
+  }
 
-      return customFetch<PostOrgsEventsBoothPlan201>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/booth-plan`, method: 'POST',
-      headers: {'Content-Type': 'multipart/form-data', },
-       data: formData
+  return customFetch<PostOrgsEventsBoothPlan201>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/booth-plan`,
+      method: "POST",
+      headers: { "Content-Type": "multipart/form-data" },
+      data: formData,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Retrieve all integrations configured for an event
  * @summary List event integrations
  */
 export const getOrgsEventsIntegrations = (
-    orgSlug: string,
-    eventSlug: string,
- options?: SecondParameter<typeof customFetch<IntegrationSchema[]>>,) => {
-      return customFetch<IntegrationSchema[]>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/integrations`, method: 'GET'
-    },
-      options);
-    }
-  
+  orgSlug: string,
+  eventSlug: string,
+  options?: SecondParameter<typeof customFetch<IntegrationSchema[]>>,
+) => {
+  return customFetch<IntegrationSchema[]>(
+    { url: `/orgs/${orgSlug}/events/${eventSlug}/integrations`, method: "GET" },
+    options,
+  );
+};
+
 /**
  * Register an integration for an event
  * @summary Create event integration
  */
 export const postOrgsEventsIntegrations = (
-    orgSlug: string,
-    eventSlug: string,
-    provider: 'mailjet' | 'slack' | 'qonto' | 'billetweb' | 'webhook' | 'openplanner',
-    usage: 'notification' | 'billing' | 'ticketing' | 'webhook' | 'agenda',
-    postOrgsEventsIntegrationsBody: PostOrgsEventsIntegrationsBody,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/integrations/${provider}/${usage}`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: postOrgsEventsIntegrationsBody
+  orgSlug: string,
+  eventSlug: string,
+  provider: "mailjet" | "slack" | "qonto" | "billetweb" | "webhook" | "openplanner",
+  usage: "notification" | "billing" | "ticketing" | "webhook" | "agenda",
+  postOrgsEventsIntegrationsBody: PostOrgsEventsIntegrationsBody,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/integrations/${provider}/${usage}`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: postOrgsEventsIntegrationsBody,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Remove an integration from an event
  * @summary Delete event integration
  */
 export const deleteOrgsEventsIntegrations = (
-    orgSlug: string,
-    eventSlug: string,
-    integrationId: string,
- options?: SecondParameter<typeof customFetch<void>>,) => {
-      return customFetch<void>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/integrations/${integrationId}`, method: 'DELETE'
-    },
-      options);
-    }
-  
+  orgSlug: string,
+  eventSlug: string,
+  integrationId: string,
+  options?: SecondParameter<typeof customFetch<void>>,
+) => {
+  return customFetch<void>(
+    { url: `/orgs/${orgSlug}/events/${eventSlug}/integrations/${integrationId}`, method: "DELETE" },
+    options,
+  );
+};
+
 /**
  * Get status of event integration
  * @summary get status of event integration
  */
 export const getStatusIntegration = (
-    orgSlug: string,
-    eventSlug: string,
-    integrationId: string,
- options?: SecondParameter<typeof customFetch<void>>,) => {
-      return customFetch<void>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/integrations/${integrationId}/status`, method: 'GET'
+  orgSlug: string,
+  eventSlug: string,
+  integrationId: string,
+  options?: SecondParameter<typeof customFetch<void>>,
+) => {
+  return customFetch<void>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/integrations/${integrationId}/status`,
+      method: "GET",
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * List sponsoring options for an event
  * @summary Get organization details
  */
 export const getOrgsEventsOptions = (
-    orgSlug: string,
-    eventSlug: string,
- options?: SecondParameter<typeof customFetch<SponsoringOptionSchema[]>>,) => {
-      return customFetch<SponsoringOptionSchema[]>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/options`, method: 'GET'
-    },
-      options);
-    }
-  
+  orgSlug: string,
+  eventSlug: string,
+  options?: SecondParameter<typeof customFetch<SponsoringOptionSchema[]>>,
+) => {
+  return customFetch<SponsoringOptionSchema[]>(
+    { url: `/orgs/${orgSlug}/events/${eventSlug}/options`, method: "GET" },
+    options,
+  );
+};
+
 /**
  * Create a new sponsoring option
  * @summary Create sponsoring option
  */
 export const postOrgsEventsOptions = (
-    orgSlug: string,
-    eventSlug: string,
-    createSponsoringOptionSchema: CreateSponsoringOptionSchema,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/options`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createSponsoringOptionSchema
+  orgSlug: string,
+  eventSlug: string,
+  createSponsoringOptionSchema: CreateSponsoringOptionSchema,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/options`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: createSponsoringOptionSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * @summary Delete sponsoring option
  */
 export const deleteOrgsEventsOptions = (
-    orgSlug: string,
-    eventSlug: string,
-    optionId: string,
- options?: SecondParameter<typeof customFetch<DeleteOrgsEventsOptions204>>,) => {
-      return customFetch<DeleteOrgsEventsOptions204>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/options/${optionId}`, method: 'DELETE'
-    },
-      options);
-    }
-  
+  orgSlug: string,
+  eventSlug: string,
+  optionId: string,
+  options?: SecondParameter<typeof customFetch<DeleteOrgsEventsOptions204>>,
+) => {
+  return customFetch<DeleteOrgsEventsOptions204>(
+    { url: `/orgs/${orgSlug}/events/${eventSlug}/options/${optionId}`, method: "DELETE" },
+    options,
+  );
+};
+
 /**
  * @summary Update sponsoring option
  */
 export const putOrgsEventsOptions = (
-    orgSlug: string,
-    eventSlug: string,
-    optionId: string,
-    createSponsoringOptionSchema: CreateSponsoringOptionSchema,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/options/${optionId}`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: createSponsoringOptionSchema
+  orgSlug: string,
+  eventSlug: string,
+  optionId: string,
+  createSponsoringOptionSchema: CreateSponsoringOptionSchema,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/options/${optionId}`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: createSponsoringOptionSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * List sponsoring packs for an event
  * @summary Get organization details
  */
 export const getOrgsEventsPacks = (
-    orgSlug: string,
-    eventSlug: string,
- options?: SecondParameter<typeof customFetch<SponsoringPackSchema[]>>,) => {
-      return customFetch<SponsoringPackSchema[]>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/packs`, method: 'GET'
-    },
-      options);
-    }
-  
+  orgSlug: string,
+  eventSlug: string,
+  options?: SecondParameter<typeof customFetch<SponsoringPackSchema[]>>,
+) => {
+  return customFetch<SponsoringPackSchema[]>(
+    { url: `/orgs/${orgSlug}/events/${eventSlug}/packs`, method: "GET" },
+    options,
+  );
+};
+
 /**
  * Create a new sponsoring pack
  * @summary Create sponsoring pack
  */
 export const postOrgsEventsPacks = (
-    orgSlug: string,
-    eventSlug: string,
-    createSponsoringPackSchema: CreateSponsoringPackSchema,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/packs`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createSponsoringPackSchema
+  orgSlug: string,
+  eventSlug: string,
+  createSponsoringPackSchema: CreateSponsoringPackSchema,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/packs`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: createSponsoringPackSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * @summary Delete sponsoring pack
  */
 export const deleteOrgsEventsPacks = (
-    orgSlug: string,
-    eventSlug: string,
-    packId: string,
- options?: SecondParameter<typeof customFetch<DeleteOrgsEventsPacks204>>,) => {
-      return customFetch<DeleteOrgsEventsPacks204>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/packs/${packId}`, method: 'DELETE'
-    },
-      options);
-    }
-  
+  orgSlug: string,
+  eventSlug: string,
+  packId: string,
+  options?: SecondParameter<typeof customFetch<DeleteOrgsEventsPacks204>>,
+) => {
+  return customFetch<DeleteOrgsEventsPacks204>(
+    { url: `/orgs/${orgSlug}/events/${eventSlug}/packs/${packId}`, method: "DELETE" },
+    options,
+  );
+};
+
 /**
  * @summary Update sponsoring pack
  */
 export const putOrgsEventsPacks = (
-    orgSlug: string,
-    eventSlug: string,
-    packId: string,
-    createSponsoringPackSchema: CreateSponsoringPackSchema,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/packs/${packId}`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: createSponsoringPackSchema
+  orgSlug: string,
+  eventSlug: string,
+  packId: string,
+  createSponsoringPackSchema: CreateSponsoringPackSchema,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/packs/${packId}`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: createSponsoringPackSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Synchronizes the complete set of options for a sponsoring pack.
 
@@ -3247,110 +3370,125 @@ Both required and optional lists can be empty to remove all options from the pac
  * @summary Synchronize sponsoring pack options
  */
 export const postOrgsEventsPacksOptions = (
-    orgSlug: string,
-    eventSlug: string,
-    packId: string,
-    attachOptionsToPackSchema: AttachOptionsToPackSchema,
- options?: SecondParameter<typeof customFetch<void>>,) => {
-      return customFetch<void>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/packs/${packId}/options`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: attachOptionsToPackSchema
+  orgSlug: string,
+  eventSlug: string,
+  packId: string,
+  attachOptionsToPackSchema: AttachOptionsToPackSchema,
+  options?: SecondParameter<typeof customFetch<void>>,
+) => {
+  return customFetch<void>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/packs/${packId}/options`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: attachOptionsToPackSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * @summary Delete sponsoring option
  */
 export const deleteOrgsEventsPacksOptions = (
-    orgSlug: string,
-    eventSlug: string,
-    packId: string,
-    optionId: string,
- options?: SecondParameter<typeof customFetch<DeleteOrgsEventsPacksOptions204>>,) => {
-      return customFetch<DeleteOrgsEventsPacksOptions204>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/packs/${packId}/options/${optionId}`, method: 'DELETE'
+  orgSlug: string,
+  eventSlug: string,
+  packId: string,
+  optionId: string,
+  options?: SecondParameter<typeof customFetch<DeleteOrgsEventsPacksOptions204>>,
+) => {
+  return customFetch<DeleteOrgsEventsPacksOptions204>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/packs/${packId}/options/${optionId}`,
+      method: "DELETE",
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Get communication plan for all partnerships of an event, grouped by status
  * @summary Get organization details
  */
 export const getOrgsEventsCommunication = (
-    orgSlug: string,
-    eventSlug: string,
- options?: SecondParameter<typeof customFetch<CommunicationPlanSchema>>,) => {
-      return customFetch<CommunicationPlanSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/communication`, method: 'GET'
-    },
-      options);
-    }
-  
+  orgSlug: string,
+  eventSlug: string,
+  options?: SecondParameter<typeof customFetch<CommunicationPlanSchema>>,
+) => {
+  return customFetch<CommunicationPlanSchema>(
+    { url: `/orgs/${orgSlug}/events/${eventSlug}/communication`, method: "GET" },
+    options,
+  );
+};
+
 /**
  * Attach a new external link to an event
  * @summary Add external link
  */
 export const postOrgsEventsExternalLink = (
-    orgSlug: string,
-    eventSlug: string,
-    createEventExternalLinkSchema: CreateEventExternalLinkSchema,
- options?: SecondParameter<typeof customFetch<ErrorResponseSchema>>,) => {
-      return customFetch<ErrorResponseSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/external-link`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createEventExternalLinkSchema
+  orgSlug: string,
+  eventSlug: string,
+  createEventExternalLinkSchema: CreateEventExternalLinkSchema,
+  options?: SecondParameter<typeof customFetch<ErrorResponseSchema>>,
+) => {
+  return customFetch<ErrorResponseSchema>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/external-link`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: createEventExternalLinkSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Remove an external link by its ID
  * @summary Delete external link
  */
 export const deleteOrgsEventsExternalLink = (
-    orgSlug: string,
-    eventSlug: string,
-    linkId: string,
- options?: SecondParameter<typeof customFetch<void>>,) => {
-      return customFetch<void>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/external-link/${linkId}`, method: 'DELETE'
-    },
-      options);
-    }
-  
+  orgSlug: string,
+  eventSlug: string,
+  linkId: string,
+  options?: SecondParameter<typeof customFetch<void>>,
+) => {
+  return customFetch<void>(
+    { url: `/orgs/${orgSlug}/events/${eventSlug}/external-link/${linkId}`, method: "DELETE" },
+    options,
+  );
+};
+
 /**
  * Trigger fetch and storage of event agenda data from agenda integration. Requires organization write permissions.
  * @summary Fetch and update agenda from agenda integration
  */
 export const updateEventAgenda = (
-    orgSlug: string,
-    eventSlug: string,
- options?: SecondParameter<typeof customFetch<void>>,) => {
-      return customFetch<void>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/agenda`, method: 'POST'
-    },
-      options);
-    }
-  
+  orgSlug: string,
+  eventSlug: string,
+  options?: SecondParameter<typeof customFetch<void>>,
+) => {
+  return customFetch<void>(
+    { url: `/orgs/${orgSlug}/events/${eventSlug}/agenda`, method: "POST" },
+    options,
+  );
+};
+
 /**
  * List partnerships for an event with filtering options
  * @summary Get partnership list
  */
 export const getOrgsEventsPartnership = (
-    orgSlug: string,
-    eventSlug: string,
-    params?: GetOrgsEventsPartnershipParams,
- options?: SecondParameter<typeof customFetch<PartnershipItemSchema[]>>,) => {
-      return customFetch<PartnershipItemSchema[]>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships`, method: 'GET',
-        params
-    },
-      options);
-    }
-  
+  orgSlug: string,
+  eventSlug: string,
+  params?: GetOrgsEventsPartnershipParams,
+  options?: SecondParameter<typeof customFetch<PartnershipItemSchema[]>>,
+) => {
+  return customFetch<PartnershipItemSchema[]>(
+    { url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships`, method: "GET", params },
+    options,
+  );
+};
+
 /**
  * Deletes a partnership that has not been finalized (validated or declined).
 Only partnerships where both validatedAt and declinedAt are null can be deleted.
@@ -3360,459 +3498,646 @@ Performs a hard delete with no audit trail.
  * @summary Delete an unvalidated partnership
  */
 export const deletePartnership = (
-    orgSlug: string,
-    eventSlug: string,
-    partnershipId: string,
- options?: SecondParameter<typeof customFetch<void>>,) => {
-      return customFetch<void>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}`, method: 'DELETE'
-    },
-      options);
-    }
-  
+  orgSlug: string,
+  eventSlug: string,
+  partnershipId: string,
+  options?: SecondParameter<typeof customFetch<void>>,
+) => {
+  return customFetch<void>(
+    { url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}`, method: "DELETE" },
+    options,
+  );
+};
+
 /**
  * Generate a partnership agreement PDF
  * @summary Generate partnership agreement
  */
 export const postOrgsEventsPartnershipAgreement = (
-    orgSlug: string,
-    eventSlug: string,
-    partnershipId: string,
- options?: SecondParameter<typeof customFetch<PostOrgsEventsPartnershipAgreement200>>,) => {
-      return customFetch<PostOrgsEventsPartnershipAgreement200>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/agreement`, method: 'POST'
+  orgSlug: string,
+  eventSlug: string,
+  partnershipId: string,
+  options?: SecondParameter<typeof customFetch<PostOrgsEventsPartnershipAgreement200>>,
+) => {
+  return customFetch<PostOrgsEventsPartnershipAgreement200>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/agreement`,
+      method: "POST",
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Update the billing status of a partnership.
  * @summary Update partnership billing status
  */
 export const postOrgsEventsPartnershipBilling = (
-    orgSlug: string,
-    eventSlug: string,
-    partnershipId: string,
-    billingStatus: 'pending' | 'sent' | 'paid',
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/billing/${billingStatus}`, method: 'POST'
+  orgSlug: string,
+  eventSlug: string,
+  partnershipId: string,
+  billingStatus: "pending" | "sent" | "paid",
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/billing/${billingStatus}`,
+      method: "POST",
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Assign booth location to a partnership
  * @summary Update organization
  */
 export const putOrgsEventsPartnershipBoothLocation = (
-    orgSlug: string,
-    eventSlug: string,
-    partnershipId: string,
-    boothLocationRequestSchema: BoothLocationRequestSchema,
- options?: SecondParameter<typeof customFetch<BoothLocationResponseSchema>>,) => {
-      return customFetch<BoothLocationResponseSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/booth-location`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: boothLocationRequestSchema
+  orgSlug: string,
+  eventSlug: string,
+  partnershipId: string,
+  boothLocationRequestSchema: BoothLocationRequestSchema,
+  options?: SecondParameter<typeof customFetch<BoothLocationResponseSchema>>,
+) => {
+  return customFetch<BoothLocationResponseSchema>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/booth-location`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: boothLocationRequestSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * @summary Create partnership suggestion
  */
 export const postOrgsEventsPartnershipSuggestion = (
-    orgSlug: string,
-    eventSlug: string,
-    partnershipId: string,
-    suggestPartnershipSchema: SuggestPartnershipSchema,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/suggestion`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: suggestPartnershipSchema
+  orgSlug: string,
+  eventSlug: string,
+  partnershipId: string,
+  suggestPartnershipSchema: SuggestPartnershipSchema,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/suggestion`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: suggestPartnershipSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Validate a partnership request
  * @summary Validate partnership
  */
 export const postOrgsEventsPartnershipValidate = (
-    orgSlug: string,
-    eventSlug: string,
-    partnershipId: string,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/validate`, method: 'POST'
+  orgSlug: string,
+  eventSlug: string,
+  partnershipId: string,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/validate`,
+      method: "POST",
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Decline a partnership request
  * @summary Decline partnership
  */
 export const postOrgsEventsPartnershipDecline = (
-    orgSlug: string,
-    eventSlug: string,
-    partnershipId: string,
- options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
-      return customFetch<IdentifierSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/decline`, method: 'POST'
+  orgSlug: string,
+  eventSlug: string,
+  partnershipId: string,
+  options?: SecondParameter<typeof customFetch<IdentifierSchema>>,
+) => {
+  return customFetch<IdentifierSchema>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/decline`,
+      method: "POST",
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Schedule publication date for partnership communication
  * @summary Update organization
  */
 export const putOrgsEventsPartnershipCommunicationPublication = (
-    orgSlug: string,
-    eventSlug: string,
-    partnershipId: string,
-    publicationDateRequestSchema: PublicationDateRequestSchema,
- options?: SecondParameter<typeof customFetch<PublicationDateResponseSchema>>,) => {
-      return customFetch<PublicationDateResponseSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/communication/publication`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: publicationDateRequestSchema
+  orgSlug: string,
+  eventSlug: string,
+  partnershipId: string,
+  publicationDateRequestSchema: PublicationDateRequestSchema,
+  options?: SecondParameter<typeof customFetch<PublicationDateResponseSchema>>,
+) => {
+  return customFetch<PublicationDateResponseSchema>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/communication/publication`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: publicationDateRequestSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Upload visual support material for partnership communication
  * @summary Update organization
  */
 export const putOrgsEventsPartnershipCommunicationSupport = (
-    orgSlug: string,
-    eventSlug: string,
-    partnershipId: string,
-    putOrgsEventsPartnershipCommunicationSupportBody: Blob,
- options?: SecondParameter<typeof customFetch<SupportUploadResponseSchema>>,) => {
-      return customFetch<SupportUploadResponseSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/communication/support`, method: 'PUT',
-      headers: {'Content-Type': 'image/png', },
-      data: putOrgsEventsPartnershipCommunicationSupportBody
+  orgSlug: string,
+  eventSlug: string,
+  partnershipId: string,
+  putOrgsEventsPartnershipCommunicationSupportBody: Blob,
+  options?: SecondParameter<typeof customFetch<SupportUploadResponseSchema>>,
+) => {
+  return customFetch<SupportUploadResponseSchema>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/communication/support`,
+      method: "PUT",
+      headers: { "Content-Type": "image/png" },
+      data: putOrgsEventsPartnershipCommunicationSupportBody,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Get paginated list of job offer promotions for a specific partnership. Public endpoint accessible without authentication.
  * @summary List job offers for partnership
  */
 export const listPartnershipJobOffers = (
-    orgSlug: string,
-    eventSlug: string,
-    partnershipId: string,
-    params?: ListPartnershipJobOffersParams,
- options?: SecondParameter<typeof customFetch<ListPartnershipJobOffers200>>,) => {
-      return customFetch<ListPartnershipJobOffers200>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/job-offers`, method: 'GET',
-        params
+  orgSlug: string,
+  eventSlug: string,
+  partnershipId: string,
+  params?: ListPartnershipJobOffersParams,
+  options?: SecondParameter<typeof customFetch<ListPartnershipJobOffers200>>,
+) => {
+  return customFetch<ListPartnershipJobOffers200>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/job-offers`,
+      method: "GET",
+      params,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Get paginated list of all job offer promotions for an event. Requires organization edit permissions.
  * @summary List all job offers for event
  */
 export const listEventJobOfferPromotions = (
-    orgSlug: string,
-    eventSlug: string,
-    params?: ListEventJobOfferPromotionsParams,
- options?: SecondParameter<typeof customFetch<ListEventJobOfferPromotions200>>,) => {
-      return customFetch<ListEventJobOfferPromotions200>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/job-offers`, method: 'GET',
-        params
-    },
-      options);
-    }
-  
+  orgSlug: string,
+  eventSlug: string,
+  params?: ListEventJobOfferPromotionsParams,
+  options?: SecondParameter<typeof customFetch<ListEventJobOfferPromotions200>>,
+) => {
+  return customFetch<ListEventJobOfferPromotions200>(
+    { url: `/orgs/${orgSlug}/events/${eventSlug}/job-offers`, method: "GET", params },
+    options,
+  );
+};
+
 /**
  * Approve a pending job offer promotion. Requires organization edit permissions. Sends notification to company.
  * @summary Approve job offer promotion
  */
 export const approveJobOfferPromotion = (
-    orgSlug: string,
-    eventSlug: string,
-    partnershipId: string,
-    promotionId: string,
-    approveJobOfferPromotionBody: ApproveJobOfferPromotionBody,
- options?: SecondParameter<typeof customFetch<JobOfferPromotionResponseSchema>>,) => {
-      return customFetch<JobOfferPromotionResponseSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/job-offers/${promotionId}/approve`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: approveJobOfferPromotionBody
+  orgSlug: string,
+  eventSlug: string,
+  partnershipId: string,
+  promotionId: string,
+  approveJobOfferPromotionBody: ApproveJobOfferPromotionBody,
+  options?: SecondParameter<typeof customFetch<JobOfferPromotionResponseSchema>>,
+) => {
+  return customFetch<JobOfferPromotionResponseSchema>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/job-offers/${promotionId}/approve`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: approveJobOfferPromotionBody,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Decline a pending job offer promotion with optional reason. Requires organization edit permissions. Sends notification to company.
  * @summary Decline job offer promotion
  */
 export const declineJobOfferPromotion = (
-    orgSlug: string,
-    eventSlug: string,
-    partnershipId: string,
-    promotionId: string,
-    declineJobOfferPromotionSchema: DeclineJobOfferPromotionSchema,
- options?: SecondParameter<typeof customFetch<JobOfferPromotionResponseSchema>>,) => {
-      return customFetch<JobOfferPromotionResponseSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/job-offers/${promotionId}/decline`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: declineJobOfferPromotionSchema
+  orgSlug: string,
+  eventSlug: string,
+  partnershipId: string,
+  promotionId: string,
+  declineJobOfferPromotionSchema: DeclineJobOfferPromotionSchema,
+  options?: SecondParameter<typeof customFetch<JobOfferPromotionResponseSchema>>,
+) => {
+  return customFetch<JobOfferPromotionResponseSchema>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/job-offers/${promotionId}/decline`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: declineJobOfferPromotionSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Assign an organiser to manage a specific partnership. The organiser must be a member of the organization with edit permissions.
  * @summary Assign organiser to partnership
  */
 export const postPartnershipOrganiser = (
-    orgSlug: string,
-    eventSlug: string,
-    partnershipId: string,
-    assignOrganiserRequestSchema: AssignOrganiserRequestSchema,
- options?: SecondParameter<typeof customFetch<PartnershipOrganiserResponseSchema>>,) => {
-      return customFetch<PartnershipOrganiserResponseSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/organiser`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: assignOrganiserRequestSchema
+  orgSlug: string,
+  eventSlug: string,
+  partnershipId: string,
+  assignOrganiserRequestSchema: AssignOrganiserRequestSchema,
+  options?: SecondParameter<typeof customFetch<PartnershipOrganiserResponseSchema>>,
+) => {
+  return customFetch<PartnershipOrganiserResponseSchema>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/organiser`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: assignOrganiserRequestSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Remove the assigned organiser from a partnership
  * @summary Remove organiser from partnership
  */
 export const deletePartnershipOrganiser = (
-    orgSlug: string,
-    eventSlug: string,
-    partnershipId: string,
- options?: SecondParameter<typeof customFetch<PartnershipOrganiserResponseSchema>>,) => {
-      return customFetch<PartnershipOrganiserResponseSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/organiser`, method: 'DELETE'
+  orgSlug: string,
+  eventSlug: string,
+  partnershipId: string,
+  options?: SecondParameter<typeof customFetch<PartnershipOrganiserResponseSchema>>,
+) => {
+  return customFetch<PartnershipOrganiserResponseSchema>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/organiser`,
+      method: "DELETE",
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * List providers attached to an event with pagination (requires organization membership)
  * @summary List event providers
  */
 export const getOrgsEventsProviders = (
-    orgSlug: string,
-    eventSlug: string,
-    params?: GetOrgsEventsProvidersParams,
- options?: SecondParameter<typeof customFetch<PaginatedProviderSchema>>,) => {
-      return customFetch<PaginatedProviderSchema>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/providers`, method: 'GET',
-        params
-    },
-      options);
-    }
-  
+  orgSlug: string,
+  eventSlug: string,
+  params?: GetOrgsEventsProvidersParams,
+  options?: SecondParameter<typeof customFetch<PaginatedProviderSchema>>,
+) => {
+  return customFetch<PaginatedProviderSchema>(
+    { url: `/orgs/${orgSlug}/events/${eventSlug}/providers`, method: "GET", params },
+    options,
+  );
+};
+
 /**
  * Attach providers to an event (requires event write access)
  * @summary Create new provider
  */
 export const postOrgsEventsProviders = (
-    orgSlug: string,
-    eventSlug: string,
-    createByIdentifiersSchema: CreateByIdentifiersSchema,
- options?: SecondParameter<typeof customFetch<string[]>>,) => {
-      return customFetch<string[]>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/providers`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createByIdentifiersSchema
+  orgSlug: string,
+  eventSlug: string,
+  createByIdentifiersSchema: CreateByIdentifiersSchema,
+  options?: SecondParameter<typeof customFetch<string[]>>,
+) => {
+  return customFetch<string[]>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/providers`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: createByIdentifiersSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Remove providers from an event (requires event write access)
  * @summary Remove providers from event
  */
 export const deleteOrgsEventsProviders = (
-    orgSlug: string,
-    eventSlug: string,
-    createByIdentifiersSchema: CreateByIdentifiersSchema,
- options?: SecondParameter<typeof customFetch<string[]>>,) => {
-      return customFetch<string[]>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/providers`, method: 'DELETE',
-      headers: {'Content-Type': 'application/json', },
-      data: createByIdentifiersSchema
+  orgSlug: string,
+  eventSlug: string,
+  createByIdentifiersSchema: CreateByIdentifiersSchema,
+  options?: SecondParameter<typeof customFetch<string[]>>,
+) => {
+  return customFetch<string[]>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/providers`,
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      data: createByIdentifiersSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * @summary Get organization details
  */
 export const getOrgsUsers = (
-    orgSlug: string,
- options?: SecondParameter<typeof customFetch<UserSchema[]>>,) => {
-      return customFetch<UserSchema[]>(
-      {url: `/orgs/${orgSlug}/users`, method: 'GET'
-    },
-      options);
-    }
-  
+  orgSlug: string,
+  options?: SecondParameter<typeof customFetch<UserSchema[]>>,
+) => {
+  return customFetch<UserSchema[]>({ url: `/orgs/${orgSlug}/users`, method: "GET" }, options);
+};
+
 /**
  * @summary Create resource
  */
 export const postOrgsUsersGrant = (
-    orgSlug: string,
-    grantPermissionRequestSchema: GrantPermissionRequestSchema,
- options?: SecondParameter<typeof customFetch<string>>,) => {
-      return customFetch<string>(
-      {url: `/orgs/${orgSlug}/users/grant`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: grantPermissionRequestSchema
+  orgSlug: string,
+  grantPermissionRequestSchema: GrantPermissionRequestSchema,
+  options?: SecondParameter<typeof customFetch<string>>,
+) => {
+  return customFetch<string>(
+    {
+      url: `/orgs/${orgSlug}/users/grant`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: grantPermissionRequestSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * Revoke edit permissions for multiple users on an organisation
  * @summary Revoke user permissions
  */
 export const postOrgsUsersRevoke = (
-    orgSlug: string,
-    revokePermissionRequestSchema: RevokePermissionRequestSchema,
- options?: SecondParameter<typeof customFetch<RevokeUsersResultSchema>>,) => {
-      return customFetch<RevokeUsersResultSchema>(
-      {url: `/orgs/${orgSlug}/users/revoke`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: revokePermissionRequestSchema
+  orgSlug: string,
+  revokePermissionRequestSchema: RevokePermissionRequestSchema,
+  options?: SecondParameter<typeof customFetch<RevokeUsersResultSchema>>,
+) => {
+  return customFetch<RevokeUsersResultSchema>(
+    {
+      url: `/orgs/${orgSlug}/users/revoke`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: revokePermissionRequestSchema,
     },
-      options);
-    }
-  
+    options,
+  );
+};
+
 /**
  * @summary List organization events
  */
 export const getUsersMeEvents = (
-    
- options?: SecondParameter<typeof customFetch<EventSummarySchema[]>>,) => {
-      return customFetch<EventSummarySchema[]>(
-      {url: `/users/me/events`, method: 'GET'
-    },
-      options);
-    }
-  
+  options?: SecondParameter<typeof customFetch<EventSummarySchema[]>>,
+) => {
+  return customFetch<EventSummarySchema[]>({ url: `/users/me/events`, method: "GET" }, options);
+};
+
 /**
  * @summary Get resource
  */
 export const getUsersMeOrgs = (
-    
- options?: SecondParameter<typeof customFetch<OrganisationItemSchema[]>>,) => {
-      return customFetch<OrganisationItemSchema[]>(
-      {url: `/users/me/orgs`, method: 'GET'
-    },
-      options);
-    }
-  
-export type GetAuthCallbackResult = NonNullable<Awaited<ReturnType<typeof getAuthCallback>>>
-export type GetAuthLoginResult = NonNullable<Awaited<ReturnType<typeof getAuthLogin>>>
-export type GetAuthLogoutResult = NonNullable<Awaited<ReturnType<typeof getAuthLogout>>>
-export type GetAuthMeResult = NonNullable<Awaited<ReturnType<typeof getAuthMe>>>
-export type GetCompaniesResult = NonNullable<Awaited<ReturnType<typeof getCompanies>>>
-export type PostCompaniesResult = NonNullable<Awaited<ReturnType<typeof postCompanies>>>
-export type GetCompanyByIdResult = NonNullable<Awaited<ReturnType<typeof getCompanyById>>>
-export type PutCompanyByIdResult = NonNullable<Awaited<ReturnType<typeof putCompanyById>>>
-export type DeleteCompanyByIdResult = NonNullable<Awaited<ReturnType<typeof deleteCompanyById>>>
-export type PostCompaniesLogoResult = NonNullable<Awaited<ReturnType<typeof postCompaniesLogo>>>
-export type GetCompaniesPartnershipResult = NonNullable<Awaited<ReturnType<typeof getCompaniesPartnership>>>
-export type GetCompaniesJobOffersResult = NonNullable<Awaited<ReturnType<typeof getCompaniesJobOffers>>>
-export type PostCompaniesJobOffersResult = NonNullable<Awaited<ReturnType<typeof postCompaniesJobOffers>>>
-export type GetCompaniesJobOffersByIdResult = NonNullable<Awaited<ReturnType<typeof getCompaniesJobOffersById>>>
-export type PutCompaniesJobOffersByIdResult = NonNullable<Awaited<ReturnType<typeof putCompaniesJobOffersById>>>
-export type DeleteCompaniesJobOffersByIdResult = NonNullable<Awaited<ReturnType<typeof deleteCompaniesJobOffersById>>>
-export type PromoteJobOfferToPartnershipResult = NonNullable<Awaited<ReturnType<typeof promoteJobOfferToPartnership>>>
-export type ListJobOfferPromotionsResult = NonNullable<Awaited<ReturnType<typeof listJobOfferPromotions>>>
-export type GetEventsResult = NonNullable<Awaited<ReturnType<typeof getEvents>>>
-export type GetEventBySlugResult = NonNullable<Awaited<ReturnType<typeof getEventBySlug>>>
-export type GetEventAgendaPublicResult = NonNullable<Awaited<ReturnType<typeof getEventAgendaPublic>>>
-export type GetEventsSponsoringPacksResult = NonNullable<Awaited<ReturnType<typeof getEventsSponsoringPacks>>>
-export type PostEventsPartnershipResult = NonNullable<Awaited<ReturnType<typeof postEventsPartnership>>>
-export type GetEventsPartnershipDetailedResult = NonNullable<Awaited<ReturnType<typeof getEventsPartnershipDetailed>>>
-export type UpdatePartnershipContactInfoResult = NonNullable<Awaited<ReturnType<typeof updatePartnershipContactInfo>>>
-export type GetEventsPartnershipBillingResult = NonNullable<Awaited<ReturnType<typeof getEventsPartnershipBilling>>>
-export type PostEventsPartnershipBillingResult = NonNullable<Awaited<ReturnType<typeof postEventsPartnershipBilling>>>
-export type PutEventsPartnershipBillingResult = NonNullable<Awaited<ReturnType<typeof putEventsPartnershipBilling>>>
-export type PostEventsPartnershipBillingInvoiceResult = NonNullable<Awaited<ReturnType<typeof postEventsPartnershipBillingInvoice>>>
-export type PostEventsPartnershipBillingQuoteResult = NonNullable<Awaited<ReturnType<typeof postEventsPartnershipBillingQuote>>>
-export type PostEventsPartnershipSignedAgreementResult = NonNullable<Awaited<ReturnType<typeof postEventsPartnershipSignedAgreement>>>
-export type PostEventsPartnershipSuggestionApproveResult = NonNullable<Awaited<ReturnType<typeof postEventsPartnershipSuggestionApprove>>>
-export type PostEventsPartnershipSuggestionDeclineResult = NonNullable<Awaited<ReturnType<typeof postEventsPartnershipSuggestionDecline>>>
-export type GetEventsPartnershipTicketsResult = NonNullable<Awaited<ReturnType<typeof getEventsPartnershipTickets>>>
-export type PostEventsPartnershipTicketsResult = NonNullable<Awaited<ReturnType<typeof postEventsPartnershipTickets>>>
-export type PutEventsPartnershipTicketsResult = NonNullable<Awaited<ReturnType<typeof putEventsPartnershipTickets>>>
-export type GetPartnershipJobOffersResult = NonNullable<Awaited<ReturnType<typeof getPartnershipJobOffers>>>
-export type AttachSpeakerToPartnershipResult = NonNullable<Awaited<ReturnType<typeof attachSpeakerToPartnership>>>
-export type DetachSpeakerFromPartnershipResult = NonNullable<Awaited<ReturnType<typeof detachSpeakerFromPartnership>>>
-export type GetProvidersResult = NonNullable<Awaited<ReturnType<typeof getProviders>>>
-export type PostProvidersResult = NonNullable<Awaited<ReturnType<typeof postProviders>>>
-export type PostOrgsResult = NonNullable<Awaited<ReturnType<typeof postOrgs>>>
-export type GetOrgsResult = NonNullable<Awaited<ReturnType<typeof getOrgs>>>
-export type PutOrgsResult = NonNullable<Awaited<ReturnType<typeof putOrgs>>>
-export type PostOrgsProvidersResult = NonNullable<Awaited<ReturnType<typeof postOrgsProviders>>>
-export type PutOrgsProvidersResult = NonNullable<Awaited<ReturnType<typeof putOrgsProviders>>>
-export type DeleteOrgsProvidersResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsProviders>>>
-export type GetOrgsEventsResult = NonNullable<Awaited<ReturnType<typeof getOrgsEvents>>>
-export type PostOrgsEventsResult = NonNullable<Awaited<ReturnType<typeof postOrgsEvents>>>
-export type PutOrgsEventsResult = NonNullable<Awaited<ReturnType<typeof putOrgsEvents>>>
-export type PostOrgsEventsBoothPlanResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsBoothPlan>>>
-export type GetOrgsEventsIntegrationsResult = NonNullable<Awaited<ReturnType<typeof getOrgsEventsIntegrations>>>
-export type PostOrgsEventsIntegrationsResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsIntegrations>>>
-export type DeleteOrgsEventsIntegrationsResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsEventsIntegrations>>>
-export type GetStatusIntegrationResult = NonNullable<Awaited<ReturnType<typeof getStatusIntegration>>>
-export type GetOrgsEventsOptionsResult = NonNullable<Awaited<ReturnType<typeof getOrgsEventsOptions>>>
-export type PostOrgsEventsOptionsResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsOptions>>>
-export type DeleteOrgsEventsOptionsResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsEventsOptions>>>
-export type PutOrgsEventsOptionsResult = NonNullable<Awaited<ReturnType<typeof putOrgsEventsOptions>>>
-export type GetOrgsEventsPacksResult = NonNullable<Awaited<ReturnType<typeof getOrgsEventsPacks>>>
-export type PostOrgsEventsPacksResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsPacks>>>
-export type DeleteOrgsEventsPacksResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsEventsPacks>>>
-export type PutOrgsEventsPacksResult = NonNullable<Awaited<ReturnType<typeof putOrgsEventsPacks>>>
-export type PostOrgsEventsPacksOptionsResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsPacksOptions>>>
-export type DeleteOrgsEventsPacksOptionsResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsEventsPacksOptions>>>
-export type GetOrgsEventsCommunicationResult = NonNullable<Awaited<ReturnType<typeof getOrgsEventsCommunication>>>
-export type PostOrgsEventsExternalLinkResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsExternalLink>>>
-export type DeleteOrgsEventsExternalLinkResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsEventsExternalLink>>>
-export type UpdateEventAgendaResult = NonNullable<Awaited<ReturnType<typeof updateEventAgenda>>>
-export type GetOrgsEventsPartnershipResult = NonNullable<Awaited<ReturnType<typeof getOrgsEventsPartnership>>>
-export type DeletePartnershipResult = NonNullable<Awaited<ReturnType<typeof deletePartnership>>>
-export type PostOrgsEventsPartnershipAgreementResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsPartnershipAgreement>>>
-export type PostOrgsEventsPartnershipBillingResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsPartnershipBilling>>>
-export type PutOrgsEventsPartnershipBoothLocationResult = NonNullable<Awaited<ReturnType<typeof putOrgsEventsPartnershipBoothLocation>>>
-export type PostOrgsEventsPartnershipSuggestionResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsPartnershipSuggestion>>>
-export type PostOrgsEventsPartnershipValidateResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsPartnershipValidate>>>
-export type PostOrgsEventsPartnershipDeclineResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsPartnershipDecline>>>
-export type PutOrgsEventsPartnershipCommunicationPublicationResult = NonNullable<Awaited<ReturnType<typeof putOrgsEventsPartnershipCommunicationPublication>>>
-export type PutOrgsEventsPartnershipCommunicationSupportResult = NonNullable<Awaited<ReturnType<typeof putOrgsEventsPartnershipCommunicationSupport>>>
-export type ListPartnershipJobOffersResult = NonNullable<Awaited<ReturnType<typeof listPartnershipJobOffers>>>
-export type ListEventJobOfferPromotionsResult = NonNullable<Awaited<ReturnType<typeof listEventJobOfferPromotions>>>
-export type ApproveJobOfferPromotionResult = NonNullable<Awaited<ReturnType<typeof approveJobOfferPromotion>>>
-export type DeclineJobOfferPromotionResult = NonNullable<Awaited<ReturnType<typeof declineJobOfferPromotion>>>
-export type PostPartnershipOrganiserResult = NonNullable<Awaited<ReturnType<typeof postPartnershipOrganiser>>>
-export type DeletePartnershipOrganiserResult = NonNullable<Awaited<ReturnType<typeof deletePartnershipOrganiser>>>
-export type GetOrgsEventsProvidersResult = NonNullable<Awaited<ReturnType<typeof getOrgsEventsProviders>>>
-export type PostOrgsEventsProvidersResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsProviders>>>
-export type DeleteOrgsEventsProvidersResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsEventsProviders>>>
-export type GetOrgsUsersResult = NonNullable<Awaited<ReturnType<typeof getOrgsUsers>>>
-export type PostOrgsUsersGrantResult = NonNullable<Awaited<ReturnType<typeof postOrgsUsersGrant>>>
-export type PostOrgsUsersRevokeResult = NonNullable<Awaited<ReturnType<typeof postOrgsUsersRevoke>>>
-export type GetUsersMeEventsResult = NonNullable<Awaited<ReturnType<typeof getUsersMeEvents>>>
-export type GetUsersMeOrgsResult = NonNullable<Awaited<ReturnType<typeof getUsersMeOrgs>>>
+  options?: SecondParameter<typeof customFetch<OrganisationItemSchema[]>>,
+) => {
+  return customFetch<OrganisationItemSchema[]>({ url: `/users/me/orgs`, method: "GET" }, options);
+};
+
+export type GetAuthCallbackResult = NonNullable<Awaited<ReturnType<typeof getAuthCallback>>>;
+export type GetAuthLoginResult = NonNullable<Awaited<ReturnType<typeof getAuthLogin>>>;
+export type GetAuthLogoutResult = NonNullable<Awaited<ReturnType<typeof getAuthLogout>>>;
+export type GetAuthMeResult = NonNullable<Awaited<ReturnType<typeof getAuthMe>>>;
+export type GetCompaniesResult = NonNullable<Awaited<ReturnType<typeof getCompanies>>>;
+export type PostCompaniesResult = NonNullable<Awaited<ReturnType<typeof postCompanies>>>;
+export type GetCompanyByIdResult = NonNullable<Awaited<ReturnType<typeof getCompanyById>>>;
+export type PutCompanyByIdResult = NonNullable<Awaited<ReturnType<typeof putCompanyById>>>;
+export type DeleteCompanyByIdResult = NonNullable<Awaited<ReturnType<typeof deleteCompanyById>>>;
+export type PostCompaniesLogoResult = NonNullable<Awaited<ReturnType<typeof postCompaniesLogo>>>;
+export type GetCompaniesPartnershipResult = NonNullable<
+  Awaited<ReturnType<typeof getCompaniesPartnership>>
+>;
+export type GetCompaniesJobOffersResult = NonNullable<
+  Awaited<ReturnType<typeof getCompaniesJobOffers>>
+>;
+export type PostCompaniesJobOffersResult = NonNullable<
+  Awaited<ReturnType<typeof postCompaniesJobOffers>>
+>;
+export type GetCompaniesJobOffersByIdResult = NonNullable<
+  Awaited<ReturnType<typeof getCompaniesJobOffersById>>
+>;
+export type PutCompaniesJobOffersByIdResult = NonNullable<
+  Awaited<ReturnType<typeof putCompaniesJobOffersById>>
+>;
+export type DeleteCompaniesJobOffersByIdResult = NonNullable<
+  Awaited<ReturnType<typeof deleteCompaniesJobOffersById>>
+>;
+export type PromoteJobOfferToPartnershipResult = NonNullable<
+  Awaited<ReturnType<typeof promoteJobOfferToPartnership>>
+>;
+export type ListJobOfferPromotionsResult = NonNullable<
+  Awaited<ReturnType<typeof listJobOfferPromotions>>
+>;
+export type GetEventsResult = NonNullable<Awaited<ReturnType<typeof getEvents>>>;
+export type GetEventBySlugResult = NonNullable<Awaited<ReturnType<typeof getEventBySlug>>>;
+export type GetEventAgendaPublicResult = NonNullable<
+  Awaited<ReturnType<typeof getEventAgendaPublic>>
+>;
+export type GetEventsSponsoringPacksResult = NonNullable<
+  Awaited<ReturnType<typeof getEventsSponsoringPacks>>
+>;
+export type PostEventsPartnershipResult = NonNullable<
+  Awaited<ReturnType<typeof postEventsPartnership>>
+>;
+export type GetEventsPartnershipDetailedResult = NonNullable<
+  Awaited<ReturnType<typeof getEventsPartnershipDetailed>>
+>;
+export type UpdatePartnershipContactInfoResult = NonNullable<
+  Awaited<ReturnType<typeof updatePartnershipContactInfo>>
+>;
+export type GetEventsPartnershipBillingResult = NonNullable<
+  Awaited<ReturnType<typeof getEventsPartnershipBilling>>
+>;
+export type PostEventsPartnershipBillingResult = NonNullable<
+  Awaited<ReturnType<typeof postEventsPartnershipBilling>>
+>;
+export type PutEventsPartnershipBillingResult = NonNullable<
+  Awaited<ReturnType<typeof putEventsPartnershipBilling>>
+>;
+export type PostEventsPartnershipBillingInvoiceResult = NonNullable<
+  Awaited<ReturnType<typeof postEventsPartnershipBillingInvoice>>
+>;
+export type PostEventsPartnershipBillingQuoteResult = NonNullable<
+  Awaited<ReturnType<typeof postEventsPartnershipBillingQuote>>
+>;
+export type PostEventsPartnershipSignedAgreementResult = NonNullable<
+  Awaited<ReturnType<typeof postEventsPartnershipSignedAgreement>>
+>;
+export type PostEventsPartnershipSuggestionApproveResult = NonNullable<
+  Awaited<ReturnType<typeof postEventsPartnershipSuggestionApprove>>
+>;
+export type PostEventsPartnershipSuggestionDeclineResult = NonNullable<
+  Awaited<ReturnType<typeof postEventsPartnershipSuggestionDecline>>
+>;
+export type GetEventsPartnershipTicketsResult = NonNullable<
+  Awaited<ReturnType<typeof getEventsPartnershipTickets>>
+>;
+export type PostEventsPartnershipTicketsResult = NonNullable<
+  Awaited<ReturnType<typeof postEventsPartnershipTickets>>
+>;
+export type PutEventsPartnershipTicketsResult = NonNullable<
+  Awaited<ReturnType<typeof putEventsPartnershipTickets>>
+>;
+export type GetPartnershipJobOffersResult = NonNullable<
+  Awaited<ReturnType<typeof getPartnershipJobOffers>>
+>;
+export type AttachSpeakerToPartnershipResult = NonNullable<
+  Awaited<ReturnType<typeof attachSpeakerToPartnership>>
+>;
+export type DetachSpeakerFromPartnershipResult = NonNullable<
+  Awaited<ReturnType<typeof detachSpeakerFromPartnership>>
+>;
+export type GetProvidersResult = NonNullable<Awaited<ReturnType<typeof getProviders>>>;
+export type PostProvidersResult = NonNullable<Awaited<ReturnType<typeof postProviders>>>;
+export type PostOrgsResult = NonNullable<Awaited<ReturnType<typeof postOrgs>>>;
+export type GetOrgsResult = NonNullable<Awaited<ReturnType<typeof getOrgs>>>;
+export type PutOrgsResult = NonNullable<Awaited<ReturnType<typeof putOrgs>>>;
+export type PostOrgsProvidersResult = NonNullable<Awaited<ReturnType<typeof postOrgsProviders>>>;
+export type PutOrgsProvidersResult = NonNullable<Awaited<ReturnType<typeof putOrgsProviders>>>;
+export type DeleteOrgsProvidersResult = NonNullable<
+  Awaited<ReturnType<typeof deleteOrgsProviders>>
+>;
+export type GetOrgsEventsResult = NonNullable<Awaited<ReturnType<typeof getOrgsEvents>>>;
+export type PostOrgsEventsResult = NonNullable<Awaited<ReturnType<typeof postOrgsEvents>>>;
+export type PutOrgsEventsResult = NonNullable<Awaited<ReturnType<typeof putOrgsEvents>>>;
+export type PostOrgsEventsBoothPlanResult = NonNullable<
+  Awaited<ReturnType<typeof postOrgsEventsBoothPlan>>
+>;
+export type GetOrgsEventsIntegrationsResult = NonNullable<
+  Awaited<ReturnType<typeof getOrgsEventsIntegrations>>
+>;
+export type PostOrgsEventsIntegrationsResult = NonNullable<
+  Awaited<ReturnType<typeof postOrgsEventsIntegrations>>
+>;
+export type DeleteOrgsEventsIntegrationsResult = NonNullable<
+  Awaited<ReturnType<typeof deleteOrgsEventsIntegrations>>
+>;
+export type GetStatusIntegrationResult = NonNullable<
+  Awaited<ReturnType<typeof getStatusIntegration>>
+>;
+export type GetOrgsEventsOptionsResult = NonNullable<
+  Awaited<ReturnType<typeof getOrgsEventsOptions>>
+>;
+export type PostOrgsEventsOptionsResult = NonNullable<
+  Awaited<ReturnType<typeof postOrgsEventsOptions>>
+>;
+export type DeleteOrgsEventsOptionsResult = NonNullable<
+  Awaited<ReturnType<typeof deleteOrgsEventsOptions>>
+>;
+export type PutOrgsEventsOptionsResult = NonNullable<
+  Awaited<ReturnType<typeof putOrgsEventsOptions>>
+>;
+export type GetOrgsEventsPacksResult = NonNullable<Awaited<ReturnType<typeof getOrgsEventsPacks>>>;
+export type PostOrgsEventsPacksResult = NonNullable<
+  Awaited<ReturnType<typeof postOrgsEventsPacks>>
+>;
+export type DeleteOrgsEventsPacksResult = NonNullable<
+  Awaited<ReturnType<typeof deleteOrgsEventsPacks>>
+>;
+export type PutOrgsEventsPacksResult = NonNullable<Awaited<ReturnType<typeof putOrgsEventsPacks>>>;
+export type PostOrgsEventsPacksOptionsResult = NonNullable<
+  Awaited<ReturnType<typeof postOrgsEventsPacksOptions>>
+>;
+export type DeleteOrgsEventsPacksOptionsResult = NonNullable<
+  Awaited<ReturnType<typeof deleteOrgsEventsPacksOptions>>
+>;
+export type GetOrgsEventsCommunicationResult = NonNullable<
+  Awaited<ReturnType<typeof getOrgsEventsCommunication>>
+>;
+export type PostOrgsEventsExternalLinkResult = NonNullable<
+  Awaited<ReturnType<typeof postOrgsEventsExternalLink>>
+>;
+export type DeleteOrgsEventsExternalLinkResult = NonNullable<
+  Awaited<ReturnType<typeof deleteOrgsEventsExternalLink>>
+>;
+export type UpdateEventAgendaResult = NonNullable<Awaited<ReturnType<typeof updateEventAgenda>>>;
+export type GetOrgsEventsPartnershipResult = NonNullable<
+  Awaited<ReturnType<typeof getOrgsEventsPartnership>>
+>;
+export type DeletePartnershipResult = NonNullable<Awaited<ReturnType<typeof deletePartnership>>>;
+export type PostOrgsEventsPartnershipAgreementResult = NonNullable<
+  Awaited<ReturnType<typeof postOrgsEventsPartnershipAgreement>>
+>;
+export type PostOrgsEventsPartnershipBillingResult = NonNullable<
+  Awaited<ReturnType<typeof postOrgsEventsPartnershipBilling>>
+>;
+export type PutOrgsEventsPartnershipBoothLocationResult = NonNullable<
+  Awaited<ReturnType<typeof putOrgsEventsPartnershipBoothLocation>>
+>;
+export type PostOrgsEventsPartnershipSuggestionResult = NonNullable<
+  Awaited<ReturnType<typeof postOrgsEventsPartnershipSuggestion>>
+>;
+export type PostOrgsEventsPartnershipValidateResult = NonNullable<
+  Awaited<ReturnType<typeof postOrgsEventsPartnershipValidate>>
+>;
+export type PostOrgsEventsPartnershipDeclineResult = NonNullable<
+  Awaited<ReturnType<typeof postOrgsEventsPartnershipDecline>>
+>;
+export type PutOrgsEventsPartnershipCommunicationPublicationResult = NonNullable<
+  Awaited<ReturnType<typeof putOrgsEventsPartnershipCommunicationPublication>>
+>;
+export type PutOrgsEventsPartnershipCommunicationSupportResult = NonNullable<
+  Awaited<ReturnType<typeof putOrgsEventsPartnershipCommunicationSupport>>
+>;
+export type ListPartnershipJobOffersResult = NonNullable<
+  Awaited<ReturnType<typeof listPartnershipJobOffers>>
+>;
+export type ListEventJobOfferPromotionsResult = NonNullable<
+  Awaited<ReturnType<typeof listEventJobOfferPromotions>>
+>;
+export type ApproveJobOfferPromotionResult = NonNullable<
+  Awaited<ReturnType<typeof approveJobOfferPromotion>>
+>;
+export type DeclineJobOfferPromotionResult = NonNullable<
+  Awaited<ReturnType<typeof declineJobOfferPromotion>>
+>;
+export type PostPartnershipOrganiserResult = NonNullable<
+  Awaited<ReturnType<typeof postPartnershipOrganiser>>
+>;
+export type DeletePartnershipOrganiserResult = NonNullable<
+  Awaited<ReturnType<typeof deletePartnershipOrganiser>>
+>;
+export type GetOrgsEventsProvidersResult = NonNullable<
+  Awaited<ReturnType<typeof getOrgsEventsProviders>>
+>;
+export type PostOrgsEventsProvidersResult = NonNullable<
+  Awaited<ReturnType<typeof postOrgsEventsProviders>>
+>;
+export type DeleteOrgsEventsProvidersResult = NonNullable<
+  Awaited<ReturnType<typeof deleteOrgsEventsProviders>>
+>;
+export type GetOrgsUsersResult = NonNullable<Awaited<ReturnType<typeof getOrgsUsers>>>;
+export type PostOrgsUsersGrantResult = NonNullable<Awaited<ReturnType<typeof postOrgsUsersGrant>>>;
+export type PostOrgsUsersRevokeResult = NonNullable<
+  Awaited<ReturnType<typeof postOrgsUsersRevoke>>
+>;
+export type GetUsersMeEventsResult = NonNullable<Awaited<ReturnType<typeof getUsersMeEvents>>>;
+export type GetUsersMeOrgsResult = NonNullable<Awaited<ReturnType<typeof getUsersMeOrgs>>>;

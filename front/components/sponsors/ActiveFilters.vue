@@ -1,14 +1,12 @@
 <template>
   <div v-if="hasActiveFilters" class="active-filters flex flex-wrap items-center gap-2 mb-4">
-    <span class="text-sm font-medium text-gray-700">{{ $t('common.activeFilters') || 'Filtres actifs:' }}</span>
+    <span
+      class="text-sm font-medium text-gray-700"
+      >{{ $t('common.activeFilters') || 'Filtres actifs:' }}</span
+    >
 
     <!-- Pack Filter Badge -->
-    <UBadge
-      v-if="filters.packId"
-      color="primary"
-      variant="subtle"
-      class="flex items-center gap-1"
-    >
+    <UBadge v-if="filters.packId" color="primary" variant="subtle" class="flex items-center gap-1">
       <span>{{ $t('sponsors.filters.pack') }}: {{ getPackName(filters.packId) }}</span>
       <button
         @click="$emit('clear', 'packId')"
@@ -26,7 +24,10 @@
       variant="subtle"
       class="flex items-center gap-1"
     >
-      <span>{{ $t('sponsors.filters.validated') }}: {{ filters.validated ? $t('common.yes') : $t('common.no') }}</span>
+      <span
+        >{{ $t('sponsors.filters.validated') }}:
+        {{ filters.validated ? $t('common.yes') : $t('common.no') }}</span
+      >
       <button
         @click="$emit('clear', 'validated')"
         class="ml-1 hover:text-red-600"
@@ -43,7 +44,10 @@
       variant="subtle"
       class="flex items-center gap-1"
     >
-      <span>{{ $t('sponsors.filters.paid') }}: {{ filters.paid ? $t('common.yes') : $t('common.no') }}</span>
+      <span
+        >{{ $t('sponsors.filters.paid') }}:
+        {{ filters.paid ? $t('common.yes') : $t('common.no') }}</span
+      >
       <button
         @click="$emit('clear', 'paid')"
         class="ml-1 hover:text-red-600"
@@ -60,7 +64,10 @@
       variant="subtle"
       class="flex items-center gap-1"
     >
-      <span>{{ $t('sponsors.filters.agreementGenerated') }}: {{ filters.agreementGenerated ? $t('common.yes') : $t('common.no') }}</span>
+      <span
+        >{{ $t('sponsors.filters.agreementGenerated') }}:
+        {{ filters.agreementGenerated ? $t('common.yes') : $t('common.no') }}</span
+      >
       <button
         @click="$emit('clear', 'agreementGenerated')"
         class="ml-1 hover:text-red-600"
@@ -77,7 +84,10 @@
       variant="subtle"
       class="flex items-center gap-1"
     >
-      <span>{{ $t('sponsors.filters.agreementSigned') }}: {{ filters.agreementSigned ? $t('common.yes') : $t('common.no') }}</span>
+      <span
+        >{{ $t('sponsors.filters.agreementSigned') }}:
+        {{ filters.agreementSigned ? $t('common.yes') : $t('common.no') }}</span
+      >
       <button
         @click="$emit('clear', 'agreementSigned')"
         class="ml-1 hover:text-red-600"
@@ -94,7 +104,10 @@
       variant="subtle"
       class="flex items-center gap-1"
     >
-      <span>{{ $t('sponsors.filters.suggestion') }}: {{ filters.suggestion ? $t('common.yes') : $t('common.no') }}</span>
+      <span
+        >{{ $t('sponsors.filters.suggestion') }}:
+        {{ filters.suggestion ? $t('common.yes') : $t('common.no') }}</span
+      >
       <button
         @click="$emit('clear', 'suggestion')"
         class="ml-1 hover:text-red-600"

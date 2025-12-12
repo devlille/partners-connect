@@ -6,12 +6,7 @@
           <BackButton :to="`/orgs/${orgSlug}/events/${eventSlug}`" label="Retour" />
           <PageTitle>Prestataires - {{ eventName }}</PageTitle>
         </div>
-        <UButton
-          color="primary"
-          size="lg"
-          icon="i-heroicons-plus"
-          @click="isAddModalOpen = true"
-        >
+        <UButton color="primary" size="lg" icon="i-heroicons-plus" @click="isAddModalOpen = true">
           Ajouter un prestataire
         </UButton>
       </div>
@@ -25,17 +20,23 @@
       </div>
 
       <div v-else-if="providers.length === 0" class="text-center py-12">
-        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        <svg
+          class="mx-auto h-12 w-12 text-gray-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+          />
         </svg>
         <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun prestataire</h3>
         <p class="mt-1 text-sm text-gray-500">Commencez par ajouter un prestataire.</p>
         <div class="mt-6">
-          <UButton
-            color="primary"
-            icon="i-heroicons-plus"
-            @click="isAddModalOpen = true"
-          >
+          <UButton color="primary" icon="i-heroicons-plus" @click="isAddModalOpen = true">
             Ajouter un prestataire
           </UButton>
         </div>
@@ -45,12 +46,36 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Site web</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Téléphone</th>
-              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Nom
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Type
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Site web
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Email
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Téléphone
+              </th>
+              <th
+                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
@@ -62,13 +87,23 @@
                 {{ provider.type }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                <a v-if="provider.website" :href="provider.website" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline">
+                <a
+                  v-if="provider.website"
+                  :href="provider.website"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-blue-600 hover:text-blue-800 underline"
+                >
                   {{ provider.website }}
                 </a>
                 <span v-else class="text-gray-400">-</span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                <a v-if="provider.email" :href="`mailto:${provider.email}`" class="text-blue-600 hover:text-blue-800">
+                <a
+                  v-if="provider.email"
+                  :href="`mailto:${provider.email}`"
+                  class="text-blue-600 hover:text-blue-800"
+                >
                   {{ provider.email }}
                 </a>
                 <span v-else class="text-gray-400">-</span>
@@ -95,7 +130,11 @@
 
     <!-- Modal d'ajout -->
     <Teleport to="body">
-      <div v-if="isAddModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" @click.self="isAddModalOpen = false">
+      <div
+        v-if="isAddModalOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+        @click.self="isAddModalOpen = false"
+      >
         <div class="w-full max-w-lg bg-white rounded-lg shadow-xl" @click.stop>
           <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-semibold text-gray-900">Ajouter un prestataire</h3>
@@ -186,11 +225,7 @@
             >
               Annuler
             </UButton>
-            <UButton
-              color="primary"
-              :loading="isSubmitting"
-              @click="handleAddProvider"
-            >
+            <UButton color="primary" :loading="isSubmitting" @click="handleAddProvider">
               Ajouter
             </UButton>
           </div>
@@ -200,7 +235,11 @@
 
     <!-- Modal de suppression -->
     <Teleport to="body">
-      <div v-if="isDeleteModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" @click.self="isDeleteModalOpen = false; providerToDelete = null">
+      <div
+        v-if="isDeleteModalOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+        @click.self="isDeleteModalOpen = false; providerToDelete = null"
+      >
         <div class="w-full max-w-md bg-white rounded-lg shadow-xl" @click.stop>
           <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-semibold text-gray-900">Confirmer la suppression</h3>
@@ -211,9 +250,7 @@
               Êtes-vous sûr de vouloir supprimer le prestataire
               <strong>{{ providerToDelete?.name }}</strong> ?
             </p>
-            <p class="mt-2 text-sm text-gray-500">
-              Cette action est irréversible.
-            </p>
+            <p class="mt-2 text-sm text-gray-500">Cette action est irréversible.</p>
           </div>
 
           <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
@@ -225,11 +262,7 @@
             >
               Annuler
             </UButton>
-            <UButton
-              color="red"
-              :loading="deletingId !== null"
-              @click="handleDeleteConfirm"
-            >
+            <UButton color="red" :loading="deletingId !== null" @click="handleDeleteConfirm">
               Supprimer
             </UButton>
           </div>

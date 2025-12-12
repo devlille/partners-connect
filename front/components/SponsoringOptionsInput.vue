@@ -33,9 +33,7 @@
         <p v-if="option.description" class="option-description">{{ option.description }}</p>
 
         <div v-if="isOptionSelected(option.id)" class="quantity-input">
-          <label :for="`quantity-${option.id}`" class="quantity-label">
-            Quantité :
-          </label>
+          <label :for="`quantity-${option.id}`" class="quantity-label"> Quantité : </label>
           <input
             :id="`quantity-${option.id}`"
             type="number"
@@ -78,9 +76,7 @@
         <p v-if="option.description" class="option-description">{{ option.description }}</p>
 
         <div v-if="isOptionSelected(option.id)" class="selectable-input">
-          <label :for="`select-${option.id}`" class="select-label">
-            Choisissez :
-          </label>
+          <label :for="`select-${option.id}`" class="select-label"> Choisissez : </label>
           <select
             :id="`select-${option.id}`"
             :value="getOptionSelectedValue(option.id)"

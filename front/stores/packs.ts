@@ -1,6 +1,6 @@
-import { defineStore } from 'pinia';
-import type { SponsoringPack } from '~/utils/api';
-import type { EntityState } from '~/types/generics';
+import { defineStore } from "pinia";
+import type { SponsoringPack } from "~/utils/api";
+import type { EntityState } from "~/types/generics";
 
 /**
  * Packs store state using generic EntityState
@@ -11,7 +11,7 @@ interface PacksState extends EntityState<SponsoringPack> {
   packs: SponsoringPack[];
 }
 
-export const usePacksStore = defineStore('packs', {
+export const usePacksStore = defineStore("packs", {
   state: (): PacksState => ({
     packs: [],
     items: [], // Required by EntityState<SponsoringPack>
@@ -24,14 +24,14 @@ export const usePacksStore = defineStore('packs', {
      * Obtenir un pack par son ID
      */
     getPackById: (state) => (packId: string) => {
-      return state.packs.find(p => p.id === packId);
+      return state.packs.find((p) => p.id === packId);
     },
 
     /**
      * Obtenir les packs avec stand
      */
     packsWithBooth: (state) => {
-      return state.packs.filter(p => p.with_booth);
+      return state.packs.filter((p) => p.with_booth);
     },
 
     /**
@@ -61,7 +61,7 @@ export const usePacksStore = defineStore('packs', {
      * Mettre à jour un pack
      */
     updatePack(packId: string, updatedPack: Partial<SponsoringPack>) {
-      const index = this.packs.findIndex(p => p.id === packId);
+      const index = this.packs.findIndex((p) => p.id === packId);
       if (index !== -1) {
         this.packs[index] = { ...this.packs[index], ...updatedPack };
       }
@@ -71,7 +71,7 @@ export const usePacksStore = defineStore('packs', {
      * Supprimer un pack
      */
     removePack(packId: string) {
-      this.packs = this.packs.filter(p => p.id !== packId);
+      this.packs = this.packs.filter((p) => p.id !== packId);
     },
 
     /**

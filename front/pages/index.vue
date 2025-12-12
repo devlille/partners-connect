@@ -6,16 +6,24 @@
   <div id="container">
     <main>
       <div v-if="error" class="flex items-center justify-center min-h-[400px]">
-        <div style="background-color: #dc2626; color: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); max-width: 28rem;">
-          <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; color: white;">Erreur</h3>
+        <div
+          style="background-color: #dc2626; color: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); max-width: 28rem;"
+        >
+          <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; color: white;">
+            Erreur
+          </h3>
           <p style="color: white;">{{ error }}</p>
         </div>
       </div>
 
       <div v-else-if="success" class="flex items-center justify-center min-h-[400px]">
         <UCard>
-          <div style="background-color: white; color: black; padding: 1.5rem; border-radius: 0.5rem;">
-            <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; color: black;">Succès</h3>
+          <div
+            style="background-color: white; color: black; padding: 1.5rem; border-radius: 0.5rem;"
+          >
+            <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; color: black;">
+              Succès
+            </h3>
             <p style="color: black;">Compagnie créée avec succès !</p>
           </div>
         </UCard>
@@ -32,7 +40,13 @@
           :aria-describedby="errors.name ? 'ip-name-error' : undefined"
           :class="{ 'error': errors.name }"
         />
-        <div v-if="errors.name" id="ip-name-error" class="error-message" role="alert" style="color: white; margin-bottom: 1rem;">
+        <div
+          v-if="errors.name"
+          id="ip-name-error"
+          class="error-message"
+          role="alert"
+          style="color: white; margin-bottom: 1rem;"
+        >
           {{ errors.name }}
         </div>
 
@@ -46,7 +60,13 @@
           :aria-describedby="errors.email ? 'ip-email-error' : undefined"
           :class="{ 'error': errors.email }"
         />
-        <div v-if="errors.email" id="ip-email-error" class="error-message" role="alert" style="color: white; margin-bottom: 1rem;">
+        <div
+          v-if="errors.email"
+          id="ip-email-error"
+          class="error-message"
+          role="alert"
+          style="color: white; margin-bottom: 1rem;"
+        >
           {{ errors.email }}
         </div>
 
@@ -59,7 +79,13 @@
           :aria-describedby="errors.phone ? 'ip-phone-error' : undefined"
           :class="{ 'error': errors.phone }"
         />
-        <div v-if="errors.phone" id="ip-phone-error" class="error-message" role="alert" style="color: white; margin-bottom: 1rem;">
+        <div
+          v-if="errors.phone"
+          id="ip-phone-error"
+          class="error-message"
+          role="alert"
+          style="color: white; margin-bottom: 1rem;"
+        >
           {{ errors.phone }}
         </div>
 
@@ -72,7 +98,13 @@
             :aria-describedby="errors.packId ? 'pack-error' : undefined"
           />
         </div>
-        <div v-if="errors.packId" id="pack-error" class="error-message" role="alert" style="color: white; margin-bottom: 1rem;">
+        <div
+          v-if="errors.packId"
+          id="pack-error"
+          class="error-message"
+          role="alert"
+          style="color: white; margin-bottom: 1rem;"
+        >
           {{ errors.packId }}
         </div>
 
@@ -83,23 +115,37 @@
         />
 
         <!-- Total Summary -->
-        <fieldset v-if="formData.packId" style="border: 2px solid #fbbf24; padding: 1.5rem; margin: 1.5rem 0; box-sizing: border-box; background-color: rgba(251, 191, 36, 0.1);">
-          <legend style="color: #fbbf24; font-weight: 700; font-size: 1.1rem; padding: 0 0.5rem;">Récapitulatif</legend>
+        <fieldset
+          v-if="formData.packId"
+          style="border: 2px solid #fbbf24; padding: 1.5rem; margin: 1.5rem 0; box-sizing: border-box; background-color: rgba(251, 191, 36, 0.1);"
+        >
+          <legend style="color: #fbbf24; font-weight: 700; font-size: 1.1rem; padding: 0 0.5rem;">
+            Récapitulatif
+          </legend>
 
           <div style="color: white;">
             <!-- Pack Price -->
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255, 255, 255, 0.2);">
+            <div
+              style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255, 255, 255, 0.2);"
+            >
               <span>Pack {{ selectedPackName }}</span>
               <span style="font-weight: 600;">{{ selectedPackPrice }} €</span>
             </div>
 
             <!-- Options Prices -->
-            <div v-if="selectedOptionsTotal > 0" style="margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255, 255, 255, 0.2);">
+            <div
+              v-if="selectedOptionsTotal > 0"
+              style="margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255, 255, 255, 0.2);"
+            >
               <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                 <span>Options ({{ formData.optionSelections.length }})</span>
                 <span style="font-weight: 600;">{{ selectedOptionsTotal }} €</span>
               </div>
-              <div v-for="(selection, index) in formData.optionSelections" :key="index" style="font-size: 0.875rem; color: #cbd5e1; margin-left: 1rem; margin-top: 0.25rem;">
+              <div
+                v-for="(selection, index) in formData.optionSelections"
+                :key="index"
+                style="font-size: 0.875rem; color: #cbd5e1; margin-left: 1rem; margin-top: 0.25rem;"
+              >
                 <div style="display: flex; justify-content: space-between;">
                   <span>• {{ getOptionName(selection.option_id) }}</span>
                   <span>{{ getOptionTotal(selection) }} €</span>
@@ -108,7 +154,9 @@
             </div>
 
             <!-- Total -->
-            <div style="display: flex; justify-content: space-between; font-size: 1.25rem; font-weight: 700; color: #fbbf24; margin-top: 1rem;">
+            <div
+              style="display: flex; justify-content: space-between; font-size: 1.25rem; font-weight: 700; color: #fbbf24; margin-top: 1rem;"
+            >
               <span>Total</span>
               <span>{{ totalPrice }} €</span>
             </div>
@@ -116,7 +164,7 @@
         </fieldset>
 
         <p class="buttons-bar">
-          <input type="submit" value="Valider" :disabled="isSubmitting">
+          <input type="submit" value="Valider" :disabled="isSubmitting" />
         </p>
       </form>
     </main>

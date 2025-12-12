@@ -17,10 +17,10 @@ export const ZIP_CODE_REGEX = /^\d{5}$/;
  * Messages d'erreur de validation
  */
 export const VALIDATION_MESSAGES = {
-  EMAIL_INVALID: 'Adresse email invalide',
-  REQUIRED: 'Ce champ est requis',
-  URL_INVALID: 'URL invalide',
-  SIRET_INVALID: 'Numéro SIRET invalide (14 chiffres)',
-  VAT_INVALID: 'Numéro de TVA invalide',
-  ZIP_CODE_INVALID: 'Code postal invalide (5 chiffres)'
+  EMAIL_INVALID: "Adresse email invalide",
+  REQUIRED: "Ce champ est requis",
+  URL_INVALID: "URL invalide",
+  SIRET_INVALID: "Numéro SIRET invalide (14 chiffres)",
+  VAT_INVALID: "Numéro de TVA invalide",
+  ZIP_CODE_INVALID: "Code postal invalide (5 chiffres)",
 } as const;

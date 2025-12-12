@@ -2,10 +2,10 @@
  * Type de notification
  */
 export enum ToastType {
-  SUCCESS = 'success',
-  ERROR = 'error',
-  WARNING = 'warning',
-  INFO = 'info'
+  SUCCESS = "success",
+  ERROR = "error",
+  WARNING = "warning",
+  INFO = "info",
 }
 
 /**
@@ -50,7 +50,7 @@ export const useCustomToast = () => {
    * Supprimer une notification
    */
   const removeToast = (id: string) => {
-    toasts.value = toasts.value.filter(t => t.id !== id);
+    toasts.value = toasts.value.filter((t) => t.id !== id);
   };
 
   /**
@@ -97,6 +97,6 @@ export const useCustomToast = () => {
     warning,
     info,
     clearAll,
-    ToastType
+    ToastType,
   };
 };

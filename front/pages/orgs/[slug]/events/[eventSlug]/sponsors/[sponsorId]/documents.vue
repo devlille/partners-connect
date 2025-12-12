@@ -30,17 +30,27 @@
                   Téléchargez le logo de l'entreprise (PNG, JPG, max 5MB).
                 </p>
 
-                <div v-if="logoError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+                <div
+                  v-if="logoError"
+                  class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm"
+                >
                   {{ logoError }}
                 </div>
 
-                <div v-if="logoSuccess" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4 text-sm">
+                <div
+                  v-if="logoSuccess"
+                  class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4 text-sm"
+                >
                   {{ logoSuccess }}
                 </div>
 
                 <div v-if="companyLogo" class="mb-4">
                   <div class="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded">
-                    <img :src="companyLogo" alt="Logo de l'entreprise" class="h-12 w-12 object-contain" />
+                    <img
+                      :src="companyLogo"
+                      alt="Logo de l'entreprise"
+                      class="h-12 w-12 object-contain"
+                    />
                     <div class="flex-1">
                       <p class="text-sm font-medium text-gray-900">Logo actuel</p>
                       <a
@@ -93,7 +103,10 @@
                   Générez le devis au format PDF pour ce sponsor.
                 </p>
 
-                <div v-if="quoteError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+                <div
+                  v-if="quoteError"
+                  class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm"
+                >
                   {{ quoteError }}
                 </div>
 
@@ -135,7 +148,10 @@
                   Générez la facture au format PDF pour ce sponsor.
                 </p>
 
-                <div v-if="invoiceError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+                <div
+                  v-if="invoiceError"
+                  class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm"
+                >
                   {{ invoiceError }}
                 </div>
 
@@ -169,7 +185,10 @@
           <div class="bg-gray-50 rounded-lg p-6">
             <div class="flex items-start gap-4">
               <div class="shrink-0">
-                <i class="i-heroicons-document-check text-3xl text-primary-600" aria-hidden="true" />
+                <i
+                  class="i-heroicons-document-check text-3xl text-primary-600"
+                  aria-hidden="true"
+                />
               </div>
               <div class="flex-1">
                 <h3 class="text-sm font-medium text-gray-900 mb-2">Convention de partenariat</h3>
@@ -177,7 +196,10 @@
                   Générez la convention de partenariat au format PDF pour ce sponsor.
                 </p>
 
-                <div v-if="agreementError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+                <div
+                  v-if="agreementError"
+                  class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm"
+                >
                   {{ agreementError }}
                 </div>
 
@@ -211,7 +233,10 @@
           <div class="bg-gray-50 rounded-lg p-6">
             <div class="flex items-start gap-4">
               <div class="shrink-0">
-                <i class="i-heroicons-document-check text-3xl text-success-600" aria-hidden="true" />
+                <i
+                  class="i-heroicons-document-check text-3xl text-success-600"
+                  aria-hidden="true"
+                />
               </div>
               <div class="flex-1">
                 <h3 class="text-sm font-medium text-gray-900 mb-2">Convention signée</h3>
@@ -219,17 +244,28 @@
                   Téléchargez la convention de partenariat signée par le sponsor (PDF, max 10MB).
                 </p>
 
-                <div v-if="signedAgreementError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+                <div
+                  v-if="signedAgreementError"
+                  class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm"
+                >
                   {{ signedAgreementError }}
                 </div>
 
-                <div v-if="signedAgreementSuccess" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4 text-sm">
+                <div
+                  v-if="signedAgreementSuccess"
+                  class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4 text-sm"
+                >
                   {{ signedAgreementSuccess }}
                 </div>
 
                 <div v-if="signedAgreementUrl" class="mb-4">
-                  <div class="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded">
-                    <i class="i-heroicons-document-check text-2xl text-success-600" aria-hidden="true" />
+                  <div
+                    class="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded"
+                  >
+                    <i
+                      class="i-heroicons-document-check text-2xl text-success-600"
+                      aria-hidden="true"
+                    />
                     <div class="flex-1">
                       <p class="text-sm font-medium text-gray-900">Convention signée téléchargée</p>
                       <a

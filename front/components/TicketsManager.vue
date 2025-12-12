@@ -3,9 +3,7 @@
     <div class="flex items-center justify-between">
       <div>
         <h3 class="text-lg font-semibold text-gray-900">Tickets</h3>
-        <p class="text-sm text-gray-600 mt-1">
-          Gérez les tickets pour ce partenariat
-        </p>
+        <p class="text-sm text-gray-600 mt-1">Gérez les tickets pour ce partenariat</p>
       </div>
       <UButton
         color="primary"
@@ -28,19 +26,34 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
               Prénom
             </th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
               Nom
             </th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
               ID Externe
             </th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
               URL
             </th>
-            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th
+              scope="col"
+              class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
               Actions
             </th>
           </tr>
@@ -86,17 +99,16 @@
     </div>
 
     <!-- Empty state -->
-    <div v-else class="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+    <div
+      v-else
+      class="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300"
+    >
       <i class="i-heroicons-ticket text-4xl text-gray-400 mb-3" />
       <h3 class="text-sm font-medium text-gray-900 mb-1">Aucun ticket</h3>
       <p class="text-sm text-gray-500 mb-4">
         Commencez par ajouter un premier ticket pour ce partenariat
       </p>
-      <UButton
-        color="primary"
-        icon="i-heroicons-plus"
-        @click="openAddTicketModal"
-      >
+      <UButton color="primary" icon="i-heroicons-plus" @click="openAddTicketModal">
         Ajouter un ticket
       </UButton>
     </div>
@@ -110,7 +122,9 @@
         role="dialog"
         aria-modal="true"
       >
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div
+          class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+        >
           <!-- Background overlay -->
           <div
             class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
@@ -119,9 +133,13 @@
           ></div>
 
           <!-- Center modal -->
-          <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+          <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true"
+            >&#8203;</span
+          >
 
-          <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+          <div
+            class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
+          >
             <div>
               <div class="mt-3 sm:mt-0">
                 <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4" id="modal-title">
@@ -157,7 +175,12 @@
                     />
                   </div>
 
-                  <AlertMessage v-if="formError" :message="formError" type="error" class="text-sm" />
+                  <AlertMessage
+                    v-if="formError"
+                    :message="formError"
+                    type="error"
+                    class="text-sm"
+                  />
 
                   <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
                     <UButton

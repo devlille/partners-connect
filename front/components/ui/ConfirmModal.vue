@@ -25,10 +25,7 @@
               <i :class="[icon, iconColorClass]" class="text-xl" />
             </div>
 
-            <h3
-              :id="titleId"
-              class="text-lg font-semibold text-gray-900 dark:text-gray-100"
-            >
+            <h3 :id="titleId" class="text-lg font-semibold text-gray-900 dark:text-gray-100">
               {{ title }}
             </h3>
           </div>
@@ -44,12 +41,7 @@
 
         <!-- Footer -->
         <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
-          <UButton
-            color="neutral"
-            variant="ghost"
-            :disabled="loading"
-            @click="handleCancel"
-          >
+          <UButton color="neutral" variant="ghost" :disabled="loading" @click="handleCancel">
             {{ cancelText }}
           </UButton>
           <UButton

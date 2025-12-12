@@ -51,7 +51,10 @@
           </div>
 
           <div v-if="jobOffers.length === 0" class="px-6 py-12 text-center">
-            <i class="i-heroicons-briefcase text-gray-400 text-5xl mx-auto block mb-4" aria-hidden="true" />
+            <i
+              class="i-heroicons-briefcase text-gray-400 text-5xl mx-auto block mb-4"
+              aria-hidden="true"
+            />
             <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune offre d'emploi</h3>
             <p class="mt-1 text-sm text-gray-500">Commencez par ajouter une offre d'emploi.</p>
           </div>
@@ -72,13 +75,19 @@
                       <span class="font-medium">Expérience:</span> {{ job.experience_years }} an(s)
                     </p>
                     <p class="text-sm text-gray-600">
-                      <span class="font-medium">Publié le:</span> {{ formatDate(job.publication_date) }}
+                      <span class="font-medium">Publié le:</span>
+                      {{ formatDate(job.publication_date) }}
                     </p>
                     <p v-if="job.end_date" class="text-sm text-gray-600">
                       <span class="font-medium">Date limite:</span> {{ formatDate(job.end_date) }}
                     </p>
                     <p class="text-sm text-gray-600">
-                      <a :href="job.url" target="_blank" rel="noopener noreferrer" class="text-primary-600 hover:text-primary-800 underline">
+                      <a
+                        :href="job.url"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-primary-600 hover:text-primary-800 underline"
+                      >
                         Voir l'offre complète
                       </a>
                     </p>
@@ -103,8 +112,15 @@
 
     <!-- Modal d'ajout -->
     <Teleport to="body">
-      <div v-if="isAddModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" @click.self="isAddModalOpen = false">
-        <div class="w-full max-w-2xl bg-white rounded-lg shadow-xl max-h-[90vh] overflow-y-auto" @click.stop>
+      <div
+        v-if="isAddModalOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+        @click.self="isAddModalOpen = false"
+      >
+        <div
+          class="w-full max-w-2xl bg-white rounded-lg shadow-xl max-h-[90vh] overflow-y-auto"
+          @click.stop
+        >
           <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-semibold text-gray-900">Ajouter une offre d'emploi</h3>
           </div>
@@ -153,7 +169,10 @@
 
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label for="publication_date" class="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    for="publication_date"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Date de publication <span class="text-red-500">*</span>
                   </label>
                   <UInput
@@ -181,7 +200,10 @@
 
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label for="experience_years" class="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    for="experience_years"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Années d'expérience (optionnel)
                   </label>
                   <UInput
@@ -225,11 +247,7 @@
             >
               Annuler
             </UButton>
-            <UButton
-              color="primary"
-              :loading="isSubmitting"
-              @click="handleAddJob"
-            >
+            <UButton color="primary" :loading="isSubmitting" @click="handleAddJob">
               Ajouter
             </UButton>
           </div>
@@ -239,7 +257,11 @@
 
     <!-- Modal de confirmation de suppression -->
     <Teleport to="body">
-      <div v-if="isDeleteModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" @click.self="isDeleteModalOpen = false">
+      <div
+        v-if="isDeleteModalOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+        @click.self="isDeleteModalOpen = false"
+      >
         <div class="w-full max-w-lg bg-white rounded-lg shadow-xl" @click.stop>
           <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-semibold text-gray-900">Confirmer la suppression</h3>
@@ -249,9 +271,7 @@
             <p class="text-sm text-gray-700">
               Êtes-vous sûr de vouloir supprimer l'offre <strong>{{ jobToDelete?.title }}</strong> ?
             </p>
-            <p class="text-sm text-gray-500">
-              Cette action est irréversible.
-            </p>
+            <p class="text-sm text-gray-500">Cette action est irréversible.</p>
           </div>
 
           <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
@@ -263,11 +283,7 @@
             >
               Annuler
             </UButton>
-            <UButton
-              color="error"
-              :loading="!!deletingJobId"
-              @click="handleDelete"
-            >
+            <UButton color="error" :loading="!!deletingJobId" @click="handleDelete">
               Supprimer
             </UButton>
           </div>

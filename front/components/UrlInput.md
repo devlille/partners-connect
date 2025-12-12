@@ -44,25 +44,25 @@ const company = ref({
 
 ## Props
 
-| Prop | Type | Défaut | Description |
-|------|------|--------|-------------|
-| `modelValue` | `string \| null \| undefined` | - | Valeur du champ (v-model) |
-| `label` | `string` | `'URL'` | Texte du label |
-| `placeholder` | `string` | `'https://example.com'` | Texte du placeholder |
-| `disabled` | `boolean` | `false` | Désactive le champ |
-| `required` | `boolean` | `false` | Marque le champ comme requis |
-| `hint` | `string` | - | Texte d'aide sous le champ |
-| `inputClass` | `string` | `'w-full'` | Classes CSS additionnelles |
-| `validate` | `boolean` | `true` | Active/désactive la validation |
-| `showErrorOnInput` | `boolean` | `false` | Affiche l'erreur pendant la saisie |
-| `allowHttp` | `boolean` | `true` | Autorise HTTP (sinon uniquement HTTPS) |
+| Prop               | Type                          | Défaut                  | Description                            |
+| ------------------ | ----------------------------- | ----------------------- | -------------------------------------- |
+| `modelValue`       | `string \| null \| undefined` | -                       | Valeur du champ (v-model)              |
+| `label`            | `string`                      | `'URL'`                 | Texte du label                         |
+| `placeholder`      | `string`                      | `'https://example.com'` | Texte du placeholder                   |
+| `disabled`         | `boolean`                     | `false`                 | Désactive le champ                     |
+| `required`         | `boolean`                     | `false`                 | Marque le champ comme requis           |
+| `hint`             | `string`                      | -                       | Texte d'aide sous le champ             |
+| `inputClass`       | `string`                      | `'w-full'`              | Classes CSS additionnelles             |
+| `validate`         | `boolean`                     | `true`                  | Active/désactive la validation         |
+| `showErrorOnInput` | `boolean`                     | `false`                 | Affiche l'erreur pendant la saisie     |
+| `allowHttp`        | `boolean`                     | `true`                  | Autorise HTTP (sinon uniquement HTTPS) |
 
 ## Événements
 
-| Événement | Payload | Description |
-|-----------|---------|-------------|
-| `update:modelValue` | `string \| null` | Émis quand la valeur change |
-| `validation` | `boolean` | Émis quand l'état de validation change |
+| Événement           | Payload          | Description                            |
+| ------------------- | ---------------- | -------------------------------------- |
+| `update:modelValue` | `string \| null` | Émis quand la valeur change            |
+| `validation`        | `boolean`        | Émis quand l'état de validation change |
 
 ## Exemples d'utilisation
 
@@ -178,17 +178,17 @@ Pour afficher l'erreur pendant la saisie, utilisez `show-error-on-input` :
 
 ## Exemples de valeurs
 
-| Valeur saisie | Valide (défaut) | Valide (allowHttp=false) | Message d'erreur |
-|---------------|-----------------|--------------------------|------------------|
-| `https://example.com` | ✅ Oui | ✅ Oui | - |
-| `http://example.com` | ✅ Oui | ❌ Non | "URL doit utiliser HTTPS (https://)" |
-| `https://example.com/path` | ✅ Oui | ✅ Oui | - |
-| `https://sub.example.com` | ✅ Oui | ✅ Oui | - |
-| `https://example.com:8080` | ✅ Oui | ✅ Oui | - |
-| `example.com` | ❌ Non | ❌ Non | "URL invalide" |
-| `not a url` | ❌ Non | ❌ Non | "URL invalide" |
-| (vide avec required) | ❌ Non | ❌ Non | "Ce champ est requis" |
-| (vide sans required) | ✅ Oui | ✅ Oui | - |
+| Valeur saisie              | Valide (défaut) | Valide (allowHttp=false) | Message d'erreur                     |
+| -------------------------- | --------------- | ------------------------ | ------------------------------------ |
+| `https://example.com`      | ✅ Oui          | ✅ Oui                   | -                                    |
+| `http://example.com`       | ✅ Oui          | ❌ Non                   | "URL doit utiliser HTTPS (https://)" |
+| `https://example.com/path` | ✅ Oui          | ✅ Oui                   | -                                    |
+| `https://sub.example.com`  | ✅ Oui          | ✅ Oui                   | -                                    |
+| `https://example.com:8080` | ✅ Oui          | ✅ Oui                   | -                                    |
+| `example.com`              | ❌ Non          | ❌ Non                   | "URL invalide"                       |
+| `not a url`                | ❌ Non          | ❌ Non                   | "URL invalide"                       |
+| (vide avec required)       | ❌ Non          | ❌ Non                   | "Ce champ est requis"                |
+| (vide sans required)       | ✅ Oui          | ✅ Oui                   | -                                    |
 
 ## Cas d'usage
 
@@ -237,6 +237,7 @@ Pour afficher l'erreur pendant la saisie, utilisez `show-error-on-input` :
 ## Tests
 
 Le composant est entièrement testé avec **23 tests** couvrant :
+
 - Validation HTTP/HTTPS
 - Option `allowHttp`
 - URLs avec path, query, fragment, port, sous-domaine
@@ -262,15 +263,15 @@ Le composant est déjà intégré dans les formulaires suivants :
 
 ## Différences avec un input standard
 
-| Fonctionnalité | `<input type="url">` | `<UrlInput>` |
-|----------------|---------------------|--------------|
-| Validation HTML5 | ✅ | ✅ |
-| Messages personnalisés | ❌ | ✅ |
-| Validation regex | ❌ | ✅ |
-| Option HTTPS uniquement | ❌ | ✅ |
-| Validation temps réel | ❌ | ✅ |
-| Événements validation | ❌ | ✅ |
-| Styling erreur | ❌ | ✅ |
+| Fonctionnalité          | `<input type="url">` | `<UrlInput>` |
+| ----------------------- | -------------------- | ------------ |
+| Validation HTML5        | ✅                   | ✅           |
+| Messages personnalisés  | ❌                   | ✅           |
+| Validation regex        | ❌                   | ✅           |
+| Option HTTPS uniquement | ❌                   | ✅           |
+| Validation temps réel   | ❌                   | ✅           |
+| Événements validation   | ❌                   | ✅           |
+| Styling erreur          | ❌                   | ✅           |
 
 ## Voir aussi
 

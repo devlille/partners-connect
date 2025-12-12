@@ -3,7 +3,10 @@
     <div class="bg-white border-b border-gray-200 p-6">
       <div class="flex items-center justify-between">
         <div>
-          <BackButton :to="`/orgs/${orgSlug}/events/${eventSlug}/sponsors`" label="Retour aux sponsors" />
+          <BackButton
+            :to="`/orgs/${orgSlug}/events/${eventSlug}/sponsors`"
+            label="Retour aux sponsors"
+          />
           <PageTitle>Créer un sponsor - {{ eventName }}</PageTitle>
         </div>
       </div>
@@ -14,10 +17,10 @@
 
       <AlertMessage v-if="error" type="error" :message="error" class="mb-4" />
 
-      <AlertMessage 
-        v-if="success" 
-        type="success" 
-        message="Sponsor créé avec succès ! Redirection en cours..." 
+      <AlertMessage
+        v-if="success"
+        type="success"
+        message="Sponsor créé avec succès ! Redirection en cours..."
         class="mb-4"
       />
 
@@ -30,7 +33,9 @@
             <h3 class="text-md font-semibold text-gray-900 mb-4">Informations de l'entreprise</h3>
             <div class="grid grid-cols-1 gap-4">
               <div>
-                <label for="company_name" class="block text-sm font-medium text-gray-700 mb-1">Nom de l'entreprise*</label>
+                <label for="company_name" class="block text-sm font-medium text-gray-700 mb-1"
+                  >Nom de l'entreprise*</label
+                >
                 <UInput
                   id="company_name"
                   v-model="formData.company_name"
@@ -39,11 +44,15 @@
                   placeholder="Nom de l'entreprise"
                   :class="{ 'border-red-500': validationErrors.company_name }"
                 />
-                <p v-if="validationErrors.company_name" class="mt-1 text-sm text-red-600">{{ validationErrors.company_name }}</p>
+                <p v-if="validationErrors.company_name" class="mt-1 text-sm text-red-600">
+                  {{ validationErrors.company_name }}
+                </p>
               </div>
 
               <div>
-                <label for="contact_name" class="block text-sm font-medium text-gray-700 mb-1">Nom du contact*</label>
+                <label for="contact_name" class="block text-sm font-medium text-gray-700 mb-1"
+                  >Nom du contact*</label
+                >
                 <UInput
                   id="contact_name"
                   v-model="formData.contact_name"
@@ -52,11 +61,15 @@
                   placeholder="Nom du contact"
                   :class="{ 'border-red-500': validationErrors.contact_name }"
                 />
-                <p v-if="validationErrors.contact_name" class="mt-1 text-sm text-red-600">{{ validationErrors.contact_name }}</p>
+                <p v-if="validationErrors.contact_name" class="mt-1 text-sm text-red-600">
+                  {{ validationErrors.contact_name }}
+                </p>
               </div>
 
               <div>
-                <label for="contact_role" class="block text-sm font-medium text-gray-700 mb-1">Rôle du contact</label>
+                <label for="contact_role" class="block text-sm font-medium text-gray-700 mb-1"
+                  >Rôle du contact</label
+                >
                 <UInput
                   id="contact_role"
                   v-model="formData.contact_role"
@@ -66,7 +79,9 @@
               </div>
 
               <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email*</label>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1"
+                  >Email*</label
+                >
                 <UInput
                   id="email"
                   v-model="formData.email"
@@ -75,11 +90,15 @@
                   placeholder="email@entreprise.com"
                   :class="{ 'border-red-500': validationErrors.email }"
                 />
-                <p v-if="validationErrors.email" class="mt-1 text-sm text-red-600">{{ validationErrors.email }}</p>
+                <p v-if="validationErrors.email" class="mt-1 text-sm text-red-600">
+                  {{ validationErrors.email }}
+                </p>
               </div>
 
               <div>
-                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1"
+                  >Téléphone</label
+                >
                 <UInput
                   id="phone"
                   v-model="formData.phone"
@@ -94,7 +113,9 @@
           <div class="border-t pt-6">
             <h3 class="text-md font-semibold text-gray-900 mb-4">Pack de sponsoring</h3>
             <div>
-              <label for="pack" class="block text-sm font-medium text-gray-700 mb-1">Sélectionner un pack*</label>
+              <label for="pack" class="block text-sm font-medium text-gray-700 mb-1"
+                >Sélectionner un pack*</label
+              >
               <select
                 id="pack"
                 v-model="formData.pack_id"
@@ -107,7 +128,9 @@
                   {{ pack.name }} - {{ pack.base_price }}€
                 </option>
               </select>
-              <p v-if="validationErrors.pack_id" class="mt-1 text-sm text-red-600">{{ validationErrors.pack_id }}</p>
+              <p v-if="validationErrors.pack_id" class="mt-1 text-sm text-red-600">
+                {{ validationErrors.pack_id }}
+              </p>
             </div>
           </div>
 
@@ -115,7 +138,11 @@
           <div v-if="availableOptions.length > 0" class="border-t pt-6">
             <h3 class="text-md font-semibold text-gray-900 mb-4">Options optionnelles</h3>
             <div class="space-y-2">
-              <div v-for="option in availableOptions" :key="option.id" class="flex items-center space-x-3">
+              <div
+                v-for="option in availableOptions"
+                :key="option.id"
+                class="flex items-center space-x-3"
+              >
                 <input
                   :id="`option-${option.id}`"
                   v-model="formData.option_ids"
@@ -131,21 +158,10 @@
           </div>
 
           <div class="flex justify-end gap-4 pt-4">
-            <UButton
-              type="button"
-              color="gray"
-              variant="outline"
-              @click="onCancel"
-            >
+            <UButton type="button" color="gray" variant="outline" @click="onCancel">
               Annuler
             </UButton>
-            <UButton
-              type="submit"
-              color="primary"
-              :loading="saving"
-            >
-              Créer le sponsor
-            </UButton>
+            <UButton type="submit" color="primary" :loading="saving"> Créer le sponsor </UButton>
           </div>
         </form>
       </div>

@@ -11,10 +11,7 @@ export function useDocumentGeneration() {
    * @param documentType - Type of document (agreement, quote, invoice)
    * @returns Formatted error message
    */
-  function handleDocumentError(
-    err: any,
-    documentType: 'agreement' | 'quote' | 'invoice'
-  ): string {
+  function handleDocumentError(err: any, documentType: "agreement" | "quote" | "invoice"): string {
     console.error(`Failed to generate ${documentType}:`, err);
 
     let errorMessage: string;
@@ -26,17 +23,17 @@ export function useDocumentGeneration() {
       // Handle specific HTTP status codes
       switch (err.response.status) {
         case 404:
-          errorMessage = 'Partenariat introuvable';
+          errorMessage = "Partenariat introuvable";
           break;
         case 403:
-          errorMessage = `Vous n'êtes pas autorisé à générer ${getDocumentLabel(documentType, 'ce', 'cette')}`;
+          errorMessage = `Vous n'êtes pas autorisé à générer ${getDocumentLabel(documentType, "ce", "cette")}`;
           break;
         default:
-          errorMessage = `Une erreur est survenue lors de la génération ${getDocumentLabel(documentType, 'du', 'de la')}`;
+          errorMessage = `Une erreur est survenue lors de la génération ${getDocumentLabel(documentType, "du", "de la")}`;
       }
     } else {
       // Handle network errors or unknown errors
-      errorMessage = `Une erreur est survenue lors de la génération ${getDocumentLabel(documentType, 'du', 'de la')}`;
+      errorMessage = `Une erreur est survenue lors de la génération ${getDocumentLabel(documentType, "du", "de la")}`;
     }
 
     // Show error toast
@@ -53,16 +50,16 @@ export function useDocumentGeneration() {
    */
   function handleDocumentSuccess(
     documentId: string,
-    documentType: 'agreement' | 'quote' | 'invoice'
+    documentType: "agreement" | "quote" | "invoice",
   ): string {
     // Construct document URL
     const documentUrl = `/api/documents/${documentId}`;
 
     // Open PDF in new tab
-    window.open(documentUrl, '_blank');
+    window.open(documentUrl, "_blank");
 
     // Show success toast
-    const successMessage = `${getDocumentLabel(documentType, 'Le', 'La', true)} a été ${documentType === 'agreement' ? 'générée' : 'généré'} avec succès`;
+    const successMessage = `${getDocumentLabel(documentType, "Le", "La", true)} a été ${documentType === "agreement" ? "générée" : "généré"} avec succès`;
     toast.success(successMessage);
 
     return documentUrl;
@@ -77,15 +74,15 @@ export function useDocumentGeneration() {
    * @returns Formatted document label
    */
   function getDocumentLabel(
-    documentType: 'agreement' | 'quote' | 'invoice',
+    documentType: "agreement" | "quote" | "invoice",
     masculineArticle: string,
     feminineArticle: string,
-    capitalize = false
+    capitalize = false,
   ): string {
     const labels: Record<typeof documentType, { article: string; noun: string }> = {
-      agreement: { article: feminineArticle, noun: 'convention' },
-      quote: { article: masculineArticle, noun: 'devis' },
-      invoice: { article: feminineArticle, noun: 'facture' }
+      agreement: { article: feminineArticle, noun: "convention" },
+      quote: { article: masculineArticle, noun: "devis" },
+      invoice: { article: feminineArticle, noun: "facture" },
     };
 
     const { article, noun } = labels[documentType];
@@ -106,10 +103,10 @@ export function useDocumentGeneration() {
    */
   async function generateDocument(
     generateFn: () => Promise<{ data: { id?: string; url?: string } }>,
-    documentType: 'agreement' | 'quote' | 'invoice',
+    documentType: "agreement" | "quote" | "invoice",
     loadingRef: Ref<boolean>,
     errorRef: Ref<string | null>,
-    urlRef: Ref<string | null>
+    urlRef: Ref<string | null>,
   ): Promise<void> {
     errorRef.value = null;
     loadingRef.value = true;
@@ -124,13 +121,13 @@ export function useDocumentGeneration() {
       // Handle response with URL (agreement)
       else if (response.data.url) {
         urlRef.value = response.data.url;
-        window.open(response.data.url, '_blank');
-        const successMessage = `${getDocumentLabel(documentType, 'Le', 'La', true)} a été ${documentType === 'agreement' ? 'générée' : 'généré'} avec succès`;
+        window.open(response.data.url, "_blank");
+        const successMessage = `${getDocumentLabel(documentType, "Le", "La", true)} a été ${documentType === "agreement" ? "générée" : "généré"} avec succès`;
         toast.success(successMessage);
       }
       // No ID or URL in response
       else {
-        errorRef.value = `Aucun ${documentType === 'agreement' ? 'URL de convention' : documentType === 'quote' ? 'ID de devis' : 'ID de facture'} n'a été ${documentType === 'agreement' ? 'retournée' : 'retourné'}`;
+        errorRef.value = `Aucun ${documentType === "agreement" ? "URL de convention" : documentType === "quote" ? "ID de devis" : "ID de facture"} n'a été ${documentType === "agreement" ? "retournée" : "retourné"}`;
       }
     } catch (err: any) {
       errorRef.value = handleDocumentError(err, documentType);
@@ -143,6 +140,6 @@ export function useDocumentGeneration() {
     handleDocumentError,
     handleDocumentSuccess,
     generateDocument,
-    getDocumentLabel
+    getDocumentLabel,
   };
 }

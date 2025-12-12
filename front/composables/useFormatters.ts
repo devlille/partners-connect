@@ -16,7 +16,7 @@
  * ```
  */
 export function useFormatters() {
-  const { d, n } = useI18n()
+  const { d, n } = useI18n();
 
   /**
    * Formate une date selon le format spécifié
@@ -32,25 +32,23 @@ export function useFormatters() {
    */
   function formatDate(
     date: Date | string | number,
-    format: 'short' | 'long' | 'full' = 'short'
+    format: "short" | "long" | "full" = "short",
   ): string {
-    if (!date) return ''
+    if (!date) return "";
 
     try {
-      const dateObj = typeof date === 'string' || typeof date === 'number'
-        ? new Date(date)
-        : date
+      const dateObj = typeof date === "string" || typeof date === "number" ? new Date(date) : date;
 
       // Vérifier que la date est valide
       if (isNaN(dateObj.getTime())) {
-        console.warn('Invalid date:', date)
-        return ''
+        console.warn("Invalid date:", date);
+        return "";
       }
 
-      return d(dateObj, format)
+      return d(dateObj, format);
     } catch (error) {
-      console.error('Error formatting date:', error, date)
-      return ''
+      console.error("Error formatting date:", error, date);
+      return "";
     }
   }
 
@@ -67,27 +65,25 @@ export function useFormatters() {
    */
   function formatCurrency(
     amount: number | string,
-    options?: Partial<Intl.NumberFormatOptions>
+    options?: Partial<Intl.NumberFormatOptions>,
   ): string {
-    if (amount === null || amount === undefined || amount === '') return ''
+    if (amount === null || amount === undefined || amount === "") return "";
 
     try {
-      const numericAmount = typeof amount === 'string'
-        ? parseFloat(amount)
-        : amount
+      const numericAmount = typeof amount === "string" ? parseFloat(amount) : amount;
 
       if (isNaN(numericAmount)) {
-        console.warn('Invalid currency amount:', amount)
-        return ''
+        console.warn("Invalid currency amount:", amount);
+        return "";
       }
 
       return n(numericAmount, {
         ...options,
-        key: 'currency'
-      })
+        key: "currency",
+      });
     } catch (error) {
-      console.error('Error formatting currency:', error, amount)
-      return ''
+      console.error("Error formatting currency:", error, amount);
+      return "";
     }
   }
 
@@ -103,36 +99,31 @@ export function useFormatters() {
    * formatNumber(1234.567, 0)    // "1 235" (fr)
    * formatNumber(1234.567, 3)    // "1 234,567" (fr)
    */
-  function formatNumber(
-    value: number | string,
-    decimals?: number
-  ): string {
-    if (value === null || value === undefined || value === '') return ''
+  function formatNumber(value: number | string, decimals?: number): string {
+    if (value === null || value === undefined || value === "") return "";
 
     try {
-      const numericValue = typeof value === 'string'
-        ? parseFloat(value)
-        : value
+      const numericValue = typeof value === "string" ? parseFloat(value) : value;
 
       if (isNaN(numericValue)) {
-        console.warn('Invalid number:', value)
-        return ''
+        console.warn("Invalid number:", value);
+        return "";
       }
 
       const options: Intl.NumberFormatOptions = {
-        style: 'decimal',
+        style: "decimal",
         useGrouping: true,
-      }
+      };
 
       if (decimals !== undefined) {
-        options.minimumFractionDigits = decimals
-        options.maximumFractionDigits = decimals
+        options.minimumFractionDigits = decimals;
+        options.maximumFractionDigits = decimals;
       }
 
-      return n(numericValue, options)
+      return n(numericValue, options);
     } catch (error) {
-      console.error('Error formatting number:', error, value)
-      return ''
+      console.error("Error formatting number:", error, value);
+      return "";
     }
   }
 
@@ -148,30 +139,25 @@ export function useFormatters() {
    * formatPercent(0.8567, 2)   // "85,67 %" (fr)
    * formatPercent(1)           // "100 %" (fr)
    */
-  function formatPercent(
-    value: number | string,
-    decimals = 1
-  ): string {
-    if (value === null || value === undefined || value === '') return ''
+  function formatPercent(value: number | string, decimals = 1): string {
+    if (value === null || value === undefined || value === "") return "";
 
     try {
-      const numericValue = typeof value === 'string'
-        ? parseFloat(value)
-        : value
+      const numericValue = typeof value === "string" ? parseFloat(value) : value;
 
       if (isNaN(numericValue)) {
-        console.warn('Invalid percent value:', value)
-        return ''
+        console.warn("Invalid percent value:", value);
+        return "";
       }
 
       return n(numericValue, {
-        style: 'percent',
+        style: "percent",
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals,
-      })
+      });
     } catch (error) {
-      console.error('Error formatting percent:', error, value)
-      return ''
+      console.error("Error formatting percent:", error, value);
+      return "";
     }
   }
 
@@ -187,29 +173,29 @@ export function useFormatters() {
    * formatDuration(172800000)   // "2j"
    */
   function formatDuration(milliseconds: number): string {
-    if (!milliseconds || milliseconds < 0) return '0s'
+    if (!milliseconds || milliseconds < 0) return "0s";
 
-    const seconds = Math.floor(milliseconds / 1000)
-    const minutes = Math.floor(seconds / 60)
-    const hours = Math.floor(minutes / 60)
-    const days = Math.floor(hours / 24)
+    const seconds = Math.floor(milliseconds / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
 
     if (days > 0) {
-      const remainingHours = hours % 24
-      return remainingHours > 0 ? `${days}j ${remainingHours}h` : `${days}j`
+      const remainingHours = hours % 24;
+      return remainingHours > 0 ? `${days}j ${remainingHours}h` : `${days}j`;
     }
 
     if (hours > 0) {
-      const remainingMinutes = minutes % 60
-      return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}min` : `${hours}h`
+      const remainingMinutes = minutes % 60;
+      return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}min` : `${hours}h`;
     }
 
     if (minutes > 0) {
-      const remainingSeconds = seconds % 60
-      return remainingSeconds > 0 ? `${minutes}min ${remainingSeconds}s` : `${minutes}min`
+      const remainingSeconds = seconds % 60;
+      return remainingSeconds > 0 ? `${minutes}min ${remainingSeconds}s` : `${minutes}min`;
     }
 
-    return `${seconds}s`
+    return `${seconds}s`;
   }
 
   /**
@@ -223,40 +209,38 @@ export function useFormatters() {
    * formatRelativeTime(new Date(Date.now() + 86400000)) // "dans 1 jour"
    */
   function formatRelativeTime(date: Date | string | number): string {
-    if (!date) return ''
+    if (!date) return "";
 
     try {
-      const dateObj = typeof date === 'string' || typeof date === 'number'
-        ? new Date(date)
-        : date
+      const dateObj = typeof date === "string" || typeof date === "number" ? new Date(date) : date;
 
       if (isNaN(dateObj.getTime())) {
-        console.warn('Invalid date:', date)
-        return ''
+        console.warn("Invalid date:", date);
+        return "";
       }
 
-      const now = new Date()
-      const diffMs = dateObj.getTime() - now.getTime()
-      const diffSeconds = Math.floor(diffMs / 1000)
-      const diffMinutes = Math.floor(diffSeconds / 60)
-      const diffHours = Math.floor(diffMinutes / 60)
-      const diffDays = Math.floor(diffHours / 24)
+      const now = new Date();
+      const diffMs = dateObj.getTime() - now.getTime();
+      const diffSeconds = Math.floor(diffMs / 1000);
+      const diffMinutes = Math.floor(diffSeconds / 60);
+      const diffHours = Math.floor(diffMinutes / 60);
+      const diffDays = Math.floor(diffHours / 24);
 
-      const rtf = new Intl.RelativeTimeFormat(useI18n().locale.value, { numeric: 'auto' })
+      const rtf = new Intl.RelativeTimeFormat(useI18n().locale.value, { numeric: "auto" });
 
       if (Math.abs(diffDays) >= 1) {
-        return rtf.format(diffDays, 'day')
+        return rtf.format(diffDays, "day");
       }
       if (Math.abs(diffHours) >= 1) {
-        return rtf.format(diffHours, 'hour')
+        return rtf.format(diffHours, "hour");
       }
       if (Math.abs(diffMinutes) >= 1) {
-        return rtf.format(diffMinutes, 'minute')
+        return rtf.format(diffMinutes, "minute");
       }
-      return rtf.format(diffSeconds, 'second')
+      return rtf.format(diffSeconds, "second");
     } catch (error) {
-      console.error('Error formatting relative time:', error, date)
-      return ''
+      console.error("Error formatting relative time:", error, date);
+      return "";
     }
   }
 
@@ -273,15 +257,15 @@ export function useFormatters() {
    * formatFileSize(5242880, 1)     // "5,0 MB"
    */
   function formatFileSize(bytes: number, decimals = 2): string {
-    if (bytes === 0) return '0 B'
-    if (!bytes || bytes < 0) return ''
+    if (bytes === 0) return "0 B";
+    if (!bytes || bytes < 0) return "";
 
-    const k = 1024
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    const value = bytes / Math.pow(k, i)
+    const k = 1024;
+    const sizes = ["B", "KB", "MB", "GB", "TB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    const value = bytes / Math.pow(k, i);
 
-    return `${formatNumber(value, decimals)} ${sizes[i]}`
+    return `${formatNumber(value, decimals)} ${sizes[i]}`;
   }
 
   return {
@@ -292,5 +276,5 @@ export function useFormatters() {
     formatDuration,
     formatRelativeTime,
     formatFileSize,
-  }
+  };
 }

@@ -15,7 +15,9 @@
         />
 
         <!-- Modal -->
-        <div class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto transform transition-all">
+        <div
+          class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto transform transition-all"
+        >
           <!-- Header -->
           <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
             <h3 class="text-lg font-semibold text-gray-900">
@@ -28,7 +30,12 @@
               @click="handleClose"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -71,10 +78,7 @@
                       :value="option.id"
                       class="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
-                    <label
-                      :for="`option-${option.id}`"
-                      class="ml-3 flex-1"
-                    >
+                    <label :for="`option-${option.id}`" class="ml-3 flex-1">
                       <span class="block text-sm font-medium text-gray-900">
                         {{ option.name }}
                       </span>
@@ -108,7 +112,8 @@
                   <div class="text-sm text-blue-800">
                     <p class="font-medium mb-1">Proposition de pack alternatif</p>
                     <p>
-                      Une suggestion de pack sera envoyée au sponsor. Il devra approuver cette suggestion avant que le partenariat puisse être validé.
+                      Une suggestion de pack sera envoyée au sponsor. Il devra approuver cette
+                      suggestion avant que le partenariat puisse être validé.
                     </p>
                   </div>
                 </div>

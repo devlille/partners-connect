@@ -1,5 +1,5 @@
-import { ref, computed } from 'vue';
-import type { Ref, ComputedRef } from 'vue';
+import { ref, computed } from "vue";
+import type { Ref, ComputedRef } from "vue";
 import {
   getOrgsEventsIntegrations,
   postOrgsEventsIntegrations,
@@ -7,14 +7,14 @@ import {
   getStatusIntegration,
   type IntegrationSchema,
   type IntegrationSchemaProvider,
-  type IntegrationSchemaUsage
-} from '~/utils/api';
+  type IntegrationSchemaUsage,
+} from "~/utils/api";
 
 /**
  * Extended integration schema with status
  */
 export interface IntegrationWithStatus extends IntegrationSchema {
-  status?: 'success' | 'error' | 'loading' | null;
+  status?: "success" | "error" | "loading" | null;
 }
 
 /**
@@ -83,7 +83,7 @@ export function useIntegrations(options: UseIntegrationsOptions): UseIntegration
    * Used to filter provider dropdown in create modal
    */
   const configuredProviders = computed(() => {
-    return integrations.value.map(integration => integration.provider);
+    return integrations.value.map((integration) => integration.provider);
   });
 
   /**
@@ -93,21 +93,21 @@ export function useIntegrations(options: UseIntegrationsOptions): UseIntegration
    * @param integrationId - Integration UUID
    */
   async function loadIntegrationStatus(integrationId: string): Promise<void> {
-    const integration = integrations.value.find(i => i.id === integrationId);
+    const integration = integrations.value.find((i) => i.id === integrationId);
     if (!integration) return;
 
     try {
-      integration.status = 'loading';
+      integration.status = "loading";
       const response = await getStatusIntegration(orgSlug, eventSlug, integrationId);
 
       // L'API retourne { status: boolean }
       // true = success, false = error
       const statusData = response.data as unknown as { status: boolean };
-      integration.status = statusData.status ? 'success' : 'error';
+      integration.status = statusData.status ? "success" : "error";
     } catch (err: any) {
       console.error(`Failed to load status for integration ${integrationId}:`, err);
       // Si l'appel échoue (erreur réseau, 404, etc.), le statut est error
-      integration.status = 'error';
+      integration.status = "error";
     }
   }
 
@@ -121,18 +121,18 @@ export function useIntegrations(options: UseIntegrationsOptions): UseIntegration
       error.value = null;
 
       const response = await getOrgsEventsIntegrations(orgSlug, eventSlug);
-      integrations.value = response.data.map(integration => ({
+      integrations.value = response.data.map((integration) => ({
         ...integration,
-        status: null
+        status: null,
       }));
 
       // Charger le statut de chaque intégration en parallèle
       await Promise.all(
-        integrations.value.map(integration => loadIntegrationStatus(integration.id))
+        integrations.value.map((integration) => loadIntegrationStatus(integration.id)),
       );
     } catch (err) {
-      console.error('Failed to load integrations:', err);
-      error.value = 'Impossible de charger les intégrations. Veuillez rafraîchir la page.';
+      console.error("Failed to load integrations:", err);
+      error.value = "Impossible de charger les intégrations. Veuillez rafraîchir la page.";
       integrations.value = [];
     } finally {
       loading.value = false;
@@ -153,14 +153,14 @@ export function useIntegrations(options: UseIntegrationsOptions): UseIntegration
         eventSlug,
         data.provider,
         data.usage,
-        data.configuration
+        data.configuration,
       );
 
       // Refresh integration list to show new integration
       await loadIntegrations();
     } catch (err) {
-      console.error('Failed to create integration:', err);
-      throw new Error('Échec de la création de l\'intégration. Vérifiez vos identifiants.');
+      console.error("Failed to create integration:", err);
+      throw new Error("Échec de la création de l'intégration. Vérifiez vos identifiants.");
     }
   }
 
@@ -171,21 +171,15 @@ export function useIntegrations(options: UseIntegrationsOptions): UseIntegration
    * @param integrationId - Integration UUID
    * @throws Error with user-friendly message if deletion fails
    */
-  async function deleteIntegration(
-    integrationId: string
-  ): Promise<void> {
+  async function deleteIntegration(integrationId: string): Promise<void> {
     try {
-      await deleteOrgsEventsIntegrations(
-        orgSlug,
-        eventSlug,
-        integrationId
-      );
+      await deleteOrgsEventsIntegrations(orgSlug, eventSlug, integrationId);
 
       // Refresh integration list to remove deleted integration
       await loadIntegrations();
     } catch (err) {
-      console.error('Failed to delete integration:', err);
-      throw new Error('Impossible de supprimer l\'intégration. Veuillez réessayer.');
+      console.error("Failed to delete integration:", err);
+      throw new Error("Impossible de supprimer l'intégration. Veuillez réessayer.");
     }
   }
 
@@ -197,6 +191,6 @@ export function useIntegrations(options: UseIntegrationsOptions): UseIntegration
     createIntegration,
     deleteIntegration,
     configuredProviders,
-    loadIntegrationStatus
+    loadIntegrationStatus,
   };
 }

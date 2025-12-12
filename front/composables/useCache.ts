@@ -3,9 +3,9 @@
  * Permet de mettre en cache des données API avec expiration automatique
  */
 
-import type { CacheEntry, CacheOptions, CacheKey } from '~/types/cache';
-import { UI_CONSTANTS } from '~/constants/ui';
-import { getCacheKey, getCacheTimestampKey } from '~/constants/storage-keys';
+import type { CacheEntry, CacheOptions, CacheKey } from "~/types/cache";
+import { UI_CONSTANTS } from "~/constants/ui";
+import { getCacheKey, getCacheTimestampKey } from "~/constants/storage-keys";
 
 export function useCache() {
   const cacheStore = new Map<string, CacheEntry>();
@@ -60,7 +60,7 @@ export function useCache() {
         localStorage.setItem(getCacheTimestampKey(cacheKey), String(entry.timestamp));
       } catch (e) {
         // Silently fail si localStorage est plein
-        console.warn('Failed to persist cache to localStorage:', e);
+        console.warn("Failed to persist cache to localStorage:", e);
       }
     }
   }
@@ -69,7 +69,7 @@ export function useCache() {
    * Invalider une ou plusieurs entrées de cache
    */
   function invalidate(pattern: string | RegExp): void {
-    if (typeof pattern === 'string') {
+    if (typeof pattern === "string") {
       // Invalidation exacte
       cacheStore.delete(pattern);
       if (import.meta.client) {
@@ -104,7 +104,7 @@ export function useCache() {
       const keysToRemove: string[] = [];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && (key.startsWith('cache_') || key.startsWith('cache_ts_'))) {
+        if (key && (key.startsWith("cache_") || key.startsWith("cache_ts_"))) {
           keysToRemove.push(key);
         }
       }
@@ -133,8 +133,8 @@ export function useCache() {
     // Identifier toutes les clés de cache
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && key.startsWith('cache_') && !key.startsWith('cache_ts_')) {
-        keysToCheck.push(key.replace('cache_', ''));
+      if (key && key.startsWith("cache_") && !key.startsWith("cache_ts_")) {
+        keysToCheck.push(key.replace("cache_", ""));
       }
     }
 
@@ -172,7 +172,7 @@ export function useCache() {
   async function fetchWithCache<T>(
     key: CacheKey,
     fetchFn: () => Promise<T>,
-    options?: CacheOptions
+    options?: CacheOptions,
   ): Promise<T> {
     // Vérifier le cache d'abord
     const cached = get<T>(key, options);

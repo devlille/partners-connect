@@ -41,13 +41,13 @@ function handleChange(optionId: string, checked: boolean) {
 </script>
 
 <style lang="css" scoped>
-  fieldset {
-    border: 1px solid white;
-    padding: 1.5rem;
-    margin: 0;
-    box-sizing: border-box;
-  }
-  label, legend {
-    color: white;
-  }
+fieldset {
+  border: 1px solid white;
+  padding: 1.5rem;
+  margin: 0;
+  box-sizing: border-box;
+}
+label, legend {
+  color: white;
+}
 </style>

@@ -48,7 +48,9 @@
         @blur="validateField('sandbox_token')"
         @input="handleInput"
       />
-      <p v-if="errors.sandbox_token" class="mt-1 text-sm text-red-600">{{ errors.sandbox_token }}</p>
+      <p v-if="errors.sandbox_token" class="mt-1 text-sm text-red-600">
+        {{ errors.sandbox_token }}
+      </p>
     </div>
   </div>
 </template>

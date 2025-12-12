@@ -2,9 +2,9 @@
  * Types pour les modals
  */
 
-import type { Variant } from '~/constants/ui';
+import type { Variant } from "~/constants/ui";
 
-export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | 'full';
+export type ModalSize = "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "full";
 
 export interface ModalState {
   isOpen: boolean;
@@ -52,13 +52,13 @@ export interface FormModalProps {
 
 export interface ModalEmits {
   /** Émis quand le modal est confirmé */
-  (e: 'confirm'): void;
+  (e: "confirm"): void;
   /** Émis quand le modal est annulé */
-  (e: 'cancel'): void;
+  (e: "cancel"): void;
   /** Émis quand le modal est fermé */
-  (e: 'close'): void;
+  (e: "close"): void;
   /** Émis quand l'état d'ouverture change */
-  (e: 'update:isOpen', value: boolean): void;
+  (e: "update:isOpen", value: boolean): void;
 }
 
 export interface UseModalOptions {

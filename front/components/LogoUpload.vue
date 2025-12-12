@@ -2,18 +2,16 @@
   <div class="space-y-4">
     <div class="flex items-start justify-between">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">
-          Logo de l'entreprise
-        </label>
-        <p class="text-xs text-gray-500">
-          Format: SVG, PNG ou JPEG. Taille maximale: 5MB.
-        </p>
+        <label class="block text-sm font-medium text-gray-700 mb-2"> Logo de l'entreprise </label>
+        <p class="text-xs text-gray-500">Format: SVG, PNG ou JPEG. Taille maximale: 5MB.</p>
       </div>
     </div>
 
     <!-- Logo actuel -->
     <div v-if="currentLogo" class="relative inline-block">
-      <div class="w-48 h-48 rounded-lg border-2 border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden">
+      <div
+        class="w-48 h-48 rounded-lg border-2 border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden"
+      >
         <img
           :src="currentLogo"
           :alt="`Logo de ${companyName}`"
@@ -63,9 +61,7 @@
           <p class="text-sm font-medium text-gray-700 mb-1">
             Cliquez pour uploader ou glissez-déposez
           </p>
-          <p class="text-xs text-gray-500">
-            SVG, PNG ou JPEG jusqu'à 5MB
-          </p>
+          <p class="text-xs text-gray-500">SVG, PNG ou JPEG jusqu'à 5MB</p>
         </div>
       </div>
     </div>
@@ -73,12 +69,10 @@
     <!-- Prévisualisation avant upload -->
     <div v-if="preview && !currentLogo" class="space-y-3">
       <div class="relative inline-block">
-        <div class="w-48 h-48 rounded-lg border-2 border-primary-200 bg-gray-50 flex items-center justify-center overflow-hidden">
-          <img
-            :src="preview"
-            alt="Aperçu du logo"
-            class="max-w-full max-h-full object-contain"
-          />
+        <div
+          class="w-48 h-48 rounded-lg border-2 border-primary-200 bg-gray-50 flex items-center justify-center overflow-hidden"
+        >
+          <img :src="preview" alt="Aperçu du logo" class="max-w-full max-h-full object-contain" />
         </div>
       </div>
 
@@ -92,12 +86,7 @@
         >
           Uploader le logo
         </UButton>
-        <UButton
-          color="neutral"
-          variant="outline"
-          @click="cancelUpload"
-          :disabled="uploading"
-        >
+        <UButton color="neutral" variant="outline" @click="cancelUpload" :disabled="uploading">
           Annuler
         </UButton>
       </div>

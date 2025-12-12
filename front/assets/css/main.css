@@ -1,5 +1,3 @@
-
-
 /* --------------------------------------------------------------------
                	  DEVLILLE TOOL 2025
                		Main style-sheet
@@ -503,7 +501,8 @@ fieldset.switch li:last-of-type label {
 fieldset.switch input:checked + label {
   background-color: var(--switch-bg-checked);
   color: var(--switch-text-checked);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.8),
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.8),
     inset 0 1px 2px rgba(255, 255, 255, 0.75);
 }
 
@@ -761,27 +760,16 @@ html:has(#partners) {
 #partners {
   overflow: auto;
   background-color: var(--main-medium);
-  background-image: linear-gradient(
-      -25deg,
-      var(--main-medium) 50%,
-      transparent,
-      rgba(255, 255, 255, 0.05) 50%
-    ),
-    linear-gradient(
-      -20deg,
-      rgba(255, 255, 255, 0.05) 50%,
-      transparent,
-      var(--main-medium) 50%
-    ),
-    linear-gradient(
-      -45deg,
-      rgba(255, 255, 255, 0.1) 50%,
-      transparent,
-      var(--main-medium) 50%
-    );
+  background-image:
+    linear-gradient(-25deg, var(--main-medium) 50%, transparent, rgba(255, 255, 255, 0.05) 50%),
+    linear-gradient(-20deg, rgba(255, 255, 255, 0.05) 50%, transparent, var(--main-medium) 50%),
+    linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 50%, transparent, var(--main-medium) 50%);
   background-repeat: no-repeat;
   background-size: 50%, 77%, 50%;
-  background-position: top left, 52%, top right;
+  background-position:
+    top left,
+    52%,
+    top right;
 
   & header {
     position: static;
@@ -834,8 +822,6 @@ html:has(#partners) {
     position: relative;
     font-size: clamp(0.9em, calc(0.9em + 1vw), 1.2em);
   }
-
-
 
   & .buttons-bar {
     max-width: 7em;

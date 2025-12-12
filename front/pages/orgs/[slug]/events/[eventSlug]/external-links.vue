@@ -6,12 +6,7 @@
           <BackButton :to="`/orgs/${orgSlug}/events/${eventSlug}`" label="Retour" />
           <PageTitle>Liens externes - {{ eventName }}</PageTitle>
         </div>
-        <UButton
-          color="primary"
-          size="lg"
-          icon="i-heroicons-plus"
-          @click="isAddModalOpen = true"
-        >
+        <UButton color="primary" size="lg" icon="i-heroicons-plus" @click="isAddModalOpen = true">
           Ajouter un lien
         </UButton>
       </div>
@@ -25,17 +20,23 @@
       </div>
 
       <div v-else-if="externalLinks.length === 0" class="text-center py-12">
-        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+        <svg
+          class="mx-auto h-12 w-12 text-gray-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+          />
         </svg>
         <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun lien externe</h3>
         <p class="mt-1 text-sm text-gray-500">Commencez par ajouter un lien externe.</p>
         <div class="mt-6">
-          <UButton
-            color="primary"
-            icon="i-heroicons-plus"
-            @click="isAddModalOpen = true"
-          >
+          <UButton color="primary" icon="i-heroicons-plus" @click="isAddModalOpen = true">
             Ajouter un lien
           </UButton>
         </div>
@@ -45,9 +46,21 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
-              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Nom
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                URL
+              </th>
+              <th
+                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
@@ -56,7 +69,12 @@
                 {{ link.name }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                <a :href="link.url" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline">
+                <a
+                  :href="link.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-blue-600 hover:text-blue-800 underline"
+                >
                   {{ link.url }}
                 </a>
               </td>
@@ -80,7 +98,11 @@
 
     <!-- Modal d'ajout -->
     <Teleport to="body">
-      <div v-if="isAddModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" @click.self="isAddModalOpen = false">
+      <div
+        v-if="isAddModalOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+        @click.self="isAddModalOpen = false"
+      >
         <div class="w-full max-w-lg bg-white rounded-lg shadow-xl" @click.stop>
           <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-semibold text-gray-900">Ajouter un lien externe</h3>
@@ -130,11 +152,7 @@
             >
               Annuler
             </UButton>
-            <UButton
-              color="primary"
-              :loading="isSubmitting"
-              @click="handleAddLink"
-            >
+            <UButton color="primary" :loading="isSubmitting" @click="handleAddLink">
               Ajouter
             </UButton>
           </div>
@@ -144,7 +162,11 @@
 
     <!-- Modal de confirmation de suppression -->
     <Teleport to="body">
-      <div v-if="isDeleteModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" @click.self="isDeleteModalOpen = false">
+      <div
+        v-if="isDeleteModalOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+        @click.self="isDeleteModalOpen = false"
+      >
         <div class="w-full max-w-lg bg-white rounded-lg shadow-xl" @click.stop>
           <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-semibold text-gray-900">Confirmer la suppression</h3>
@@ -154,9 +176,7 @@
             <p class="text-sm text-gray-700">
               Êtes-vous sûr de vouloir supprimer le lien <strong>{{ linkToDelete?.name }}</strong> ?
             </p>
-            <p class="text-sm text-gray-500">
-              Cette action est irréversible.
-            </p>
+            <p class="text-sm text-gray-500">Cette action est irréversible.</p>
           </div>
 
           <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
@@ -168,11 +188,7 @@
             >
               Annuler
             </UButton>
-            <UButton
-              color="error"
-              :loading="!!deletingLinkId"
-              @click="handleDelete"
-            >
+            <UButton color="error" :loading="!!deletingLinkId" @click="handleDelete">
               Supprimer
             </UButton>
           </div>

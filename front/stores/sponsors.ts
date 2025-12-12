@@ -1,6 +1,6 @@
-import { defineStore } from 'pinia';
-import type { PartnershipItemSchema } from '~/utils/api';
-import type { EntityState } from '~/types/generics';
+import { defineStore } from "pinia";
+import type { PartnershipItemSchema } from "~/utils/api";
+import type { EntityState } from "~/types/generics";
 
 /**
  * Sponsors store state using generic EntityState
@@ -11,7 +11,7 @@ interface SponsorsState extends EntityState<PartnershipItemSchema> {
   sponsors: PartnershipItemSchema[];
 }
 
-export const useSponsorsStore = defineStore('sponsors', {
+export const useSponsorsStore = defineStore("sponsors", {
   state: (): SponsorsState => ({
     sponsors: [],
     items: [], // Required by EntityState<PartnershipItemSchema>

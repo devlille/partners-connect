@@ -32,7 +32,7 @@ export interface FormField<T = any> {
   /** Placeholder */
   placeholder?: string;
   /** Type du champ */
-  type?: 'text' | 'email' | 'password' | 'number' | 'date' | 'url' | 'tel' | 'textarea' | 'select';
+  type?: "text" | "email" | "password" | "number" | "date" | "url" | "tel" | "textarea" | "select";
   /** Champ requis */
   required?: boolean;
   /** Règles de validation */
@@ -42,11 +42,11 @@ export interface FormField<T = any> {
 }
 
 export type ValidationRule =
-  | 'required'
-  | 'email'
-  | 'url'
-  | 'number'
-  | 'date'
+  | "required"
+  | "email"
+  | "url"
+  | "number"
+  | "date"
   | { min: number }
   | { max: number }
   | { minLength: number }

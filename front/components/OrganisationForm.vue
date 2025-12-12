@@ -15,7 +15,9 @@
       </div>
 
       <div>
-        <label for="head_office" class="block text-sm font-medium text-gray-700 mb-1">Siège social</label>
+        <label for="head_office" class="block text-sm font-medium text-gray-700 mb-1"
+          >Siège social</label
+        >
         <UInput
           id="head_office"
           v-model="initialState.head_office"
@@ -26,9 +28,7 @@
         />
       </div>
 
-      <SiretInput
-        v-model="initialState.siret"
-      />
+      <SiretInput v-model="initialState.siret" />
 
       <div>
         <label for="siren" class="block text-sm font-medium text-gray-700 mb-1">SIREN</label>
@@ -42,14 +42,12 @@
         />
       </div>
 
-      <UrlInput
-        v-model="initialState.rib_url"
-        label="RIB (URL)"
-        placeholder="https://..."
-      />
+      <UrlInput v-model="initialState.rib_url" label="RIB (URL)" placeholder="https://..." />
 
       <div>
-        <label for="representative_user_email" class="block text-sm font-medium text-gray-700 mb-1">Email du représentant</label>
+        <label for="representative_user_email" class="block text-sm font-medium text-gray-700 mb-1"
+          >Email du représentant</label
+        >
         <UInput
           id="representative_user_email"
           v-model="initialState.representative_user_email"
@@ -61,7 +59,9 @@
       </div>
 
       <div>
-        <label for="representative_role" class="block text-sm font-medium text-gray-700 mb-1">Rôle du représentant</label>
+        <label for="representative_role" class="block text-sm font-medium text-gray-700 mb-1"
+          >Rôle du représentant</label
+        >
         <UInput
           id="representative_role"
           v-model="initialState.representative_role"
@@ -73,17 +73,16 @@
       </div>
 
       <div>
-        <label for="created_at" class="block text-sm font-medium text-gray-700 mb-1">Date de création</label>
-        <UInput
-          id="created_at"
-          v-model="initialState.created_at"
-          type="date"
-          class="w-full"
-        />
+        <label for="created_at" class="block text-sm font-medium text-gray-700 mb-1"
+          >Date de création</label
+        >
+        <UInput id="created_at" v-model="initialState.created_at" type="date" class="w-full" />
       </div>
 
       <div>
-        <label for="creation_location" class="block text-sm font-medium text-gray-700 mb-1">Lieu de création</label>
+        <label for="creation_location" class="block text-sm font-medium text-gray-700 mb-1"
+          >Lieu de création</label
+        >
         <UInput
           id="creation_location"
           v-model="initialState.creation_location"
@@ -94,23 +93,21 @@
       </div>
 
       <div>
-        <label for="published_at" class="block text-sm font-medium text-gray-700 mb-1">Date de publication des statuts</label>
-        <UInput
-          id="published_at"
-          v-model="initialState.published_at"
-          type="date"
-          class="w-full"
-        />
+        <label for="published_at" class="block text-sm font-medium text-gray-700 mb-1"
+          >Date de publication des statuts</label
+        >
+        <UInput id="published_at" v-model="initialState.published_at" type="date" class="w-full" />
       </div>
     </div>
 
     <!-- Panneau déroulant - Informations complémentaires -->
-    <UAccordion :items="[{ label: 'Informations complémentaires', slot: 'complementary' }]" class="mb-6">
+    <UAccordion
+      :items="[{ label: 'Informations complémentaires', slot: 'complementary' }]"
+      class="mb-6"
+    >
       <template #complementary>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-          <VatInput
-            v-model="initialState.tva"
-          />
+          <VatInput v-model="initialState.tva" />
 
           <div>
             <label for="d_and_b" class="block text-sm font-medium text-gray-700 mb-1">D&B</label>
@@ -188,9 +185,7 @@
     </UAccordion>
 
     <div class="flex justify-end gap-4 pt-4">
-      <UButton type="submit" color="primary" size="lg">
-        Valider
-      </UButton>
+      <UButton type="submit" color="primary" size="lg"> Valider </UButton>
     </div>
   </form>
 </template>

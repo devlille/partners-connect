@@ -1,5 +1,5 @@
-import type { ExtendedPartnershipItem } from '~/types/partnership';
-import { PARTNERSHIP_ACTION_ERRORS, PARTNERSHIP_ACTION_SUCCESS } from '~/constants/partnership';
+import type { ExtendedPartnershipItem } from "~/types/partnership";
+import { PARTNERSHIP_ACTION_ERRORS, PARTNERSHIP_ACTION_SUCCESS } from "~/constants/partnership";
 
 /**
  * Formater les messages d'erreur API pour les actions de partenariat
@@ -7,7 +7,7 @@ import { PARTNERSHIP_ACTION_ERRORS, PARTNERSHIP_ACTION_SUCCESS } from '~/constan
  * @param action - Le type d'action ('validate' | 'decline')
  * @returns Message d'erreur formaté
  */
-export function formatPartnershipActionError(err: any, action: 'validate' | 'decline'): string {
+export function formatPartnershipActionError(err: any, action: "validate" | "decline"): string {
   if (err.response) {
     if (err.response.status === 404) {
       return PARTNERSHIP_ACTION_ERRORS.NOT_FOUND;
@@ -17,7 +17,7 @@ export function formatPartnershipActionError(err: any, action: 'validate' | 'dec
     }
   }
 
-  return action === 'validate'
+  return action === "validate"
     ? PARTNERSHIP_ACTION_ERRORS.VALIDATION_GENERIC
     : PARTNERSHIP_ACTION_ERRORS.DECLINE_GENERIC;
 }
@@ -41,10 +41,10 @@ export const usePartnershipActions = () => {
     orgSlug: string,
     eventSlug: string,
     sponsorId: string,
-    onSuccess?: () => Promise<void>
+    onSuccess?: () => Promise<void>,
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const { postOrgsEventsPartnershipValidate } = await import('~/utils/api');
+      const { postOrgsEventsPartnershipValidate } = await import("~/utils/api");
 
       await postOrgsEventsPartnershipValidate(orgSlug, eventSlug, sponsorId);
 
@@ -56,8 +56,8 @@ export const usePartnershipActions = () => {
 
       return { success: true };
     } catch (err: any) {
-      console.error('Failed to validate partnership:', err);
-      const errorMessage = formatPartnershipActionError(err, 'validate');
+      console.error("Failed to validate partnership:", err);
+      const errorMessage = formatPartnershipActionError(err, "validate");
       toast.error(errorMessage);
       return { success: false, error: errorMessage };
     }
@@ -76,10 +76,10 @@ export const usePartnershipActions = () => {
     orgSlug: string,
     eventSlug: string,
     sponsorId: string,
-    onSuccess?: () => void
+    onSuccess?: () => void,
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const { postOrgsEventsPartnershipDecline } = await import('~/utils/api');
+      const { postOrgsEventsPartnershipDecline } = await import("~/utils/api");
 
       await postOrgsEventsPartnershipDecline(orgSlug, eventSlug, sponsorId);
 
@@ -91,8 +91,8 @@ export const usePartnershipActions = () => {
 
       return { success: true };
     } catch (err: any) {
-      console.error('Failed to decline partnership:', err);
-      const errorMessage = formatPartnershipActionError(err, 'decline');
+      console.error("Failed to decline partnership:", err);
+      const errorMessage = formatPartnershipActionError(err, "decline");
       toast.error(errorMessage);
       return { success: false, error: errorMessage };
     }
@@ -101,6 +101,6 @@ export const usePartnershipActions = () => {
   return {
     validatePartnership,
     declinePartnership,
-    formatPartnershipActionError
+    formatPartnershipActionError,
   };
 };

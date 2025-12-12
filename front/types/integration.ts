@@ -1,5 +1,17 @@
-export type IntegrationProvider = 'QONTO' | 'MAILJET' | 'BILLETWEB' | 'OPENPLANNER' | 'SLACK' | 'WEBHOOK';
-export type IntegrationUsage = 'NOTIFICATION' | 'BILLING' | 'MAILING' | 'TICKETING' | 'WEBHOOK' | 'AGENDA';
+export type IntegrationProvider =
+  | "QONTO"
+  | "MAILJET"
+  | "BILLETWEB"
+  | "OPENPLANNER"
+  | "SLACK"
+  | "WEBHOOK";
+export type IntegrationUsage =
+  | "NOTIFICATION"
+  | "BILLING"
+  | "MAILING"
+  | "TICKETING"
+  | "WEBHOOK"
+  | "AGENDA";
 
 export interface IntegrationConfig {
   provider: IntegrationProvider;

@@ -19,13 +19,14 @@
 
         <TableSkeleton v-if="loadingCompany" :columns="4" :rows="6" />
 
-        <div v-else-if="companyError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div
+          v-else-if="companyError"
+          class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded"
+        >
           {{ companyError }}
         </div>
 
         <div v-else-if="company">
-         
-
           <PartnershipCompanyForm
             :company="company"
             :loading="savingCompany"

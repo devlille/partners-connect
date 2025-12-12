@@ -62,7 +62,12 @@
     </div>
 
     <!-- Message d'erreur général pour les traductions -->
-    <p v-if="validationErrors['translations']" class="mb-4 text-sm text-red-600" role="alert" aria-live="polite">
+    <p
+      v-if="validationErrors['translations']"
+      class="mb-4 text-sm text-red-600"
+      role="alert"
+      aria-live="polite"
+    >
       {{ validationErrors['translations'] }}
     </p>
 
@@ -75,7 +80,10 @@
       class="grid grid-cols-1 gap-4 mb-6"
     >
       <div>
-        <label :for="`name-${currentLanguage}`" class="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          :for="`name-${currentLanguage}`"
+          class="block text-sm font-medium text-gray-700 mb-1"
+        >
           Nom de l'option* ({{ getCurrentLanguageLabel() }})
         </label>
         <UInput
@@ -89,13 +97,21 @@
           :aria-invalid="!!validationErrors[`translations.${currentLanguage}.name`]"
           :aria-describedby="validationErrors[`translations.${currentLanguage}.name`] ? `name-${currentLanguage}-error` : undefined"
         />
-        <p v-if="validationErrors[`translations.${currentLanguage}.name`]" :id="`name-${currentLanguage}-error`" class="mt-1 text-sm text-red-600" role="alert">
+        <p
+          v-if="validationErrors[`translations.${currentLanguage}.name`]"
+          :id="`name-${currentLanguage}-error`"
+          class="mt-1 text-sm text-red-600"
+          role="alert"
+        >
           {{ validationErrors[`translations.${currentLanguage}.name`] }}
         </p>
       </div>
 
       <div>
-        <label :for="`description-${currentLanguage}`" class="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          :for="`description-${currentLanguage}`"
+          class="block text-sm font-medium text-gray-700 mb-1"
+        >
           Description ({{ getCurrentLanguageLabel() }})
         </label>
         <UTextarea
@@ -124,7 +140,14 @@
           :aria-invalid="!!validationErrors.price"
           :aria-describedby="validationErrors.price ? 'price-error' : undefined"
         />
-        <p v-if="validationErrors.price" id="price-error" class="mt-1 text-sm text-red-600" role="alert">{{ validationErrors.price }}</p>
+        <p
+          v-if="validationErrors.price"
+          id="price-error"
+          class="mt-1 text-sm text-red-600"
+          role="alert"
+        >
+          {{ validationErrors.price }}
+        </p>
       </div>
     </div>
 
@@ -161,7 +184,11 @@
         </p>
 
         <!-- Liste des valeurs -->
-        <div v-for="(selectableValue, index) in form.selectableValues" :key="index" class="flex gap-2 mb-2">
+        <div
+          v-for="(selectableValue, index) in form.selectableValues"
+          :key="index"
+          class="flex gap-2 mb-2"
+        >
           <UInput
             v-model="selectableValue.value"
             type="text"
@@ -220,9 +247,7 @@
     </div>
 
     <div class="flex justify-end gap-4 pt-4">
-      <UButton type="submit" color="primary" size="lg">
-        Valider
-      </UButton>
+      <UButton type="submit" color="primary" size="lg"> Valider </UButton>
     </div>
   </form>
 </template>

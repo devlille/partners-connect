@@ -83,12 +83,7 @@
       </div>
 
       <div class="flex gap-3 pt-4">
-        <UButton
-          type="submit"
-          color="primary"
-          :loading="isLoading"
-          :disabled="!isFormValid"
-        >
+        <UButton type="submit" color="primary" :loading="isLoading" :disabled="!isFormValid">
           {{ existingBilling ? 'Mettre à jour' : 'Créer' }} les informations de facturation
         </UButton>
       </div>

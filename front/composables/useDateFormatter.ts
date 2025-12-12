@@ -8,14 +8,14 @@ export const useDateFormatter = () => {
   const formatDate = (
     dateString: string,
     options: Intl.DateTimeFormatOptions = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    },
   ): string => {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('fr-FR', options).format(date);
-  }
+    return new Intl.DateTimeFormat("fr-FR", options).format(date);
+  };
 
   /**
    * Formate une date ISO en format court français
@@ -24,11 +24,11 @@ export const useDateFormatter = () => {
    */
   const formatDateShort = (dateString: string): string => {
     return formatDate(dateString, {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
     });
-  }
+  };
 
   /**
    * Formate une date ISO avec l'heure
@@ -37,17 +37,17 @@ export const useDateFormatter = () => {
    */
   const formatDateTime = (dateString: string): string => {
     return formatDate(dateString, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
-  }
+  };
 
   return {
     formatDate,
     formatDateShort,
-    formatDateTime
-  }
-}
+    formatDateTime,
+  };
+};

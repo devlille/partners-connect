@@ -44,24 +44,24 @@ const address = ref({
 
 ## Props
 
-| Prop | Type | Défaut | Description |
-|------|------|--------|-------------|
-| `modelValue` | `string \| null \| undefined` | - | Valeur du champ (v-model) |
-| `label` | `string` | `'Code postal'` | Texte du label |
-| `placeholder` | `string` | `'00000'` | Texte du placeholder |
-| `disabled` | `boolean` | `false` | Désactive le champ |
-| `required` | `boolean` | `false` | Marque le champ comme requis |
-| `hint` | `string` | - | Texte d'aide sous le champ |
-| `inputClass` | `string` | `'w-full'` | Classes CSS additionnelles |
-| `validate` | `boolean` | `true` | Active/désactive la validation |
-| `showErrorOnInput` | `boolean` | `false` | Affiche l'erreur pendant la saisie |
+| Prop               | Type                          | Défaut          | Description                        |
+| ------------------ | ----------------------------- | --------------- | ---------------------------------- |
+| `modelValue`       | `string \| null \| undefined` | -               | Valeur du champ (v-model)          |
+| `label`            | `string`                      | `'Code postal'` | Texte du label                     |
+| `placeholder`      | `string`                      | `'00000'`       | Texte du placeholder               |
+| `disabled`         | `boolean`                     | `false`         | Désactive le champ                 |
+| `required`         | `boolean`                     | `false`         | Marque le champ comme requis       |
+| `hint`             | `string`                      | -               | Texte d'aide sous le champ         |
+| `inputClass`       | `string`                      | `'w-full'`      | Classes CSS additionnelles         |
+| `validate`         | `boolean`                     | `true`          | Active/désactive la validation     |
+| `showErrorOnInput` | `boolean`                     | `false`         | Affiche l'erreur pendant la saisie |
 
 ## Événements
 
-| Événement | Payload | Description |
-|-----------|---------|-------------|
-| `update:modelValue` | `string \| null` | Émis quand la valeur change |
-| `validation` | `boolean` | Émis quand l'état de validation change |
+| Événement           | Payload          | Description                            |
+| ------------------- | ---------------- | -------------------------------------- |
+| `update:modelValue` | `string \| null` | Émis quand la valeur change            |
+| `validation`        | `boolean`        | Émis quand l'état de validation change |
 
 ## Exemples d'utilisation
 
@@ -166,38 +166,42 @@ Pour afficher l'erreur pendant la saisie, utilisez `show-error-on-input` :
 
 ## Exemples de valeurs
 
-| Valeur saisie | Valeur stockée | Valide | Message d'erreur |
-|---------------|----------------|--------|------------------|
-| `75001` | `75001` | ✅ Oui | - |
-| `75 001` | `75001` | ✅ Oui | - |
-| `75-001` | `75001` | ✅ Oui | - |
-| `750` | `750` | ❌ Non | "Code postal invalide (5 chiffres)" |
-| `7500` | `7500` | ❌ Non | "Code postal invalide (5 chiffres)" |
-| `ABC123` | `123` | ❌ Non | "Code postal invalide (5 chiffres)" |
-| `750012345` | `75001` | ✅ Oui | - (tronqué à 5 chiffres) |
-| (vide avec required) | `null` | ❌ Non | "Ce champ est requis" |
-| (vide sans required) | `null` | ✅ Oui | - |
+| Valeur saisie        | Valeur stockée | Valide | Message d'erreur                    |
+| -------------------- | -------------- | ------ | ----------------------------------- |
+| `75001`              | `75001`        | ✅ Oui | -                                   |
+| `75 001`             | `75001`        | ✅ Oui | -                                   |
+| `75-001`             | `75001`        | ✅ Oui | -                                   |
+| `750`                | `750`          | ❌ Non | "Code postal invalide (5 chiffres)" |
+| `7500`               | `7500`         | ❌ Non | "Code postal invalide (5 chiffres)" |
+| `ABC123`             | `123`          | ❌ Non | "Code postal invalide (5 chiffres)" |
+| `750012345`          | `75001`        | ✅ Oui | - (tronqué à 5 chiffres)            |
+| (vide avec required) | `null`         | ❌ Non | "Ce champ est requis"               |
+| (vide sans required) | `null`         | ✅ Oui | -                                   |
 
 ## Codes postaux français valides
 
 Le composant accepte tous les codes postaux français sur 5 chiffres, incluant :
 
 ### France métropolitaine
+
 - `01000` à `95999` - Départements métropolitains
 - `75001` à `75020` - Paris
 - `69001` à `69009` - Lyon
 - `13001` à `13016` - Marseille
 
 ### Départements et territoires d'outre-mer (DOM-TOM)
+
 - `97100` à `97690` - Guadeloupe, Martinique, Guyane, Réunion, Mayotte
 - `98000` à `98999` - Nouvelle-Calédonie, Polynésie française, etc.
 
 ### Collectivités d'outre-mer (COM)
+
 - `98600` à `98890` - Wallis-et-Futuna, Saint-Pierre-et-Miquelon, etc.
 
 ## Tests
 
 Le composant est entièrement testé avec **30 tests** couvrant :
+
 - Validation du format (5 chiffres)
 - Rejet des formats invalides (trop court, trop long)
 - Nettoyage des caractères non-numériques
@@ -258,6 +262,7 @@ Le composant est déjà intégré dans les formulaires suivants :
 **Note** : Ce composant est actuellement optimisé pour les codes postaux **français uniquement** (5 chiffres).
 
 Pour supporter d'autres formats internationaux, vous devrez :
+
 1. Créer un composant plus générique (ex: `PostalCodeInput`)
 2. Ajouter une prop `country` pour adapter la validation
 3. Gérer différentes regex selon le pays :
@@ -268,15 +273,15 @@ Pour supporter d'autres formats internationaux, vous devrez :
 
 ## Différences avec un input standard
 
-| Fonctionnalité | `<input type="text">` | `<ZipCodeInput>` |
-|----------------|----------------------|------------------|
-| Validation format | ❌ | ✅ |
-| Messages personnalisés | ❌ | ✅ |
-| Nettoyage auto | ❌ | ✅ |
-| Limitation 5 chiffres | ❌ | ✅ |
-| Clavier numérique mobile | ❌ | ✅ |
-| Événements validation | ❌ | ✅ |
-| Styling erreur | ❌ | ✅ |
+| Fonctionnalité           | `<input type="text">` | `<ZipCodeInput>` |
+| ------------------------ | --------------------- | ---------------- |
+| Validation format        | ❌                    | ✅               |
+| Messages personnalisés   | ❌                    | ✅               |
+| Nettoyage auto           | ❌                    | ✅               |
+| Limitation 5 chiffres    | ❌                    | ✅               |
+| Clavier numérique mobile | ❌                    | ✅               |
+| Événements validation    | ❌                    | ✅               |
+| Styling erreur           | ❌                    | ✅               |
 
 ## Voir aussi
 

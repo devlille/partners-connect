@@ -11,7 +11,7 @@ export interface ConfirmOptions {
   /** Label du bouton d'annulation */
   cancelLabel?: string;
   /** Type de confirmation (danger, warning, info) */
-  type?: 'danger' | 'warning' | 'info';
+  type?: "danger" | "warning" | "info";
 }
 
 /**
@@ -27,14 +27,14 @@ interface ConfirmState {
 const state = reactive<ConfirmState>({
   isOpen: false,
   options: {
-    title: '',
-    message: '',
-    confirmLabel: 'Confirmer',
-    cancelLabel: 'Annuler',
-    type: 'info'
+    title: "",
+    message: "",
+    confirmLabel: "Confirmer",
+    cancelLabel: "Annuler",
+    type: "info",
   },
   confirming: false,
-  resolve: null
+  resolve: null,
 });
 
 /**
@@ -62,10 +62,10 @@ export const useConfirm = () => {
   const confirm = (options: ConfirmOptions): Promise<boolean> => {
     return new Promise((resolve) => {
       state.options = {
-        confirmLabel: 'Confirmer',
-        cancelLabel: 'Annuler',
-        type: 'info',
-        ...options
+        confirmLabel: "Confirmer",
+        cancelLabel: "Annuler",
+        type: "info",
+        ...options,
       };
       state.isOpen = true;
       state.confirming = false;
@@ -110,6 +110,6 @@ export const useConfirm = () => {
     confirm,
     handleConfirm,
     handleCancel,
-    setConfirming
+    setConfirming,
   };
 };

@@ -1,10 +1,6 @@
 <template>
   <div>
-    <label
-      v-if="label"
-      :for="inputId"
-      class="block text-sm font-medium text-gray-700 mb-2"
-    >
+    <label v-if="label" :for="inputId" class="block text-sm font-medium text-gray-700 mb-2">
       {{ label }}
     </label>
     <UInput
@@ -19,16 +15,10 @@
       @input="handleInput"
       @blur="handleBlur"
     />
-    <p
-      v-if="showError && errorMessage"
-      class="mt-1 text-sm text-red-600"
-    >
+    <p v-if="showError && errorMessage" class="mt-1 text-sm text-red-600">
       {{ errorMessage }}
     </p>
-    <p
-      v-else-if="hint"
-      class="mt-1 text-sm text-gray-500"
-    >
+    <p v-else-if="hint" class="mt-1 text-sm text-gray-500">
       {{ hint }}
     </p>
   </div>

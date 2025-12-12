@@ -25,7 +25,10 @@
 
         <!-- Empty State -->
         <div v-else-if="providers.length === 0" class="bg-white rounded-lg shadow p-12 text-center">
-          <i class="i-heroicons-user-group text-gray-400 text-5xl mx-auto mb-4" aria-hidden="true" />
+          <i
+            class="i-heroicons-user-group text-gray-400 text-5xl mx-auto mb-4"
+            aria-hidden="true"
+          />
           <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun prestataire</h3>
           <p class="text-sm text-gray-500">
             Aucun prestataire n'a été configuré pour cet événement.
@@ -43,19 +46,29 @@
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
                 <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Nom
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Type
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Site web
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Email
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Téléphone
                   </th>
                 </tr>
@@ -66,7 +79,9 @@
                     {{ provider.name }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <span
+                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                    >
                       {{ provider.type }}
                     </span>
                   </td>

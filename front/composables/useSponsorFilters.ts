@@ -43,7 +43,7 @@ export interface UseSponsorFiltersReturn {
   /** Update a single status filter */
   setStatusFilter(
     key: "validated" | "paid" | "agreementGenerated" | "agreementSigned" | "suggestion",
-    value: boolean | null
+    value: boolean | null,
   ): void;
   /** Clear all filters (reset to initial state) */
   clearAllFilters(): void;
@@ -91,8 +91,10 @@ export function useSponsorFilters(options: UseSponsorFiltersOptions): UseSponsor
       if (query.packId) urlFilters.packId = query.packId as string;
       if (query.validated !== undefined) urlFilters.validated = query.validated === "true";
       if (query.paid !== undefined) urlFilters.paid = query.paid === "true";
-      if (query.agreementGenerated !== undefined) urlFilters.agreementGenerated = query.agreementGenerated === "true";
-      if (query.agreementSigned !== undefined) urlFilters.agreementSigned = query.agreementSigned === "true";
+      if (query.agreementGenerated !== undefined)
+        urlFilters.agreementGenerated = query.agreementGenerated === "true";
+      if (query.agreementSigned !== undefined)
+        urlFilters.agreementSigned = query.agreementSigned === "true";
       if (query.suggestion !== undefined) urlFilters.suggestion = query.suggestion === "true";
 
       return { ...initialFilterState, ...urlFilters };
@@ -144,8 +146,10 @@ export function useSponsorFilters(options: UseSponsorFiltersOptions): UseSponsor
     if (filters.value.packId) query.packId = filters.value.packId;
     if (filters.value.validated !== null) query.validated = String(filters.value.validated);
     if (filters.value.paid !== null) query.paid = String(filters.value.paid);
-    if (filters.value.agreementGenerated !== null) query.agreementGenerated = String(filters.value.agreementGenerated);
-    if (filters.value.agreementSigned !== null) query.agreementSigned = String(filters.value.agreementSigned);
+    if (filters.value.agreementGenerated !== null)
+      query.agreementGenerated = String(filters.value.agreementGenerated);
+    if (filters.value.agreementSigned !== null)
+      query.agreementSigned = String(filters.value.agreementSigned);
     if (filters.value.suggestion !== null) query.suggestion = String(filters.value.suggestion);
 
     router.replace({ query });
@@ -207,7 +211,7 @@ export function useSponsorFilters(options: UseSponsorFiltersOptions): UseSponsor
    */
   function setStatusFilter(
     key: "validated" | "paid" | "agreementGenerated" | "agreementSigned" | "suggestion",
-    value: boolean | null
+    value: boolean | null,
   ): void {
     filters.value[key] = value;
   }

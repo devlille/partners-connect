@@ -37,11 +37,7 @@
             </button>
           </div>
 
-          <UButton
-            color="primary"
-            icon="i-heroicons-arrow-down-tray"
-            @click="handleExport"
-          >
+          <UButton color="primary" icon="i-heroicons-arrow-down-tray" @click="handleExport">
             Exporter
           </UButton>
         </div>
@@ -75,7 +71,9 @@
             </div>
             <div>
               <h2 class="text-lg font-semibold text-gray-900">Communications non planifiées</h2>
-              <p class="text-sm text-gray-600">{{ communicationPlan.unplanned.length }} partenariat(s)</p>
+              <p class="text-sm text-gray-600">
+                {{ communicationPlan.unplanned.length }} partenariat(s)
+              </p>
             </div>
           </div>
 
@@ -99,7 +97,9 @@
             </div>
             <div>
               <h2 class="text-lg font-semibold text-gray-900">Communications planifiées</h2>
-              <p class="text-sm text-gray-600">{{ communicationPlan.planned.length }} partenariat(s)</p>
+              <p class="text-sm text-gray-600">
+                {{ communicationPlan.planned.length }} partenariat(s)
+              </p>
             </div>
           </div>
 
@@ -123,7 +123,9 @@
             </div>
             <div>
               <h2 class="text-lg font-semibold text-gray-900">Communications terminées</h2>
-              <p class="text-sm text-gray-600">{{ communicationPlan.done.length }} partenariat(s)</p>
+              <p class="text-sm text-gray-600">
+                {{ communicationPlan.done.length }} partenariat(s)
+              </p>
             </div>
           </div>
 
@@ -140,17 +142,26 @@
         </section>
 
         <!-- Empty state -->
-        <div v-if="communicationPlan.unplanned.length === 0 && communicationPlan.planned.length === 0 && communicationPlan.done.length === 0" class="text-center py-12">
+        <div
+          v-if="communicationPlan.unplanned.length === 0 && communicationPlan.planned.length === 0 && communicationPlan.done.length === 0"
+          class="text-center py-12"
+        >
           <i class="i-heroicons-inbox text-6xl text-gray-400 mb-4" />
           <p class="text-gray-600 text-lg">Aucune communication à afficher</p>
-          <p class="text-gray-500 text-sm mt-2">Les communications apparaîtront ici une fois que vous aurez des partenariats.</p>
+          <p class="text-gray-500 text-sm mt-2">
+            Les communications apparaîtront ici une fois que vous aurez des partenariats.
+          </p>
         </div>
       </div>
     </div>
 
     <!-- Modal: Planifier une date de publication -->
     <Teleport to="body">
-      <div v-if="isScheduleModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" @click.self="isScheduleModalOpen = false">
+      <div
+        v-if="isScheduleModalOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+        @click.self="isScheduleModalOpen = false"
+      >
         <div class="w-full max-w-lg bg-white rounded-lg shadow-xl" @click.stop>
           <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-semibold text-gray-900">Planifier la date de publication</h3>
@@ -158,9 +169,7 @@
 
           <div class="px-6 py-4 space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Entreprise
-              </label>
+              <label class="block text-sm font-medium text-gray-700 mb-2"> Entreprise </label>
               <input
                 type="text"
                 :value="selectedItem?.company_name"
@@ -184,11 +193,7 @@
           </div>
 
           <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
-            <UButton
-              color="neutral"
-              variant="ghost"
-              @click="isScheduleModalOpen = false"
-            >
+            <UButton color="neutral" variant="ghost" @click="isScheduleModalOpen = false">
               Annuler
             </UButton>
             <UButton
@@ -206,7 +211,11 @@
 
     <!-- Modal: Upload support visuel -->
     <Teleport to="body">
-      <div v-if="isUploadModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" @click.self="isUploadModalOpen = false">
+      <div
+        v-if="isUploadModalOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+        @click.self="isUploadModalOpen = false"
+      >
         <div class="w-full max-w-lg bg-white rounded-lg shadow-xl" @click.stop>
           <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-semibold text-gray-900">Ajouter un support visuel</h3>
@@ -214,9 +223,7 @@
 
           <div class="px-6 py-4 space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Entreprise
-              </label>
+              <label class="block text-sm font-medium text-gray-700 mb-2"> Entreprise </label>
               <input
                 type="text"
                 :value="selectedItem?.company_name"
@@ -227,9 +234,7 @@
 
             <!-- Preview de l'image existante -->
             <div v-if="selectedItem?.support_url">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Support actuel
-              </label>
+              <label class="block text-sm font-medium text-gray-700 mb-2"> Support actuel </label>
               <img
                 :src="selectedItem.support_url"
                 alt="Support visuel actuel"
@@ -253,9 +258,7 @@
 
             <!-- Preview de la nouvelle image -->
             <div v-if="filePreview">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Aperçu
-              </label>
+              <label class="block text-sm font-medium text-gray-700 mb-2"> Aperçu </label>
               <img
                 :src="filePreview"
                 alt="Aperçu"
@@ -265,11 +268,7 @@
           </div>
 
           <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
-            <UButton
-              color="neutral"
-              variant="ghost"
-              @click="isUploadModalOpen = false"
-            >
+            <UButton color="neutral" variant="ghost" @click="isUploadModalOpen = false">
               Annuler
             </UButton>
             <UButton

@@ -17,15 +17,26 @@
         />
 
         <!-- Modal -->
-        <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6 transform transition-all">
+        <div
+          class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6 transform transition-all"
+        >
           <!-- Icon -->
-          <div v-if="type === 'danger'" class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full">
+          <div
+            v-if="type === 'danger'"
+            class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full"
+          >
             <i class="i-heroicons-exclamation-triangle text-2xl text-red-600" aria-hidden="true" />
           </div>
-          <div v-else-if="type === 'warning'" class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-orange-100 rounded-full">
+          <div
+            v-else-if="type === 'warning'"
+            class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-orange-100 rounded-full"
+          >
             <i class="i-heroicons-exclamation-circle text-2xl text-orange-600" aria-hidden="true" />
           </div>
-          <div v-else class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-blue-100 rounded-full">
+          <div
+            v-else
+            class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-blue-100 rounded-full"
+          >
             <i class="i-heroicons-information-circle text-2xl text-blue-600" aria-hidden="true" />
           </div>
 
@@ -38,10 +49,7 @@
           </h3>
 
           <!-- Message -->
-          <p
-            :id="`confirm-modal-description-${id}`"
-            class="text-sm text-gray-600 text-center mb-6"
-          >
+          <p :id="`confirm-modal-description-${id}`" class="text-sm text-gray-600 text-center mb-6">
             {{ message }}
           </p>
 

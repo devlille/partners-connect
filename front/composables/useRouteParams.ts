@@ -13,7 +13,7 @@ export const useRouteParams = () => {
     const params = route.params[paramName];
     let value = Array.isArray(params) ? params[0] : params;
 
-    if (typeof value !== 'string') {
+    if (typeof value !== "string") {
       value = String(value);
     }
 
@@ -25,7 +25,7 @@ export const useRouteParams = () => {
    * @param lowercase - Convertir en minuscules (défaut: false)
    */
   function getOrgSlug(lowercase: boolean = false): string {
-    return getParam('slug', lowercase);
+    return getParam("slug", lowercase);
   }
 
   /**
@@ -33,21 +33,21 @@ export const useRouteParams = () => {
    * @param lowercase - Convertir en minuscules (défaut: false)
    */
   function getEventSlug(lowercase: boolean = false): string {
-    return getParam('eventSlug', lowercase);
+    return getParam("eventSlug", lowercase);
   }
 
   /**
    * Extrait l'ID du sponsor/partenariat
    */
   function getSponsorId(): string {
-    return getParam('sponsorId');
+    return getParam("sponsorId");
   }
 
   /**
    * Extrait l'ID du partenariat
    */
   function getPartnershipId(): string {
-    return getParam('partnershipId');
+    return getParam("partnershipId");
   }
 
   /**
@@ -68,6 +68,6 @@ export const useRouteParams = () => {
     orgSlug,
     eventSlug,
     sponsorId,
-    partnershipId
+    partnershipId,
   };
 };

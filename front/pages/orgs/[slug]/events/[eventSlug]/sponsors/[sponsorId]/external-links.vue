@@ -3,7 +3,10 @@
     <div class="bg-white border-b border-gray-200 p-6">
       <div class="flex items-center justify-between">
         <div>
-          <BackButton :to="`/orgs/${orgSlug}/events/${eventSlug}/sponsors/${sponsorId}`" label="Retour" />
+          <BackButton
+            :to="`/orgs/${orgSlug}/events/${eventSlug}/sponsors/${sponsorId}`"
+            label="Retour"
+          />
           <PageTitle>Liens externes - {{ sponsorName }}</PageTitle>
         </div>
       </div>
@@ -24,19 +27,39 @@
         </div>
 
         <div v-else-if="externalLinks.length === 0" class="px-6 py-12 text-center">
-          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+          <svg
+            class="mx-auto h-12 w-12 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+            />
           </svg>
           <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun lien externe</h3>
-          <p class="mt-1 text-sm text-gray-500">Aucun lien externe n'a été configuré pour cet événement.</p>
+          <p class="mt-1 text-sm text-gray-500">
+            Aucun lien externe n'a été configuré pour cet événement.
+          </p>
         </div>
 
         <div v-else>
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Nom
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  URL
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -45,7 +68,12 @@
                   {{ link.name }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  <a :href="link.url" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline">
+                  <a
+                    :href="link.url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-blue-600 hover:text-blue-800 underline"
+                  >
                     {{ link.url }}
                   </a>
                 </td>
@@ -64,27 +92,62 @@
 
         <TableSkeleton v-if="loadingProviders" :columns="5" :rows="6" />
 
-        <div v-else-if="providersError" class="px-6 py-4 bg-red-50 border border-red-200 text-red-700">
+        <div
+          v-else-if="providersError"
+          class="px-6 py-4 bg-red-50 border border-red-200 text-red-700"
+        >
           {{ providersError }}
         </div>
 
         <div v-else-if="providers.length === 0" class="px-6 py-12 text-center">
-          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          <svg
+            class="mx-auto h-12 w-12 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+            />
           </svg>
           <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun prestataire</h3>
-          <p class="mt-1 text-sm text-gray-500">Aucun prestataire n'a été configuré pour cet événement.</p>
+          <p class="mt-1 text-sm text-gray-500">
+            Aucun prestataire n'a été configuré pour cet événement.
+          </p>
         </div>
 
         <div v-else>
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Site web</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Téléphone</th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Nom
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Type
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Site web
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Email
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Téléphone
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -96,13 +159,23 @@
                   {{ provider.type }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  <a v-if="provider.website" :href="provider.website" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline">
+                  <a
+                    v-if="provider.website"
+                    :href="provider.website"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-blue-600 hover:text-blue-800 underline"
+                  >
                     {{ provider.website }}
                   </a>
                   <span v-else class="text-gray-400">-</span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  <a v-if="provider.email" :href="`mailto:${provider.email}`" class="text-blue-600 hover:text-blue-800">
+                  <a
+                    v-if="provider.email"
+                    :href="`mailto:${provider.email}`"
+                    class="text-blue-600 hover:text-blue-800"
+                  >
                     {{ provider.email }}
                   </a>
                   <span v-else class="text-gray-400">-</span>

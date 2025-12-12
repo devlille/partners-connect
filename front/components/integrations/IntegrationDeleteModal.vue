@@ -9,13 +9,12 @@
       @click.self="handleClose"
       @keydown.esc="handleClose"
     >
-      <div
-        class="w-full max-w-md bg-white rounded-lg shadow-xl"
-        @click.stop
-      >
+      <div class="w-full max-w-md bg-white rounded-lg shadow-xl" @click.stop>
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200">
-          <h3 id="delete-modal-title" class="text-lg font-semibold text-gray-900">Supprimer l'intégration</h3>
+          <h3 id="delete-modal-title" class="text-lg font-semibold text-gray-900">
+            Supprimer l'intégration
+          </h3>
         </div>
 
         <!-- Body -->
@@ -25,27 +24,15 @@
             <span class="font-semibold">{{ getProviderName(integration.provider) }}</span>
             ({{ getUsageName(integration.usage) }}) ?
           </p>
-          <p class="text-sm text-red-600 font-medium">
-            Cette action est irréversible
-          </p>
+          <p class="text-sm text-red-600 font-medium">Cette action est irréversible</p>
         </div>
 
         <!-- Footer -->
         <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
-          <UButton
-            color="neutral"
-            variant="ghost"
-            :disabled="deleting"
-            @click="handleClose"
-          >
+          <UButton color="neutral" variant="ghost" :disabled="deleting" @click="handleClose">
             Annuler
           </UButton>
-          <UButton
-            color="error"
-            :loading="deleting"
-            :disabled="deleting"
-            @click="handleConfirm"
-          >
+          <UButton color="error" :loading="deleting" :disabled="deleting" @click="handleConfirm">
             Supprimer
           </UButton>
         </div>

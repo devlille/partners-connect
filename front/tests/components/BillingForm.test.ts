@@ -3,7 +3,11 @@ import type { CompanyBillingData } from "~/utils/api";
 
 describe("BillingForm Component", () => {
   describe("Form Validation", () => {
-    function isValidBillingContact(contact: { first_name: string; last_name: string; email: string }): boolean {
+    function isValidBillingContact(contact: {
+      first_name: string;
+      last_name: string;
+      email: string;
+    }): boolean {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
       return !!(

@@ -52,7 +52,10 @@
         </div>
 
         <!-- Statistiques -->
-        <div v-if="packs.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <div
+          v-if="packs.length > 0"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6"
+        >
           <div
             v-for="pack in packs"
             :key="`stat-${pack.id}`"
@@ -93,10 +96,7 @@
         </div>
 
         <div v-else>
-          <UTable
-            :data="partnerships"
-            :columns="columns"
-          />
+          <UTable :data="partnerships" :columns="columns" />
         </div>
       </template>
     </div>
@@ -115,12 +115,7 @@
     />
 
     <!-- Annonce ARIA pour les lecteurs d'écran -->
-    <div
-      role="status"
-      aria-live="polite"
-      aria-atomic="true"
-      class="sr-only"
-    >
+    <div role="status" aria-live="polite" aria-atomic="true" class="sr-only">
       {{ ariaAnnouncement }}
     </div>
   </Dashboard>

@@ -14,14 +14,14 @@
         {{ error }}
       </div>
 
-      <div v-if="success" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
+      <div
+        v-if="success"
+        class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4"
+      >
         Option créée avec succès ! Redirection en cours...
       </div>
 
-      <SponsoringOptionForm
-        :data="{}"
-        @save="onSave"
-      />
+      <SponsoringOptionForm :data="{}" @save="onSave" />
     </div>
   </Dashboard>
 </template>

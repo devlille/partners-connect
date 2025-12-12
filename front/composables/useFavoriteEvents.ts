@@ -43,10 +43,7 @@ export const useFavoriteEvents = () => {
           if (validationResult.success) {
             favorites.value = validationResult.data;
           } else {
-            console.error(
-              "Invalid favorite events data in localStorage:",
-              validationResult.error,
-            );
+            console.error("Invalid favorite events data in localStorage:", validationResult.error);
             favorites.value = [];
             // Nettoyer les données corrompues
             localStorage.removeItem(STORAGE_KEY);
@@ -74,13 +71,8 @@ export const useFavoriteEvents = () => {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites.value));
       } catch (error) {
-        if (
-          error instanceof DOMException &&
-          error.name === "QuotaExceededError"
-        ) {
-          console.error(
-            "localStorage quota exceeded - unable to save favorites",
-          );
+        if (error instanceof DOMException && error.name === "QuotaExceededError") {
+          console.error("localStorage quota exceeded - unable to save favorites");
           // En production, vous pourriez utiliser un toast pour notifier l'utilisateur
           // useToast().add({ title: 'Limite atteinte', description: 'Impossible d\'ajouter plus de favoris', color: 'error' });
         } else {
@@ -106,9 +98,7 @@ export const useFavoriteEvents = () => {
 
     // Vérifier la limite de favoris
     if (favorites.value.length >= MAX_FAVORITES) {
-      console.warn(
-        `Cannot add favorite: maximum limit of ${MAX_FAVORITES} reached`,
-      );
+      console.warn(`Cannot add favorite: maximum limit of ${MAX_FAVORITES} reached`);
       return false;
     }
 
@@ -144,9 +134,7 @@ export const useFavoriteEvents = () => {
    * Vérifie si un événement est dans les favoris
    */
   function isFavorite(orgSlug: string, eventSlug: string): boolean {
-    return favorites.value.some(
-      (f) => f.orgSlug === orgSlug && f.eventSlug === eventSlug,
-    );
+    return favorites.value.some((f) => f.orgSlug === orgSlug && f.eventSlug === eventSlug);
   }
 
   /**

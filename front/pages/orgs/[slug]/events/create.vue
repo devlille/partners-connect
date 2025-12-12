@@ -12,17 +12,14 @@
     <div class="p-6">
       <AlertMessage v-if="error" type="error" :message="error" class="mb-4" />
 
-      <AlertMessage 
-        v-if="success" 
-        type="success" 
-        message="Événement créé avec succès ! Redirection en cours..." 
+      <AlertMessage
+        v-if="success"
+        type="success"
+        message="Événement créé avec succès ! Redirection en cours..."
         class="mb-4"
       />
 
-      <EventForm
-        :data="initialData"
-        @save="onSave"
-      />
+      <EventForm :data="initialData" @save="onSave" />
     </div>
   </Dashboard>
 </template>

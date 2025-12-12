@@ -16,17 +16,31 @@
       >
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200">
-          <h3 id="create-modal-title" class="text-lg font-semibold text-gray-900">Ajouter une intégration</h3>
+          <h3 id="create-modal-title" class="text-lg font-semibold text-gray-900">
+            Ajouter une intégration
+          </h3>
         </div>
 
         <!-- Body -->
         <div class="px-6 py-4">
           <!-- All Providers Configured Message -->
           <div v-if="availableProviders.length === 0" class="text-center py-8">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              class="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">Tous les types d'intégration sont déjà configurés</h3>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">
+              Tous les types d'intégration sont déjà configurés
+            </h3>
             <p class="mt-1 text-sm text-gray-500">
               Supprimez une intégration existante pour en ajouter une nouvelle.
             </p>
@@ -91,12 +105,7 @@
 
         <!-- Footer -->
         <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
-          <UButton
-            color="neutral"
-            variant="ghost"
-            :disabled="isSubmitting"
-            @click="handleClose"
-          >
+          <UButton color="neutral" variant="ghost" :disabled="isSubmitting" @click="handleClose">
             Annuler
           </UButton>
           <UButton

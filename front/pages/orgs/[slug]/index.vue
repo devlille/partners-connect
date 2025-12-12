@@ -16,11 +16,7 @@
         {{ error }}
       </div>
 
-      <OrganisationForm
-        v-else-if="organisation"
-        :data="organisation"
-        @save="onSave"
-      />
+      <OrganisationForm v-else-if="organisation" :data="organisation" @save="onSave" />
     </div>
   </Dashboard>
 </template>
