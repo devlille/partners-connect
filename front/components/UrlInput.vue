@@ -1,6 +1,10 @@
 <template>
   <div>
-    <label v-if="label" :for="inputId" class="block text-sm font-medium text-gray-700 mb-2">
+    <label
+      v-if="label"
+      :for="inputId"
+      :class="[hideLabel ? 'sr-only' : 'block text-sm font-medium text-gray-700 mb-2']"
+    >
       {{ label }}<span v-if="required" class="text-red-500 ml-1">*</span>
     </label>
     <UInput
@@ -36,6 +40,7 @@ interface Props {
   validate?: boolean;
   showErrorOnInput?: boolean;
   allowHttp?: boolean;
+  hideLabel?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -46,7 +51,8 @@ const props = withDefaults(defineProps<Props>(), {
   validate: true,
   inputClass: 'w-full',
   showErrorOnInput: false,
-  allowHttp: true
+  allowHttp: true,
+  hideLabel: false
 });
 
 const emit = defineEmits<{

@@ -36,10 +36,7 @@
           </div>
 
           <!-- Information message for validated but unpaid partnerships -->
-          <div
-            v-if="!loading && !error && partnership && partnership.validated && !partnership.paid"
-            class="mt-4 pt-4 border-t border-gray-200"
-          >
+          <div v-if="shouldShowCompletionMessage" class="mt-4 pt-4 border-t border-gray-200">
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <div class="flex items-start gap-3">
                 <i
@@ -461,6 +458,21 @@ const uploadError = ref<string | null>(null);
 const agreementFileInput = ref<HTMLInputElement>();
 
 const { t } = useI18n();
+
+/**
+ * Determine if completion message should be shown
+ */
+const shouldShowCompletionMessage = computed(() => {
+  if (loading.value || error.value || !partnership.value) {
+    return false;
+  }
+
+  const hasDocumentsGenerated = partnership.value.quote_url || partnership.value.agreement_url;
+
+  return partnership.value.validated
+    && !partnership.value.paid
+    && !hasDocumentsGenerated;
+});
 
 /**
  * Handle partnership information save

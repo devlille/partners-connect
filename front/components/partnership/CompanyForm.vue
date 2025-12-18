@@ -157,6 +157,7 @@
                 placeholder="https://..."
                 :disabled="readonly || loading"
                 :validate="false"
+                hideLabel
               />
             </div>
             <div>
