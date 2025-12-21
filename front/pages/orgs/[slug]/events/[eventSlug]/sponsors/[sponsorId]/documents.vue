@@ -391,7 +391,10 @@ async function loadPartnership() {
     // Stocker l'URL du logo si elle existe
     companyLogo.value = company.medias?.original || null;
 
-    // Stocker l'URL de la convention signée si elle existe
+    // Stocker les URLs des documents générés
+    quoteUrl.value = p.process_status?.quote_url || null;
+    invoiceUrl.value = p.process_status?.invoice_url || null;
+    agreementUrl.value = p.process_status?.agreement_url || null;
     signedAgreementUrl.value = p.process_status?.agreement_signed_url || null;
 
     // Créer l'objet partnership simplifié pour l'affichage

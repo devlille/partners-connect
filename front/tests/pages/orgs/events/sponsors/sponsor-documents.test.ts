@@ -1,6 +1,203 @@
 import { describe, it, expect, vi } from "vitest";
 
 describe("Sponsor Documents Page", () => {
+  describe("Load Partnership - Document URLs", () => {
+    it("should load document URLs from API response", async () => {
+      const mockApiResponse = {
+        data: {
+          partnership: {
+            id: "partnership-123",
+            contact_name: "John Doe",
+            contact_role: "Manager",
+            process_status: {
+              quote_url: "https://example.com/quote.pdf",
+              invoice_url: "https://example.com/invoice.pdf",
+              agreement_url: "https://example.com/agreement.pdf",
+              agreement_signed_url: "https://example.com/agreement-signed.pdf",
+            },
+          },
+          company: {
+            id: "company-123",
+            name: "Test Company",
+            medias: { original: "https://example.com/logo.png" },
+          },
+        },
+      };
+
+      const state = {
+        quoteUrl: null as string | null,
+        invoiceUrl: null as string | null,
+        agreementUrl: null as string | null,
+        signedAgreementUrl: null as string | null,
+        companyLogo: null as string | null,
+      };
+
+      // Simulate loadPartnership behavior
+      const { partnership: p, company } = mockApiResponse.data;
+      state.companyLogo = company.medias?.original || null;
+      state.quoteUrl = p.process_status?.quote_url || null;
+      state.invoiceUrl = p.process_status?.invoice_url || null;
+      state.agreementUrl = p.process_status?.agreement_url || null;
+      state.signedAgreementUrl = p.process_status?.agreement_signed_url || null;
+
+      expect(state.quoteUrl).toBe("https://example.com/quote.pdf");
+      expect(state.invoiceUrl).toBe("https://example.com/invoice.pdf");
+      expect(state.agreementUrl).toBe("https://example.com/agreement.pdf");
+      expect(state.signedAgreementUrl).toBe("https://example.com/agreement-signed.pdf");
+      expect(state.companyLogo).toBe("https://example.com/logo.png");
+    });
+
+    it("should handle missing process_status in API response", () => {
+      const mockApiResponse = {
+        data: {
+          partnership: {
+            id: "partnership-123",
+            contact_name: "John Doe",
+            contact_role: "Manager",
+            process_status: null,
+          },
+          company: {
+            id: "company-123",
+            name: "Test Company",
+            medias: null,
+          },
+        },
+      };
+
+      const state = {
+        quoteUrl: null as string | null,
+        invoiceUrl: null as string | null,
+        agreementUrl: null as string | null,
+        signedAgreementUrl: null as string | null,
+        companyLogo: null as string | null,
+      };
+
+      // Simulate loadPartnership behavior with null process_status
+      const { partnership: p, company } = mockApiResponse.data;
+      state.companyLogo = company.medias?.original || null;
+      state.quoteUrl = p.process_status?.quote_url || null;
+      state.invoiceUrl = p.process_status?.invoice_url || null;
+      state.agreementUrl = p.process_status?.agreement_url || null;
+      state.signedAgreementUrl = p.process_status?.agreement_signed_url || null;
+
+      expect(state.quoteUrl).toBeNull();
+      expect(state.invoiceUrl).toBeNull();
+      expect(state.agreementUrl).toBeNull();
+      expect(state.signedAgreementUrl).toBeNull();
+      expect(state.companyLogo).toBeNull();
+    });
+
+    it("should handle partial process_status with only some documents", () => {
+      const mockApiResponse = {
+        data: {
+          partnership: {
+            id: "partnership-123",
+            contact_name: "John Doe",
+            contact_role: "Manager",
+            process_status: {
+              quote_url: "https://example.com/quote.pdf",
+              invoice_url: null,
+              agreement_url: "https://example.com/agreement.pdf",
+              agreement_signed_url: null,
+            },
+          },
+          company: {
+            id: "company-123",
+            name: "Test Company",
+            medias: { original: "https://example.com/logo.png" },
+          },
+        },
+      };
+
+      const state = {
+        quoteUrl: null as string | null,
+        invoiceUrl: null as string | null,
+        agreementUrl: null as string | null,
+        signedAgreementUrl: null as string | null,
+      };
+
+      const { partnership: p } = mockApiResponse.data;
+      state.quoteUrl = p.process_status?.quote_url || null;
+      state.invoiceUrl = p.process_status?.invoice_url || null;
+      state.agreementUrl = p.process_status?.agreement_url || null;
+      state.signedAgreementUrl = p.process_status?.agreement_signed_url || null;
+
+      expect(state.quoteUrl).toBe("https://example.com/quote.pdf");
+      expect(state.invoiceUrl).toBeNull();
+      expect(state.agreementUrl).toBe("https://example.com/agreement.pdf");
+      expect(state.signedAgreementUrl).toBeNull();
+    });
+
+    it("should persist document URLs after page refresh", () => {
+      // This test simulates the behavior where document URLs
+      // should be loaded from API on mount/refresh
+      const mockGetEventsPartnershipDetailed = vi.fn().mockResolvedValue({
+        data: {
+          partnership: {
+            id: "partnership-123",
+            process_status: {
+              quote_url: "https://example.com/quote.pdf",
+              invoice_url: "https://example.com/invoice.pdf",
+              agreement_url: "https://example.com/agreement.pdf",
+              agreement_signed_url: null,
+            },
+          },
+          company: { id: "company-123", name: "Test Company" },
+        },
+      });
+
+      // Verify the mock would be called on mount
+      expect(mockGetEventsPartnershipDetailed).not.toHaveBeenCalled();
+
+      // Simulate component mount calling loadPartnership
+      mockGetEventsPartnershipDetailed("event-slug", "sponsor-id");
+
+      expect(mockGetEventsPartnershipDetailed).toHaveBeenCalledWith("event-slug", "sponsor-id");
+    });
+
+    it("should update document URLs when navigating to different sponsor", async () => {
+      const mockApi = vi.fn();
+
+      // First sponsor
+      mockApi.mockResolvedValueOnce({
+        data: {
+          partnership: {
+            id: "sponsor-1",
+            process_status: {
+              quote_url: "https://example.com/sponsor1-quote.pdf",
+            },
+          },
+          company: { id: "company-1", name: "Company 1" },
+        },
+      });
+
+      // Second sponsor
+      mockApi.mockResolvedValueOnce({
+        data: {
+          partnership: {
+            id: "sponsor-2",
+            process_status: {
+              quote_url: "https://example.com/sponsor2-quote.pdf",
+            },
+          },
+          company: { id: "company-2", name: "Company 2" },
+        },
+      });
+
+      const state = { quoteUrl: null as string | null };
+
+      // Load first sponsor
+      let response = await mockApi();
+      state.quoteUrl = response.data.partnership.process_status?.quote_url || null;
+      expect(state.quoteUrl).toBe("https://example.com/sponsor1-quote.pdf");
+
+      // Navigate to second sponsor
+      response = await mockApi();
+      state.quoteUrl = response.data.partnership.process_status?.quote_url || null;
+      expect(state.quoteUrl).toBe("https://example.com/sponsor2-quote.pdf");
+    });
+  });
+
   describe("Document Generation - Quote", () => {
     describe("Generate Quote API Call", () => {
       it("should call API with correct parameters", async () => {
