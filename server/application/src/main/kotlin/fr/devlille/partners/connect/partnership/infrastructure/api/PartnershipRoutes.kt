@@ -46,6 +46,7 @@ fun Route.partnershipRoutes() {
     orgsPartnershipJobOfferRoutes()
     orgsPartnershipJobOfferDecisionRoutes()
     orgsPartnershipOrganiserRoutes()
+    partnershipEmailRoutes()
 }
 
 @Suppress("LongMethod")

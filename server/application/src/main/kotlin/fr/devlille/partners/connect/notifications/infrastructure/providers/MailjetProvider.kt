@@ -51,6 +51,8 @@ data class Message(
     val from: Contact,
     @SerialName("To")
     val to: List<Contact>,
+    @SerialName("Cc")
+    val cc: List<Contact>? = null,
     @SerialName("Subject")
     val subject: String,
     @SerialName("HTMLPart")

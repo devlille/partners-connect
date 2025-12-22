@@ -155,35 +155,22 @@ Request: POST /orgs/{orgSlug}/events/{eventSlug}/partnerships/email
   │    └─ EventRepository.findBySlug(eventSlug)
   │         └─ Returns: Event(name, contact.email, organisation_id)
   │
-  ├─ 3. Group Partnerships by Organizer (route logic)
-  │    └─ partnershipsWithEmails.groupBy { it.organiser }
-  │         └─ Map<User?, List<PartnershipWithEmails>>
-  │              ├─ Key = User (assigned organizer)
-  │              └─ Key = null (no organizer assigned)
+  ├─ 3. Get Destinations (via NotificationGateway.getDestination)
+  │    └─ For each partnership, gateway creates provider-specific Destination:
+  │         └─ MailjetDestination(
+  │              from = organiser.email OR event.contact.email,
+  │              to = partnership contact emails,
+  │              cc = organiser.email (if organiser assigned) OR empty
+  │            )
   │
-  ├─ 4. Send Emails via NotificationRepository (for each organizer group)
-  │    └─ For Each Organizer Group:
-  │              ├─ Determine From/CC:
-  │              │    ├─ If organiser != null:
-  │              │    │    ├─ From: organiser.email, organiser.name
-  │              │    │    └─ CC: event.contact.email
-  │              │    └─ If organiser == null:
-  │              │         ├─ From: event.contact.email, event.name
-  │              │         └─ CC: (none)
-  │              │
-  │              ├─ Collect & Deduplicate Recipients:
-  │              │    └─ group.flatMap { it.emails }.distinct()
-  │              │         └─ Result: List<EmailContact> (unique email addresses)
-  │              │
-  │              └─ Send via NotificationRepository:
-  │                   └─ NotificationRepository.sendMail(
-  │                        orgSlug = orgSlug,
-  │                        from = EmailContact(email=fromEmail, name=fromName),
-  │                        to = recipients.map { EmailContact(email=it) },
-  │                        cc = ccEmail?.let { [EmailContact(email=it)] },
-  │                        subject = "[${event.name}] $subject",
-  │                        htmlBody = body
-  │                      )
+  ├─ 4. Send Emails via NotificationRepository (for each destination)
+  │    └─ For Each Destination:
+  │              └─ NotificationRepository.sendMessage(
+  │                   eventSlug = eventSlug,
+  │                   destination = destination,
+  │                   subject = "$subject",
+  │                   htmlBody = body
+  │                 )
   │                        ↓
   │                        [NotificationRepository converts to generic format]
   │                        └─ Converts EmailContact → Destination, subject → header, etc.
@@ -200,7 +187,7 @@ Request: POST /orgs/{orgSlug}/events/{eventSlug}/partnerships/email
   │                        Returns: Boolean (success)
   │
   └─ 5. Return Response:
-       └─ HTTP 200 OK { recipients: <total_unique_count> }
+       └─ HTTP 200 OK { recipients: <total_destination_count> }
 
 Error Scenarios:
   ├─ Zero partnerships match filters → NotFoundException (404)
