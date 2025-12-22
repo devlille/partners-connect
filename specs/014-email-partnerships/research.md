@@ -6,9 +6,9 @@
 
 ## Technical Decisions
 
-### 1. Email Grouping by Partnership Organizer
+### 1. Email Sending Strategy (Updated)
 
-**Decision**: Implement email grouping logic in route handler, sending separate Mailjet API batches per unique organizer assignment.
+**Decision**: Send individual emails per partnership (no grouping). Each partnership gets its own destination with From/CC determined by assigned organizer.
 
 **Rationale**:
 - Partnerships can have different assigned organizers (or no organizer)
@@ -19,93 +19,65 @@
 
 **Implementation Approach**:
 ```kotlin
-// Route handler orchestration (injects 3 repositories)
+// Route handler orchestration (injects 2 repositories)
 val partnershipEmailRepository by inject<PartnershipEmailRepository>()
-val eventRepository by inject<EventRepository>()
 val notificationRepository by inject<NotificationRepository>()
 
-// Fetch partnerships with emails and organizer contact info
-val partnershipsWithEmails = partnershipEmailRepository.getPartnershipsWithEmails(eventSlug, filters)
+// Get destinations for all partnerships (gateway creates provider-specific destinations)
+val destinations = partnershipEmailRepository.getPartnershipDestination(eventSlug, filters)
+if (destinations.isEmpty()) throw NotFoundException("No partnerships match filters")
 
-// Get event details for From/CC fallback
-val event = eventRepository.findBySlug(eventSlug) ?: throw NotFoundException("Event not found")
-
-// Group by organizer (already included in domain object)
-val groupedByOrganizer = partnershipsWithEmails.groupBy { it.organiserContact }
-
-var totalRecipients = 0
-
-// Loop organizer groups and send via NotificationRepository
-groupedByOrganizer.forEach { (organiserContact, partnershipGroup) ->
-    val recipients = partnershipGroup.flatMap { it.emailContacts }.distinct()
-    if (recipients.isEmpty()) return@forEach
-    
-    totalRecipients += recipients.size
-    
-    // Determine sender: use organizer contact if present, otherwise event contact
-    val fromContact = organiserContact ?: EmailContact(
-        email = event.contactEmail,
-        name = event.name
-    )
-    
-    val ccContacts = if (organiserContact != null) {
-        listOf(EmailContact(email = event.contactEmail))
-    } else null
-    
-    // Send via NotificationRepository (internally handles Mailjet gateway)
-    val success = notificationRepository.sendMail(
-        orgSlug = orgSlug,
-        from = fromContact,
-        to = recipients,
-        cc = ccContacts,
-        subject = "[${event.name}] ${request.subject}",
+// Send to each destination
+destinations.forEach { destination ->
+    notificationRepository.sendMessage(
+        eventSlug = eventSlug,
+        destination = destination,
+        subject = request.subject,
         htmlBody = request.body
     )
-    
-    if (!success) {
-        throw ServiceUnavailableException("Email service unavailable")
-    }
 }
+
+// Return total destinations count
+SendPartnershipEmailResponse(recipients = destinations.size)
 ```
 
 **Alternatives Considered**:
 - **Single batch with mixed From addresses**: Rejected - Mailjet requires consistent From per message
-- **Separate API call per partnership**: Rejected - Too many HTTP requests, inefficient
-- **Group only by event**: Rejected - Loses personalization from assigned organizer
+- **Group partnerships by organizer**: Simplified to individual sending for clearer tracking and simpler architecture
+- **Separate API call per contact email**: Rejected - Too many HTTP requests, inefficient
 
 ---
 
-### 2. Email Deduplication Strategy
+### 2. Email Deduplication Strategy (Updated)
 
-**Decision**: Deduplicate email addresses within each organizer group before sending to Mailjet.
+**Decision**: Each partnership sends to its own contact emails (no cross-partnership deduplication).
 
 **Rationale**:
-- Same email address may exist in multiple partnerships (e.g., contact works for multiple companies)
-- Mailjet charges per recipient and users dislike receiving duplicate emails
-- Deduplication prevents spam and reduces costs
-- Must happen per organizer group to maintain proper From/CC context
+- Each partnership is treated independently
+- Contact emails are stored per partnership in partnership_emails table  
+- If same email appears in multiple partnerships, they receive separate emails (acceptable for per-partnership tracking)
+- Simplified logic without cross-partnership coordination
 
 **Implementation Approach**:
 ```kotlin
-// PartnershipEmailRepository returns partnerships with EmailContact objects
-val partnershipsWithEmails = partnershipEmailRepository.getPartnershipsWithEmails(eventSlug, filters)
+// Each destination contains contact emails for one partnership
+val destinations = partnershipEmailRepository.getPartnershipDestination(eventSlug, filters)
 
-// Group by organizer contact, then use pre-structured EmailContact objects
-val groupedByOrganizer = partnershipsWithEmails.groupBy { it.organiserContact }
-
-groupedByOrganizer.forEach { (organiserContact, partnershipGroup) ->
-    val recipients = partnershipGroup
-        .flatMap { it.emailContacts }  // EmailContact objects already created by repository
-        .distinct()  // Kotlin Set-based deduplication per organizer group
-    
-    // Send via NotificationRepository...
+// Gateway creates destination with From/CC logic and partnership emails
+// Each partnership sends independently
+destinations.forEach { destination ->
+    notificationRepository.sendMessage(
+        eventSlug = eventSlug,
+        destination = destination,
+        subject = request.subject,
+        htmlBody = request.body
+    )
 }
 ```
 
 **Alternatives Considered**:
-- **No deduplication**: Rejected - Poor user experience, spam complaints
-- **Global deduplication across all groups**: Rejected - Would prevent same recipient from getting emails from different organizers
-- **Database-level DISTINCT**: Rejected - Requires complex query, better handled in-memory for this scale
+- **Cross-partnership deduplication**: Rejected - Adds complexity, per-partnership tracking is acceptable
+- **Database-level DISTINCT**: Rejected - Not needed for individual partnership sending
 
 ---
 

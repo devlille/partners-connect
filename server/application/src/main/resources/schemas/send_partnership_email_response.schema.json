@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Send Partnership Email Response",
+  "description": "Response after successfully sending emails to partnerships",
+  "required": ["recipients"],
+  "properties": {
+    "recipients": {
+      "type": "integer",
+      "description": "Total number of unique email recipients who received the email",
+      "minimum": 1,
+      "examples": [25, 150]
+    }
+  },
+  "additionalProperties": false
+}

@@ -3929,6 +3929,100 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/email:
+    post:
+      summary: Send email to filtered partnerships
+      operationId: postPartnershipEmail
+      description: |
+        Send an email to partnerships matching filter criteria. Each partnership receives
+        an individual email (no grouping by organizer). The email subject is prefixed with
+        the event name. Requires edit permission on the organization. Requires Mailjet
+        integration to be configured for the event's organization.
+      tags:
+        - Partnerships
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug identifier
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug identifier
+        - name: filter[validated]
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Filter by validation status (true = validated, false = not validated)
+        - name: filter[paid]
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Filter by payment status (true = paid, false = unpaid)
+        - name: filter[pack_id]
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Filter by sponsoring pack UUID
+        - name: filter[suggestion]
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Filter by suggestion status (true = suggested by organizer)
+        - name: filter[agreement-generated]
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Filter by agreement generation status
+        - name: filter[agreement-signed]
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Filter by agreement signature status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/send_partnership_email_request.schema'
+      responses:
+        '200':
+          description: OK - Emails sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/send_partnership_email_response.schema'
+        '401':
+          description: Unauthorized - Missing or invalid authentication token, or user lacks edit permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Not Found - No partnerships match the filter criteria, or Mailjet integration not configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '503':
+          description: Service Unavailable - Mailjet API failure during email sending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/providers:
     get:
       summary: List event providers
@@ -4410,6 +4504,10 @@ components:
       $ref: '#/components/schemas/speaker_partnership.schema'
     Integration:
       $ref: '#/components/schemas/integration.schema'
+    SendPartnershipEmailRequest:
+      $ref: '#/components/schemas/send_partnership_email_request.schema'
+    SendPartnershipEmailResponse:
+      $ref: '#/components/schemas/send_partnership_email_response.schema'
     user_session.schema:
       $id: user_session.schema.json
       type: object
@@ -7329,6 +7427,46 @@ components:
       required:
         - partnership_id
         - organiser
+      additionalProperties: false
+    send_partnership_email_request.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      type: object
+      title: Send Partnership Email Request
+      description: Request body for sending bulk emails to filtered partnerships
+      required:
+        - subject
+        - body
+      properties:
+        subject:
+          type: string
+          description: Email subject line (will be prefixed with [event_name])
+          minLength: 1
+          maxLength: 500
+          examples:
+            - Partnership Update
+            - Important Event Information
+        body:
+          type: string
+          description: Email body content in HTML format
+          minLength: 1
+          examples:
+            - <h1>Hello Partners</h1><p>Thank you for your support!</p>
+      additionalProperties: false
+    send_partnership_email_response.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      type: object
+      title: Send Partnership Email Response
+      description: Response after successfully sending emails to partnerships
+      required:
+        - recipients
+      properties:
+        recipients:
+          type: integer
+          description: Total number of unique email recipients who received the email
+          minimum: 1
+          examples:
+            - 25
+            - 150
       additionalProperties: false
     create_by_identifiers.schema:
       $id: create_by_identifiers.schema.json

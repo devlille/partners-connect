@@ -32,9 +32,9 @@
 
 ### Tasks
 
-- [ ] T001 [P] Create JSON schema for email request validation at `server/application/src/main/resources/schemas/send_partnership_email_request.schema.json`
-- [ ] T002 [P] Create JSON schema for email response validation at `server/application/src/main/resources/schemas/send_partnership_email_response.schema.json`
-- [ ] T003 [P] Add mock factory helper `insertMockedPartnershipEmail()` in `server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/factories/PartnershipFactory.kt`
+- [X] T001 [P] Create JSON schema for email request validation at `server/application/src/main/resources/schemas/send_partnership_email_request.schema.json`
+- [X] T002 [P] Create JSON schema for email response validation at `server/application/src/main/resources/schemas/send_partnership_email_response.schema.json`
+- [X] T003 [P] Add mock factory helper `insertMockedPartnershipEmail()` in `server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/factories/PartnershipFactory.kt`
 
 ---
 
@@ -48,19 +48,19 @@
 
 ### Tasks
 
-- [ ] T004 Create `EmailContact` data class in `server/application/src/main/kotlin/fr/devlille/partners/connect/notifications/domain/EmailContact.kt`
-- [ ] T005 Create `PartnershipWithEmails` data class in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipWithEmails.kt`
-- [ ] T006 Create `PartnershipEmailRepository` interface in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipEmailRepository.kt`
-- [ ] T007 Create `SendPartnershipEmailRequest` data class in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/SendPartnershipEmailRequest.kt`
-- [ ] T008 Create `SendPartnershipEmailResponse` data class in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/SendPartnershipEmailResponse.kt`
-- [ ] T009 Enhance `NotificationGateway` interface with generic `send()` function in `server/application/src/main/kotlin/fr/devlille/partners/connect/notifications/domain/NotificationGateway.kt`
-- [ ] T010 Enhance `NotificationRepository` interface with `sendMail()` function in `server/application/src/main/kotlin/fr/devlille/partners/connect/notifications/domain/NotificationRepository.kt`
+- [X] T004 Create `EmailContact` data class in `server/application/src/main/kotlin/fr/devlille/partners/connect/notifications/domain/EmailContact.kt`
+- [X] T005 Create `PartnershipWithEmails` data class in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipWithEmails.kt`
+- [X] T006 Create `PartnershipEmailRepository` interface in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipEmailRepository.kt`
+- [X] T007 Create `SendPartnershipEmailRequest` data class in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/SendPartnershipEmailRequest.kt`
+- [X] T008 Create `SendPartnershipEmailResponse` data class in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/SendPartnershipEmailResponse.kt`
+- [X] T009 Enhance `NotificationGateway` interface with generic `send()` function in `server/application/src/main/kotlin/fr/devlille/partners/connect/notifications/domain/NotificationGateway.kt`
+- [X] T010 Enhance `NotificationRepository` interface with `sendMail()` function in `server/application/src/main/kotlin/fr/devlille/partners/connect/notifications/domain/NotificationRepository.kt`
 
 ---
 
 ## Phase 3: User Story 1 (P1) - Send Bulk Email to Filtered Partnerships ⭐ MVP
 
-**Goal**: Enable organizers to send bulk emails to filtered partnership groups with email deduplication and organizer-based grouping.
+**Goal**: Enable organizers to send bulk emails to filtered partnerships with individual delivery per partnership.
 
 **User Story**: Event organizers need to communicate important information to specific groups of partners (e.g., all validated partnerships, all paid partnerships, specific sponsorship pack holders). Instead of manually copying emails and using external tools, organizers should be able to compose and send emails directly through the platform using the same filtering capabilities available in the partnership listing view.
 
@@ -81,28 +81,28 @@
 
 #### Contract Tests (TDD Approach)
 
-- [ ] T011 [P] [US1] Write contract test for request schema validation in `server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/PartnershipEmailRoutesContractTest.kt`
-- [ ] T012 [P] [US1] Write contract test for response schema validation in `server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/PartnershipEmailRoutesContractTest.kt`
+- [X] T011 [P] [US1] Write contract test for request schema validation in `server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/PartnershipEmailRoutesContractTest.kt`
+- [X] T012 [P] [US1] Write contract test for response schema validation in `server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/PartnershipEmailRoutesContractTest.kt`
 
 #### Repository Implementation
 
-- [ ] T013 [US1] Implement `PartnershipEmailRepositoryExposed` with `getPartnershipsWithEmails()` in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/application/PartnershipEmailRepositoryExposed.kt`
+- [X] T013 [US1] Implement `PartnershipEmailRepositoryExposed` with `getPartnershipsWithEmails()` in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/application/PartnershipEmailRepositoryExposed.kt`
 
 #### Notification Layer Implementation
 
-- [ ] T014 [US1] Implement `NotificationRepository.sendMail()` adapter function in `server/application/src/main/kotlin/fr/devlille/partners/connect/notifications/application/NotificationRepositoryImpl.kt`
+- [X] T014 [US1] Implement `NotificationRepository.sendMail()` adapter function in `server/application/src/main/kotlin/fr/devlille/partners/connect/notifications/application/NotificationRepositoryImpl.kt`
 
 #### Route Implementation
 
-- [ ] T015 [US1] Implement `PartnershipEmailRoutes` with POST `/email` endpoint including organizer grouping logic in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipEmailRoutes.kt`
-- [ ] T016 [US1] Register `PartnershipEmailRoutes` in Ktor routing configuration in `server/application/src/main/kotlin/fr/devlille/partners/connect/App.kt`
-- [ ] T017 [US1] Register `PartnershipEmailRepository` binding in Koin module in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/bindings/PartnershipBindings.kt`
+- [X] T015 [US1] Implement `PartnershipEmailRoutes` with POST `/email` endpoint in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipEmailRoutes.kt`
+- [X] T016 [US1] Register `PartnershipEmailRoutes` in Ktor routing configuration in `server/application/src/main/kotlin/fr/devlille/partners/connect/App.kt`
+- [X] T017 [US1] Register `PartnershipEmailRepository` binding in Koin module in `server/application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/bindings/PartnershipBindings.kt`
 
 #### Integration Tests
 
-- [ ] T018 [US1] Write integration test for email grouping by organizer in `server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/PartnershipEmailIntegrationTest.kt`
-- [ ] T019 [US1] Write integration test for email deduplication logic in `server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/PartnershipEmailIntegrationTest.kt`
-- [ ] T020 [US1] Write integration test for From/CC address logic (organizer vs event) in `server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/PartnershipEmailIntegrationTest.kt`
+- [X] T018 [US1] Write integration test for individual email sending per partnership in `server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/PartnershipEmailIntegrationTest.kt`
+- [X] T019 [US1] Write integration test for email deduplication logic in `server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/PartnershipEmailIntegrationTest.kt`
+- [X] T020 [US1] Write integration test for From/CC address logic (organizer vs event) in `server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/PartnershipEmailIntegrationTest.kt`
 
 ---
 
@@ -140,7 +140,7 @@
 
 ### Tasks
 
-- [ ] T024 [P] Update OpenAPI specification with new POST endpoint in `server/application/src/main/resources/openapi/openapi.yaml`
+- [X] T024 [P] Update OpenAPI specification with new POST endpoint in `server/application/src/main/resources/openapi/openapi.yaml`
 - [ ] T025 [P] Add KDoc documentation to all public interfaces and classes
 - [ ] T026 Run `./gradlew ktlintCheck detekt` and fix any violations
 - [ ] T027 Run `./gradlew test` and ensure all tests pass with 80%+ coverage
