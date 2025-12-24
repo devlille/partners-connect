@@ -1,0 +1,135 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`NoticeBlock > Snapshots > matches snapshot for error variant 1`] = `
+"<transition-stub enteractiveclass="transition-all duration-300 ease-out" enterfromclass="opacity-0 -translate-y-2" entertoclass="opacity-100 translate-y-0" leaveactiveclass="transition-all duration-200 ease-in" leavefromclass="opacity-100 translate-y-0" leavetoclass="opacity-0 -translate-y-2" appear="false" persisted="false" css="true">
+  <div class="mt-4 pt-4 border-t border-gray-200">
+    <div class="rounded-lg border p-4 bg-red-50 border-red-200" role="alert" aria-live="assertive">
+      <div class="flex items-start gap-3">
+        <!-- Icon --><i class="i-heroicons-x-circle text-xl text-red-600 shrink-0 mt-0.5" aria-hidden="true"></i><!-- Content -->
+        <div class="flex-1 min-w-0">
+          <!-- Header with title and dismiss button -->
+          <div class="flex items-start justify-between gap-2">
+            <h3 class="text-sm font-semibold mb-1 text-red-900">Error Notice</h3>
+            <!--v-if-->
+          </div><!-- Collapsible content -->
+          <transition-stub enteractiveclass="transition-all duration-200 ease-out" enterfromclass="opacity-0 max-h-0" entertoclass="opacity-100 max-h-96" leaveactiveclass="transition-all duration-150 ease-in" leavefromclass="opacity-100 max-h-96" leavetoclass="opacity-0 max-h-0" appear="false" persisted="true" css="true">
+            <div class="overflow-hidden">
+              <div class="text-sm text-red-700">
+                <p>An error occurred</p>
+              </div><!-- Actions slot -->
+              <!--v-if-->
+            </div>
+          </transition-stub>
+        </div>
+      </div>
+    </div>
+  </div>
+</transition-stub>"
+`;
+
+exports[`NoticeBlock > Snapshots > matches snapshot for info variant 1`] = `
+"<transition-stub enteractiveclass="transition-all duration-300 ease-out" enterfromclass="opacity-0 -translate-y-2" entertoclass="opacity-100 translate-y-0" leaveactiveclass="transition-all duration-200 ease-in" leavefromclass="opacity-100 translate-y-0" leavetoclass="opacity-0 -translate-y-2" appear="false" persisted="false" css="true">
+  <div class="mt-4 pt-4 border-t border-gray-200">
+    <div class="rounded-lg border p-4 bg-blue-50 border-blue-200" role="status" aria-live="polite">
+      <div class="flex items-start gap-3">
+        <!-- Icon --><i class="i-heroicons-information-circle text-xl text-blue-600 shrink-0 mt-0.5" aria-hidden="true"></i><!-- Content -->
+        <div class="flex-1 min-w-0">
+          <!-- Header with title and dismiss button -->
+          <div class="flex items-start justify-between gap-2">
+            <h3 class="text-sm font-semibold mb-1 text-blue-900">Info Notice</h3>
+            <!--v-if-->
+          </div><!-- Collapsible content -->
+          <transition-stub enteractiveclass="transition-all duration-200 ease-out" enterfromclass="opacity-0 max-h-0" entertoclass="opacity-100 max-h-96" leaveactiveclass="transition-all duration-150 ease-in" leavefromclass="opacity-100 max-h-96" leavetoclass="opacity-0 max-h-0" appear="false" persisted="true" css="true">
+            <div class="overflow-hidden">
+              <div class="text-sm text-blue-700">
+                <p>This is an info message</p>
+              </div><!-- Actions slot -->
+              <!--v-if-->
+            </div>
+          </transition-stub>
+        </div>
+      </div>
+    </div>
+  </div>
+</transition-stub>"
+`;
+
+exports[`NoticeBlock > Snapshots > matches snapshot for success variant 1`] = `
+"<transition-stub enteractiveclass="transition-all duration-300 ease-out" enterfromclass="opacity-0 -translate-y-2" entertoclass="opacity-100 translate-y-0" leaveactiveclass="transition-all duration-200 ease-in" leavefromclass="opacity-100 translate-y-0" leavetoclass="opacity-0 -translate-y-2" appear="false" persisted="false" css="true">
+  <div class="mt-4 pt-4 border-t border-gray-200">
+    <div class="rounded-lg border p-4 bg-green-50 border-green-200" role="status" aria-live="polite">
+      <div class="flex items-start gap-3">
+        <!-- Icon --><i class="i-heroicons-check-circle text-xl text-green-600 shrink-0 mt-0.5" aria-hidden="true"></i><!-- Content -->
+        <div class="flex-1 min-w-0">
+          <!-- Header with title and dismiss button -->
+          <div class="flex items-start justify-between gap-2">
+            <h3 class="text-sm font-semibold mb-1 text-green-900">Success Notice</h3>
+            <!--v-if-->
+          </div><!-- Collapsible content -->
+          <transition-stub enteractiveclass="transition-all duration-200 ease-out" enterfromclass="opacity-0 max-h-0" entertoclass="opacity-100 max-h-96" leaveactiveclass="transition-all duration-150 ease-in" leavefromclass="opacity-100 max-h-96" leavetoclass="opacity-0 max-h-0" appear="false" persisted="true" css="true">
+            <div class="overflow-hidden">
+              <div class="text-sm text-green-700">
+                <p>Operation completed successfully</p>
+              </div><!-- Actions slot -->
+              <!--v-if-->
+            </div>
+          </transition-stub>
+        </div>
+      </div>
+    </div>
+  </div>
+</transition-stub>"
+`;
+
+exports[`NoticeBlock > Snapshots > matches snapshot for warning variant 1`] = `
+"<transition-stub enteractiveclass="transition-all duration-300 ease-out" enterfromclass="opacity-0 -translate-y-2" entertoclass="opacity-100 translate-y-0" leaveactiveclass="transition-all duration-200 ease-in" leavefromclass="opacity-100 translate-y-0" leavetoclass="opacity-0 -translate-y-2" appear="false" persisted="false" css="true">
+  <div class="mt-4 pt-4 border-t border-gray-200">
+    <div class="rounded-lg border p-4 bg-amber-50 border-amber-200" role="status" aria-live="polite">
+      <div class="flex items-start gap-3">
+        <!-- Icon --><i class="i-heroicons-exclamation-triangle text-xl text-amber-600 shrink-0 mt-0.5" aria-hidden="true"></i><!-- Content -->
+        <div class="flex-1 min-w-0">
+          <!-- Header with title and dismiss button -->
+          <div class="flex items-start justify-between gap-2">
+            <h3 class="text-sm font-semibold mb-1 text-amber-900">Warning Notice</h3>
+            <!--v-if-->
+          </div><!-- Collapsible content -->
+          <transition-stub enteractiveclass="transition-all duration-200 ease-out" enterfromclass="opacity-0 max-h-0" entertoclass="opacity-100 max-h-96" leaveactiveclass="transition-all duration-150 ease-in" leavefromclass="opacity-100 max-h-96" leavetoclass="opacity-0 max-h-0" appear="false" persisted="true" css="true">
+            <div class="overflow-hidden">
+              <div class="text-sm text-amber-700">
+                <p>Please be careful</p>
+              </div><!-- Actions slot -->
+              <!--v-if-->
+            </div>
+          </transition-stub>
+        </div>
+      </div>
+    </div>
+  </div>
+</transition-stub>"
+`;
+
+exports[`NoticeBlock > Snapshots > matches snapshot with all features enabled 1`] = `
+"<transition-stub enteractiveclass="transition-all duration-300 ease-out" enterfromclass="opacity-0 -translate-y-2" entertoclass="opacity-100 translate-y-0" leaveactiveclass="transition-all duration-200 ease-in" leavefromclass="opacity-100 translate-y-0" leavetoclass="opacity-0 -translate-y-2" appear="false" persisted="false" css="true">
+  <div class="mt-4 pt-4 border-t border-gray-200">
+    <div class="rounded-lg border p-5 bg-blue-50 border-blue-200" role="status" aria-live="polite">
+      <div class="flex items-start gap-3">
+        <!-- Icon --><i class="i-heroicons-information-circle text-2xl text-blue-600 shrink-0 mt-0.5" aria-hidden="true"></i><!-- Content -->
+        <div class="flex-1 min-w-0">
+          <!-- Header with title and dismiss button -->
+          <div class="flex items-start justify-between gap-2"><button type="button" class="flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-offset-1 rounded text-blue-900" aria-expanded="true">
+              <h3 class="text-base font-semibold">Full Featured Notice</h3><i class="i-heroicons-chevron-up text-sm transition-transform" aria-hidden="true"></i>
+            </button><button type="button" class="shrink-0 p-1 rounded hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-offset-1 transition-colors text-blue-600 hover:text-blue-800 focus:ring-blue-500" aria-label="Fermer"><i class="i-heroicons-x-mark text-lg" aria-hidden="true"></i></button></div><!-- Collapsible content -->
+          <transition-stub enteractiveclass="transition-all duration-200 ease-out" enterfromclass="opacity-0 max-h-0" entertoclass="opacity-100 max-h-96" leaveactiveclass="transition-all duration-150 ease-in" leavefromclass="opacity-100 max-h-96" leavetoclass="opacity-0 max-h-0" appear="false" persisted="true" css="true">
+            <div class="overflow-hidden">
+              <div class="text-base text-blue-700 mt-2">
+                <p>Full featured content</p>
+              </div><!-- Actions slot -->
+              <div class="mt-3 flex items-center gap-2"><button>Action</button></div>
+            </div>
+          </transition-stub>
+        </div>
+      </div>
+    </div>
+  </div>
+</transition-stub>"
+`;
