@@ -69,7 +69,7 @@ class PartnershipDetailIntegrationTest {
 
             val sponsoringPack = insertMockedSponsoringPack(
                 id = packId,
-                event = eventId,
+                eventId = eventId,
                 name = "Platinum Sponsor",
             )
 

@@ -17,3 +17,15 @@ fun insertMockedOrgaPermission(
         this.canEdit = canEdit
     }
 }
+
+fun insertMockedOrgaPermission(
+    orgId: UUID,
+    userId: UUID,
+    canEdit: Boolean = true,
+): OrganisationPermissionEntity = transaction {
+    OrganisationPermissionEntity.new {
+        this.organisation = OrganisationEntity[orgId]
+        this.user = UserEntity[userId]
+        this.canEdit = canEdit
+    }
+}

@@ -10,7 +10,7 @@ import java.util.UUID
 fun insertMockedSpeaker(
     id: UUID = UUID.randomUUID(),
     externalId: String = "speaker-${id.toString().take(8)}",
-    name: String = "Test Speaker",
+    name: String = id.toString(),
     biography: String? = "Test speaker biography",
     photoUrl: String? = "https://example.com/photo.jpg",
     jobTitle: String? = "Developer",

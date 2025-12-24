@@ -32,8 +32,24 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import java.util.UUID
 
+fun Application.moduleSharedDb(
+    userId: UUID,
+    storage: Storage = mockk(),
+) {
+    moduleMocked(
+        databaseUrl = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
+        mockNetwork = module {
+            single<HttpClientEngine> { mockEngine(userId) }
+        },
+        mockStorage = module {
+            single { storage }
+        },
+    )
+}
+
 @Suppress("LongParameterList")
 fun Application.moduleMocked(
+    databaseUrl: String = "jdbc:h2:mem:${UUID.randomUUID()};DB_CLOSE_DELAY=-1",
     mockNetwork: Module = module {
         single<HttpClientEngine> { mockEngine }
     },
@@ -69,7 +85,7 @@ fun Application.moduleMocked(
 ) {
     module(
         ApplicationConfig(
-            databaseUrl = "jdbc:h2:mem:${UUID.randomUUID()};DB_CLOSE_DELAY=-1",
+            databaseUrl = databaseUrl,
             enableOpenAPI = false,
             modules = listOf(
                 networkClientModule,

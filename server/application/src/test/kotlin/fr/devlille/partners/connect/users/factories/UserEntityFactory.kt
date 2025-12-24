@@ -1,9 +1,10 @@
 package fr.devlille.partners.connect.users.factories
 
+import fr.devlille.partners.connect.auth.infrastructure.providers.mockedAdminUser
 import fr.devlille.partners.connect.events.factories.insertMockedEvent
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
-import fr.devlille.partners.connect.internal.mockedAdminUser
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
+import fr.devlille.partners.connect.users.infrastructure.db.UsersTable
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
@@ -23,10 +24,15 @@ fun insertMockedAdminUser(
     name: String = mockedAdminUser.givenName ?: "Admin User",
     pictureUrl: String? = mockedAdminUser.picture,
 ): UserEntity = transaction {
-    UserEntity.new(id) {
-        this.email = email
-        this.name = name
-        this.pictureUrl = pictureUrl
+    val users = UserEntity.find { UsersTable.email eq email }
+    if (users.empty()) {
+        UserEntity.new(id) {
+            this.email = email
+            this.name = name
+            this.pictureUrl = pictureUrl
+        }
+    } else {
+        users.first()
     }
 }
 
