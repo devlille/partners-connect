@@ -1,6 +1,7 @@
-import { ref, computed, watchEffect, type Ref, type ComputedRef } from "vue";
+import { computed, type Ref, type ComputedRef } from "vue";
 import type { GetOrgsEventsPartnershipParams } from "~/utils/api";
-import { initialFilterState, FilterStateSchema, type FilterState } from "~/types/sponsors";
+import { type FilterState } from "~/types/sponsors";
+import { useQueryStates, parsers } from "./useQueryState";
 
 /**
  * Options for useSponsorFilters composable
@@ -52,10 +53,24 @@ export interface UseSponsorFiltersReturn {
 }
 
 /**
+ * Schema for sponsor filter query parameters
+ * Uses nuqs-inspired parsers for type-safe URL state management
+ */
+const filterSchema = {
+  packId: parsers.stringOrNull(),
+  validated: parsers.booleanOrNull(),
+  paid: parsers.booleanOrNull(),
+  agreementGenerated: parsers.booleanOrNull(),
+  agreementSigned: parsers.booleanOrNull(),
+  suggestion: parsers.booleanOrNull(),
+} as const;
+
+/**
  * Composable for managing sponsor list filters
  *
- * Provides reactive filter state, computed properties for active filter count and API query params,
- * and action methods for updating filters. Filters are persisted to sessionStorage with event-specific keys.
+ * Uses useQueryStates for type-safe URL query parameter management,
+ * inspired by nuqs for React. Filters are automatically synced to the URL
+ * and persisted in sessionStorage.
  *
  * @param options - Configuration options including orgSlug and eventSlug
  * @returns Filter state management interface
@@ -67,100 +82,33 @@ export interface UseSponsorFiltersReturn {
  *   eventSlug: 'my-event'
  * })
  *
+ * // Filters are automatically synced to URL
+ * // e.g., ?packId=pack-123&validated=true
+ *
  * setPackFilter('pack-123')
  * console.log(queryParams.value) // { 'filter[pack_id]': 'pack-123' }
  * ```
  */
 export function useSponsorFilters(options: UseSponsorFiltersOptions): UseSponsorFiltersReturn {
   const { orgSlug, eventSlug } = options;
-  const storageKey = `sponsor-filters:${orgSlug}:${eventSlug}`;
 
-  const route = useRoute();
-  const router = useRouter();
-
-  // Initialize filter state - restore from URL or sessionStorage immediately
-  function getInitialFilters(): FilterState {
-    if (typeof window === "undefined") return { ...initialFilterState };
-
-    const query = route.query;
-
-    // Restore from URL first (takes priority over sessionStorage)
-    if (Object.keys(query).length > 0) {
-      const urlFilters: Partial<FilterState> = {};
-
-      if (query.packId) urlFilters.packId = query.packId as string;
-      if (query.validated !== undefined) urlFilters.validated = query.validated === "true";
-      if (query.paid !== undefined) urlFilters.paid = query.paid === "true";
-      if (query.agreementGenerated !== undefined)
-        urlFilters.agreementGenerated = query.agreementGenerated === "true";
-      if (query.agreementSigned !== undefined)
-        urlFilters.agreementSigned = query.agreementSigned === "true";
-      if (query.suggestion !== undefined) urlFilters.suggestion = query.suggestion === "true";
-
-      return { ...initialFilterState, ...urlFilters };
-    }
-
-    // Fallback to sessionStorage if no URL params
-    const stored = sessionStorage.getItem(storageKey);
-    if (!stored) return { ...initialFilterState };
-
-    try {
-      const parsed = JSON.parse(stored);
-      const result = FilterStateSchema.safeParse(parsed);
-
-      if (result.success) {
-        return result.data;
-      } else {
-        console.warn("[useSponsorFilters] Invalid filter state in storage, using defaults");
-        return { ...initialFilterState };
-      }
-    } catch (error) {
-      console.error("[useSponsorFilters] Failed to parse filter state from storage:", error);
-      return { ...initialFilterState };
-    }
-  }
-
-  const filters = ref<FilterState>(getInitialFilters());
+  // Use useQueryStates for type-safe URL state management (nuqs-inspired)
+  const { state: filters, resetAll, reset, modifiedCount, isModified } = useQueryStates({
+    schema: filterSchema,
+    history: "replace",
+    throttleMs: 50,
+    storageKeyPrefix: `sponsor-filters:${orgSlug}:${eventSlug}`,
+  });
 
   /**
    * Count of active (non-null) filters
    */
-  const activeFilterCount = computed<number>(() => {
-    return Object.values(filters.value).filter((value) => value !== null).length;
-  });
+  const activeFilterCount = computed<number>(() => modifiedCount.value);
 
   /**
    * True if no filters are currently active
    */
-  const isEmpty = computed<boolean>(() => {
-    return activeFilterCount.value === 0;
-  });
-
-  // Sync filters to URL and sessionStorage when they change
-  watchEffect(() => {
-    // Only run on client-side
-    if (typeof window === "undefined") return;
-
-    // Update URL query params
-    const query: Record<string, string> = {};
-    if (filters.value.packId) query.packId = filters.value.packId;
-    if (filters.value.validated !== null) query.validated = String(filters.value.validated);
-    if (filters.value.paid !== null) query.paid = String(filters.value.paid);
-    if (filters.value.agreementGenerated !== null)
-      query.agreementGenerated = String(filters.value.agreementGenerated);
-    if (filters.value.agreementSigned !== null)
-      query.agreementSigned = String(filters.value.agreementSigned);
-    if (filters.value.suggestion !== null) query.suggestion = String(filters.value.suggestion);
-
-    router.replace({ query });
-
-    // Update sessionStorage
-    if (isEmpty.value) {
-      sessionStorage.removeItem(storageKey);
-    } else {
-      sessionStorage.setItem(storageKey, JSON.stringify(filters.value));
-    }
-  });
+  const isEmpty = computed<boolean>(() => !isModified.value);
 
   /**
    * API query parameters derived from current filter state
@@ -220,7 +168,7 @@ export function useSponsorFilters(options: UseSponsorFiltersOptions): UseSponsor
    * Clear all filters (reset to initial state)
    */
   function clearAllFilters(): void {
-    filters.value = { ...initialFilterState };
+    resetAll();
   }
 
   /**
@@ -228,11 +176,12 @@ export function useSponsorFilters(options: UseSponsorFiltersOptions): UseSponsor
    * @param key Which filter to clear
    */
   function clearFilter(key: keyof FilterState): void {
-    filters.value[key] = null;
+    reset(key);
   }
 
+  // Cast the filters ref to match the expected return type
   return {
-    filters,
+    filters: filters as unknown as Ref<FilterState>,
     activeFilterCount,
     isEmpty,
     queryParams,

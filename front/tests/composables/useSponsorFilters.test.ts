@@ -396,30 +396,28 @@ describe("useSponsorFilters", () => {
   });
 
   describe("sessionStorage persistence", () => {
+    // Note: useQueryStates stores values individually with a prefix pattern:
+    // `${storageKeyPrefix}:${key}` instead of a single JSON object
+    const getStorageKey = (key: string) => `${storageKey}:${key}`;
+
     it("should save filters to sessionStorage when filters change", async () => {
+      vi.useFakeTimers();
       const { setPackFilter } = useSponsorFilters({ orgSlug, eventSlug });
 
       setPackFilter("pack-persistent");
       await nextTick();
+      vi.advanceTimersByTime(100); // Wait for throttle
 
-      const stored = sessionStorage.getItem(storageKey);
-      expect(stored).not.toBeNull();
-
-      const parsed = JSON.parse(stored!);
-      expect(parsed.packId).toBe("pack-persistent");
+      const stored = sessionStorage.getItem(getStorageKey("packId"));
+      expect(stored).toBe("pack-persistent");
+      vi.useRealTimers();
     });
 
     it("should restore filters from sessionStorage on mount", () => {
-      const savedState = {
-        packId: "pack-restored",
-        validated: true,
-        paid: false,
-        agreementGenerated: null,
-        agreementSigned: null,
-        suggestion: null,
-      };
-
-      sessionStorage.setItem(storageKey, JSON.stringify(savedState));
+      // Store individual values as useQueryStates expects
+      sessionStorage.setItem(getStorageKey("packId"), "pack-restored");
+      sessionStorage.setItem(getStorageKey("validated"), "true");
+      sessionStorage.setItem(getStorageKey("paid"), "false");
 
       const { filters } = useSponsorFilters({ orgSlug, eventSlug });
 
@@ -429,57 +427,49 @@ describe("useSponsorFilters", () => {
     });
 
     it("should clear sessionStorage when all filters are cleared", async () => {
+      vi.useFakeTimers();
       const { setPackFilter, clearAllFilters } = useSponsorFilters({ orgSlug, eventSlug });
 
       setPackFilter("pack-temp");
       await nextTick();
-      expect(sessionStorage.getItem(storageKey)).not.toBeNull();
+      vi.advanceTimersByTime(100);
+      expect(sessionStorage.getItem(getStorageKey("packId"))).toBe("pack-temp");
 
       clearAllFilters();
       await nextTick();
-      expect(sessionStorage.getItem(storageKey)).toBeNull();
+      vi.advanceTimersByTime(100);
+      expect(sessionStorage.getItem(getStorageKey("packId"))).toBeNull();
+      vi.useRealTimers();
     });
 
     it("should clear sessionStorage when isEmpty becomes true", async () => {
+      vi.useFakeTimers();
       const { setPackFilter, clearFilter } = useSponsorFilters({ orgSlug, eventSlug });
 
       setPackFilter("pack-temp");
       await nextTick();
-      expect(sessionStorage.getItem(storageKey)).not.toBeNull();
+      vi.advanceTimersByTime(100);
+      expect(sessionStorage.getItem(getStorageKey("packId"))).toBe("pack-temp");
 
       clearFilter("packId");
       await nextTick();
-      expect(sessionStorage.getItem(storageKey)).toBeNull();
+      vi.advanceTimersByTime(100);
+      expect(sessionStorage.getItem(getStorageKey("packId"))).toBeNull();
+      vi.useRealTimers();
     });
 
-    it("should validate restored data with Zod and use initial state if invalid", () => {
-      const invalidState = {
-        packId: 123, // Should be string or null
-        validated: "yes", // Should be boolean or null
-        paid: null,
-        agreementGenerated: null,
-        agreementSigned: null,
-        suggestion: null,
-      };
-
-      sessionStorage.setItem(storageKey, JSON.stringify(invalidState));
+    it("should handle invalid data in sessionStorage gracefully", () => {
+      // Store a value that will be parsed but results in default
+      sessionStorage.setItem(getStorageKey("packId"), "");
 
       const { filters } = useSponsorFilters({ orgSlug, eventSlug });
 
-      // Should fall back to initial state
-      expect(filters.value).toEqual(initialFilterState);
+      // Should fall back to initial state (null for stringOrNull parser)
+      expect(filters.value.packId).toBeNull();
     });
 
-    it("should handle malformed JSON in sessionStorage gracefully", () => {
-      sessionStorage.setItem(storageKey, "{invalid json}");
-
-      const { filters } = useSponsorFilters({ orgSlug, eventSlug });
-
-      // Should fall back to initial state
-      expect(filters.value).toEqual(initialFilterState);
-    });
-
-    it("should use event-specific storage key", async () => {
+    it("should use event-specific storage key prefix", async () => {
+      vi.useFakeTimers();
       const { setPackFilter: setPackFilter1 } = useSponsorFilters({
         orgSlug: "org1",
         eventSlug: "event1",
@@ -492,29 +482,31 @@ describe("useSponsorFilters", () => {
       setPackFilter1("pack-1");
       setPackFilter2("pack-2");
       await nextTick();
+      vi.advanceTimersByTime(100);
 
-      const stored1 = sessionStorage.getItem("sponsor-filters:org1:event1");
-      const stored2 = sessionStorage.getItem("sponsor-filters:org2:event2");
+      const stored1 = sessionStorage.getItem("sponsor-filters:org1:event1:packId");
+      const stored2 = sessionStorage.getItem("sponsor-filters:org2:event2:packId");
 
-      expect(stored1).not.toBeNull();
-      expect(stored2).not.toBeNull();
-      expect(JSON.parse(stored1!).packId).toBe("pack-1");
-      expect(JSON.parse(stored2!).packId).toBe("pack-2");
+      expect(stored1).toBe("pack-1");
+      expect(stored2).toBe("pack-2");
+      vi.useRealTimers();
     });
 
     it("should update sessionStorage reactively as filters change", async () => {
+      vi.useFakeTimers();
       const { setPackFilter, setStatusFilter } = useSponsorFilters({ orgSlug, eventSlug });
 
       setPackFilter("pack-1");
       await nextTick();
-      let stored = JSON.parse(sessionStorage.getItem(storageKey)!);
-      expect(stored.packId).toBe("pack-1");
+      vi.advanceTimersByTime(100);
+      expect(sessionStorage.getItem(getStorageKey("packId"))).toBe("pack-1");
 
       setStatusFilter("validated", true);
       await nextTick();
-      stored = JSON.parse(sessionStorage.getItem(storageKey)!);
-      expect(stored.packId).toBe("pack-1");
-      expect(stored.validated).toBe(true);
+      vi.advanceTimersByTime(100);
+      expect(sessionStorage.getItem(getStorageKey("packId"))).toBe("pack-1");
+      expect(sessionStorage.getItem(getStorageKey("validated"))).toBe("true");
+      vi.useRealTimers();
     });
   });
 });
