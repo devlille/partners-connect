@@ -3,11 +3,11 @@ import { mountSuspended } from "@nuxt/test-utils/runtime";
 import PartnershipStatusNotices from "./PartnershipStatusNotices.vue";
 import type { PublicPartnership } from "~/types/partnership";
 
-// Les tests utilisent les clés i18n car les traductions ne sont pas toujours chargées
-const I18N_KEYS = {
-  completeInfo: "partnershipNotices.completeInfo.title",
-  awaitingPayment: "partnershipNotices.awaitingPayment.title",
-  paymentReceived: "partnershipNotices.paymentReceived.title",
+// Les traductions sont maintenant chargées, on utilise les valeurs traduites
+const TRANSLATED_TITLES = {
+  completeInfo: "Complete your information",
+  awaitingPayment: "Awaiting payment",
+  paymentReceived: "Payment received",
 };
 
 const createMockPartnership = (overrides: Partial<PublicPartnership> = {}): PublicPartnership =>
@@ -55,7 +55,7 @@ describe("PartnershipStatusNotices", () => {
         },
       });
 
-      expect(wrapper.text()).toContain(I18N_KEYS.completeInfo);
+      expect(wrapper.text()).toContain(TRANSLATED_TITLES.completeInfo);
     });
 
     it("does not show completion message when loading", async () => {
@@ -74,7 +74,7 @@ describe("PartnershipStatusNotices", () => {
         },
       });
 
-      expect(wrapper.text()).not.toContain(I18N_KEYS.completeInfo);
+      expect(wrapper.text()).not.toContain(TRANSLATED_TITLES.completeInfo);
     });
 
     it("does not show completion message when there is an error", async () => {
@@ -93,7 +93,7 @@ describe("PartnershipStatusNotices", () => {
         },
       });
 
-      expect(wrapper.text()).not.toContain(I18N_KEYS.completeInfo);
+      expect(wrapper.text()).not.toContain(TRANSLATED_TITLES.completeInfo);
     });
 
     it("does not show completion message when documents are generated", async () => {
@@ -113,7 +113,7 @@ describe("PartnershipStatusNotices", () => {
         },
       });
 
-      expect(wrapper.text()).not.toContain(I18N_KEYS.completeInfo);
+      expect(wrapper.text()).not.toContain(TRANSLATED_TITLES.completeInfo);
     });
 
     it("does not show completion message when already paid", async () => {
@@ -132,7 +132,7 @@ describe("PartnershipStatusNotices", () => {
         },
       });
 
-      expect(wrapper.text()).not.toContain(I18N_KEYS.completeInfo);
+      expect(wrapper.text()).not.toContain(TRANSLATED_TITLES.completeInfo);
     });
   });
 
@@ -153,7 +153,7 @@ describe("PartnershipStatusNotices", () => {
         },
       });
 
-      expect(wrapper.text()).toContain(I18N_KEYS.awaitingPayment);
+      expect(wrapper.text()).toContain(TRANSLATED_TITLES.awaitingPayment);
     });
 
     it("does not show awaiting payment when no signed agreement", async () => {
@@ -172,7 +172,7 @@ describe("PartnershipStatusNotices", () => {
         },
       });
 
-      expect(wrapper.text()).not.toContain(I18N_KEYS.awaitingPayment);
+      expect(wrapper.text()).not.toContain(TRANSLATED_TITLES.awaitingPayment);
     });
 
     it("does not show awaiting payment when already paid", async () => {
@@ -191,7 +191,7 @@ describe("PartnershipStatusNotices", () => {
         },
       });
 
-      expect(wrapper.text()).not.toContain(I18N_KEYS.awaitingPayment);
+      expect(wrapper.text()).not.toContain(TRANSLATED_TITLES.awaitingPayment);
     });
 
     it("does not show awaiting payment when loading", async () => {
@@ -210,7 +210,7 @@ describe("PartnershipStatusNotices", () => {
         },
       });
 
-      expect(wrapper.text()).not.toContain(I18N_KEYS.awaitingPayment);
+      expect(wrapper.text()).not.toContain(TRANSLATED_TITLES.awaitingPayment);
     });
   });
 
@@ -230,7 +230,7 @@ describe("PartnershipStatusNotices", () => {
         },
       });
 
-      expect(wrapper.text()).toContain(I18N_KEYS.paymentReceived);
+      expect(wrapper.text()).toContain(TRANSLATED_TITLES.paymentReceived);
     });
 
     it("does not show payment received when not paid", async () => {
@@ -248,7 +248,7 @@ describe("PartnershipStatusNotices", () => {
         },
       });
 
-      expect(wrapper.text()).not.toContain(I18N_KEYS.paymentReceived);
+      expect(wrapper.text()).not.toContain(TRANSLATED_TITLES.paymentReceived);
     });
 
     it("does not show payment received when loading", async () => {
@@ -266,7 +266,7 @@ describe("PartnershipStatusNotices", () => {
         },
       });
 
-      expect(wrapper.text()).not.toContain(I18N_KEYS.paymentReceived);
+      expect(wrapper.text()).not.toContain(TRANSLATED_TITLES.paymentReceived);
     });
 
     it("contains links to job offers, company and providers pages", async () => {
@@ -330,8 +330,8 @@ describe("PartnershipStatusNotices", () => {
       });
 
       // Should show both messages
-      expect(wrapper.text()).toContain(I18N_KEYS.completeInfo);
-      expect(wrapper.text()).toContain(I18N_KEYS.awaitingPayment);
+      expect(wrapper.text()).toContain(TRANSLATED_TITLES.completeInfo);
+      expect(wrapper.text()).toContain(TRANSLATED_TITLES.awaitingPayment);
     });
   });
 
