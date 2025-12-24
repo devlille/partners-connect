@@ -31,34 +31,163 @@ tests that directly test implementation details. Repository logic is validated i
 route tests which provide better coverage of the complete request/response cycle including 
 serialization, validation, and error handling.
 
+> **📚 COMPLETE TESTING DOCUMENTATION**: See [server/docs/TESTING.md](../server/docs/TESTING.md) for comprehensive testing patterns, architecture, and examples.
+
+#### Test Architecture (MANDATORY - Updated 2025-12-28)
+
+**Shared Database Pattern** (ALL tests MUST follow):
+- Use `moduleSharedDb(userId)` for ALL new tests (NOT `moduleMocked()`)
+- Pre-create ALL UUIDs before data initialization: `val companyId = UUID.randomUUID()`
+- Initialize ALL test data in a SINGLE `transaction {}` block
+- Factory functions MUST NOT manage transactions themselves
+- Use UUID-based defaults in factories to ensure uniqueness: `name = id.toString()`
+
+**Test Organization**:
+- **Contract Tests**: `<feature>.infrastructure.api` package - validates HTTP contract
+- **Integration Tests**: `<feature>` package (root) - validates end-to-end workflows
+
 #### Contract Test Requirements (CRITICAL)
 All new API endpoints MUST include contract tests that focus on API schema validation:
 
+**Naming Convention**: `<Feature><EndpointResource>Route<Verb>Test`
+- Examples: `PartnershipRegisterRoutePostTest`, `CompanyJobOfferRouteDeleteTest`, `EventBySlugRouteGetTest`
+
+**Location**: `<feature>.infrastructure.api` package
+
 **Contract Test Scope**:
 - Request/response schema validation ONLY - not business logic
+- Test ALL HTTP status codes the endpoint can return (200/201/204, 400, 401, 403, 404, 409)
 - JSON serialization/deserialization correctness
-- HTTP status code validation for success/error scenarios
 - Parameter validation (path, query, body)
-- MUST use existing mock factory functions or create new ones for test data setup
+- MUST use `call.receive<T>(schema)` pattern with JSON schemas
 - MUST be written BEFORE implementation (TDD approach)
-- MUST fail initially (no implementation exists yet)
 
-**Mock Factory Pattern**:
-- Use existing mock factories: `mockCompany()`, `mockEvent()`, `mockPartnership()`, etc.
-- Create new mock factories if entities don't exist: `mockSponsoringOption()`, `mockSelectable()`
-- Mock factories MUST be reusable across multiple test scenarios
-- Mock factories SHOULD provide realistic but deterministic data
-- Mock factories MUST follow existing naming conventions in test packages
+**Factory Function Pattern** (MANDATORY):
+- **Naming**: `insertMocked<Entity>()` for database entities, `create<Domain>()` for domain objects
+- **File naming**: `<Name>.factory.kt` (e.g., `Company.factory.kt`, `Partnership.factory.kt`)
+- **Location**: `<feature>/factories/` package
+- All parameters MUST have defaults
+- Unique fields MUST use UUID-based defaults: `name = id.toString()`
+- NO transaction management in factories
+- Follow existing factory patterns exactly
+
+**Example Factory**:
+```kotlin
+@Suppress("LongParameterList")
+fun insertMockedCompany(
+    id: UUID = UUID.randomUUID(),
+    name: String = id.toString(), // UUID-based unique default
+    siret: String = "SIRET-${id}",
+    // ... all parameters with defaults
+): CompanyEntity = CompanyEntity.new(id) {
+    this.name = name
+    this.siret = siret
+    // ... set all fields
+}
+```
+
+**Example Test Structure**:
+```kotlin
+package fr.devlille.partners.connect.partnership.infrastructure.api
+
+class PartnershipRegisterRoutePostTest {
+    @Test
+    fun `POST registers valid partnership - returns 201`() = testApplication {
+        val userId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedOrganisationEntity(orgId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyId)
+            }
+        }
+        
+        val response = client.post("/events/$eventId/partnerships") {
+            contentType(ContentType.Application.Json)
+            setBody("""{"packId":"...", "companyId":"$companyId"}""")
+        }
+        
+        assertEquals(HttpStatusCode.Created, response.status)
+    }
+    
+    @Test
+    fun `POST with invalid data - returns 400`() = testApplication { /* ... */ }
+    
+    @Test
+    fun `POST without auth - returns 401`() = testApplication { /* ... */ }
+    
+    // Test ALL status codes!
+}
+```
+
+#### Integration Test Requirements (CRITICAL)
+
+**Naming Convention**: `<Feature>(<EndpointResource>)RoutesTest` (plural "Routes")
+- Examples: `PartnershipSpeakersRoutesTest`, `CompanyJobOfferRoutesTest`, `ProvidersAttachmentRoutesTest`
+
+**Location**: `<feature>` package (root of domain)
 
 **Integration Test Scope** (separate from contract tests):
-- End-to-end business logic validation
+- End-to-end business logic validation across multiple endpoints
 - Cross-domain operations and notifications
-- Complex workflows and state transitions
+- Complex workflows and state transitions (create → verify → update → delete)
 - Database persistence and consistency
+- Minimal setup - only create data necessary for the workflow
+
+**Example Test Structure**:
+```kotlin
+package fr.devlille.partners.connect.partnership
+
+/**
+ * Integration test for complete speaker-partnership workflow.
+ * Tests end-to-end business logic from attachment to detachment.
+ */
+class PartnershipSpeakersRoutesTest {
+    @Test
+    fun `complete workflow from attachment to detachment`() = testApplication {
+        val userId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val partnershipId = UUID.randomUUID()
+        val speakerId = UUID.randomUUID()
+        
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                // Minimal setup for workflow
+                insertMockedUser(userId)
+                insertMockedEvent(eventId)
+                insertMockedPartnership(partnershipId, eventId)
+                insertMockedSpeaker(speakerId, eventId)
+            }
+        }
+        
+        // Step 1: Attach speaker
+        val attachResponse = client.post("/events/$eventId/partnerships/$partnershipId/speakers/$speakerId")
+        assertEquals(HttpStatusCode.Created, attachResponse.status)
+        
+        // Step 2: Verify attachment
+        val getResponse = client.get("/events/$eventId/partnerships/$partnershipId")
+        // Assert speaker is in response
+        
+        // Step 3: Detach speaker
+        val detachResponse = client.delete("/events/$eventId/partnerships/$partnershipId/speakers/$speakerId")
+        assertEquals(HttpStatusCode.NoContent, detachResponse.status)
+        
+        // Step 4: Verify detachment
+        val finalResponse = client.get("/events/$eventId/partnerships/$partnershipId")
+        // Assert speaker is NOT in response
+    }
+}
+```
 
 **Rationale**: Contract tests ensure API reliability and prevent breaking changes. Integration 
 tests validate business requirements. Separation of concerns prevents brittle tests that fail 
-due to implementation details while maintaining comprehensive coverage of API contracts.
+due to implementation details while maintaining comprehensive coverage of API contracts. The 
+shared database pattern improves performance while UUID-based uniqueness prevents data conflicts.
 
 ### III. Clean Modular Architecture
 Domain modules MUST remain decoupled with clear boundaries. Each module (auth, billing, companies, 

@@ -1,39 +1,39 @@
 package fr.devlille.partners.connect.internal
 
-import fr.devlille.partners.connect.auth.infrastructure.providers.GoogleUserInfo
+import fr.devlille.partners.connect.auth.infrastructure.providers.isGoogleProvider
+import fr.devlille.partners.connect.auth.infrastructure.providers.mockedGoogleProviderResponse
+import fr.devlille.partners.connect.auth.infrastructure.providers.unAuthorizedGoogleProviderResponse
+import fr.devlille.partners.connect.tickets.infrastructure.providers.isBilletWebProvider
+import fr.devlille.partners.connect.tickets.infrastructure.providers.mockedBilletWebProviderResponse
 import io.ktor.client.engine.mock.MockEngine
-import io.ktor.client.engine.mock.respond
-import io.ktor.client.request.HttpRequestData
 import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.headersOf
-import kotlinx.serialization.json.Json
-
-val mockedAdminUser = GoogleUserInfo(
-    givenName = "John",
-    familyName = "Doe",
-    picture = "https://example.com/john_doe.jpg",
-    email = "john.doe@contact.com",
-)
+import java.util.UUID
 
 val mockEngine = MockEngine { request ->
     if (request.isGoogleProvider()) {
         if (request.headers[HttpHeaders.Authorization]?.contains("invalid") == true) {
-            respond(
-                content = """{"error":"Unauthorized"}""",
-                status = HttpStatusCode.Unauthorized,
-                headers = headersOf(HttpHeaders.ContentType, "application/json"),
-            )
+            unAuthorizedGoogleProviderResponse
         } else {
-            respond(
-                content = Json.encodeToString(mockedAdminUser),
-                status = HttpStatusCode.OK,
-                headers = headersOf(HttpHeaders.ContentType, "application/json"),
-            )
+            mockedGoogleProviderResponse()
         }
     } else {
         TODO("Handle other providers or requests")
     }
 }
 
-private fun HttpRequestData.isGoogleProvider(): Boolean = url.host == "openidconnect.googleapis.com"
+fun mockEngine(
+    userId: UUID,
+    nbProductsForTickets: Int = 0,
+): MockEngine = MockEngine { request ->
+    if (request.isGoogleProvider()) {
+        if (request.headers[HttpHeaders.Authorization]?.contains("invalid") == true) {
+            unAuthorizedGoogleProviderResponse
+        } else {
+            mockedGoogleProviderResponse(userId)
+        }
+    } else if (request.isBilletWebProvider()) {
+        mockedBilletWebProviderResponse(nbProducts = nbProductsForTickets)
+    } else {
+        TODO("Handle other providers or requests")
+    }
+}

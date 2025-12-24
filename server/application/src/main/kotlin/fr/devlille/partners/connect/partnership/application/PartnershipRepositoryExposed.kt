@@ -113,7 +113,7 @@ class PartnershipRepositoryExposed : PartnershipRepository {
             PartnershipOptionEntity.new {
                 this.partnership = partnership
                 this.option = option
-                this.packId = pack.id
+                this.pack = pack
             }
         }
 

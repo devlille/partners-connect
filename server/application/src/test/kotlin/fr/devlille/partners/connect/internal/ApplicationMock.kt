@@ -32,8 +32,41 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import java.util.UUID
 
+/**
+ * Sets up the application module with a shared in-memory database for testing.
+ * @param userId The ID of the user to be used in the mock network engine.
+ * @param nbProductsForTickets The number of products to be returned by the mock network engine for tickets.
+ * @param storage The storage instance to be used in the module. Defaults to a mock instance.
+ */
+fun Application.moduleSharedDb(
+    userId: UUID,
+    nbProductsForTickets: Int = 0,
+    storage: Storage = mockk(),
+) {
+    moduleMocked(
+        databaseUrl = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
+        mockNetwork = module {
+            single<HttpClientEngine> { mockEngine(userId, nbProductsForTickets) }
+        },
+        mockStorage = module {
+            single { storage }
+        },
+    )
+}
+
+/**
+ * Sets up the application module with mocked dependencies for testing.
+ * @param databaseUrl The JDBC URL for the in-memory database.
+ * @param mockNetwork The Koin module providing a mocked network client.
+ * @param mockSlack The Koin module providing a mocked Slack client.
+ * @param mockStorage The Koin module providing a mocked storage client.
+ * @param mockGeocode The Koin module providing a mocked geocode client.
+ * @param mockBillingIntegration The Koin module providing mocked billing gateways.
+ * @param mockWebhook The Koin module providing a mocked webhook repository.
+ */
 @Suppress("LongParameterList")
 fun Application.moduleMocked(
+    databaseUrl: String = "jdbc:h2:mem:${UUID.randomUUID()};DB_CLOSE_DELAY=-1",
     mockNetwork: Module = module {
         single<HttpClientEngine> { mockEngine }
     },
@@ -69,7 +102,7 @@ fun Application.moduleMocked(
 ) {
     module(
         ApplicationConfig(
-            databaseUrl = "jdbc:h2:mem:${UUID.randomUUID()};DB_CLOSE_DELAY=-1",
+            databaseUrl = databaseUrl,
             enableOpenAPI = false,
             modules = listOf(
                 networkClientModule,
