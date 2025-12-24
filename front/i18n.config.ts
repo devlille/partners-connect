@@ -26,6 +26,33 @@ export default defineI18nConfig(() => ({
         clear: "Effacer",
         activeFilters: "Filtres actifs",
       },
+      partnershipNotices: {
+        completeInfo: {
+          title: "Complétez vos informations",
+          description:
+            "Votre partenariat a été validé ! Pour finaliser le processus, merci de compléter les informations manquantes dans les onglets suivants :",
+          partnershipLink: "Partenariat",
+          partnershipDescription: "Vérifiez et complétez vos coordonnées de contact",
+          companyLink: "Entreprise",
+          companyDescription: "Renseignez les informations de votre société",
+        },
+        awaitingPayment: {
+          title: "En attente de paiement",
+          description:
+            "Votre convention de partenariat a été signée. Nous sommes actuellement dans l'attente de la réception de votre paiement pour finaliser votre partenariat.",
+        },
+        paymentReceived: {
+          title: "Paiement reçu",
+          description:
+            "Votre paiement a bien été reçu. Vous pouvez à présent configurer votre espace partenaire :",
+          jobOffersLink: "Offres d'emploi",
+          jobOffersDescription: "Publiez vos offres d'emploi",
+          companyLink: "Entreprise",
+          companyDescription: "Configurez vos réseaux sociaux et informations",
+          providersLink: "Prestataires",
+          providersDescription: "Gérez vos prestataires",
+        },
+      },
       sponsors: {
         title: "Sponsors",
         list: "Liste des sponsors",
@@ -67,6 +94,32 @@ export default defineI18nConfig(() => ({
         yes: "Yes",
         no: "No",
       },
+      partnershipNotices: {
+        completeInfo: {
+          title: "Complete your information",
+          description:
+            "Your partnership has been validated! To finalize the process, please complete the missing information in the following tabs:",
+          partnershipLink: "Partnership",
+          partnershipDescription: "Check and complete your contact details",
+          companyLink: "Company",
+          companyDescription: "Fill in your company information",
+        },
+        awaitingPayment: {
+          title: "Awaiting payment",
+          description:
+            "Your partnership agreement has been signed. We are currently awaiting receipt of your payment to finalize your partnership.",
+        },
+        paymentReceived: {
+          title: "Payment received",
+          description: "Your payment has been received. You can now configure your partner space:",
+          jobOffersLink: "Job offers",
+          jobOffersDescription: "Publish your job offers",
+          companyLink: "Company",
+          companyDescription: "Configure your social networks and information",
+          providersLink: "Providers",
+          providersDescription: "Manage your providers",
+        },
+      },
       sponsors: {
         title: "Sponsors",
         list: "Sponsors list",
@@ -107,6 +160,32 @@ export default defineI18nConfig(() => ({
         activeFilters: "Filtros Activos",
         yes: "Sí",
         no: "No",
+      },
+      partnershipNotices: {
+        completeInfo: {
+          title: "Complete su información",
+          description:
+            "¡Su asociación ha sido validada! Para finalizar el proceso, complete la información faltante en las siguientes pestañas:",
+          partnershipLink: "Asociación",
+          partnershipDescription: "Verifique y complete sus datos de contacto",
+          companyLink: "Empresa",
+          companyDescription: "Complete la información de su empresa",
+        },
+        awaitingPayment: {
+          title: "En espera de pago",
+          description:
+            "Su acuerdo de asociación ha sido firmado. Actualmente estamos esperando la recepción de su pago para finalizar su asociación.",
+        },
+        paymentReceived: {
+          title: "Pago recibido",
+          description: "Su pago ha sido recibido. Ahora puede configurar su espacio de socio:",
+          jobOffersLink: "Ofertas de empleo",
+          jobOffersDescription: "Publique sus ofertas de empleo",
+          companyLink: "Empresa",
+          companyDescription: "Configure sus redes sociales e información",
+          providersLink: "Proveedores",
+          providersDescription: "Gestione sus proveedores",
+        },
       },
       sponsors: {
         title: "Patrocinadores",

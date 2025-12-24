@@ -18,6 +18,30 @@
     "confirm": "Confirm",
     "close": "Close"
   },
+  "partnershipNotices": {
+    "completeInfo": {
+      "title": "Complete your information",
+      "description": "Your partnership has been validated! To finalize the process, please complete the missing information in the following tabs:",
+      "partnershipLink": "Partnership",
+      "partnershipDescription": "Check and complete your contact details",
+      "companyLink": "Company",
+      "companyDescription": "Fill in your company information"
+    },
+    "awaitingPayment": {
+      "title": "Awaiting payment",
+      "description": "Your partnership agreement has been signed. We are currently awaiting receipt of your payment to finalize your partnership."
+    },
+    "paymentReceived": {
+      "title": "Payment received",
+      "description": "Your payment has been received. You can now configure your partner space:",
+      "jobOffersLink": "Job offers",
+      "jobOffersDescription": "Publish your job offers",
+      "companyLink": "Company",
+      "companyDescription": "Configure your social networks and information",
+      "providersLink": "Providers",
+      "providersDescription": "Manage your providers"
+    }
+  },
   "nav": {
     "myOrganizations": "My organizations",
     "createOrganization": "Create organization",

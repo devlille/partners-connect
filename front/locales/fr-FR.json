@@ -21,6 +21,30 @@
     "clear": "Effacer",
     "activeFilters": "Filtres actifs"
   },
+  "partnershipNotices": {
+    "completeInfo": {
+      "title": "Complétez vos informations",
+      "description": "Votre partenariat a été validé ! Pour finaliser le processus, merci de compléter les informations manquantes dans les onglets suivants :",
+      "partnershipLink": "Partenariat",
+      "partnershipDescription": "Vérifiez et complétez vos coordonnées de contact",
+      "companyLink": "Entreprise",
+      "companyDescription": "Renseignez les informations de votre société"
+    },
+    "awaitingPayment": {
+      "title": "En attente de paiement",
+      "description": "Votre convention de partenariat a été signée. Nous sommes actuellement dans l'attente de la réception de votre paiement pour finaliser votre partenariat."
+    },
+    "paymentReceived": {
+      "title": "Paiement reçu",
+      "description": "Votre paiement a bien été reçu. Vous pouvez à présent configurer votre espace partenaire :",
+      "jobOffersLink": "Offres d'emploi",
+      "jobOffersDescription": "Publiez vos offres d'emploi",
+      "companyLink": "Entreprise",
+      "companyDescription": "Configurez vos réseaux sociaux et informations",
+      "providersLink": "Prestataires",
+      "providersDescription": "Gérez vos prestataires"
+    }
+  },
   "nav": {
     "myOrganizations": "Mes organisations",
     "createOrganization": "Créer une organisation",
