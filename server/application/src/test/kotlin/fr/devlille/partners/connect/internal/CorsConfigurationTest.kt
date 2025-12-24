@@ -5,6 +5,7 @@ import io.ktor.client.request.options
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
+import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -13,7 +14,7 @@ class CorsConfigurationTest {
     @Test
     fun `OPTIONS request with localhost origin is allowed`() = testApplication {
         application {
-            moduleMocked()
+            moduleSharedDb(UUID.randomUUID())
         }
 
         val response = client.options("/") {
@@ -28,7 +29,7 @@ class CorsConfigurationTest {
     @Test
     fun `OPTIONS request with localhost on port 8080 is allowed`() = testApplication {
         application {
-            moduleMocked()
+            moduleSharedDb(UUID.randomUUID())
         }
 
         val response = client.options("/") {
@@ -43,7 +44,7 @@ class CorsConfigurationTest {
     @Test
     fun `OPTIONS request with 127_0_0_1 origin is allowed`() = testApplication {
         application {
-            moduleMocked()
+            moduleSharedDb(UUID.randomUUID())
         }
 
         val response = client.options("/") {

@@ -122,18 +122,42 @@ npm install && npm run validate  # OpenAPI validation
 
 ## Testing Strategy (CRITICAL)
 
-**Contract Tests** (API Schema Validation):
+> **NOTE**: The test architecture has been refactored. See [Testing Guide](../server/docs/TESTING.md) for complete details.
+
+**Contract Tests** (Unit Tests - API Schema Validation):
+- **Location**: `<feature>.infrastructure.api` package
+- **Naming**: `<Feature><EndpointResource>Route<Verb>Test` (e.g., `PartnershipRegisterRoutePostTest`)
 - **MUST be written BEFORE implementation** (TDD approach)
 - Focus on request/response schema validation ONLY, not business logic
+- Test ALL HTTP status codes returned by the endpoint (200/201/204, 400, 401, 403, 404, 409)
 - Use `call.receive<T>(schema)` pattern with JSON schemas in `/schemas/` directory
-- Use mock factory functions for entities: `insertMockedCompany()`, `insertMockedEvent()`, `insertMockedPartnership()`
-- Create new factories for missing entities following existing naming conventions
+- Use factory functions: `insertMockedCompany()`, `insertMockedEvent()`, `insertMockedPartnership()`
+- Create new factories for missing entities following naming conventions
 
-**Integration Tests** (Business Logic):
+**Integration Tests** (End-to-End Business Logic):
+- **Location**: `<feature>` package (root of domain)
+- **Naming**: `<Feature>(<EndpointResource>)RoutesTest` (e.g., `PartnershipSpeakersRoutesTest`)
 - HTTP route testing with H2 in-memory database (NOT repository tests)
+- Test complete workflows across multiple endpoints
 - End-to-end validation including serialization, validation, error handling
 - Cross-domain operations, notifications, complex workflows
 - **Minimum 80% coverage** for new features
+
+**Shared Database Pattern** (MANDATORY):
+- Use `moduleSharedDb(userId)` instead of `moduleMocked()` for all new tests
+- Pre-create UUIDs before initializing data: `val companyId = UUID.randomUUID()`
+- Initialize all data in a SINGLE `transaction {}` block
+- Factory functions MUST NOT manage transactions
+- Use UUID-based defaults in factories to ensure uniqueness: `name = id.toString()`
+
+**Factory Functions**:
+- **Naming**: `insertMocked<Entity>()` for database entities, `create<Domain>()` for domain objects
+- **File naming**: `<Name>.factory.kt` (e.g., `Company.factory.kt`, `Partnership.factory.kt`)
+- **Location**: `<feature>/factories/` package
+- All parameters MUST have defaults
+- Unique fields MUST use UUID-based defaults
+- NO transaction management in factories
+- Follow existing factory patterns exactly
 
 **Schema Files** (Required for all new endpoints):
 - Create in `server/application/src/main/resources/schemas/{name}.schema.json`

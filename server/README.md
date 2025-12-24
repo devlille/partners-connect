@@ -142,9 +142,13 @@ Set these in your `.env` file or as environment variables:
 
 - **Formatting:** Enforced by ktlint (`./gradlew ktlintCheck`).
 - **Static Analysis:** Run detekt (`./gradlew detekt`).
-- **Testing:** All new features require tests in `application/src/test/kotlin/`.
+- **Testing:** All new features require tests in `application/src/test/kotlin/`. See [Testing Guide](docs/TESTING.md) for detailed patterns.
 - **Commit Hygiene:** Run all checks before pushing.
 - **Secrets:** Never commit secrets to the repository.
+
+## Documentation
+
+- **[Testing Guide](docs/TESTING.md)**: Comprehensive guide for writing tests, factory functions, and following test architecture patterns.
 
 ## Contributing
 

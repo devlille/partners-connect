@@ -27,7 +27,7 @@ class PartnershipOptionEntity(id: EntityID<UUID>) : UUIDEntity(id) {
         ) {
             new {
                 this.partnership = partnership
-                this.packId = pack.id
+                this.pack = pack
                 this.option = option
 
                 // Set selection data based on the polymorphic selection type
@@ -76,7 +76,7 @@ class PartnershipOptionEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     }
 
     var partnership by PartnershipEntity referencedOn PartnershipOptionsTable.partnershipId
-    var packId by PartnershipOptionsTable.packId
+    var pack by SponsoringPackEntity referencedOn PartnershipOptionsTable.packId
     var option by SponsoringOptionEntity referencedOn PartnershipOptionsTable.optionId
     var selectedQuantity by PartnershipOptionsTable.selectedQuantity
     var selectedValue by SelectableValueEntity optionalReferencedOn PartnershipOptionsTable.selectedValueId

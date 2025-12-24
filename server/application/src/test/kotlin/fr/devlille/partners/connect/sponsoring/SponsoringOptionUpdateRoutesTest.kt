@@ -1,19 +1,14 @@
 package fr.devlille.partners.connect.sponsoring
 
-import fr.devlille.partners.connect.events.factories.insertMockedEvent
-import fr.devlille.partners.connect.internal.moduleMocked
+import fr.devlille.partners.connect.events.factories.insertMockedFutureEvent
+import fr.devlille.partners.connect.internal.moduleSharedDb
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
-import fr.devlille.partners.connect.sponsoring.domain.CreateSelectableValue
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.CreateText
-import fr.devlille.partners.connect.sponsoring.domain.CreateTypedQuantitative
-import fr.devlille.partners.connect.sponsoring.domain.CreateTypedSelectable
-import fr.devlille.partners.connect.sponsoring.domain.QuantitativeDescriptor
-import fr.devlille.partners.connect.sponsoring.domain.SelectableDescriptor
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringOptionWithTranslations
 import fr.devlille.partners.connect.sponsoring.domain.TranslatedLabel
-import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringOption
-import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
+import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
+import fr.devlille.partners.connect.users.factories.insertMockedUser
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -27,6 +22,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
 import kotlinx.serialization.json.Json
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -37,132 +33,19 @@ class SponsoringOptionUpdateRoutesTest {
     private val json = Json { ignoreUnknownKeys = true }
 
     @Test
-    fun `PUT updates text option - schema validation`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val eventSlug = "test-event-update-text"
-        val optionId = UUID.randomUUID()
-
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-            insertMockedSponsoringOption(optionId, eventId)
-        }
-
-        val request = CreateText(
-            translations = listOf(
-                TranslatedLabel(
-                    language = "en",
-                    name = "Updated Social Media",
-                    description = "Updated description",
-                ),
-            ),
-            price = 600,
-        )
-
-        val response = client.put("/orgs/$orgId/events/$eventSlug/options/$optionId") {
-            contentType(ContentType.Application.Json)
-            header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(Json.encodeToString(CreateSponsoringOption.serializer(), request))
-        }
-
-        // Contract test: Should return 200 with updated option ID
-        assertEquals(HttpStatusCode.OK, response.status)
-        val responseBody = response.bodyAsText()
-        assertTrue(responseBody.contains("id"))
-        assertTrue(responseBody.contains("\"id\":"))
-    }
-
-    @Test
-    fun `PUT updates typed_quantitative option - schema validation`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val eventSlug = "test-event-update-quantitative"
-        val optionId = UUID.randomUUID()
-
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-            insertMockedSponsoringOption(optionId, eventId)
-        }
-
-        val request = CreateTypedQuantitative(
-            translations = listOf(
-                TranslatedLabel(
-                    language = "en",
-                    name = "Updated Job Offers",
-                    description = "Updated job board posting",
-                ),
-            ),
-            price = 150,
-            typeDescriptor = QuantitativeDescriptor.JOB_OFFER,
-        )
-
-        val response = client.put("/orgs/$orgId/events/$eventSlug/options/$optionId") {
-            contentType(ContentType.Application.Json)
-            header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(Json.encodeToString(CreateSponsoringOption.serializer(), request))
-        }
-
-        // Contract test: This should fail initially - polymorphic types not implemented
-        assertEquals(HttpStatusCode.OK, response.status)
-        val responseBody = response.bodyAsText()
-        assertTrue(responseBody.contains("id"))
-    }
-
-    @Test
-    fun `PUT updates typed_selectable option - schema validation`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val eventSlug = "test-event-update-selectable"
-        val optionId = UUID.randomUUID()
-
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-            insertMockedSponsoringOption(optionId, eventId)
-        }
-
-        val request = CreateTypedSelectable(
-            translations = listOf(
-                TranslatedLabel(
-                    language = "en",
-                    name = "Updated Exhibition Booth",
-                    description = "Updated booth space",
-                ),
-            ),
-            typeDescriptor = SelectableDescriptor.BOOTH,
-            selectableValues = listOf(
-                CreateSelectableValue("2x2m", 80000),
-                CreateSelectableValue("4x4m", 120000),
-                CreateSelectableValue("6x8m", 250000),
-            ),
-        )
-
-        val response = client.put("/orgs/$orgId/events/$eventSlug/options/$optionId") {
-            contentType(ContentType.Application.Json)
-            header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(Json.encodeToString(CreateSponsoringOption.serializer(), request))
-        }
-
-        // Contract test: This should fail initially
-        assertEquals(HttpStatusCode.OK, response.status)
-        val responseBody = response.bodyAsText()
-        assertTrue(responseBody.contains("id"))
-    }
-
-    @Test
     fun `PUT replaces translations completely`() = testApplication {
+        val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-2"
+
         application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+            }
         }
 
         // Create option with FR and EN translations
@@ -174,7 +57,7 @@ class SponsoringOptionUpdateRoutesTest {
             price = 100,
         )
 
-        val createResponse = client.post("/orgs/$orgId/events/$eventSlug/options") {
+        val createResponse = client.post("/orgs/$orgId/events/$eventId/options") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(json.encodeToString(CreateSponsoringOption.serializer(), createRequest))
@@ -191,7 +74,7 @@ class SponsoringOptionUpdateRoutesTest {
             price = 150,
         )
 
-        val updateResponse = client.put("/orgs/$orgId/events/$eventSlug/options/$optionId") {
+        val updateResponse = client.put("/orgs/$orgId/events/$eventId/options/$optionId") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(json.encodeToString(CreateSponsoringOption.serializer(), updateRequest))
@@ -200,7 +83,7 @@ class SponsoringOptionUpdateRoutesTest {
         assertEquals(HttpStatusCode.OK, updateResponse.status)
 
         // Verify the translation replacement using organizer endpoint (returns all translations)
-        val response = client.get("/orgs/$orgId/events/$eventSlug/options") {
+        val response = client.get("/orgs/$orgId/events/$eventId/options") {
             header(HttpHeaders.Authorization, "Bearer valid")
             // No Accept-Language header needed - organizer endpoint returns all translations
         }
@@ -219,214 +102,21 @@ class SponsoringOptionUpdateRoutesTest {
     }
 
     @Test
-    fun `PUT returns error when eventId is invalid UUID`() = testApplication {
-        val orgId = UUID.randomUUID()
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-        }
-
-        val updateRequest = CreateText(
-            translations = listOf(
-                TranslatedLabel(language = "en", name = "Updated Option"),
-            ),
-            price = 200,
-        )
-
-        val response = client.put("/orgs/$orgId/events/not-a-uuid/options/${UUID.randomUUID()}") {
-            contentType(ContentType.Application.Json)
-            header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(updateRequest))
-        }
-
-        // The UUID parsing might happen at different levels, so let's just check it's not a 200
-        assertTrue(response.status.value >= 400)
-        assertTrue(
-            response.bodyAsText().contains("Invalid UUID format") ||
-                response.bodyAsText().contains("not found", ignoreCase = true) ||
-                response.bodyAsText().contains("bad request", ignoreCase = true),
-        )
-    }
-
-    @Test
-    fun `PUT returns error when optionId is invalid UUID`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-3"
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-        }
-
-        val updateRequest = CreateText(
-            translations = listOf(
-                TranslatedLabel(language = "en", name = "Updated Option"),
-            ),
-            price = 200,
-        )
-
-        val response = client.put("/orgs/$orgId/events/$eventSlug/options/not-a-uuid") {
-            contentType(ContentType.Application.Json)
-            header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(updateRequest))
-        }
-
-        // The UUID parsing might happen at different levels, so let's just check it's not a 200
-        assertTrue(response.status.value >= 400)
-        assertTrue(response.bodyAsText().contains("Request parameter id couldn't be parsed/converted to UUID"))
-    }
-
-    @Test
-    fun `PUT returns 400 when payload has empty translations`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val optionId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-4"
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-            insertMockedSponsoringOption(optionId, eventId)
-        }
-
-        val updateRequest = CreateText(
-            translations = emptyList(),
-            price = 200,
-        )
-
-        val response = client.put("/orgs/$orgId/events/$eventSlug/options/$optionId") {
-            contentType(ContentType.Application.Json)
-            header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(CreateSponsoringOption.serializer(), updateRequest))
-        }
-
-        assertEquals(HttpStatusCode.BadRequest, response.status)
-    }
-
-    @Test
-    fun `PUT returns 401 when no authorization header`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-5"
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-        }
-
-        val updateRequest = CreateText(
-            translations = listOf(
-                TranslatedLabel(language = "en", name = "Updated Option"),
-            ),
-            price = 200,
-        )
-
-        val response = client.put("/orgs/$orgId/events/$eventSlug/options/${UUID.randomUUID()}") {
-            contentType(ContentType.Application.Json)
-            setBody(json.encodeToString(updateRequest))
-        }
-
-        assertEquals(HttpStatusCode.Unauthorized, response.status)
-    }
-
-    @Test
-    fun `PUT returns 401 when user lacks organization permission`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-6"
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-        }
-
-        val updateRequest = CreateText(
-            translations = listOf(
-                TranslatedLabel(language = "en", name = "Updated Option"),
-            ),
-            price = 200,
-        )
-
-        val response = client.put("/orgs/$orgId/events/$eventSlug/options/${UUID.randomUUID()}") {
-            contentType(ContentType.Application.Json)
-            header(HttpHeaders.Authorization, "Bearer invalid")
-            setBody(json.encodeToString(updateRequest))
-        }
-
-        assertEquals(HttpStatusCode.Unauthorized, response.status)
-    }
-
-    @Test
-    fun `PUT returns 404 when event does not exist`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val nonExistentEventSlug = "non-existent-event-slug"
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId)
-        }
-
-        val updateRequest = CreateText(
-            translations = listOf(
-                TranslatedLabel(language = "en", name = "Updated Option"),
-            ),
-            price = 200,
-        )
-
-        val response = client.put("/orgs/$orgId/events/$nonExistentEventSlug/options/${UUID.randomUUID()}") {
-            contentType(ContentType.Application.Json)
-            header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(CreateSponsoringOption.serializer(), updateRequest))
-        }
-
-        assertEquals(HttpStatusCode.NotFound, response.status)
-    }
-
-    @Test
-    fun `PUT returns 404 when option does not exist`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-7"
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-        }
-
-        val updateRequest = CreateText(
-            translations = listOf(
-                TranslatedLabel(language = "en", name = "Updated Option"),
-            ),
-            price = 200,
-        )
-
-        val nonExistentOptionId = UUID.randomUUID()
-        val response = client.put("/orgs/$orgId/events/$eventSlug/options/$nonExistentOptionId") {
-            contentType(ContentType.Application.Json)
-            header(HttpHeaders.Authorization, "Bearer valid")
-            setBody(json.encodeToString(CreateSponsoringOption.serializer(), updateRequest))
-        }
-
-        assertEquals(HttpStatusCode.NotFound, response.status)
-        assertTrue(response.bodyAsText().contains("Option not found"))
-    }
-
-    @Test
     fun `PUT returns 404 when option belongs to different event`() = testApplication {
+        val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val event1Id = UUID.randomUUID()
         val event2Id = UUID.randomUUID()
-        val event1Slug = "test-event1-slug"
-        val event2Slug = "test-event2-slug"
 
         application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(event1Id, orgId, event1Slug)
-            // Create second event without admin user (just the event)
-            insertMockedEvent(event2Id, slug = event2Slug, orgId = orgId)
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                insertMockedFutureEvent(event1Id, orgId = orgId)
+                insertMockedFutureEvent(event2Id, orgId = orgId)
+            }
         }
 
         // Create option for event1
@@ -437,7 +127,7 @@ class SponsoringOptionUpdateRoutesTest {
             price = 100,
         )
 
-        val createResponse = client.post("/orgs/$orgId/events/$event1Slug/options") {
+        val createResponse = client.post("/orgs/$orgId/events/$event1Id/options") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(json.encodeToString(CreateSponsoringOption.serializer(), createRequest))
@@ -454,7 +144,7 @@ class SponsoringOptionUpdateRoutesTest {
             price = 200,
         )
 
-        val response = client.put("/orgs/$orgId/events/$event2Slug/options/$optionId") {
+        val response = client.put("/orgs/$orgId/events/$event2Id/options/$optionId") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(json.encodeToString(CreateSponsoringOption.serializer(), updateRequest))

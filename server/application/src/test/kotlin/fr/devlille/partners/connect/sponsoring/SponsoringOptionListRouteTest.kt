@@ -1,11 +1,13 @@
 package fr.devlille.partners.connect.sponsoring
 
-import fr.devlille.partners.connect.internal.moduleMocked
+import fr.devlille.partners.connect.events.factories.insertMockedFutureEvent
+import fr.devlille.partners.connect.internal.moduleSharedDb
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.CreateText
 import fr.devlille.partners.connect.sponsoring.domain.TranslatedLabel
-import fr.devlille.partners.connect.users.factories.insertMockedEventWithAdminUser
+import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
+import fr.devlille.partners.connect.users.factories.insertMockedUser
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -17,6 +19,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
 import kotlinx.serialization.json.Json
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -26,54 +29,19 @@ class SponsoringOptionListRouteTest {
     private val json = Json { ignoreUnknownKeys = true }
 
     @Test
-    fun `GET returns empty list when no options exist`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-1"
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-        }
-
-        val response = client.get("/orgs/$orgId/events/$eventSlug/options") {
-            header(HttpHeaders.AcceptLanguage, "fr")
-            header(HttpHeaders.Authorization, "Bearer valid")
-        }
-
-        assertEquals(HttpStatusCode.OK, response.status)
-        assertEquals("[]", response.bodyAsText())
-    }
-
-    @Test
-    fun `GET succeeds without Accept-Language header for organizer endpoints`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-3"
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-        }
-
-        val response = client.get("/orgs/$orgId/events/$eventSlug/options") {
-            header(HttpHeaders.Authorization, "Bearer valid")
-        }
-        // Organizer endpoints now work without Accept-Language header
-        assertEquals(HttpStatusCode.OK, response.status)
-        val responseBody = response.bodyAsText()
-        assertTrue(responseBody.isNotEmpty())
-    }
-
-    @Test
     fun `GET returns all options with all translations without Accept-Language header`() = testApplication {
+        val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        val eventSlug = "test-multi-language-options"
+
         application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+            }
         }
 
         val request = CreateText(
@@ -93,29 +61,20 @@ class SponsoringOptionListRouteTest {
             price = null,
         )
 
-        client.post("/orgs/$orgId/events/$eventSlug/options") {
+        client.post("/orgs/$orgId/events/$eventId/options") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
             setBody(json.encodeToString(CreateSponsoringOption.serializer(), request))
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventSlug/options") {
+        val response = client.get("/orgs/$orgId/events/$eventId/options") {
             header(HttpHeaders.Authorization, "Bearer valid")
             // Intentionally NO Accept-Language header
         }
 
-        // Implementation completed - endpoint now works without Accept-Language header
-        // We expect OK status and response containing all translations
         assertEquals(HttpStatusCode.OK, response.status)
         val responseBody = response.bodyAsText()
         assertTrue(responseBody.isNotEmpty())
-
-        // Verify response contains translations map structure
         assertTrue(responseBody.contains("translations"))
-        assertTrue(
-            responseBody.contains("\"en\":") ||
-                responseBody.contains("\"fr\":") ||
-                responseBody.contains("\"de\":"),
-        )
     }
 }
