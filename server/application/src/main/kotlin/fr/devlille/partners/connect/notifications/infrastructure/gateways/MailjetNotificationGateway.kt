@@ -42,17 +42,12 @@ class MailjetNotificationGateway(
 
     override fun getDestination(eventId: UUID, partnership: PartnershipItem): Destination = transaction {
         val event = EventEntity.findById(eventId) ?: throw NotFoundException("Event with ID $eventId not found")
+        val orgContact = partnership.organiser?.let { EmailContact(email = it.email, name = it.displayName) }
+        val eventContact = EmailContact(email = event.contactEmail, name = event.name)
         MailjetDestination(
-            from = EmailContact(
-                email = partnership.organiser?.email ?: event.contactEmail,
-                name = partnership.organiser?.displayName ?: event.name,
-            ),
-            to = partnership.emails.map {
-                EmailContact(email = it, name = null)
-            },
-            cc = partnership.organiser?.let {
-                listOf(EmailContact(email = it.email, name = it.displayName))
-            } ?: emptyList(),
+            from = orgContact ?: eventContact,
+            to = partnership.emails.map { EmailContact(email = it, name = null) },
+            cc = orgContact?.let { listOf(it, eventContact) } ?: listOf(eventContact),
         )
     }
 
