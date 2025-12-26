@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { getEventsPartnershipDetailed, putCompanyById, type CompanySchema, type MediaSchema, type UpdateCompanySchema } from "~/utils/api";
+import { getEventsPartnershipDetailed, getEventsPartnershipBilling, putCompanyById, type CompanySchema, type MediaSchema, type UpdateCompanySchema, type CompanyBillingDataSchema } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 import type { ExtendedPartnershipItem } from "~/types/partnership";
 
@@ -60,14 +60,22 @@ const loading = ref(true);
 const error = ref<string | null>(null);
 
 const company = ref<CompanySchema | null>(null);
+const billing = ref<CompanyBillingDataSchema | null>(null);
 const loadingCompany = ref(false);
 const companyError = ref<string | null>(null);
 
 const savingCompany = ref(false);
 const companyFormError = ref<string | null>(null);
 
-// Menu contextuel pour la page du sponsor
-const { sponsorLinks } = useSponsorLinks(orgSlug.value, eventSlug.value, sponsorId.value);
+// Menu contextuel pour la page du sponsor avec indicateurs d'informations manquantes
+const { sponsorLinks } = useSponsorLinks({
+  orgSlug: orgSlug.value,
+  eventSlug: eventSlug.value,
+  sponsorId: sponsorId.value,
+  partnership,
+  company,
+  billing,
+});
 
 async function loadPartnership() {
   try {
@@ -194,12 +202,26 @@ function handleLogoError(errorMessage: string) {
   companyError.value = errorMessage;
 }
 
+async function loadBilling() {
+  try {
+    const response = await getEventsPartnershipBilling(eventSlug.value, sponsorId.value);
+    billing.value = response.data;
+  } catch (err: any) {
+    // Si le billing n'existe pas encore, ce n'est pas une erreur
+    if (err.response?.status !== 404) {
+      console.error('Failed to load billing data:', err);
+    }
+  }
+}
+
 onMounted(() => {
   loadPartnership();
+  loadBilling();
 });
 
 watch([orgSlug, eventSlug, sponsorId], () => {
   loadPartnership();
+  loadBilling();
 });
 
 useHead({

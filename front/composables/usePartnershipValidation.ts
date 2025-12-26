@@ -72,18 +72,37 @@ export const usePartnershipValidation = () => {
   }
 
   /**
+   * Vérifie si les informations de facturation sont complètes
+   */
+  function isBillingComplete(billing: any | null): boolean {
+    if (!billing) return false;
+
+    return !!(
+      billing.contact?.first_name &&
+      billing.contact?.last_name &&
+      billing.contact?.email &&
+      isValidEmail(billing.contact.email)
+    );
+  }
+
+  /**
    * Vérifie si toutes les informations requises sont complètes
    */
   function isAllDataComplete(
     partnership: ExtendedPartnershipItem | null,
     company: any | null,
+    billing?: any | null,
   ): boolean {
-    return isPartnershipComplete(partnership) && isCompanyComplete(company);
+    const partnershipOk = isPartnershipComplete(partnership);
+    const companyOk = isCompanyComplete(company);
+    const billingOk = billing !== undefined ? isBillingComplete(billing) : true;
+    return partnershipOk && companyOk && billingOk;
   }
 
   return {
     isPartnershipComplete,
     isCompanyComplete,
+    isBillingComplete,
     isAllDataComplete,
   };
 };

@@ -233,7 +233,7 @@
 </template>
 
 <script setup lang="ts">
-import { getEventsPartnershipDetailed, updatePartnershipContactInfo, postOrgsEventsPartnershipSuggestion, postOrgsEventsPartnershipBilling, postPartnershipOrganiser, deletePartnershipOrganiser, getOrgsUsers, type UserSchema } from "~/utils/api";
+import { getEventsPartnershipDetailed, getEventsPartnershipBilling, updatePartnershipContactInfo, postOrgsEventsPartnershipSuggestion, postOrgsEventsPartnershipBilling, postPartnershipOrganiser, deletePartnershipOrganiser, getOrgsUsers, type UserSchema, type CompanyBillingDataSchema } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 import type { ExtendedPartnershipItem } from "~/types/partnership";
 import { PARTNERSHIP_CONFIRM } from "~/constants/partnership";
@@ -265,6 +265,8 @@ const sponsorId = computed(() => {
 });
 
 const partnership = ref<ExtendedPartnershipItem | null>(null);
+const company = ref<any | null>(null);
+const billing = ref<CompanyBillingDataSchema | null>(null);
 const loading = ref(true);
 const saving = ref(false);
 const error = ref<string | null>(null);
@@ -286,8 +288,15 @@ const isAssigning = ref(false);
 const isUnassigning = ref(false);
 const assignError = ref<string | null>(null);
 
-// Menu contextuel pour la page du sponsor
-const { sponsorLinks } = useSponsorLinks(orgSlug.value, eventSlug.value, sponsorId.value);
+// Menu contextuel pour la page du sponsor avec indicateurs d'informations manquantes
+const { sponsorLinks } = useSponsorLinks({
+  orgSlug: orgSlug.value,
+  eventSlug: eventSlug.value,
+  sponsorId: sponsorId.value,
+  partnership,
+  company,
+  billing,
+});
 
 /**
  * Utilisateurs triés par ordre alphabétique (display_name ou email)
@@ -322,6 +331,9 @@ async function loadPartnership() {
       selected_value: opt.selected_value ?? null
     }));
     const optionIds = packOptions.map((opt: { id: string }) => opt.id);
+
+    // Stocker les données de l'entreprise pour les indicateurs du menu
+    company.value = c;
 
     // Mapper les données de DetailedPartnershipResponseSchema vers ExtendedPartnershipItem
     partnership.value = {
@@ -359,6 +371,17 @@ async function loadPartnership() {
   }
 }
 
+async function loadBilling() {
+  try {
+    const response = await getEventsPartnershipBilling(eventSlug.value, sponsorId.value);
+    billing.value = response.data;
+  } catch (err: any) {
+    // Si le billing n'existe pas encore, ce n'est pas une erreur
+    if (err.response?.status !== 404) {
+      console.error('Failed to load billing data:', err);
+    }
+  }
+}
 
 async function onSave(data: any) {
   try {
@@ -488,8 +511,9 @@ async function handleMarkAsPaid() {
  * Gère la sauvegarde des informations de facturation
  */
 function handleBillingSaved() {
-  // Recharger les données du partenariat pour mettre à jour le statut
+  // Recharger les données du partenariat et de facturation pour mettre à jour le statut
   loadPartnership();
+  loadBilling();
 }
 
 /**
@@ -642,12 +666,14 @@ async function handleUnassignOrganiser() {
 
 onMounted(() => {
   loadPartnership();
+  loadBilling();
   loadOrgUsers();
 });
 
 // Recharger si les slugs changent
 watch([orgSlug, eventSlug, sponsorId], () => {
   loadPartnership();
+  loadBilling();
 });
 
 useHead({
