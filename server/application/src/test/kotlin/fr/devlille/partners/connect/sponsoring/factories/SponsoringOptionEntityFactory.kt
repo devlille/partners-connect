@@ -17,7 +17,7 @@ fun insertMockedSponsoringOption(
     optionId: UUID = UUID.randomUUID(),
     eventId: UUID = UUID.randomUUID(),
     optionType: OptionType = OptionType.TEXT,
-    name: String = "Test Option",
+    name: String = optionId.toString(),
     price: Int = 150,
     description: String = "Test Description",
     selectableValues: List<SelectableValue> = emptyList(),

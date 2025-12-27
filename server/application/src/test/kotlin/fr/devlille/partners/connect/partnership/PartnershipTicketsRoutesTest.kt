@@ -98,7 +98,7 @@ class PartnershipTicketsRoutesTest {
             transaction {
                 insertMockedEventWithOrga(eventId, slug = eventSlug)
                 val company = insertMockedCompany()
-                val selectedPack = insertMockedSponsoringPack(event = eventId)
+                val selectedPack = insertMockedSponsoringPack(eventId = eventId)
                 val selectedOption = insertMockedSponsoringOption(
                     eventId = eventId,
                     optionType = OptionType.TYPED_NUMBER,
@@ -197,7 +197,7 @@ class PartnershipTicketsRoutesTest {
             )
             insertMockedEventWithOrga(eventId, slug = eventSlug)
             val company = insertMockedCompany()
-            val selectedPack = insertMockedSponsoringPack(event = eventId)
+            val selectedPack = insertMockedSponsoringPack(eventId = eventId)
             insertMockedPartnership(
                 id = partnershipId,
                 eventId = eventId,
@@ -243,7 +243,7 @@ class PartnershipTicketsRoutesTest {
             )
             insertMockedEventWithOrga(eventId, slug = eventSlug)
             val company = insertMockedCompany()
-            val selectedPack = insertMockedSponsoringPack(event = eventId)
+            val selectedPack = insertMockedSponsoringPack(eventId = eventId)
             insertMockedPartnership(
                 id = partnershipId,
                 eventId = eventId,
@@ -289,7 +289,7 @@ class PartnershipTicketsRoutesTest {
             )
             insertMockedEventWithOrga(eventId, slug = eventSlug)
             val company = insertMockedCompany()
-            val selectedPack = insertMockedSponsoringPack(event = eventId)
+            val selectedPack = insertMockedSponsoringPack(eventId = eventId)
             insertMockedPartnership(
                 id = partnershipId,
                 eventId = eventId,

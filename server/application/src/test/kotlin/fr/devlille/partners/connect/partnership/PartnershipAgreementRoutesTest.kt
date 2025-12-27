@@ -55,7 +55,7 @@ class PartnershipAgreementRoutesTest {
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
             insertMockedCompany(companyId)
-            val selectedPack = insertMockedSponsoringPack(event = eventId)
+            val selectedPack = insertMockedSponsoringPack(eventId = eventId)
             insertMockedPartnership(
                 id = partnershipId,
                 eventId = eventId,
@@ -176,7 +176,7 @@ class PartnershipAgreementRoutesTest {
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
             insertMockedCompany(companyId)
-            val selectedPack = insertMockedSponsoringPack(event = eventId)
+            val selectedPack = insertMockedSponsoringPack(eventId = eventId)
             insertMockedPartnership(
                 id = partnershipId,
                 eventId = eventId,
@@ -244,7 +244,7 @@ class PartnershipAgreementRoutesTest {
             insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
 
             insertMockedCompany(companyId)
-            val selectedPack = insertMockedSponsoringPack(event = eventId)
+            val selectedPack = insertMockedSponsoringPack(eventId = eventId)
             insertMockedPartnership(
                 id = partnershipId,
                 eventId = eventId,
@@ -282,7 +282,7 @@ class PartnershipAgreementRoutesTest {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
             insertMockedEventWithOrga(eventId, slug = eventSlug)
             insertMockedCompany(companyId)
-            val selectedPack = insertMockedSponsoringPack(event = eventId)
+            val selectedPack = insertMockedSponsoringPack(eventId = eventId)
             insertMockedPartnership(
                 id = partnershipId,
                 eventId = eventId,
@@ -358,7 +358,7 @@ class PartnershipAgreementRoutesTest {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
             insertMockedEventWithOrga(eventId, slug = eventSlug)
             insertMockedCompany(companyId)
-            val selectedPack = insertMockedSponsoringPack(event = eventId)
+            val selectedPack = insertMockedSponsoringPack(eventId = eventId)
             insertMockedPartnership(
                 id = partnershipId,
                 eventId = eventId,
@@ -391,7 +391,7 @@ class PartnershipAgreementRoutesTest {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
             insertMockedEventWithOrga(eventId, slug = eventSlug)
             insertMockedCompany(companyId)
-            val selectedPack = insertMockedSponsoringPack(event = eventId)
+            val selectedPack = insertMockedSponsoringPack(eventId = eventId)
             insertMockedPartnership(
                 id = partnershipId,
                 eventId = eventId,

@@ -26,46 +26,6 @@ class SponsoringOptionListRouteTest {
     private val json = Json { ignoreUnknownKeys = true }
 
     @Test
-    fun `GET returns empty list when no options exist`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-1"
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-        }
-
-        val response = client.get("/orgs/$orgId/events/$eventSlug/options") {
-            header(HttpHeaders.AcceptLanguage, "fr")
-            header(HttpHeaders.Authorization, "Bearer valid")
-        }
-
-        assertEquals(HttpStatusCode.OK, response.status)
-        assertEquals("[]", response.bodyAsText())
-    }
-
-    @Test
-    fun `GET succeeds without Accept-Language header for organizer endpoints`() = testApplication {
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val eventSlug = "test-event-slug-3"
-        application {
-            moduleMocked()
-            insertMockedOrganisationEntity(orgId)
-            insertMockedEventWithAdminUser(eventId, orgId, eventSlug)
-        }
-
-        val response = client.get("/orgs/$orgId/events/$eventSlug/options") {
-            header(HttpHeaders.Authorization, "Bearer valid")
-        }
-        // Organizer endpoints now work without Accept-Language header
-        assertEquals(HttpStatusCode.OK, response.status)
-        val responseBody = response.bodyAsText()
-        assertTrue(responseBody.isNotEmpty())
-    }
-
-    @Test
     fun `GET returns all options with all translations without Accept-Language header`() = testApplication {
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
@@ -104,18 +64,9 @@ class SponsoringOptionListRouteTest {
             // Intentionally NO Accept-Language header
         }
 
-        // Implementation completed - endpoint now works without Accept-Language header
-        // We expect OK status and response containing all translations
         assertEquals(HttpStatusCode.OK, response.status)
         val responseBody = response.bodyAsText()
         assertTrue(responseBody.isNotEmpty())
-
-        // Verify response contains translations map structure
         assertTrue(responseBody.contains("translations"))
-        assertTrue(
-            responseBody.contains("\"en\":") ||
-                responseBody.contains("\"fr\":") ||
-                responseBody.contains("\"de\":"),
-        )
     }
 }

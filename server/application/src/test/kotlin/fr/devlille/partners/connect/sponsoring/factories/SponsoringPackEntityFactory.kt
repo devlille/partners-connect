@@ -8,13 +8,13 @@ import java.util.UUID
 @Suppress("LongParameterList")
 fun insertMockedSponsoringPack(
     id: UUID = UUID.randomUUID(),
-    event: UUID = UUID.randomUUID(),
+    eventId: UUID = UUID.randomUUID(),
     name: String = "Mock Sponsoring Pack",
     basePrice: Int = 1000,
     maxQuantity: Int? = 100,
 ): SponsoringPackEntity = transaction {
     SponsoringPackEntity.new(id) {
-        this.event = EventEntity[event]
+        this.event = EventEntity[eventId]
         this.name = name
         this.basePrice = basePrice
         this.maxQuantity = maxQuantity

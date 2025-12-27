@@ -10,7 +10,7 @@ import java.util.UUID
 @Suppress("LongParameterList")
 fun insertMockedCompany(
     id: UUID = UUID.randomUUID(),
-    name: String = "Mock Company",
+    name: String = id.toString(),
     address: String = "123 Mock St",
     city: String = "Mock City",
     zipCode: String = "12345",
