@@ -14,9 +14,9 @@ import fr.devlille.partners.connect.notifications.infrastructure.providers.Conta
 import fr.devlille.partners.connect.notifications.infrastructure.providers.MailjetBody
 import fr.devlille.partners.connect.notifications.infrastructure.providers.MailjetProvider
 import fr.devlille.partners.connect.notifications.infrastructure.providers.Message
+import fr.devlille.partners.connect.partnership.application.mappers.toDomain
 import fr.devlille.partners.connect.partnership.domain.PartnershipItem
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
-import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
 import io.ktor.server.plugins.NotFoundException
@@ -55,16 +55,16 @@ class MailjetNotificationGateway(
     @OptIn(ExperimentalEncodingApi::class)
     override suspend fun send(integrationId: UUID, variables: NotificationVariables): Boolean {
         val config = transaction { MailjetIntegrationsTable[integrationId] }
-        val emails = transaction {
+        val partnershipItem = transaction {
             val partnership = PartnershipEntity
                 .find { PartnershipsTable.companyId eq variables.company.id.toUUID() }
                 .singleOrNull()
                 ?: throw NotFoundException("No partnership found for company ${variables.company.id}")
-
-            PartnershipEmailEntity
-                .find { PartnershipEmailsTable.partnershipId eq partnership.id }
-                .toList()
+            partnership.toDomain(PartnershipEmailEntity.emails(partnership.id.value).toList())
         }
+        val destination = getDestination(variables.event.event.id.toUUID(), partnershipItem)
+        val mailDestination = destination as? MailjetDestination
+            ?: throw ForbiddenException("Invalid destination type for Mailjet")
         val pathHeader = "/notifications/email/${variables.usageName}/header.${variables.language}.txt"
         val pathContent = "/notifications/email/${variables.usageName}/content.${variables.language}.html"
         val subject = try {
@@ -80,8 +80,9 @@ class MailjetNotificationGateway(
         val body = MailjetBody(
             messages = listOf(
                 Message(
-                    from = Contact(email = variables.event.event.contact.email, name = variables.event.event.name),
-                    to = emails.map { Contact(email = it.email) },
+                    from = Contact(email = mailDestination.from.email, name = mailDestination.from.name),
+                    to = mailDestination.to.map { Contact(email = it.email, name = it.name) },
+                    cc = mailDestination.cc.map { Contact(email = it.email, name = it.name) },
                     subject = "[${variables.event.event.name}] $subject",
                     htmlPart = htmlPart,
                 ),
