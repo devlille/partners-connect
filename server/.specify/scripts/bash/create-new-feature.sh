@@ -160,16 +160,30 @@ clean_branch_name() {
 # were initialised with --no-git.
 SCRIPT_DIR="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-if git rev-parse --show-toplevel >/dev/null 2>&1; then
-    REPO_ROOT=$(git rev-parse --show-toplevel)
-    HAS_GIT=true
-else
-    REPO_ROOT="$(find_repo_root "$SCRIPT_DIR")"
-    if [ -z "$REPO_ROOT" ]; then
-        echo "Error: Could not determine repository root. Please run this script from within the repository." >&2
-        exit 1
+# Always use the directory containing .specify folder as root (server directory)
+REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+
+# Verify .specify exists in this directory
+if [ ! -d "$REPO_ROOT/.specify" ]; then
+    # Fall back to git root if .specify not found
+    if git rev-parse --show-toplevel >/dev/null 2>&1; then
+        REPO_ROOT=$(git rev-parse --show-toplevel)
+        HAS_GIT=true
+    else
+        REPO_ROOT="$(find_repo_root "$SCRIPT_DIR")"
+        if [ -z "$REPO_ROOT" ]; then
+            echo "Error: Could not determine repository root. Please run this script from within the repository." >&2
+            exit 1
+        fi
+        HAS_GIT=false
     fi
-    HAS_GIT=false
+else
+    # Check if we have git available
+    if git rev-parse --show-toplevel >/dev/null 2>&1; then
+        HAS_GIT=true
+    else
+        HAS_GIT=false
+    fi
 fi
 
 cd "$REPO_ROOT"

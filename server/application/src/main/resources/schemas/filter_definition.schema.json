@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["name", "type"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Filter parameter name (without 'filter[]' prefix)",
+      "examples": ["pack_id", "validated", "organiser"]
+    },
+    "type": {
+      "type": "string",
+      "enum": ["string", "boolean"],
+      "description": "Data type of the filter parameter (enum: 'string' or 'boolean')"
+    },
+    "values": {
+      "oneOf": [
+        {
+          "type": "array",
+          "description": "Optional array of valid options for the filter (only populated for organiser filter)",
+          "items": {
+            "$ref": "filter_value.schema.json"
+          }
+        },
+        {
+          "type": "null",
+          "description": "No predefined values (user provides arbitrary value)"
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "name": "validated",
+      "type": "boolean"
+    },
+    {
+      "name": "organiser",
+      "type": "string",
+      "values": [
+        {
+          "value": "john.doe@example.com",
+          "display_value": "John Doe"
+        }
+      ]
+    }
+  ]
+}

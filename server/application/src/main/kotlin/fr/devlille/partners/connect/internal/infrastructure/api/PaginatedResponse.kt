@@ -12,4 +12,5 @@ data class PaginatedResponse<T>(
     @SerialName("page_size")
     val pageSize: Int,
     val total: Long,
+    val metadata: PaginationMetadata? = null,
 )

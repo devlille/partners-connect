@@ -50,6 +50,7 @@ fun Route.partnershipEmailRoutes() {
                 paid = call.request.queryParameters["filter[paid]"]?.toBoolean(),
                 agreementGenerated = call.request.queryParameters["filter[agreement-generated]"]?.toBoolean(),
                 agreementSigned = call.request.queryParameters["filter[agreement-signed]"]?.toBoolean(),
+                organiser = call.request.queryParameters["filter[organiser]"],
             )
 
             // Fetch partnerships with emails and organizer contact info

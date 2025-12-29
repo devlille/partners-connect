@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["items", "page", "page_size", "total"],
+  "properties": {
+    "items": {
+      "type": "array",
+      "description": "Array of partnership items matching filter criteria",
+      "items": {
+        "$ref": "partnership_item.schema.json"
+      }
+    },
+    "page": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Current page number (1-based)"
+    },
+    "page_size": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Number of items per page"
+    },
+    "total": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total count of items matching all filters"
+    },
+    "metadata": {
+      "oneOf": [
+        {
+          "$ref": "pagination_metadata.schema.json"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Pagination metadata containing available filters and sorts (always populated but nullable for backwards compatibility)"
+    }
+  },
+  "additionalProperties": false
+}

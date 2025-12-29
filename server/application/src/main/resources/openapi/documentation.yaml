@@ -2939,6 +2939,13 @@ paths:
           schema:
             type: boolean
           description: Filter by agreement signature status
+        - name: filter[organiser]
+          in: query
+          required: false
+          schema:
+            type: string
+            format: email
+          description: Filter by assigned organiser email address (case-insensitive)
         - name: direction
           in: query
           required: false
@@ -2958,13 +2965,11 @@ paths:
         - bearerAuth: []
       responses:
         '200':
-          description: OK
+          description: OK - Returns paginated partnership list with metadata including available filters and organisers
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/partnership_item.schema'
+                $ref: '#/components/schemas/partnership_list_response.schema'
         '400':
           description: Bad Request
           content:
@@ -3992,6 +3997,13 @@ paths:
           schema:
             type: boolean
           description: Filter by agreement signature status
+        - name: filter[organiser]
+          in: query
+          required: false
+          schema:
+            type: string
+            format: email
+          description: Filter by assigned organiser email address for targeted bulk emails
       requestBody:
         required: true
         content:
@@ -4508,6 +4520,14 @@ components:
       $ref: '#/components/schemas/send_partnership_email_request.schema'
     SendPartnershipEmailResponse:
       $ref: '#/components/schemas/send_partnership_email_response.schema'
+    PaginationMetadata:
+      $ref: '#/components/schemas/pagination_metadata.schema'
+    FilterDefinition:
+      $ref: '#/components/schemas/filter_definition.schema'
+    FilterValue:
+      $ref: '#/components/schemas/filter_value.schema'
+    PartnershipListResponse:
+      $ref: '#/components/schemas/partnership_list_response.schema'
     user_session.schema:
       $id: user_session.schema.json
       type: object
@@ -7282,6 +7302,124 @@ components:
       required:
         - name
         - url
+    filter_value.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      type: object
+      required:
+        - value
+        - display_value
+      properties:
+        value:
+          type: string
+          description: Filter value (e.g., email address for organiser filter)
+          examples:
+            - john.doe@example.com
+            - jane.smith@example.com
+        display_value:
+          type: string
+          description: Human-readable display name (e.g., full name for organiser filter)
+          minLength: 1
+          examples:
+            - John Doe
+            - Jane Smith
+      additionalProperties: false
+      examples:
+        - value: john.doe@example.com
+          display_value: John Doe
+        - value: jane.smith@example.com
+          display_value: Jane Smith
+    filter_definition.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      type: object
+      required:
+        - name
+        - type
+      properties:
+        name:
+          type: string
+          description: Filter parameter name (without 'filter[]' prefix)
+          examples:
+            - pack_id
+            - validated
+            - organiser
+        type:
+          type: string
+          enum:
+            - string
+            - boolean
+          description: 'Data type of the filter parameter (enum: ''string'' or ''boolean'')'
+        values:
+          oneOf:
+            - type: array
+              description: Optional array of valid options for the filter (only populated for organiser filter)
+              items:
+                $ref: '#/components/schemas/filter_value.schema'
+            - type: 'null'
+              description: No predefined values (user provides arbitrary value)
+      additionalProperties: false
+      examples:
+        - name: validated
+          type: boolean
+        - name: organiser
+          type: string
+          values:
+            - value: john.doe@example.com
+              display_value: John Doe
+    pagination_metadata.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      type: object
+      required:
+        - filters
+        - sorts
+      properties:
+        filters:
+          type: array
+          description: Array of filter definitions describing all available filters for the endpoint
+          items:
+            $ref: '#/components/schemas/filter_definition.schema'
+        sorts:
+          type: array
+          description: Array of field names that can be used for sorting
+          items:
+            type: string
+          examples:
+            - - created
+              - validated
+            - - name
+              - created_at
+      additionalProperties: false
+    partnership_list_response.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      type: object
+      required:
+        - items
+        - page
+        - page_size
+        - total
+      properties:
+        items:
+          type: array
+          description: Array of partnership items matching filter criteria
+          items:
+            $ref: '#/components/schemas/partnership_item.schema'
+        page:
+          type: integer
+          minimum: 1
+          description: Current page number (1-based)
+        page_size:
+          type: integer
+          minimum: 1
+          description: Number of items per page
+        total:
+          type: integer
+          minimum: 0
+          description: Total count of items matching all filters
+        metadata:
+          oneOf:
+            - $ref: '#/components/schemas/pagination_metadata.schema'
+            - type: 'null'
+          description: Pagination metadata containing available filters and sorts (always populated but nullable for backwards compatibility)
+      additionalProperties: false
     booth_location_request.schema:
       $id: booth_location_request.schema.json
       type: object

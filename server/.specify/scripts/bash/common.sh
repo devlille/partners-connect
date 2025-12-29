@@ -2,13 +2,41 @@
 # Common functions and variables for all scripts
 
 # Get repository root, with fallback for non-git repositories
+# Always returns the directory containing the .specify folder (server directory)
 get_repo_root() {
+    local script_dir
+    
+    # Handle both sourcing and direct execution
+    if [ -n "${BASH_SOURCE[0]}" ]; then
+        script_dir="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    else
+        script_dir="$(pwd)"
+    fi
+    
+    # Calculate repo root from script location (.specify/scripts/bash -> go up 3 levels)
+    local repo_root="$(cd "$script_dir/../../.." 2>/dev/null && pwd)"
+    
+    # Verify .specify exists in this directory
+    if [ -d "$repo_root/.specify" ]; then
+        echo "$repo_root"
+        return 0
+    fi
+    
+    # If not found, try to find .specify in parent directories
+    local current_dir="$script_dir"
+    while [ "$current_dir" != "/" ]; do
+        if [ -d "$current_dir/.specify" ]; then
+            echo "$current_dir"
+            return 0
+        fi
+        current_dir="$(dirname "$current_dir")"
+    done
+    
+    # Last resort: use git root
     if git rev-parse --show-toplevel >/dev/null 2>&1; then
         git rev-parse --show-toplevel
     else
-        # Fall back to script location for non-git repos
-        local script_dir="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-        (cd "$script_dir/../../.." && pwd)
+        echo "$repo_root"
     fi
 }
 
