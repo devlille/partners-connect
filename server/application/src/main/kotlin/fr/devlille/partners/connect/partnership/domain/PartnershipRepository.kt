@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.partnership.domain
 
 import fr.devlille.partners.connect.companies.domain.Company
+import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedResponse
 import fr.devlille.partners.connect.partnership.infrastructure.api.PartnershipOrganiserResponse
 import java.util.UUID
 
@@ -17,7 +18,7 @@ interface PartnershipRepository {
         eventSlug: String,
         filters: PartnershipFilters = PartnershipFilters(),
         direction: String = "asc",
-    ): List<PartnershipItem>
+    ): PaginatedResponse<PartnershipItem>
 
     fun listByCompany(companyId: UUID): List<PartnershipItem>
 

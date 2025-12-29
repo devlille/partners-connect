@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.events.factories.insertMockedFutureEvent
+import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedResponse
 import fr.devlille.partners.connect.internal.moduleSharedDb
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.partnership.domain.InvoiceStatus
@@ -28,6 +29,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
+@Suppress("LargeClass")
 class PartnershipListRouteGetTest {
     @Test
     fun `GET returns one partnership when one exists`() = testApplication {
@@ -61,8 +63,8 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
-        assertEquals(1, partnerships.size)
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        assertEquals(1, paginatedResponse.items.size)
     }
 
     @Test
@@ -109,7 +111,8 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val partnerships = paginatedResponse.items
         assertEquals(2, partnerships.size)
 
         // Verify first partnership
@@ -168,7 +171,8 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val partnerships = paginatedResponse.items
         assertEquals(1, partnerships.size)
         assertEquals("John Doe", partnerships[0].contact.displayName)
         assertEquals("$packId1", partnerships[0].selectedPackName)
@@ -215,7 +219,8 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val partnerships = paginatedResponse.items
         assertEquals(1, partnerships.size)
         assertEquals("John Doe", partnerships[0].contact.displayName)
     }
@@ -261,7 +266,8 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val partnerships = paginatedResponse.items
         assertEquals(1, partnerships.size)
         assertEquals("Jane Smith", partnerships[0].contact.displayName)
     }
@@ -309,7 +315,8 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val partnerships = paginatedResponse.items
         assertEquals(1, partnerships.size)
         val partnership = partnerships[0]
         assertEquals("John Doe", partnership.contact.displayName)
@@ -361,7 +368,8 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val partnerships = paginatedResponse.items
         assertEquals(1, partnerships.size)
         assertEquals("John Doe", partnerships[0].contact.displayName)
     }
@@ -407,7 +415,8 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val partnerships = paginatedResponse.items
         assertEquals(1, partnerships.size)
         assertEquals("John Doe", partnerships[0].contact.displayName)
     }
@@ -461,7 +470,8 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val partnerships = paginatedResponse.items
         assertEquals(1, partnerships.size)
         assertEquals("John Doe", partnerships[0].contact.displayName)
         assertEquals("$packId1", partnerships[0].selectedPackName)
@@ -492,8 +502,8 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val partnerships = Json.decodeFromString<List<PartnershipItem>>(response.bodyAsText())
-        assertTrue(partnerships.isEmpty())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        assertTrue(paginatedResponse.items.isEmpty())
     }
 
     @Test
@@ -537,5 +547,276 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.Unauthorized, response.status)
+    }
+
+    @Test
+    fun `GET returns metadata with all 7 filter definitions`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyId)
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedPartnership(
+                    id = UUID.randomUUID(),
+                    eventId = eventId,
+                    companyId = companyId,
+                    selectedPackId = packId,
+                )
+            }
+        }
+
+        val response = client.get("/orgs/$orgId/events/$eventId/partnerships") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+
+        // Verify metadata exists
+        val metadata = paginatedResponse.metadata
+        assertTrue(metadata != null, "Metadata should be present")
+
+        // Verify 7 filter definitions exist
+        assertEquals(7, metadata.filters.size)
+
+        val filterNames = metadata.filters.map { it.name }
+        assertTrue(filterNames.contains("pack_id"))
+        assertTrue(filterNames.contains("validated"))
+        assertTrue(filterNames.contains("suggestion"))
+        assertTrue(filterNames.contains("paid"))
+        assertTrue(filterNames.contains("agreement-generated"))
+        assertTrue(filterNames.contains("agreement-signed"))
+        assertTrue(filterNames.contains("organiser"))
+    }
+
+    @Test
+    fun `GET returns organiser filter with values array containing organisation editors`() = testApplication {
+        val userId = UUID.randomUUID()
+        val organiser1Id = UUID.randomUUID()
+        val organiser2Id = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedUser(organiser1Id, email = "editor1@example.com", name = "Editor One")
+                insertMockedUser(organiser2Id, email = "editor2@example.com", name = "Editor Two")
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                insertMockedOrgaPermission(orgId, userId = organiser1Id)
+                insertMockedOrgaPermission(orgId, userId = organiser2Id)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyId)
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedPartnership(
+                    id = UUID.randomUUID(),
+                    eventId = eventId,
+                    companyId = companyId,
+                    selectedPackId = packId,
+                )
+            }
+        }
+
+        val response = client.get("/orgs/$orgId/events/$eventId/partnerships") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+
+        val metadata = paginatedResponse.metadata
+        assertTrue(metadata != null)
+
+        // Find organiser filter
+        val organiserFilter = metadata.filters.find { it.name == "organiser" }
+        assertTrue(organiserFilter != null, "Organiser filter should exist")
+
+        // Verify organiser filter has values
+        val values = organiserFilter.values
+        assertTrue(!values.isNullOrEmpty(), "Organiser filter should have values")
+
+        // Verify all 3 editors are present (including the main user)
+        assertEquals(3, values.size)
+
+        val emails = values.map { it.value } ?: emptyList()
+        assertTrue(emails.contains("editor1@example.com"))
+        assertTrue(emails.contains("editor2@example.com"))
+    }
+
+    @Test
+    fun `GET returns metadata with users who have no assigned partnerships`() = testApplication {
+        val userId = UUID.randomUUID()
+        val unassignedOrganiserId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedUser(unassignedOrganiserId, email = "unassigned@example.com", name = "Unassigned Editor")
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                insertMockedOrgaPermission(orgId, userId = unassignedOrganiserId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyId)
+                insertMockedSponsoringPack(packId, eventId)
+                // Partnership with no organiser assigned
+                insertMockedPartnership(
+                    id = UUID.randomUUID(),
+                    eventId = eventId,
+                    companyId = companyId,
+                    selectedPackId = packId,
+                    organiserId = null,
+                )
+            }
+        }
+
+        val response = client.get("/orgs/$orgId/events/$eventId/partnerships") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+
+        val metadata = paginatedResponse.metadata
+        val organiserFilter = metadata?.filters?.find { it.name == "organiser" }
+        val values = organiserFilter?.values
+
+        // Unassigned organiser should still appear in the values list
+        assertEquals(2, values?.size) // Both users should be present
+        val emails = values?.map { it.value } ?: emptyList()
+        assertTrue(emails.contains("unassigned@example.com"))
+    }
+
+    @Test
+    fun `GET returns metadata sorts with expected sort fields`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyId)
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedPartnership(
+                    id = UUID.randomUUID(),
+                    eventId = eventId,
+                    companyId = companyId,
+                    selectedPackId = packId,
+                )
+            }
+        }
+
+        val response = client.get("/orgs/$orgId/events/$eventId/partnerships") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+
+        val metadata = paginatedResponse.metadata
+        assertTrue(metadata != null)
+
+        // Verify sorts array exists and contains expected fields
+        val sorts = metadata.sorts
+        assertTrue(sorts.isNotEmpty())
+        assertEquals(sorts.contains("asc"), true)
+        assertEquals(sorts.contains("desc"), true)
+    }
+
+    @Test
+    fun `GET returns metadata present in every response`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+            }
+        }
+
+        // Test with empty partnership list
+        val response = client.get("/orgs/$orgId/events/$eventId/partnerships") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+
+        // Metadata should be present even when there are no partnerships
+        assertTrue(paginatedResponse.metadata != null, "Metadata should be present in empty results")
+        assertEquals(true, paginatedResponse.metadata.filters.isNotEmpty())
+        assertEquals(true, paginatedResponse.metadata.sorts.isNotEmpty())
+    }
+
+    @Test
+    fun `GET returns empty values array when no organisation editors exist`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedOrganisationEntity(orgId)
+                // Add only the main user permission (needed for authorization)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyId)
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedPartnership(
+                    id = UUID.randomUUID(),
+                    eventId = eventId,
+                    companyId = companyId,
+                    selectedPackId = packId,
+                )
+            }
+        }
+
+        val response = client.get("/orgs/$orgId/events/$eventId/partnerships") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+
+        val metadata = paginatedResponse.metadata
+        val organiserFilter = metadata?.filters?.find { it.name == "organiser" }
+
+        // When only the main user exists (no additional editors), values should contain only one user
+        assertTrue(organiserFilter?.values != null)
+        assertEquals(1, organiserFilter.values.size)
     }
 }

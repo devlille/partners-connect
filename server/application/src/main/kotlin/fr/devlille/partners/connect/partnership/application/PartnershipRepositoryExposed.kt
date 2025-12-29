@@ -7,7 +7,12 @@ import fr.devlille.partners.connect.companies.infrastructure.db.CompanySocialEnt
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
+import fr.devlille.partners.connect.internal.infrastructure.api.FilterDefinition
+import fr.devlille.partners.connect.internal.infrastructure.api.FilterType
+import fr.devlille.partners.connect.internal.infrastructure.api.FilterValue
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
+import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedResponse
+import fr.devlille.partners.connect.internal.infrastructure.api.PaginationMetadata
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.application.mappers.toDetailedDomain
 import fr.devlille.partners.connect.partnership.application.mappers.toDomain
@@ -44,6 +49,7 @@ import fr.devlille.partners.connect.users.domain.User
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionEntity
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionsTable
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
+import fr.devlille.partners.connect.users.infrastructure.db.listUserGrantedByOrgId
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
@@ -54,6 +60,7 @@ import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
+@Suppress("TooManyFunctions")
 class PartnershipRepositoryExposed : PartnershipRepository {
     @Suppress("LongMethod", "CyclomaticComplexMethod")
     override fun register(eventSlug: String, register: RegisterPartnership): UUID = transaction {
@@ -209,11 +216,16 @@ class PartnershipRepositoryExposed : PartnershipRepository {
         eventSlug: String,
         filters: PartnershipFilters,
         direction: String,
-    ): List<PartnershipItem> = transaction {
+    ): PaginatedResponse<PartnershipItem> = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
         val eventId = event.id.value
         val sort = if (direction == "asc") SortOrder.ASC else SortOrder.DESC
+
+        // Resolve organiser email to user ID if provided
+        val organiserUserId = filters.organiser
+            ?.let { email -> UserEntity.singleUserByEmail(email)?.id?.value }
+
         val partnerships = PartnershipEntity
             .filters(
                 eventId = eventId,
@@ -222,6 +234,7 @@ class PartnershipRepositoryExposed : PartnershipRepository {
                 suggestion = filters.suggestion,
                 agreementGenerated = filters.agreementGenerated,
                 agreementSigned = filters.agreementSigned,
+                organiserUserId = organiserUserId,
             )
             .orderBy(PartnershipsTable.createdAt to sort)
         val filteredPartnerships = if (filters.paid != null) {
@@ -232,9 +245,44 @@ class PartnershipRepositoryExposed : PartnershipRepository {
         } else {
             partnerships
         }
-        filteredPartnerships.map { partnership ->
+        val items = filteredPartnerships.map { partnership ->
             partnership.toDomain(PartnershipEmailEntity.emails(partnership.id.value))
         }
+
+        // Build pagination metadata
+        val metadata = buildMetadata(event.organisation.id.value)
+
+        PaginatedResponse(
+            items = items,
+            page = 1,
+            pageSize = items.size,
+            total = items.size.toLong(),
+            metadata = metadata,
+        )
+    }
+
+    private fun buildMetadata(organisationId: UUID): PaginationMetadata {
+        // Query organisation editors for available organisers
+        val editors = OrganisationPermissionEntity.listUserGrantedByOrgId(organisationId)
+        val organiserValues = editors.map { permission ->
+            FilterValue(
+                value = permission.user.email,
+                displayValue = permission.user.name ?: permission.user.email,
+            )
+        }.distinctBy { it.value }
+
+        return PaginationMetadata(
+            filters = listOf(
+                FilterDefinition("pack_id", FilterType.STRING),
+                FilterDefinition("validated", FilterType.BOOLEAN),
+                FilterDefinition("suggestion", FilterType.BOOLEAN),
+                FilterDefinition("paid", FilterType.BOOLEAN),
+                FilterDefinition("agreement-generated", FilterType.BOOLEAN),
+                FilterDefinition("agreement-signed", FilterType.BOOLEAN),
+                FilterDefinition("organiser", FilterType.STRING, organiserValues),
+            ),
+            sorts = listOf("asc", "desc"),
+        )
     }
 
     override fun listByCompany(companyId: UUID): List<PartnershipItem> = transaction {
