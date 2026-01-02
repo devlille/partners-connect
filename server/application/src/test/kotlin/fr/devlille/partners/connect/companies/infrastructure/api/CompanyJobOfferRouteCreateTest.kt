@@ -10,7 +10,10 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
+import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -19,6 +22,7 @@ import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.days
 
 class CompanyJobOfferRouteCreateTest {
     private val json = Json { ignoreUnknownKeys = true }
@@ -131,7 +135,7 @@ class CompanyJobOfferRouteCreateTest {
             title = "Developer",
             location = "Paris, France",
             // Future date
-            publicationDate = LocalDateTime.parse("2026-01-01T09:00:00"),
+            publicationDate = Clock.System.now().plus(1.days).toLocalDateTime(TimeZone.UTC),
         )
 
         val response = client.post("/companies/$companyId/job-offers") {
