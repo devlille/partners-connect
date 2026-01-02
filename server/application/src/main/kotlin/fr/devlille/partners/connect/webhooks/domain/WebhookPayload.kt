@@ -1,26 +1,15 @@
 package fr.devlille.partners.connect.webhooks.domain
 
+import fr.devlille.partners.connect.companies.domain.Company
+import fr.devlille.partners.connect.events.domain.EventSummary
+import fr.devlille.partners.connect.partnership.domain.PartnershipDetail
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class WebhookPayload(
     val eventType: WebhookEventType,
-    val partnership: PartnershipWebhookData,
-    val event: EventWebhookData,
+    val partnership: PartnershipDetail,
+    val company: Company,
+    val event: EventSummary,
     val timestamp: String,
-)
-
-@Serializable
-data class PartnershipWebhookData(
-    val id: String,
-    val companyId: String?,
-    val packId: String?,
-    val status: String,
-)
-
-@Serializable
-data class EventWebhookData(
-    val id: String,
-    val slug: String,
-    val name: String,
 )
