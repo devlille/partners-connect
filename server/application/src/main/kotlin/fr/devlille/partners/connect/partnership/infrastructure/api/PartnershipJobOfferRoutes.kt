@@ -16,6 +16,8 @@ import fr.devlille.partners.connect.organisations.infrastructure.api.orgSlug
 import fr.devlille.partners.connect.partnership.domain.DeclineJobOfferRequest
 import fr.devlille.partners.connect.partnership.domain.PartnershipJobOfferRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
+import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
+import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -23,6 +25,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
+import kotlin.getValue
 
 /**
  * Routes for partnership job offer promotions.
@@ -85,6 +88,7 @@ fun Route.orgsPartnershipJobOfferDecisionRoutes() {
     val notificationRepository by inject<NotificationRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
     val eventRepository by inject<EventRepository>()
+    val webhookRepository by inject<WebhookRepository>()
 
     route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/job-offers/{promotionId}") {
         install(AuthorizedOrganisationPlugin)
@@ -92,10 +96,7 @@ fun Route.orgsPartnershipJobOfferDecisionRoutes() {
             val promotionId = call.parameters.getValue("promotionId").toUUID()
             val eventSlug = call.parameters.eventSlug
             val userInfo = authRepository.getUserInfo(call.token)
-            val promotion = repository.approvePromotion(
-                promotionId = promotionId,
-                reviewer = userInfo,
-            )
+            val promotion = repository.approvePromotion(promotionId = promotionId, reviewer = userInfo)
 
             // Send notification after successful approval
             val partnershipId = promotion.partnershipId.toUUID()
@@ -111,6 +112,9 @@ fun Route.orgsPartnershipJobOfferDecisionRoutes() {
             )
             notificationRepository.sendMessage(eventSlug, variables)
 
+            // Send webhook notification for job offer approval
+            webhookRepository.sendWebhooks(eventSlug, partnershipId, WebhookEventType.UPDATED)
+
             call.respond(HttpStatusCode.OK, promotion)
         }
 
@@ -119,11 +123,8 @@ fun Route.orgsPartnershipJobOfferDecisionRoutes() {
             val eventSlug = call.parameters.eventSlug
             val request = call.receive<DeclineJobOfferRequest>(schema = "decline_job_offer_promotion.schema.json")
             val userInfo = authRepository.getUserInfo(call.token)
-            val promotion = repository.declinePromotion(
-                promotionId = promotionId,
-                reviewer = userInfo,
-                reason = request.reason,
-            )
+            val promotion = repository
+                .declinePromotion(promotionId = promotionId, reviewer = userInfo, reason = request.reason)
 
             // Send notification after successful decline
             val partnershipId = promotion.partnershipId.toUUID()
@@ -139,6 +140,9 @@ fun Route.orgsPartnershipJobOfferDecisionRoutes() {
                 declineReason = request.reason,
             )
             notificationRepository.sendMessage(eventSlug, variables)
+
+            // Send webhook notification for job offer decline
+            webhookRepository.sendWebhooks(eventSlug, partnershipId, WebhookEventType.UPDATED)
 
             call.respond(HttpStatusCode.OK, promotion)
         }

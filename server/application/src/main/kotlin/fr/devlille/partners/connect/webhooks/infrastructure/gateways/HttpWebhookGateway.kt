@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.webhooks.infrastructure.gateways
 
 import fr.devlille.partners.connect.companies.application.mappers.toDomain
+import fr.devlille.partners.connect.companies.infrastructure.db.CompanyJobOfferPromotionEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanySocialEntity
 import fr.devlille.partners.connect.events.domain.EventSummary
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
@@ -8,6 +9,7 @@ import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.WebhookType
 import fr.devlille.partners.connect.integrations.infrastructure.db.WebhookIntegrationsTable
 import fr.devlille.partners.connect.integrations.infrastructure.db.get
+import fr.devlille.partners.connect.internal.infrastructure.db.PromotionStatus
 import fr.devlille.partners.connect.partnership.application.mappers.toDetailedDomain
 import fr.devlille.partners.connect.partnership.application.mappers.toDomain
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
@@ -60,26 +62,22 @@ class HttpWebhookGateway(
         // Get partnership entity and throw NotFoundException if it doesn't exist
         val payload = transaction {
             val eventEntity = EventEntity.findById(eventId) ?: throw NotFoundException("Event not found")
-            val billing = BillingEntity
-                .singleByEventAndPartnership(eventEntity.id.value, partnershipId)
+            val billing = BillingEntity.singleByEventAndPartnership(eventEntity.id.value, partnershipId)
             val partnership = PartnershipEntity.findById(partnershipId)
                 ?: throw NotFoundException("Partnership not found")
+            val jobs = CompanyJobOfferPromotionEntity
+                .listByPartnershipAndStatus(partnershipId, status = PromotionStatus.APPROVED)
+                .map { it.jobOffer.toDomain() }
             WebhookPayload(
                 eventType = eventType,
                 partnership = partnership.toDetailedDomain(
                     billing = billing,
-                    selectedPack = partnership.selectedPack?.toDomain(
-                        language = partnership.language,
-                        partnershipId = partnershipId,
-                    ),
-                    suggestionPack = partnership.suggestionPack?.toDomain(
-                        language = partnership.language,
-                        partnershipId = partnershipId,
-                    ),
-                    validatedPack = partnership.validatedPack()?.toDomain(
-                        language = partnership.language,
-                        partnershipId = partnershipId,
-                    ),
+                    selectedPack = partnership.selectedPack
+                        ?.toDomain(language = partnership.language, partnershipId = partnershipId),
+                    suggestionPack = partnership.suggestionPack
+                        ?.toDomain(language = partnership.language, partnershipId = partnershipId),
+                    validatedPack = partnership.validatedPack()
+                        ?.toDomain(language = partnership.language, partnershipId = partnershipId),
                 ),
                 company = partnership.company
                     .toDomain(partnership.company.socials.map(CompanySocialEntity::toDomain)),
@@ -91,6 +89,7 @@ class HttpWebhookGateway(
                     submissionStartTime = eventEntity.submissionStartTime,
                     submissionEndTime = eventEntity.submissionEndTime,
                 ),
+                jobs = jobs,
                 timestamp = Clock.System.now().toString(),
             )
         }

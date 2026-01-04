@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.partnership.application.mappers
 
 import fr.devlille.partners.connect.companies.domain.JobOffer
 import fr.devlille.partners.connect.companies.domain.JobOfferPromotionResponse
+import fr.devlille.partners.connect.companies.infrastructure.db.CompanyJobOfferEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyJobOfferPromotionEntity
 
 fun CompanyJobOfferPromotionEntity.toDomain(): JobOfferPromotionResponse = JobOfferPromotionResponse(
@@ -14,11 +15,13 @@ fun CompanyJobOfferPromotionEntity.toDomain(): JobOfferPromotionResponse = JobOf
     reviewedAt = reviewedAt,
     reviewedBy = reviewedBy?.id?.value?.toString(),
     declineReason = declineReason,
-    jobOffer = JobOffer(
-        id = jobOffer.id.value.toString(),
-        title = jobOffer.title,
-        url = jobOffer.url,
-    ),
+    jobOffer = jobOffer.toDomain(),
     createdAt = createdAt,
     updatedAt = updatedAt,
+)
+
+fun CompanyJobOfferEntity.toDomain(): JobOffer = JobOffer(
+    id = id.value.toString(),
+    title = title,
+    url = url,
 )
