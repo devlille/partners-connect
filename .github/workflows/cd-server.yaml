@@ -153,13 +153,9 @@ jobs:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           webhook-type: incoming-webhook
           payload: |
-            text: "Deployment to Clever Cloud Completed :rocket:"
+            text: "Server deployment in production to Clever Cloud completed :rocket:"
             blocks:
               - type: "section"
                 text:
                   type: "mrkdwn"
-                  text: "*Deployment to Clever Cloud Completed* :rocket:"
-              - type: "section"
-                text:
-                  type: "mrkdwn"
-                  text: "GitHub Action build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+                  text: "*Server deployment in production to Clever Cloud completed* :rocket:"

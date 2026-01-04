@@ -106,3 +106,17 @@ jobs:
         run: |
           clever link $CLEVER_APP_ID
           clever deploy --force --verbose
+
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v2.1.1
+        if: steps.vars.outputs.environment == 'production'
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            text: "Front deployment in production to Clever Cloud completed :rocket:"
+            blocks:
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: "*Front deployment in production to Clever Cloud completed* :rocket:"
