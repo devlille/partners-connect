@@ -23,7 +23,7 @@ Ktor, and PostgreSQL, it provides a secure, modular REST API for partner and eve
 - **Build Tool:** Gradle 8.13+
 - **Testing:** JUnit, Ktor Test, H2 in-memory DB
 - **Linting:** ktlint, detekt
-- **Integrations:** Google Cloud Storage, Slack, Mailjet, Qonto, BilletWeb
+- **Integrations:** Google Cloud Storage, Slack, Mailjet, Qonto, BilletWeb, OpenPlanner
 
 ## Architecture Overview
 
@@ -40,7 +40,7 @@ The server is organized as a modular, layered Kotlin application:
 - **billing/**: Invoice and quote generation, Qonto integration.
 - **companies/**: Company registration and management.
 - **events/**: Event creation, management, and ticketing.
-- **integrations/**: External service connectors (Slack, Mailjet, BilletWeb, Google Cloud Storage).
+- **integrations/**: External service connectors (Slack, Mailjet, BilletWeb, OpenPlanner).
 - **internal/**: Shared infrastructure (logging, error handling, config).
 - **notifications/**: Slack notifications and event triggers.
 - **organisations/**: Organisation and team management.
@@ -112,25 +112,21 @@ The server is organized as a modular, layered Kotlin application:
 
 Set these in your `.env` file or as environment variables:
 
-| Variable                | Purpose                                | Example/Notes                      |
-|-------------------------|----------------------------------------|------------------------------------|
-| `EXPOSED_DB_URL`        | JDBC URL for PostgreSQL                | `jdbc:postgresql://localhost/db`   |
-| `EXPOSED_DB_USER`       | DB username                            |                                    |
-| `EXPOSED_DB_PASSWORD`   | DB password                            |                                    |
-| `GOOGLE_CLIENT_ID`      | Google OAuth client ID                 | For user authentication            |
-| `GOOGLE_CLIENT_SECRET`  | Google OAuth client secret             |                                    |
-| `GOOGLE_STORAGE_BUCKET` | Google Storage bucket name             |                                    |
-| `GOOGLE_MAPS_API_KEY`   | Google Maps api key                    |                                    |
-| `CRYPTO_SECRET`         | Encryption key for sensitive data      | 32+ chars, base64 recommended      |
-| `SLACK_WEBHOOK_URL`     | Slack notifications                    | Optional, for event alerts         |
-| `MAILJET_API_KEY`       | Mailjet integration                    | Optional, for transactional emails |
-| `MAILJET_SECRET_KEY`    | Mailjet secret                         |                                    |
-| `QONTO_API_KEY`         | Qonto integration                      | Optional, for billing              |
-| `BILLETWEB_API_KEY`     | BilletWeb ticketing integration        | Optional, for event tickets        |
-| `GCS_BUCKET`            | Google Cloud Storage bucket name       | For file uploads                   |
-| `GCS_CREDENTIALS_JSON`  | GCS service account credentials (JSON) |                                    |
-
-> **Note:** Not all integrations are required for local development. The app will run with minimal config, but some features will be disabled.
+| Variable                | Purpose                           | Example/Notes                    |
+|-------------------------|-----------------------------------|----------------------------------|
+| `PROJECT_ID`            | GCP Project ID                    |                                  |
+| `SERVER_BASE_URL`       | Base URL for the server           | `http://localhost:8080`          |
+| `FRONTEND_BASE_URL`     | Base URL for the frontend         | `http://localhost:3000`          |
+| `EXPOSED_DB_URL`        | JDBC URL for PostgreSQL           | `jdbc:postgresql://localhost/db` |
+| `EXPOSED_DB_USER`       | DB username                       |                                  |
+| `EXPOSED_DB_PASSWORD`   | DB password                       |                                  |
+| `CRYPTO_KEY`            | Key for encrypting sensitive data | 32+ characters recommended       |
+| `CRYPTO_SALT`           | Salt for encryption               | 16+ characters recommended       |
+| `GOOGLE_CLIENT_ID`      | Google OAuth client ID            | For user authentication          |
+| `GOOGLE_CLIENT_SECRET`  | Google OAuth client secret        |                                  |
+| `GOOGLE_STORAGE_BUCKET` | Google Storage bucket name        |                                  |
+| `GOOGLE_MAPS_API_KEY`   | Google Maps api key               |                                  |
+| `QONTO_BASE_URL`        | Qonto API base URL                |                                  |
 
 ## Deployment
 
