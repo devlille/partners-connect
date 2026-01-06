@@ -97,6 +97,8 @@
       "agreementGenerated": "Accord généré",
       "agreementSigned": "Accord signé",
       "suggestion": "Suggestion",
+      "organiser": "Organisateur",
+      "all": "Tous",
       "clearAll": "Effacer tous les filtres",
       "showingResults": "Affichage de {count} sponsor(s)",
       "noResults": "Aucun sponsor ne correspond aux filtres sélectionnés",

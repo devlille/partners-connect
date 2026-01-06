@@ -44,6 +44,34 @@ export interface FilterState {
    * - false: show only confirmed sponsors (not suggestions)
    */
   suggestion: boolean | null;
+
+  /** Organiser email filter, null = all organisers */
+  organiser: string | null;
+}
+
+/**
+ * Filter value option for string filters with predefined values
+ */
+export interface FilterValueOption {
+  value: string;
+  display_value: string;
+}
+
+/**
+ * Filter metadata from API
+ */
+export interface FilterMetadata {
+  name: string;
+  type: "boolean" | "string";
+  values?: FilterValueOption[];
+}
+
+/**
+ * Metadata returned by the API for partnerships list
+ */
+export interface PartnershipsMetadata {
+  filters: FilterMetadata[];
+  sorts: string[];
 }
 
 /**
@@ -57,6 +85,7 @@ export const FilterStateSchema = z.object({
   agreementGenerated: z.boolean().nullable(),
   agreementSigned: z.boolean().nullable(),
   suggestion: z.boolean().nullable(),
+  organiser: z.string().nullable(),
 });
 
 /**
@@ -69,4 +98,5 @@ export const initialFilterState: FilterState = {
   agreementGenerated: null,
   agreementSigned: null,
   suggestion: null,
+  organiser: null,
 };

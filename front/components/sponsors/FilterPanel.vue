@@ -32,7 +32,7 @@
         v-if="activeFilterCount > 0"
         :label="$t('sponsors.filters.clearAll')"
         size="sm"
-        color="gray"
+        color="neutral"
         variant="ghost"
         icon="i-heroicons-x-mark"
         @click="$emit('clear-all')"
@@ -50,28 +50,52 @@
         collapsible && !isExpanded ? 'hidden md:flex' : 'flex'
       ]"
     >
-      <!-- Pack Filter (full width on top) -->
-      <div class="w-full md:w-1/3">
-        <PackFilter
-          :model-value="modelValue.packId"
-          :packs="packs"
-          @update:model-value="updateFilter('packId', $event)"
-        />
+      <!-- Dynamic Filters based on metadata -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Pack Filter (always first if available) -->
+        <div v-if="hasPackFilter" class="w-full">
+          <PackFilter
+            :model-value="modelValue.packId"
+            :packs="packs"
+            @update:model-value="updateFilter('packId', $event)"
+          />
+        </div>
+
+        <!-- String filters with values (dropdowns) -->
+        <div v-for="filter in stringFiltersWithValues" :key="filter.name" class="w-full">
+          <label :for="`filter-${filter.name}`" class="block text-sm font-medium text-gray-700 mb-2">
+            {{ getFilterLabel(filter.name) }}
+          </label>
+          <select
+            :id="`filter-${filter.name}`"
+            :value="getFilterValue(filter.name)"
+            @change="updateFilterFromEvent(filter.name, $event)"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+          >
+            <option value="">{{ $t('sponsors.filters.all') }}</option>
+            <option v-for="option in filter.values" :key="option.value" :value="option.value">
+              {{ option.display_value }}
+            </option>
+          </select>
+        </div>
       </div>
 
-      <!-- Status Filters (below pack filter) -->
-      <div class="w-full">
-        <StatusFilters
-          :model-value="{
-            validated: modelValue.validated,
-            paid: modelValue.paid,
-            agreementGenerated: modelValue.agreementGenerated,
-            agreementSigned: modelValue.agreementSigned,
-            suggestion: modelValue.suggestion
-          }"
-          @update:model-value="updateStatusFilters($event)"
-        />
-      </div>
+      <!-- Boolean Filters (checkboxes) -->
+      <fieldset v-if="booleanFilters.length > 0" class="status-filters">
+        <legend class="text-sm font-medium text-gray-900 mb-3">
+          {{ $t('sponsors.filters.statusFilters') }}
+        </legend>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div v-for="filter in booleanFilters" :key="filter.name" class="flex items-center gap-2">
+            <UCheckbox
+              :model-value="getFilterValue(filter.name) === true"
+              :label="getFilterLabel(filter.name)"
+              @update:model-value="updateBooleanFilter(filter.name, $event)"
+            />
+          </div>
+        </div>
+      </fieldset>
     </div>
 
     <!-- Loading indicator -->
@@ -83,16 +107,17 @@
 </template>
 
 <script setup lang="ts">
-import type { FilterState } from '~/types/sponsors'
+import type { FilterState, FilterMetadata, PartnershipsMetadata } from '~/types/sponsors'
 import type { SponsoringPack } from '~/utils/api'
 import PackFilter from '~/components/sponsors/PackFilter.vue'
-import StatusFilters from '~/components/sponsors/StatusFilters.vue'
 
 interface FilterPanelProps {
   /** Current filter state (v-model) */
   modelValue: FilterState
   /** List of packs for dropdown */
   packs: SponsoringPack[]
+  /** Metadata from API containing available filters */
+  metadata?: PartnershipsMetadata | null
   /** Whether filters are being applied (loading state) */
   loading?: boolean
   /** Number of active filters */
@@ -109,16 +134,88 @@ interface FilterPanelEmits {
 const props = withDefaults(defineProps<FilterPanelProps>(), {
   loading: false,
   activeFilterCount: 0,
-  collapsible: true
+  collapsible: true,
+  metadata: null
 })
 
 const emit = defineEmits<FilterPanelEmits>()
+const { t } = useI18n()
 
 // Mobile collapsible state
 const isExpanded = ref(false)
 
+// Mapping from API filter names to FilterState keys
+const filterNameMapping: Record<string, keyof FilterState> = {
+  'pack_id': 'packId',
+  'validated': 'validated',
+  'paid': 'paid',
+  'suggestion': 'suggestion',
+  'agreement-generated': 'agreementGenerated',
+  'agreement-signed': 'agreementSigned',
+  'organiser': 'organiser',
+}
+
+// Mapping from API filter names to i18n keys
+const filterLabelMapping: Record<string, string> = {
+  'pack_id': 'sponsors.filters.pack',
+  'validated': 'sponsors.filters.validated',
+  'paid': 'sponsors.filters.paid',
+  'suggestion': 'sponsors.filters.suggestion',
+  'agreement-generated': 'sponsors.filters.agreementGenerated',
+  'agreement-signed': 'sponsors.filters.agreementSigned',
+  'organiser': 'sponsors.filters.organiser',
+}
+
+// Check if pack filter is available in metadata
+const hasPackFilter = computed(() => {
+  if (!props.metadata?.filters) return true // Default to showing pack filter
+  return props.metadata.filters.some(f => f.name === 'pack_id')
+})
+
+// Get boolean filters from metadata
+const booleanFilters = computed<FilterMetadata[]>(() => {
+  if (!props.metadata?.filters) {
+    // Default filters when no metadata
+    return [
+      { name: 'validated', type: 'boolean' },
+      { name: 'paid', type: 'boolean' },
+      { name: 'agreement-generated', type: 'boolean' },
+      { name: 'agreement-signed', type: 'boolean' },
+      { name: 'suggestion', type: 'boolean' },
+    ]
+  }
+  return props.metadata.filters.filter(f => f.type === 'boolean')
+})
+
+// Get string filters with values (for dropdowns, excluding pack_id which has its own component)
+const stringFiltersWithValues = computed<FilterMetadata[]>(() => {
+  if (!props.metadata?.filters) return []
+  return props.metadata.filters.filter(f => f.type === 'string' && f.values && f.name !== 'pack_id')
+})
+
 function toggleFilters() {
   isExpanded.value = !isExpanded.value
+}
+
+function getFilterLabel(filterName: string): string {
+  const key = filterLabelMapping[filterName]
+  if (key) {
+    
+    const translated = t(key)
+    console.log('[FilterPanel] translation result:', { key, translated, isMissing: translated === key })
+    return translated
+  }
+  // Fallback: capitalize the filter name
+  return filterName.charAt(0).toUpperCase() + filterName.slice(1).replace(/-/g, ' ')
+}
+
+function getFilterStateKey(filterName: string): keyof FilterState {
+  return filterNameMapping[filterName] || (filterName as keyof FilterState)
+}
+
+function getFilterValue(filterName: string): any {
+  const key = getFilterStateKey(filterName)
+  return props.modelValue[key]
 }
 
 /**
@@ -131,20 +228,16 @@ function updateFilter(key: keyof FilterState, value: any) {
   })
 }
 
-/**
- * Update status filters when StatusFilters component emits changes
- */
-function updateStatusFilters(statusUpdates: Partial<{
-  validated: boolean | null
-  paid: boolean | null
-  agreementGenerated: boolean | null
-  agreementSigned: boolean | null
-  suggestion: boolean | null
-}>) {
-  emit('update:modelValue', {
-    ...props.modelValue,
-    ...statusUpdates
-  })
+function updateFilterFromEvent(filterName: string, event: Event) {
+  const target = event.target as HTMLSelectElement
+  const value = target.value || null
+  const key = getFilterStateKey(filterName)
+  updateFilter(key, value)
+}
+
+function updateBooleanFilter(filterName: string, value: boolean) {
+  const key = getFilterStateKey(filterName)
+  updateFilter(key, value ? true : null)
 }
 </script>
 
@@ -189,5 +282,15 @@ function updateStatusFilters(statusUpdates: Partial<{
   .transition-all {
     transition: none;
   }
+}
+
+.status-filters fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.status-filters legend {
+  padding: 0;
 }
 </style>

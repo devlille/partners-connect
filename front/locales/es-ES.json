@@ -67,6 +67,8 @@
       "agreementGenerated": "Acuerdo Generado",
       "agreementSigned": "Acuerdo Firmado",
       "suggestion": "Sugerencia",
+      "organiser": "Organizador",
+      "all": "Todos",
       "clearAll": "Limpiar Todos los Filtros",
       "showingResults": "Mostrando {count} patrocinador(es)",
       "noResults": "Ningún patrocinador coincide con los filtros seleccionados",

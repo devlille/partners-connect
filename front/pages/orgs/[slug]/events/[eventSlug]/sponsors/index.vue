@@ -6,12 +6,21 @@
           <BackButton :to="`/orgs/${orgSlug}/events/${eventSlug}`" label="Retour" />
           <PageTitle>Sponsors - {{ eventName }}</PageTitle>
         </div>
-        <UButton
-          :to="`/orgs/${orgSlug}/events/${eventSlug}/sponsors/create`"
-          label="Créer un sponsor"
-          icon="i-heroicons-plus"
-          color="primary"
-        />
+        <div class="flex gap-3">
+          <UButton
+            label="Envoyer un email"
+            icon="i-heroicons-envelope"
+            color="neutral"
+            variant="outline"
+            @click="showEmailModal = true"
+          />
+          <UButton
+            :to="`/orgs/${orgSlug}/events/${eventSlug}/sponsors/create`"
+            label="Créer un sponsor"
+            icon="i-heroicons-plus"
+            color="primary"
+          />
+        </div>
       </div>
     </div>
 
@@ -27,6 +36,7 @@
         <FilterPanel
           v-model="filters"
           :packs="packs"
+          :metadata="filterMetadata"
           :loading="loading"
           :active-filter-count="activeFilterCount"
           @clear-all="clearAllFilters"
@@ -48,7 +58,7 @@
           aria-live="polite"
           aria-atomic="true"
         >
-          {{ $t('sponsors.filters.showingResults', { count: partnerships.length }) }}
+          {{ $t('sponsors.filters.showingResults', { count: totalItems }) }}
         </div>
 
         <!-- Statistiques -->
@@ -97,6 +107,40 @@
 
         <div v-else>
           <UTable :data="partnerships" :columns="columns" />
+
+          <!-- Pagination -->
+          <div v-if="totalPages > 1" class="flex items-center justify-between mt-6">
+            <div class="text-sm text-gray-600">
+              Page {{ currentPage }} sur {{ totalPages }} ({{ totalItems }} sponsors)
+            </div>
+            <div class="flex gap-2">
+              <UButton
+                icon="i-heroicons-chevron-left"
+                color="neutral"
+                variant="outline"
+                size="sm"
+                :disabled="currentPage <= 1"
+                @click="goToPage(currentPage - 1)"
+              />
+              <UButton
+                v-for="page in visiblePages"
+                :key="page"
+                :label="String(page)"
+                :color="page === currentPage ? 'primary' : 'neutral'"
+                :variant="page === currentPage ? 'solid' : 'outline'"
+                size="sm"
+                @click="goToPage(page)"
+              />
+              <UButton
+                icon="i-heroicons-chevron-right"
+                color="neutral"
+                variant="outline"
+                size="sm"
+                :disabled="currentPage >= totalPages"
+                @click="goToPage(currentPage + 1)"
+              />
+            </div>
+          </div>
         </div>
       </template>
     </div>
@@ -118,16 +162,35 @@
     <div role="status" aria-live="polite" aria-atomic="true" class="sr-only">
       {{ ariaAnnouncement }}
     </div>
+
+    <!-- Modale d'envoi d'email -->
+    <SendEmailModal
+      v-model="showEmailModal"
+      :org-slug="orgSlug"
+      :event-slug="eventSlug"
+      :filter-params="emailFilterParams"
+      @sent="handleEmailSent"
+    />
   </Dashboard>
 </template>
 
 <script setup lang="ts">
-import { getOrgsEventsPartnership, getEventBySlug, getOrgsEventsPacks, deletePartnership, type PartnershipItem, type SponsoringPack } from "~/utils/api";
+import { getOrgsEventsPartnership, getEventBySlug, getOrgsEventsPacks, deletePartnership, type PartnershipItemSchema, type SponsoringPack, type PostPartnershipEmailParams } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
-import type {TableRow} from "@nuxt/ui";
 import { useSponsorFilters } from '~/composables/useSponsorFilters'
 import FilterPanel from '~/components/sponsors/FilterPanel.vue'
 import ActiveFilters from '~/components/sponsors/ActiveFilters.vue'
+
+import type { PartnershipsMetadata } from '~/types/sponsors'
+
+// Type pour la réponse paginée de l'API
+interface PaginatedPartnershipsResponse {
+  items: PartnershipItemSchema[];
+  page: number;
+  page_size: number;
+  total: number;
+  metadata?: PartnershipsMetadata;
+}
 
 const { t } = useI18n();
 const { footerLinks } = useDashboardLinks();
@@ -145,7 +208,6 @@ const eventSlug = computed(() => getEventSlug());
 const {
   filters,
   activeFilterCount,
-  isEmpty: filtersEmpty,
   queryParams,
   clearAllFilters,
   clearFilter
@@ -229,23 +291,87 @@ const columns = [
   }
 ];
 
-const partnerships = ref<PartnershipItem[]>([]);
+const partnerships = ref<PartnershipItemSchema[]>([]);
 const packs = ref<SponsoringPack[]>([]);
+const filterMetadata = ref<PartnershipsMetadata | null>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const eventName = ref<string>('');
 
+// Pagination
+const currentPage = ref(1);
+const pageSize = ref(20);
+const totalItems = ref(0);
+
+const totalPages = computed(() => Math.ceil(totalItems.value / pageSize.value));
+
+// Pages visibles pour la pagination (max 5 pages autour de la page courante)
+const visiblePages = computed(() => {
+  const pages: number[] = [];
+  const total = totalPages.value;
+  const current = currentPage.value;
+
+  let start = Math.max(1, current - 2);
+  let end = Math.min(total, current + 2);
+
+  // Ajuster pour toujours afficher 5 pages si possible
+  if (end - start < 4) {
+    if (start === 1) {
+      end = Math.min(total, start + 4);
+    } else if (end === total) {
+      start = Math.max(1, end - 4);
+    }
+  }
+
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+
+  return pages;
+});
+
+function goToPage(page: number) {
+  if (page < 1 || page > totalPages.value) return;
+  currentPage.value = page;
+  loadPartnerships();
+}
+
 // Gestion de la suppression
 const showDeleteModal = ref(false);
-const partnershipToDelete = ref<PartnershipItem | null>(null);
+const partnershipToDelete = ref<PartnershipItemSchema | null>(null);
 const deleting = ref(false);
 const toast = useToast();
 
 // Annonce ARIA pour les lecteurs d'écran
 const ariaAnnouncement = ref('');
 
+// Gestion de l'envoi d'email
+const showEmailModal = ref(false);
+
 // Menu contextuel pour la page des sponsors
 const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
+
+// Paramètres de filtre pour l'envoi d'email (convertis au format API)
+const emailFilterParams = computed<PostPartnershipEmailParams>(() => {
+  const params: PostPartnershipEmailParams = {};
+  if (filters.value.validated !== null) params['filter[validated]'] = filters.value.validated;
+  if (filters.value.paid !== null) params['filter[paid]'] = filters.value.paid;
+  if (filters.value.packId !== null) params['filter[pack_id]'] = filters.value.packId;
+  if (filters.value.suggestion !== null) params['filter[suggestion]'] = filters.value.suggestion;
+  if (filters.value.agreementGenerated !== null) params['filter[agreement-generated]'] = filters.value.agreementGenerated;
+  if (filters.value.agreementSigned !== null) params['filter[agreement-signed]'] = filters.value.agreementSigned;
+  return params;
+});
+
+// Gérer l'envoi d'email réussi
+function handleEmailSent(recipientCount: number) {
+  toast.add({
+    title: 'Email envoyé',
+    description: `L'email a été envoyé à ${recipientCount} destinataire(s).`,
+    color: 'success'
+  });
+  ariaAnnouncement.value = `Email envoyé à ${recipientCount} destinataires`;
+}
 
 // Calculer le nombre de partnerships par pack
 function getPackPartnershipCount(packId: string): number {
@@ -272,7 +398,7 @@ function getProgressBarColor(packId: string, maxQuantity: number): string {
 }
 
 // Ouvrir la modale de suppression
-function openDeleteModal(partnership: PartnershipItem) {
+function openDeleteModal(partnership: PartnershipItemSchema) {
   partnershipToDelete.value = partnership;
   showDeleteModal.value = true;
 }
@@ -333,16 +459,28 @@ async function loadPartnerships() {
     loading.value = true;
     error.value = null;
 
+    // Construire les paramètres avec pagination
+    const paginationParams = {
+      ...queryParams.value,
+      page: currentPage.value,
+      page_size: pageSize.value,
+    };
+
     // Charger toutes les données en parallèle
-    // Apply query params for filtering
     const [eventResponse, partnershipsResponse, packsResponse] = await Promise.all([
       getEventBySlug(eventSlug.value),
-      getOrgsEventsPartnership(orgSlug.value, eventSlug.value, queryParams.value),
+      getOrgsEventsPartnership(orgSlug.value, eventSlug.value, paginationParams),
       getOrgsEventsPacks(orgSlug.value, eventSlug.value)
     ]);
 
     eventName.value = eventResponse.data.event.name;
-    partnerships.value = partnershipsResponse.data;
+
+    // Gérer la nouvelle structure paginée de l'API
+    const data = partnershipsResponse.data as unknown as PaginatedPartnershipsResponse;
+    partnerships.value = data.items;
+    totalItems.value = data.total;
+    filterMetadata.value = data.metadata || null;
+
     packs.value = packsResponse.data;
   } catch (err) {
     console.error('Failed to load partnerships:', err);
@@ -361,13 +499,15 @@ watch([orgSlug, eventSlug], () => {
   loadPartnerships();
 });
 
-// Watch for filter changes and reload partnerships
-watchEffect(() => {
-  // Trigger reload when queryParams change
-  if (queryParams.value) {
+// Watch for filter changes and reload partnerships (reset to page 1)
+watch(
+  () => queryParams.value,
+  () => {
+    currentPage.value = 1;
     loadPartnerships();
-  }
-});
+  },
+  { deep: true }
+);
 
 useHead({
   title: computed(() => `Sponsors - ${eventName.value || 'Événement'} | DevLille`)

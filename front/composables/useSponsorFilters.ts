@@ -63,6 +63,7 @@ const filterSchema = {
   agreementGenerated: parsers.booleanOrNull(),
   agreementSigned: parsers.booleanOrNull(),
   suggestion: parsers.booleanOrNull(),
+  organiser: parsers.stringOrNull(),
 } as const;
 
 /**
@@ -139,6 +140,10 @@ export function useSponsorFilters(options: UseSponsorFiltersOptions): UseSponsor
 
     if (filters.value.suggestion !== null) {
       params["filter[suggestion]"] = filters.value.suggestion;
+    }
+
+    if (filters.value.organiser !== null) {
+      params["filter[organiser]"] = filters.value.organiser;
     }
 
     return params;
