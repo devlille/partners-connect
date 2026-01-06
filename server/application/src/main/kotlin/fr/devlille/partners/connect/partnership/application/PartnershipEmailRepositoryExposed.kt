@@ -12,6 +12,8 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
+import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
+import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
@@ -33,6 +35,11 @@ class PartnershipEmailRepositoryExposed(
             ?: throw NotFoundException("Event with slug $eventSlug not found")
         val eventId = event.id.value
 
+        // Resolve organiser email to user ID if provided
+        val organiserUserId = filters.organiser?.let { email ->
+            UserEntity.singleUserByEmail(email)?.id?.value
+        }
+
         // Fetch partnerships matching filters
         val partnerships = PartnershipEntity
             .filters(
@@ -42,6 +49,7 @@ class PartnershipEmailRepositoryExposed(
                 suggestion = filters.suggestion,
                 agreementGenerated = filters.agreementGenerated,
                 agreementSigned = filters.agreementSigned,
+                organiserUserId = organiserUserId,
             )
 
         // Apply additional filters that require entity-level checks

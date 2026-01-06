@@ -149,6 +149,7 @@ private fun Route.orgsPartnershipRoutes() {
                 paid = call.request.queryParameters["filter[paid]"]?.toBoolean(),
                 agreementGenerated = call.request.queryParameters["filter[agreement-generated]"]?.toBoolean(),
                 agreementSigned = call.request.queryParameters["filter[agreement-signed]"]?.toBoolean(),
+                organiser = call.request.queryParameters["filter[organiser]"],
             )
 
             val direction = call.request.queryParameters["direction"] ?: "asc"
