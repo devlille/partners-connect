@@ -46,7 +46,7 @@ class MailjetNotificationGateway(
         val event = EventEntity.findById(eventId) ?: throw NotFoundException("Event with ID $eventId not found")
         val orgContact = partnership.organiser?.let { EmailContact(email = it.email, name = it.displayName) }
         val eventContact = EmailContact(email = event.contactEmail, name = event.name)
-        val footerPath = "/mailing/footer/content.${partnership.language}.txt"
+        val footerPath = "/mailing/footer/content.${partnership.language}.html"
         val footer = try {
             readResourceFile(footerPath)
                 .replace("{{event_name}}", event.name)
