@@ -63,7 +63,10 @@
 
         <!-- String filters with values (dropdowns) -->
         <div v-for="filter in stringFiltersWithValues" :key="filter.name" class="w-full">
-          <label :for="`filter-${filter.name}`" class="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            :for="`filter-${filter.name}`"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
             {{ getFilterLabel(filter.name) }}
           </label>
           <select

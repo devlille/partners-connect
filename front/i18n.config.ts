@@ -43,7 +43,8 @@ export default defineI18nConfig(() => ({
         },
         paymentReceived: {
           title: "Paiement reçu",
-          description: "Votre paiement a bien été reçu. Vous pouvez à présent configurer votre espace partenaire :",
+          description:
+            "Votre paiement a bien été reçu. Vous pouvez à présent configurer votre espace partenaire :",
           jobOffersLink: "Offres d'emploi",
           jobOffersDescription: "Publiez vos offres d'emploi",
           companyLink: "Entreprise",

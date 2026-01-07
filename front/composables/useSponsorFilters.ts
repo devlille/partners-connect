@@ -95,7 +95,13 @@ export function useSponsorFilters(options: UseSponsorFiltersOptions): UseSponsor
   const { orgSlug, eventSlug } = options;
 
   // Use useQueryStates for type-safe URL state management (nuqs-inspired)
-  const { state: filters, resetAll, reset, modifiedCount, isModified } = useQueryStates({
+  const {
+    state: filters,
+    resetAll,
+    reset,
+    modifiedCount,
+    isModified,
+  } = useQueryStates({
     schema: filterSchema,
     history: "replace",
     throttleMs: 50,

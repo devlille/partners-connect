@@ -221,10 +221,7 @@ export function useQueryState<T>(options: UseQueryStateOptions<T>): UseQueryStat
         const currentQuery = { ...route.query };
 
         // Remove key if value is empty or equals default
-        if (
-          serialized === "" ||
-          serialized === parser.serialize(parser.defaultValue)
-        ) {
+        if (serialized === "" || serialized === parser.serialize(parser.defaultValue)) {
           delete currentQuery[key];
         } else {
           currentQuery[key] = serialized;

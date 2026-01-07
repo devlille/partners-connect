@@ -25,7 +25,8 @@ export const useSponsorLinks = (
         }
       : orgSlugOrOptions;
 
-  const { isPartnershipComplete, isCompanyComplete, isBillingComplete } = usePartnershipValidation();
+  const { isPartnershipComplete, isCompanyComplete, isBillingComplete } =
+    usePartnershipValidation();
 
   const sponsorLinks = computed(() => {
     const basePath = `/orgs/${options.orgSlug}/events/${options.eventSlug}/sponsors/${options.sponsorId}`;

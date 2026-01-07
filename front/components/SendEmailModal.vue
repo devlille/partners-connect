@@ -53,9 +53,7 @@
                     <p v-if="hasFilters">
                       L'email sera envoyé aux sponsors correspondant aux filtres actifs.
                     </p>
-                    <p v-else>
-                      L'email sera envoyé à tous les sponsors de l'événement.
-                    </p>
+                    <p v-else>L'email sera envoyé à tous les sponsors de l'événement.</p>
                   </div>
                 </div>
               </div>
@@ -95,12 +93,18 @@
               </div>
 
               <!-- Erreur -->
-              <div v-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+              <div
+                v-if="error"
+                class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded"
+              >
                 {{ error }}
               </div>
 
               <!-- Succès -->
-              <div v-if="successMessage" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
+              <div
+                v-if="successMessage"
+                class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded"
+              >
                 {{ successMessage }}
               </div>
             </form>
