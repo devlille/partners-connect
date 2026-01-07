@@ -44,7 +44,7 @@ export interface UseSponsorFiltersReturn {
   /** Update a single status filter */
   setStatusFilter(
     key: "validated" | "paid" | "agreementGenerated" | "agreementSigned" | "suggestion",
-    value: boolean,
+    value: boolean | null,
   ): void;
   /** Clear all filters (reset to initial state) */
   clearAllFilters(): void;
@@ -55,15 +55,15 @@ export interface UseSponsorFiltersReturn {
 /**
  * Schema for sponsor filter query parameters
  * Uses nuqs-inspired parsers for type-safe URL state management
- * Boolean filters default to false (all unchecked by default)
+ * Boolean filters default to null (no filter applied)
  */
 const filterSchema = {
   packId: parsers.stringOrNull(),
-  validated: parsers.boolean(false),
-  paid: parsers.boolean(false),
-  agreementGenerated: parsers.boolean(false),
-  agreementSigned: parsers.boolean(false),
-  suggestion: parsers.boolean(false),
+  validated: parsers.booleanOrNull(),
+  paid: parsers.booleanOrNull(),
+  agreementGenerated: parsers.booleanOrNull(),
+  agreementSigned: parsers.booleanOrNull(),
+  suggestion: parsers.booleanOrNull(),
   organiser: parsers.stringOrNull(),
 } as const;
 
@@ -121,7 +121,7 @@ export function useSponsorFilters(options: UseSponsorFiltersOptions): UseSponsor
   /**
    * API query parameters derived from current filter state
    * Maps FilterState to GetOrgsEventsPartnershipParams format
-   * Boolean filters are always sent (true or false)
+   * Only sends filters that have a non-null value
    */
   const queryParams = computed<GetOrgsEventsPartnershipParams>(() => {
     const params: GetOrgsEventsPartnershipParams = {};
@@ -130,12 +130,22 @@ export function useSponsorFilters(options: UseSponsorFiltersOptions): UseSponsor
       params["filter[pack_id]"] = filters.value.packId;
     }
 
-    // Boolean filters are always sent (true or false)
-    params["filter[validated]"] = filters.value.validated;
-    params["filter[paid]"] = filters.value.paid;
-    params["filter[agreement-generated]"] = filters.value.agreementGenerated;
-    params["filter[agreement-signed]"] = filters.value.agreementSigned;
-    params["filter[suggestion]"] = filters.value.suggestion;
+    // Boolean filters are only sent when they have a value (not null)
+    if (filters.value.validated !== null) {
+      params["filter[validated]"] = filters.value.validated;
+    }
+    if (filters.value.paid !== null) {
+      params["filter[paid]"] = filters.value.paid;
+    }
+    if (filters.value.agreementGenerated !== null) {
+      params["filter[agreement-generated]"] = filters.value.agreementGenerated;
+    }
+    if (filters.value.agreementSigned !== null) {
+      params["filter[agreement-signed]"] = filters.value.agreementSigned;
+    }
+    if (filters.value.suggestion !== null) {
+      params["filter[suggestion]"] = filters.value.suggestion;
+    }
 
     if (filters.value.organiser !== null) {
       params["filter[organiser]"] = filters.value.organiser;
@@ -155,11 +165,11 @@ export function useSponsorFilters(options: UseSponsorFiltersOptions): UseSponsor
   /**
    * Update a single status filter
    * @param key Which status filter to update
-   * @param value New value (true or false)
+   * @param value New value (true, false, or null for no filter)
    */
   function setStatusFilter(
     key: "validated" | "paid" | "agreementGenerated" | "agreementSigned" | "suggestion",
-    value: boolean,
+    value: boolean | null,
   ): void {
     filters.value[key] = value;
   }

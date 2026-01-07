@@ -83,19 +83,19 @@
         </div>
       </div>
 
-      <!-- Boolean Filters (checkboxes) -->
+      <!-- Boolean Filters (tri-state checkboxes) -->
       <fieldset v-if="booleanFilters.length > 0" class="status-filters">
         <legend class="text-sm font-medium text-gray-900 mb-3">
           {{ $t('sponsors.filters.statusFilters') }}
         </legend>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div v-for="filter in booleanFilters" :key="filter.name" class="flex items-center gap-2">
-            <UCheckbox
-              :model-value="getFilterValue(filter.name) === true"
-              :label="getFilterLabel(filter.name)"
+          <div v-for="filter in booleanFilters" :key="filter.name" class="flex items-center gap-3">
+            <TriStateCheckbox
+              :model-value="getFilterValue(filter.name)"
               @update:model-value="updateBooleanFilter(filter.name, $event)"
             />
+            <span class="text-sm text-gray-700">{{ getFilterLabel(filter.name) }}</span>
           </div>
         </div>
       </fieldset>
@@ -235,9 +235,8 @@ function updateFilterFromEvent(filterName: string, event: Event) {
   updateFilter(key, value)
 }
 
-function updateBooleanFilter(filterName: string, value: boolean) {
+function updateBooleanFilter(filterName: string, value: boolean | null) {
   const key = getFilterStateKey(filterName)
-  // Always send true or false, never null
   updateFilter(key, value)
 }
 </script>

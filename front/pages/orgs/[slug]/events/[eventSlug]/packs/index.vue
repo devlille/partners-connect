@@ -199,12 +199,7 @@ const deletingPackId = ref<string | null>(null);
 
 // Calculer le nombre de partnerships par pack
 function getPackPartnershipCount(packId: string): number {
-  // Trouver le nom du pack correspondant à l'ID
-  const pack = packs.value.find(p => p.id === packId);
-  if (!pack) return 0;
-
-  // Compter les partnerships qui ont ce pack_name
-  return partnerships.value.filter(p => p.pack_name === pack.name).length;
+  return partnerships.value.filter(p => p.selected_pack_id === packId).length;
 }
 
 // Calculer le pourcentage de remplissage
@@ -267,7 +262,7 @@ async function loadPacks() {
     eventName.value = eventResponse.data.event.name;
     packs.value = packsResponse.data;
 
-    // Gérer la nouvelle structure paginée de l'API
+    // Extraire les items de la réponse paginée
     const partnershipsData = partnershipsResponse.data as unknown as { items: PartnershipItemSchema[] };
     partnerships.value = partnershipsData.items || [];
   } catch (err) {
