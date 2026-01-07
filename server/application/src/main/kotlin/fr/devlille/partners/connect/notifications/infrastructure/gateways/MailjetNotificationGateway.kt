@@ -6,6 +6,7 @@ import fr.devlille.partners.connect.integrations.infrastructure.db.MailjetIntegr
 import fr.devlille.partners.connect.integrations.infrastructure.db.get
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.resources.readResourceFile
+import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.Destination
 import fr.devlille.partners.connect.notifications.domain.NotificationGateway
@@ -28,6 +29,7 @@ internal class MailjetDestination(
     val from: EmailContact,
     val to: List<EmailContact>,
     val cc: List<EmailContact> = emptyList(),
+    val footer: String? = null,
 ) : Destination
 
 internal class EmailContact(
@@ -44,10 +46,20 @@ class MailjetNotificationGateway(
         val event = EventEntity.findById(eventId) ?: throw NotFoundException("Event with ID $eventId not found")
         val orgContact = partnership.organiser?.let { EmailContact(email = it.email, name = it.displayName) }
         val eventContact = EmailContact(email = event.contactEmail, name = event.name)
+        val footerPath = "/mailing/footer/content.${partnership.language}.txt"
+        val footer = try {
+            readResourceFile(footerPath)
+                .replace("{{event_name}}", event.name)
+                .replace("{{event_contact}}", event.contactEmail)
+                .replace("{{partnership_link}}", "${SystemVarEnv.frontendBaseUrl}/${event.slug}/$id")
+        } catch (_: IllegalArgumentException) {
+            null
+        }
         MailjetDestination(
             from = orgContact ?: eventContact,
             to = partnership.emails.map { EmailContact(email = it, name = null) },
             cc = orgContact?.let { listOf(it, eventContact) } ?: listOf(eventContact),
+            footer = footer,
         )
     }
 
@@ -107,7 +119,7 @@ class MailjetNotificationGateway(
                     to = mailDestination.to.map { Contact(email = it.email, name = it.name) },
                     cc = mailDestination.cc.map { Contact(email = it.email, name = it.name) },
                     subject = header,
-                    htmlPart = body,
+                    htmlPart = "$body<br><br>${mailDestination.footer ?: ""}",
                 ),
             ),
         )
