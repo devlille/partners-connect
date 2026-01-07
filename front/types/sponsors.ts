@@ -3,47 +3,42 @@ import { z } from "zod";
 /**
  * Filter state for sponsor list filtering
  *
- * All fields are nullable to support "no filter" state.
- * For boolean fields, null means "show both" (not the same as false).
+ * Boolean filters are always true or false (never null).
+ * They are always sent to the API and default to true (checked).
  */
 export interface FilterState {
   /** Selected pack ID, null = all packs */
   packId: string | null;
 
   /** Validation status filter
-   * - null: show both validated and not validated
    * - true: show only validated sponsors
    * - false: show only not validated sponsors
    */
-  validated: boolean | null;
+  validated: boolean;
 
   /** Payment status filter
-   * - null: show both paid and unpaid
    * - true: show only paid sponsors
    * - false: show only unpaid sponsors
    */
-  paid: boolean | null;
+  paid: boolean;
 
   /** Agreement generation status filter
-   * - null: show both generated and not generated
    * - true: show only sponsors with agreement generated
    * - false: show only sponsors without agreement generated
    */
-  agreementGenerated: boolean | null;
+  agreementGenerated: boolean;
 
   /** Agreement signature status filter
-   * - null: show both signed and not signed
    * - true: show only sponsors with signed agreement
    * - false: show only sponsors without signed agreement
    */
-  agreementSigned: boolean | null;
+  agreementSigned: boolean;
 
   /** Suggestion status filter
-   * - null: show both suggestions and confirmed sponsors
    * - true: show only suggestions
    * - false: show only confirmed sponsors (not suggestions)
    */
-  suggestion: boolean | null;
+  suggestion: boolean;
 
   /** Organiser email filter, null = all organisers */
   organiser: string | null;
@@ -80,23 +75,23 @@ export interface PartnershipsMetadata {
  */
 export const FilterStateSchema = z.object({
   packId: z.string().nullable(),
-  validated: z.boolean().nullable(),
-  paid: z.boolean().nullable(),
-  agreementGenerated: z.boolean().nullable(),
-  agreementSigned: z.boolean().nullable(),
-  suggestion: z.boolean().nullable(),
+  validated: z.boolean(),
+  paid: z.boolean(),
+  agreementGenerated: z.boolean(),
+  agreementSigned: z.boolean(),
+  suggestion: z.boolean(),
   organiser: z.string().nullable(),
 });
 
 /**
- * Initial filter state with all filters disabled
+ * Initial filter state with all boolean filters disabled (unchecked)
  */
 export const initialFilterState: FilterState = {
   packId: null,
-  validated: null,
-  paid: null,
-  agreementGenerated: null,
-  agreementSigned: null,
-  suggestion: null,
+  validated: false,
+  paid: false,
+  agreementGenerated: false,
+  agreementSigned: false,
+  suggestion: false,
   organiser: null,
 };

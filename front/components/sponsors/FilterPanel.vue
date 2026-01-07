@@ -200,10 +200,7 @@ function toggleFilters() {
 function getFilterLabel(filterName: string): string {
   const key = filterLabelMapping[filterName]
   if (key) {
-    
-    const translated = t(key)
-    console.log('[FilterPanel] translation result:', { key, translated, isMissing: translated === key })
-    return translated
+    return t(key)
   }
   // Fallback: capitalize the filter name
   return filterName.charAt(0).toUpperCase() + filterName.slice(1).replace(/-/g, ' ')
@@ -237,7 +234,8 @@ function updateFilterFromEvent(filterName: string, event: Event) {
 
 function updateBooleanFilter(filterName: string, value: boolean) {
   const key = getFilterStateKey(filterName)
-  updateFilter(key, value ? true : null)
+  // Always send true or false, never null
+  updateFilter(key, value)
 }
 </script>
 

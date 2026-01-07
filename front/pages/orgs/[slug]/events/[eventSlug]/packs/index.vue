@@ -266,7 +266,10 @@ async function loadPacks() {
 
     eventName.value = eventResponse.data.event.name;
     packs.value = packsResponse.data;
-    partnerships.value = partnershipsResponse.data;
+
+    // Gérer la nouvelle structure paginée de l'API
+    const partnershipsData = partnershipsResponse.data as unknown as { items: PartnershipItemSchema[] };
+    partnerships.value = partnershipsData.items || [];
   } catch (err) {
     console.error('Failed to load packs:', err);
     error.value = 'Impossible de charger les packs';
