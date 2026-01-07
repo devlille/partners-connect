@@ -265,7 +265,7 @@ class PartnershipRepositoryExposed : PartnershipRepository {
     private fun buildMetadata(eventId: UUID, organisationId: UUID): PaginationMetadata {
         // Query packs for filter values
         val packValues = SponsoringPackEntity
-            .find { SponsoringPacksTable.eventId eq organisationId }
+            .find { SponsoringPacksTable.eventId eq eventId }
             .map { pack ->
                 FilterValue(
                     value = pack.id.value.toString(),
