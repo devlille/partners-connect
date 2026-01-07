@@ -42,6 +42,7 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslati
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPacksTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionsByPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listTranslationsByOptionAndLanguage
 import fr.devlille.partners.connect.users.application.toDomain
@@ -250,7 +251,7 @@ class PartnershipRepositoryExposed : PartnershipRepository {
         }
 
         // Build pagination metadata
-        val metadata = buildMetadata(event.organisation.id.value)
+        val metadata = buildMetadata(event.id.value, event.organisation.id.value)
 
         PaginatedResponse(
             items = items,
@@ -261,7 +262,17 @@ class PartnershipRepositoryExposed : PartnershipRepository {
         )
     }
 
-    private fun buildMetadata(organisationId: UUID): PaginationMetadata {
+    private fun buildMetadata(eventId: UUID, organisationId: UUID): PaginationMetadata {
+        // Query packs for filter values
+        val packValues = SponsoringPackEntity
+            .find { SponsoringPacksTable.eventId eq organisationId }
+            .map { pack ->
+                FilterValue(
+                    value = pack.id.value.toString(),
+                    displayValue = pack.name,
+                )
+            }
+
         // Query organisation editors for available organisers
         val editors = OrganisationPermissionEntity.listUserGrantedByOrgId(organisationId)
         val organiserValues = editors.map { permission ->
@@ -273,7 +284,7 @@ class PartnershipRepositoryExposed : PartnershipRepository {
 
         return PaginationMetadata(
             filters = listOf(
-                FilterDefinition("pack_id", FilterType.STRING),
+                FilterDefinition("pack_id", FilterType.STRING, packValues),
                 FilterDefinition("validated", FilterType.BOOLEAN),
                 FilterDefinition("suggestion", FilterType.BOOLEAN),
                 FilterDefinition("paid", FilterType.BOOLEAN),
