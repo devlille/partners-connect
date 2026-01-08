@@ -35,7 +35,6 @@
         <!-- Filter Panel -->
         <FilterPanel
           v-model="filters"
-          :packs="packs"
           :metadata="filterMetadata"
           :loading="loading"
           :active-filter-count="activeFilterCount"
@@ -45,7 +44,7 @@
         <!-- Active Filters Badges -->
         <ActiveFilters
           :filters="filters"
-          :packs="packs"
+          :metadata="filterMetadata"
           @clear="clearFilter"
           @clear-all="clearAllFilters"
         />
@@ -169,6 +168,7 @@
       :org-slug="orgSlug"
       :event-slug="eventSlug"
       :filter-params="emailFilterParams"
+      :recipient-emails="recipientEmails"
       @sent="handleEmailSent"
     />
   </Dashboard>
@@ -176,6 +176,7 @@
 
 <script setup lang="ts">
 import { getOrgsEventsPartnership, getEventBySlug, getOrgsEventsPacks, deletePartnership, type PartnershipItemSchema, type SponsoringPack, type PostPartnershipEmailParams } from "~/utils/api";
+import { filterStateToApiParams } from "~/types/sponsors";
 import authMiddleware from "~/middleware/auth";
 import { useSponsorFilters } from '~/composables/useSponsorFilters'
 import FilterPanel from '~/components/sponsors/FilterPanel.vue'
@@ -195,6 +196,8 @@ interface PaginatedPartnershipsResponse {
 const { t } = useI18n();
 const { footerLinks } = useDashboardLinks();
 const { getOrgSlug, getEventSlug } = useRouteParams();
+const route = useRoute();
+const router = useRouter();
 
 definePageMeta({
   middleware: authMiddleware,
@@ -345,22 +348,59 @@ const toast = useToast();
 // Annonce ARIA pour les lecteurs d'écran
 const ariaAnnouncement = ref('');
 
-// Gestion de l'envoi d'email
-const showEmailModal = ref(false);
+// Gestion de l'envoi d'email - synchronisé avec le query parameter 'email'
+// On utilise un état interne qui attend que les données soient chargées
+const emailModalInternal = ref(false);
+
+// Computed pour lire/écrire dans l'URL
+const showEmailModal = computed({
+  get: () => emailModalInternal.value,
+  set: (value: boolean) => {
+    emailModalInternal.value = value;
+    const query = { ...route.query };
+    if (value) {
+      query.email = 'true';
+    } else {
+      delete query.email;
+    }
+    router.replace({ query });
+  }
+});
+
+// Ouvrir la modale depuis l'URL une fois les données chargées
+watch(loading, (isLoading) => {
+  if (!isLoading && route.query.email === 'true') {
+    emailModalInternal.value = true;
+  }
+});
 
 // Menu contextuel pour la page des sponsors
 const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
 
 // Paramètres de filtre pour l'envoi d'email (convertis au format API)
 const emailFilterParams = computed<PostPartnershipEmailParams>(() => {
-  const params: PostPartnershipEmailParams = {};
-  if (filters.value.validated !== null) params['filter[validated]'] = filters.value.validated;
-  if (filters.value.paid !== null) params['filter[paid]'] = filters.value.paid;
-  if (filters.value.packId !== null) params['filter[pack_id]'] = filters.value.packId;
-  if (filters.value.suggestion !== null) params['filter[suggestion]'] = filters.value.suggestion;
-  if (filters.value.agreementGenerated !== null) params['filter[agreement-generated]'] = filters.value.agreementGenerated;
-  if (filters.value.agreementSigned !== null) params['filter[agreement-signed]'] = filters.value.agreementSigned;
-  return params;
+  return filterStateToApiParams<PostPartnershipEmailParams>(filters.value);
+});
+
+// Liste des emails des destinataires (extraite des partenariats filtrés)
+const recipientEmails = computed<string[]>(() => {
+  const emails = new Set<string>();
+  for (const partnership of partnerships.value) {
+    if (partnership.emails) {
+      // Le champ emails peut être une chaîne (séparée par virgules) ou un tableau
+      if (typeof partnership.emails === 'string') {
+        const partnerEmails = partnership.emails.split(',').map(e => e.trim()).filter(Boolean);
+        partnerEmails.forEach(email => emails.add(email));
+      } else if (Array.isArray(partnership.emails)) {
+        partnership.emails.forEach(email => {
+          if (email && typeof email === 'string') {
+            emails.add(email.trim());
+          }
+        });
+      }
+    }
+  }
+  return Array.from(emails).sort();
 });
 
 // Gérer l'envoi d'email réussi

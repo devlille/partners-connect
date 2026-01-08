@@ -131,14 +131,13 @@
 </template>
 
 <script setup lang="ts">
-import type { FilterState } from '~/types/sponsors'
-import type { SponsoringPack } from '~/utils/api'
+import type { FilterState, PartnershipsMetadata } from '~/types/sponsors'
 
 interface ActiveFiltersProps {
   /** Current filter state */
   filters: FilterState
-  /** List of packs (to display pack name instead of ID) */
-  packs: SponsoringPack[]
+  /** Metadata from API containing filter values */
+  metadata?: PartnershipsMetadata | null
 }
 
 interface ActiveFiltersEmits {
@@ -148,7 +147,9 @@ interface ActiveFiltersEmits {
   (e: 'clear-all'): void
 }
 
-const props = defineProps<ActiveFiltersProps>()
+const props = withDefaults(defineProps<ActiveFiltersProps>(), {
+  metadata: null
+})
 const emit = defineEmits<ActiveFiltersEmits>()
 
 /**
@@ -159,10 +160,11 @@ const hasActiveFilters = computed(() => {
 })
 
 /**
- * Get pack name from pack ID
+ * Get pack name from pack ID using metadata
  */
 function getPackName(packId: string): string {
-  const pack = props.packs.find(p => p.id === packId)
-  return pack?.name || packId
+  const packFilter = props.metadata?.filters?.find(f => f.name === 'pack_id')
+  const packOption = packFilter?.values?.find(v => v.value === packId)
+  return packOption?.display_value || packId
 }
 </script>

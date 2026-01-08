@@ -76,5 +76,38 @@
   "sponsors": {
     "title": "Sponsors",
     "list": "Liste des sponsors"
+  },
+  "email": {
+    "modal": {
+      "title": "Envoyer un email aux sponsors",
+      "recipients": "Destinataires",
+      "recipientsWithFilters": "L'email sera envoyé aux sponsors correspondant aux filtres actifs.",
+      "recipientsAll": "L'email sera envoyé à tous les sponsors de l'événement.",
+      "subject": "Sujet",
+      "subjectPlaceholder": "Sujet de l'email",
+      "subjectHint": "Le sujet sera préfixé par le nom de l'événement.",
+      "body": "Message",
+      "bodyPlaceholder": "Contenu de l'email",
+      "send": "Envoyer",
+      "sending": "Envoi en cours...",
+      "success": "Email envoyé avec succès à {count} destinataire(s).",
+      "error": "Impossible d'envoyer l'email. Veuillez réessayer.",
+      "required": "*"
+    },
+    "editor": {
+      "loading": "Chargement de l'éditeur...",
+      "bold": "Gras",
+      "italic": "Italique",
+      "underline": "Souligné",
+      "strike": "Barré",
+      "heading": "Titre",
+      "bulletList": "Liste à puces",
+      "orderedList": "Liste numérotée",
+      "link": "Lien",
+      "unlink": "Supprimer le lien",
+      "undo": "Annuler",
+      "redo": "Rétablir",
+      "linkPrompt": "URL du lien:"
+    }
   }
 }

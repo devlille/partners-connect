@@ -52,16 +52,7 @@
     >
       <!-- Dynamic Filters based on metadata -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- Pack Filter (always first if available) -->
-        <div v-if="hasPackFilter" class="w-full">
-          <PackFilter
-            :model-value="modelValue.packId"
-            :packs="packs"
-            @update:model-value="updateFilter('packId', $event)"
-          />
-        </div>
-
-        <!-- String filters with values (dropdowns) -->
+        <!-- String filters with values (dropdowns) - includes pack_id and organiser -->
         <div v-for="filter in stringFiltersWithValues" :key="filter.name" class="w-full">
           <label
             :for="`filter-${filter.name}`"
@@ -111,14 +102,10 @@
 
 <script setup lang="ts">
 import type { FilterState, FilterMetadata, PartnershipsMetadata } from '~/types/sponsors'
-import type { SponsoringPack } from '~/utils/api'
-import PackFilter from '~/components/sponsors/PackFilter.vue'
 
 interface FilterPanelProps {
   /** Current filter state (v-model) */
   modelValue: FilterState
-  /** List of packs for dropdown */
-  packs: SponsoringPack[]
   /** Metadata from API containing available filters */
   metadata?: PartnershipsMetadata | null
   /** Whether filters are being applied (loading state) */
@@ -169,12 +156,6 @@ const filterLabelMapping: Record<string, string> = {
   'organiser': 'sponsors.filters.organiser',
 }
 
-// Check if pack filter is available in metadata
-const hasPackFilter = computed(() => {
-  if (!props.metadata?.filters) return true // Default to showing pack filter
-  return props.metadata.filters.some(f => f.name === 'pack_id')
-})
-
 // Get boolean filters from metadata
 const booleanFilters = computed<FilterMetadata[]>(() => {
   if (!props.metadata?.filters) {
@@ -190,10 +171,10 @@ const booleanFilters = computed<FilterMetadata[]>(() => {
   return props.metadata.filters.filter(f => f.type === 'boolean')
 })
 
-// Get string filters with values (for dropdowns, excluding pack_id which has its own component)
+// Get string filters with values (for dropdowns) - includes pack_id and organiser
 const stringFiltersWithValues = computed<FilterMetadata[]>(() => {
   if (!props.metadata?.filters) return []
-  return props.metadata.filters.filter(f => f.type === 'string' && f.values && f.name !== 'pack_id')
+  return props.metadata.filters.filter(f => f.type === 'string' && f.values)
 })
 
 function toggleFilters() {

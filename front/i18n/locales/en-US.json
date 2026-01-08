@@ -76,5 +76,38 @@
   "sponsors": {
     "title": "Sponsors",
     "list": "Sponsors list"
+  },
+  "email": {
+    "modal": {
+      "title": "Send email to sponsors",
+      "recipients": "Recipients",
+      "recipientsWithFilters": "The email will be sent to sponsors matching the active filters.",
+      "recipientsAll": "The email will be sent to all sponsors of the event.",
+      "subject": "Subject",
+      "subjectPlaceholder": "Email subject",
+      "subjectHint": "The subject will be prefixed with the event name.",
+      "body": "Message",
+      "bodyPlaceholder": "Email content",
+      "send": "Send",
+      "sending": "Sending...",
+      "success": "Email sent successfully to {count} recipient(s).",
+      "error": "Unable to send email. Please try again.",
+      "required": "*"
+    },
+    "editor": {
+      "loading": "Loading editor...",
+      "bold": "Bold",
+      "italic": "Italic",
+      "underline": "Underline",
+      "strike": "Strikethrough",
+      "heading": "Heading",
+      "bulletList": "Bullet list",
+      "orderedList": "Numbered list",
+      "link": "Link",
+      "unlink": "Remove link",
+      "undo": "Undo",
+      "redo": "Redo",
+      "linkPrompt": "Link URL:"
+    }
   }
 }

@@ -102,3 +102,31 @@ export const initialFilterState: FilterState = {
   suggestion: null,
   organiser: null,
 };
+
+/**
+ * Mapping from FilterState keys to API parameter names
+ */
+export const filterToApiParamMapping: Record<keyof FilterState, string> = {
+  packId: "filter[pack_id]",
+  validated: "filter[validated]",
+  paid: "filter[paid]",
+  agreementGenerated: "filter[agreement-generated]",
+  agreementSigned: "filter[agreement-signed]",
+  suggestion: "filter[suggestion]",
+  organiser: "filter[organiser]",
+};
+
+/**
+ * Convert FilterState to API query parameters
+ * Only includes non-null filters
+ */
+export function filterStateToApiParams<T extends Record<string, unknown>>(filters: FilterState): T {
+  const params = {} as T;
+  for (const [key, apiParam] of Object.entries(filterToApiParamMapping)) {
+    const value = filters[key as keyof FilterState];
+    if (value !== null) {
+      (params as Record<string, unknown>)[apiParam] = value;
+    }
+  }
+  return params;
+}
