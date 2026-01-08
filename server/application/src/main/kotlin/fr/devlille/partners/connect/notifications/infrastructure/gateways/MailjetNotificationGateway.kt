@@ -51,7 +51,7 @@ class MailjetNotificationGateway(
             readResourceFile(footerPath)
                 .replace("{{event_name}}", event.name)
                 .replace("{{event_contact}}", event.contactEmail)
-                .replace("{{partnership_link}}", "${SystemVarEnv.frontendBaseUrl}/${event.slug}/$id")
+                .replace("{{partnership_link}}", "${SystemVarEnv.frontendBaseUrl}/${event.slug}/${partnership.id}")
         } catch (_: IllegalArgumentException) {
             null
         }
