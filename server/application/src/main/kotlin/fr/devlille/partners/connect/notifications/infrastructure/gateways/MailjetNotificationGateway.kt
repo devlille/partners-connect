@@ -29,6 +29,7 @@ internal class MailjetDestination(
     val from: EmailContact,
     val to: List<EmailContact>,
     val cc: List<EmailContact> = emptyList(),
+    val subjectPrefix: String? = null,
     val footer: String? = null,
 ) : Destination
 
@@ -59,6 +60,7 @@ class MailjetNotificationGateway(
             from = orgContact ?: eventContact,
             to = partnership.emails.map { EmailContact(email = it, name = null) },
             cc = orgContact?.let { listOf(it, eventContact) } ?: listOf(eventContact),
+            subjectPrefix = "[${event.name}][${partnership.companyName}]",
             footer = footer,
         )
     }
@@ -95,7 +97,7 @@ class MailjetNotificationGateway(
                     from = Contact(email = mailDestination.from.email, name = mailDestination.from.name),
                     to = mailDestination.to.map { Contact(email = it.email, name = it.name) },
                     cc = mailDestination.cc.map { Contact(email = it.email, name = it.name) },
-                    subject = "[${variables.event.event.name}] $subject",
+                    subject = "[${variables.event.event.name}][${variables.company.name}] $subject",
                     htmlPart = htmlPart,
                 ),
             ),
@@ -118,7 +120,7 @@ class MailjetNotificationGateway(
                     from = Contact(email = mailDestination.from.email, name = mailDestination.from.name),
                     to = mailDestination.to.map { Contact(email = it.email, name = it.name) },
                     cc = mailDestination.cc.map { Contact(email = it.email, name = it.name) },
-                    subject = header,
+                    subject = "${mailDestination.subjectPrefix?.let { "$it " } ?: ""}$header",
                     htmlPart = "$body<br><br>${mailDestination.footer ?: ""}",
                 ),
             ),
