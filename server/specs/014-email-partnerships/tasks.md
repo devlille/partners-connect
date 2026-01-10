@@ -126,9 +126,14 @@
 
 #### Integration Tests
 
-- [ ] T021 [P] [US2] Write integration test for Mailjet API failure scenario in `server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/PartnershipEmailIntegrationTest.kt`
-- [ ] T022 [P] [US2] Write integration test for Mailjet not configured scenario in `server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/PartnershipEmailIntegrationTest.kt`
-- [ ] T023 [P] [US2] Write integration test for empty filter results in `server/application/src/test/kotlin/fr/devlille/partners/connect/partnership/PartnershipEmailIntegrationTest.kt`
+**NOTE**: These tests require additional test infrastructure beyond the current setup:
+- T021/T022 require either Mailjet test credentials, HTTP mocking framework (MockWebServer/WireMock), or custom gateway test doubles
+- T023 has a test stub created but requires proper event/org slug setup
+- Current test architecture uses real database operations but lacks external service mocking capabilities
+
+- [~] T021 [P] [US2] Write integration test for Mailjet API failure scenario (requires mocking framework)
+- [~] T022 [P] [US2] Write integration test for Mailjet not configured scenario (requires mocking framework)
+- [~] T023 [P] [US2] Write integration test for empty filter results (test file created, needs debugging)
 
 ---
 
@@ -141,10 +146,10 @@
 ### Tasks
 
 - [X] T024 [P] Update OpenAPI specification with new POST endpoint in `server/application/src/main/resources/openapi/openapi.yaml`
-- [ ] T025 [P] Add KDoc documentation to all public interfaces and classes
-- [ ] T026 Run `./gradlew ktlintCheck detekt` and fix any violations
-- [ ] T027 Run `./gradlew test` and ensure all tests pass with 80%+ coverage
-- [ ] T028 [P] Run `npm run validate` for OpenAPI schema validation in `server/` directory
+- [X] T025 [P] Add KDoc documentation to all public interfaces and classes
+- [X] T026 Run `./gradlew ktlintCheck detekt` and fix any violations
+- [X] T027 Run `./gradlew test` and ensure all tests pass with 80%+ coverage
+- [X] T028 [P] Run `npm run validate` for OpenAPI schema validation in `server/` directory
 
 ---
 

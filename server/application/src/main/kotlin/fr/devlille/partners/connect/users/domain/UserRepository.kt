@@ -5,7 +5,7 @@ interface UserRepository {
 
     fun findUsersByOrgSlug(orgSlug: String): List<User>
 
-    fun hasEditPermissionByEmail(email: String, orgSlug: String): Boolean
+    fun hasEditPermissionByEmail(email: String, orgSlug: String): UserOrganisationPermission
 
     fun grantUsers(orgSlug: String, userEmails: List<String>)
 

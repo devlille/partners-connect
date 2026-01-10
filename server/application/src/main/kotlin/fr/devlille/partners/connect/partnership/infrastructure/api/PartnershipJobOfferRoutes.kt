@@ -7,13 +7,16 @@ import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrgani
 import fr.devlille.partners.connect.internal.infrastructure.api.DEFAULT_PAGE_SIZE
 import fr.devlille.partners.connect.internal.infrastructure.api.getValue
 import fr.devlille.partners.connect.internal.infrastructure.api.token
+import fr.devlille.partners.connect.internal.infrastructure.api.user
 import fr.devlille.partners.connect.internal.infrastructure.db.PromotionStatus
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
+import fr.devlille.partners.connect.notifications.infrastructure.gateways.EmailDeliveryResult
 import fr.devlille.partners.connect.organisations.infrastructure.api.orgSlug
 import fr.devlille.partners.connect.partnership.domain.DeclineJobOfferRequest
+import fr.devlille.partners.connect.partnership.domain.PartnershipEmailHistoryRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipJobOfferRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
@@ -82,9 +85,11 @@ fun Route.orgsPartnershipJobOfferRoutes() {
     }
 }
 
+@Suppress("LongMethod")
 fun Route.orgsPartnershipJobOfferDecisionRoutes() {
     val repository by inject<PartnershipJobOfferRepository>()
     val authRepository by inject<AuthRepository>()
+    val partnershipEmailHistoryRepository by inject<PartnershipEmailHistoryRepository>()
     val notificationRepository by inject<NotificationRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
     val eventRepository by inject<EventRepository>()
@@ -110,7 +115,19 @@ fun Route.orgsPartnershipJobOfferDecisionRoutes() {
                 partnership = partnership,
                 jobOffer = promotion.jobOffer,
             )
-            notificationRepository.sendMessage(eventSlug, variables)
+            val deliveryResults = notificationRepository.sendMessage(eventSlug, variables)
+
+            // Log email history
+            deliveryResults.filterIsInstance<EmailDeliveryResult>().firstOrNull()?.let { deliveryResult ->
+                partnershipEmailHistoryRepository.create(
+                    partnershipId = partnershipId,
+                    senderEmail = deliveryResult.senderEmail,
+                    subject = deliveryResult.subject,
+                    bodyPlainText = deliveryResult.body,
+                    deliveryResult = deliveryResult,
+                    triggeredBy = this.call.attributes.user.userId.toUUID(),
+                )
+            }
 
             // Send webhook notification for job offer approval
             webhookRepository.sendWebhooks(eventSlug, partnershipId, WebhookEventType.UPDATED)
@@ -139,7 +156,19 @@ fun Route.orgsPartnershipJobOfferDecisionRoutes() {
                 jobOffer = promotion.jobOffer,
                 declineReason = request.reason,
             )
-            notificationRepository.sendMessage(eventSlug, variables)
+            val deliveryResults = notificationRepository.sendMessage(eventSlug, variables)
+
+            // Log email history
+            deliveryResults.filterIsInstance<EmailDeliveryResult>().firstOrNull()?.let { deliveryResult ->
+                partnershipEmailHistoryRepository.create(
+                    partnershipId = partnershipId,
+                    senderEmail = deliveryResult.senderEmail,
+                    subject = deliveryResult.subject,
+                    bodyPlainText = deliveryResult.body,
+                    deliveryResult = deliveryResult,
+                    triggeredBy = this.call.attributes.user.userId.toUUID(),
+                )
+            }
 
             // Send webhook notification for job offer decline
             webhookRepository.sendWebhooks(eventSlug, partnershipId, WebhookEventType.UPDATED)

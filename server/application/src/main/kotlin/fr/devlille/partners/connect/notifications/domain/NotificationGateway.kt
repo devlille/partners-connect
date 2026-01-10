@@ -9,7 +9,7 @@ interface NotificationGateway {
 
     fun getDestination(eventId: UUID, partnership: PartnershipItem): Destination
 
-    suspend fun send(integrationId: UUID, variables: NotificationVariables): Boolean
+    suspend fun send(integrationId: UUID, variables: NotificationVariables): DeliveryResult
 
     /**
      * Send a generic notification without template-based variables.
@@ -21,17 +21,19 @@ interface NotificationGateway {
      * @param header Notification header/subject
      * @param body Notification body content (format depends on provider: HTML for email, markdown for Slack)
      * @param destination Destination object containing recipient details
-     * @return true if notification was accepted by the provider, false otherwise
+     * @return DeliveryResult with overall status and per-recipient delivery status
      */
     suspend fun send(
         integrationId: UUID,
         header: String,
         body: String,
         destination: Destination,
-    ): Boolean
+    ): DeliveryResult
 }
 
 /**
  * Generic destination.
  */
-interface Destination
+interface Destination {
+    val partnershipId: UUID
+}

@@ -8,6 +8,7 @@ import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddHealthUrlColumnMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddIntegrationCreatedAtMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPartnershipCommunicationFieldsMigration
+import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPartnershipEmailHistoryMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPartnershipOrganiserMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPolymorphicSponsoringOptionsMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddProviderManagementMigration
@@ -45,6 +46,7 @@ object MigrationRegistry {
         AddHealthUrlColumnMigration,
         AddPartnershipOrganiserMigration,
         MigrateNullableColumnInCompanyTableMigration,
+        AddPartnershipEmailHistoryMigration,
     )
 
     /**

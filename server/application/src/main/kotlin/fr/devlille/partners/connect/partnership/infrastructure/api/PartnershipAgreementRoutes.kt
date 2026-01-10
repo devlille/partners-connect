@@ -4,10 +4,14 @@ import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.api.UnsupportedMediaTypeException
+import fr.devlille.partners.connect.internal.infrastructure.api.user
 import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
+import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
+import fr.devlille.partners.connect.notifications.infrastructure.gateways.EmailDeliveryResult
 import fr.devlille.partners.connect.partnership.domain.PartnershipAgreementRepository
+import fr.devlille.partners.connect.partnership.domain.PartnershipEmailHistoryRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipStorageRepository
 import io.ktor.http.ContentType
@@ -25,6 +29,7 @@ fun Route.publicPartnershipAgreementRoutes() {
     val partnershipRepository by inject<PartnershipRepository>()
     val agreementRepository by inject<PartnershipAgreementRepository>()
     val storageRepository by inject<PartnershipStorageRepository>()
+    val partnershipEmailHistoryRepository by inject<PartnershipEmailHistoryRepository>()
     val notificationRepository by inject<NotificationRepository>()
 
     route("/events/{eventSlug}/partnerships/{partnershipId}/signed-agreement") {
@@ -43,7 +48,20 @@ fun Route.publicPartnershipAgreementRoutes() {
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             val variables = NotificationVariables
                 .PartnershipAgreementSigned(partnership.language, event, company, partnership)
-            notificationRepository.sendMessage(eventSlug, variables)
+            val deliveryResults = notificationRepository.sendMessage(eventSlug, variables)
+
+            // Log email history
+            deliveryResults.filterIsInstance<EmailDeliveryResult>().firstOrNull()?.let { deliveryResult ->
+                partnershipEmailHistoryRepository.create(
+                    partnershipId = partnershipId,
+                    senderEmail = deliveryResult.senderEmail,
+                    subject = deliveryResult.subject,
+                    bodyPlainText = deliveryResult.body,
+                    deliveryResult = deliveryResult,
+                    triggeredBy = this.call.attributes.user.userId.toUUID(),
+                )
+            }
+
             call.respond(HttpStatusCode.OK, mapOf("url" to url))
         }
     }

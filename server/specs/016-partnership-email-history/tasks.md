@@ -24,9 +24,9 @@ description: "Task list for Partnership Email History feature implementation"
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Add database schema registration to MigrationRegistry for PartnershipEmailHistoryTable and RecipientDeliveryStatusTable
-- [ ] T002 [P] Create EmailStatus enum in application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/EmailStatus.kt
-- [ ] T003 [P] Create DeliveryStatus enum in application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/DeliveryStatus.kt
+- [X] T001 Add database schema registration to MigrationRegistry for PartnershipEmailHistoryTable and RecipientDeliveryStatusTable
+- [X] T002 [P] Create EmailStatus enum in application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/EmailStatus.kt
+- [X] T003 [P] Create DeliveryStatus enum in application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/DeliveryStatus.kt
 
 ---
 
@@ -36,11 +36,11 @@ description: "Task list for Partnership Email History feature implementation"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 [P] Create EmailDeliveryResult domain model in application/src/main/kotlin/fr/devlille/partners/connect/notifications/domain/EmailDeliveryResult.kt
-- [ ] T005 [P] Create RecipientResult domain model (nested in EmailDeliveryResult) in application/src/main/kotlin/fr/devlille/partners/connect/notifications/domain/RecipientResult.kt
-- [ ] T006 Update NotificationGateway interface to return EmailDeliveryResult instead of Boolean in application/src/main/kotlin/fr/devlille/partners/connect/notifications/domain/NotificationGateway.kt
-- [ ] T007 Update MailjetProvider to parse Mailjet response JSON (extract "Sent" array, map present emails to SENT status, absent emails to FAILED status) and return structured result with per-recipient status in application/src/main/kotlin/fr/devlille/partners/connect/notifications/infrastructure/providers/MailjetProvider.kt
-- [ ] T008 Update MailjetNotificationGateway to map MailjetProvider result to EmailDeliveryResult (NO history logging - that happens in routes) in application/src/main/kotlin/fr/devlille/partners/connect/notifications/infrastructure/gateways/MailjetNotificationGateway.kt
+- [X] T004 [P] Create EmailDeliveryResult domain model in application/src/main/kotlin/fr/devlille/partners/connect/notifications/domain/EmailDeliveryResult.kt
+- [X] T005 [P] Create RecipientResult domain model (nested in EmailDeliveryResult) in application/src/main/kotlin/fr/devlille/partners/connect/notifications/domain/RecipientResult.kt
+- [X] T006 Update NotificationGateway interface to return EmailDeliveryResult instead of Boolean in application/src/main/kotlin/fr/devlille/partners/connect/notifications/domain/NotificationGateway.kt
+- [X] T007 Update MailjetProvider to parse Mailjet response JSON (extract "Sent" array, map present emails to SENT status, absent emails to FAILED status) and return structured result with per-recipient status in application/src/main/kotlin/fr/devlille/partners/connect/notifications/infrastructure/providers/MailjetProvider.kt
+- [X] T008 Update MailjetNotificationGateway to map MailjetProvider result to EmailDeliveryResult (NO history logging - that happens in routes) in application/src/main/kotlin/fr/devlille/partners/connect/notifications/infrastructure/gateways/MailjetNotificationGateway.kt
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -54,28 +54,28 @@ description: "Task list for Partnership Email History feature implementation"
 
 ### Database & Domain Models for User Story 2
 
-- [ ] T009 [P] [US2] Create PartnershipEmailHistoryTable in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/PartnershipEmailHistoryTable.kt
-- [ ] T010 [P] [US2] Create RecipientDeliveryStatusTable in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/RecipientDeliveryStatusTable.kt
-- [ ] T011 [P] [US2] Create PartnershipEmailHistoryEntity in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/PartnershipEmailHistoryEntity.kt
-- [ ] T012 [P] [US2] Create RecipientDeliveryStatusEntity in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/RecipientDeliveryStatusEntity.kt
-- [ ] T013 [P] [US2] Create PartnershipEmailHistory domain model in application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipEmailHistory.kt
+- [X] T009 [P] [US2] Create PartnershipEmailHistoryTable in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/PartnershipEmailHistoryTable.kt
+- [X] T010 [P] [US2] Create RecipientDeliveryStatusTable in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/RecipientDeliveryStatusTable.kt
+- [X] T011 [P] [US2] Create PartnershipEmailHistoryEntity in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/PartnershipEmailHistoryEntity.kt
+- [X] T012 [P] [US2] Create RecipientDeliveryStatusEntity in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/RecipientDeliveryStatusEntity.kt
+- [X] T013 [P] [US2] Create PartnershipEmailHistory domain model in application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipEmailHistory.kt
 
 ### Repository Implementation for User Story 2
 
-- [ ] T014 [US2] Create PartnershipEmailHistoryRepository interface in application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipEmailHistoryRepository.kt
-- [ ] T015 [US2] Implement PartnershipEmailHistoryRepositoryExposed with create() method in application/src/main/kotlin/fr/devlille/partners/connect/partnership/application/PartnershipEmailHistoryRepositoryExposed.kt
-- [ ] T016 [US2] Add entity-to-domain mapping (toDomain()) methods for PartnershipEmailHistoryEntity and RecipientDeliveryStatusEntity in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/PartnershipEmailHistoryEntity.kt
+- [X] T014 [US2] Create PartnershipEmailHistoryRepository interface in application/src/main/kotlin/fr/devlille/partners/connect/partnership/domain/PartnershipEmailHistoryRepository.kt
+- [X] T015 [US2] Implement PartnershipEmailHistoryRepositoryExposed with create() method in application/src/main/kotlin/fr/devlille/partners/connect/partnership/application/PartnershipEmailHistoryRepositoryExposed.kt
+- [X] T016 [US2] Add entity-to-domain mapping (toDomain()) methods for PartnershipEmailHistoryEntity and RecipientDeliveryStatusEntity in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/db/PartnershipEmailHistoryEntity.kt
 
 ### Integration with Routes for User Story 2
 
-- [ ] T017 [US2] Register PartnershipEmailHistoryRepository in Koin DI partnership module in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/bindings/PartnershipModule.kt
-- [ ] T018 [US2] Update PartnershipDecisionRoutes (approve/reject endpoints) to log email history after calling notificationRepository.sendMessage() in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipDecisionRoutes.kt
-- [ ] T019 [US2] Update PartnershipAgreementRoutes to log email history after calling notificationRepository.sendMessage() in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipAgreementRoutes.kt
-- [ ] T019a [US2] Update PartnershipEmailRoutes to log email history after calling notificationRepository.sendMessage() in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipEmailRoutes.kt
-- [ ] T019b [US2] Update PartnershipBillingRoutes to log email history after calling notificationRepository.sendMessage() in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipBillingRoutes.kt
-- [ ] T019c [US2] Update PartnershipJobOfferRoutes to log email history after calling notificationRepository.sendMessage() in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipJobOfferRoutes.kt
-- [ ] T019d [US2] Update PartnershipSuggestionRoutes to log email history after calling notificationRepository.sendMessage() in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipSuggestionRoutes.kt
-- [ ] T019e [US2] Update PartnershipRoutes to log email history after calling notificationRepository.sendMessage() in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipRoutes.kt
+- [X] T017 [US2] Register PartnershipEmailHistoryRepository in Koin DI partnership module in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/bindings/PartnershipModule.kt
+- [X] T018 [US2] Update PartnershipDecisionRoutes (approve/reject endpoints) to log email history after calling notificationRepository.sendMessage() in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipDecisionRoutes.kt
+- [X] T019 [US2] Update PartnershipAgreementRoutes to log email history after calling notificationRepository.sendMessage() in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipAgreementRoutes.kt
+- [X] T019a [US2] Update PartnershipEmailRoutes to log email history after calling notificationRepository.sendMessage() in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipEmailRoutes.kt
+- [X] T019b [US2] Update PartnershipBillingRoutes to log email history after calling notificationRepository.sendMessage() in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipBillingRoutes.kt
+- [X] T019c [US2] Update PartnershipJobOfferRoutes to log email history after calling notificationRepository.sendMessage() in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipJobOfferRoutes.kt
+- [X] T019d [US2] Update PartnershipSuggestionRoutes to log email history after calling notificationRepository.sendMessage() in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipSuggestionRoutes.kt
+- [X] T019e [US2] Update PartnershipRoutes to log email history after calling notificationRepository.sendMessage() in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipRoutes.kt
 
 **Checkpoint**: At this point, emails are automatically logged to database when sent
 
@@ -91,22 +91,22 @@ description: "Task list for Partnership Email History feature implementation"
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T020 [P] [US1] Create contract test PartnershipEmailHistoryRouteGetTest in application/src/test/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipEmailHistoryRouteGetTest.kt
-- [ ] T021 [P] [US1] Create integration test PartnershipEmailHistoryRoutesTest in application/src/test/kotlin/fr/devlille/partners/connect/partnership/PartnershipEmailHistoryRoutesTest.kt
-- [ ] T022 [P] [US1] Create factory function insertMockedPartnershipEmailHistory() in application/src/test/kotlin/fr/devlille/partners/connect/partnership/factories/PartnershipEmailHistory.factory.kt
+- [X] T020 [P] [US1] Create contract test PartnershipEmailHistoryRouteGetTest in application/src/test/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipEmailHistoryRouteGetTest.kt
+- [X] T021 [P] [US1] Create integration test PartnershipEmailHistoryRoutesTest in application/src/test/kotlin/fr/devlille/partners/connect/partnership/PartnershipEmailHistoryRoutesTest.kt
+- [X] T022 [P] [US1] Create factory function insertMockedPartnershipEmailHistory() in application/src/test/kotlin/fr/devlille/partners/connect/partnership/factories/PartnershipEmailHistory.factory.kt
 
 ### Implementation for User Story 1
 
-- [ ] T023 [US1] Add findByPartnershipId() method with pagination to PartnershipEmailHistoryRepositoryExposed in application/src/main/kotlin/fr/devlille/partners/connect/partnership/application/PartnershipEmailHistoryRepositoryExposed.kt
-- [ ] T024 [US1] Add countByPartnershipId() method to PartnershipEmailHistoryRepositoryExposed in application/src/main/kotlin/fr/devlille/partners/connect/partnership/application/PartnershipEmailHistoryRepositoryExposed.kt
-- [ ] T025 [P] [US1] Create PartnershipEmailHistoryResponse DTO in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipEmailHistoryResponse.kt
-- [ ] T026 [P] [US1] Create RecipientStatusResponse DTO in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/RecipientStatusResponse.kt
-- [ ] T027 [US1] Create GET /email-history route in PartnershipEmailHistoryRoutes.kt in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipEmailHistoryRoutes.kt
-- [ ] T027a [US1] Add partnership existence validation (throw NotFoundException if partnership doesn't exist) in PartnershipEmailHistoryRoutes.kt
-- [ ] T028 [US1] Install AuthorizedOrganisationPlugin on email history route in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipEmailHistoryRoutes.kt
-- [ ] T029 [US1] Implement query parameter validation (page >= 0, page_size 1-100) in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipEmailHistoryRoutes.kt
-- [ ] T030 [US1] Implement pagination logic using PaginatedResponse<PartnershipEmailHistoryResponse> in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipEmailHistoryRoutes.kt
-- [ ] T031 [US1] Register email history route in App.kt module configuration in application/src/main/kotlin/fr/devlille/partners/connect/App.kt
+- [X] T023 [US1] Add findByPartnershipId() method with pagination to PartnershipEmailHistoryRepositoryExposed in application/src/main/kotlin/fr/devlille/partners/connect/partnership/application/PartnershipEmailHistoryRepositoryExposed.kt
+- [X] T024 [US1] Add countByPartnershipId() method to PartnershipEmailHistoryRepositoryExposed in application/src/main/kotlin/fr/devlille/partners/connect/partnership/application/PartnershipEmailHistoryRepositoryExposed.kt
+- [X] T025 [P] [US1] Create PartnershipEmailHistoryResponse DTO in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipEmailHistoryResponse.kt
+- [X] T026 [P] [US1] Create RecipientStatusResponse DTO in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/RecipientStatusResponse.kt
+- [X] T027 [US1] Create GET /email-history route in PartnershipEmailHistoryRoutes.kt in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipEmailHistoryRoutes.kt
+- [X] T027a [US1] Add partnership existence validation (throw NotFoundException if partnership doesn't exist) in PartnershipEmailHistoryRoutes.kt
+- [X] T028 [US1] Install AuthorizedOrganisationPlugin on email history route in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipEmailHistoryRoutes.kt
+- [X] T029 [US1] Implement query parameter validation (page >= 0, page_size 1-100) in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipEmailHistoryRoutes.kt
+- [X] T030 [US1] Implement pagination logic using PaginatedResponse<PartnershipEmailHistoryResponse> in application/src/main/kotlin/fr/devlille/partners/connect/partnership/infrastructure/api/PartnershipEmailHistoryRoutes.kt
+- [X] T031 [US1] Register email history route in App.kt module configuration in application/src/main/kotlin/fr/devlille/partners/connect/App.kt
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work - emails logged automatically (in routes after notification) and retrievable via API
 

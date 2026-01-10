@@ -1,0 +1,64 @@
+{
+  "$id": "partnership_email_history_response.schema.json",
+  "type": "object",
+  "description": "Complete email history record with delivery details",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for the email history record"
+    },
+    "partnership_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "UUID of the partnership this email was sent to"
+    },
+    "sent_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the email was sent (UTC)"
+    },
+    "sender_email": {
+      "type": "string",
+      "format": "email",
+      "description": "Email address used as the 'From' address"
+    },
+    "subject": {
+      "type": "string",
+      "description": "Email subject line",
+      "maxLength": 500
+    },
+    "body_plain_text": {
+      "type": "string",
+      "description": "Email body content (HTML or plain text)"
+    },
+    "overall_status": {
+      "type": "string",
+      "enum": ["SENT", "FAILED", "PARTIAL"],
+      "description": "Overall delivery status: SENT (all succeeded), FAILED (all failed), PARTIAL (mixed results)"
+    },
+    "triggered_by": {
+      "$ref": "user.schema.json",
+      "description": "User who triggered the email (organiser)"
+    },
+    "recipients": {
+      "type": "array",
+      "items": {
+        "$ref": "recipient_status_response.schema.json"
+      },
+      "description": "Per-recipient delivery status details",
+      "minItems": 1
+    }
+  },
+  "required": [
+    "id",
+    "partnership_id",
+    "sent_at",
+    "sender_email",
+    "subject",
+    "body_plain_text",
+    "overall_status",
+    "triggered_by",
+    "recipients"
+  ]
+}

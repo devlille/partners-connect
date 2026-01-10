@@ -8,14 +8,17 @@ import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenExcepti
 import fr.devlille.partners.connect.internal.infrastructure.resources.readResourceFile
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
+import fr.devlille.partners.connect.notifications.domain.DeliveryResult
 import fr.devlille.partners.connect.notifications.domain.Destination
 import fr.devlille.partners.connect.notifications.domain.NotificationGateway
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
+import fr.devlille.partners.connect.notifications.domain.RecipientResult
 import fr.devlille.partners.connect.notifications.infrastructure.providers.Contact
 import fr.devlille.partners.connect.notifications.infrastructure.providers.MailjetBody
 import fr.devlille.partners.connect.notifications.infrastructure.providers.MailjetProvider
 import fr.devlille.partners.connect.notifications.infrastructure.providers.Message
 import fr.devlille.partners.connect.partnership.application.mappers.toDomain
+import fr.devlille.partners.connect.partnership.domain.OverallDeliveryStatus
 import fr.devlille.partners.connect.partnership.domain.PartnershipItem
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
@@ -26,6 +29,7 @@ import java.util.UUID
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 internal class MailjetDestination(
+    override val partnershipId: UUID,
     val from: EmailContact,
     val to: List<EmailContact>,
     val cc: List<EmailContact> = emptyList(),
@@ -37,6 +41,14 @@ internal class EmailContact(
     val email: String,
     val name: String? = null,
 )
+
+data class EmailDeliveryResult(
+    override val overallStatus: OverallDeliveryStatus,
+    override val recipients: List<RecipientResult>,
+    val subject: String = "",
+    val body: String = "",
+    val senderEmail: String = "",
+) : DeliveryResult
 
 class MailjetNotificationGateway(
     private val mailjetProvider: MailjetProvider,
@@ -57,6 +69,7 @@ class MailjetNotificationGateway(
             null
         }
         MailjetDestination(
+            partnershipId = partnership.id.toUUID(),
             from = orgContact ?: eventContact,
             to = partnership.emails.map { EmailContact(email = it, name = null) },
             cc = orgContact?.let { listOf(it, eventContact) } ?: listOf(eventContact),
@@ -67,7 +80,7 @@ class MailjetNotificationGateway(
 
     @Suppress("ReturnCount")
     @OptIn(ExperimentalEncodingApi::class)
-    override suspend fun send(integrationId: UUID, variables: NotificationVariables): Boolean {
+    override suspend fun send(integrationId: UUID, variables: NotificationVariables): DeliveryResult {
         val config = transaction { MailjetIntegrationsTable[integrationId] }
         val partnershipItem = transaction {
             val partnership = PartnershipEntity
@@ -84,12 +97,12 @@ class MailjetNotificationGateway(
         val subject = try {
             variables.populate(readResourceFile(pathHeader))
         } catch (_: IllegalArgumentException) {
-            return false
+            return EmailDeliveryResult(overallStatus = OverallDeliveryStatus.FAILED, recipients = emptyList())
         }
         val htmlPart = try {
             variables.populate(readResourceFile(pathContent))
         } catch (_: IllegalArgumentException) {
-            return false
+            return EmailDeliveryResult(overallStatus = OverallDeliveryStatus.FAILED, recipients = emptyList())
         }
         val body = MailjetBody(
             messages = listOf(
@@ -110,7 +123,7 @@ class MailjetNotificationGateway(
         header: String,
         body: String,
         destination: Destination,
-    ): Boolean {
+    ): DeliveryResult {
         val config = transaction { MailjetIntegrationsTable[integrationId] }
         val mailDestination = destination as? MailjetDestination
             ?: throw ForbiddenException("Invalid destination type for Mailjet")

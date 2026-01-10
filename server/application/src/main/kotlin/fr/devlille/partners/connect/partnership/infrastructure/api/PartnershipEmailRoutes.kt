@@ -2,8 +2,12 @@ package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.api.user
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
+import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
+import fr.devlille.partners.connect.notifications.infrastructure.gateways.EmailDeliveryResult
+import fr.devlille.partners.connect.partnership.domain.PartnershipEmailHistoryRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipEmailRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
 import fr.devlille.partners.connect.partnership.domain.SendPartnershipEmailRequest
@@ -31,6 +35,7 @@ import org.koin.ktor.ext.inject
  */
 fun Route.partnershipEmailRoutes() {
     val partnershipEmailRepository by inject<PartnershipEmailRepository>()
+    val partnershipEmailHistoryRepository by inject<PartnershipEmailHistoryRepository>()
     val notificationRepository by inject<NotificationRepository>()
 
     route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/email") {
@@ -59,12 +64,22 @@ fun Route.partnershipEmailRoutes() {
                 throw NotFoundException("No partnerships match the provided filters")
             }
             destinations.forEach { destination ->
-                notificationRepository.sendMessage(
+                val deliveryResult = notificationRepository.sendMessage(
                     eventSlug = eventSlug,
                     destination = destination,
                     subject = request.subject,
                     htmlBody = request.body,
                 )
+                if (deliveryResult is EmailDeliveryResult) {
+                    partnershipEmailHistoryRepository.create(
+                        partnershipId = destination.partnershipId,
+                        senderEmail = deliveryResult.senderEmail,
+                        subject = deliveryResult.subject,
+                        bodyPlainText = deliveryResult.body,
+                        deliveryResult = deliveryResult,
+                        triggeredBy = call.attributes.user.userId.toUUID(),
+                    )
+                }
             }
 
             call.respond(

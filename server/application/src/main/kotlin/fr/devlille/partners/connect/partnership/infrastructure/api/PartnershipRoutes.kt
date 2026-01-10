@@ -4,11 +4,14 @@ import fr.devlille.partners.connect.companies.domain.CompanyRepository
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.api.user
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
+import fr.devlille.partners.connect.notifications.infrastructure.gateways.EmailDeliveryResult
 import fr.devlille.partners.connect.partnership.domain.DetailedPartnershipResponse
+import fr.devlille.partners.connect.partnership.domain.PartnershipEmailHistoryRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipSpeakerRepository
@@ -47,6 +50,7 @@ fun Route.partnershipRoutes() {
     orgsPartnershipJobOfferDecisionRoutes()
     orgsPartnershipOrganiserRoutes()
     partnershipEmailRoutes()
+    partnershipEmailHistoryRoutes()
 }
 
 @Suppress("LongMethod")
@@ -55,6 +59,7 @@ private fun Route.publicPartnershipRoutes() {
     val companyRepository by inject<CompanyRepository>()
     val speakerRepository by inject<PartnershipSpeakerRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
+    val partnershipEmailHistoryRepository by inject<PartnershipEmailHistoryRepository>()
     val notificationRepository by inject<NotificationRepository>()
     val webhookRepository by inject<WebhookRepository>()
 
@@ -75,7 +80,19 @@ private fun Route.publicPartnershipRoutes() {
                 partnership,
                 pack,
             )
-            notificationRepository.sendMessage(eventSlug, variables)
+            val deliveryResults = notificationRepository.sendMessage(eventSlug, variables)
+
+            // Log email history
+            deliveryResults.filterIsInstance<EmailDeliveryResult>().firstOrNull()?.let { deliveryResult ->
+                partnershipEmailHistoryRepository.create(
+                    partnershipId = id,
+                    senderEmail = deliveryResult.senderEmail,
+                    subject = deliveryResult.subject,
+                    bodyPlainText = deliveryResult.body,
+                    deliveryResult = deliveryResult,
+                    triggeredBy = this.call.attributes.user.userId.toUUID(),
+                )
+            }
 
             // Send webhook notification for partnership creation
             webhookRepository.sendWebhooks(eventSlug, id, WebhookEventType.CREATED)
