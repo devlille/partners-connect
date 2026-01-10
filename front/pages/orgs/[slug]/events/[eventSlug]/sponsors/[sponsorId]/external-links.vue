@@ -233,7 +233,9 @@ const providersError = ref<string | null>(null);
 async function loadSponsorName() {
   try {
     const response = await getOrgsEventsPartnership(orgSlug.value, eventSlug.value);
-    const partnership = response.data.find(p => p.id === sponsorId.value);
+    // L'API retourne maintenant une structure paginée avec items
+    const items = Array.isArray(response.data) ? response.data : response.data.items;
+    const partnership = items.find(p => p.id === sponsorId.value);
     if (partnership) {
       sponsorName.value = partnership.company_name;
     }

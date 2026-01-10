@@ -130,7 +130,9 @@ async function loadPartnership() {
     error.value = null;
 
     const response = await getOrgsEventsPartnership(orgSlug.value, eventSlug.value);
-    const found = response.data.find(p => p.id === sponsorId.value);
+    // L'API retourne maintenant une structure paginée avec items
+    const items = Array.isArray(response.data) ? response.data : response.data.items;
+    const found = items.find(p => p.id === sponsorId.value);
 
     if (!found) {
       error.value = 'Sponsor non trouvé';
