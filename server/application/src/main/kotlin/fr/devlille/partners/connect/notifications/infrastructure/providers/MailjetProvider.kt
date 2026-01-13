@@ -75,6 +75,7 @@ class MailjetProvider(
         // Extract all recipient emails from request
         val allRecipientEmails = body.messages
             .flatMap { message -> (message.to + (message.cc ?: emptyList())).map { it.email } }
+            .distinct()
 
         // Build per-recipient results
         val recipientResults = allRecipientEmails.map { email ->
