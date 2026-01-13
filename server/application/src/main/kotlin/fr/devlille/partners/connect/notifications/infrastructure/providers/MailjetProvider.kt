@@ -66,15 +66,15 @@ class MailjetProvider(
         // Parse Mailjet response to extract per-recipient status
         val mailjetResponse = json.decodeFromString<MailjetResponse>(response.bodyAsText())
 
-        // Extract all recipient emails from request
-        val allRecipientEmails = body.messages
-            .flatMap { message -> (message.to + (message.cc ?: emptyList())).map { it.email } }
-
         // Extract successful recipients from Mailjet "Sent" array
         val successfulEmails = mailjetResponse.messages
             .filter { it.status == "success" }
-            .flatMap { it.to }
+            .flatMap { it.to + (it.cc ?: emptyList()) }
             .map { it.email }
+
+        // Extract all recipient emails from request
+        val allRecipientEmails = body.messages
+            .flatMap { message -> (message.to + (message.cc ?: emptyList())).map { it.email } }
 
         // Build per-recipient results
         val recipientResults = allRecipientEmails.map { email ->
