@@ -5,6 +5,7 @@ import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationEntity
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsTable
+import fr.devlille.partners.connect.notifications.domain.DeliveryResult
 import fr.devlille.partners.connect.notifications.domain.Destination
 import fr.devlille.partners.connect.notifications.domain.NotificationGateway
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
@@ -17,7 +18,7 @@ class NotificationRepositoryExposed(
     private val notificationGateways: List<NotificationGateway>,
     private val mailingGateway: NotificationGateway,
 ) : NotificationRepository {
-    override suspend fun sendMessage(eventSlug: String, variables: NotificationVariables) {
+    override suspend fun sendMessage(eventSlug: String, variables: NotificationVariables): List<DeliveryResult> {
         val eventEntity = transaction {
             EventEntity.findBySlug(eventSlug)
                 ?: throw NotFoundException("Event with slug $eventSlug not found")
@@ -30,11 +31,15 @@ class NotificationRepositoryExposed(
                 }
                 .toList()
         }
-        integrations.forEach { integration ->
+
+        // Send to all integrations and collect results
+        val results = integrations.map { integration ->
             val gateway = notificationGateways.find { it.provider == integration.provider }
                 ?: throw NotFoundException("No gateway for provider ${integration.provider}")
             gateway.send(integration.id.value, variables)
         }
+
+        return results
     }
 
     override suspend fun sendMessage(
@@ -42,7 +47,7 @@ class NotificationRepositoryExposed(
         destination: Destination,
         subject: String,
         htmlBody: String,
-    ) {
+    ): DeliveryResult {
         val eventEntity = transaction {
             EventEntity.findBySlug(eventSlug)
                 ?: throw NotFoundException("Event with slug $eventSlug not found")
@@ -56,8 +61,8 @@ class NotificationRepositoryExposed(
             }.firstOrNull()
         } ?: throw NotFoundException("No mailing integration found for event")
 
-        // Call generic gateway send method
-        mailingGateway.send(
+        // Call generic gateway send method and return result
+        return mailingGateway.send(
             integrationId = integration.id.value,
             destination = destination,
             header = subject,

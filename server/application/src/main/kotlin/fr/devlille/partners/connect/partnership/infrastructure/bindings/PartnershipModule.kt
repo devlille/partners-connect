@@ -6,6 +6,7 @@ import fr.devlille.partners.connect.partnership.application.PartnershipBillingRe
 import fr.devlille.partners.connect.partnership.application.PartnershipBoothRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipCommunicationRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipDecisionRepositoryExposed
+import fr.devlille.partners.connect.partnership.application.PartnershipEmailHistoryRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipEmailRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipJobOfferRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipRepositoryExposed
@@ -18,6 +19,7 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipBillingReposit
 import fr.devlille.partners.connect.partnership.domain.PartnershipBoothRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipCommunicationRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipDecisionRepository
+import fr.devlille.partners.connect.partnership.domain.PartnershipEmailHistoryRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipEmailRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipJobOfferRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
@@ -65,5 +67,8 @@ val partnershipModule = module {
         PartnershipEmailRepositoryExposed(
             notificationGateway = MailjetNotificationGateway(mailjetProvider = get()),
         )
+    }
+    single<PartnershipEmailHistoryRepository> {
+        PartnershipEmailHistoryRepositoryExposed()
     }
 }

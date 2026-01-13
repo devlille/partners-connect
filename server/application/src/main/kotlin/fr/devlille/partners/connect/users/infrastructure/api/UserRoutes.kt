@@ -48,7 +48,7 @@ fun Route.userRoutes() {
             val orgSlug = call.parameters.orgSlug
             val request = call.receive<GrantPermissionRequest>(schema = "grant_permission_request.schema.json")
             val userInfo = authRepository.getUserInfo(token)
-            val hasPerm = userRepository.hasEditPermissionByEmail(userInfo.email, orgSlug)
+            val hasPerm = userRepository.hasEditPermissionByEmail(userInfo.email, orgSlug).canEdit
             if (!hasPerm) {
                 throw UnauthorizedException("You do not have permission to grant users for this event")
             }
@@ -60,7 +60,7 @@ fun Route.userRoutes() {
             val orgSlug = call.parameters.orgSlug
             val request = call.receive<RevokePermissionRequest>(schema = "revoke_permission_request.schema.json")
             val userInfo = authRepository.getUserInfo(token)
-            val hasPerm = userRepository.hasEditPermissionByEmail(userInfo.email, orgSlug)
+            val hasPerm = userRepository.hasEditPermissionByEmail(userInfo.email, orgSlug).canEdit
             if (!hasPerm) {
                 throw UnauthorizedException("You do not have permission to revoke users for this organisation")
             }

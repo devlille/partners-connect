@@ -3,9 +3,13 @@ package fr.devlille.partners.connect.partnership.infrastructure.api
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.api.user
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
+import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
+import fr.devlille.partners.connect.notifications.infrastructure.gateways.EmailDeliveryResult
+import fr.devlille.partners.connect.partnership.domain.PartnershipEmailHistoryRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipSuggestionRepository
 import fr.devlille.partners.connect.partnership.domain.SuggestPartnership
@@ -23,6 +27,7 @@ fun Route.publicPartnershipSuggestionDecisionRoutes() {
     val eventRepository by inject<EventRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
     val suggestionRepository by inject<PartnershipSuggestionRepository>()
+    val partnershipEmailHistoryRepository by inject<PartnershipEmailHistoryRepository>()
     val notificationRepository by inject<NotificationRepository>()
     val webhookRepository by inject<WebhookRepository>()
 
@@ -40,7 +45,19 @@ fun Route.publicPartnershipSuggestionDecisionRoutes() {
                 company,
                 partnership,
             )
-            notificationRepository.sendMessage(eventSlug, variables)
+            val deliveryResults = notificationRepository.sendMessage(eventSlug, variables)
+
+            // Log email history
+            deliveryResults.filterIsInstance<EmailDeliveryResult>().firstOrNull()?.let { deliveryResult ->
+                partnershipEmailHistoryRepository.create(
+                    partnershipId = partnershipId,
+                    senderEmail = deliveryResult.senderEmail,
+                    subject = deliveryResult.subject,
+                    bodyPlainText = deliveryResult.body,
+                    deliveryResult = deliveryResult,
+                    triggeredBy = this.call.attributes.user.userId.toUUID(),
+                )
+            }
 
             // Send webhook notification for suggestion approval
             webhookRepository.sendWebhooks(eventSlug, partnershipId, WebhookEventType.UPDATED)
@@ -55,13 +72,20 @@ fun Route.publicPartnershipSuggestionDecisionRoutes() {
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             val event = eventRepository.getBySlug(eventSlug)
-            val variables = NotificationVariables.SuggestionDeclined(
-                partnership.language,
-                event,
-                company,
-                partnership,
-            )
-            notificationRepository.sendMessage(eventSlug, variables)
+            val variables = NotificationVariables.SuggestionDeclined(partnership.language, event, company, partnership)
+            val deliveryResults = notificationRepository.sendMessage(eventSlug, variables)
+
+            // Log email history
+            deliveryResults.filterIsInstance<EmailDeliveryResult>().firstOrNull()?.let { deliveryResult ->
+                partnershipEmailHistoryRepository.create(
+                    partnershipId = partnershipId,
+                    senderEmail = deliveryResult.senderEmail,
+                    subject = deliveryResult.subject,
+                    bodyPlainText = deliveryResult.body,
+                    deliveryResult = deliveryResult,
+                    triggeredBy = this.call.attributes.user.userId.toUUID(),
+                )
+            }
 
             // Send webhook notification for suggestion decline
             webhookRepository.sendWebhooks(eventSlug, partnershipId, WebhookEventType.UPDATED)
@@ -75,6 +99,7 @@ fun Route.orgsPartnershipSuggestionRoutes() {
     val eventRepository by inject<EventRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
     val suggestionRepository by inject<PartnershipSuggestionRepository>()
+    val partnershipEmailHistoryRepository by inject<PartnershipEmailHistoryRepository>()
     val notificationRepository by inject<NotificationRepository>()
     val webhookRepository by inject<WebhookRepository>()
 
@@ -98,7 +123,19 @@ fun Route.orgsPartnershipSuggestionRoutes() {
                 partnership,
                 pack,
             )
-            notificationRepository.sendMessage(eventSlug, variables)
+            val deliveryResults = notificationRepository.sendMessage(eventSlug, variables)
+
+            // Log email history
+            deliveryResults.filterIsInstance<EmailDeliveryResult>().firstOrNull()?.let { deliveryResult ->
+                partnershipEmailHistoryRepository.create(
+                    partnershipId = partnershipId,
+                    senderEmail = deliveryResult.senderEmail,
+                    subject = deliveryResult.subject,
+                    bodyPlainText = deliveryResult.body,
+                    deliveryResult = deliveryResult,
+                    triggeredBy = this.call.attributes.user.userId.toUUID(),
+                )
+            }
 
             // Send webhook notification for new suggestion
             webhookRepository.sendWebhooks(eventSlug, partnershipId, WebhookEventType.UPDATED)

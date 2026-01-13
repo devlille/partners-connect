@@ -42,7 +42,7 @@ fun Route.organisationRoutes() {
             val orgSlug = call.parameters.orgSlug
             val input = call.receive<Organisation>(schema = "organisation.schema.json")
             val userInfo = authRepository.getUserInfo(token)
-            val canEdit = userRepository.hasEditPermissionByEmail(userInfo.email, orgSlug)
+            val canEdit = userRepository.hasEditPermissionByEmail(userInfo.email, orgSlug).canEdit
             if (!canEdit) {
                 throw UnauthorizedException("You are not allowed to edit this organisation")
             }

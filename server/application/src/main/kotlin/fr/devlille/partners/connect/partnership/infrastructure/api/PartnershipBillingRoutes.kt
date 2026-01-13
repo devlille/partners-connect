@@ -5,11 +5,14 @@ import fr.devlille.partners.connect.companies.domain.CompanyBillingData
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.api.user
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
+import fr.devlille.partners.connect.notifications.infrastructure.gateways.EmailDeliveryResult
 import fr.devlille.partners.connect.partnership.domain.PartnershipBillingRepository
+import fr.devlille.partners.connect.partnership.domain.PartnershipEmailHistoryRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
 import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
@@ -23,11 +26,13 @@ import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 import kotlin.getValue
 
+@Suppress("LongMethod")
 fun Route.publicPartnershipBillingRoutes() {
     val partnershipBillingRepository by inject<PartnershipBillingRepository>()
     val billingRepository by inject<BillingRepository>()
     val eventRepository by inject<EventRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
+    val partnershipEmailHistoryRepository by inject<PartnershipEmailHistoryRepository>()
     val notificationRepository by inject<NotificationRepository>()
     val webhookRepository by inject<WebhookRepository>()
 
@@ -61,7 +66,20 @@ fun Route.publicPartnershipBillingRoutes() {
             partnershipBillingRepository.updateInvoiceUrl(eventSlug, partnershipId, invoiceUrl)
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val variables = NotificationVariables.NewInvoice(partnership.language, event, company, partnership)
-            notificationRepository.sendMessage(eventSlug, variables)
+            val deliveryResults = notificationRepository.sendMessage(eventSlug, variables)
+
+            // Log email history
+            deliveryResults.filterIsInstance<EmailDeliveryResult>().firstOrNull()?.let { deliveryResult ->
+                partnershipEmailHistoryRepository.create(
+                    partnershipId = partnershipId,
+                    senderEmail = deliveryResult.senderEmail,
+                    subject = deliveryResult.subject,
+                    bodyPlainText = deliveryResult.body,
+                    deliveryResult = deliveryResult,
+                    triggeredBy = this.call.attributes.user.userId.toUUID(),
+                )
+            }
+
             webhookRepository.sendWebhooks(eventSlug, partnershipId, WebhookEventType.UPDATED)
             call.respond(HttpStatusCode.Created, mapOf("url" to invoiceUrl))
         }
@@ -74,7 +92,20 @@ fun Route.publicPartnershipBillingRoutes() {
             partnershipBillingRepository.updateQuoteUrl(eventSlug, partnershipId, quoteUrl)
             val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val variables = NotificationVariables.NewQuote(partnership.language, event, company, partnership)
-            notificationRepository.sendMessage(eventSlug, variables)
+            val deliveryResults = notificationRepository.sendMessage(eventSlug, variables)
+
+            // Log email history
+            deliveryResults.filterIsInstance<EmailDeliveryResult>().firstOrNull()?.let { deliveryResult ->
+                partnershipEmailHistoryRepository.create(
+                    partnershipId = partnershipId,
+                    senderEmail = deliveryResult.senderEmail,
+                    subject = deliveryResult.subject,
+                    bodyPlainText = deliveryResult.body,
+                    deliveryResult = deliveryResult,
+                    triggeredBy = this.call.attributes.user.userId.toUUID(),
+                )
+            }
+
             webhookRepository.sendWebhooks(eventSlug, partnershipId, WebhookEventType.UPDATED)
             call.respond(HttpStatusCode.Created, mapOf("url" to quoteUrl))
         }

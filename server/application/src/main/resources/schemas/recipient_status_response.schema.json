@@ -1,0 +1,21 @@
+{
+  "$id": "recipient_status_response.schema.json",
+  "type": "object",
+  "description": "Per-recipient email delivery status",
+  "properties": {
+    "recipient_email": {
+      "type": "string",
+      "format": "email",
+      "description": "Email address of the recipient"
+    },
+    "delivery_status": {
+      "type": "string",
+      "enum": ["SENT", "FAILED"],
+      "description": "Delivery status for this specific recipient"
+    }
+  },
+  "required": [
+    "recipient_email",
+    "delivery_status"
+  ]
+}

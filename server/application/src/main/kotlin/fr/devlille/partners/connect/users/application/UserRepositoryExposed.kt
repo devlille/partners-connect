@@ -1,10 +1,12 @@
 package fr.devlille.partners.connect.users.application
 
 import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
+import fr.devlille.partners.connect.organisations.application.mappers.toDomain
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.users.domain.RevokeUsersResult
 import fr.devlille.partners.connect.users.domain.User
+import fr.devlille.partners.connect.users.domain.UserOrganisationPermission
 import fr.devlille.partners.connect.users.domain.UserRepository
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionEntity
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionsTable
@@ -38,13 +40,18 @@ class UserRepositoryExposed : UserRepository {
             .map { it.user.toDomain() }
     }
 
-    override fun hasEditPermissionByEmail(email: String, orgSlug: String): Boolean = transaction {
+    override fun hasEditPermissionByEmail(email: String, orgSlug: String): UserOrganisationPermission = transaction {
         val user = UserEntity.singleUserByEmail(email)
             ?: throw NotFoundException("User with email $email not found")
         val organisation = OrganisationEntity.findBySlug(orgSlug)
             ?: throw NotFoundException("Organisation with slug: $orgSlug not found")
-        OrganisationPermissionEntity
-            .hasPermission(organisationId = organisation.id.value, userId = user.id.value)
+        UserOrganisationPermission(
+            userId = user.id.value.toString(),
+            user = user.toDomain(),
+            organisation = organisation.toDomain(),
+            canEdit = OrganisationPermissionEntity
+                .hasPermission(organisationId = organisation.id.value, userId = user.id.value),
+        )
     }
 
     override fun grantUsers(orgSlug: String, userEmails: List<String>) = transaction {
