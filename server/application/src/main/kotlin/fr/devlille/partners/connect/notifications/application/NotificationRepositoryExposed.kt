@@ -18,7 +18,8 @@ class NotificationRepositoryExposed(
     private val notificationGateways: List<NotificationGateway>,
     private val mailingGateway: NotificationGateway,
 ) : NotificationRepository {
-    override suspend fun sendMessage(eventSlug: String, variables: NotificationVariables): List<DeliveryResult> {
+    override suspend fun sendMessage(variables: NotificationVariables): List<DeliveryResult> {
+        val eventSlug = variables.event.event.slug
         val eventEntity = transaction {
             EventEntity.findBySlug(eventSlug)
                 ?: throw NotFoundException("Event with slug $eventSlug not found")

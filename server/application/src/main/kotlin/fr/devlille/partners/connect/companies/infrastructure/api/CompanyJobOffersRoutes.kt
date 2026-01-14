@@ -8,13 +8,11 @@ import fr.devlille.partners.connect.companies.domain.PromoteJobOfferRequest
 import fr.devlille.partners.connect.companies.domain.UpdateJobOffer
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.DEFAULT_PAGE_SIZE
-import fr.devlille.partners.connect.internal.infrastructure.api.user
+import fr.devlille.partners.connect.internal.infrastructure.ktor.NotificationPartnershipPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
+import fr.devlille.partners.connect.internal.infrastructure.ktor.variables
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
-import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
-import fr.devlille.partners.connect.notifications.infrastructure.gateways.EmailDeliveryResult
-import fr.devlille.partners.connect.partnership.domain.PartnershipEmailHistoryRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipId
 import io.ktor.http.HttpStatusCode
@@ -27,7 +25,6 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
-import kotlin.getValue
 
 fun Route.publicCompanyJobOfferRoutes() {
     val jobOfferRepository by inject<CompanyJobOfferRepository>()
@@ -80,10 +77,8 @@ fun Route.publicCompanyJobOfferRoutes() {
 fun Route.publicCompanyJobOfferPromotionsRoutes() {
     val companyRepository by inject<CompanyRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
-    val notificationRepository by inject<NotificationRepository>()
     val eventRepository by inject<EventRepository>()
     val promotionRepository by inject<CompanyJobOfferPromotionRepository>()
-    val partnershipEmailHistoryRepository by inject<PartnershipEmailHistoryRepository>()
 
     route("/companies/{companyId}/job-offers/{jobOfferId}/promotions") {
         get {
@@ -104,6 +99,8 @@ fun Route.publicCompanyJobOfferPromotionsRoutes() {
     }
 
     route("/companies/{companyId}/partnerships/{partnershipId}/promote") {
+        install(NotificationPartnershipPlugin)
+
         post {
             val companyId = call.parameters.companyUUID
             val partnershipId = call.parameters.partnershipId
@@ -128,31 +125,15 @@ fun Route.publicCompanyJobOfferPromotionsRoutes() {
                 ?: throw NotFoundException("Promotion not found after creation")
 
             // Send notification to organizers
-            val company = companyRepository.getById(companyId)
             val partnership = partnershipRepository.getById(promotion.eventSlug, partnershipId)
-            val event = eventRepository.getBySlug(promotion.eventSlug)
-
             val variables = NotificationVariables.JobOfferPromoted(
                 language = partnership.language,
-                event = event,
-                company = company,
+                event = eventRepository.getBySlug(promotion.eventSlug),
+                company = companyRepository.getById(companyId),
                 partnership = partnership,
                 jobOffer = promotion.jobOffer,
             )
-            val deliveryResults = notificationRepository.sendMessage(promotion.eventSlug, variables)
-
-            // Log email history
-            deliveryResults.filterIsInstance<EmailDeliveryResult>().firstOrNull()?.let { deliveryResult ->
-                partnershipEmailHistoryRepository.create(
-                    partnershipId = partnershipId,
-                    senderEmail = deliveryResult.senderEmail,
-                    subject = deliveryResult.subject,
-                    bodyPlainText = deliveryResult.body,
-                    deliveryResult = deliveryResult,
-                    triggeredBy = this.call.attributes.user.userId.toUUID(),
-                )
-            }
-
+            call.attributes.variables = variables
             call.respond(HttpStatusCode.Created, mapOf("id" to promotionId.toString()))
         }
     }
