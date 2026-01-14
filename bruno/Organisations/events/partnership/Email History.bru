@@ -1,0 +1,36 @@
+meta {
+  name: Email History
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/partnerships/:partnership_id/email-history
+  body: none
+  auth: none
+}
+
+params:path {
+  partnership_id: {{partnership_id}}
+  event_slug: {{event_slug}}
+  org_slug: {{org_slug}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "company_id": "{{company_id}}",
+    "pack_id": "{{pack_id}}",
+    "option_ids": [],
+    "contact_name": "John Doe",
+    "contact_role": "Director",
+    "language": "en",
+    "phone": "0612788709",
+    "emails": [
+      "gerard@devlille.fr"
+    ]
+  }
+}

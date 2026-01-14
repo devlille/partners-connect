@@ -1,0 +1,35 @@
+meta {
+  name: Send Email
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/partnerships/email
+  body: json
+  auth: none
+}
+
+params:query {
+  ~filter[validated]: false
+  ~filter[agreement-generated]: false
+  ~filter[agreement-signed]: false
+  ~filter[pack_id]: {{pack_id}}
+  ~filter[suggestion]: false
+}
+
+params:path {
+  event_slug: {{event_slug}}
+  org_slug: {{org_slug}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "subject": "Test",
+    "body": "Test"
+  }
+}
