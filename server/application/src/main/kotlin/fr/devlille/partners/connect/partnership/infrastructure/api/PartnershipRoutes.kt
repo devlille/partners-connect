@@ -68,22 +68,21 @@ private fun Route.publicPartnershipRoutes() {
             val eventSlug = call.parameters.eventSlug
             val register = call.receive<RegisterPartnership>(schema = "register_partnership.schema.json")
             val id = partnershipRepository.register(eventSlug, register)
-            val company = companyRepository.getById(register.companyId.toUUID())
             val partnership = partnershipRepository.getById(eventSlug, id)
-            val pack = partnership.selectedPack
-                ?: throw NotFoundException("Partnership does not have a selected pack")
-            val event = eventRepository.getBySlug(eventSlug)
             val variables = NotificationVariables.NewPartnership(
-                register.language,
-                event,
-                company,
-                partnership,
-                pack,
+                language = register.language,
+                event = eventRepository.getBySlug(eventSlug),
+                company = companyRepository.getById(register.companyId.toUUID()),
+                partnership = partnership,
+                pack = partnership.selectedPack
+                    ?: throw NotFoundException("Partnership does not have a selected pack"),
             )
-            val deliveryResults = notificationRepository.sendMessage(eventSlug, variables)
+            val deliveryResult = notificationRepository.sendMessage(variables)
+                .filterIsInstance<EmailDeliveryResult>()
+                .firstOrNull()
 
             // Log email history
-            deliveryResults.filterIsInstance<EmailDeliveryResult>().firstOrNull()?.let { deliveryResult ->
+            deliveryResult?.let { deliveryResult ->
                 partnershipEmailHistoryRepository.create(
                     partnershipId = id,
                     senderEmail = deliveryResult.senderEmail,
@@ -96,11 +95,11 @@ private fun Route.publicPartnershipRoutes() {
 
             // Send webhook notification for partnership creation
             webhookRepository.sendWebhooks(eventSlug, id, WebhookEventType.CREATED)
-
             call.respond(HttpStatusCode.Created, mapOf("id" to id.toString()))
         }
-
-        get("/{partnershipId}") {
+    }
+    route("/events/{eventSlug}/partnerships/{partnershipId}") {
+        get {
             val eventSlug = call.parameters.eventSlug
             val partnershipId = call.parameters.partnershipId
 
@@ -120,7 +119,7 @@ private fun Route.publicPartnershipRoutes() {
             call.respond(HttpStatusCode.OK, response)
         }
 
-        put("/{partnershipId}") {
+        put {
             val eventSlug = call.parameters.eventSlug
             val partnershipId = call.parameters.partnershipId
             val update = call.receive<UpdatePartnershipContactInfo>(
@@ -174,8 +173,11 @@ private fun Route.orgsPartnershipRoutes() {
             val partnerships = repository.listByEvent(eventSlug, filters, direction)
             call.respond(HttpStatusCode.OK, partnerships)
         }
+    }
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}") {
+        install(AuthorizedOrganisationPlugin)
 
-        delete("/{partnershipId}") {
+        delete {
             val partnershipId = call.parameters.partnershipId
             repository.delete(partnershipId)
             call.respond(HttpStatusCode.NoContent)

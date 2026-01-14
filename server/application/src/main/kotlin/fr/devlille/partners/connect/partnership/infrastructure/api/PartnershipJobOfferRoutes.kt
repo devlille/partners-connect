@@ -7,20 +7,17 @@ import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrgani
 import fr.devlille.partners.connect.internal.infrastructure.api.DEFAULT_PAGE_SIZE
 import fr.devlille.partners.connect.internal.infrastructure.api.getValue
 import fr.devlille.partners.connect.internal.infrastructure.api.token
-import fr.devlille.partners.connect.internal.infrastructure.api.user
 import fr.devlille.partners.connect.internal.infrastructure.db.PromotionStatus
+import fr.devlille.partners.connect.internal.infrastructure.ktor.NotificationPartnershipPlugin
+import fr.devlille.partners.connect.internal.infrastructure.ktor.WebhookPartnershipPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
+import fr.devlille.partners.connect.internal.infrastructure.ktor.variables
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
-import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
-import fr.devlille.partners.connect.notifications.infrastructure.gateways.EmailDeliveryResult
 import fr.devlille.partners.connect.organisations.infrastructure.api.orgSlug
 import fr.devlille.partners.connect.partnership.domain.DeclineJobOfferRequest
-import fr.devlille.partners.connect.partnership.domain.PartnershipEmailHistoryRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipJobOfferRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
-import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
-import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -28,7 +25,6 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
-import kotlin.getValue
 
 /**
  * Routes for partnership job offer promotions.
@@ -89,15 +85,15 @@ fun Route.orgsPartnershipJobOfferRoutes() {
 fun Route.orgsPartnershipJobOfferDecisionRoutes() {
     val repository by inject<PartnershipJobOfferRepository>()
     val authRepository by inject<AuthRepository>()
-    val partnershipEmailHistoryRepository by inject<PartnershipEmailHistoryRepository>()
-    val notificationRepository by inject<NotificationRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
     val eventRepository by inject<EventRepository>()
-    val webhookRepository by inject<WebhookRepository>()
 
-    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/job-offers/{promotionId}") {
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/job-offers/{promotionId}/approve") {
         install(AuthorizedOrganisationPlugin)
-        post("/approve") {
+        install(NotificationPartnershipPlugin)
+        install(WebhookPartnershipPlugin)
+
+        post {
             val promotionId = call.parameters.getValue("promotionId").toUUID()
             val eventSlug = call.parameters.eventSlug
             val userInfo = authRepository.getUserInfo(call.token)
@@ -105,37 +101,24 @@ fun Route.orgsPartnershipJobOfferDecisionRoutes() {
 
             // Send notification after successful approval
             val partnershipId = promotion.partnershipId.toUUID()
-            val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
-            val event = eventRepository.getBySlug(eventSlug)
             val variables = NotificationVariables.JobOfferApproved(
                 language = partnership.language,
-                event = event,
-                company = company,
+                event = eventRepository.getBySlug(eventSlug),
+                company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId),
                 partnership = partnership,
                 jobOffer = promotion.jobOffer,
             )
-            val deliveryResults = notificationRepository.sendMessage(eventSlug, variables)
-
-            // Log email history
-            deliveryResults.filterIsInstance<EmailDeliveryResult>().firstOrNull()?.let { deliveryResult ->
-                partnershipEmailHistoryRepository.create(
-                    partnershipId = partnershipId,
-                    senderEmail = deliveryResult.senderEmail,
-                    subject = deliveryResult.subject,
-                    bodyPlainText = deliveryResult.body,
-                    deliveryResult = deliveryResult,
-                    triggeredBy = this.call.attributes.user.userId.toUUID(),
-                )
-            }
-
-            // Send webhook notification for job offer approval
-            webhookRepository.sendWebhooks(eventSlug, partnershipId, WebhookEventType.UPDATED)
-
+            call.attributes.variables = variables
             call.respond(HttpStatusCode.OK, promotion)
         }
+    }
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/job-offers/{promotionId}/decline") {
+        install(AuthorizedOrganisationPlugin)
+        install(NotificationPartnershipPlugin)
+        install(WebhookPartnershipPlugin)
 
-        post("/decline") {
+        post {
             val promotionId = call.parameters.getValue("promotionId").toUUID()
             val eventSlug = call.parameters.eventSlug
             val request = call.receive<DeclineJobOfferRequest>(schema = "decline_job_offer_promotion.schema.json")
@@ -145,34 +128,16 @@ fun Route.orgsPartnershipJobOfferDecisionRoutes() {
 
             // Send notification after successful decline
             val partnershipId = promotion.partnershipId.toUUID()
-            val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
-            val event = eventRepository.getBySlug(eventSlug)
             val variables = NotificationVariables.JobOfferDeclined(
                 language = partnership.language,
-                event = event,
-                company = company,
+                event = eventRepository.getBySlug(eventSlug),
+                company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId),
                 partnership = partnership,
                 jobOffer = promotion.jobOffer,
                 declineReason = request.reason,
             )
-            val deliveryResults = notificationRepository.sendMessage(eventSlug, variables)
-
-            // Log email history
-            deliveryResults.filterIsInstance<EmailDeliveryResult>().firstOrNull()?.let { deliveryResult ->
-                partnershipEmailHistoryRepository.create(
-                    partnershipId = partnershipId,
-                    senderEmail = deliveryResult.senderEmail,
-                    subject = deliveryResult.subject,
-                    bodyPlainText = deliveryResult.body,
-                    deliveryResult = deliveryResult,
-                    triggeredBy = this.call.attributes.user.userId.toUUID(),
-                )
-            }
-
-            // Send webhook notification for job offer decline
-            webhookRepository.sendWebhooks(eventSlug, partnershipId, WebhookEventType.UPDATED)
-
+            call.attributes.variables = variables
             call.respond(HttpStatusCode.OK, promotion)
         }
     }

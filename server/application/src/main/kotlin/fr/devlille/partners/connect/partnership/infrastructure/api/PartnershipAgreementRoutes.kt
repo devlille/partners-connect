@@ -4,14 +4,12 @@ import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.api.UnsupportedMediaTypeException
-import fr.devlille.partners.connect.internal.infrastructure.api.user
+import fr.devlille.partners.connect.internal.infrastructure.ktor.NotificationPartnershipPlugin
+import fr.devlille.partners.connect.internal.infrastructure.ktor.WebhookPartnershipPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
-import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
-import fr.devlille.partners.connect.notifications.domain.NotificationRepository
+import fr.devlille.partners.connect.internal.infrastructure.ktor.variables
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
-import fr.devlille.partners.connect.notifications.infrastructure.gateways.EmailDeliveryResult
 import fr.devlille.partners.connect.partnership.domain.PartnershipAgreementRepository
-import fr.devlille.partners.connect.partnership.domain.PartnershipEmailHistoryRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipStorageRepository
 import io.ktor.http.ContentType
@@ -29,10 +27,11 @@ fun Route.publicPartnershipAgreementRoutes() {
     val partnershipRepository by inject<PartnershipRepository>()
     val agreementRepository by inject<PartnershipAgreementRepository>()
     val storageRepository by inject<PartnershipStorageRepository>()
-    val partnershipEmailHistoryRepository by inject<PartnershipEmailHistoryRepository>()
-    val notificationRepository by inject<NotificationRepository>()
 
     route("/events/{eventSlug}/partnerships/{partnershipId}/signed-agreement") {
+        install(NotificationPartnershipPlugin)
+        install(WebhookPartnershipPlugin)
+
         post {
             val eventSlug = call.parameters.eventSlug
             val partnershipId = call.parameters.partnershipId
@@ -43,25 +42,14 @@ fun Route.publicPartnershipAgreementRoutes() {
             }
             val url = storageRepository.uploadSignedAgreement(eventSlug, partnershipId, bytes)
             agreementRepository.updateAgreementSignedUrl(eventSlug, partnershipId, url)
-            val event = eventRepository.getBySlug(eventSlug)
-            val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
-            val variables = NotificationVariables
-                .PartnershipAgreementSigned(partnership.language, event, company, partnership)
-            val deliveryResults = notificationRepository.sendMessage(eventSlug, variables)
-
-            // Log email history
-            deliveryResults.filterIsInstance<EmailDeliveryResult>().firstOrNull()?.let { deliveryResult ->
-                partnershipEmailHistoryRepository.create(
-                    partnershipId = partnershipId,
-                    senderEmail = deliveryResult.senderEmail,
-                    subject = deliveryResult.subject,
-                    bodyPlainText = deliveryResult.body,
-                    deliveryResult = deliveryResult,
-                    triggeredBy = this.call.attributes.user.userId.toUUID(),
-                )
-            }
-
+            val variables = NotificationVariables.PartnershipAgreementSigned(
+                language = partnership.language,
+                event = eventRepository.getBySlug(eventSlug),
+                company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId),
+                partnership = partnership,
+            )
+            call.attributes.variables = variables
             call.respond(HttpStatusCode.OK, mapOf("url" to url))
         }
     }
@@ -74,6 +62,7 @@ fun Route.orgsPartnershipAgreementRoutes() {
 
     route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/agreement") {
         install(AuthorizedOrganisationPlugin)
+        install(WebhookPartnershipPlugin)
 
         post {
             val eventSlug = call.parameters.eventSlug
