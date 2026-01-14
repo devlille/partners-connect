@@ -88,10 +88,13 @@ fun Route.publicPartnershipBillingRoutes() {
 }
 
 fun Route.orgsPartnershipBillingRoutes() {
+    val eventRepository by inject<EventRepository>()
+    val partnershipRepository by inject<PartnershipRepository>()
     val partnershipBillingRepository by inject<PartnershipBillingRepository>()
 
     route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/billing/{billingStatus}") {
         install(AuthorizedOrganisationPlugin)
+        install(NotificationPartnershipPlugin)
         install(WebhookPartnershipPlugin)
 
         post {
@@ -99,6 +102,18 @@ fun Route.orgsPartnershipBillingRoutes() {
             val partnershipId = call.parameters.partnershipId
             val status = call.parameters.billingStatus
             val id = partnershipBillingRepository.updateStatus(eventSlug, partnershipId, status)
+
+            val event = eventRepository.getBySlug(eventSlug)
+            val company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId)
+            val partnership = partnershipRepository.getById(eventSlug, partnershipId)
+            val variables = NotificationVariables.BillingStatusChanged(
+                language = partnership.language,
+                event = event,
+                company = company,
+                partnership = partnership,
+                status = status,
+            )
+            call.attributes.variables = variables
             call.respond(HttpStatusCode.OK, mapOf("id" to id.toString()))
         }
     }

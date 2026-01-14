@@ -3,6 +3,7 @@ package fr.devlille.partners.connect.notifications.domain
 import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.companies.domain.JobOffer
 import fr.devlille.partners.connect.events.domain.EventWithOrganisation
+import fr.devlille.partners.connect.partnership.domain.InvoiceStatus
 import fr.devlille.partners.connect.partnership.domain.Partnership
 import fr.devlille.partners.connect.partnership.domain.PartnershipDetail
 import fr.devlille.partners.connect.partnership.domain.PartnershipPack
@@ -127,6 +128,26 @@ sealed interface NotificationVariables {
                 .replace("{{event_contact}}", event.event.contact.email)
                 .replace("{{company_name}}", company.name)
                 .replace("{{partnership_link}}", partnershipLink)
+        }
+    }
+
+    data class BillingStatusChanged(
+        override val language: String,
+        override val event: EventWithOrganisation,
+        override val company: Company,
+        val partnership: Partnership,
+        val status: InvoiceStatus,
+    ) : NotificationVariables {
+        override val usageName: String = "billing_status_changed"
+
+        override fun populate(content: String): String {
+            val partnershipLink = partnership.link(event)
+            return content
+                .replace("{{event_name}}", event.event.name)
+                .replace("{{event_contact}}", event.event.contact.email)
+                .replace("{{company_name}}", company.name)
+                .replace("{{partnership_link}}", partnershipLink)
+                .replace("{{billing_status}}", status.name.lowercase())
         }
     }
 
