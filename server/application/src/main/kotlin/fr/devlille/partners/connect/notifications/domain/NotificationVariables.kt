@@ -151,6 +151,23 @@ sealed interface NotificationVariables {
         }
     }
 
+    data class PartnershipAgreement(
+        override val language: String,
+        override val event: EventWithOrganisation,
+        override val company: Company,
+        val partnership: PartnershipDetail,
+    ) : NotificationVariables {
+        override val usageName: String = "partnership_agreement"
+
+        override fun populate(content: String): String {
+            val partnershipLink = partnership.link(event)
+            return content
+                .replace("{{event_name}}", event.event.name)
+                .replace("{{company_name}}", company.name)
+                .replace("{{partnership_link}}", partnershipLink)
+        }
+    }
+
     data class PartnershipAgreementSigned(
         override val language: String,
         override val event: EventWithOrganisation,

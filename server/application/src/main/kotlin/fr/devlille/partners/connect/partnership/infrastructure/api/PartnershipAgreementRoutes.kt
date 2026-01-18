@@ -56,12 +56,14 @@ fun Route.publicPartnershipAgreementRoutes() {
 }
 
 fun Route.orgsPartnershipAgreementRoutes() {
+    val eventRepository by inject<EventRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
     val agreementRepository by inject<PartnershipAgreementRepository>()
     val storageRepository by inject<PartnershipStorageRepository>()
 
     route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/agreement") {
         install(AuthorizedOrganisationPlugin)
+        install(NotificationPartnershipPlugin)
         install(WebhookPartnershipPlugin)
 
         post {
@@ -72,6 +74,13 @@ fun Route.orgsPartnershipAgreementRoutes() {
             val pdfBinary = agreementRepository.generatePDF(agreement, details)
             val agreementUrl = storageRepository.uploadAgreement(eventSlug, partnershipId, pdfBinary)
             agreementRepository.updateAgreementUrl(eventSlug, partnershipId, agreementUrl)
+            val variables = NotificationVariables.PartnershipAgreement(
+                language = details.language,
+                event = eventRepository.getBySlug(eventSlug),
+                company = partnershipRepository.getCompanyByPartnershipId(eventSlug, partnershipId),
+                partnership = details,
+            )
+            call.attributes.variables = variables
             call.respond(HttpStatusCode.OK, mapOf("url" to agreementUrl))
         }
     }
