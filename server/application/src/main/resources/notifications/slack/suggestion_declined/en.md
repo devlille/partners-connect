@@ -1,1 +1,3 @@
-Company {{company_name}} declined pack suggestion.
+Company **{{company_name}}** declined pack suggestion.
+
+View partnership: {{partnership_link}}
