@@ -1,1 +1,1 @@
-Promotion d'offre d'emploi approuvée - {{event_name}}
+Promotion d'offre d'emploi approuvée

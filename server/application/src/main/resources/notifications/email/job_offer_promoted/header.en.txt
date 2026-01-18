@@ -1,1 +1,1 @@
-Job offer promoted - {{event_name}}
+Job offer promoted

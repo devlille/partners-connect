@@ -1,1 +1,1 @@
-Promotion d'offre d'emploi refusée - {{event_name}}
+Promotion d'offre d'emploi refusée
