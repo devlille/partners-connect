@@ -205,6 +205,66 @@
             </p>
           </div>
         </div>
+
+        <!-- Section Historique des emails -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 id="email-history-section" class="text-lg font-semibold text-gray-900 mb-4">
+            {{ $t('email.history.title') }}
+          </h2>
+
+          <div v-if="loadingEmails" class="text-sm text-gray-500" role="status" aria-live="polite">
+            <i class="i-heroicons-arrow-path animate-spin mr-2" aria-hidden="true" />
+            {{ $t('email.history.loading') }}
+          </div>
+
+          <div v-else-if="emailError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            {{ $t('email.history.error') }}
+          </div>
+
+          <div v-else-if="emailHistory.length === 0" class="text-center py-8">
+            <i class="i-heroicons-envelope text-4xl text-gray-300 mb-2" aria-hidden="true" />
+            <p class="text-sm text-gray-500">{{ $t('email.history.empty') }}</p>
+          </div>
+
+          <div v-else class="space-y-3">
+            <div
+              v-for="email in emailHistory"
+              :key="email.id"
+              class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+              role="button"
+              tabindex="0"
+              :aria-label="$t('email.history.ariaEmailItem', { subject: email.subject, date: formatEmailDate(email.sent_at) })"
+              @click="openEmailModal(email)"
+              @keydown.enter="openEmailModal(email)"
+              @keydown.space.prevent="openEmailModal(email)"
+            >
+              <div class="flex items-start justify-between gap-4">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span
+                      :class="[
+                        'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
+                        getEmailStatusColor(email.overall_status)
+                      ]"
+                    >
+                      {{ getEmailStatusLabel(email.overall_status) }}
+                    </span>
+                    <span class="text-xs text-gray-500">
+                      {{ $t('email.history.recipients', { count: email.recipients.length }) }}
+                    </span>
+                  </div>
+                  <p class="text-sm font-medium text-gray-900 truncate">{{ email.subject }}</p>
+                  <p class="text-xs text-gray-500 mt-1">
+                    {{ $t('email.history.sentBy', { name: email.triggered_by.display_name || email.triggered_by.email }) }}
+                  </p>
+                </div>
+                <div class="text-xs text-gray-500 whitespace-nowrap">
+                  {{ formatEmailDate(email.sent_at) }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -229,17 +289,128 @@
       :current-language="partnership?.language"
       @submit="handleSuggestPackSubmit"
     />
+
+    <!-- Modale de détail d'un email -->
+    <Teleport to="body">
+      <div
+        v-if="selectedEmailInternal"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+        role="dialog"
+        aria-modal="true"
+        :aria-labelledby="'email-modal-title'"
+        @click.self="closeEmailModal"
+        @keydown.escape="closeEmailModal"
+      >
+        <div
+          ref="emailModalRef"
+          class="w-full max-w-2xl bg-white rounded-lg shadow-xl max-h-[90vh] overflow-hidden"
+          @click.stop
+        >
+          <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h3 id="email-modal-title" class="text-lg font-semibold text-gray-900">{{ $t('email.history.detailTitle') }}</h3>
+            <UButton
+              ref="closeButtonRef"
+              icon="i-heroicons-x-mark"
+              color="neutral"
+              variant="ghost"
+              size="sm"
+              :aria-label="$t('common.close')"
+              @click="closeEmailModal"
+            />
+          </div>
+
+          <div class="px-6 py-4 space-y-4 overflow-y-auto max-h-[calc(90vh-120px)]">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-500">{{ $t('email.history.sentAt') }}</label>
+                <p class="text-gray-900">{{ formatEmailDate(selectedEmailInternal.sent_at) }}</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-500">{{ $t('email.history.status') }}</label>
+                <span
+                  :class="[
+                    'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
+                    getEmailStatusColor(selectedEmailInternal.overall_status)
+                  ]"
+                >
+                  {{ getEmailStatusLabel(selectedEmailInternal.overall_status) }}
+                </span>
+              </div>
+              <div class="col-span-2">
+                <label class="block text-sm font-medium text-gray-500">{{ $t('email.history.sender') }}</label>
+                <p class="text-gray-900">{{ selectedEmailInternal.triggered_by.display_name || selectedEmailInternal.triggered_by.email }}</p>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-500">{{ $t('email.history.subject') }}</label>
+              <p class="text-gray-900 font-medium">{{ selectedEmailInternal.subject }}</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-500 mb-2">{{ $t('email.history.recipientsList') }}</label>
+              <div class="space-y-2">
+                <div
+                  v-for="recipient in selectedEmailInternal.recipients"
+                  :key="recipient.value"
+                  class="flex items-center justify-between p-2 bg-gray-50 rounded"
+                >
+                  <span class="text-sm text-gray-900">{{ recipient.value }}</span>
+                  <span
+                    :class="[
+                      'text-xs px-2 py-1 rounded-full',
+                      recipient.status === 'SENT'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                    ]"
+                  >
+                    {{ recipient.status === 'SENT' ? $t('email.history.statusSent') : $t('email.history.statusFailed') }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-500 mb-2">{{ $t('email.history.content') }}</label>
+              <div
+                class="p-4 bg-gray-50 rounded border border-gray-200 text-sm text-gray-700 prose prose-sm max-w-none"
+                v-html="sanitizedEmailBody"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </Dashboard>
 </template>
 
 <script setup lang="ts">
-import { getEventsPartnershipDetailed, getEventsPartnershipBilling, updatePartnershipContactInfo, postOrgsEventsPartnershipSuggestion, postOrgsEventsPartnershipBilling, postPartnershipOrganiser, deletePartnershipOrganiser, getOrgsUsers, type UserSchema, type CompanyBillingDataSchema } from "~/utils/api";
+import DOMPurify from 'dompurify';
+import { getEventsPartnershipDetailed, getEventsPartnershipBilling, updatePartnershipContactInfo, postOrgsEventsPartnershipSuggestion, postOrgsEventsPartnershipBilling, postPartnershipOrganiser, deletePartnershipOrganiser, getOrgsUsers, getPartnershipEmailHistory, type UserSchema, type CompanyBillingDataSchema } from "~/utils/api";
+
+interface EmailRecipient {
+  value: string;
+  status: 'SENT' | 'FAILED';
+}
+
+interface EmailHistoryItem {
+  id: string;
+  partnership_id: string;
+  sent_at: string;
+  sender_email: string;
+  subject: string;
+  body_plain_text: string;
+  overall_status: 'SENT' | 'FAILED' | 'PARTIAL';
+  triggered_by: UserSchema;
+  recipients: EmailRecipient[];
+}
 import authMiddleware from "~/middleware/auth";
 import type { ExtendedPartnershipItem } from "~/types/partnership";
 import { PARTNERSHIP_CONFIRM } from "~/constants/partnership";
 
 const route = useRoute();
 const router = useRouter();
+const { t } = useI18n();
 const { footerLinks } = useDashboardLinks();
 const { validatePartnership, declinePartnership } = usePartnershipActions();
 const { confirm, confirmState, handleConfirm: confirmModalConfirm, handleCancel: confirmModalCancel } = useConfirm();
@@ -287,6 +458,48 @@ const loadingUsers = ref(false);
 const isAssigning = ref(false);
 const isUnassigning = ref(false);
 const assignError = ref<string | null>(null);
+
+// États pour l'historique des emails
+const emailHistory = ref<EmailHistoryItem[]>([]);
+const loadingEmails = ref(false);
+const emailError = ref(false);
+const selectedEmailInternal = ref<EmailHistoryItem | null>(null);
+const emailModalRef = ref<HTMLElement | null>(null);
+const closeButtonRef = ref<{ $el: HTMLElement } | null>(null);
+
+// Computed pour sanitiser le HTML du corps de l'email
+const sanitizedEmailBody = computed(() => {
+  if (!selectedEmailInternal.value) return '';
+  return DOMPurify.sanitize(selectedEmailInternal.value.body_plain_text, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'span', 'div'],
+    ALLOWED_ATTR: ['href', 'target', 'rel', 'class']
+  });
+});
+
+/**
+ * Ouvrir la modale d'un email et mettre à jour l'URL
+ */
+function openEmailModal(email: EmailHistoryItem) {
+  selectedEmailInternal.value = email;
+  const url = new URL(window.location.href);
+  url.searchParams.set('email', email.id);
+  window.history.replaceState({}, '', url.toString());
+
+  // Focus sur le bouton de fermeture après ouverture
+  nextTick(() => {
+    closeButtonRef.value?.$el?.focus();
+  });
+}
+
+/**
+ * Fermer la modale d'email et retirer le paramètre de l'URL
+ */
+function closeEmailModal() {
+  selectedEmailInternal.value = null;
+  const url = new URL(window.location.href);
+  url.searchParams.delete('email');
+  window.history.replaceState({}, '', url.toString());
+}
 
 // Menu contextuel pour la page du sponsor avec indicateurs d'informations manquantes
 const { sponsorLinks } = useSponsorLinks({
@@ -664,16 +877,95 @@ async function handleUnassignOrganiser() {
   }
 }
 
+/**
+ * Charger l'historique des emails du partenariat
+ */
+async function loadEmailHistory() {
+  try {
+    loadingEmails.value = true;
+    emailError.value = false;
+    const response = await getPartnershipEmailHistory(
+      orgSlug.value,
+      eventSlug.value,
+      sponsorId.value,
+      { page: 1, pageSize: 100 }
+    );
+    emailHistory.value = response.data.items as unknown as EmailHistoryItem[];
+
+    // Ouvrir la modale si un email est spécifié dans l'URL
+    const emailIdFromUrl = route.query.email as string | undefined;
+    if (emailIdFromUrl) {
+      const emailToOpen = emailHistory.value.find(e => e.id === emailIdFromUrl);
+      if (emailToOpen) {
+        selectedEmailInternal.value = emailToOpen;
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load email history:', err);
+    emailError.value = true;
+  } finally {
+    loadingEmails.value = false;
+  }
+}
+
+/**
+ * Formater une date d'email
+ */
+function formatEmailDate(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+/**
+ * Obtenir la couleur du badge de statut d'email
+ */
+function getEmailStatusColor(status: string): string {
+  switch (status) {
+    case 'SENT':
+      return 'bg-green-100 text-green-800';
+    case 'PARTIAL':
+      return 'bg-yellow-100 text-yellow-800';
+    case 'FAILED':
+      return 'bg-red-100 text-red-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
+}
+
+/**
+ * Obtenir le libellé du statut d'email
+ */
+function getEmailStatusLabel(status: string): string {
+  switch (status) {
+    case 'SENT':
+      return t('email.history.statusSent');
+    case 'PARTIAL':
+      return t('email.history.statusPartial');
+    case 'FAILED':
+      return t('email.history.statusFailed');
+    default:
+      return status;
+  }
+}
+
 onMounted(() => {
   loadPartnership();
   loadBilling();
   loadOrgUsers();
+  loadEmailHistory();
 });
 
 // Recharger si les slugs changent
 watch([orgSlug, eventSlug, sponsorId], () => {
   loadPartnership();
   loadBilling();
+  loadEmailHistory();
 });
 
 useHead({

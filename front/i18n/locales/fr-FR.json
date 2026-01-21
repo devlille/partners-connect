@@ -78,6 +78,25 @@
     "list": "Liste des sponsors"
   },
   "email": {
+    "history": {
+      "title": "Historique des emails",
+      "loading": "Chargement de l'historique...",
+      "empty": "Aucun email envoyé à ce partenaire",
+      "error": "Impossible de charger l'historique des emails",
+      "recipients": "{count} destinataire(s)",
+      "sentBy": "Envoyé par {name}",
+      "detailTitle": "Détail de l'email",
+      "sentAt": "Date d'envoi",
+      "status": "Statut",
+      "sender": "Envoyé par",
+      "subject": "Sujet",
+      "recipientsList": "Destinataires",
+      "content": "Contenu",
+      "statusSent": "Envoyé",
+      "statusPartial": "Partiel",
+      "statusFailed": "Échoué",
+      "ariaEmailItem": "Email: {subject}, envoyé le {date}"
+    },
     "modal": {
       "title": "Envoyer un email aux sponsors",
       "recipients": "Destinataires",

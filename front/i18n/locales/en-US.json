@@ -78,6 +78,25 @@
     "list": "Sponsors list"
   },
   "email": {
+    "history": {
+      "title": "Email history",
+      "loading": "Loading history...",
+      "empty": "No email sent to this partner",
+      "error": "Unable to load email history",
+      "recipients": "{count} recipient(s)",
+      "sentBy": "Sent by {name}",
+      "detailTitle": "Email details",
+      "sentAt": "Sent at",
+      "status": "Status",
+      "sender": "Sent by",
+      "subject": "Subject",
+      "recipientsList": "Recipients",
+      "content": "Content",
+      "statusSent": "Sent",
+      "statusPartial": "Partial",
+      "statusFailed": "Failed",
+      "ariaEmailItem": "Email: {subject}, sent on {date}"
+    },
     "modal": {
       "title": "Send email to sponsors",
       "recipients": "Recipients",

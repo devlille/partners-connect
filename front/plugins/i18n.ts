@@ -37,7 +37,8 @@ export default defineNuxtPlugin((nuxtApp) => {
         description:
           "Votre partenariat a été validé ! Pour finaliser le processus, merci de compléter les informations manquantes dans les onglets suivants :",
         partnershipLink: "Partenariat",
-        partnershipDescription: "Vérifiez et complétez vos coordonnées de contact",
+        partnershipDescription:
+          "Vérifiez et complétez vos coordonnées de contact",
         companyLink: "Entreprise",
         companyDescription: "Renseignez les informations de votre société",
       },
@@ -84,11 +85,32 @@ export default defineNuxtPlugin((nuxtApp) => {
       },
     },
     email: {
+      history: {
+        title: "Historique des emails",
+        loading: "Chargement de l'historique...",
+        empty: "Aucun email envoyé à ce partenaire",
+        error: "Impossible de charger l'historique des emails",
+        recipients: "{count} destinataire(s)",
+        sentBy: "Envoyé par {name}",
+        detailTitle: "Détail de l'email",
+        sentAt: "Date d'envoi",
+        status: "Statut",
+        sender: "Envoyé par",
+        subject: "Sujet",
+        recipientsList: "Destinataires",
+        content: "Contenu",
+        statusSent: "Envoyé",
+        statusPartial: "Partiel",
+        statusFailed: "Échoué",
+        ariaEmailItem: "Email: {subject}, envoyé le {date}",
+      },
       modal: {
         title: "Envoyer un email aux sponsors",
         recipients: "Destinataires",
-        recipientsWithFilters: "L'email sera envoyé aux sponsors correspondant aux filtres actifs.",
-        recipientsAll: "L'email sera envoyé à tous les sponsors de l'événement.",
+        recipientsWithFilters:
+          "L'email sera envoyé aux sponsors correspondant aux filtres actifs.",
+        recipientsAll:
+          "L'email sera envoyé à tous les sponsors de l'événement.",
         subject: "Sujet",
         subjectPlaceholder: "Sujet de l'email",
         subjectHint: "Le sujet sera préfixé par le nom de l'événement.",
@@ -154,7 +176,8 @@ export default defineNuxtPlugin((nuxtApp) => {
       },
       paymentReceived: {
         title: "Payment received",
-        description: "Your payment has been received. You can now configure your partner space:",
+        description:
+          "Your payment has been received. You can now configure your partner space:",
         jobOffersLink: "Job offers",
         jobOffersDescription: "Publish your job offers",
         companyLink: "Company",
@@ -189,10 +212,30 @@ export default defineNuxtPlugin((nuxtApp) => {
       },
     },
     email: {
+      history: {
+        title: "Email History",
+        loading: "Loading history...",
+        empty: "No emails sent to this partner",
+        error: "Unable to load email history",
+        recipients: "{count} recipient(s)",
+        sentBy: "Sent by {name}",
+        detailTitle: "Email Details",
+        sentAt: "Sent Date",
+        status: "Status",
+        sender: "Sent by",
+        subject: "Subject",
+        recipientsList: "Recipients",
+        content: "Content",
+        statusSent: "Sent",
+        statusPartial: "Partial",
+        statusFailed: "Failed",
+        ariaEmailItem: "Email: {subject}, sent on {date}",
+      },
       modal: {
         title: "Send email to sponsors",
         recipients: "Recipients",
-        recipientsWithFilters: "The email will be sent to sponsors matching the active filters.",
+        recipientsWithFilters:
+          "The email will be sent to sponsors matching the active filters.",
         recipientsAll: "The email will be sent to all sponsors of the event.",
         subject: "Subject",
         subjectPlaceholder: "Email subject",
@@ -259,7 +302,8 @@ export default defineNuxtPlugin((nuxtApp) => {
       },
       paymentReceived: {
         title: "Pago recibido",
-        description: "Su pago ha sido recibido. Ahora puede configurar su espacio de socio:",
+        description:
+          "Su pago ha sido recibido. Ahora puede configurar su espacio de socio:",
         jobOffersLink: "Ofertas de empleo",
         jobOffersDescription: "Publique sus ofertas de empleo",
         companyLink: "Empresa",
@@ -294,12 +338,32 @@ export default defineNuxtPlugin((nuxtApp) => {
       },
     },
     email: {
+      history: {
+        title: "Historial de emails",
+        loading: "Cargando historial...",
+        empty: "No se han enviado emails a este socio",
+        error: "No se pudo cargar el historial de emails",
+        recipients: "{count} destinatario(s)",
+        sentBy: "Enviado por {name}",
+        detailTitle: "Detalle del email",
+        sentAt: "Fecha de envío",
+        status: "Estado",
+        sender: "Enviado por",
+        subject: "Asunto",
+        recipientsList: "Destinatarios",
+        content: "Contenido",
+        statusSent: "Enviado",
+        statusPartial: "Parcial",
+        statusFailed: "Fallido",
+        ariaEmailItem: "Email: {subject}, enviado el {date}",
+      },
       modal: {
         title: "Enviar email a los patrocinadores",
         recipients: "Destinatarios",
         recipientsWithFilters:
           "El email se enviará a los patrocinadores que coincidan con los filtros activos.",
-        recipientsAll: "El email se enviará a todos los patrocinadores del evento.",
+        recipientsAll:
+          "El email se enviará a todos los patrocinadores del evento.",
         subject: "Asunto",
         subjectPlaceholder: "Asunto del email",
         subjectHint: "El asunto será prefijado con el nombre del evento.",
