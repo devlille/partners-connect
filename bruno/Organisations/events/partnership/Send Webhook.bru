@@ -1,0 +1,28 @@
+meta {
+  name: Send Webhook
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/partnerships/:partnership_id/trigger/webhook
+  body: none
+  auth: none
+}
+
+params:path {
+  org_slug: {{org_slug}}
+  event_slug: {{event_slug}}
+  partnership_id: {{partnership_id}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "subject": "Test",
+    "body": "Test"
+  }
+}

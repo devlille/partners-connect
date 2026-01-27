@@ -4023,6 +4023,50 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/trigger/webhook:
+    post:
+      summary: Trigger webhook for partnership
+      operationId: postPartnershipTriggerWebhook
+      description: Manually trigger webhook for a specific partnership. Requires webhook integration to be configured.
+      tags:
+        - Partnerships
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Partnership ID
+      responses:
+        '204':
+          description: No Content - Webhook triggered successfully
+        '401':
+          description: Unauthorized - No valid session or insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Not Found - Partnership not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/partnerships/email:
     post:
       summary: Send email to filtered partnerships
