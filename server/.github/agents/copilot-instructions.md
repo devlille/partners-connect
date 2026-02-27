@@ -3,6 +3,8 @@
 Auto-generated from all feature plans. Last updated: 2026-01-10
 
 ## Active Technologies
+- Kotlin 1.9.x, JVM 21 (Amazon Corretto) + Ktor 2.x, Exposed 0.41+, kotlinx.serialization, Koin (017-override-partnership-price)
+- PostgreSQL (prod) / H2 in-memory (tests) via Exposed ORM (017-override-partnership-price)
 
 - Kotlin 1.9.x with JVM 21 (Amazon Corretto) + Ktor 2.x, Exposed 0.41+, kotlinx.serialization, Koin DI (016-partnership-email-history)
 
@@ -22,6 +24,7 @@ tests/
 Kotlin 1.9.x with JVM 21 (Amazon Corretto): Follow standard conventions
 
 ## Recent Changes
+- 017-override-partnership-price: Added Kotlin 1.9.x, JVM 21 (Amazon Corretto) + Ktor 2.x, Exposed 0.41+, kotlinx.serialization, Koin
 
 - 016-partnership-email-history: Added Kotlin 1.9.x with JVM 21 (Amazon Corretto) + Ktor 2.x, Exposed 0.41+, kotlinx.serialization, Koin DI
 

@@ -97,6 +97,7 @@ class PartnershipEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var communicationPublicationDate by PartnershipsTable.communicationPublicationDate
     var communicationSupportUrl by PartnershipsTable.communicationSupportUrl
     var organiser by UserEntity optionalReferencedOn PartnershipsTable.organiserId
+    var packPriceOverride by PartnershipsTable.packPriceOverride
     var createdAt by PartnershipsTable.createdAt
 }
 

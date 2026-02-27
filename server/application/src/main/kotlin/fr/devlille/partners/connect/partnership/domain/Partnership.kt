@@ -20,11 +20,13 @@ data class Partnership(
 )
 
 @Serializable
-class PartnershipPack(
+data class PartnershipPack(
     val id: String,
     val name: String,
     @SerialName("base_price")
     val basePrice: Int,
+    @SerialName("pack_price_override")
+    val packPriceOverride: Int? = null,
     @SerialName("required_options")
     val requiredOptions: List<PartnershipOption>,
     @SerialName("optional_options")

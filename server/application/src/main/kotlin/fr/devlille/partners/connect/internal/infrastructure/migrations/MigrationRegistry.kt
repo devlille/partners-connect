@@ -10,6 +10,7 @@ import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPartnershipCommunicationFieldsMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPartnershipEmailHistoryMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPartnershipOrganiserMigration
+import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPartnershipPriceOverridesMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPolymorphicSponsoringOptionsMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddProviderManagementMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddSelectableValuePricingMigration
@@ -47,6 +48,7 @@ object MigrationRegistry {
         AddPartnershipOrganiserMigration,
         MigrateNullableColumnInCompanyTableMigration,
         AddPartnershipEmailHistoryMigration,
+        AddPartnershipPriceOverridesMigration,
     )
 
     /**

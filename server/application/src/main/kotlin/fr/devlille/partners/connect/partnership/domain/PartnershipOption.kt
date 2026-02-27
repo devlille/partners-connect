@@ -39,6 +39,9 @@ sealed class PartnershipOption {
     abstract val price: Int
     abstract val quantity: Int
     abstract val totalPrice: Int
+
+    @SerialName("price_override")
+    abstract val priceOverride: Int?
 }
 
 /**
@@ -71,6 +74,8 @@ data class TextPartnershipOption(
     override val quantity: Int = 1,
     @SerialName("total_price")
     override val totalPrice: Int,
+    @SerialName("price_override")
+    override val priceOverride: Int? = null,
 ) : PartnershipOption()
 
 /**
@@ -108,6 +113,8 @@ data class QuantitativePartnershipOption(
     override val totalPrice: Int,
     @SerialName("type_descriptor")
     val typeDescriptor: QuantitativeDescriptor,
+    @SerialName("price_override")
+    override val priceOverride: Int? = null,
 ) : PartnershipOption()
 
 /**
@@ -145,6 +152,8 @@ data class NumberPartnershipOption(
     override val totalPrice: Int,
     @SerialName("type_descriptor")
     val typeDescriptor: NumberDescriptor,
+    @SerialName("price_override")
+    override val priceOverride: Int? = null,
 ) : PartnershipOption()
 
 /**
@@ -190,6 +199,8 @@ data class SelectablePartnershipOption(
     val typeDescriptor: SelectableDescriptor,
     @SerialName("selected_value")
     val selectedValue: SelectedValue,
+    @SerialName("price_override")
+    override val priceOverride: Int? = null,
 ) : PartnershipOption()
 
 /**

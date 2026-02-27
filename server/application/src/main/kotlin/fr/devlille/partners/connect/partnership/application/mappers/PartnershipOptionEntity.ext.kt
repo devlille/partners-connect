@@ -39,23 +39,29 @@ internal fun PartnershipOptionEntity.toDomain(
 private fun PartnershipOptionEntity.toTextPartnershipOption(
     name: String,
     description: String,
-): TextPartnershipOption = TextPartnershipOption(
-    id = option.id.value.toString(),
-    name = name,
-    description = description,
-    // No value to append
-    labelWithValue = name,
-    price = option.price ?: 0,
-    quantity = 1,
-    totalPrice = option.price ?: 0,
-)
+): TextPartnershipOption {
+    val cataloguePrice = option.price ?: 0
+    val effectivePrice = (priceOverride ?: option.price) ?: 0
+    return TextPartnershipOption(
+        id = option.id.value.toString(),
+        name = name,
+        description = description,
+        // No value to append
+        labelWithValue = name,
+        price = cataloguePrice,
+        quantity = 1,
+        totalPrice = effectivePrice,
+        priceOverride = priceOverride,
+    )
+}
 
 private fun PartnershipOptionEntity.toQuantitativePartnershipOption(
     name: String,
     description: String,
 ): QuantitativePartnershipOption {
     val quantity = selectedQuantity ?: 0
-    val price = option.price ?: 0
+    val cataloguePrice = option.price ?: 0
+    val effectivePrice = (priceOverride ?: option.price) ?: 0
     val labelWithValue = if (quantity > 0) "$name ($quantity)" else name
 
     return QuantitativePartnershipOption(
@@ -63,10 +69,11 @@ private fun PartnershipOptionEntity.toQuantitativePartnershipOption(
         name = name,
         description = description,
         labelWithValue = labelWithValue,
-        price = price,
+        price = cataloguePrice,
         quantity = quantity,
-        totalPrice = price * quantity,
+        totalPrice = effectivePrice * quantity,
         typeDescriptor = option.quantitativeDescriptor!!,
+        priceOverride = priceOverride,
     )
 }
 
@@ -75,7 +82,8 @@ private fun PartnershipOptionEntity.toNumberPartnershipOption(
     description: String,
 ): NumberPartnershipOption {
     val fixedQty = option.fixedQuantity ?: 0
-    val price = option.price ?: 0
+    val cataloguePrice = option.price ?: 0
+    val effectivePrice = (priceOverride ?: option.price) ?: 0
     val labelWithValue = if (fixedQty > 0) "$name ($fixedQty)" else name
 
     return NumberPartnershipOption(
@@ -83,10 +91,11 @@ private fun PartnershipOptionEntity.toNumberPartnershipOption(
         name = name,
         description = description,
         labelWithValue = labelWithValue,
-        price = price,
+        price = cataloguePrice,
         quantity = fixedQty,
-        totalPrice = price * fixedQty,
+        totalPrice = effectivePrice * fixedQty,
         typeDescriptor = option.numberDescriptor!!,
+        priceOverride = priceOverride,
     )
 }
 
@@ -97,6 +106,7 @@ private fun PartnershipOptionEntity.toSelectablePartnershipOption(
     val selectedVal = selectedValue
         ?: throw ForbiddenException("Selected value not found for selectable option ${option.id}")
     val labelWithValue = "$name (${selectedVal.value})"
+    val effectivePrice = priceOverride ?: selectedVal.price
 
     return SelectablePartnershipOption(
         id = option.id.value.toString(),
@@ -105,12 +115,13 @@ private fun PartnershipOptionEntity.toSelectablePartnershipOption(
         labelWithValue = labelWithValue,
         price = selectedVal.price,
         quantity = 1,
-        totalPrice = selectedVal.price,
+        totalPrice = effectivePrice,
         typeDescriptor = option.selectableDescriptor!!,
         selectedValue = SelectedValue(
             id = selectedVal.id.value.toString(),
             value = selectedVal.value,
             price = selectedVal.price,
         ),
+        priceOverride = priceOverride,
     )
 }

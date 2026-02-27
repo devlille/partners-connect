@@ -80,4 +80,5 @@ class PartnershipOptionEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var option by SponsoringOptionEntity referencedOn PartnershipOptionsTable.optionId
     var selectedQuantity by PartnershipOptionsTable.selectedQuantity
     var selectedValue by SelectableValueEntity optionalReferencedOn PartnershipOptionsTable.selectedValueId
+    var priceOverride by PartnershipOptionsTable.priceOverride
 }

@@ -14,6 +14,7 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipSpeakerRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
 import fr.devlille.partners.connect.partnership.domain.UpdatePartnershipContactInfo
+import fr.devlille.partners.connect.partnership.domain.UpdatePartnershipPricing
 import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
 import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
 import io.ktor.http.HttpStatusCode
@@ -46,6 +47,7 @@ fun Route.partnershipRoutes() {
     orgsPartnershipJobOfferRoutes()
     orgsPartnershipJobOfferDecisionRoutes()
     orgsPartnershipOrganiserRoutes()
+    orgsPartnershipPricingRoutes()
     partnershipEmailRoutes()
     partnershipEmailHistoryRoutes()
     orgsPartnershipWebhookRoutes()
@@ -185,6 +187,29 @@ private fun Route.orgsPartnershipOrganiserRoutes() {
             val partnershipId = call.parameters.partnershipId
             val response = repository.removeOrganiser(partnershipId)
             call.respond(HttpStatusCode.OK, response)
+        }
+    }
+}
+
+private fun Route.orgsPartnershipPricingRoutes() {
+    val repository by inject<PartnershipRepository>()
+
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/pricing") {
+        install(AuthorizedOrganisationPlugin)
+
+        put {
+            val eventSlug = call.parameters.eventSlug
+            val partnershipId = call.parameters.partnershipId
+            val pricing = call.receive<UpdatePartnershipPricing>(
+                schema = "update_partnership_pricing_request.schema.json",
+            )
+            repository.updatePricing(
+                eventSlug = eventSlug,
+                partnershipId = partnershipId,
+                pricing = pricing,
+            )
+            val partnershipDetail = repository.getByIdDetailed(eventSlug, partnershipId)
+            call.respond(HttpStatusCode.OK, partnershipDetail)
         }
     }
 }

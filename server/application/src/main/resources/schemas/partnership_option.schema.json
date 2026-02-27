@@ -52,6 +52,11 @@
           "type": "integer",
           "minimum": 0,
           "description": "Total cost for this option (same as price)"
+        },
+        "price_override": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Organiser-set price override for this option in cents. When non-null, replaces the catalogue price for billing."
         }
       },
       "additionalProperties": false
@@ -104,6 +109,11 @@
           "type": "string",
           "enum": ["job_offer"],
           "description": "Quantitative descriptor for user-defined quantities"
+        },
+        "price_override": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Organiser-set price override for this option in cents. When non-null, replaces the catalogue price for billing."
         }
       },
       "additionalProperties": false
@@ -156,6 +166,11 @@
           "type": "string",
           "enum": ["nb_ticket"],
           "description": "Number descriptor for fixed quantities"
+        },
+        "price_override": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Organiser-set price override for this option in cents. When non-null, replaces the catalogue price for billing."
         }
       },
       "additionalProperties": false
@@ -211,6 +226,11 @@
         },
         "selected_value": {
           "$ref": "#/$defs/SelectedValue"
+        },
+        "price_override": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Organiser-set price override for this option in cents. When non-null, replaces the catalogue price for billing."
         }
       },
       "additionalProperties": false

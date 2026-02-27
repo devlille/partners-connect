@@ -3934,6 +3934,74 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/pricing:
+    put:
+      summary: Update partnership price overrides
+      operationId: putPartnershipPricing
+      description: |
+        Update price overrides for the sponsoring pack and/or individual options on a partnership.
+        All fields are optional – omitting a key leaves the existing override unchanged.
+        Setting a field to null clears the override (reverts to catalogue price).
+        Requires organiser permission for the organization.
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Partnership ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update_partnership_pricing_request.schema'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK - Price overrides updated; returns the full updated partnership detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/partnership_detail.schema'
+        '400':
+          description: Bad Request - Invalid request body (e.g. negative price)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '401':
+          description: Unauthorized - No valid session or insufficient org permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Not Found - Event, partnership, or option not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '409':
+          description: Conflict - Pack price override requested but partnership has no validated sponsoring pack
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/email-history:
     get:
       summary: Get email history for partnership
@@ -4665,6 +4733,8 @@ components:
       $ref: '#/components/schemas/filter_value.schema'
     PartnershipListResponse:
       $ref: '#/components/schemas/partnership_list_response.schema'
+    UpdatePartnershipPricingRequest:
+      $ref: '#/components/schemas/update_partnership_pricing_request.schema'
     user_session.schema:
       $id: user_session.schema.json
       type: object
@@ -6037,6 +6107,12 @@ components:
           type: integer
           minimum: 0
           description: Total cost for this option (same as price)
+        price_override:
+          type:
+            - integer
+            - 'null'
+          minimum: 0
+          description: Organiser-set price override for this option in cents. When non-null, replaces the catalogue price for billing.
       additionalProperties: false
     QuantitativePartnershipOption:
       type: object
@@ -6088,6 +6164,12 @@ components:
           enum:
             - job_offer
           description: Quantitative descriptor for user-defined quantities
+        price_override:
+          type:
+            - integer
+            - 'null'
+          minimum: 0
+          description: Organiser-set price override for this option in cents. When non-null, replaces the catalogue price for billing.
       additionalProperties: false
     NumberPartnershipOption:
       type: object
@@ -6139,6 +6221,12 @@ components:
           enum:
             - nb_ticket
           description: Number descriptor for fixed quantities
+        price_override:
+          type:
+            - integer
+            - 'null'
+          minimum: 0
+          description: Organiser-set price override for this option in cents. When non-null, replaces the catalogue price for billing.
       additionalProperties: false
     SelectablePartnershipOption:
       type: object
@@ -6193,6 +6281,12 @@ components:
           description: Selectable descriptor for predefined choices
         selected_value:
           $ref: '#/components/schemas/SelectedValue'
+        price_override:
+          type:
+            - integer
+            - 'null'
+          minimum: 0
+          description: Organiser-set price override for this option in cents. When non-null, replaces the catalogue price for billing.
       additionalProperties: false
     partnership_option.schema:
       $schema: https://json-schema.org/draft/2020-12/schema
@@ -6248,6 +6342,12 @@ components:
               type: integer
               minimum: 0
               description: Total cost for this option (same as price)
+            price_override:
+              type:
+                - integer
+                - 'null'
+              minimum: 0
+              description: Organiser-set price override for this option in cents. When non-null, replaces the catalogue price for billing.
           additionalProperties: false
         QuantitativePartnershipOption:
           type: object
@@ -6299,6 +6399,12 @@ components:
               enum:
                 - job_offer
               description: Quantitative descriptor for user-defined quantities
+            price_override:
+              type:
+                - integer
+                - 'null'
+              minimum: 0
+              description: Organiser-set price override for this option in cents. When non-null, replaces the catalogue price for billing.
           additionalProperties: false
         NumberPartnershipOption:
           type: object
@@ -6350,6 +6456,12 @@ components:
               enum:
                 - nb_ticket
               description: Number descriptor for fixed quantities
+            price_override:
+              type:
+                - integer
+                - 'null'
+              minimum: 0
+              description: Organiser-set price override for this option in cents. When non-null, replaces the catalogue price for billing.
           additionalProperties: false
         SelectablePartnershipOption:
           type: object
@@ -6404,6 +6516,12 @@ components:
               description: Selectable descriptor for predefined choices
             selected_value:
               $ref: '#/components/schemas/SelectedValue'
+            price_override:
+              type:
+                - integer
+                - 'null'
+              minimum: 0
+              description: Organiser-set price override for this option in cents. When non-null, replaces the catalogue price for billing.
           additionalProperties: false
         SelectedValue:
           type: object
@@ -6470,6 +6588,12 @@ components:
           type: integer
           minimum: 0
           description: Total price for this pack in cents (base_price + sum of optional option costs)
+        pack_price_override:
+          type:
+            - integer
+            - 'null'
+          minimum: 0
+          description: Organiser-set price override for this pack in cents. When non-null, this value replaces base_price in total price computation. Null when no override is active.
       additionalProperties: false
     partnership_process_status.schema:
       $id: partnership_process_status.schema.json
@@ -7703,6 +7827,54 @@ components:
         - partnership_id
         - organiser
       additionalProperties: false
+    update_partnership_pricing_request.schema:
+      $schema: https://json-schema.org/draft/2020-12/schema
+      $id: update_partnership_pricing_request.schema.json
+      title: UpdatePartnershipPricing
+      description: Request body for updating price overrides on a partnership. All fields are optional to support partial updates. Omitting a field leaves the existing override unchanged. Explicitly setting a field to null clears the override.
+      type: object
+      properties:
+        pack_price_override:
+          type:
+            - integer
+            - 'null'
+          minimum: 0
+          description: Custom price override for the validated sponsoring pack, in the same unit as the catalogue price. Omit to keep existing override. Set to null to clear the override. Set to 0 for a complimentary pack.
+        options_price_overrides:
+          type:
+            - array
+            - 'null'
+          description: List of price overrides for specific options. Only listed option IDs are affected. Option IDs not listed are left unchanged.
+          items:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: string
+                format: uuid
+                description: UUID of the option to override. Must belong to this partnership.
+              price_override:
+                type:
+                  - integer
+                  - 'null'
+                minimum: 0
+                description: Custom price override for this option. Set to null to clear the override.
+            additionalProperties: false
+          minItems: 1
+      additionalProperties: false
+      examples:
+        - pack_price_override: 150000
+        - options_price_overrides:
+            - id: 550e8400-e29b-41d4-a716-446655440001
+              price_override: 5000
+            - id: 550e8400-e29b-41d4-a716-446655440002
+              price_override: null
+        - pack_price_override: 120000
+          options_price_overrides:
+            - id: 550e8400-e29b-41d4-a716-446655440001
+              price_override: 5000
+        - pack_price_override: null
     recipient_status_response.schema:
       $id: recipient_status_response.schema.json
       type: object

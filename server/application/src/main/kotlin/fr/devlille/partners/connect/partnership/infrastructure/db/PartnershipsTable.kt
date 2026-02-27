@@ -30,6 +30,7 @@ object PartnershipsTable : UUIDTable("partnerships") {
     val communicationPublicationDate = datetime("communication_publication_date").nullable()
     val communicationSupportUrl = text("communication_support_url").nullable()
     val organiserId = reference("organiser_id", UsersTable).nullable()
+    val packPriceOverride = integer("pack_price_override").nullable()
     val createdAt = datetime("created_at").clientDefault {
         Clock.System.now().toLocalDateTime(TimeZone.UTC)
     }

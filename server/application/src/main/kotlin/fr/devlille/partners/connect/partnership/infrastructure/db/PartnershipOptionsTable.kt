@@ -16,4 +16,5 @@ object PartnershipOptionsTable : UUIDTable("partnership_options") {
     // Keep for backward compatibility, will be deprecated
     val selectedValue = varchar("selected_value", length = 255).nullable()
     val selectedValueId = reference("selected_value_id", SelectableValuesTable).nullable()
+    val priceOverride = integer("price_override").nullable()
 }
