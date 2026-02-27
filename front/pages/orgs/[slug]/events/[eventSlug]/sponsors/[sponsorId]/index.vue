@@ -217,7 +217,10 @@
             {{ $t('email.history.loading') }}
           </div>
 
-          <div v-else-if="emailError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <div
+            v-else-if="emailError"
+            class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded"
+          >
             {{ $t('email.history.error') }}
           </div>
 
@@ -307,7 +310,9 @@
           @click.stop
         >
           <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <h3 id="email-modal-title" class="text-lg font-semibold text-gray-900">{{ $t('email.history.detailTitle') }}</h3>
+            <h3 id="email-modal-title" class="text-lg font-semibold text-gray-900">
+              {{ $t('email.history.detailTitle') }}
+            </h3>
             <UButton
               ref="closeButtonRef"
               icon="i-heroicons-x-mark"
@@ -322,11 +327,17 @@
           <div class="px-6 py-4 space-y-4 overflow-y-auto max-h-[calc(90vh-120px)]">
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-500">{{ $t('email.history.sentAt') }}</label>
+                <label
+                  class="block text-sm font-medium text-gray-500"
+                  >{{ $t('email.history.sentAt') }}</label
+                >
                 <p class="text-gray-900">{{ formatEmailDate(selectedEmailInternal.sent_at) }}</p>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-500">{{ $t('email.history.status') }}</label>
+                <label
+                  class="block text-sm font-medium text-gray-500"
+                  >{{ $t('email.history.status') }}</label
+                >
                 <span
                   :class="[
                     'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
@@ -337,18 +348,29 @@
                 </span>
               </div>
               <div class="col-span-2">
-                <label class="block text-sm font-medium text-gray-500">{{ $t('email.history.sender') }}</label>
-                <p class="text-gray-900">{{ selectedEmailInternal.triggered_by.display_name || selectedEmailInternal.triggered_by.email }}</p>
+                <label
+                  class="block text-sm font-medium text-gray-500"
+                  >{{ $t('email.history.sender') }}</label
+                >
+                <p class="text-gray-900">
+                  {{ selectedEmailInternal.triggered_by.display_name || selectedEmailInternal.triggered_by.email }}
+                </p>
               </div>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-500">{{ $t('email.history.subject') }}</label>
+              <label
+                class="block text-sm font-medium text-gray-500"
+                >{{ $t('email.history.subject') }}</label
+              >
               <p class="text-gray-900 font-medium">{{ selectedEmailInternal.subject }}</p>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-500 mb-2">{{ $t('email.history.recipientsList') }}</label>
+              <label
+                class="block text-sm font-medium text-gray-500 mb-2"
+                >{{ $t('email.history.recipientsList') }}</label
+              >
               <div class="space-y-2">
                 <div
                   v-for="recipient in selectedEmailInternal.recipients"
@@ -371,7 +393,10 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-500 mb-2">{{ $t('email.history.content') }}</label>
+              <label
+                class="block text-sm font-medium text-gray-500 mb-2"
+                >{{ $t('email.history.content') }}</label
+              >
               <div
                 class="p-4 bg-gray-50 rounded border border-gray-200 text-sm text-gray-700 prose prose-sm max-w-none"
                 v-html="sanitizedEmailBody"

@@ -53,106 +53,136 @@
         {{ error }}
       </div>
 
-      <!-- Vue Calendrier -->
-      <div v-else-if="viewMode === 'calendar'">
-        <CommunicationCalendar
-          :communications="allCommunications"
-          @select-communication="handleSelectCommunication"
+      <template v-else>
+        <!-- Filter Panel -->
+        <FilterPanel
+          v-model="filters"
+          :metadata="filterMetadata"
+          :loading="loading"
+          :active-filter-count="activeFilterCount"
+          @clear-all="clearAllFilters"
         />
-      </div>
 
-      <!-- Vue Grille (Communication Plan) -->
-      <div v-else class="space-y-8">
-        <!-- Section: Non planifiées -->
-        <section v-if="communicationPlan.unplanned.length > 0">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100">
-              <i class="i-heroicons-clock text-xl text-gray-600" />
-            </div>
-            <div>
-              <h2 class="text-lg font-semibold text-gray-900">Communications non planifiées</h2>
-              <p class="text-sm text-gray-600">
-                {{ communicationPlan.unplanned.length }} partenariat(s)
-              </p>
-            </div>
-          </div>
+        <!-- Active Filters Badges -->
+        <ActiveFilters
+          :filters="filters"
+          :metadata="filterMetadata"
+          @clear="clearFilter"
+          @clear-all="clearAllFilters"
+        />
 
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <CommunicationCard
-              v-for="item in communicationPlan.unplanned"
-              :key="item.partnership_id"
-              :item="item"
-              status="unplanned"
-              @schedule="openScheduleModal"
-              @upload="openUploadModal"
-            />
-          </div>
-        </section>
-
-        <!-- Section: Planifiées -->
-        <section v-if="communicationPlan.planned.length > 0">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100">
-              <i class="i-heroicons-calendar text-xl text-blue-600" />
-            </div>
-            <div>
-              <h2 class="text-lg font-semibold text-gray-900">Communications planifiées</h2>
-              <p class="text-sm text-gray-600">
-                {{ communicationPlan.planned.length }} partenariat(s)
-              </p>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <CommunicationCard
-              v-for="item in communicationPlan.planned"
-              :key="item.partnership_id"
-              :item="item"
-              status="planned"
-              @schedule="openScheduleModal"
-              @upload="openUploadModal"
-            />
-          </div>
-        </section>
-
-        <!-- Section: Terminées -->
-        <section v-if="communicationPlan.done.length > 0">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-100">
-              <i class="i-heroicons-check-circle text-xl text-green-600" />
-            </div>
-            <div>
-              <h2 class="text-lg font-semibold text-gray-900">Communications terminées</h2>
-              <p class="text-sm text-gray-600">
-                {{ communicationPlan.done.length }} partenariat(s)
-              </p>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <CommunicationCard
-              v-for="item in communicationPlan.done"
-              :key="item.partnership_id"
-              :item="item"
-              status="done"
-              @schedule="openScheduleModal"
-              @upload="openUploadModal"
-            />
-          </div>
-        </section>
-
-        <!-- Empty state -->
+        <!-- Result Count -->
         <div
-          v-if="communicationPlan.unplanned.length === 0 && communicationPlan.planned.length === 0 && communicationPlan.done.length === 0"
-          class="text-center py-12"
+          v-if="!loading"
+          class="text-sm text-gray-600 mb-4"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
         >
-          <i class="i-heroicons-inbox text-6xl text-gray-400 mb-4" />
-          <p class="text-gray-600 text-lg">Aucune communication à afficher</p>
-          <p class="text-gray-500 text-sm mt-2">
-            Les communications apparaîtront ici une fois que vous aurez des partenariats.
-          </p>
+          {{ $t('sponsors.filters.showingResults', { count: totalItems }) }}
         </div>
-      </div>
+
+        <!-- Vue Calendrier -->
+        <div v-if="viewMode === 'calendar'">
+          <CommunicationCalendar
+            :communications="allCommunications"
+            @select-communication="handleSelectCommunication"
+          />
+        </div>
+
+        <!-- Vue Grille (Communication Plan) -->
+        <div v-else class="space-y-8">
+          <!-- Section: Non planifiées -->
+          <section v-if="communicationPlan.unplanned.length > 0">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100">
+                <i class="i-heroicons-clock text-xl text-gray-600" />
+              </div>
+              <div>
+                <h2 class="text-lg font-semibold text-gray-900">Communications non planifiées</h2>
+                <p class="text-sm text-gray-600">
+                  {{ communicationPlan.unplanned.length }} partenariat(s)
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <CommunicationCard
+                v-for="item in communicationPlan.unplanned"
+                :key="item.partnership_id"
+                :item="item"
+                status="unplanned"
+                @schedule="openScheduleModal"
+                @upload="openUploadModal"
+              />
+            </div>
+          </section>
+
+          <!-- Section: Planifiées -->
+          <section v-if="communicationPlan.planned.length > 0">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100">
+                <i class="i-heroicons-calendar text-xl text-blue-600" />
+              </div>
+              <div>
+                <h2 class="text-lg font-semibold text-gray-900">Communications planifiées</h2>
+                <p class="text-sm text-gray-600">
+                  {{ communicationPlan.planned.length }} partenariat(s)
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <CommunicationCard
+                v-for="item in communicationPlan.planned"
+                :key="item.partnership_id"
+                :item="item"
+                status="planned"
+                @schedule="openScheduleModal"
+                @upload="openUploadModal"
+              />
+            </div>
+          </section>
+
+          <!-- Section: Terminées -->
+          <section v-if="communicationPlan.done.length > 0">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-100">
+                <i class="i-heroicons-check-circle text-xl text-green-600" />
+              </div>
+              <div>
+                <h2 class="text-lg font-semibold text-gray-900">Communications terminées</h2>
+                <p class="text-sm text-gray-600">
+                  {{ communicationPlan.done.length }} partenariat(s)
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <CommunicationCard
+                v-for="item in communicationPlan.done"
+                :key="item.partnership_id"
+                :item="item"
+                status="done"
+                @schedule="openScheduleModal"
+                @upload="openUploadModal"
+              />
+            </div>
+          </section>
+
+          <!-- Empty state -->
+          <div
+            v-if="communicationPlan.unplanned.length === 0 && communicationPlan.planned.length === 0 && communicationPlan.done.length === 0"
+            class="text-center py-12"
+          >
+            <i class="i-heroicons-inbox text-6xl text-gray-400 mb-4" />
+            <p class="text-gray-600 text-lg">Aucune communication à afficher</p>
+            <p class="text-gray-500 text-sm mt-2">
+              Les communications apparaîtront ici une fois que vous aurez des partenariats.
+            </p>
+          </div>
+        </div>
+      </template>
     </div>
 
     <!-- Modal: Planifier une date de publication -->
@@ -287,9 +317,13 @@
 </template>
 
 <script setup lang="ts">
-import { getOrgsEventsCommunication, getEventBySlug, putOrgsEventsPartnershipCommunicationPublication, putOrgsEventsPartnershipCommunicationSupport, type CommunicationPlanSchema, type CommunicationItemSchema } from "~/utils/api";
+import { getOrgsEventsCommunication, getOrgsEventsPartnership, getEventBySlug, putOrgsEventsPartnershipCommunicationPublication, putOrgsEventsPartnershipCommunicationSupport, type CommunicationPlanSchema, type CommunicationItemSchema, type PartnershipItemSchema } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "~/constants/errors";
+import { useCommunicationFilters } from '~/composables/useCommunicationFilters';
+import FilterPanel from '~/components/sponsors/FilterPanel.vue';
+import ActiveFilters from '~/components/sponsors/ActiveFilters.vue';
+import type { PartnershipsMetadata } from '~/types/sponsors';
 
 const route = useRoute();
 const toast = useToast();
@@ -309,14 +343,39 @@ const eventSlug = computed(() => {
   return Array.isArray(params) ? params[1] as string : params as string;
 });
 
-const communicationPlan = ref<CommunicationPlanSchema>({
+// Initialize communication filters
+const {
+  filters,
+  activeFilterCount,
+  queryParams,
+  clearAllFilters,
+  clearFilter
+} = useCommunicationFilters({
+  orgSlug: orgSlug.value,
+  eventSlug: eventSlug.value
+});
+
+const unfilteredCommunicationPlan = ref<CommunicationPlanSchema>({
   done: [],
   planned: [],
   unplanned: []
 });
+const partnerships = ref<PartnershipItemSchema[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const eventName = ref<string>('');
+const filterMetadata = ref<PartnershipsMetadata | null>(null);
+
+// Communication plan (filtered by backend API in loadCommunicationPlan)
+const communicationPlan = computed<CommunicationPlanSchema>(() => {
+  return unfilteredCommunicationPlan.value;
+});
+
+const totalItems = computed(() => {
+  return communicationPlan.value.done.length +
+         communicationPlan.value.planned.length +
+         communicationPlan.value.unplanned.length;
+});
 
 // Mode d'affichage (grille ou calendrier)
 const viewMode = ref<'grid' | 'calendar'>('grid');
@@ -529,13 +588,48 @@ async function loadCommunicationPlan() {
     loading.value = true;
     error.value = null;
 
-    // Charger le nom de l'événement
-    const eventResponse = await getEventBySlug(eventSlug.value);
+    // Charger toutes les données en parallèle
+    // On charge tous les partenariats avec les filtres actifs
+    const filterParams = activeFilterCount.value > 0 ? queryParams.value : {};
+
+    const [eventResponse, commResponse, partnershipsResponse] = await Promise.all([
+      getEventBySlug(eventSlug.value),
+      getOrgsEventsCommunication(orgSlug.value, eventSlug.value),
+      getOrgsEventsPartnership(orgSlug.value, eventSlug.value, {
+        page: 1,
+        page_size: 1000,
+        ...filterParams
+      })
+    ]);
+
     eventName.value = eventResponse.data.event.name;
 
-    // Charger le plan de communication
-    const response = await getOrgsEventsCommunication(orgSlug.value, eventSlug.value);
-    communicationPlan.value = response.data;
+    // Gérer la réponse paginée des partnerships
+    const partnershipsData = partnershipsResponse.data as any;
+    let filteredPartnershipIds: Set<string>;
+
+    if (partnershipsData.items) {
+      partnerships.value = partnershipsData.items;
+      filterMetadata.value = partnershipsData.metadata || null;
+      // Créer un Set des IDs des partenariats filtrés
+      filteredPartnershipIds = new Set(partnershipsData.items.map((p: PartnershipItemSchema) => p.id));
+    } else {
+      partnerships.value = partnershipsResponse.data as PartnershipItemSchema[];
+      filteredPartnershipIds = new Set((partnershipsResponse.data as PartnershipItemSchema[]).map(p => p.id));
+    }
+
+    // Si des filtres sont actifs, filtrer les communications pour ne garder que celles
+    // correspondant aux partenariats filtrés par le backend
+    if (activeFilterCount.value > 0) {
+      const allComm = commResponse.data;
+      unfilteredCommunicationPlan.value = {
+        done: allComm.done.filter(c => filteredPartnershipIds.has(c.partnership_id)),
+        planned: allComm.planned.filter(c => filteredPartnershipIds.has(c.partnership_id)),
+        unplanned: allComm.unplanned.filter(c => filteredPartnershipIds.has(c.partnership_id))
+      };
+    } else {
+      unfilteredCommunicationPlan.value = commResponse.data;
+    }
   } catch (err) {
     console.error('Failed to load communication plan:', err);
     error.value = ERROR_MESSAGES.LOAD_FAILED('le plan de communication');
@@ -552,6 +646,15 @@ onMounted(() => {
 watch([orgSlug, eventSlug], () => {
   loadCommunicationPlan();
 });
+
+// Recharger quand les filtres changent (le filtrage se fait côté backend)
+watch(
+  () => queryParams.value,
+  () => {
+    loadCommunicationPlan();
+  },
+  { deep: true }
+);
 
 useHead({
   title: computed(() => `Plan de Communication - ${eventName.value || 'Événement'} | DevLille`)

@@ -37,8 +37,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         description:
           "Votre partenariat a été validé ! Pour finaliser le processus, merci de compléter les informations manquantes dans les onglets suivants :",
         partnershipLink: "Partenariat",
-        partnershipDescription:
-          "Vérifiez et complétez vos coordonnées de contact",
+        partnershipDescription: "Vérifiez et complétez vos coordonnées de contact",
         companyLink: "Entreprise",
         companyDescription: "Renseignez les informations de votre société",
       },
@@ -107,10 +106,8 @@ export default defineNuxtPlugin((nuxtApp) => {
       modal: {
         title: "Envoyer un email aux sponsors",
         recipients: "Destinataires",
-        recipientsWithFilters:
-          "L'email sera envoyé aux sponsors correspondant aux filtres actifs.",
-        recipientsAll:
-          "L'email sera envoyé à tous les sponsors de l'événement.",
+        recipientsWithFilters: "L'email sera envoyé aux sponsors correspondant aux filtres actifs.",
+        recipientsAll: "L'email sera envoyé à tous les sponsors de l'événement.",
         subject: "Sujet",
         subjectPlaceholder: "Sujet de l'email",
         subjectHint: "Le sujet sera préfixé par le nom de l'événement.",
@@ -176,8 +173,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       },
       paymentReceived: {
         title: "Payment received",
-        description:
-          "Your payment has been received. You can now configure your partner space:",
+        description: "Your payment has been received. You can now configure your partner space:",
         jobOffersLink: "Job offers",
         jobOffersDescription: "Publish your job offers",
         companyLink: "Company",
@@ -234,8 +230,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       modal: {
         title: "Send email to sponsors",
         recipients: "Recipients",
-        recipientsWithFilters:
-          "The email will be sent to sponsors matching the active filters.",
+        recipientsWithFilters: "The email will be sent to sponsors matching the active filters.",
         recipientsAll: "The email will be sent to all sponsors of the event.",
         subject: "Subject",
         subjectPlaceholder: "Email subject",
@@ -302,8 +297,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       },
       paymentReceived: {
         title: "Pago recibido",
-        description:
-          "Su pago ha sido recibido. Ahora puede configurar su espacio de socio:",
+        description: "Su pago ha sido recibido. Ahora puede configurar su espacio de socio:",
         jobOffersLink: "Ofertas de empleo",
         jobOffersDescription: "Publique sus ofertas de empleo",
         companyLink: "Empresa",
@@ -362,8 +356,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         recipients: "Destinatarios",
         recipientsWithFilters:
           "El email se enviará a los patrocinadores que coincidan con los filtros activos.",
-        recipientsAll:
-          "El email se enviará a todos los patrocinadores del evento.",
+        recipientsAll: "El email se enviará a todos los patrocinadores del evento.",
         subject: "Asunto",
         subjectPlaceholder: "Asunto del email",
         subjectHint: "El asunto será prefijado con el nombre del evento.",

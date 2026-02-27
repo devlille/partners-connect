@@ -592,7 +592,10 @@ describe("Sponsor Detail Page - Email History", () => {
     });
 
     it("should use display_name when available", () => {
-      const triggeredBy = { email: "admin@devlille.fr", display_name: "Admin User" };
+      const triggeredBy = {
+        email: "admin@devlille.fr",
+        display_name: "Admin User",
+      };
 
       const displayName = triggeredBy.display_name || triggeredBy.email;
 
@@ -667,7 +670,7 @@ describe("Sponsor Detail Page - Email History", () => {
   describe("Accessibility", () => {
     it("should have correct ARIA attributes for email list items", () => {
       const email = { subject: "Test Email", sent_at: "2025-01-15T10:30:00Z" };
-      const formatEmailDate = (date: string) => "15/01/2025 11:30";
+      const formatEmailDate = () => "15/01/2025 11:30";
 
       const ariaLabel = `Email: ${email.subject}, envoy\u00e9 le ${formatEmailDate(email.sent_at)}`;
 
