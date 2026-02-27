@@ -3901,6 +3901,74 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PartnershipOrganiserResponse"
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/pricing:
+    put:
+      summary: "Update partnership price overrides"
+      operationId: "putPartnershipPricing"
+      description: |
+        Update price overrides for the sponsoring pack and/or individual options on a partnership.
+        All fields are optional – omitting a key leaves the existing override unchanged.
+        Setting a field to null clears the override (reverts to catalogue price).
+        Requires organiser permission for the organization.
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organization slug"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "Partnership ID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePartnershipPricingRequest"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "OK - Price overrides updated; returns the full updated partnership detail"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PartnershipDetail"
+        "400":
+          description: "Bad Request - Invalid request body (e.g. negative price)"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "Unauthorized - No valid session or insufficient org permission"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Not Found - Event, partnership, or option not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: "Conflict - Pack price override requested but partnership has no validated sponsoring pack"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/email-history:
     get:
       summary: "Get email history for partnership"
@@ -4632,3 +4700,5 @@ components:
       $ref: "../schemas/filter_value.schema.json"
     PartnershipListResponse:
       $ref: "../schemas/partnership_list_response.schema.json"
+    UpdatePartnershipPricingRequest:
+      $ref: "../schemas/update_partnership_pricing_request.schema.json"

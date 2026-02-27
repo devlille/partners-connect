@@ -24,6 +24,7 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipItem
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
 import fr.devlille.partners.connect.partnership.domain.UpdatePartnershipContactInfo
+import fr.devlille.partners.connect.partnership.domain.UpdatePartnershipPricing
 import fr.devlille.partners.connect.partnership.infrastructure.api.PartnershipOrganiserResponse
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingsTable
@@ -160,12 +161,14 @@ class PartnershipRepositoryExposed : PartnershipRepository {
                 pack.toDomain(
                     language = partnership.language,
                     partnershipId = partnershipId,
+                    packPriceOverride = partnership.packPriceOverride,
                 )
             },
             suggestionPack = partnership.suggestionPack?.let { pack ->
                 pack.toDomain(
                     language = partnership.language,
                     partnershipId = partnershipId,
+                    packPriceOverride = partnership.packPriceOverride,
                 )
             },
             organiser = partnership.organiser?.toDomain(),
@@ -187,18 +190,21 @@ class PartnershipRepositoryExposed : PartnershipRepository {
                 pack.toDomain(
                     language = partnership.language,
                     partnershipId = partnershipId,
+                    packPriceOverride = partnership.packPriceOverride,
                 )
             },
             suggestionPack = partnership.suggestionPack?.let { pack ->
                 pack.toDomain(
                     language = partnership.language,
                     partnershipId = partnershipId,
+                    packPriceOverride = partnership.packPriceOverride,
                 )
             },
             validatedPack = partnership.validatedPack()?.let { pack ->
                 pack.toDomain(
                     language = partnership.language,
                     partnershipId = partnershipId,
+                    packPriceOverride = partnership.packPriceOverride,
                 )
             },
         )
@@ -431,5 +437,36 @@ class PartnershipRepositoryExposed : PartnershipRepository {
 
         // Hard delete the partnership
         partnership.delete()
+    }
+
+    @Suppress("ThrowsCount")
+    override fun updatePricing(
+        eventSlug: String,
+        partnershipId: UUID,
+        pricing: UpdatePartnershipPricing,
+    ): UUID = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val partnership = PartnershipEntity.singleByEventAndPartnership(event.id.value, partnershipId)
+            ?: throw NotFoundException("Partnership not found")
+
+        if (pricing.packPriceOverride != null && partnership.validatedPack() == null) {
+            throw ConflictException("Cannot set pack price override: partnership has no validated sponsoring pack")
+        }
+        partnership.packPriceOverride = pricing.packPriceOverride
+
+        pricing.optionsPriceOverrides?.forEach { override ->
+            val optionId = override.id.toUUID()
+            val optionEntity = PartnershipOptionEntity
+                .find {
+                    (PartnershipOptionsTable.partnershipId eq partnershipId) and
+                        (PartnershipOptionsTable.optionId eq optionId)
+                }
+                .singleOrNull()
+                ?: throw NotFoundException("Option $optionId is not associated with partnership $partnershipId")
+            optionEntity.priceOverride = override.priceOverride
+        }
+
+        partnership.id.value
     }
 }

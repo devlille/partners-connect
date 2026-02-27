@@ -43,6 +43,11 @@
       "type": "integer",
       "minimum": 0,
       "description": "Total price for this pack in cents (base_price + sum of optional option costs)"
+    },
+    "pack_price_override": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "description": "Organiser-set price override for this pack in cents. When non-null, this value replaces base_price in total price computation. Null when no override is active."
     }
   },
   "additionalProperties": false

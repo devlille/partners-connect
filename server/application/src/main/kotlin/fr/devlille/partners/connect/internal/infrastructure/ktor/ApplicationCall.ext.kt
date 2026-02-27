@@ -69,6 +69,7 @@ val schemas by lazy {
         .register(readResourceFile("/schemas/decline_job_offer_promotion.schema.json"), SchemaType.DRAFT_7)
         .register(readResourceFile("/schemas/assign_organiser_request.schema.json"), SchemaType.DRAFT_7)
         .register(readResourceFile("/schemas/update_partnership_request.schema.json"), SchemaType.DRAFT_7)
+        .register(readResourceFile("/schemas/update_partnership_pricing_request.schema.json"), SchemaType.DRAFT_7)
         .register(readResourceFile("/schemas/send_partnership_email_request.schema.json"), SchemaType.DRAFT_7)
 }
 

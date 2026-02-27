@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "update_partnership_pricing_request.schema.json",
+  "title": "UpdatePartnershipPricing",
+  "description": "Request body for updating price overrides on a partnership. All fields are optional to support partial updates. Omitting a field leaves the existing override unchanged. Explicitly setting a field to null clears the override.",
+  "type": "object",
+  "properties": {
+    "pack_price_override": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "description": "Custom price override for the validated sponsoring pack, in the same unit as the catalogue price. Omit to keep existing override. Set to null to clear the override. Set to 0 for a complimentary pack."
+    },
+    "options_price_overrides": {
+      "type": ["array", "null"],
+      "description": "List of price overrides for specific options. Only listed option IDs are affected. Option IDs not listed are left unchanged.",
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "UUID of the option to override. Must belong to this partnership."
+          },
+          "price_override": {
+            "type": ["integer", "null"],
+            "minimum": 0,
+            "description": "Custom price override for this option. Set to null to clear the override."
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "pack_price_override": 150000
+    },
+    {
+      "options_price_overrides": [
+        { "id": "550e8400-e29b-41d4-a716-446655440001", "price_override": 5000 },
+        { "id": "550e8400-e29b-41d4-a716-446655440002", "price_override": null }
+      ]
+    },
+    {
+      "pack_price_override": 120000,
+      "options_price_overrides": [
+        { "id": "550e8400-e29b-41d4-a716-446655440001", "price_override": 5000 }
+      ]
+    },
+    {
+      "pack_price_override": null
+    }
+  ]
+}

@@ -11,15 +11,18 @@ import java.util.UUID
  * Maps SponsoringPackEntity to PartnershipPack with partnership-specific options.
  *
  * Separates options into required and optional lists based on PackOptionsTable,
- * calculates totalPrice as basePrice + sum of optional option amounts.
+ * calculates totalPrice as effectiveBasePrice + sum of optional option amounts.
  *
  * @param language Partnership language for translation lookup
  * @param partnershipId UUID of the partnership
- * @return PartnershipPack with requiredOptions, optionalOptions, and totalPrice
+ * @param packPriceOverride Optional organiser-set price override for this pack.
+ *   When non-null, replaces [SponsoringPackEntity.basePrice] in the total price calculation.
+ * @return PartnershipPack with requiredOptions, optionalOptions, packPriceOverride, and totalPrice
  */
 internal fun SponsoringPackEntity.toDomain(
     language: String,
     partnershipId: UUID,
+    packPriceOverride: Int? = null,
 ): PartnershipPack {
     // Get all partnership options for this pack
     val partnershipOptions = PartnershipOptionEntity
@@ -37,13 +40,15 @@ internal fun SponsoringPackEntity.toDomain(
     val requiredOptions = partnershipOptions.filter { requiredOptionIds.contains(it.id) }
     val optionalOptions = partnershipOptions.filter { !requiredOptionIds.contains(it.id) }
 
-    // Calculate total price: base price + sum of optional option amounts
-    val totalPrice = basePrice + optionalOptions.sumOf { it.totalPrice }
+    // Calculate total price: effective base price (override or catalogue) + sum of optional option amounts
+    val effectiveBasePrice = packPriceOverride ?: basePrice
+    val totalPrice = effectiveBasePrice + optionalOptions.sumOf { it.totalPrice }
 
     return PartnershipPack(
         id = this.id.value.toString(),
         name = this.name,
         basePrice = this.basePrice,
+        packPriceOverride = packPriceOverride,
         requiredOptions = requiredOptions,
         optionalOptions = optionalOptions,
         totalPrice = totalPrice,

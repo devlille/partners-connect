@@ -13,14 +13,20 @@ internal fun invoiceItems(
         QontoInvoiceItem(
             title = "Sponsoring ${pack.name}",
             quantity = "1",
-            unitPrice = QontoMoneyAmount(value = "${pack.basePrice}", currency = partnership.currency),
+            unitPrice = QontoMoneyAmount(
+                value = "${pack.packPriceOverride ?: pack.basePrice}",
+                currency = partnership.currency,
+            ),
             vatRate = "0",
         ),
         *pack.optionalOptions.map { option ->
             QontoInvoiceItem(
                 title = option.labelWithValue,
                 quantity = "${option.quantity}",
-                unitPrice = QontoMoneyAmount(value = "${option.price}", currency = partnership.currency),
+                unitPrice = QontoMoneyAmount(
+                    value = "${option.priceOverride ?: option.price}",
+                    currency = partnership.currency,
+                ),
                 vatRate = "0",
             )
         }.toTypedArray(),

@@ -5,6 +5,7 @@ import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedRespons
 import fr.devlille.partners.connect.partnership.infrastructure.api.PartnershipOrganiserResponse
 import java.util.UUID
 
+@Suppress("TooManyFunctions")
 interface PartnershipRepository {
     fun register(eventSlug: String, register: RegisterPartnership): UUID
 
@@ -76,4 +77,29 @@ interface PartnershipRepository {
      *   if partnership has been finalized (validated or declined)
      */
     fun delete(partnershipId: UUID)
+
+    /**
+     * Updates price overrides for the pack and/or options of a partnership.
+     *
+     * Partial update semantics:
+     * - [UpdatePartnershipPricing.packPriceOverride] is always applied: null clears any existing
+     *   override, a non-null value sets/replaces it.
+     * - [UpdatePartnershipPricing.optionsPriceOverrides] when non-null applies overrides only to
+     *   the listed option IDs; all other option overrides are unchanged.
+     *
+     * @param eventSlug Slug of the event owning this partnership
+     * @param partnershipId UUID of the partnership to update
+     * @param pricing Pricing update payload
+     * @return UUID of the updated partnership
+     * @throws fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException
+     *   if the event, partnership, or any listed option ID is not found
+     * @throws fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
+     *   if a non-null [UpdatePartnershipPricing.packPriceOverride] is provided but the partnership
+     *   has no validated sponsoring pack
+     */
+    fun updatePricing(
+        eventSlug: String,
+        partnershipId: UUID,
+        pricing: UpdatePartnershipPricing,
+    ): UUID
 }

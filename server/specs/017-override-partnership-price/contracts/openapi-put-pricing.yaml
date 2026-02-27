@@ -1,0 +1,187 @@
+# OpenAPI Specification Addition
+
+**Feature**: Override Partnership Pricing  
+**Endpoint**: `PUT /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/pricing`  
+**Auth**: `AuthorizedOrganisationPlugin` (organiser must belong to the organisation)
+
+---
+
+## New Endpoint
+
+Add this operation to the existing `openapi.yaml` under path  
+`/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/pricing`:
+
+```yaml
+paths:
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/pricing:
+    put:
+      summary: Override partnership pricing
+      description: |
+        Sets optional price overrides for the validated sponsoring pack and/or
+        one or more options on an existing partnership.
+
+        Only authenticated organisers belonging to the owning organisation may
+        call this endpoint.
+
+        Partial update semantics apply:
+        - Omitting `pack_price_override` from the request body leaves the
+          existing pack override unchanged.
+        - Setting `pack_price_override` to `null` explicitly clears the override
+          (catalogue price is used again).
+        - Setting `pack_price_override` to a non-negative integer sets or
+          replaces the override.
+        - Omitting `options_price_overrides` leaves all option overrides unchanged.
+        - Including `options_price_overrides` only affects the listed option IDs.
+        - Setting an option's `price_override` to `null` clears that option's override.
+
+        No notification is sent to the partner when pricing is updated.
+      operationId: updatePartnershipPricing
+      tags:
+        - Partnerships
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          description: Organisation slug
+          schema:
+            type: string
+          example: "devlille"
+        - name: eventSlug
+          in: path
+          required: true
+          description: Unique slug identifier for the event
+          schema:
+            type: string
+          example: "devlille-2025"
+        - name: partnershipId
+          in: path
+          required: true
+          description: UUID of the partnership to update
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      requestBody:
+        required: true
+        description: Price override fields to update (all optional for partial updates)
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePartnershipPricing"
+            examples:
+              overridePackOnly:
+                summary: Override pack price only
+                value:
+                  pack_price_override: 150000
+              overrideOptionsOnly:
+                summary: Override two option prices
+                value:
+                  options_price_overrides:
+                    - id: "550e8400-e29b-41d4-a716-446655440001"
+                      price_override: 5000
+                    - id: "550e8400-e29b-41d4-a716-446655440002"
+                      price_override: 10000
+              overrideBoth:
+                summary: Override pack and one option
+                value:
+                  pack_price_override: 120000
+                  options_price_overrides:
+                    - id: "550e8400-e29b-41d4-a716-446655440001"
+                      price_override: 5000
+              clearPackOverride:
+                summary: Clear pack override (revert to catalogue price)
+                value:
+                  pack_price_override: null
+      responses:
+        "200":
+          description: Pricing updated. Returns the updated partnership detail.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PartnershipDetail"
+        "400":
+          description: |
+            Validation failed. Possible causes:
+            - Override price is negative
+            - Option ID is not associated with this partnership
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Not authenticated
+        "403":
+          description: Authenticated user does not belong to the owning organisation
+        "404":
+          description: Event or partnership not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "409":
+          description: |
+            Conflict. Possible causes:
+            - `pack_price_override` provided but partnership has no validated sponsoring pack
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+```
+
+---
+
+## Schema Components to Add / Update
+
+### New component: `UpdatePartnershipPricing`
+
+Add to `components/schemas` in `openapi.yaml`:
+
+```yaml
+UpdatePartnershipPricing:
+  $ref: "schemas/update_partnership_pricing_request.schema.json"
+```
+
+---
+
+### Updated component: `PartnershipPack`
+
+Add `pack_price_override` field to the existing `PartnershipPack` schema:
+
+```yaml
+pack_price_override:
+  type: integer
+  nullable: true
+  minimum: 0
+  description: >
+    Organiser-set price override for this pack, in the same unit as base_price.
+    Null when no override is active. When present, this supersedes base_price for
+    billing purposes. total_price is computed using this value when set.
+```
+
+---
+
+### Updated component: `PartnershipOption` (all subtypes)
+
+Add `price_override` field to all four `PartnershipOption` subtypes (text, typed_quantitative, typed_number, typed_selectable):
+
+```yaml
+price_override:
+  type: integer
+  nullable: true
+  minimum: 0
+  description: >
+    Organiser-set price override for this option, in the same unit as price.
+    Null when no override is active. When present, this supersedes price for
+    billing purposes. total_price is computed using this value when set.
+```
