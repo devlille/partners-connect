@@ -100,6 +100,94 @@
           />
         </div>
 
+        <!-- Prix personnalisé du pack (Admin uniquement) -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-gray-900">Prix personnalisé du pack</h2>
+            <UBadge color="primary" variant="subtle">Admin</UBadge>
+          </div>
+
+          <div class="space-y-4">
+            <!-- Prix du catalogue -->
+            <div class="p-4 bg-gray-50 rounded-lg">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-gray-700">Prix du catalogue</p>
+                  <p class="text-xs text-gray-500 mt-1">Prix de base défini dans le pack</p>
+                </div>
+                <p class="text-lg font-semibold text-gray-900">
+                  {{ formatPrice(partnership?.selected_pack?.base_price || 0) }} €
+                </p>
+              </div>
+            </div>
+
+            <!-- Prix personnalisé -->
+            <div>
+              <label for="custom-price" class="block text-sm font-medium text-gray-700 mb-2">
+                Prix personnalisé (optionnel)
+              </label>
+              <div class="flex gap-3">
+                <div class="flex-1">
+                  <UInput
+                    id="custom-price"
+                    v-model="customPrice"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="Laisser vide pour utiliser le prix du catalogue"
+                    class="w-full"
+                    :disabled="updatingPrice"
+                  />
+                  <p class="text-xs text-gray-500 mt-1">
+                    Entrez 0 pour un pack gratuit. Laissez vide pour utiliser le prix du catalogue.
+                  </p>
+                </div>
+                <div class="flex gap-2">
+                  <UButton
+                    color="primary"
+                    :loading="updatingPrice"
+                    :disabled="!hasCustomPriceChanged"
+                    @click="updateCustomPrice"
+                  >
+                    <i class="i-heroicons-check mr-1" aria-hidden="true" />
+                    Appliquer
+                  </UButton>
+                  <UButton
+                    v-if="partnership?.selected_pack?.pack_price_override !== null && partnership?.selected_pack?.pack_price_override !== undefined"
+                    color="neutral"
+                    variant="outline"
+                    :loading="updatingPrice"
+                    @click="clearCustomPrice"
+                  >
+                    <i class="i-heroicons-x-mark mr-1" aria-hidden="true" />
+                    Réinitialiser
+                  </UButton>
+                </div>
+              </div>
+            </div>
+
+            <!-- Prix actuel appliqué -->
+            <div
+              v-if="partnership?.selected_pack?.pack_price_override !== null && partnership?.selected_pack?.pack_price_override !== undefined"
+              class="p-4 bg-blue-50 border border-blue-200 rounded-lg"
+            >
+              <div class="flex items-start gap-2">
+                <i class="i-heroicons-information-circle text-blue-600 mt-0.5" aria-hidden="true" />
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-blue-900">Prix personnalisé actif</p>
+                  <p class="text-sm text-blue-700 mt-1">
+                    Le prix de ce pack a été modifié à
+                    <strong
+                      >{{ formatPrice(partnership.selected_pack.pack_price_override) }} €</strong
+                    >
+                    au lieu de {{ formatPrice(partnership.selected_pack.base_price) }} €
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="bg-white rounded-lg shadow p-6">
           <h2 id="organiser-section" class="text-lg font-semibold text-gray-900 mb-4">
             Organisateur assigné
@@ -411,7 +499,7 @@
 
 <script setup lang="ts">
 import DOMPurify from 'dompurify';
-import { getEventsPartnershipDetailed, getEventsPartnershipBilling, updatePartnershipContactInfo, postOrgsEventsPartnershipSuggestion, postOrgsEventsPartnershipBilling, postPartnershipOrganiser, deletePartnershipOrganiser, getOrgsUsers, getPartnershipEmailHistory, type UserSchema, type CompanyBillingDataSchema } from "~/utils/api";
+import { getEventsPartnershipDetailed, getEventsPartnershipBilling, updatePartnershipContactInfo, postOrgsEventsPartnershipSuggestion, postOrgsEventsPartnershipBilling, postPartnershipOrganiser, deletePartnershipOrganiser, getOrgsUsers, getPartnershipEmailHistory, putPartnershipPricing, type UserSchema, type CompanyBillingDataSchema } from "~/utils/api";
 
 interface EmailRecipient {
   value: string;
@@ -436,6 +524,7 @@ import { PARTNERSHIP_CONFIRM } from "~/constants/partnership";
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
+const toast = useToast();
 const { footerLinks } = useDashboardLinks();
 const { validatePartnership, declinePartnership } = usePartnershipActions();
 const { confirm, confirmState, handleConfirm: confirmModalConfirm, handleCancel: confirmModalCancel } = useConfirm();
@@ -465,6 +554,10 @@ const company = ref<any | null>(null);
 const billing = ref<CompanyBillingDataSchema | null>(null);
 const loading = ref(true);
 const saving = ref(false);
+
+// Prix personnalisé du pack
+const customPrice = ref<string>('');
+const updatingPrice = ref(false);
 const error = ref<string | null>(null);
 
 // États pour validation/refus de partenariat
@@ -599,8 +692,21 @@ async function loadPartnership() {
       agreement_generated: p.process_status?.agreement_url !== null && p.process_status?.agreement_url !== undefined,
       agreement_signed: p.process_status?.agreement_signed_url !== null && p.process_status?.agreement_signed_url !== undefined,
       option_ids: optionIds,
-      pack_options: packOptions
+      pack_options: packOptions,
+      selected_pack: p.selected_pack ? {
+        id: p.selected_pack.id,
+        name: p.selected_pack.name,
+        base_price: p.selected_pack.base_price,
+        pack_price_override: p.selected_pack.pack_price_override
+      } : undefined
     };
+
+    // Initialiser le champ customPrice si un override existe
+    if (p.selected_pack?.pack_price_override !== null && p.selected_pack?.pack_price_override !== undefined) {
+      customPrice.value = formatPrice(p.selected_pack.pack_price_override);
+    } else {
+      customPrice.value = '';
+    }
   } catch (err) {
     console.error('Failed to load partnership:', err);
     error.value = 'Impossible de charger les informations du sponsor';
@@ -936,6 +1042,114 @@ async function loadEmailHistory() {
 /**
  * Formater une date d'email
  */
+// Formater le prix en euros
+// Note: Contrairement à la doc, l'API retourne les prix en euros, pas en centimes
+function formatPrice(priceInEuros: number): string {
+  return priceInEuros.toFixed(2);
+}
+
+// Vérifier si le prix personnalisé a changé
+const hasCustomPriceChanged = computed(() => {
+  if (customPrice.value === '') return false;
+
+  const newPriceInEuros = parseFloat(customPrice.value);
+  const currentOverride = partnership.value?.selected_pack?.pack_price_override;
+
+  // Si pas d'override actuel et qu'on a une valeur, c'est un changement
+  if (currentOverride === null || currentOverride === undefined) {
+    return customPrice.value !== '';
+  }
+
+  // Sinon comparer les valeurs (avec tolérance pour les erreurs d'arrondi)
+  return Math.abs(newPriceInEuros - currentOverride) > 0.01;
+});
+
+// Mettre à jour le prix personnalisé
+async function updateCustomPrice() {
+  if (!partnership.value || customPrice.value === '') return;
+
+  try {
+    updatingPrice.value = true;
+
+    // L'API attend le prix en euros (pas en centimes malgré la doc)
+    const priceInEuros = parseFloat(customPrice.value);
+
+    await putPartnershipPricing(
+      orgSlug.value,
+      eventSlug.value,
+      sponsorId.value,
+      {
+        pack_price_override: priceInEuros
+      }
+    );
+
+    toast.add({
+      title: 'Succès',
+      description: 'Le prix personnalisé a été appliqué avec succès.',
+      color: 'green'
+    });
+
+    // Recharger les données du partenariat
+    await loadPartnership();
+  } catch (err: any) {
+    console.error('Failed to update custom price:', err);
+    const errorMessage = err.response?.status === 404
+      ? 'L\'endpoint de modification de prix n\'est pas disponible. Vérifiez que le backend est à jour.'
+      : err.response?.data?.message || 'Impossible de mettre à jour le prix.';
+
+    toast.add({
+      title: 'Erreur',
+      description: errorMessage,
+      color: 'red'
+    });
+  } finally {
+    updatingPrice.value = false;
+  }
+}
+
+// Réinitialiser le prix personnalisé (revenir au prix du catalogue)
+async function clearCustomPrice() {
+  if (!partnership.value) return;
+
+  try {
+    updatingPrice.value = true;
+
+    await putPartnershipPricing(
+      orgSlug.value,
+      eventSlug.value,
+      sponsorId.value,
+      {
+        pack_price_override: null
+      }
+    );
+
+    toast.add({
+      title: 'Succès',
+      description: 'Le prix a été réinitialisé au prix du catalogue.',
+      color: 'green'
+    });
+
+    // Vider le champ
+    customPrice.value = '';
+
+    // Recharger les données du partenariat
+    await loadPartnership();
+  } catch (err: any) {
+    console.error('Failed to clear custom price:', err);
+    const errorMessage = err.response?.status === 404
+      ? 'L\'endpoint de modification de prix n\'est pas disponible. Vérifiez que le backend est à jour.'
+      : err.response?.data?.message || 'Impossible de réinitialiser le prix.';
+
+    toast.add({
+      title: 'Erreur',
+      description: errorMessage,
+      color: 'red'
+    });
+  } finally {
+    updatingPrice.value = false;
+  }
+}
+
 function formatEmailDate(dateString: string): string {
   const date = new Date(dateString);
   return date.toLocaleDateString('fr-FR', {

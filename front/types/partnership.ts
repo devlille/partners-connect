@@ -26,7 +26,18 @@ export interface ExtendedPartnershipItem extends PartnershipItemSchema {
   /** IDs des options de sponsoring choisies par le sponsor */
   option_ids?: string[];
   /** Options complètes du pack sélectionné (avec nom et description) */
-  pack_options?: Array<{ id: string; name: string; description?: string | null }>;
+  pack_options?: Array<{
+    id: string;
+    name: string;
+    description?: string | null;
+  }>;
   /** Détails des sélections d'options avec quantité et valeur sélectionnée */
   option_selections?: PartnershipOptionSelection[];
+  /** Pack sélectionné avec son prix de base et override */
+  selected_pack?: {
+    id: string;
+    name: string;
+    base_price: number;
+    pack_price_override?: number | null;
+  };
 }

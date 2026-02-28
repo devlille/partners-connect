@@ -162,6 +162,8 @@ export type FilterValue = FilterValueSchema;
 
 export type PartnershipListResponse = PartnershipListResponseSchema;
 
+export type UpdatePartnershipPricingRequest = UpdatePartnershipPricingRequestSchema;
+
 export interface UserSessionSchema {
   state: string;
   token: string;
@@ -969,6 +971,12 @@ export interface SelectedValue {
 }
 
 /**
+ * Organiser-set price override for this option in cents. When non-null, replaces the catalogue price for billing.
+ * @minimum 0
+ */
+export type TextPartnershipOptionPriceOverride = number | null;
+
+/**
  * Text-based option with no quantity or value selection
  */
 export interface TextPartnershipOption {
@@ -997,6 +1005,11 @@ export interface TextPartnershipOption {
    * @minimum 0
    */
   total_price: number;
+  /**
+   * Organiser-set price override for this option in cents. When non-null, replaces the catalogue price for billing.
+   * @minimum 0
+   */
+  price_override?: TextPartnershipOptionPriceOverride;
 }
 
 /**
@@ -1009,6 +1022,12 @@ export type QuantitativePartnershipOptionTypeDescriptor =
 export const QuantitativePartnershipOptionTypeDescriptor = {
   job_offer: "job_offer",
 } as const;
+
+/**
+ * Organiser-set price override for this option in cents. When non-null, replaces the catalogue price for billing.
+ * @minimum 0
+ */
+export type QuantitativePartnershipOptionPriceOverride = number | null;
 
 /**
  * Option with user-selected quantity
@@ -1047,6 +1066,11 @@ export interface QuantitativePartnershipOption {
   total_price: number;
   /** Quantitative descriptor for user-defined quantities */
   type_descriptor: QuantitativePartnershipOptionTypeDescriptor;
+  /**
+   * Organiser-set price override for this option in cents. When non-null, replaces the catalogue price for billing.
+   * @minimum 0
+   */
+  price_override?: QuantitativePartnershipOptionPriceOverride;
 }
 
 /**
@@ -1059,6 +1083,12 @@ export type NumberPartnershipOptionTypeDescriptor =
 export const NumberPartnershipOptionTypeDescriptor = {
   nb_ticket: "nb_ticket",
 } as const;
+
+/**
+ * Organiser-set price override for this option in cents. When non-null, replaces the catalogue price for billing.
+ * @minimum 0
+ */
+export type NumberPartnershipOptionPriceOverride = number | null;
 
 /**
  * Option with fixed quantity from definition
@@ -1097,6 +1127,11 @@ export interface NumberPartnershipOption {
   total_price: number;
   /** Number descriptor for fixed quantities */
   type_descriptor: NumberPartnershipOptionTypeDescriptor;
+  /**
+   * Organiser-set price override for this option in cents. When non-null, replaces the catalogue price for billing.
+   * @minimum 0
+   */
+  price_override?: NumberPartnershipOptionPriceOverride;
 }
 
 /**
@@ -1109,6 +1144,12 @@ export type SelectablePartnershipOptionTypeDescriptor =
 export const SelectablePartnershipOptionTypeDescriptor = {
   booth: "booth",
 } as const;
+
+/**
+ * Organiser-set price override for this option in cents. When non-null, replaces the catalogue price for billing.
+ * @minimum 0
+ */
+export type SelectablePartnershipOptionPriceOverride = number | null;
 
 /**
  * Option with user-chosen value from predefined list
@@ -1145,6 +1186,11 @@ export interface SelectablePartnershipOption {
   /** Selectable descriptor for predefined choices */
   type_descriptor: SelectablePartnershipOptionTypeDescriptor;
   selected_value: SelectedValue;
+  /**
+   * Organiser-set price override for this option in cents. When non-null, replaces the catalogue price for billing.
+   * @minimum 0
+   */
+  price_override?: SelectablePartnershipOptionPriceOverride;
 }
 
 /**
@@ -1155,6 +1201,12 @@ export type PartnershipOptionSchema =
   | QuantitativePartnershipOption
   | NumberPartnershipOption
   | SelectablePartnershipOption;
+
+/**
+ * Organiser-set price override for this pack in cents. When non-null, this value replaces base_price in total price computation. Null when no override is active.
+ * @minimum 0
+ */
+export type PartnershipPackSchemaPackPriceOverride = number | null;
 
 /**
  * Enhanced partnership pack with partnership-specific options
@@ -1189,6 +1241,11 @@ export interface PartnershipPackSchema {
    * @minimum 0
    */
   total_price: number;
+  /**
+   * Organiser-set price override for this pack in cents. When non-null, this value replaces base_price in total price computation. Null when no override is active.
+   * @minimum 0
+   */
+  pack_price_override?: PartnershipPackSchemaPackPriceOverride;
 }
 
 export type PartnershipProcessStatusSchemaSuggestionSentAt = string | null;
@@ -1945,6 +2002,54 @@ export interface PartnershipOrganiserResponseSchema {
   partnership_id: string;
   /** Organiser user information or null if no organiser assigned */
   organiser: PartnershipOrganiserResponseSchemaOrganiser;
+}
+
+/**
+ * Custom price override for the validated sponsoring pack, in the same unit as the catalogue price. Omit to keep existing override. Set to null to clear the override. Set to 0 for a complimentary pack.
+ * @minimum 0
+ */
+export type UpdatePartnershipPricingRequestSchemaPackPriceOverride = number | null;
+
+/**
+ * Custom price override for this option. Set to null to clear the override.
+ * @minimum 0
+ */
+export type UpdatePartnershipPricingRequestSchemaOptionsPriceOverridesAnyOfItemPriceOverride =
+  | number
+  | null;
+
+export type UpdatePartnershipPricingRequestSchemaOptionsPriceOverridesAnyOfItem = {
+  /** UUID of the option to override. Must belong to this partnership. */
+  id: string;
+  /**
+   * Custom price override for this option. Set to null to clear the override.
+   * @minimum 0
+   */
+  price_override?: UpdatePartnershipPricingRequestSchemaOptionsPriceOverridesAnyOfItemPriceOverride;
+};
+
+/**
+ * List of price overrides for specific options. Only listed option IDs are affected. Option IDs not listed are left unchanged.
+ * @minItems 1
+ */
+export type UpdatePartnershipPricingRequestSchemaOptionsPriceOverrides =
+  | UpdatePartnershipPricingRequestSchemaOptionsPriceOverridesAnyOfItem[]
+  | null;
+
+/**
+ * Request body for updating price overrides on a partnership. All fields are optional to support partial updates. Omitting a field leaves the existing override unchanged. Explicitly setting a field to null clears the override.
+ */
+export interface UpdatePartnershipPricingRequestSchema {
+  /**
+   * Custom price override for the validated sponsoring pack, in the same unit as the catalogue price. Omit to keep existing override. Set to null to clear the override. Set to 0 for a complimentary pack.
+   * @minimum 0
+   */
+  pack_price_override?: UpdatePartnershipPricingRequestSchemaPackPriceOverride;
+  /**
+   * List of price overrides for specific options. Only listed option IDs are affected. Option IDs not listed are left unchanged.
+   * @minItems 1
+   */
+  options_price_overrides?: UpdatePartnershipPricingRequestSchemaOptionsPriceOverrides;
 }
 
 /**
@@ -4032,6 +4137,32 @@ export const deletePartnershipOrganiser = (
 };
 
 /**
+ * Update price overrides for the sponsoring pack and/or individual options on a partnership.
+All fields are optional – omitting a key leaves the existing override unchanged.
+Setting a field to null clears the override (reverts to catalogue price).
+Requires organiser permission for the organization.
+
+ * @summary Update partnership price overrides
+ */
+export const putPartnershipPricing = (
+  orgSlug: string,
+  eventSlug: string,
+  partnershipId: string,
+  updatePartnershipPricingRequestSchema: UpdatePartnershipPricingRequestSchema,
+  options?: SecondParameter<typeof customFetch<PartnershipDetailSchema>>,
+) => {
+  return customFetch<PartnershipDetailSchema>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/pricing`,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      data: updatePartnershipPricingRequestSchema,
+    },
+    options,
+  );
+};
+
+/**
  * Retrieve paginated email history for a specific partnership. Returns all emails
 sent to the partnership, ordered by most recent first. Each record includes
 full email details (subject, body, sender) and per-recipient delivery status.
@@ -4051,6 +4182,25 @@ export const getPartnershipEmailHistory = (
       url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/email-history`,
       method: "GET",
       params,
+    },
+    options,
+  );
+};
+
+/**
+ * Manually trigger webhook for a specific partnership. Requires webhook integration to be configured.
+ * @summary Trigger webhook for partnership
+ */
+export const postPartnershipTriggerWebhook = (
+  orgSlug: string,
+  eventSlug: string,
+  partnershipId: string,
+  options?: SecondParameter<typeof customFetch<void>>,
+) => {
+  return customFetch<void>(
+    {
+      url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/trigger/webhook`,
+      method: "POST",
     },
     options,
   );
@@ -4411,8 +4561,14 @@ export type PostPartnershipOrganiserResult = NonNullable<
 export type DeletePartnershipOrganiserResult = NonNullable<
   Awaited<ReturnType<typeof deletePartnershipOrganiser>>
 >;
+export type PutPartnershipPricingResult = NonNullable<
+  Awaited<ReturnType<typeof putPartnershipPricing>>
+>;
 export type GetPartnershipEmailHistoryResult = NonNullable<
   Awaited<ReturnType<typeof getPartnershipEmailHistory>>
+>;
+export type PostPartnershipTriggerWebhookResult = NonNullable<
+  Awaited<ReturnType<typeof postPartnershipTriggerWebhook>>
 >;
 export type PostPartnershipEmailResult = NonNullable<
   Awaited<ReturnType<typeof postPartnershipEmail>>
