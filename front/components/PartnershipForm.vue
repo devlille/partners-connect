@@ -25,16 +25,90 @@
         />
       </div>
 
-      <div>
+      <div class="md:col-span-2">
         <label class="block text-sm font-medium text-gray-700 mb-2"> Options </label>
-        <div v-if="selectedOptions.length > 0" class="bg-gray-50 rounded-lg p-3">
-          <div class="space-y-3">
-            <div v-for="option in selectedOptions" :key="option.id" class="flex items-start gap-3">
+
+        <!-- Options incluses dans le pack -->
+        <div
+          v-if="requiredOptions.length > 0"
+          class="bg-blue-50 rounded-lg p-3 mb-3"
+          role="region"
+          aria-labelledby="required-options-heading"
+        >
+          <h4
+            id="required-options-heading"
+            class="text-sm font-semibold text-blue-900 uppercase mb-2"
+          >
+            <i class="i-heroicons-check-circle mr-1" aria-hidden="true"></i>
+            Options incluses dans le pack
+          </h4>
+          <div class="space-y-3" role="list">
+            <div
+              v-for="option in requiredOptions"
+              :key="option.id"
+              class="flex items-start gap-3"
+              role="listitem"
+            >
+              <input
+                type="checkbox"
+                :id="`form-required-option-${option.id}`"
+                checked
+                disabled
+                tabindex="-1"
+                :aria-label="`Option incluse : ${option.name}`"
+                class="mt-1 h-4 w-4 rounded border-blue-300 text-blue-600 cursor-not-allowed opacity-80"
+              />
+              <label :for="`form-required-option-${option.id}`" class="flex-1 cursor-not-allowed">
+                <span class="block text-sm font-medium text-gray-900">
+                  {{ option.name }}
+                  <span
+                    v-if="option.price !== null && option.price !== undefined"
+                    class="text-gray-600"
+                  >
+                    ({{ option.price }} €)
+                  </span>
+                </span>
+                <span
+                  v-if="option.description"
+                  class="block text-sm text-gray-500 mt-1"
+                  :class="{ 'line-clamp-2': isDescriptionLong(option.description) }"
+                  :title="isDescriptionLong(option.description) ? option.description : undefined"
+                >
+                  {{ option.description }}
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Options optionnelles sélectionnées -->
+        <div
+          v-if="selectedOptions.length > 0"
+          class="bg-gray-50 rounded-lg p-3"
+          role="region"
+          aria-labelledby="optional-options-heading"
+        >
+          <h4
+            id="optional-options-heading"
+            class="text-sm font-semibold text-gray-700 uppercase mb-2"
+          >
+            <i class="i-heroicons-plus-circle mr-1" aria-hidden="true"></i>
+            Options optionnelles sélectionnées
+          </h4>
+          <div class="space-y-3" role="list">
+            <div
+              v-for="option in selectedOptions"
+              :key="option.id"
+              class="flex items-start gap-3"
+              role="listitem"
+            >
               <input
                 type="checkbox"
                 :id="`form-option-${option.id}`"
                 checked
                 disabled
+                tabindex="-1"
+                :aria-label="`Option optionnelle : ${option.name}`"
                 class="mt-1 h-4 w-4 rounded border-gray-300 text-primary-600 cursor-not-allowed opacity-60"
               />
               <label :for="`form-option-${option.id}`" class="flex-1 cursor-not-allowed">
@@ -62,14 +136,27 @@
                     ({{ option.price }} €)
                   </span>
                 </span>
-                <span v-if="option.description" class="block text-sm text-gray-500 mt-1">
+                <span
+                  v-if="option.description"
+                  class="block text-sm text-gray-500 mt-1"
+                  :class="{ 'line-clamp-2': isDescriptionLong(option.description) }"
+                  :title="isDescriptionLong(option.description) ? option.description : undefined"
+                >
                   {{ option.description }}
                 </span>
               </label>
             </div>
           </div>
         </div>
-        <p v-else class="text-sm text-gray-500 italic">Aucune option sélectionnée</p>
+
+        <p
+          v-if="requiredOptions.length === 0 && selectedOptions.length === 0"
+          class="text-sm text-gray-500 italic"
+          role="status"
+          aria-live="polite"
+        >
+          Aucune option
+        </p>
       </div>
 
       <div>
@@ -131,6 +218,16 @@ const eventSlug = computed(() => {
 
 const packs = ref<SponsoringPack[]>([]);
 const selectedPackName = ref('');
+
+// Options incluses dans le pack (required_options)
+const requiredOptions = ref<Array<{
+  id: string;
+  name: string;
+  description?: string | null;
+  price?: number | null;
+}>>([]);
+
+// Options optionnelles sélectionnées (optional_options)
 const selectedOptions = ref<Array<{
   id: string;
   name: string;
@@ -148,6 +245,7 @@ async function loadPacks() {
     const response = await getEventsSponsoringPacks(eventSlug.value);
     packs.value = response.data;
     updateSelectedPackName();
+    updateRequiredOptions();
     updateSelectedOptions();
   } catch (error) {
     console.error('Failed to load packs:', error);
@@ -164,6 +262,33 @@ function updateSelectedPackName() {
   } else {
     selectedPackName.value = '';
   }
+}
+
+// Vérifier si une description est longue (> 100 caractères)
+// Pour afficher un tooltip et tronquer le texte
+function isDescriptionLong(description: string | null | undefined): boolean {
+  if (!description) return false;
+  return description.length > 100;
+}
+
+// Mettre à jour les options incluses dans le pack (required_options)
+function updateRequiredOptions() {
+  requiredOptions.value = [];
+
+  // Trouver le pack pour accéder à ses options incluses
+  const packId = props.partnership?.selected_pack_id || props.partnership?.suggested_pack_id;
+  if (!packId) return;
+
+  const pack = packs.value.find(p => p.id === packId);
+  if (!pack || !pack.required_options || pack.required_options.length === 0) return;
+
+  // Mapper les options incluses
+  requiredOptions.value = pack.required_options.map((opt) => ({
+    id: opt.id,
+    name: opt.name,
+    description: opt.description || null,
+    price: opt.price ?? null
+  }));
 }
 
 // Mettre à jour les options sélectionnées
@@ -236,6 +361,7 @@ watch(() => props.partnership, (newPartnership) => {
       phone: newPartnership.phone || ''
     };
     updateSelectedPackName();
+    updateRequiredOptions();
     updateSelectedOptions();
   }
 }, { deep: true });
