@@ -17,6 +17,17 @@
             <i class="i-heroicons-arrow-top-right-on-square mr-2" aria-hidden="true" />
             Page publique
           </UButton>
+          <UButton
+              color="error"
+              variant="outline"
+              :loading="isDeclining"
+              :disabled="isValidating || isSuggesting"
+              :aria-label="`Refuser le partenariat avec ${partnership?.company_name}`"
+              @click="handleDeclinePartnership"
+            >
+              <i class="i-heroicons-x-mark mr-2" aria-hidden="true" />
+              Refuser
+            </UButton>
           <div v-if="partnership && !partnership.validated_pack_id" class="flex gap-3">
             <UButton
               color="neutral"
@@ -29,17 +40,7 @@
               <i class="i-heroicons-arrow-path mr-2" aria-hidden="true" />
               Proposer un autre pack
             </UButton>
-            <UButton
-              color="error"
-              variant="outline"
-              :loading="isDeclining"
-              :disabled="isValidating || isSuggesting"
-              :aria-label="`Refuser le partenariat avec ${partnership.company_name}`"
-              @click="handleDeclinePartnership"
-            >
-              <i class="i-heroicons-x-mark mr-2" aria-hidden="true" />
-              Refuser
-            </UButton>
+
             <UButton
               color="primary"
               :loading="isValidating"
