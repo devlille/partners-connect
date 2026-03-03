@@ -2924,6 +2924,18 @@ paths:
             type: "string"
             format: "email"
           description: "Filter by assigned organiser email address (case-insensitive)"
+        - name: "filter[declined]"
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+          description: >-
+            Filter by declined status. When absent or false (default), declined partnerships
+            (those with a non-null declinedAt timestamp) are excluded from results.
+            When true, declined partnerships are included alongside active ones.
+            NOTE: This changes the default behaviour — previously declined partnerships
+            were returned by default. Existing callers that need the old behaviour must
+            pass filter[declined]=true.
         - name: "direction"
           in: "query"
           required: false
@@ -4172,6 +4184,15 @@ paths:
             type: "string"
             format: "email"
           description: "Filter by assigned organiser email address for targeted bulk emails"
+        - name: "filter[declined]"
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+          description: >-
+            Filter by declined status for email recipients. When absent or false (default),
+            declined partnerships are excluded from the email recipient list.
+            When true, declined partnerships are included as recipients.
       requestBody:
         required: true
         content:

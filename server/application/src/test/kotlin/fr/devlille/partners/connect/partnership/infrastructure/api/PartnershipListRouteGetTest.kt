@@ -550,7 +550,7 @@ class PartnershipListRouteGetTest {
     }
 
     @Test
-    fun `GET returns metadata with all 7 filter definitions`() = testApplication {
+    fun `GET returns metadata with all 8 filter definitions`() = testApplication {
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
@@ -586,8 +586,8 @@ class PartnershipListRouteGetTest {
         val metadata = paginatedResponse.metadata
         assertTrue(metadata != null, "Metadata should be present")
 
-        // Verify 7 filter definitions exist
-        assertEquals(7, metadata.filters.size)
+        // Verify 8 filter definitions exist
+        assertEquals(8, metadata.filters.size)
 
         val filterNames = metadata.filters.map { it.name }
         assertTrue(filterNames.contains("pack_id"))
@@ -597,6 +597,7 @@ class PartnershipListRouteGetTest {
         assertTrue(filterNames.contains("agreement-generated"))
         assertTrue(filterNames.contains("agreement-signed"))
         assertTrue(filterNames.contains("organiser"))
+        assertTrue(filterNames.contains("declined"))
     }
 
     @Test

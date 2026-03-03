@@ -47,4 +47,5 @@ data class PartnershipFilters(
     val agreementGenerated: Boolean? = null,
     val agreementSigned: Boolean? = null,
     val organiser: String? = null,
+    val declined: Boolean = false,
 )

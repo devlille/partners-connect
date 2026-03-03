@@ -50,6 +50,7 @@ class PartnershipEmailRepositoryExposed(
                 agreementGenerated = filters.agreementGenerated,
                 agreementSigned = filters.agreementSigned,
                 organiserUserId = organiserUserId,
+                declined = filters.declined,
             )
 
         // Apply additional filters that require entity-level checks
