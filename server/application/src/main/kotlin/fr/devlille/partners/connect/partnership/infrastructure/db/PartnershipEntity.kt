@@ -26,6 +26,7 @@ class PartnershipEntity(id: EntityID<UUID>) : UUIDEntity(id) {
             agreementGenerated: Boolean?,
             agreementSigned: Boolean?,
             organiserUserId: UUID?,
+            declined: Boolean = false,
         ): SizedIterable<PartnershipEntity> {
             var op = PartnershipsTable.eventId eq eventId
             if (packId != null) {
@@ -61,6 +62,11 @@ class PartnershipEntity(id: EntityID<UUID>) : UUIDEntity(id) {
             }
             if (organiserUserId != null) {
                 op = op and (PartnershipsTable.organiserId eq organiserUserId)
+            }
+            op = if (declined) {
+                op and (PartnershipsTable.declinedAt.isNotNull())
+            } else {
+                op and (PartnershipsTable.declinedAt.isNull())
             }
             return find { op }
         }

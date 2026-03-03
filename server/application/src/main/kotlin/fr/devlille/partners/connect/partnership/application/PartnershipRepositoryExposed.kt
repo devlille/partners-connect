@@ -242,6 +242,7 @@ class PartnershipRepositoryExposed : PartnershipRepository {
                 agreementGenerated = filters.agreementGenerated,
                 agreementSigned = filters.agreementSigned,
                 organiserUserId = organiserUserId,
+                declined = filters.declined,
             )
             .orderBy(PartnershipsTable.createdAt to sort)
         val filteredPartnerships = if (filters.paid != null) {
@@ -297,6 +298,7 @@ class PartnershipRepositoryExposed : PartnershipRepository {
                 FilterDefinition("agreement-generated", FilterType.BOOLEAN),
                 FilterDefinition("agreement-signed", FilterType.BOOLEAN),
                 FilterDefinition("organiser", FilterType.STRING, organiserValues),
+                FilterDefinition("declined", FilterType.BOOLEAN),
             ),
             sorts = listOf("asc", "desc"),
         )
