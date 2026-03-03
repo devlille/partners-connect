@@ -18,16 +18,16 @@
             Page publique
           </UButton>
           <UButton
-              color="error"
-              variant="outline"
-              :loading="isDeclining"
-              :disabled="isValidating || isSuggesting"
-              :aria-label="`Refuser le partenariat avec ${partnership?.company_name}`"
-              @click="handleDeclinePartnership"
-            >
-              <i class="i-heroicons-x-mark mr-2" aria-hidden="true" />
-              Refuser
-            </UButton>
+            color="error"
+            variant="outline"
+            :loading="isDeclining"
+            :disabled="isValidating || isSuggesting"
+            :aria-label="`Refuser le partenariat avec ${partnership?.company_name}`"
+            @click="handleDeclinePartnership"
+          >
+            <i class="i-heroicons-x-mark mr-2" aria-hidden="true" />
+            Refuser
+          </UButton>
           <div v-if="partnership && !partnership.validated_pack_id" class="flex gap-3">
             <UButton
               color="neutral"

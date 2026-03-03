@@ -67,6 +67,7 @@ export default defineI18nConfig(() => ({
           paid: "Payé",
           agreementGenerated: "Accord généré",
           agreementSigned: "Accord signé",
+          declined: "Refusé",
           suggestion: "Suggestion",
           organiser: "Organisateur",
           all: "Tous",

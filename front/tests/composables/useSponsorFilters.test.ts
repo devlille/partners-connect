@@ -29,42 +29,50 @@ describe("useSponsorFilters", () => {
   });
 
   describe("initial state", () => {
-    it("should initialize with all filters set to null", () => {
+    it("should initialize with all filters set to null except declined", () => {
       const { filters } = useSponsorFilters({ orgSlug, eventSlug });
 
       expect(filters.value).toEqual(initialFilterState);
       expect(filters.value.packId).toBeNull();
-      // Boolean filters default to null (no filter applied)
+      // Boolean filters default to null (no filter applied) except declined
       expect(filters.value.validated).toBeNull();
       expect(filters.value.paid).toBeNull();
       expect(filters.value.agreementGenerated).toBeNull();
       expect(filters.value.agreementSigned).toBeNull();
       expect(filters.value.suggestion).toBeNull();
+      expect(filters.value.declined).toBe(false);
     });
 
-    it("should have activeFilterCount of 0 initially", () => {
+    it("should have activeFilterCount of 0 initially (declined is at default value)", () => {
       const { activeFilterCount } = useSponsorFilters({ orgSlug, eventSlug });
 
+      // declined is false (default value), so it's not counted as modified
       expect(activeFilterCount.value).toBe(0);
     });
 
-    it("should have isEmpty as true initially", () => {
+    it("should have isEmpty as true initially (all filters at default values)", () => {
       const { isEmpty } = useSponsorFilters({ orgSlug, eventSlug });
 
+      // declined is at default value, so no filters are "modified"
       expect(isEmpty.value).toBe(true);
     });
 
-    it("should have empty queryParams initially (no filters applied)", () => {
+    it("should have declined filter in queryParams initially", () => {
       const { queryParams } = useSponsorFilters({ orgSlug, eventSlug });
 
-      // No filters are sent when all values are null
-      expect(queryParams.value).toEqual({});
+      // declined filter is sent by default with value false
+      expect(queryParams.value).toEqual({
+        "filter[declined]": false,
+      });
     });
   });
 
   describe("setPackFilter", () => {
     it("should set pack filter to specified value", () => {
-      const { filters, setPackFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { filters, setPackFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setPackFilter("pack-123");
 
@@ -72,7 +80,10 @@ describe("useSponsorFilters", () => {
     });
 
     it("should set pack filter to null when clearing", () => {
-      const { filters, setPackFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { filters, setPackFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setPackFilter("pack-123");
       expect(filters.value.packId).toBe("pack-123");
@@ -82,29 +93,39 @@ describe("useSponsorFilters", () => {
     });
 
     it("should update activeFilterCount when pack filter is set", () => {
-      const { activeFilterCount, setPackFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { activeFilterCount, setPackFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
-      expect(activeFilterCount.value).toBe(0);
+      expect(activeFilterCount.value).toBe(0); // no modified filters initially
 
       setPackFilter("pack-123");
-      expect(activeFilterCount.value).toBe(1);
+      expect(activeFilterCount.value).toBe(1); // only packId
     });
 
     it("should update queryParams when pack filter is set", () => {
-      const { queryParams, setPackFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { queryParams, setPackFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setPackFilter("pack-456");
 
-      // Only pack_id is included (other filters are null)
+      // pack_id and declined (default) are included
       expect(queryParams.value).toEqual({
         "filter[pack_id]": "pack-456",
+        "filter[declined]": false,
       });
     });
   });
 
   describe("setStatusFilter", () => {
     it("should set validated filter to true", () => {
-      const { filters, setStatusFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { filters, setStatusFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setStatusFilter("validated", true);
 
@@ -112,7 +133,10 @@ describe("useSponsorFilters", () => {
     });
 
     it("should set paid filter to false", () => {
-      const { filters, setStatusFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { filters, setStatusFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setStatusFilter("paid", false);
 
@@ -120,7 +144,10 @@ describe("useSponsorFilters", () => {
     });
 
     it("should cycle agreementGenerated filter through null, true, false", () => {
-      const { filters, setStatusFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { filters, setStatusFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       // Default is null
       expect(filters.value.agreementGenerated).toBeNull();
@@ -136,7 +163,13 @@ describe("useSponsorFilters", () => {
     });
 
     it("should update activeFilterCount when status filters are set (non-null)", () => {
-      const { activeFilterCount, setStatusFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { activeFilterCount, setStatusFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
+
+      // No modified filters initially
+      expect(activeFilterCount.value).toBe(0);
 
       // Setting to true counts
       setStatusFilter("validated", true);
@@ -156,23 +189,31 @@ describe("useSponsorFilters", () => {
     });
 
     it("should update queryParams for each status filter", () => {
-      const { queryParams, setStatusFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { queryParams, setStatusFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setStatusFilter("validated", true);
-      // Only filters with non-null values are included
+      // declined (default) and validated are included
       expect(queryParams.value).toEqual({
         "filter[validated]": true,
+        "filter[declined]": false,
       });
 
       setStatusFilter("paid", false);
       expect(queryParams.value).toEqual({
         "filter[validated]": true,
         "filter[paid]": false,
+        "filter[declined]": false,
       });
     });
 
     it("should handle all status filter types", () => {
-      const { filters, setStatusFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { filters, setStatusFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setStatusFilter("validated", true);
       setStatusFilter("paid", false);
@@ -190,7 +231,10 @@ describe("useSponsorFilters", () => {
 
   describe("clearFilter", () => {
     it("should clear a specific pack filter", () => {
-      const { filters, setPackFilter, clearFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { filters, setPackFilter, clearFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setPackFilter("pack-789");
       expect(filters.value.packId).toBe("pack-789");
@@ -200,7 +244,10 @@ describe("useSponsorFilters", () => {
     });
 
     it("should clear a specific status filter (reset to null)", () => {
-      const { filters, setStatusFilter, clearFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { filters, setStatusFilter, clearFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setStatusFilter("validated", true);
       expect(filters.value.validated).toBe(true);
@@ -211,10 +258,11 @@ describe("useSponsorFilters", () => {
     });
 
     it("should update activeFilterCount when clearing filters", () => {
-      const { activeFilterCount, setPackFilter, setStatusFilter, clearFilter } = useSponsorFilters({
-        orgSlug,
-        eventSlug,
-      });
+      const { activeFilterCount, setPackFilter, setStatusFilter, clearFilter } =
+        useSponsorFilters({
+          orgSlug,
+          eventSlug,
+        });
 
       setPackFilter("pack-123");
       setStatusFilter("validated", true);
@@ -231,10 +279,11 @@ describe("useSponsorFilters", () => {
 
   describe("clearAllFilters", () => {
     it("should reset all filters to initial state", () => {
-      const { filters, setPackFilter, setStatusFilter, clearAllFilters } = useSponsorFilters({
-        orgSlug,
-        eventSlug,
-      });
+      const { filters, setPackFilter, setStatusFilter, clearAllFilters } =
+        useSponsorFilters({
+          orgSlug,
+          eventSlug,
+        });
 
       setPackFilter("pack-123");
       setStatusFilter("validated", true);
@@ -246,32 +295,40 @@ describe("useSponsorFilters", () => {
     });
 
     it("should reset activeFilterCount to 0", () => {
-      const { activeFilterCount, setPackFilter, setStatusFilter, clearAllFilters } =
-        useSponsorFilters({ orgSlug, eventSlug });
+      const {
+        activeFilterCount,
+        setPackFilter,
+        setStatusFilter,
+        clearAllFilters,
+      } = useSponsorFilters({ orgSlug, eventSlug });
 
       setPackFilter("pack-123");
       setStatusFilter("validated", true);
-      expect(activeFilterCount.value).toBe(2);
+      expect(activeFilterCount.value).toBe(2); // packId + validated
 
       clearAllFilters();
-      expect(activeFilterCount.value).toBe(0);
+      expect(activeFilterCount.value).toBe(0); // all back to defaults
     });
 
-    it("should set isEmpty to true", () => {
-      const { isEmpty, setPackFilter, clearAllFilters } = useSponsorFilters({ orgSlug, eventSlug });
+    it("should set isEmpty to true after clearing all", () => {
+      const { isEmpty, setPackFilter, clearAllFilters } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setPackFilter("pack-123");
       expect(isEmpty.value).toBe(false);
 
       clearAllFilters();
-      expect(isEmpty.value).toBe(true);
+      expect(isEmpty.value).toBe(true); // all back to defaults
     });
 
-    it("should reset queryParams to empty (no filters)", () => {
-      const { queryParams, setPackFilter, setStatusFilter, clearAllFilters } = useSponsorFilters({
-        orgSlug,
-        eventSlug,
-      });
+    it("should reset queryParams to only declined filter", () => {
+      const { queryParams, setPackFilter, setStatusFilter, clearAllFilters } =
+        useSponsorFilters({
+          orgSlug,
+          eventSlug,
+        });
 
       setPackFilter("pack-123");
       setStatusFilter("validated", true);
@@ -279,17 +336,20 @@ describe("useSponsorFilters", () => {
       expect(queryParams.value["filter[validated]"]).toBe(true);
 
       clearAllFilters();
-      // All filters are null, so queryParams is empty
-      expect(queryParams.value).toEqual({});
+      // All filters are reset to defaults, only declined remains
+      expect(queryParams.value).toEqual({
+        "filter[declined]": false,
+      });
     });
   });
 
   describe("activeFilterCount", () => {
     it("should count only non-null filter values", () => {
-      const { activeFilterCount, setPackFilter, setStatusFilter } = useSponsorFilters({
-        orgSlug,
-        eventSlug,
-      });
+      const { activeFilterCount, setPackFilter, setStatusFilter } =
+        useSponsorFilters({
+          orgSlug,
+          eventSlug,
+        });
 
       expect(activeFilterCount.value).toBe(0);
 
@@ -318,26 +378,35 @@ describe("useSponsorFilters", () => {
     });
 
     it("should be false when at least one filter is active", () => {
-      const { isEmpty, setPackFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { isEmpty, setPackFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setPackFilter("pack-123");
       expect(isEmpty.value).toBe(false);
     });
 
     it("should be true after clearing all filters", () => {
-      const { isEmpty, setPackFilter, clearAllFilters } = useSponsorFilters({ orgSlug, eventSlug });
+      const { isEmpty, setPackFilter, clearAllFilters } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setPackFilter("pack-123");
       expect(isEmpty.value).toBe(false);
 
       clearAllFilters();
-      expect(isEmpty.value).toBe(true);
+      expect(isEmpty.value).toBe(true); // all back to defaults
     });
   });
 
   describe("queryParams", () => {
     it("should map packId to filter[pack_id]", () => {
-      const { queryParams, setPackFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { queryParams, setPackFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setPackFilter("pack-abc");
 
@@ -345,7 +414,10 @@ describe("useSponsorFilters", () => {
     });
 
     it("should map validated to filter[validated]", () => {
-      const { queryParams, setStatusFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { queryParams, setStatusFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setStatusFilter("validated", true);
 
@@ -353,7 +425,10 @@ describe("useSponsorFilters", () => {
     });
 
     it("should map paid to filter[paid]", () => {
-      const { queryParams, setStatusFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { queryParams, setStatusFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setStatusFilter("paid", false);
 
@@ -361,7 +436,10 @@ describe("useSponsorFilters", () => {
     });
 
     it("should map agreementGenerated to filter[agreement-generated]", () => {
-      const { queryParams, setStatusFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { queryParams, setStatusFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setStatusFilter("agreementGenerated", true);
 
@@ -369,7 +447,10 @@ describe("useSponsorFilters", () => {
     });
 
     it("should map agreementSigned to filter[agreement-signed]", () => {
-      const { queryParams, setStatusFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { queryParams, setStatusFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setStatusFilter("agreementSigned", false);
 
@@ -377,7 +458,10 @@ describe("useSponsorFilters", () => {
     });
 
     it("should map suggestion to filter[suggestion]", () => {
-      const { queryParams, setStatusFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { queryParams, setStatusFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setStatusFilter("suggestion", true);
 
@@ -385,20 +469,23 @@ describe("useSponsorFilters", () => {
     });
 
     it("should include only non-null filters in queryParams", () => {
-      const { queryParams, setPackFilter, setStatusFilter } = useSponsorFilters({
-        orgSlug,
-        eventSlug,
-      });
+      const { queryParams, setPackFilter, setStatusFilter } = useSponsorFilters(
+        {
+          orgSlug,
+          eventSlug,
+        },
+      );
 
       setPackFilter("pack-multi");
       setStatusFilter("validated", true);
       setStatusFilter("paid", false);
 
-      // Only non-null filters are included
+      // Only non-null filters are included (plus declined default)
       expect(queryParams.value).toEqual({
         "filter[pack_id]": "pack-multi",
         "filter[validated]": true,
         "filter[paid]": false,
+        "filter[declined]": false,
       });
     });
 
@@ -413,6 +500,7 @@ describe("useSponsorFilters", () => {
 
       expect(queryParams.value).toEqual({
         "filter[paid]": true,
+        "filter[declined]": false,
       });
       // packId not included because it's null
       expect(queryParams.value["filter[pack_id]"]).toBeUndefined();
@@ -454,7 +542,10 @@ describe("useSponsorFilters", () => {
 
     it("should clear sessionStorage when all filters are cleared", async () => {
       vi.useFakeTimers();
-      const { setPackFilter, clearAllFilters } = useSponsorFilters({ orgSlug, eventSlug });
+      const { setPackFilter, clearAllFilters } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setPackFilter("pack-temp");
       await nextTick();
@@ -470,7 +561,10 @@ describe("useSponsorFilters", () => {
 
     it("should clear sessionStorage when isEmpty becomes true", async () => {
       vi.useFakeTimers();
-      const { setPackFilter, clearFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { setPackFilter, clearFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setPackFilter("pack-temp");
       await nextTick();
@@ -510,8 +604,12 @@ describe("useSponsorFilters", () => {
       await nextTick();
       vi.advanceTimersByTime(100);
 
-      const stored1 = sessionStorage.getItem("sponsor-filters:org1:event1:packId");
-      const stored2 = sessionStorage.getItem("sponsor-filters:org2:event2:packId");
+      const stored1 = sessionStorage.getItem(
+        "sponsor-filters:org1:event1:packId",
+      );
+      const stored2 = sessionStorage.getItem(
+        "sponsor-filters:org2:event2:packId",
+      );
 
       expect(stored1).toBe("pack-1");
       expect(stored2).toBe("pack-2");
@@ -520,7 +618,10 @@ describe("useSponsorFilters", () => {
 
     it("should update sessionStorage reactively as filters change", async () => {
       vi.useFakeTimers();
-      const { setPackFilter, setStatusFilter } = useSponsorFilters({ orgSlug, eventSlug });
+      const { setPackFilter, setStatusFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setPackFilter("pack-1");
       await nextTick();

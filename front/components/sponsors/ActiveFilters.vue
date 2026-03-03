@@ -117,6 +117,26 @@
       </button>
     </UBadge>
 
+    <!-- Declined Badge -->
+    <UBadge
+      v-if="filters.declined !== null"
+      color="red"
+      variant="subtle"
+      class="flex items-center gap-1"
+    >
+      <span
+        >{{ $t('sponsors.filters.declined') }}:
+        {{ filters.declined ? $t('common.yes') : $t('common.no') }}</span
+      >
+      <button
+        @click="$emit('clear', 'declined')"
+        class="ml-1 hover:text-red-600"
+        :aria-label="`${$t('common.clear')} ${$t('sponsors.filters.declined')}`"
+      >
+        <UIcon name="i-heroicons-x-mark" class="w-4 h-4" />
+      </button>
+    </UBadge>
+
     <!-- Clear All Button -->
     <UButton
       size="xs"

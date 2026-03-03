@@ -47,6 +47,13 @@ export interface FilterState {
    */
   suggestion: boolean | null;
 
+  /** Declined status filter
+   * - null: show all sponsors
+   * - true: show only declined sponsors
+   * - false: show only not declined sponsors
+   */
+  declined: boolean | null;
+
   /** Organiser email filter, null = all organisers */
   organiser: string | null;
 }
@@ -87,11 +94,13 @@ export const FilterStateSchema = z.object({
   agreementGenerated: z.boolean().nullable(),
   agreementSigned: z.boolean().nullable(),
   suggestion: z.boolean().nullable(),
+  declined: z.boolean().nullable(),
   organiser: z.string().nullable(),
 });
 
 /**
  * Initial filter state with all filters set to null (no filter applied)
+ * Exception: declined is set to false by default to hide declined sponsors
  */
 export const initialFilterState: FilterState = {
   packId: null,
@@ -100,6 +109,7 @@ export const initialFilterState: FilterState = {
   agreementGenerated: null,
   agreementSigned: null,
   suggestion: null,
+  declined: false,
   organiser: null,
 };
 
@@ -113,6 +123,7 @@ export const filterToApiParamMapping: Record<keyof FilterState, string> = {
   agreementGenerated: "filter[agreement-generated]",
   agreementSigned: "filter[agreement-signed]",
   suggestion: "filter[suggestion]",
+  declined: "filter[declined]",
   organiser: "filter[organiser]",
 };
 

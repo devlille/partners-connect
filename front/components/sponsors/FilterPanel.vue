@@ -140,6 +140,7 @@ const filterNameMapping: Record<string, keyof FilterState> = {
   'validated': 'validated',
   'paid': 'paid',
   'suggestion': 'suggestion',
+  'declined': 'declined',
   'agreement-generated': 'agreementGenerated',
   'agreement-signed': 'agreementSigned',
   'organiser': 'organiser',
@@ -151,6 +152,7 @@ const filterLabelMapping: Record<string, string> = {
   'validated': 'sponsors.filters.validated',
   'paid': 'sponsors.filters.paid',
   'suggestion': 'sponsors.filters.suggestion',
+  'declined': 'sponsors.filters.declined',
   'agreement-generated': 'sponsors.filters.agreementGenerated',
   'agreement-signed': 'sponsors.filters.agreementSigned',
   'organiser': 'sponsors.filters.organiser',
@@ -166,6 +168,7 @@ const booleanFilters = computed<FilterMetadata[]>(() => {
       { name: 'agreement-generated', type: 'boolean' },
       { name: 'agreement-signed', type: 'boolean' },
       { name: 'suggestion', type: 'boolean' },
+      { name: 'declined', type: 'boolean' },
     ]
   }
   return props.metadata.filters.filter(f => f.type === 'boolean')

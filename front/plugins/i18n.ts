@@ -71,6 +71,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         validated: "Validé",
         paid: "Payé",
         agreementGenerated: "Accord généré",
+        declined: "Refusé",
         agreementSigned: "Accord signé",
         suggestion: "Suggestion",
         organiser: "Organisateur",

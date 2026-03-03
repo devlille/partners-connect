@@ -1,7 +1,7 @@
 import { computed, type Ref, type ComputedRef } from "vue";
 import type { GetOrgsEventsPartnershipParams } from "~/utils/api";
 import { type FilterState } from "~/types/sponsors";
-import { useQueryStates, parsers } from "./useQueryState";
+import { useQueryStates, parsers, type Parser } from "./useQueryState";
 
 /**
  * Options for useSponsorFilters composable
@@ -57,6 +57,16 @@ export interface UseSponsorFiltersReturn {
  * Uses nuqs-inspired parsers for type-safe URL state management
  * Boolean filters default to null (no filter applied)
  */
+/**
+ * Custom parser for declined filter with default value of false
+ * This ensures that by default, declined sponsors are filtered out
+ */
+const declinedParser = (): Parser<boolean | null> => ({
+  parse: (value) => (value === "true" ? true : value === "false" ? false : null),
+  serialize: (value) => (value === null ? "" : String(value)),
+  defaultValue: false, // Default to false to hide declined sponsors
+});
+
 const filterSchema = {
   packId: parsers.stringOrNull(),
   validated: parsers.booleanOrNull(),
@@ -64,6 +74,7 @@ const filterSchema = {
   agreementGenerated: parsers.booleanOrNull(),
   agreementSigned: parsers.booleanOrNull(),
   suggestion: parsers.booleanOrNull(),
+  declined: declinedParser(),
   organiser: parsers.stringOrNull(),
 } as const;
 
@@ -146,6 +157,9 @@ export function useSponsorFilters(options: UseSponsorFiltersOptions): UseSponsor
     if (filters.value.suggestion !== null) {
       params["filter[suggestion]"] = filters.value.suggestion;
     }
+    if (filters.value.declined !== null) {
+      params["filter[declined]"] = filters.value.declined;
+    }
 
     if (filters.value.organiser !== null) {
       params["filter[organiser]"] = filters.value.organiser;
@@ -168,7 +182,13 @@ export function useSponsorFilters(options: UseSponsorFiltersOptions): UseSponsor
    * @param value New value (true, false, or null for no filter)
    */
   function setStatusFilter(
-    key: "validated" | "paid" | "agreementGenerated" | "agreementSigned" | "suggestion",
+    key:
+      | "validated"
+      | "paid"
+      | "agreementGenerated"
+      | "agreementSigned"
+      | "suggestion"
+      | "declined",
     value: boolean | null,
   ): void {
     filters.value[key] = value;
