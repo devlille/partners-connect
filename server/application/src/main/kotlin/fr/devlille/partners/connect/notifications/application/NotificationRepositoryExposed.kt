@@ -17,6 +17,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 class NotificationRepositoryExposed(
     private val notificationGateways: List<NotificationGateway>,
     private val mailingGateway: NotificationGateway,
+    private val messagingGateway: NotificationGateway,
 ) : NotificationRepository {
     override suspend fun sendMessage(variables: NotificationVariables): List<DeliveryResult> {
         val eventSlug = variables.event.event.slug
@@ -68,6 +69,28 @@ class NotificationRepositoryExposed(
             destination = destination,
             header = subject,
             body = htmlBody,
+        )
+    }
+
+    override suspend fun sendMessageFromMessaging(variables: NotificationVariables): DeliveryResult {
+        val eventSlug = variables.event.event.slug
+        val eventEntity = transaction {
+            EventEntity.findBySlug(eventSlug)
+                ?: throw NotFoundException("Event with slug $eventSlug not found")
+        }
+
+        // Find integration id for event
+        val integration = transaction {
+            IntegrationEntity.find {
+                (IntegrationsTable.eventId eq eventEntity.id.value) and
+                    (IntegrationsTable.provider eq messagingGateway.provider)
+            }.firstOrNull()
+        } ?: throw NotFoundException("No messaging integration found for event")
+
+        // Call generic gateway send method and return result
+        return messagingGateway.send(
+            integrationId = integration.id.value,
+            variables = variables,
         )
     }
 }

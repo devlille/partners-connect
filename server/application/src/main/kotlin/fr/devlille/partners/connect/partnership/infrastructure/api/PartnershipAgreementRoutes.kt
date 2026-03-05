@@ -2,8 +2,9 @@ package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
-import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.api.UnsupportedMediaTypeException
+import fr.devlille.partners.connect.internal.infrastructure.ktor.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.ktor.MessagingPartnershipPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.NotificationPartnershipPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.WebhookPartnershipPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
@@ -29,7 +30,7 @@ fun Route.publicPartnershipAgreementRoutes() {
     val storageRepository by inject<PartnershipStorageRepository>()
 
     route("/events/{eventSlug}/partnerships/{partnershipId}/signed-agreement") {
-        install(NotificationPartnershipPlugin)
+        install(MessagingPartnershipPlugin)
         install(WebhookPartnershipPlugin)
 
         post {

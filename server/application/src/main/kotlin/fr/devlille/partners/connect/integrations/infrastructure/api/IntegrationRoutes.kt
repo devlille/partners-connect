@@ -3,7 +3,7 @@ package fr.devlille.partners.connect.integrations.infrastructure.api
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.integrations.domain.IntegrationRepository
 import fr.devlille.partners.connect.integrations.domain.IntegrationStatusRepository
-import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.ktor.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.organisations.infrastructure.api.orgSlug
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receiveText

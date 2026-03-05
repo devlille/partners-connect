@@ -1,7 +1,7 @@
 package fr.devlille.partners.connect.events.infrastructure.api
 
 import fr.devlille.partners.connect.agenda.domain.AgendaRepository
-import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.ktor.AuthorizedOrganisationPlugin
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route

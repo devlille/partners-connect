@@ -3,11 +3,11 @@ package fr.devlille.partners.connect.partnership.infrastructure.api
 import fr.devlille.partners.connect.auth.domain.AuthRepository
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
-import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.api.DEFAULT_PAGE_SIZE
 import fr.devlille.partners.connect.internal.infrastructure.api.getValue
 import fr.devlille.partners.connect.internal.infrastructure.api.token
 import fr.devlille.partners.connect.internal.infrastructure.db.PromotionStatus
+import fr.devlille.partners.connect.internal.infrastructure.ktor.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.NotificationPartnershipPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.WebhookPartnershipPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive

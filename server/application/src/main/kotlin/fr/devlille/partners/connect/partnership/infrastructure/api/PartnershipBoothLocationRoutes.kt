@@ -1,8 +1,8 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
-import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.api.EmptyStringValidationException
+import fr.devlille.partners.connect.internal.infrastructure.ktor.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.partnership.domain.PartnershipBoothRepository
 import io.ktor.http.HttpStatusCode

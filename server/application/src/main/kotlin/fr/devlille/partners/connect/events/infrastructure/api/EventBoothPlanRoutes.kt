@@ -2,8 +2,8 @@ package fr.devlille.partners.connect.events.infrastructure.api
 
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventStorageRepository
-import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.api.UnsupportedMediaTypeException
+import fr.devlille.partners.connect.internal.infrastructure.ktor.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.MissingRequestParameterException

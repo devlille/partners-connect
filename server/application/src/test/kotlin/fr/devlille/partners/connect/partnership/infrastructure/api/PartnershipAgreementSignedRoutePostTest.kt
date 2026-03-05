@@ -1,7 +1,16 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
+import com.slack.api.RequestConfigurator
+import com.slack.api.Slack
+import com.slack.api.methods.MethodsClient
+import com.slack.api.methods.request.chat.ChatPostMessageRequest
+import com.slack.api.methods.response.chat.ChatPostMessageResponse
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.events.factories.insertMockedFutureEvent
+import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
+import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
+import fr.devlille.partners.connect.integrations.factories.insertMockedIntegration
+import fr.devlille.partners.connect.integrations.factories.insertSlackIntegration
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
 import fr.devlille.partners.connect.internal.infrastructure.bucket.Upload
 import fr.devlille.partners.connect.internal.moduleSharedDb
@@ -30,6 +39,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class PartnershipAgreementSignedRoutePostTest {
+    @Suppress("LongMethod")
     @Test
     fun `POST upload signed agreement PDF and returns URL`() = testApplication {
         val storage = mockk<Storage>()
@@ -40,6 +50,16 @@ class PartnershipAgreementSignedRoutePostTest {
             url = expectedUrl,
         )
 
+        val slack = mockk<Slack>()
+        val slackMethod = mockk<MethodsClient>()
+        val slackResponse = mockk<ChatPostMessageResponse>()
+        every { slack.methods(any()) } returns slackMethod
+        every {
+            slackMethod
+                .chatPostMessage(any<RequestConfigurator<ChatPostMessageRequest.ChatPostMessageRequestBuilder>>())
+        } returns slackResponse
+        every { slackResponse.isOk } returns true
+
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
@@ -48,7 +68,7 @@ class PartnershipAgreementSignedRoutePostTest {
         val partnershipId = UUID.randomUUID()
 
         application {
-            moduleSharedDb(userId, storage = storage)
+            moduleSharedDb(userId, storage = storage, slack = slack)
             transaction {
                 insertMockedUser(userId)
                 insertMockedOrganisationEntity(orgId)
@@ -63,6 +83,12 @@ class PartnershipAgreementSignedRoutePostTest {
                     selectedPackId = packId,
                     validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
                 )
+                val integrationId = insertMockedIntegration(
+                    eventId = eventId,
+                    provider = IntegrationProvider.SLACK,
+                    usage = IntegrationUsage.NOTIFICATION,
+                )
+                insertSlackIntegration(integrationId)
             }
         }
 

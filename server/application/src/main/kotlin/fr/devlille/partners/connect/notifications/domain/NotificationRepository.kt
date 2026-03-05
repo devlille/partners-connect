@@ -16,4 +16,15 @@ interface NotificationRepository {
         subject: String,
         htmlBody: String,
     ): DeliveryResult
+
+    /**
+     * Sends a message to the default messaging gateway (e.g., Slack) for the specified event.
+     * The message content is determined by the provided [NotificationVariables] and the configured message template
+     * for the event.
+     * @param variables The variables to populate the message template
+     * @throws NotFoundException if no messaging integration is configured for the event
+     */
+    suspend fun sendMessageFromMessaging(
+        variables: NotificationVariables,
+    ): DeliveryResult
 }
