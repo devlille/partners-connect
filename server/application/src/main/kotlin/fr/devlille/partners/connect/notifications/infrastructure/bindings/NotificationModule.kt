@@ -16,12 +16,14 @@ val notificationModule = module {
     single { MailjetProvider(httpClient = get()) }
     single<NotificationRepository> {
         val mailingGateway = MailjetNotificationGateway(mailjetProvider = get())
+        val slackGateway = SlackNotificationGateway(slack = get())
         NotificationRepositoryExposed(
             notificationGateways = listOf(
-                SlackNotificationGateway(slack = get()),
+                slackGateway,
                 mailingGateway,
             ),
             mailingGateway = mailingGateway,
+            messagingGateway = slackGateway,
         )
     }
 }

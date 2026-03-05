@@ -2,7 +2,7 @@ package fr.devlille.partners.connect.events.infrastructure.api
 
 import fr.devlille.partners.connect.events.domain.CreateEventExternalLinkRequest
 import fr.devlille.partners.connect.events.domain.EventRepository
-import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.ktor.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond

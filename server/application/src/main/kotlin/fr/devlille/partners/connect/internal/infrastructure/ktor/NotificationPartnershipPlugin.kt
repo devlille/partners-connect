@@ -1,6 +1,5 @@
 package fr.devlille.partners.connect.internal.infrastructure.ktor
 
-import fr.devlille.partners.connect.internal.infrastructure.api.user
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
@@ -30,6 +29,14 @@ val NotificationPartnershipPlugin = createRouteScopedPlugin(name = "Notification
                 triggeredBy = call.attributes.user.userId.toUUID(),
             )
         }
+    }
+}
+
+val MessagingPartnershipPlugin = createRouteScopedPlugin(name = "MessagingPartnershipPlugin") {
+    val notificationRepository by application.inject<NotificationRepository>()
+
+    onCallRespond { call ->
+        notificationRepository.sendMessageFromMessaging(call.attributes.variables)
     }
 }
 

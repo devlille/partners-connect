@@ -1,6 +1,8 @@
-package fr.devlille.partners.connect.internal.infrastructure.api
+package fr.devlille.partners.connect.internal.infrastructure.ktor
 
 import fr.devlille.partners.connect.auth.domain.AuthRepository
+import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
+import fr.devlille.partners.connect.internal.infrastructure.api.token
 import fr.devlille.partners.connect.organisations.infrastructure.api.orgSlug
 import fr.devlille.partners.connect.users.domain.UserOrganisationPermission
 import fr.devlille.partners.connect.users.domain.UserRepository

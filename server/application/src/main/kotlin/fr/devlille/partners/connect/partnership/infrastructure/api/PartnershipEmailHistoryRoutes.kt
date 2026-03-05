@@ -1,7 +1,7 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
-import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.api.DEFAULT_PAGE_SIZE
+import fr.devlille.partners.connect.internal.infrastructure.ktor.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.partnership.domain.PartnershipEmailHistoryRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond

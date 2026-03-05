@@ -1,8 +1,8 @@
 package fr.devlille.partners.connect.provider.infrastructure.api
 
-import fr.devlille.partners.connect.internal.infrastructure.api.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.internal.infrastructure.api.DEFAULT_PAGE_SIZE
+import fr.devlille.partners.connect.internal.infrastructure.ktor.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.organisations.infrastructure.api.orgSlug
 import fr.devlille.partners.connect.provider.domain.CreateProvider

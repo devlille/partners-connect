@@ -42,6 +42,7 @@ fun Application.moduleSharedDb(
     userId: UUID,
     nbProductsForTickets: Int = 0,
     storage: Storage = mockk(),
+    slack: Slack = mockk(),
 ) {
     moduleMocked(
         databaseUrl = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
@@ -50,6 +51,9 @@ fun Application.moduleSharedDb(
         },
         mockStorage = module {
             single { storage }
+        },
+        mockSlack = module {
+            single<Slack> { slack }
         },
     )
 }
