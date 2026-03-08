@@ -4525,6 +4525,46 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RevokeUsersResult"
+  /orgs/{orgSlug}/events/{eventSlug}/jobs/digest:
+    post:
+      operationId: "postDigestJob"
+      summary: "Trigger the morning organiser daily digest for a single event"
+      description: >
+        Fire-and-forget job endpoint that queries actionable items for the given
+        event (agreement reminders, quote reminders, social media reminders) and
+        sends a Slack digest notification. Always returns 204 even if no items or
+        if Slack is unavailable. No authentication required.
+      security:
+        - {}
+      parameters:
+        - name: "orgSlug"
+          in: path
+          required: true
+          schema:
+            type: "string"
+        - name: "eventSlug"
+          in: path
+          required: true
+          schema:
+            type: "string"
+        - name: "Accept-Language"
+          in: header
+          required: false
+          schema:
+            type: "string"
+            enum:
+              - "fr"
+              - "en"
+            default: "en"
+      responses:
+        "204":
+          description: "Digest ran successfully (or had nothing to do)"
+        "404":
+          description: "Event not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /users/me/events:
     get:
       summary: "List organization events"

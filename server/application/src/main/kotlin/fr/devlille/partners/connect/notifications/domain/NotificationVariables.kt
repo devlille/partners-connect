@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.notifications.domain
 
 import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.companies.domain.JobOffer
+import fr.devlille.partners.connect.digest.domain.DigestEntry
 import fr.devlille.partners.connect.events.domain.EventWithOrganisation
 import fr.devlille.partners.connect.partnership.domain.InvoiceStatus
 import fr.devlille.partners.connect.partnership.domain.Partnership
@@ -284,5 +285,43 @@ sealed interface NotificationVariables {
                 .replace("{{partnership_link}}", partnershipLink)
                 .replace("{{decline_reason}}", reasonText)
         }
+    }
+
+    /**
+     * Notification variables for the morning organiser daily digest.
+     *
+     * Populates the `digest/{language}.md` template with up to three sections.
+     * The [company] property is not applicable for a digest (digest covers multiple
+     * companies) and throws [UnsupportedOperationException] if accessed.
+     */
+    class MorningDigest(
+        override val language: String,
+        override val event: EventWithOrganisation,
+        val agreementItems: List<DigestEntry>,
+        val quoteItems: List<DigestEntry>,
+        val socialMediaItems: List<DigestEntry>,
+    ) : NotificationVariables {
+        override val usageName: String = "digest"
+
+        override val company: Company
+            get() = error("Not applicable for MorningDigest")
+
+        override fun populate(content: String): String = content
+            .replace("{{event_name}}", event.event.name)
+            .replace(
+                "{{agreement_section}}",
+                agreementItems
+                    .joinToString("\n") { "• <${it.partnershipLink}|${it.companyName}>" },
+            )
+            .replace(
+                "{{quote_section}}",
+                quoteItems
+                    .joinToString("\n") { "• <${it.partnershipLink}|${it.companyName}>" },
+            )
+            .replace(
+                "{{social_media_section}}",
+                socialMediaItems
+                    .joinToString("\n") { "• <${it.partnershipLink}|${it.companyName}>" },
+            )
     }
 }

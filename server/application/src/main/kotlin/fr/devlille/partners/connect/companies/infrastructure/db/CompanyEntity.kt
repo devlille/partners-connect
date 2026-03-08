@@ -51,3 +51,10 @@ class CompanyEntity(id: EntityID<UUID>) : UUIDEntity(id) {
 
     val socials by CompanySocialEntity referrersOn CompanySocialsTable.companyId
 }
+
+fun CompanyEntity.hasCompleteAddress(): Boolean =
+    !siret.isNullOrBlank() &&
+        !address.isNullOrBlank() &&
+        !zipCode.isNullOrBlank() &&
+        !city.isNullOrBlank() &&
+        !country.isNullOrBlank()

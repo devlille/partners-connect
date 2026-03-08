@@ -6,8 +6,11 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackE
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.greaterEq
 import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.isNotNull
 import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.isNull
+import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.less
+import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.neq
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.UUIDEntity
@@ -70,6 +73,37 @@ class PartnershipEntity(id: EntityID<UUID>) : UUIDEntity(id) {
             }
             return find { op }
         }
+
+        fun findAgreementReady(eventId: UUID): List<PartnershipEntity> =
+            find {
+                (PartnershipsTable.eventId eq eventId) and
+                    PartnershipsTable.declinedAt.isNull() and
+                    PartnershipsTable.validatedAt.isNotNull() and
+                    PartnershipsTable.agreementUrl.isNull() and
+                    (PartnershipsTable.contactName neq "") and
+                    (PartnershipsTable.contactRole neq "")
+            }.toList()
+
+        fun findQuoteReady(eventId: UUID): List<PartnershipEntity> =
+            find {
+                (PartnershipsTable.eventId eq eventId) and
+                    PartnershipsTable.declinedAt.isNull() and
+                    PartnershipsTable.validatedAt.isNotNull() and
+                    PartnershipsTable.selectedPackId.isNotNull()
+            }.toList()
+
+        fun findSocialMediaDue(
+            eventId: UUID,
+            startOfDay: LocalDateTime,
+            endOfDay: LocalDateTime,
+        ): List<PartnershipEntity> =
+            find {
+                (PartnershipsTable.eventId eq eventId) and
+                    PartnershipsTable.declinedAt.isNull() and
+                    PartnershipsTable.communicationPublicationDate.isNotNull() and
+                    (PartnershipsTable.communicationPublicationDate greaterEq startOfDay) and
+                    (PartnershipsTable.communicationPublicationDate less endOfDay)
+            }.toList()
 
         fun singleByEventAndCompany(eventId: UUID, companyId: UUID): PartnershipEntity? = this
             .find { (PartnershipsTable.eventId eq eventId) and (PartnershipsTable.companyId eq companyId) }
