@@ -7,6 +7,8 @@ import fr.devlille.partners.connect.auth.infrastructure.plugins.configureSecurit
 import fr.devlille.partners.connect.billing.infrastructure.bindings.billingModule
 import fr.devlille.partners.connect.companies.infrastructure.api.companyRoutes
 import fr.devlille.partners.connect.companies.infrastructure.bindings.companyModule
+import fr.devlille.partners.connect.digest.infrastructure.api.digestRoutes
+import fr.devlille.partners.connect.digest.infrastructure.bindings.digestModule
 import fr.devlille.partners.connect.events.infrastructure.api.eventBoothPlanRoutes
 import fr.devlille.partners.connect.events.infrastructure.api.eventExternalLinkRoutes
 import fr.devlille.partners.connect.events.infrastructure.api.eventRoutes
@@ -100,6 +102,7 @@ data class ApplicationConfig(
         integrationModule,
         providerModule,
         webhookModule,
+        digestModule,
     ),
 )
 
@@ -141,6 +144,7 @@ fun Application.module(config: ApplicationConfig = ApplicationConfig()) {
         partnershipRoutes()
         integrationRoutes()
         providersRoutes()
+        digestRoutes()
     }
 }
 

@@ -15,6 +15,7 @@ fun insertMockedBilling(
     lastName: String = "Doe",
     email: String = "john@doe.com",
     po: String? = null,
+    quotePdfUrl: String? = null,
     status: InvoiceStatus = InvoiceStatus.PAID,
 ): BillingEntity = BillingEntity.new {
     this.event = EventEntity[eventId]
@@ -24,5 +25,6 @@ fun insertMockedBilling(
     this.contactLastName = lastName
     this.contactEmail = email
     this.po = po
+    this.quotePdfUrl = quotePdfUrl
     this.status = status
 }

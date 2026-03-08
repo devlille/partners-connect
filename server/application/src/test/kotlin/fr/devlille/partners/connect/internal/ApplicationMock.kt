@@ -7,6 +7,7 @@ import fr.devlille.partners.connect.auth.infrastructure.bindings.authModule
 import fr.devlille.partners.connect.billing.domain.BillingGateway
 import fr.devlille.partners.connect.billing.infrastructure.bindings.billingModule
 import fr.devlille.partners.connect.companies.infrastructure.bindings.companyModule
+import fr.devlille.partners.connect.digest.infrastructure.bindings.digestModule
 import fr.devlille.partners.connect.events.infrastructure.bindings.eventModule
 import fr.devlille.partners.connect.integrations.infrastructure.bindings.integrationModule
 import fr.devlille.partners.connect.internal.infrastructure.bindings.mapsModule
@@ -125,6 +126,7 @@ fun Application.moduleMocked(
                 ticketingModule,
                 agendaModule,
                 integrationModule,
+                digestModule,
                 mockNetwork,
                 mockSlack,
                 mockStorage,
