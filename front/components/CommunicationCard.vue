@@ -28,14 +28,13 @@
     <!-- Actions -->
     <div class="flex gap-2">
       <UButton
-        v-if="status !== 'done'"
         size="sm"
         variant="ghost"
         color="neutral"
         icon="i-heroicons-calendar"
         @click="$emit('schedule', item)"
       >
-        {{ item.publication_date ? 'Modifier la date' : 'Planifier' }}
+        {{ status === 'done' ? 'Reprogrammer' : item.publication_date ? 'Modifier la date' : 'Planifier' }}
       </UButton>
 
       <UButton
