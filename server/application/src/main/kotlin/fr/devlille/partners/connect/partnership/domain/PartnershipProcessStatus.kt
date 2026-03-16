@@ -28,10 +28,6 @@ data class PartnershipProcessStatus(
     val quoteUrl: String? = null,
     @SerialName("invoice_url")
     val invoiceUrl: String? = null,
-    @SerialName("communication_publication_date")
-    val communicationPublicationDate: String? = null,
-    @SerialName("communication_support_url")
-    val communicationSupportUrl: String? = null,
     @SerialName("billing_status")
     val billingStatus: String? = null,
 )

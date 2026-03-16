@@ -2748,6 +2748,172 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
+  /orgs/{orgSlug}/events/{eventSlug}/communication-plan:
+    post:
+      summary: Schedule a standalone communication
+      operationId: postOrgsEventsCommunicationPlan
+      description: Create a standalone communication plan entry for an event
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/communication_plan_request.schema'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/communication_plan_entry.schema'
+        '400':
+          description: Bad Request - Missing or invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '403':
+          description: Forbidden - Not authorized for this organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Not Found - Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+  /orgs/{orgSlug}/events/{eventSlug}/communication-plan/{id}:
+    put:
+      summary: Update a communication plan entry
+      operationId: putOrgsEventsCommunicationPlanById
+      description: Update an existing communication plan entry (standalone or partnership-linked)
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Communication plan entry ID
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/communication_plan_request.schema'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/communication_plan_entry.schema'
+        '400':
+          description: Bad Request - Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '403':
+          description: Forbidden - Not authorized for this organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Not Found - Entry not found or belongs to a different event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+    delete:
+      summary: Delete a communication plan entry
+      operationId: deleteOrgsEventsCommunicationPlanById
+      description: Delete a communication plan entry (standalone or partnership-linked)
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Communication plan entry ID
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '403':
+          description: Forbidden - Not authorized for this organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Not Found - Entry not found or belongs to a different event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/external-link:
     post:
       summary: Add external link
@@ -4720,6 +4886,10 @@ components:
       $ref: '#/components/schemas/communication_item.schema'
     CommunicationPlan:
       $ref: '#/components/schemas/communication_plan.schema'
+    CommunicationPlanEntry:
+      $ref: '#/components/schemas/communication_plan_entry.schema'
+    CommunicationPlanRequest:
+      $ref: '#/components/schemas/communication_plan_request.schema'
     PaginatedEventSummary:
       $ref: '#/components/schemas/paginated_event_summary.schema'
     PaginatedCompany:
@@ -7564,9 +7734,13 @@ components:
       $id: communication_item.schema.json
       type: object
       properties:
-        partnership_id:
+        id:
           type: string
-        company_name:
+        partnership_id:
+          type:
+            - string
+            - 'null'
+        title:
           type: string
         publication_date:
           type:
@@ -7578,8 +7752,8 @@ components:
             - string
             - 'null'
       required:
-        - partnership_id
-        - company_name
+        - id
+        - title
     communication_plan.schema:
       $id: communication_plan.schema.json
       type: object
@@ -7600,6 +7774,63 @@ components:
         - done
         - planned
         - unplanned
+    communication_plan_request.schema:
+      $id: communication_plan_request.schema.json
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        scheduled_date:
+          type:
+            - string
+            - 'null'
+          format: datetime
+        description:
+          type:
+            - string
+            - 'null'
+        support_url:
+          type:
+            - string
+            - 'null'
+      required:
+        - title
+    communication_plan_entry.schema:
+      $id: communication_plan_entry.schema.json
+      type: object
+      properties:
+        id:
+          type: string
+        event_id:
+          type: string
+        partnership_id:
+          type:
+            - string
+            - 'null'
+        title:
+          type: string
+        scheduled_date:
+          type:
+            - string
+            - 'null'
+          format: datetime
+        description:
+          type:
+            - string
+            - 'null'
+        support_url:
+          type:
+            - string
+            - 'null'
+        created_at:
+          type: string
+          format: datetime
+      required:
+        - id
+        - event_id
+        - title
+        - created_at
     create_event_external_link.schema:
       $id: create_event_external_link.schema.json
       type: object

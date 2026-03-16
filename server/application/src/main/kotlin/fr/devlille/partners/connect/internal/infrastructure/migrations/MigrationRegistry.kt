@@ -14,11 +14,13 @@ import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPolymorphicSponsoringOptionsMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddProviderManagementMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddSelectableValuePricingMigration
+import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateCommunicationPlansTableMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateCompanyJobOffersTableMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateJobOfferPromotionsTableMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.InitialSchemaMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.MakeOrganisationFieldsNullableMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.MigrateNullableColumnInCompanyTableMigration
+import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.MigratePartnershipCommunicationsMigration
 
 /**
  * Registry that contains all database migrations in the system.
@@ -49,6 +51,8 @@ object MigrationRegistry {
         MigrateNullableColumnInCompanyTableMigration,
         AddPartnershipEmailHistoryMigration,
         AddPartnershipPriceOverridesMigration,
+        CreateCommunicationPlansTableMigration,
+        MigratePartnershipCommunicationsMigration,
     )
 
     /**

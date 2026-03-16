@@ -51,6 +51,7 @@ fun Route.partnershipRoutes() {
     partnershipEmailRoutes()
     partnershipEmailHistoryRoutes()
     orgsPartnershipWebhookRoutes()
+    orgsEventCommunicationPlanRoutes()
 }
 
 @Suppress("LongMethod")
