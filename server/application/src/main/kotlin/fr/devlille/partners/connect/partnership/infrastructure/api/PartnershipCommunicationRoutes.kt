@@ -3,6 +3,7 @@ package fr.devlille.partners.connect.partnership.infrastructure.api
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.internal.infrastructure.ktor.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
+import fr.devlille.partners.connect.partnership.domain.CommunicationPlanRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipCommunicationRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipStorageRepository
 import io.ktor.http.HttpStatusCode
@@ -20,6 +21,7 @@ import org.koin.ktor.ext.inject
 
 fun Route.orgsPartnershipCommunicationRoutes() {
     val partnershipCommunicationRepository by inject<PartnershipCommunicationRepository>()
+    val communicationPlanRepository by inject<CommunicationPlanRepository>()
     val storageRepository by inject<PartnershipStorageRepository>()
 
     route("/orgs/{orgSlug}/events/{eventSlug}/communication") {
@@ -42,11 +44,15 @@ fun Route.orgsPartnershipCommunicationRoutes() {
                 val publicationDate = call
                     .receive<PublicationDateRequest>(schema = "publication_date_request.schema.json")
                     .publicationDate
-                val id = partnershipCommunicationRepository
-                    .updateCommunicationPublicationDate(eventSlug, partnershipId, publicationDate)
+                communicationPlanRepository.upsertForPartnership(
+                    eventSlug = eventSlug,
+                    partnershipId = partnershipId,
+                    scheduledDate = publicationDate,
+                    supportUrl = null,
+                )
                 call.respond(
                     status = HttpStatusCode.OK,
-                    message = PublicationDateResponse(id = id.toString(), publicationDate = publicationDate),
+                    message = PublicationDateResponse(id = partnershipId.toString(), publicationDate = publicationDate),
                 )
             }
         }
@@ -59,11 +65,15 @@ fun Route.orgsPartnershipCommunicationRoutes() {
                 val bytes = call.receive<ByteArray>()
                 val supportUrl = storageRepository
                     .uploadCommunicationSupport(eventSlug, partnershipId, bytes, contentType.toString())
-                val id = partnershipCommunicationRepository
-                    .updateCommunicationSupportUrl(eventSlug, partnershipId, supportUrl)
+                communicationPlanRepository.upsertForPartnership(
+                    eventSlug = eventSlug,
+                    partnershipId = partnershipId,
+                    scheduledDate = null,
+                    supportUrl = supportUrl,
+                )
                 call.respond(
                     status = HttpStatusCode.OK,
-                    message = SupportUploadResponse(id = id.toString(), url = supportUrl),
+                    message = SupportUploadResponse(id = partnershipId.toString(), url = supportUrl),
                 )
             }
         }

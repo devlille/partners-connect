@@ -1,8 +1,11 @@
 {
-  "$id": "communication_item.schema.json",
+  "$id": "communication_plan_entry.schema.json",
   "type": "object",
   "properties": {
     "id": {
+      "type": "string"
+    },
+    "event_id": {
       "type": "string"
     },
     "partnership_id": {
@@ -14,22 +17,34 @@
     "title": {
       "type": "string"
     },
-    "publication_date": {
+    "scheduled_date": {
       "type": [
         "string",
         "null"
       ],
       "format": "datetime"
     },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "support_url": {
       "type": [
         "string",
         "null"
       ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "datetime"
     }
   },
   "required": [
     "id",
-    "title"
+    "event_id",
+    "title",
+    "created_at"
   ]
 }

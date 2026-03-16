@@ -28,9 +28,9 @@ tests/
 Kotlin 1.9.x with JVM 21 (Amazon Corretto): Follow standard conventions
 
 ## Recent Changes
+- 019-standalone-communication: Added Kotlin 1.9.x, JVM 21 (Amazon Corretto) + Ktor 2.x, Exposed 0.41+, kotlinx.serialization, Koin
 - 001-morning-organizer-digest: Added Kotlin 2.1.21, JVM 21 (Amazon Corretto) + Ktor 3.2.0, Exposed 1.0.0-beta-2, kotlinx-coroutines 1.9.0, Koin 4.1.0, Slack API client 1.45.3
 - 018-filter-declined-partnerships: Added Kotlin 1.9.x / JVM 21 (Amazon Corretto) + Ktor 2.x, Exposed ORM 0.41+, Koin, kotlinx.serialization
-- 017-override-partnership-price: Added Kotlin 1.9.x, JVM 21 (Amazon Corretto) + Ktor 2.x, Exposed 0.41+, kotlinx.serialization, Koin
 
 
 <!-- MANUAL ADDITIONS START -->

@@ -7,7 +7,8 @@ import fr.devlille.partners.connect.internal.infrastructure.bucket.Upload
 import fr.devlille.partners.connect.internal.moduleSharedDb
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
-import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.CommunicationPlanEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.CommunicationPlansTable
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
 import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
 import fr.devlille.partners.connect.users.factories.insertMockedUser
@@ -25,6 +26,7 @@ import io.mockk.verify
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
@@ -89,11 +91,13 @@ class PartnershipCommunicationSupportRoutePutTest {
         assertEquals(expectedUrl, responseBody["url"]?.jsonPrimitive?.content)
 
         // Verify the database was updated
-        val partnership = transaction {
-            PartnershipEntity.singleByEventAndPartnership(eventId, partnershipId)
+        val entry = transaction {
+            CommunicationPlanEntity.find {
+                CommunicationPlansTable.partnershipId eq partnershipId
+            }.firstOrNull()
         }
-        assertNotNull(partnership)
-        assertEquals(expectedUrl, partnership.communicationSupportUrl)
+        assertNotNull(entry)
+        assertEquals(expectedUrl, entry.supportUrl)
 
         // Verify the storage service was called
         verify { storage.upload(any(), imageBytes, any()) }

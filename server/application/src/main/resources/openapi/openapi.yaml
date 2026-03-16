@@ -2726,6 +2726,172 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CommunicationPlan"
+  /orgs/{orgSlug}/events/{eventSlug}/communication-plan:
+    post:
+      summary: "Schedule a standalone communication"
+      operationId: "postOrgsEventsCommunicationPlan"
+      description: "Create a standalone communication plan entry for an event"
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organization slug"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommunicationPlanRequest"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request - Missing or invalid parameters"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Forbidden - Not authorized for this organization"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Not Found - Event not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "201":
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommunicationPlanEntry"
+  /orgs/{orgSlug}/events/{eventSlug}/communication-plan/{id}:
+    put:
+      summary: "Update a communication plan entry"
+      operationId: "putOrgsEventsCommunicationPlanById"
+      description: "Update an existing communication plan entry (standalone or partnership-linked)"
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organization slug"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug"
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Communication plan entry ID"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommunicationPlanRequest"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request - Invalid input"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Forbidden - Not authorized for this organization"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Not Found - Entry not found or belongs to a different event"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommunicationPlanEntry"
+    delete:
+      summary: "Delete a communication plan entry"
+      operationId: "deleteOrgsEventsCommunicationPlanById"
+      description: "Delete a communication plan entry (standalone or partnership-linked)"
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organization slug"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug"
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Communication plan entry ID"
+      security:
+        - bearerAuth: []
+      responses:
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Forbidden - Not authorized for this organization"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Not Found - Entry not found or belongs to a different event"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "204":
+          description: "No Content"
   /orgs/{orgSlug}/events/{eventSlug}/external-link:
     post:
       summary: "Add external link"
@@ -4699,6 +4865,10 @@ components:
       $ref: "../schemas/communication_item.schema.json"
     CommunicationPlan:
       $ref: "../schemas/communication_plan.schema.json"
+    CommunicationPlanEntry:
+      $ref: "../schemas/communication_plan_entry.schema.json"
+    CommunicationPlanRequest:
+      $ref: "../schemas/communication_plan_request.schema.json"
     PaginatedEventSummary:
       $ref: "../schemas/paginated_event_summary.schema.json"
     PaginatedCompany:
