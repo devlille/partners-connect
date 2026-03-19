@@ -1,7 +1,7 @@
 export default {
   api: {
     input:
-      "https://app-9603f7fd-d8c8-45ce-80f3-1f1d9f3fc367.cleverapps.io/swagger/documentation.yaml",
+      "https://app-be77cae5-4a57-4cca-b721-15f8ab1f76c4.cleverapps.io/swagger/documentation.yaml",
     output: {
       target: "./utils/api.ts",
       override: {

@@ -37,7 +37,16 @@
             </button>
           </div>
 
-          <UButton color="primary" icon="i-heroicons-arrow-down-tray" @click="handleExport">
+          <UButton color="primary" icon="i-heroicons-plus" @click="standaloneModal.openCreate()">
+            Nouvelle communication
+          </UButton>
+
+          <UButton
+            color="neutral"
+            variant="outline"
+            icon="i-heroicons-arrow-down-tray"
+            @click="handleExport"
+          >
             Exporter
           </UButton>
         </div>
@@ -109,11 +118,13 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <CommunicationCard
                 v-for="item in communicationPlan.unplanned"
-                :key="item.partnership_id"
+                :key="item.id"
                 :item="item"
                 status="unplanned"
                 @schedule="openScheduleModal"
                 @upload="openUploadModal"
+                @edit="standaloneModal.openEdit"
+                @delete="openDeleteConfirm"
               />
             </div>
           </section>
@@ -135,11 +146,13 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <CommunicationCard
                 v-for="item in communicationPlan.planned"
-                :key="item.partnership_id"
+                :key="item.id"
                 :item="item"
                 status="planned"
                 @schedule="openScheduleModal"
                 @upload="openUploadModal"
+                @edit="standaloneModal.openEdit"
+                @delete="openDeleteConfirm"
               />
             </div>
           </section>
@@ -161,11 +174,13 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <CommunicationCard
                 v-for="item in communicationPlan.done"
-                :key="item.partnership_id"
+                :key="item.id"
                 :item="item"
                 status="done"
                 @schedule="openScheduleModal"
                 @upload="openUploadModal"
+                @edit="standaloneModal.openEdit"
+                @delete="openDeleteConfirm"
               />
             </div>
           </section>
@@ -185,6 +200,75 @@
       </template>
     </div>
 
+    <!-- Modal: Créer / modifier une communication standalone -->
+    <Teleport to="body">
+      <div
+        v-if="standaloneModal.isOpen.value"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+        @click.self="standaloneModal.close()"
+      >
+        <div class="w-full max-w-lg bg-white rounded-lg shadow-xl" @click.stop>
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">
+              {{ standaloneModal.isEditing.value ? 'Modifier la communication' : 'Nouvelle communication' }}
+            </h3>
+          </div>
+
+          <div class="px-6 py-4 space-y-4">
+            <div>
+              <label for="standalone-title" class="block text-sm font-medium text-gray-700 mb-2">
+                Titre *
+              </label>
+              <input
+                id="standalone-title"
+                v-model="standaloneModal.form.value.title"
+                type="text"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                required
+              />
+            </div>
+
+            <div>
+              <label for="standalone-date" class="block text-sm font-medium text-gray-700 mb-2">
+                Date de publication
+              </label>
+              <input
+                id="standalone-date"
+                v-model="standaloneModal.form.value.scheduled_date"
+                type="date"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+          </div>
+
+          <div class="px-6 py-4 border-t border-gray-200 flex justify-between gap-3">
+            <UButton
+              v-if="standaloneModal.isEditing.value"
+              color="error"
+              variant="ghost"
+              :loading="standaloneModal.deleting.value"
+              @click="standaloneModal.handleDelete(orgSlug, eventSlug, loadCommunicationPlan)"
+            >
+              Supprimer
+            </UButton>
+            <div class="flex gap-3 ml-auto">
+              <UButton color="neutral" variant="ghost" @click="standaloneModal.close()">
+                Annuler
+              </UButton>
+              <UButton
+                color="primary"
+                :loading="standaloneModal.submitting.value"
+                :disabled="!standaloneModal.form.value.title"
+                @click="standaloneModal.handleSubmit(orgSlug, eventSlug, loadCommunicationPlan)"
+              >
+                {{ standaloneModal.isEditing.value ? 'Enregistrer' : 'Créer' }}
+              </UButton>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
     <!-- Modal: Planifier une date de publication -->
     <Teleport to="body">
       <div
@@ -202,7 +286,7 @@
               <label class="block text-sm font-medium text-gray-700 mb-2"> Entreprise </label>
               <input
                 type="text"
-                :value="selectedItem?.company_name"
+                :value="selectedItem?.title"
                 disabled
                 class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600"
               />
@@ -256,7 +340,7 @@
               <label class="block text-sm font-medium text-gray-700 mb-2"> Entreprise </label>
               <input
                 type="text"
-                :value="selectedItem?.company_name"
+                :value="selectedItem?.title"
                 disabled
                 class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600"
               />
@@ -321,6 +405,7 @@ import { getOrgsEventsCommunication, getOrgsEventsPartnership, getEventBySlug, p
 import authMiddleware from "~/middleware/auth";
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "~/constants/errors";
 import { useCommunicationFilters } from '~/composables/useCommunicationFilters';
+import { useStandaloneCommunicationModal } from '~/composables/useStandaloneCommunicationModal';
 import FilterPanel from '~/components/sponsors/FilterPanel.vue';
 import ActiveFilters from '~/components/sponsors/ActiveFilters.vue';
 import type { PartnershipsMetadata } from '~/types/sponsors';
@@ -391,6 +476,24 @@ const allCommunications = computed(() => {
 
 // Menu contextuel pour la page
 const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
+
+// Modal pour les communications standalone
+const standaloneModal = useStandaloneCommunicationModal();
+const { confirm } = useConfirm();
+
+async function openDeleteConfirm(item: CommunicationItemSchema) {
+  const confirmed = await confirm({
+    title: 'Supprimer la communication',
+    message: `Voulez-vous vraiment supprimer "${item.title}" ?`,
+    confirmLabel: 'Supprimer',
+    type: 'danger',
+  });
+
+  if (confirmed) {
+    standaloneModal.openEdit(item);
+    await standaloneModal.handleDelete(orgSlug.value, eventSlug.value, loadCommunicationPlan);
+  }
+}
 
 // Modal de planification
 const isScheduleModalOpen = ref(false);
@@ -539,8 +642,11 @@ async function handleUploadSupport() {
 }
 
 function handleSelectCommunication(comm: CommunicationItemSchema) {
-  // Ouvrir le modal de planification avec la communication sélectionnée
-  openScheduleModal(comm);
+  if (comm.partnership_id) {
+    openScheduleModal(comm);
+  } else {
+    standaloneModal.openEdit(comm);
+  }
 }
 
 function handleExport() {
@@ -556,7 +662,7 @@ function handleExport() {
       : 'Non planifiée';
 
     csvData.push([
-      comm.company_name,
+      comm.title,
       comm.publication_date ? new Date(comm.publication_date).toLocaleDateString('fr-FR') : '-',
       status,
       comm.support_url ? 'Oui' : 'Non'

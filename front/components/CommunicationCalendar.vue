@@ -57,15 +57,15 @@
         <div class="space-y-1">
           <div
             v-for="comm in day.communications"
-            :key="comm.partnership_id"
+            :key="comm.id"
             :class="[
               'text-xs p-1 rounded cursor-pointer truncate',
               getStatusClass(comm)
             ]"
-            :title="comm.company_name"
+            :title="comm.title"
             @click="$emit('selectCommunication', comm)"
           >
-            {{ comm.company_name }}
+            {{ comm.title }}
           </div>
         </div>
       </div>

@@ -258,11 +258,10 @@ describe("useSponsorFilters", () => {
     });
 
     it("should update activeFilterCount when clearing filters", () => {
-      const { activeFilterCount, setPackFilter, setStatusFilter, clearFilter } =
-        useSponsorFilters({
-          orgSlug,
-          eventSlug,
-        });
+      const { activeFilterCount, setPackFilter, setStatusFilter, clearFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setPackFilter("pack-123");
       setStatusFilter("validated", true);
@@ -279,11 +278,10 @@ describe("useSponsorFilters", () => {
 
   describe("clearAllFilters", () => {
     it("should reset all filters to initial state", () => {
-      const { filters, setPackFilter, setStatusFilter, clearAllFilters } =
-        useSponsorFilters({
-          orgSlug,
-          eventSlug,
-        });
+      const { filters, setPackFilter, setStatusFilter, clearAllFilters } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setPackFilter("pack-123");
       setStatusFilter("validated", true);
@@ -295,12 +293,8 @@ describe("useSponsorFilters", () => {
     });
 
     it("should reset activeFilterCount to 0", () => {
-      const {
-        activeFilterCount,
-        setPackFilter,
-        setStatusFilter,
-        clearAllFilters,
-      } = useSponsorFilters({ orgSlug, eventSlug });
+      const { activeFilterCount, setPackFilter, setStatusFilter, clearAllFilters } =
+        useSponsorFilters({ orgSlug, eventSlug });
 
       setPackFilter("pack-123");
       setStatusFilter("validated", true);
@@ -324,11 +318,10 @@ describe("useSponsorFilters", () => {
     });
 
     it("should reset queryParams to only declined filter", () => {
-      const { queryParams, setPackFilter, setStatusFilter, clearAllFilters } =
-        useSponsorFilters({
-          orgSlug,
-          eventSlug,
-        });
+      const { queryParams, setPackFilter, setStatusFilter, clearAllFilters } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setPackFilter("pack-123");
       setStatusFilter("validated", true);
@@ -345,11 +338,10 @@ describe("useSponsorFilters", () => {
 
   describe("activeFilterCount", () => {
     it("should count only non-null filter values", () => {
-      const { activeFilterCount, setPackFilter, setStatusFilter } =
-        useSponsorFilters({
-          orgSlug,
-          eventSlug,
-        });
+      const { activeFilterCount, setPackFilter, setStatusFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       expect(activeFilterCount.value).toBe(0);
 
@@ -469,12 +461,10 @@ describe("useSponsorFilters", () => {
     });
 
     it("should include only non-null filters in queryParams", () => {
-      const { queryParams, setPackFilter, setStatusFilter } = useSponsorFilters(
-        {
-          orgSlug,
-          eventSlug,
-        },
-      );
+      const { queryParams, setPackFilter, setStatusFilter } = useSponsorFilters({
+        orgSlug,
+        eventSlug,
+      });
 
       setPackFilter("pack-multi");
       setStatusFilter("validated", true);
@@ -604,12 +594,8 @@ describe("useSponsorFilters", () => {
       await nextTick();
       vi.advanceTimersByTime(100);
 
-      const stored1 = sessionStorage.getItem(
-        "sponsor-filters:org1:event1:packId",
-      );
-      const stored2 = sessionStorage.getItem(
-        "sponsor-filters:org2:event2:packId",
-      );
+      const stored1 = sessionStorage.getItem("sponsor-filters:org1:event1:packId");
+      const stored2 = sessionStorage.getItem("sponsor-filters:org2:event2:packId");
 
       expect(stored1).toBe("pack-1");
       expect(stored2).toBe("pack-2");

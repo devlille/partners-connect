@@ -1,9 +1,9 @@
 <template>
   <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-    <!-- Header avec nom de l'entreprise -->
+    <!-- Header avec titre -->
     <div class="flex items-start justify-between mb-3">
       <div class="flex-1">
-        <h3 class="font-semibold text-gray-900">{{ item.company_name }}</h3>
+        <h3 class="font-semibold text-gray-900">{{ item.title }}</h3>
         <p v-if="item.publication_date" class="text-sm text-gray-600 mt-1">
           <i class="i-heroicons-calendar-days text-xs mr-1" />
           {{ formatDate(item.publication_date) }}
@@ -20,13 +20,13 @@
     <div v-if="item.support_url" class="mb-3">
       <img
         :src="item.support_url"
-        :alt="`Support visuel ${item.company_name}`"
+        :alt="`Support visuel ${item.title}`"
         class="w-full h-32 object-cover rounded border border-gray-200"
       />
     </div>
 
-    <!-- Actions -->
-    <div class="flex gap-2">
+    <!-- Actions pour les communications liées à un partenariat -->
+    <div v-if="item.partnership_id" class="flex gap-2">
       <UButton
         size="sm"
         variant="ghost"
@@ -47,6 +47,29 @@
         {{ item.support_url ? 'Changer' : 'Ajouter' }}
       </UButton>
     </div>
+
+    <!-- Actions pour les communications standalone -->
+    <div v-else class="flex gap-2">
+      <UButton
+        size="sm"
+        variant="ghost"
+        color="neutral"
+        icon="i-heroicons-pencil"
+        @click="$emit('edit', item)"
+      >
+        Modifier
+      </UButton>
+
+      <UButton
+        size="sm"
+        variant="ghost"
+        color="error"
+        icon="i-heroicons-trash"
+        @click="$emit('delete', item)"
+      >
+        Supprimer
+      </UButton>
+    </div>
   </div>
 </template>
 
@@ -58,11 +81,13 @@ interface Props {
   status: 'done' | 'planned' | 'unplanned';
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Readonly<Props>>();
 
 defineEmits<{
   schedule: [item: CommunicationItemSchema];
   upload: [item: CommunicationItemSchema];
+  edit: [item: CommunicationItemSchema];
+  delete: [item: CommunicationItemSchema];
 }>();
 
 const statusLabel = computed(() => {
