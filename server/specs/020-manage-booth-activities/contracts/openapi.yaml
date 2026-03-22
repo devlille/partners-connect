@@ -1,0 +1,220 @@
+openapi: "3.1.0"
+info:
+  title: Booth Activity Endpoints
+  version: "1.0.0"
+  description: |
+    Public endpoints for managing booth activities on a partnership.
+    All endpoints require the partnership to have at least one sponsoring option
+    with `selectableDescriptor = BOOTH`. No authentication is required.
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /events/{eventSlug}/partnerships/{partnershipId}/activities:
+    parameters:
+      - $ref: "#/components/parameters/eventSlug"
+      - $ref: "#/components/parameters/partnershipId"
+
+    get:
+      operationId: listBoothActivities
+      summary: List all activities for a partnership booth
+      tags: [BoothActivities]
+      responses:
+        "200":
+          description: Activities returned sorted by startTime ASC NULLS LAST, then createdAt ASC
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoothActivityListResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    post:
+      operationId: createBoothActivity
+      summary: Create a new activity on a partnership booth
+      tags: [BoothActivities]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BoothActivityRequest"
+      responses:
+        "201":
+          description: Activity created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoothActivityResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /events/{eventSlug}/partnerships/{partnershipId}/activities/{activityId}:
+    parameters:
+      - $ref: "#/components/parameters/eventSlug"
+      - $ref: "#/components/parameters/partnershipId"
+      - $ref: "#/components/parameters/activityId"
+
+    put:
+      operationId: updateBoothActivity
+      summary: Update an existing booth activity
+      tags: [BoothActivities]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BoothActivityRequest"
+      responses:
+        "200":
+          description: Activity updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoothActivityResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      operationId: deleteBoothActivity
+      summary: Delete a booth activity
+      tags: [BoothActivities]
+      responses:
+        "204":
+          description: Activity deleted
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  parameters:
+    eventSlug:
+      name: eventSlug
+      in: path
+      required: true
+      schema:
+        type: string
+      example: "devlille-2026"
+
+    partnershipId:
+      name: partnershipId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      example: "7c9e6679-7425-40de-944b-e07fc1f90ae7"
+
+    activityId:
+      name: activityId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+
+  schemas:
+    BoothActivityRequest:
+      type: object
+      required: [title, description]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          description: Activity title (required, non-empty)
+          example: "Live demo: CI/CD at scale"
+        description:
+          type: string
+          minLength: 1
+          description: Activity description (required, non-empty)
+          example: "A 30-minute hands-on demo of our CI/CD pipeline."
+        startTime:
+          type: ["string", "null"]
+          format: date-time
+          description: Optional start date-time (ISO 8601). Must be before endTime when both provided.
+          example: "2026-06-14T10:00:00"
+        endTime:
+          type: ["string", "null"]
+          format: date-time
+          description: Optional end date-time (ISO 8601). Must be after startTime when both provided.
+          example: "2026-06-14T10:30:00"
+
+    BoothActivityResponse:
+      type: object
+      required: [id, partnershipId, title, description, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+        partnershipId:
+          type: string
+          format: uuid
+          example: "7c9e6679-7425-40de-944b-e07fc1f90ae7"
+        title:
+          type: string
+          example: "Live demo: CI/CD at scale"
+        description:
+          type: string
+          example: "A 30-minute hands-on demo of our CI/CD pipeline."
+        startTime:
+          type: ["string", "null"]
+          format: date-time
+          example: "2026-06-14T10:00:00"
+        endTime:
+          type: ["string", "null"]
+          format: date-time
+          example: "2026-06-14T10:30:00"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-03-21T09:00:00"
+
+    BoothActivityListResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/BoothActivityResponse"
+
+  responses:
+    BadRequest:
+      description: Request validation failed (missing/empty required field or startTime after endTime)
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+    Forbidden:
+      description: Partnership does not have a booth option
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+    NotFound:
+      description: Partnership or activity not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
