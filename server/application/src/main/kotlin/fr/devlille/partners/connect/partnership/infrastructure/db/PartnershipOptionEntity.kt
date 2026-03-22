@@ -7,6 +7,7 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipOptionSelectio
 import fr.devlille.partners.connect.partnership.domain.QuantitativeSelection
 import fr.devlille.partners.connect.partnership.domain.SelectableSelection
 import fr.devlille.partners.connect.partnership.domain.TextSelection
+import fr.devlille.partners.connect.sponsoring.domain.SelectableDescriptor
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SelectableValueEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
@@ -73,6 +74,10 @@ class PartnershipOptionEntity(id: EntityID<UUID>) : UUIDEntity(id) {
                 (PartnershipOptionsTable.partnershipId eq partnershipId) and (PartnershipOptionsTable.packId eq packId)
             }
             .forEach { it.delete() }
+
+        fun hasBoothOption(partnershipId: UUID): Boolean =
+            find { PartnershipOptionsTable.partnershipId eq partnershipId }
+                .any { it.option.selectableDescriptor == SelectableDescriptor.BOOTH }
     }
 
     var partnership by PartnershipEntity referencedOn PartnershipOptionsTable.partnershipId

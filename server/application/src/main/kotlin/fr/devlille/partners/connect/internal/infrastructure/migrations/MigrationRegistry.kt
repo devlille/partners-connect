@@ -14,6 +14,7 @@ import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPolymorphicSponsoringOptionsMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddProviderManagementMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddSelectableValuePricingMigration
+import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateBoothActivitiesTableMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateCommunicationPlansTableMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateCompanyJobOffersTableMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateJobOfferPromotionsTableMigration
@@ -53,6 +54,7 @@ object MigrationRegistry {
         AddPartnershipPriceOverridesMigration,
         CreateCommunicationPlansTableMigration,
         MigratePartnershipCommunicationsMigration,
+        CreateBoothActivitiesTableMigration,
     )
 
     /**

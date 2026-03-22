@@ -1,0 +1,7 @@
+{
+  "$id": "booth_activity_list_response.schema.json",
+  "type": "array",
+  "items": {
+    "$ref": "booth_activity_response.schema.json"
+  }
+}

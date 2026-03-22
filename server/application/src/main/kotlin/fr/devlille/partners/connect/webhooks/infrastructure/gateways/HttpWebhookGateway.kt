@@ -13,6 +13,8 @@ import fr.devlille.partners.connect.internal.infrastructure.db.PromotionStatus
 import fr.devlille.partners.connect.partnership.application.mappers.toDetailedDomain
 import fr.devlille.partners.connect.partnership.application.mappers.toDomain
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.BoothActivitiesTable
+import fr.devlille.partners.connect.partnership.infrastructure.db.BoothActivityEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
@@ -68,6 +70,9 @@ class HttpWebhookGateway(
             val jobs = CompanyJobOfferPromotionEntity
                 .listByPartnershipAndStatus(partnershipId, status = PromotionStatus.APPROVED)
                 .map { it.jobOffer.toDomain() }
+            val activities = BoothActivityEntity
+                .find { BoothActivitiesTable.partnershipId eq partnershipId }
+                .map { it.toDomain() }
             WebhookPayload(
                 eventType = eventType,
                 partnership = partnership.toDetailedDomain(
@@ -90,6 +95,7 @@ class HttpWebhookGateway(
                     submissionEndTime = eventEntity.submissionEndTime,
                 ),
                 jobs = jobs,
+                activities = activities,
                 timestamp = Clock.System.now().toString(),
             )
         }

@@ -1,0 +1,23 @@
+{
+  "$id": "booth_activity_request.schema.json",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "start_time": {
+      "type": ["string", "null"],
+      "format": "datetime"
+    },
+    "end_time": {
+      "type": ["string", "null"],
+      "format": "datetime"
+    }
+  },
+  "required": ["title", "description"]
+}
