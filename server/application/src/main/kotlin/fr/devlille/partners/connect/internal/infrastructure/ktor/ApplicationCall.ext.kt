@@ -71,6 +71,9 @@ val schemas by lazy {
         .register(readResourceFile("/schemas/update_partnership_request.schema.json"), SchemaType.DRAFT_7)
         .register(readResourceFile("/schemas/update_partnership_pricing_request.schema.json"), SchemaType.DRAFT_7)
         .register(readResourceFile("/schemas/send_partnership_email_request.schema.json"), SchemaType.DRAFT_7)
+        .register(readResourceFile("/schemas/booth_activity_request.schema.json"), SchemaType.DRAFT_7)
+        .register(readResourceFile("/schemas/booth_activity_response.schema.json"), SchemaType.DRAFT_7)
+        .register(readResourceFile("/schemas/booth_activity_list_response.schema.json"), SchemaType.DRAFT_7)
 }
 
 suspend inline fun <reified T : Any> ApplicationCall.receive(schema: String): T {

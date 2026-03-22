@@ -1518,6 +1518,186 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
+  /events/{eventSlug}/partnerships/{partnershipId}/activities:
+    get:
+      summary: List booth activities
+      operationId: listBoothActivities
+      tags:
+        - BoothActivities
+      security:
+        - {}
+      parameters:
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Activities sorted by start_time ASC NULLS LAST, then created_at ASC
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/booth_activity_list_response.schema'
+        '404':
+          description: Partnership not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+    post:
+      summary: Create a booth activity
+      operationId: createBoothActivity
+      tags:
+        - BoothActivities
+      security:
+        - {}
+      parameters:
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/booth_activity_request.schema'
+      responses:
+        '201':
+          description: Activity created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/booth_activity_response.schema'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '403':
+          description: Partnership has no booth option
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Partnership not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+  /events/{eventSlug}/partnerships/{partnershipId}/activities/{activityId}:
+    put:
+      summary: Update a booth activity
+      operationId: updateBoothActivity
+      tags:
+        - BoothActivities
+      security:
+        - {}
+      parameters:
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: activityId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/booth_activity_request.schema'
+      responses:
+        '200':
+          description: Activity updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/booth_activity_response.schema'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '403':
+          description: Partnership has no booth option
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Activity or partnership not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+    delete:
+      summary: Delete a booth activity
+      operationId: deleteBoothActivity
+      tags:
+        - BoothActivities
+      security:
+        - {}
+      parameters:
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: activityId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Activity deleted
+        '403':
+          description: Partnership has no booth option
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Activity or partnership not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /providers:
     get:
       summary: List providers
@@ -4954,6 +5134,12 @@ components:
       $ref: '#/components/schemas/partnership_list_response.schema'
     UpdatePartnershipPricingRequest:
       $ref: '#/components/schemas/update_partnership_pricing_request.schema'
+    BoothActivityRequest:
+      $ref: '#/components/schemas/booth_activity_request.schema'
+    BoothActivityResponse:
+      $ref: '#/components/schemas/booth_activity_response.schema'
+    BoothActivityListResponse:
+      $ref: '#/components/schemas/booth_activity_list_response.schema'
     user_session.schema:
       $id: user_session.schema.json
       type: object
@@ -7170,6 +7356,65 @@ components:
         - partnership_id
         - created_at
       additionalProperties: false
+    booth_activity_response.schema:
+      $id: booth_activity_response.schema.json
+      type: object
+      properties:
+        id:
+          type: string
+        partnership_id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        start_time:
+          type:
+            - string
+            - 'null'
+          format: datetime
+        end_time:
+          type:
+            - string
+            - 'null'
+          format: datetime
+        created_at:
+          type: string
+          format: datetime
+      required:
+        - id
+        - partnership_id
+        - title
+        - description
+        - created_at
+    booth_activity_list_response.schema:
+      $id: booth_activity_list_response.schema.json
+      type: array
+      items:
+        $ref: '#/components/schemas/booth_activity_response.schema'
+    booth_activity_request.schema:
+      $id: booth_activity_request.schema.json
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          minLength: 1
+        start_time:
+          type:
+            - string
+            - 'null'
+          format: datetime
+        end_time:
+          type:
+            - string
+            - 'null'
+          format: datetime
+      required:
+        - title
+        - description
     paginated_provider.schema:
       $id: paginated_provider.schema.json
       type: object

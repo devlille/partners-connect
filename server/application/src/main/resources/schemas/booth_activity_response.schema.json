@@ -1,0 +1,31 @@
+{
+  "$id": "booth_activity_response.schema.json",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "partnership_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "start_time": {
+      "type": ["string", "null"],
+      "format": "datetime"
+    },
+    "end_time": {
+      "type": ["string", "null"],
+      "format": "datetime"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "datetime"
+    }
+  },
+  "required": ["id", "partnership_id", "title", "description", "created_at"]
+}

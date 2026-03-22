@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.partnership.infrastructure.bindings
 
 import fr.devlille.partners.connect.notifications.infrastructure.gateways.MailjetNotificationGateway
+import fr.devlille.partners.connect.partnership.application.BoothActivityRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.CommunicationPlanRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipAgreementRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipBillingRepositoryExposed
@@ -15,6 +16,7 @@ import fr.devlille.partners.connect.partnership.application.PartnershipSpeakerRe
 import fr.devlille.partners.connect.partnership.application.PartnershipStorageRepositoryGoogleStorage
 import fr.devlille.partners.connect.partnership.application.PartnershipSuggestionRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipTicketRepositoryExposed
+import fr.devlille.partners.connect.partnership.domain.BoothActivityRepository
 import fr.devlille.partners.connect.partnership.domain.CommunicationPlanRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipAgreementRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipBillingRepository
@@ -32,6 +34,9 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipTicketReposito
 import org.koin.dsl.module
 
 val partnershipModule = module {
+    single<BoothActivityRepository> {
+        BoothActivityRepositoryExposed()
+    }
     single<PartnershipRepository> {
         PartnershipRepositoryExposed()
     }

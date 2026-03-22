@@ -11,6 +11,9 @@ import java.util.UUID
 val StringValues.partnershipId: UUID
     get() = getValue("partnershipId").toUUID()
 
+val StringValues.activityId: UUID
+    get() = getValue("activityId").toUUID()
+
 val StringValues.communicationPlanId: UUID
     get() = getValue("id").toUUID()
 

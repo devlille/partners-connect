@@ -36,6 +36,7 @@ fun Route.partnershipRoutes() {
     publicPartnershipTicketingRoutes()
     publicPartnershipJobOfferRoutes()
     publicPartnershipSpeakersRoutes()
+    boothActivityRoutes()
 
     orgsPartnershipRoutes()
     orgsPartnershipDecisionRoutes()
