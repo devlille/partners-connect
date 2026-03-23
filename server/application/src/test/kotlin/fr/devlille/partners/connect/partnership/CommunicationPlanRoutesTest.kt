@@ -1,8 +1,11 @@
 package fr.devlille.partners.connect.partnership
 
+import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.events.factories.insertMockedFutureEvent
 import fr.devlille.partners.connect.internal.moduleSharedDb
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
+import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
+import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
 import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
 import fr.devlille.partners.connect.users.factories.insertMockedUser
 import io.ktor.client.request.delete
@@ -126,10 +129,13 @@ class CommunicationPlanRoutesTest {
     }
 
     @Test
-    fun `standalone entry without scheduled date appears in unplanned group`() = testApplication {
+    fun `partnership without communication entry appears in unplanned group`() = testApplication {
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val partnershipId = UUID.randomUUID()
 
         application {
             moduleSharedDb(userId)
@@ -138,16 +144,17 @@ class CommunicationPlanRoutesTest {
                 insertMockedOrganisationEntity(orgId)
                 insertMockedOrgaPermission(orgId, userId = userId)
                 insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyId, "My Company")
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedPartnership(
+                    id = partnershipId,
+                    eventId = eventId,
+                    companyId = companyId,
+                    selectedPackId = packId,
+                )
+                // No communication plan entry for this partnership
             }
         }
-
-        val postResponse = client.post("/orgs/$orgId/events/$eventId/communication-plan") {
-            header(HttpHeaders.Authorization, "Bearer valid")
-            contentType(ContentType.Application.Json)
-            setBody("""{"title": "Unscheduled post", "scheduled_date": null}""")
-        }
-
-        assertEquals(HttpStatusCode.Created, postResponse.status)
 
         val getResponse = client.get("/orgs/$orgId/events/$eventId/communication") {
             header(HttpHeaders.Authorization, "Bearer valid")
@@ -157,8 +164,8 @@ class CommunicationPlanRoutesTest {
         val body = Json.parseToJsonElement(getResponse.bodyAsText()).jsonObject
         val unplanned = body["unplanned"]!!.jsonArray
         assertEquals(1, unplanned.size)
-        assertEquals("Unscheduled post", unplanned[0].jsonObject["title"]!!.jsonPrimitive.content)
-        assertTrue(unplanned[0].jsonObject["partnership_id"] == null)
+        assertEquals("My Company", unplanned[0].jsonObject["title"]!!.jsonPrimitive.content)
+        assertEquals(partnershipId.toString(), unplanned[0].jsonObject["partnership_id"]!!.jsonPrimitive.content)
         assertTrue(body["planned"]!!.jsonArray.isEmpty())
         assertTrue(body["done"]!!.jsonArray.isEmpty())
     }

@@ -26,7 +26,6 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -61,7 +60,7 @@ class EventCommunicationPlanRouteGetTest {
                 insertMockedFutureEvent(eventId, orgId = orgId)
                 insertMockedCompany(company1Id)
                 insertMockedCompany(company2Id)
-                insertMockedCompany(company3Id)
+                insertMockedCompany(company3Id, "Unplanned Company")
                 insertMockedSponsoringPack(packId, eventId)
                 insertMockedPartnership(
                     id = partnership1Id,
@@ -95,11 +94,7 @@ class EventCommunicationPlanRouteGetTest {
                     scheduledDate = futureDate,
                     supportUrl = "https://example.com/support2.jpg",
                 )
-                insertMockedCommunicationPlan(
-                    eventId = eventId,
-                    partnershipId = partnership3Id,
-                    title = company3Id.toString(),
-                )
+                // partnership3 has NO communication plan entry -> appears in unplanned
             }
         }
 
@@ -120,7 +115,6 @@ class EventCommunicationPlanRouteGetTest {
         assertEquals(company1Id.toString(), doneItem["title"]!!.jsonPrimitive.content)
         assertEquals(pastDate.toString(), doneItem["publication_date"]!!.jsonPrimitive.content)
         assertEquals("https://example.com/support1.png", doneItem["support_url"]!!.jsonPrimitive.content)
-        assertNotNull(doneItem["partnership_id"]?.jsonPrimitive?.content)
 
         // Check planned group (future publications)
         val planned = responseBody["planned"]!!.jsonArray
@@ -131,18 +125,15 @@ class EventCommunicationPlanRouteGetTest {
         assertEquals(company2Id.toString(), plannedItem["title"]!!.jsonPrimitive.content)
         assertEquals(futureDate.toString(), plannedItem["publication_date"]!!.jsonPrimitive.content)
         assertEquals("https://example.com/support2.jpg", plannedItem["support_url"]!!.jsonPrimitive.content)
-        assertNotNull(plannedItem["partnership_id"]?.jsonPrimitive?.content)
 
-        // Check unplanned group (no publication date)
+        // Check unplanned group (partnerships without any communication entry)
         val unplanned = responseBody["unplanned"]!!.jsonArray
         assertEquals(1, unplanned.size)
         val unplannedItem = unplanned[0].jsonObject
-        assertNotNull(unplannedItem["id"]?.jsonPrimitive?.content)
         assertEquals(partnership3Id.toString(), unplannedItem["partnership_id"]!!.jsonPrimitive.content)
-        assertEquals(company3Id.toString(), unplannedItem["title"]!!.jsonPrimitive.content)
+        assertEquals("Unplanned Company", unplannedItem["title"]!!.jsonPrimitive.content)
         assertNull(unplannedItem["publication_date"])
         assertNull(unplannedItem["support_url"])
-        assertNotNull(unplannedItem["partnership_id"]?.jsonPrimitive?.content)
     }
 
     @Test
@@ -199,8 +190,117 @@ class EventCommunicationPlanRouteGetTest {
         val partnershipItems = planned.filter { it.jsonObject["partnership_id"] != null }
         assertEquals(1, standaloneItems.size)
         assertEquals(1, partnershipItems.size)
-        val standaloneItem = standaloneItems[0].jsonObject
-        assertFalse(standaloneItem.containsKey("partnership_id") && standaloneItem["partnership_id"] != null)
+
+        // Partnership with communication entry should not appear in unplanned
+        val unplanned = responseBody["unplanned"]!!.jsonArray
+        assertTrue(unplanned.isEmpty())
+    }
+
+    @Test
+    fun `GET communication plan shows partnerships without communication entry as unplanned`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val company1Id = UUID.randomUUID()
+        val company2Id = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val partnership1Id = UUID.randomUUID()
+        val partnership2Id = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(company1Id, "Alpha Corp")
+                insertMockedCompany(company2Id, "Beta Inc")
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedPartnership(
+                    id = partnership1Id,
+                    eventId = eventId,
+                    companyId = company1Id,
+                    selectedPackId = packId,
+                )
+                insertMockedPartnership(
+                    id = partnership2Id,
+                    eventId = eventId,
+                    companyId = company2Id,
+                    selectedPackId = packId,
+                )
+                // No communication plan entries for either partnership
+            }
+        }
+
+        val response = client.get("/orgs/$orgId/events/$eventId/communication") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val responseBody = Json.parseToJsonElement(response.bodyAsText()).jsonObject
+        assertTrue(responseBody["done"]!!.jsonArray.isEmpty())
+        assertTrue(responseBody["planned"]!!.jsonArray.isEmpty())
+
+        val unplanned = responseBody["unplanned"]!!.jsonArray
+        assertEquals(2, unplanned.size)
+        // Sorted alphabetically by title (company name)
+        assertEquals("Alpha Corp", unplanned[0].jsonObject["title"]!!.jsonPrimitive.content)
+        assertEquals("Beta Inc", unplanned[1].jsonObject["title"]!!.jsonPrimitive.content)
+        // Each unplanned item references its partnership
+        assertEquals(partnership1Id.toString(), unplanned[0].jsonObject["partnership_id"]!!.jsonPrimitive.content)
+        assertEquals(partnership2Id.toString(), unplanned[1].jsonObject["partnership_id"]!!.jsonPrimitive.content)
+    }
+
+    @Test
+    fun `GET communication plan excludes declined partnerships from unplanned`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val company1Id = UUID.randomUUID()
+        val company2Id = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val partnership1Id = UUID.randomUUID()
+        val partnership2Id = UUID.randomUUID()
+
+        val now = Clock.System.now()
+        val declinedDate = now.minus(duration = 1.days).toLocalDateTime(TimeZone.UTC)
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(company1Id, "Active Company")
+                insertMockedCompany(company2Id, "Declined Company")
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedPartnership(
+                    id = partnership1Id,
+                    eventId = eventId,
+                    companyId = company1Id,
+                    selectedPackId = packId,
+                )
+                insertMockedPartnership(
+                    id = partnership2Id,
+                    eventId = eventId,
+                    companyId = company2Id,
+                    selectedPackId = packId,
+                    declinedAt = declinedDate,
+                )
+            }
+        }
+
+        val response = client.get("/orgs/$orgId/events/$eventId/communication") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val responseBody = Json.parseToJsonElement(response.bodyAsText()).jsonObject
+        val unplanned = responseBody["unplanned"]!!.jsonArray
+        assertEquals(1, unplanned.size)
+        assertEquals("Active Company", unplanned[0].jsonObject["title"]!!.jsonPrimitive.content)
     }
 
     @Test
