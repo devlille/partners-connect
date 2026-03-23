@@ -7,10 +7,15 @@ import fr.devlille.partners.connect.partnership.domain.CommunicationPlan
 import fr.devlille.partners.connect.partnership.domain.PartnershipCommunicationRepository
 import fr.devlille.partners.connect.partnership.infrastructure.db.CommunicationPlanEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.CommunicationPlansTable
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.isNull
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class PartnershipCommunicationRepositoryExposed : PartnershipCommunicationRepository {
@@ -30,6 +35,27 @@ class PartnershipCommunicationRepositoryExposed : PartnershipCommunicationReposi
                 )
             }
 
+        val partnershipIdsWithCommunication = communicationItems
+            .mapNotNull { it.partnershipId }
+            .toSet()
+
+        val unplannedPartnerships = PartnershipEntity
+            .find {
+                (PartnershipsTable.eventId eq event.id) and
+                    PartnershipsTable.declinedAt.isNull()
+            }
+            .filter { it.id.value.toString() !in partnershipIdsWithCommunication }
+            .map { partnership ->
+                CommunicationItem(
+                    id = partnership.id.value.toString(),
+                    partnershipId = partnership.id.value.toString(),
+                    title = partnership.company.name,
+                    publicationDate = null,
+                    supportUrl = null,
+                )
+            }
+            .sortedBy { it.title }
+
         val now = Clock.System.now().toLocalDateTime(TimeZone.UTC)
         CommunicationPlan(
             done = communicationItems
@@ -38,9 +64,7 @@ class PartnershipCommunicationRepositoryExposed : PartnershipCommunicationReposi
             planned = communicationItems
                 .filter { it.publicationDate != null && it.publicationDate >= now }
                 .sortedBy { it.publicationDate },
-            unplanned = communicationItems
-                .filter { it.publicationDate == null }
-                .sortedBy { it.title },
+            unplanned = unplannedPartnerships,
         )
     }
 }
