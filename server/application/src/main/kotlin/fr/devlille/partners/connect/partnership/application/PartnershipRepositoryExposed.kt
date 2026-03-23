@@ -39,6 +39,7 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTa
 import fr.devlille.partners.connect.partnership.infrastructure.db.SpeakerPartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.SpeakerPartnershipTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
+import fr.devlille.partners.connect.sponsoring.domain.OptionType
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
@@ -109,22 +110,51 @@ class PartnershipRepositoryExposed : PartnershipRepository {
             .filter { it[PackOptionsTable.required] }
             .map { it[PackOptionsTable.option].value }
 
-        val unknownOptions = register.optionSelections
-            .map { it.optionId.toUUID() }
-            .filterNot { it in optionalOptionIds }
-        if (unknownOptions.isNotEmpty()) {
-            throw ForbiddenException("Some options are not optional in the selected pack: $unknownOptions")
+        val requiredOptionEntities = requiredOptionIds.map { optionId ->
+            SponsoringOptionEntity.findById(optionId)
+                ?: throw NotFoundException("Option $optionId not found")
         }
 
-        requiredOptionIds.forEach { optionId ->
-            val option = SponsoringOptionEntity.findById(optionId)
-                ?: throw NotFoundException("Option $optionId not found")
-            PartnershipOptionEntity.new {
-                this.partnership = partnership
-                this.option = option
-                this.pack = pack
+        // Required options that need explicit user input: quantitative (user sets quantity)
+        // and selectable with more than one value (user must choose). Single-value selectable
+        // options are auto-selected below.
+        val valueRequiredOptionIds = requiredOptionEntities
+            .filter { option ->
+                option.optionType == OptionType.TYPED_QUANTITATIVE ||
+                    (option.optionType == OptionType.TYPED_SELECTABLE && option.selectableValues.count() > 1)
             }
+            .map { it.id.value }
+
+        val selectableOptionIds = optionalOptionIds + valueRequiredOptionIds
+
+        val unknownOptions = register.optionSelections
+            .map { it.optionId.toUUID() }
+            .filterNot { it in selectableOptionIds }
+        if (unknownOptions.isNotEmpty()) {
+            throw ForbiddenException("Some options are not selectable in the selected pack: $unknownOptions")
         }
+
+        val providedSelectionIds = register.optionSelections.map { it.optionId.toUUID() }.toSet()
+        val missingRequiredSelections = valueRequiredOptionIds.filterNot { it in providedSelectionIds }
+        if (missingRequiredSelections.isNotEmpty()) {
+            throw ForbiddenException("Missing required selections for options: $missingRequiredSelections")
+        }
+
+        // Auto-add required options that don't need user input
+        requiredOptionEntities
+            .filterNot { it.id.value in valueRequiredOptionIds }
+            .forEach { option ->
+                PartnershipOptionEntity.new {
+                    this.partnership = partnership
+                    this.option = option
+                    this.pack = pack
+                    when (option.optionType) {
+                        OptionType.TYPED_NUMBER -> this.selectedQuantity = option.fixedQuantity
+                        OptionType.TYPED_SELECTABLE -> this.selectedValue = option.selectableValues.single()
+                        else -> Unit
+                    }
+                }
+            }
 
         register.optionSelections.forEach { selection ->
             val optionId = selection.optionId.toUUID()

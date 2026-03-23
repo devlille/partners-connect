@@ -32,6 +32,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.days
 
+@Suppress("LargeClass", "MaxLineLength")
 class PartnershipRegisterRoutePostTest {
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -432,7 +433,7 @@ class PartnershipRegisterRoutePostTest {
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
         assertEquals(HttpStatusCode.Forbidden, response.status)
-        assertTrue(response.bodyAsText().contains("not optional"))
+        assertTrue(response.bodyAsText().contains("not selectable"))
     }
 
     @Test
@@ -508,5 +509,295 @@ class PartnershipRegisterRoutePostTest {
             setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
         }
         assertEquals(HttpStatusCode.Conflict, response.status)
+    }
+
+    @Test
+    fun `POST registers partnership with required text option auto-added`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val optionId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedOrganisationEntity(orgId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyId)
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedSponsoringOption(optionId, eventId, optionType = OptionType.TEXT)
+                insertMockedPackOptions(packId, optionId, required = true)
+            }
+        }
+
+        val body = RegisterPartnership(
+            companyId = companyId.toString(),
+            packId = packId.toString(),
+            contactName = "John Doe",
+            contactRole = "Marketing Manager",
+            language = "en",
+            optionSelections = emptyList(),
+        )
+        val response = client.post("/events/$eventId/partnerships") {
+            contentType(ContentType.Application.Json)
+            setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
+        }
+        assertEquals(HttpStatusCode.Created, response.status)
+    }
+
+    @Test
+    fun `POST registers partnership with required number option auto-added`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val optionId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedOrganisationEntity(orgId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyId)
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedSponsoringOption(optionId, eventId, optionType = OptionType.TYPED_NUMBER)
+                insertMockedPackOptions(packId, optionId, required = true)
+            }
+        }
+
+        val body = RegisterPartnership(
+            companyId = companyId.toString(),
+            packId = packId.toString(),
+            contactName = "John Doe",
+            contactRole = "Marketing Manager",
+            language = "en",
+            optionSelections = emptyList(),
+        )
+        val response = client.post("/events/$eventId/partnerships") {
+            contentType(ContentType.Application.Json)
+            setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
+        }
+        assertEquals(HttpStatusCode.Created, response.status)
+    }
+
+    @Test
+    fun `POST registers partnership with required single-value selectable option auto-selected`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val optionId = UUID.randomUUID()
+        val selectableValueId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedOrganisationEntity(orgId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyId)
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedSponsoringOption(
+                    optionId = optionId,
+                    eventId = eventId,
+                    optionType = OptionType.TYPED_SELECTABLE,
+                    selectableValues = listOf(SelectableValue(selectableValueId.toString(), "6m2", 500)),
+                )
+                insertMockedPackOptions(packId, optionId, required = true)
+            }
+        }
+
+        val body = RegisterPartnership(
+            companyId = companyId.toString(),
+            packId = packId.toString(),
+            contactName = "John Doe",
+            contactRole = "Marketing Manager",
+            language = "en",
+            optionSelections = emptyList(),
+        )
+        val response = client.post("/events/$eventId/partnerships") {
+            contentType(ContentType.Application.Json)
+            setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
+        }
+        assertEquals(HttpStatusCode.Created, response.status)
+    }
+
+    @Test
+    fun `POST registers partnership with required multi-value selectable option when selection provided`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val optionId = UUID.randomUUID()
+        val value1Id = UUID.randomUUID()
+        val value2Id = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedOrganisationEntity(orgId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyId)
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedSponsoringOption(
+                    optionId = optionId,
+                    eventId = eventId,
+                    optionType = OptionType.TYPED_SELECTABLE,
+                    selectableValues = listOf(
+                        SelectableValue(value1Id.toString(), "3x6m", 300),
+                        SelectableValue(value2Id.toString(), "6x6m", 600),
+                    ),
+                )
+                insertMockedPackOptions(packId, optionId, required = true)
+            }
+        }
+
+        val body = RegisterPartnership(
+            companyId = companyId.toString(),
+            packId = packId.toString(),
+            contactName = "John Doe",
+            contactRole = "Marketing Manager",
+            language = "en",
+            optionSelections = listOf(
+                SelectableSelection(
+                    optionId = optionId.toString(),
+                    selectedValueId = value1Id.toString(),
+                ),
+            ),
+        )
+        val response = client.post("/events/$eventId/partnerships") {
+            contentType(ContentType.Application.Json)
+            setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
+        }
+        assertEquals(HttpStatusCode.Created, response.status)
+    }
+
+    @Test
+    fun `POST returns 403 when required multi-value selectable option selection is missing`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val optionId = UUID.randomUUID()
+        val value1Id = UUID.randomUUID()
+        val value2Id = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedOrganisationEntity(orgId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyId)
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedSponsoringOption(
+                    optionId = optionId,
+                    eventId = eventId,
+                    optionType = OptionType.TYPED_SELECTABLE,
+                    selectableValues = listOf(
+                        SelectableValue(value1Id.toString(), "3x6m", 300),
+                        SelectableValue(value2Id.toString(), "6x6m", 600),
+                    ),
+                )
+                insertMockedPackOptions(packId, optionId, required = true)
+            }
+        }
+
+        val body = RegisterPartnership(
+            companyId = companyId.toString(),
+            packId = packId.toString(),
+            contactName = "John Doe",
+            contactRole = "Marketing Manager",
+            language = "en",
+            optionSelections = emptyList(),
+        )
+        val response = client.post("/events/$eventId/partnerships") {
+            contentType(ContentType.Application.Json)
+            setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
+        }
+        assertEquals(HttpStatusCode.Forbidden, response.status)
+        assertTrue(response.bodyAsText().contains("Missing required selections"))
+    }
+
+    @Test
+    fun `POST registers partnership with required quantitative option when selection provided`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val optionId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedOrganisationEntity(orgId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyId)
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedSponsoringOption(optionId, eventId, optionType = OptionType.TYPED_QUANTITATIVE)
+                insertMockedPackOptions(packId, optionId, required = true)
+            }
+        }
+
+        val body = RegisterPartnership(
+            companyId = companyId.toString(),
+            packId = packId.toString(),
+            contactName = "John Doe",
+            contactRole = "Marketing Manager",
+            language = "en",
+            optionSelections = listOf(
+                QuantitativeSelection(
+                    optionId = optionId.toString(),
+                    selectedQuantity = 5,
+                ),
+            ),
+        )
+        val response = client.post("/events/$eventId/partnerships") {
+            contentType(ContentType.Application.Json)
+            setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
+        }
+        assertEquals(HttpStatusCode.Created, response.status)
+    }
+
+    @Test
+    fun `POST returns 403 when required quantitative option selection is missing`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val optionId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedOrganisationEntity(orgId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyId)
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedSponsoringOption(optionId, eventId, optionType = OptionType.TYPED_QUANTITATIVE)
+                insertMockedPackOptions(packId, optionId, required = true)
+            }
+        }
+
+        val body = RegisterPartnership(
+            companyId = companyId.toString(),
+            packId = packId.toString(),
+            contactName = "John Doe",
+            contactRole = "Marketing Manager",
+            language = "en",
+            optionSelections = emptyList(),
+        )
+        val response = client.post("/events/$eventId/partnerships") {
+            contentType(ContentType.Application.Json)
+            setBody(Json.encodeToString(RegisterPartnership.serializer(), body))
+        }
+        assertEquals(HttpStatusCode.Forbidden, response.status)
+        assertTrue(response.bodyAsText().contains("Missing required selections"))
     }
 }
