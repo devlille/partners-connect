@@ -511,6 +511,12 @@ export const TypedSelectableTypeDescriptor = {
   booth: "booth",
 } as const;
 
+export interface SelectableValueItem {
+  id: string;
+  value: string;
+  price: number;
+}
+
 export interface TypedSelectable {
   type: "typed_selectable";
   id: string;
@@ -528,7 +534,7 @@ export interface TypedSelectable {
    * Predefined values that users can select from
    * @minItems 1
    */
-  selectable_values: string[];
+  selectable_values: SelectableValueItem[];
 }
 
 /**
@@ -2405,15 +2411,14 @@ export const getCompanies = (
  */
 export const postCompanies = (
   createCompanySchema: CreateCompanySchema,
-  options?: SecondParameter<typeof customFetch<Blob>>,
+  options?: SecondParameter<typeof customFetch<CompanySchema>>,
 ) => {
-  return customFetch<Blob>(
+  return customFetch<CompanySchema>(
     {
       url: `/companies`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
       data: createCompanySchema,
-      responseType: "blob",
     },
     options,
   );
