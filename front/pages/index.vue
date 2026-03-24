@@ -367,18 +367,9 @@ const handleSubmit = async () => {
     console.log('Company created:', companyResponse.data);
 
     // Step 2: Create partnership with the company
-    const selectedPackData = packs.value.find(pack => pack.id === formData.value.packId);
-    const autoSelections: PartnershipOptionSelection[] = (selectedPackData?.required_options ?? [])
-      .filter((opt): opt is TypedSelectable =>
-        opt.type === 'typed_selectable' && opt.selectable_values.length === 1
-      )
-      .map(opt => ({
-        type: 'selectable_selection' as const,
-        option_id: opt.id,
-        selected_value_id: opt.selectable_values[0].id,
-      }));
 
-    const allOptionSelections = [...autoSelections, ...formData.value.optionSelections];
+
+    const allOptionSelections = [...formData.value.optionSelections];
 
     const partnershipData: RegisterPartnershipSchema = {
       company_id: companyResponse.data.id,
