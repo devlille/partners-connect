@@ -945,8 +945,8 @@ function getInitials(name: string): string {
 async function loadOrgUsers() {
   try {
     loadingUsers.value = true;
-    const response = await getOrgsUsers(orgSlug.value);
-    orgUsers.value = response.data;
+    const response = await getOrgsUsers(orgSlug.value, { responseType: 'json' });
+    orgUsers.value = response.data as unknown as UserSchema[];
   } catch (err) {
     console.error('Failed to load org users:', err);
     assignError.value = 'Impossible de charger la liste des utilisateurs';
