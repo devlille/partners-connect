@@ -1,9 +1,7 @@
 <template>
   <div>
     <div class="flex items-center justify-between mb-6">
-      <h2 class="text-lg font-semibold text-gray-900">
-        Activités ({{ state.activities.length }})
-      </h2>
+      <h2 class="text-lg font-semibold text-gray-900">Activités ({{ state.activities.length }})</h2>
       <UButton
         color="primary"
         icon="i-heroicons-plus"
@@ -26,7 +24,10 @@
     </div>
 
     <div v-else-if="state.activities.length === 0" class="text-center py-12">
-      <i class="i-heroicons-calendar-days text-gray-400 text-5xl mx-auto block mb-4" aria-hidden="true" />
+      <i
+        class="i-heroicons-calendar-days text-gray-400 text-5xl mx-auto block mb-4"
+        aria-hidden="true"
+      />
       <h3 class="text-sm font-medium text-gray-900">Aucune activité</h3>
       <p class="mt-1 text-sm text-gray-500">Ajoutez des activités prévues sur votre stand.</p>
     </div>
@@ -40,7 +41,10 @@
         <div class="flex-1">
           <h3 class="text-base font-semibold text-gray-900">{{ activity.title }}</h3>
           <p class="mt-1 text-sm text-gray-600">{{ activity.description }}</p>
-          <div v-if="activity.start_time || activity.end_time" class="mt-2 flex gap-4 text-xs text-gray-500">
+          <div
+            v-if="activity.start_time || activity.end_time"
+            class="mt-2 flex gap-4 text-xs text-gray-500"
+          >
             <span v-if="activity.start_time">
               <span class="font-medium">Début :</span> {{ formatDateTime(activity.start_time) }}
             </span>
@@ -79,10 +83,7 @@
         aria-modal="true"
         @click.self="dispatch({ type: 'CLOSE_MODAL' })"
       >
-        <div
-          class="w-full max-w-lg bg-white rounded-lg shadow-xl"
-          @click.stop
-        >
+        <div class="w-full max-w-lg bg-white rounded-lg shadow-xl" @click.stop>
           <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
             <h3 class="text-lg font-semibold text-gray-900">
               {{ state.editingActivity ? 'Modifier l\'activité' : 'Ajouter une activité' }}
@@ -113,7 +114,10 @@
             </div>
 
             <div>
-              <label for="activity-description" class="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                for="activity-description"
+                class="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Description <span class="text-red-500">*</span>
               </label>
               <UTextarea
@@ -168,11 +172,7 @@
             >
               Annuler
             </UButton>
-            <UButton
-              color="primary"
-              :loading="state.isSubmitting"
-              @click="handleSubmit"
-            >
+            <UButton color="primary" :loading="state.isSubmitting" @click="handleSubmit">
               {{ state.editingActivity ? 'Enregistrer' : 'Ajouter' }}
             </UButton>
           </div>

@@ -15,11 +15,7 @@
       </div>
 
       <div v-else class="bg-white rounded-lg shadow p-6">
-        <ActivitiesManager
-          v-if="partnership"
-          :event-slug="eventSlug"
-          :partnership-id="sponsorId"
-        />
+        <ActivitiesManager v-if="partnership" :event-slug="eventSlug" :partnership-id="sponsorId" />
       </div>
     </div>
   </Dashboard>

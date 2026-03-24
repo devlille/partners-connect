@@ -173,7 +173,7 @@
 
 <script setup lang="ts">
 import { z } from 'zod';
-import { getEventsSponsoringPacks, postCompanies, postEventsPartnership, type SponsoringPack, type SponsoringOptionSchema, type CreateCompanySchema, type RegisterPartnershipSchema, type PartnershipOptionSelection } from "~/utils/api";
+import { getEventsSponsoringPacks, postCompanies, postEventsPartnership, type SponsoringPack, type SponsoringOptionSchema, type CreateCompanySchema, type RegisterPartnershipSchema, type PartnershipOptionSelection, type TypedSelectable } from "~/utils/api";
 
 definePageMeta({
   layout: "minimal",
@@ -363,16 +363,30 @@ const handleSubmit = async () => {
     };
 
     const companyResponse = await postCompanies(companyData);
+
     console.log('Company created:', companyResponse.data);
 
     // Step 2: Create partnership with the company
+    const selectedPackData = packs.value.find(pack => pack.id === formData.value.packId);
+    const autoSelections: PartnershipOptionSelection[] = (selectedPackData?.required_options ?? [])
+      .filter((opt): opt is TypedSelectable =>
+        opt.type === 'typed_selectable' && opt.selectable_values.length === 1
+      )
+      .map(opt => ({
+        type: 'selectable_selection' as const,
+        option_id: opt.id,
+        selected_value_id: opt.selectable_values[0].id,
+      }));
+
+    const allOptionSelections = [...autoSelections, ...formData.value.optionSelections];
+
     const partnershipData: RegisterPartnershipSchema = {
       company_id: companyResponse.data.id,
       pack_id: formData.value.packId,
-      option_selections: formData.value.optionSelections.length > 0 ? formData.value.optionSelections : undefined,
       language: 'fr',
       phone: formData.value.phone || null,
       emails: formData.value.email ? [formData.value.email] : [],
+      option_selections: allOptionSelections.length > 0 ? allOptionSelections : undefined,
     };
 
     const partnershipResponse = await postEventsPartnership(eventSlug, partnershipData);

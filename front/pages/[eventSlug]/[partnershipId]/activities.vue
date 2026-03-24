@@ -20,10 +20,7 @@
         <AlertMessage v-else-if="error" type="error" :message="error" />
 
         <div v-else class="bg-white rounded-lg shadow p-6">
-          <ActivitiesManager
-            :event-slug="eventSlug"
-            :partnership-id="partnershipId"
-          />
+          <ActivitiesManager :event-slug="eventSlug" :partnership-id="partnershipId" />
         </div>
       </main>
     </div>

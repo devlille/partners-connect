@@ -1,4 +1,4 @@
-import type { BoothActivityResponseSchema, BoothActivityRequestSchema } from '~/utils/api';
+import type { BoothActivityResponseSchema, BoothActivityRequestSchema } from "~/utils/api";
 
 export interface ActivitiesState {
   activities: BoothActivityResponseSchema[];
@@ -12,19 +12,19 @@ export interface ActivitiesState {
 }
 
 export type ActivitiesAction =
-  | { type: 'FETCH_START' }
-  | { type: 'FETCH_SUCCESS'; payload: BoothActivityResponseSchema[] }
-  | { type: 'FETCH_ERROR'; payload: string }
-  | { type: 'OPEN_CREATE_MODAL' }
-  | { type: 'OPEN_EDIT_MODAL'; payload: BoothActivityResponseSchema }
-  | { type: 'CLOSE_MODAL' }
-  | { type: 'SET_SUBMITTING'; payload: boolean }
-  | { type: 'SET_DELETING_ID'; payload: string | null }
-  | { type: 'UPDATE_FORM'; payload: Partial<BoothActivityRequestSchema> };
+  | { type: "FETCH_START" }
+  | { type: "FETCH_SUCCESS"; payload: BoothActivityResponseSchema[] }
+  | { type: "FETCH_ERROR"; payload: string }
+  | { type: "OPEN_CREATE_MODAL" }
+  | { type: "OPEN_EDIT_MODAL"; payload: BoothActivityResponseSchema }
+  | { type: "CLOSE_MODAL" }
+  | { type: "SET_SUBMITTING"; payload: boolean }
+  | { type: "SET_DELETING_ID"; payload: string | null }
+  | { type: "UPDATE_FORM"; payload: Partial<BoothActivityRequestSchema> };
 
 const emptyForm: BoothActivityRequestSchema = {
-  title: '',
-  description: '',
+  title: "",
+  description: "",
   start_time: null,
   end_time: null,
 };
@@ -45,15 +45,15 @@ export function activitiesReducer(
   action: ActivitiesAction,
 ): ActivitiesState {
   switch (action.type) {
-    case 'FETCH_START':
+    case "FETCH_START":
       return { ...state, loading: true, error: null };
-    case 'FETCH_SUCCESS':
+    case "FETCH_SUCCESS":
       return { ...state, loading: false, activities: action.payload };
-    case 'FETCH_ERROR':
+    case "FETCH_ERROR":
       return { ...state, loading: false, error: action.payload };
-    case 'OPEN_CREATE_MODAL':
+    case "OPEN_CREATE_MODAL":
       return { ...state, isModalOpen: true, editingActivity: null, form: { ...emptyForm } };
-    case 'OPEN_EDIT_MODAL':
+    case "OPEN_EDIT_MODAL":
       return {
         ...state,
         isModalOpen: true,
@@ -65,13 +65,13 @@ export function activitiesReducer(
           end_time: action.payload.end_time ?? null,
         },
       };
-    case 'CLOSE_MODAL':
+    case "CLOSE_MODAL":
       return { ...state, isModalOpen: false, editingActivity: null, form: { ...emptyForm } };
-    case 'SET_SUBMITTING':
+    case "SET_SUBMITTING":
       return { ...state, isSubmitting: action.payload };
-    case 'SET_DELETING_ID':
+    case "SET_DELETING_ID":
       return { ...state, deletingId: action.payload };
-    case 'UPDATE_FORM':
+    case "UPDATE_FORM":
       return { ...state, form: { ...state.form, ...action.payload } };
     default:
       return state;
