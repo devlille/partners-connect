@@ -59,8 +59,8 @@ const columns = [
 
 onMounted(async () => {
   try {
-    const response = await getUsersMeOrgs();
-    data.value = response.data;
+    const response = await getUsersMeOrgs({ responseType: 'json' });
+    data.value = response.data as unknown as OrganisationItem[];
   } catch (error) {
     console.error('Failed to load organizations:', error);
   }

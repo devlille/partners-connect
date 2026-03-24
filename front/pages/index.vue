@@ -362,7 +362,7 @@ const handleSubmit = async () => {
       name: formData.value.name
     };
 
-    const companyResponse = await postCompanies(companyData);
+    const companyResponse = await postCompanies(companyData, { responseType: 'json' });
 
     console.log('Company created:', companyResponse.data);
 
@@ -389,7 +389,7 @@ const handleSubmit = async () => {
       option_selections: allOptionSelections.length > 0 ? allOptionSelections : undefined,
     };
 
-    const partnershipResponse = await postEventsPartnership(eventSlug, partnershipData);
+    const partnershipResponse = await postEventsPartnership(eventSlug, partnershipData, { responseType: 'json' });
     console.log('Partnership created:', partnershipResponse.data);
 
     const partnershipId = partnershipResponse.data.id;
