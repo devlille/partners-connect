@@ -1068,24 +1068,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
-  /events/{eventSlug}/partnerships/{partnershipId}/billing/invoice:
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/billing/invoice:
     post:
       summary: Generate partnership invoice
-      operationId: postEventsPartnershipBillingInvoice
+      operationId: postOrgsEventsPartnershipBillingInvoice
       security:
-        - {}
-      description: ''
+        - bearerAuth: []
+      description: Generate an invoice for a partnership
       parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug identifier
         - name: eventSlug
           in: path
           required: true
           schema:
             type: string
+          description: Event slug identifier
         - name: partnershipId
           in: path
           required: true
           schema:
             type: string
+            format: uuid
+          description: Partnership unique identifier
       responses:
         '201':
           description: Created
@@ -1099,24 +1108,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
-  /events/{eventSlug}/partnerships/{partnershipId}/billing/quote:
+        '401':
+          description: Unauthorized - Authentication required or user not authorized for this organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/billing/quote:
     post:
       summary: Generate partnership quote
-      operationId: postEventsPartnershipBillingQuote
+      operationId: postOrgsEventsPartnershipBillingQuote
       security:
-        - {}
-      description: ''
+        - bearerAuth: []
+      description: Generate a quote for a partnership
       parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug identifier
         - name: eventSlug
           in: path
           required: true
           schema:
             type: string
+          description: Event slug identifier
         - name: partnershipId
           in: path
           required: true
           schema:
             type: string
+            format: uuid
+          description: Partnership unique identifier
       responses:
         '201':
           description: Created
@@ -1126,6 +1150,12 @@ paths:
                 $ref: '#/components/schemas/identifier.schema'
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '401':
+          description: Unauthorized - Authentication required or user not authorized for this organization
           content:
             application/json:
               schema:
