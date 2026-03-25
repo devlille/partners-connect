@@ -3,6 +3,7 @@ package fr.devlille.partners.connect.partnership.infrastructure.api
 import fr.devlille.partners.connect.companies.domain.CompanyRepository
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
+import fr.devlille.partners.connect.internal.infrastructure.api.DEFAULT_PAGE_SIZE
 import fr.devlille.partners.connect.internal.infrastructure.ktor.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
@@ -158,8 +159,10 @@ private fun Route.orgsPartnershipRoutes() {
             )
 
             val direction = call.request.queryParameters["direction"] ?: "asc"
+            val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 1
+            val pageSize = call.request.queryParameters["page_size"]?.toIntOrNull() ?: DEFAULT_PAGE_SIZE
 
-            val partnerships = repository.listByEvent(eventSlug, filters, direction)
+            val partnerships = repository.listByEvent(eventSlug, filters, direction, page, pageSize)
             call.respond(HttpStatusCode.OK, partnerships)
         }
     }

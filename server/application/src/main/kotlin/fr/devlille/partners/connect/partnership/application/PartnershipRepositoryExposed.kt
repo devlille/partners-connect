@@ -253,6 +253,8 @@ class PartnershipRepositoryExposed : PartnershipRepository {
         eventSlug: String,
         filters: PartnershipFilters,
         direction: String,
+        page: Int,
+        pageSize: Int,
     ): PaginatedResponse<PartnershipItem> = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
@@ -283,18 +285,22 @@ class PartnershipRepositoryExposed : PartnershipRepository {
         } else {
             partnerships
         }
-        val items = filteredPartnerships.map { partnership ->
+        val allItems = filteredPartnerships.map { partnership ->
             partnership.toDomain(PartnershipEmailEntity.emails(partnership.id.value))
         }
+
+        val total = allItems.size.toLong()
+        val offset = (page - 1) * pageSize
+        val paginatedItems = allItems.drop(offset).take(pageSize)
 
         // Build pagination metadata
         val metadata = buildMetadata(event.id.value, event.organisation.id.value)
 
         PaginatedResponse(
-            items = items,
-            page = 1,
-            pageSize = items.size,
-            total = items.size.toLong(),
+            items = paginatedItems,
+            page = page,
+            pageSize = pageSize,
+            total = total,
             metadata = metadata,
         )
     }
