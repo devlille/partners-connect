@@ -4,7 +4,12 @@ import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
+import fr.devlille.partners.connect.partnership.application.mappers.toDomain
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEmailEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionsTable
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
+import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 import fr.devlille.partners.connect.sponsoring.application.mappers.toDomainWithAllTranslations
 import fr.devlille.partners.connect.sponsoring.domain.AttachOptionsToPack
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
@@ -14,6 +19,7 @@ import fr.devlille.partners.connect.sponsoring.domain.CreateTypedQuantitative
 import fr.devlille.partners.connect.sponsoring.domain.CreateTypedSelectable
 import fr.devlille.partners.connect.sponsoring.domain.OptionRepository
 import fr.devlille.partners.connect.sponsoring.domain.OptionType
+import fr.devlille.partners.connect.sponsoring.domain.SponsoringOptionDetailWithPartners
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringOptionWithTranslations
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationsTable
@@ -271,5 +277,40 @@ class OptionRepositoryExposed(
         }
 
         option.toDomainWithAllTranslations()
+    }
+
+    override fun getOptionByIdWithPartners(
+        eventSlug: String,
+        optionId: UUID,
+    ): SponsoringOptionDetailWithPartners = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+
+        val option = optionEntity.findById(optionId) ?: throw NotFoundException("Option not found")
+
+        if (option.event.id.value != event.id.value) {
+            throw NotFoundException("Option not found")
+        }
+
+        val packIdsWithOption = PackOptionsTable
+            .selectAll()
+            .where { PackOptionsTable.option eq optionId }
+            .map { it[PackOptionsTable.pack].value }
+            .toSet()
+
+        val partnerships = PartnershipEntity
+            .find { PartnershipsTable.eventId eq event.id.value }
+            .filter { partnership ->
+                val validatedPack = partnership.validatedPack()
+                validatedPack != null && validatedPack.id.value in packIdsWithOption
+            }
+            .map { partnership ->
+                partnership.toDomain(PartnershipEmailEntity.emails(partnership.id.value))
+            }
+
+        SponsoringOptionDetailWithPartners(
+            option = option.toDomainWithAllTranslations(),
+            partnerships = partnerships,
+        )
     }
 }

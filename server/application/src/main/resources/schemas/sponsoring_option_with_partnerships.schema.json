@@ -1,0 +1,20 @@
+{
+  "$id": "sponsoring_option_with_partnerships.schema.json",
+  "type": "object",
+  "properties": {
+    "option": {
+      "$ref": "sponsoring_option_with_translations.schema.json"
+    },
+    "partnerships": {
+      "type": "array",
+      "items": {
+        "$ref": "partnership_item.schema.json"
+      },
+      "description": "List of validated partnerships associated with this option"
+    }
+  },
+  "required": [
+    "option",
+    "partnerships"
+  ]
+}
