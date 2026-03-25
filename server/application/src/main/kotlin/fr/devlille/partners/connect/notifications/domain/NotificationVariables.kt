@@ -236,7 +236,7 @@ sealed interface NotificationVariables {
                 .replace("{{event_name}}", event.event.name)
                 .replace("{{event_contact}}", event.event.contact.email)
                 .replace("{{company_name}}", company.name)
-                .replace("{{job_offer_title}}", jobOffer.title)
+                .replace("{{job_title}}", jobOffer.title)
                 .replace("{{job_offer_url}}", jobOffer.url)
                 .replace("{{partnership_link}}", partnershipLink)
         }
@@ -257,7 +257,7 @@ sealed interface NotificationVariables {
                 .replace("{{event_name}}", event.event.name)
                 .replace("{{event_contact}}", event.event.contact.email)
                 .replace("{{company_name}}", company.name)
-                .replace("{{job_offer_title}}", jobOffer.title)
+                .replace("{{job_title}}", jobOffer.title)
                 .replace("{{job_offer_url}}", jobOffer.url)
                 .replace("{{partnership_link}}", partnershipLink)
         }
@@ -280,7 +280,7 @@ sealed interface NotificationVariables {
                 .replace("{{event_name}}", event.event.name)
                 .replace("{{event_contact}}", event.event.contact.email)
                 .replace("{{company_name}}", company.name)
-                .replace("{{job_offer_title}}", jobOffer.title)
+                .replace("{{job_title}}", jobOffer.title)
                 .replace("{{job_offer_url}}", jobOffer.url)
                 .replace("{{partnership_link}}", partnershipLink)
                 .replace("{{decline_reason}}", reasonText)
