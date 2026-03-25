@@ -29,7 +29,7 @@ fun Application.digestRoutes() {
                     language = call.request.headers[HttpHeaders.AcceptLanguage] ?: "en",
                     event = digest.event,
                     agreementItems = digest.agreementItems,
-                    quoteItems = digest.quoteItems,
+                    billingItems = digest.billingItems,
                     socialMediaItems = digest.socialMediaItems,
                 )
                 notificationRepository.sendMessageFromMessaging(variables)

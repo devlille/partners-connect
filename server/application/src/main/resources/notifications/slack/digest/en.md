@@ -3,8 +3,8 @@
 📄 Agreements to generate:
 {{agreement_section}}
 
-💶 Quotes to generate:
-{{quote_section}}
+💶 Billing to generate:
+{{billing_section}}
 
 📢 Scheduled communication today:
 {{social_media_section}}

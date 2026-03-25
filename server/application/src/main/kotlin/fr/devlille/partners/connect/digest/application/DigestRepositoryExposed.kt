@@ -36,7 +36,7 @@ class DigestRepositoryExposed : DigestRepository {
         EventDigest(
             event = event,
             agreementItems = queryAgreementReady(eventEntity.id.value, eventSlug),
-            quoteItems = queryQuoteReady(eventEntity.id.value, eventSlug),
+            billingItems = queryBillingReady(eventEntity.id.value, eventSlug),
             socialMediaItems = querySocialMediaDue(eventEntity.id.value, today, eventSlug),
         )
     }
@@ -70,12 +70,13 @@ class DigestRepositoryExposed : DigestRepository {
             .filter { it.company.hasCompleteAddress() }
             .map { DigestEntry(it.company.name, buildLink(eventSlug, it.id.value)) }
 
-    private fun queryQuoteReady(eventId: UUID, eventSlug: String): List<DigestEntry> =
+    private fun queryBillingReady(eventId: UUID, eventSlug: String): List<DigestEntry> =
         PartnershipEntity.findQuoteReady(eventId)
             .filter {
+                val billing = BillingEntity.singleByEventAndPartnership(eventId, it.id.value)
                 it.company.hasCompleteAddress() &&
                     (it.selectedPack?.basePrice ?: 0) > 0 &&
-                    BillingEntity.singleByEventAndPartnership(eventId, it.id.value)?.quotePdfUrl == null
+                    (billing == null || (billing.quotePdfUrl == null && billing.invoicePdfUrl == null))
             }
             .map { DigestEntry(it.company.name, buildLink(eventSlug, it.id.value)) }
 

@@ -10,16 +10,16 @@ import fr.devlille.partners.connect.events.domain.EventWithOrganisation
  *
  * @param event The event this digest belongs to (used to look up the Slack channel).
  * @param agreementItems Partnerships ready for agreement generation.
- * @param quoteItems Partnerships ready for quote generation.
+ * @param billingItems Partnerships ready for billing generation (no quote or invoice yet).
  * @param socialMediaItems Partnerships scheduled for social media communication today.
  */
 data class EventDigest(
     val event: EventWithOrganisation,
     val agreementItems: List<DigestEntry>,
-    val quoteItems: List<DigestEntry>,
+    val billingItems: List<DigestEntry>,
     val socialMediaItems: List<DigestEntry>,
 ) {
     /** `true` when at least one section has items; used by the route to gate Slack dispatch. */
     val hasItems: Boolean
-        get() = agreementItems.isNotEmpty() || quoteItems.isNotEmpty() || socialMediaItems.isNotEmpty()
+        get() = agreementItems.isNotEmpty() || billingItems.isNotEmpty() || socialMediaItems.isNotEmpty()
 }

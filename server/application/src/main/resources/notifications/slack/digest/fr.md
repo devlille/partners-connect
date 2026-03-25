@@ -3,8 +3,8 @@
 📄 Conventions à générer :
 {{agreement_section}}
 
-💶 Devis à générer :
-{{quote_section}}
+💶 Facturation à générer :
+{{billing_section}}
 
 📢 Communication prévue aujourd'hui :
 {{social_media_section}}

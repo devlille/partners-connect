@@ -298,7 +298,7 @@ sealed interface NotificationVariables {
         override val language: String,
         override val event: EventWithOrganisation,
         val agreementItems: List<DigestEntry>,
-        val quoteItems: List<DigestEntry>,
+        val billingItems: List<DigestEntry>,
         val socialMediaItems: List<DigestEntry>,
     ) : NotificationVariables {
         override val usageName: String = "digest"
@@ -306,22 +306,19 @@ sealed interface NotificationVariables {
         override val company: Company
             get() = error("Not applicable for MorningDigest")
 
-        override fun populate(content: String): String = content
-            .replace("{{event_name}}", event.event.name)
-            .replace(
-                "{{agreement_section}}",
-                agreementItems
-                    .joinToString("\n") { "• <${it.partnershipLink}|${it.companyName}>" },
-            )
-            .replace(
-                "{{quote_section}}",
-                quoteItems
-                    .joinToString("\n") { "• <${it.partnershipLink}|${it.companyName}>" },
-            )
-            .replace(
-                "{{social_media_section}}",
-                socialMediaItems
-                    .joinToString("\n") { "• <${it.partnershipLink}|${it.companyName}>" },
-            )
+        private fun formatSection(items: List<DigestEntry>, emptyMessage: String): String =
+            if (items.isEmpty()) {
+                emptyMessage
+            } else {
+                items.joinToString("\n") { "• <${it.partnershipLink}|${it.companyName}>" }
+            }
+
+        override fun populate(content: String): String {
+            return content
+                .replace("{{event_name}}", event.event.name)
+                .replace("{{agreement_section}}", formatSection(agreementItems, "n/a"))
+                .replace("{{billing_section}}", formatSection(billingItems, "n/a"))
+                .replace("{{social_media_section}}", formatSection(socialMediaItems, "n/a"))
+        }
     }
 }
