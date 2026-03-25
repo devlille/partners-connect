@@ -2472,7 +2472,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/sponsoring_option.schema'
+                  $ref: '#/components/schemas/sponsoring_option_with_count.schema'
         '400':
           description: Bad Request
           content:
@@ -5183,6 +5183,8 @@ components:
       $ref: '#/components/schemas/booth_activity_list_response.schema'
     SponsoringOptionDetailWithPartners:
       $ref: '#/components/schemas/sponsoring_option_with_partnerships.schema'
+    SponsoringOptionWithCount:
+      $ref: '#/components/schemas/sponsoring_option_with_count.schema'
     user_session.schema:
       $id: user_session.schema.json
       type: object
@@ -7702,6 +7704,59 @@ components:
         - usage
         - created_at
       additionalProperties: false
+    option_translation.schema:
+      $id: option_translation.schema.json
+      type: object
+      properties:
+        language:
+          type: string
+          description: ISO 639-1 language code (e.g., 'en', 'fr')
+        name:
+          type: string
+          description: Translated option name
+        description:
+          type:
+            - string
+            - 'null'
+          description: Translated option description (optional)
+      required:
+        - language
+        - name
+        - description
+    sponsoring_option_with_translations.schema:
+      $id: sponsoring_option_with_translations.schema.json
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the sponsoring option
+        translations:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/option_translation.schema'
+          description: Map of translations keyed by language code (e.g., 'en', 'fr', 'de')
+        price:
+          type:
+            - integer
+            - 'null'
+          description: Additional cost in cents (null for free options)
+      required:
+        - id
+        - translations
+        - price
+    sponsoring_option_with_count.schema:
+      $id: sponsoring_option_with_count.schema.json
+      type: object
+      properties:
+        option:
+          $ref: '#/components/schemas/sponsoring_option_with_translations.schema'
+        partnership_count:
+          type: integer
+          minimum: 0
+          description: Number of validated partnerships whose validated pack contains this option
+      required:
+        - option
+        - partnership_count
     definitions-TranslatedLabel:
       type: object
       required:
@@ -7988,46 +8043,6 @@ components:
               minimum: 0
               description: Individual price for this selectable value in cents
           additionalProperties: false
-    option_translation.schema:
-      $id: option_translation.schema.json
-      type: object
-      properties:
-        language:
-          type: string
-          description: ISO 639-1 language code (e.g., 'en', 'fr')
-        name:
-          type: string
-          description: Translated option name
-        description:
-          type:
-            - string
-            - 'null'
-          description: Translated option description (optional)
-      required:
-        - language
-        - name
-        - description
-    sponsoring_option_with_translations.schema:
-      $id: sponsoring_option_with_translations.schema.json
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier for the sponsoring option
-        translations:
-          type: object
-          additionalProperties:
-            $ref: '#/components/schemas/option_translation.schema'
-          description: Map of translations keyed by language code (e.g., 'en', 'fr', 'de')
-        price:
-          type:
-            - integer
-            - 'null'
-          description: Additional cost in cents (null for free options)
-      required:
-        - id
-        - translations
-        - price
     sponsoring_option_with_partnerships.schema:
       $id: sponsoring_option_with_partnerships.schema.json
       type: object

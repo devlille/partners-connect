@@ -31,9 +31,9 @@ tests/
 Kotlin 1.9.x with JVM 21 (Amazon Corretto): Follow standard conventions
 
 ## Recent Changes
+- 022-option-usage-count: Added Kotlin 1.9.x / JVM 21 (Amazon Corretto) + Ktor 2.x, Exposed ORM, kotlinx.serialization, Koin
 - 021-option-partnerships: Added Kotlin 1.9.x / JVM 21 (Amazon Corretto) + Ktor 2.x, Exposed ORM, kotlinx.serialization, Koin
 - 020-manage-booth-activities: Added Kotlin 1.9.x / JVM 21 (Amazon Corretto) + Ktor 2.x, Exposed 0.41+, kotlinx.serialization, Koin
-- 020-manage-booth-activities: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 
 
 <!-- MANUAL ADDITIONS START -->

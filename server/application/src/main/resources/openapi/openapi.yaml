@@ -2462,7 +2462,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "#/components/schemas/SponsoringOption"
+                  $ref: "#/components/schemas/SponsoringOptionWithCount"
     post:
       summary: "Create sponsoring option"
       description: "Create a new sponsoring option"
@@ -5162,3 +5162,5 @@ components:
       $ref: "../schemas/booth_activity_list_response.schema.json"
     SponsoringOptionDetailWithPartners:
       $ref: "../schemas/sponsoring_option_with_partnerships.schema.json"
+    SponsoringOptionWithCount:
+      $ref: "../schemas/sponsoring_option_with_count.schema.json"

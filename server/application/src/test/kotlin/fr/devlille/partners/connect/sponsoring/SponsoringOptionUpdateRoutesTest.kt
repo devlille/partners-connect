@@ -5,7 +5,7 @@ import fr.devlille.partners.connect.internal.moduleSharedDb
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.CreateText
-import fr.devlille.partners.connect.sponsoring.domain.SponsoringOptionWithTranslations
+import fr.devlille.partners.connect.sponsoring.domain.SponsoringOptionWithCount
 import fr.devlille.partners.connect.sponsoring.domain.TranslatedLabel
 import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
 import fr.devlille.partners.connect.users.factories.insertMockedUser
@@ -89,10 +89,10 @@ class SponsoringOptionUpdateRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val body = json.decodeFromString<List<SponsoringOptionWithTranslations>>(response.body())
+        val body = json.decodeFromString<List<SponsoringOptionWithCount>>(response.body())
         assertEquals(1, body.size)
 
-        val option = body.first()
+        val option = body.first().option
         // Verify only EN translation exists (FR should be removed)
         assertTrue(option.translations.containsKey("en"))
         assertFalse(option.translations.containsKey("fr")) // Should be removed after update
