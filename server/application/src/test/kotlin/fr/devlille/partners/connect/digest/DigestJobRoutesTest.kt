@@ -135,7 +135,7 @@ class DigestJobRoutesTest {
     }
 
     @Test
-    fun `sends Slack notification when partnership needs quote`() = testApplication {
+    fun `sends Slack notification when partnership needs billing`() = testApplication {
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
@@ -153,7 +153,7 @@ class DigestJobRoutesTest {
                 val event = insertMockedFutureEvent(eventId, orgId = orgId)
                 insertMockedCompany(companyId)
                 val pack = insertMockedSponsoringPack(packId, eventId = eventId, basePrice = 2000)
-                // Partnership validated, has billing without quotePdfUrl → quote reminder
+                // Partnership validated, has billing without quotePdfUrl or invoicePdfUrl → billing reminder
                 insertMockedPartnership(
                     id = partnershipId,
                     eventId = eventId,
@@ -206,11 +206,58 @@ class DigestJobRoutesTest {
                     declinedAt = null,
                     selectedPackId = pack.id.value,
                 )
-                // Billing already has a quotePdfUrl → no quote reminder
+                // Billing already has a quotePdfUrl → no billing reminder
                 insertMockedBilling(
                     eventId = eventId,
                     partnershipId = partnershipId,
                     quotePdfUrl = "https://example.com/quote.pdf",
+                )
+                val integrationId = insertMockedIntegration(eventId = eventId)
+                insertSlackIntegration(integrationId)
+            }
+        }
+
+        val response = client.post("/orgs/$orgId/events/$eventId/jobs/digest")
+        assertEquals(HttpStatusCode.NoContent, response.status)
+        verify(exactly = 0) {
+            slackMethod.chatPostMessage(any<RequestConfigurator<ChatPostMessageRequest.ChatPostMessageRequestBuilder>>())
+        }
+    }
+
+    @Test
+    fun `no notification when billing already has invoicePdfUrl`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val partnershipId = UUID.randomUUID()
+        val (slack, slackMethod, _) = slackMock()
+
+        application {
+            moduleSharedDb(userId = userId, slack = slack)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                val event = insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyId)
+                val pack = insertMockedSponsoringPack(packId, eventId = eventId, basePrice = 2000)
+                // Partnership has agreement and billing with invoicePdfUrl → no reminders
+                insertMockedPartnership(
+                    id = partnershipId,
+                    eventId = eventId,
+                    companyId = companyId,
+                    validatedAt = event.submissionStartTime,
+                    agreementUrl = "https://example.com/agreement.pdf",
+                    declinedAt = null,
+                    selectedPackId = pack.id.value,
+                )
+                // Billing already has an invoicePdfUrl → no billing reminder
+                insertMockedBilling(
+                    eventId = eventId,
+                    partnershipId = partnershipId,
+                    invoicePdfUrl = "https://example.com/invoice.pdf",
                 )
                 val integrationId = insertMockedIntegration(eventId = eventId)
                 insertSlackIntegration(integrationId)
@@ -285,7 +332,7 @@ class DigestJobRoutesTest {
                 val event = insertMockedFutureEvent(eventId, orgId = orgId)
                 insertMockedCompany(companyId)
                 val pack = insertMockedSponsoringPack(UUID.randomUUID(), eventId = eventId, basePrice = 1000)
-                // Partnership with agreementUrl + billing with quotePdfUrl → excluded from agreement/quote queries
+                // Partnership with agreementUrl + billing with quotePdfUrl → excluded from agreement/billing queries
                 insertMockedPartnership(
                     id = partnershipId,
                     eventId = eventId,
