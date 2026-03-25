@@ -8,3 +8,6 @@
 
 📢 Scheduled communication today:
 {{social_media_section}}
+
+💼 Job offers to validate:
+{{job_offer_section}}

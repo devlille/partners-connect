@@ -31,6 +31,7 @@ fun Application.digestRoutes() {
                     agreementItems = digest.agreementItems,
                     billingItems = digest.billingItems,
                     socialMediaItems = digest.socialMediaItems,
+                    jobOfferItems = digest.jobOfferItems,
                 )
                 notificationRepository.sendMessageFromMessaging(variables)
             }

@@ -5,7 +5,9 @@ import com.slack.api.Slack
 import com.slack.api.methods.MethodsClient
 import com.slack.api.methods.request.chat.ChatPostMessageRequest
 import com.slack.api.methods.response.chat.ChatPostMessageResponse
+import fr.devlille.partners.connect.companies.factories.insertMockCompanyJobOfferPromotion
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
+import fr.devlille.partners.connect.companies.factories.insertMockedJobOffer
 import fr.devlille.partners.connect.events.factories.insertMockedFutureEvent
 import fr.devlille.partners.connect.integrations.factories.insertMockedIntegration
 import fr.devlille.partners.connect.integrations.factories.insertSlackIntegration
@@ -354,6 +356,52 @@ class DigestJobRoutesTest {
         verify(exactly = 0) {
             slackMethod.chatPostMessage(any<RequestConfigurator<ChatPostMessageRequest.ChatPostMessageRequestBuilder>>())
         }
+    }
+
+    @Test
+    fun `sends Slack notification when pending job offer promotions exist`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val partnershipId = UUID.randomUUID()
+        val jobOfferId = UUID.randomUUID()
+        val (slack, slackMethod, _) = slackMock()
+
+        application {
+            moduleSharedDb(userId = userId, slack = slack)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                val event = insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyId)
+                val pack = insertMockedSponsoringPack(packId, eventId = eventId, basePrice = 1000)
+                insertMockedPartnership(
+                    id = partnershipId,
+                    eventId = eventId,
+                    companyId = companyId,
+                    validatedAt = event.submissionStartTime,
+                    agreementUrl = "https://example.com/agreement.pdf",
+                    declinedAt = null,
+                    selectedPackId = pack.id.value,
+                )
+                insertMockedBilling(eventId = eventId, partnershipId = partnershipId, quotePdfUrl = "https://example.com/quote.pdf")
+                insertMockedJobOffer(companyId = companyId, id = jobOfferId)
+                insertMockCompanyJobOfferPromotion(
+                    jobOfferId = jobOfferId,
+                    partnershipId = partnershipId,
+                    eventId = eventId,
+                )
+                val integrationId = insertMockedIntegration(eventId = eventId)
+                insertSlackIntegration(integrationId)
+            }
+        }
+
+        val response = client.post("/orgs/$orgId/events/$eventId/jobs/digest")
+        assertEquals(HttpStatusCode.NoContent, response.status)
+        verify { slackMethod.chatPostMessage(any<RequestConfigurator<ChatPostMessageRequest.ChatPostMessageRequestBuilder>>()) }
     }
 
     @Test

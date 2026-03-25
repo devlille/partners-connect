@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.digest.application
 
+import fr.devlille.partners.connect.companies.infrastructure.db.CompanyJobOfferPromotionEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.hasCompleteAddress
 import fr.devlille.partners.connect.digest.domain.DigestEntry
 import fr.devlille.partners.connect.digest.domain.DigestRepository
@@ -9,6 +10,7 @@ import fr.devlille.partners.connect.events.domain.EventDisplay
 import fr.devlille.partners.connect.events.domain.EventWithOrganisation
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
+import fr.devlille.partners.connect.internal.infrastructure.db.PromotionStatus
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.organisations.application.mappers.toItemDomain
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
@@ -38,6 +40,7 @@ class DigestRepositoryExposed : DigestRepository {
             agreementItems = queryAgreementReady(eventEntity.id.value, eventSlug),
             billingItems = queryBillingReady(eventEntity.id.value, eventSlug),
             socialMediaItems = querySocialMediaDue(eventEntity.id.value, today, eventSlug),
+            jobOfferItems = queryPendingJobOffers(eventEntity.id.value, eventSlug),
         )
     }
 
@@ -96,4 +99,8 @@ class DigestRepositoryExposed : DigestRepository {
         return PartnershipEntity.findSocialMediaDue(eventId, startOfDay, endOfDay)
             .map { DigestEntry(it.company.name, buildLink(eventSlug, it.id.value)) }
     }
+
+    private fun queryPendingJobOffers(eventId: UUID, eventSlug: String): List<DigestEntry> =
+        CompanyJobOfferPromotionEntity.listByEventAndStatus(eventId, PromotionStatus.PENDING)
+            .map { DigestEntry(it.jobOffer.title, buildLink(eventSlug, it.partnership.id.value)) }
 }
