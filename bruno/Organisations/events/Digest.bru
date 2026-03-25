@@ -1,0 +1,25 @@
+meta {
+  name: Digest
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/jobs/digest
+  body: none
+  auth: inherit
+}
+
+params:path {
+  org_slug: {{org_slug}}
+  event_slug: {{event_slug}}
+}
+
+headers {
+  Accept-Language: fr
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

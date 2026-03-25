@@ -1,0 +1,27 @@
+meta {
+  name: Promote
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/companies/:company_id/partnerships/:partnership_id/promote
+  body: json
+  auth: none
+}
+
+params:path {
+  partnership_id: {{partnership_id}}
+  company_id: {{company_id}}
+}
+
+body:json {
+  {
+    "job_offer_id": "ab9b831b-c061-46a0-9595-740b65acf495"
+  }
+}
+
+script:post-response {
+  let data = res.getBody();
+  bru.setEnvVar("job_offer_id", data.id)
+}

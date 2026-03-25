@@ -1,0 +1,31 @@
+meta {
+  name: List
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/events/:event_slug/job-offers?status=pending
+  body: none
+  auth: none
+}
+
+params:query {
+  status: pending
+}
+
+params:path {
+  org_slug: {{org_slug}}
+  event_slug: {{event_slug}}
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "subject": "Test",
+    "body": "Test"
+  }
+}
