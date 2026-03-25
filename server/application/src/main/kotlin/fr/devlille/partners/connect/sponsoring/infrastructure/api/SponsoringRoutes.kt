@@ -103,7 +103,7 @@ private fun Route.orgsOptionRoutes() {
         install(AuthorizedOrganisationPlugin)
         get {
             val eventSlug = call.parameters.eventSlug
-            val options = repository.listOptionsByEventWithAllTranslations(eventSlug = eventSlug)
+            val options = repository.listOptionsWithPartnershipCounts(eventSlug = eventSlug)
             call.respond(HttpStatusCode.OK, options)
         }
         post {

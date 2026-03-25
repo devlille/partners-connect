@@ -20,6 +20,7 @@ import fr.devlille.partners.connect.sponsoring.domain.CreateTypedSelectable
 import fr.devlille.partners.connect.sponsoring.domain.OptionRepository
 import fr.devlille.partners.connect.sponsoring.domain.OptionType
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringOptionDetailWithPartners
+import fr.devlille.partners.connect.sponsoring.domain.SponsoringOptionWithCount
 import fr.devlille.partners.connect.sponsoring.domain.SponsoringOptionWithTranslations
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.OptionTranslationsTable
@@ -261,6 +262,45 @@ class OptionRepositoryExposed(
         optionEntity
             .allByEvent(event.id.value)
             .map { option -> option.toDomainWithAllTranslations() }
+    }
+
+    override fun listOptionsWithPartnershipCounts(
+        eventSlug: String,
+    ): List<SponsoringOptionWithCount> = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+
+        val options = optionEntity
+            .allByEvent(event.id.value)
+
+        val optionIds = options.map { it.id.value }.toSet()
+
+        val packOptionMap = PackOptionsTable
+            .selectAll()
+            .where { PackOptionsTable.option inList optionIds }
+            .groupBy(
+                { it[PackOptionsTable.pack].value },
+                { it[PackOptionsTable.option].value },
+            )
+
+        val validatedPackIds = PartnershipEntity
+            .find { PartnershipsTable.eventId eq event.id.value }
+            .mapNotNull { partnership -> partnership.validatedPack()?.id?.value }
+
+        val countMap = mutableMapOf<UUID, Int>()
+        for (packId in validatedPackIds) {
+            val packOptionIds = packOptionMap[packId] ?: continue
+            for (optionId in packOptionIds) {
+                countMap[optionId] = (countMap[optionId] ?: 0) + 1
+            }
+        }
+
+        options.map { option ->
+            SponsoringOptionWithCount(
+                option = option.toDomainWithAllTranslations(),
+                partnershipCount = countMap[option.id.value] ?: 0,
+            )
+        }
     }
 
     override fun getOptionByIdWithAllTranslations(

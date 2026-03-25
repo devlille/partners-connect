@@ -1,0 +1,18 @@
+{
+  "$id": "sponsoring_option_with_count.schema.json",
+  "type": "object",
+  "properties": {
+    "option": {
+      "$ref": "sponsoring_option_with_translations.schema.json"
+    },
+    "partnership_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of validated partnerships whose validated pack contains this option"
+    }
+  },
+  "required": [
+    "option",
+    "partnership_count"
+  ]
+}
