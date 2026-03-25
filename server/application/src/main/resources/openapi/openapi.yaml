@@ -2506,6 +2506,47 @@ paths:
               schema:
                 $ref: "#/components/schemas/Identifier"
   /orgs/{orgSlug}/events/{eventSlug}/options/{optionId}:
+    get:
+      summary: "Get sponsoring option detail with partnerships"
+      operationId: "getOrgsEventsOptionsById"
+      description: "Get a single sponsoring option with all translations and the list of validated partnerships"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "optionId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SponsoringOptionDetailWithPartners"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Not Found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
     delete:
       summary: "Delete sponsoring option"
       operationId: "deleteOrgsEventsOptions"
@@ -5119,3 +5160,5 @@ components:
       $ref: "../schemas/booth_activity_response.schema.json"
     BoothActivityListResponse:
       $ref: "../schemas/booth_activity_list_response.schema.json"
+    SponsoringOptionDetailWithPartners:
+      $ref: "../schemas/sponsoring_option_with_partnerships.schema.json"

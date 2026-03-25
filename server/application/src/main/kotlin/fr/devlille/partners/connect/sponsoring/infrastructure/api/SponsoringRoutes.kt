@@ -115,7 +115,7 @@ private fun Route.orgsOptionRoutes() {
         get("/{optionId}") {
             val eventSlug = call.parameters.eventSlug
             val optionId = call.parameters.optionId
-            val option = repository.getOptionByIdWithAllTranslations(eventSlug = eventSlug, optionId = optionId)
+            val option = repository.getOptionByIdWithPartners(eventSlug = eventSlug, optionId = optionId)
             call.respond(HttpStatusCode.OK, option)
         }
         put("/{optionId}") {

@@ -16,4 +16,6 @@ interface OptionRepository {
     fun listOptionsByEventWithAllTranslations(eventSlug: String): List<SponsoringOptionWithTranslations>
 
     fun getOptionByIdWithAllTranslations(eventSlug: String, optionId: UUID): SponsoringOptionWithTranslations
+
+    fun getOptionByIdWithPartners(eventSlug: String, optionId: UUID): SponsoringOptionDetailWithPartners
 }
