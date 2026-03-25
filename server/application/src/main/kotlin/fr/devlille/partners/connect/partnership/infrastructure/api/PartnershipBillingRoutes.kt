@@ -25,9 +25,6 @@ import org.koin.ktor.ext.inject
 @Suppress("LongMethod")
 fun Route.publicPartnershipBillingRoutes() {
     val partnershipBillingRepository by inject<PartnershipBillingRepository>()
-    val billingRepository by inject<BillingRepository>()
-    val eventRepository by inject<EventRepository>()
-    val partnershipRepository by inject<PartnershipRepository>()
 
     route("/events/{eventSlug}/partnerships/{partnershipId}/billing") {
         get {
@@ -51,7 +48,21 @@ fun Route.publicPartnershipBillingRoutes() {
             call.respond(HttpStatusCode.OK, mapOf("id" to billingId.toString()))
         }
     }
-    route("/events/{eventSlug}/partnerships/{partnershipId}/billing/invoice") {
+}
+
+fun Route.orgsPartnershipBillingRoutes() {
+    orgsPartnershipBillingGenerationRoutes()
+    orgsPartnershipBillingStatusRoutes()
+}
+
+private fun Route.orgsPartnershipBillingGenerationRoutes() {
+    val billingRepository by inject<BillingRepository>()
+    val eventRepository by inject<EventRepository>()
+    val partnershipRepository by inject<PartnershipRepository>()
+    val partnershipBillingRepository by inject<PartnershipBillingRepository>()
+
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/billing/invoice") {
+        install(AuthorizedOrganisationPlugin)
         install(NotificationPartnershipPlugin)
         install(WebhookPartnershipPlugin)
 
@@ -68,7 +79,8 @@ fun Route.publicPartnershipBillingRoutes() {
             call.respond(HttpStatusCode.Created, mapOf("url" to invoiceUrl))
         }
     }
-    route("/events/{eventSlug}/partnerships/{partnershipId}/billing/quote") {
+    route("/orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/billing/quote") {
+        install(AuthorizedOrganisationPlugin)
         install(NotificationPartnershipPlugin)
         install(WebhookPartnershipPlugin)
 
@@ -87,7 +99,7 @@ fun Route.publicPartnershipBillingRoutes() {
     }
 }
 
-fun Route.orgsPartnershipBillingRoutes() {
+private fun Route.orgsPartnershipBillingStatusRoutes() {
     val eventRepository by inject<EventRepository>()
     val partnershipRepository by inject<PartnershipRepository>()
     val partnershipBillingRepository by inject<PartnershipBillingRepository>()
