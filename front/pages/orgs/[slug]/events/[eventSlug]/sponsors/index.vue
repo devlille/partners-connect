@@ -62,35 +62,35 @@
 
         <!-- Statistiques -->
         <div
-          v-if="packs.length > 0"
+          v-if="packStats.length > 0"
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6"
         >
           <div
-            v-for="pack in packs"
-            :key="`stat-${pack.id}`"
+            v-for="stat in packStats"
+            :key="`stat-${stat.pack_id}`"
             class="bg-white rounded-lg shadow p-6 border border-gray-200"
           >
             <div class="flex items-center justify-between mb-2">
-              <h3 class="text-sm font-medium text-gray-500">{{ pack.name }}</h3>
+              <h3 class="text-sm font-medium text-gray-500">{{ stat.pack_name }}</h3>
               <div class="text-xs text-gray-400">
-                {{ pack.max_quantity ? `Max: ${pack.max_quantity}` : 'Illimité' }}
+                {{ stat.max_quantity ? `Max: ${stat.max_quantity}` : 'Illimité' }}
               </div>
             </div>
             <div class="flex items-baseline gap-2">
               <span class="text-3xl font-bold text-gray-900">
-                {{ getPackPartnershipCount(pack.id) }}
+                {{ stat.count }}
               </span>
-              <span v-if="pack.max_quantity" class="text-sm text-gray-500">
-                / {{ pack.max_quantity }}
+              <span v-if="stat.max_quantity" class="text-sm text-gray-500">
+                / {{ stat.max_quantity }}
               </span>
               <span class="text-sm text-gray-500">sponsor(s)</span>
             </div>
-            <div v-if="pack.max_quantity" class="mt-3">
+            <div v-if="stat.max_quantity" class="mt-3">
               <div class="w-full bg-gray-200 rounded-full h-2">
                 <div
                   class="h-2 rounded-full transition-all"
-                  :class="getProgressBarColor(pack.id, pack.max_quantity)"
-                  :style="{ width: `${getProgressPercentage(pack.id, pack.max_quantity)}%` }"
+                  :class="getProgressBarColor(stat.count, stat.max_quantity)"
+                  :style="{ width: `${getProgressPercentage(stat.count, stat.max_quantity)}%` }"
                 />
               </div>
             </div>
@@ -175,14 +175,14 @@
 </template>
 
 <script setup lang="ts">
-import { getOrgsEventsPartnership, getEventBySlug, getOrgsEventsPacks, deletePartnership, type PartnershipItemSchema, type SponsoringPack, type PostPartnershipEmailParams } from "~/utils/api";
+import { getOrgsEventsPartnership, getEventBySlug, getOrgsEventsPacks, deletePartnership, type PartnershipItemSchema, type SponsoringPackSchema, type PostPartnershipEmailParams } from "~/utils/api";
 import { filterStateToApiParams } from "~/types/sponsors";
 import authMiddleware from "~/middleware/auth";
 import { useSponsorFilters } from '~/composables/useSponsorFilters'
 import FilterPanel from '~/components/sponsors/FilterPanel.vue'
 import ActiveFilters from '~/components/sponsors/ActiveFilters.vue'
 
-import type { PartnershipsMetadata } from '~/types/sponsors'
+import type { PartnershipsMetadata, PackCount } from '~/types/sponsors'
 
 // Type pour la réponse paginée de l'API
 interface PaginatedPartnershipsResponse {
@@ -295,7 +295,7 @@ const columns = [
 ];
 
 const partnerships = ref<PartnershipItemSchema[]>([]);
-const packs = ref<SponsoringPack[]>([]);
+const packs = ref<SponsoringPackSchema[]>([]);
 const filterMetadata = ref<PartnershipsMetadata | null>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
@@ -413,25 +413,30 @@ function handleEmailSent(recipientCount: number) {
   ariaAnnouncement.value = `Email envoyé à ${recipientCount} destinataires`;
 }
 
-// Calculer le nombre de partnerships par pack
-function getPackPartnershipCount(packId: string): number {
-  // Trouver le nom du pack correspondant à l'ID
-  const pack = packs.value.find(p => p.id === packId);
-  if (!pack) return 0;
-
-  // Compter les partnerships qui ont ce selected_pack_name
-  return partnerships.value.filter(p => p.selected_pack_name === pack.name).length;
+// Pack stats: merge metadata pack_counts with packs max_quantity
+interface PackStat extends PackCount {
+  max_quantity: number | null;
 }
 
+const packStats = computed<PackStat[]>(() => {
+  const counts = filterMetadata.value?.pack_counts ?? [];
+  return counts.map(pc => {
+    const pack = packs.value.find(p => p.id === pc.pack_id);
+    return {
+      ...pc,
+      max_quantity: pack?.max_quantity ?? null,
+    };
+  });
+});
+
 // Calculer le pourcentage de remplissage
-function getProgressPercentage(packId: string, maxQuantity: number): number {
-  const count = getPackPartnershipCount(packId);
+function getProgressPercentage(count: number, maxQuantity: number): number {
   return Math.min((count / maxQuantity) * 100, 100);
 }
 
 // Déterminer la couleur de la barre de progression
-function getProgressBarColor(packId: string, maxQuantity: number): string {
-  const percentage = getProgressPercentage(packId, maxQuantity);
+function getProgressBarColor(count: number, maxQuantity: number): string {
+  const percentage = getProgressPercentage(count, maxQuantity);
   if (percentage >= 90) return 'bg-red-500';
   if (percentage >= 70) return 'bg-yellow-500';
   return 'bg-green-500';
