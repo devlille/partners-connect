@@ -38,7 +38,7 @@ interface CompanyJobOfferRepository {
         companyId: UUID,
         page: Int = 1,
         pageSize: Int = 20,
-    ): PaginatedResponse<JobOfferResponse>
+    ): PaginatedResponse<JobOfferResponse, Unit>
 
     /**
      * Updates an existing job offer with partial or complete data.

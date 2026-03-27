@@ -13,9 +13,10 @@ fun <T> SizedIterable<T>.paginated(page: Int, pageSize: Int): SizedIterable<T> {
     return this.limit(count = pageSize).offset(start = offset)
 }
 
-fun <T> List<T>.toPaginatedResponse(total: Long, page: Int, pageSize: Int): PaginatedResponse<T> = PaginatedResponse(
-    items = this,
-    page = page,
-    pageSize = pageSize,
-    total = total.toLong(),
-)
+fun <T> List<T>.toPaginatedResponse(total: Long, page: Int, pageSize: Int): PaginatedResponse<T, Unit> =
+    PaginatedResponse(
+        items = this,
+        page = page,
+        pageSize = pageSize,
+        total = total,
+    )

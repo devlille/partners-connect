@@ -12,15 +12,16 @@ import fr.devlille.partners.connect.internal.infrastructure.api.FilterType
 import fr.devlille.partners.connect.internal.infrastructure.api.FilterValue
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedResponse
-import fr.devlille.partners.connect.internal.infrastructure.api.PaginationMetadata
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.application.mappers.toDetailedDomain
 import fr.devlille.partners.connect.partnership.application.mappers.toDomain
 import fr.devlille.partners.connect.partnership.domain.InvoiceStatus
+import fr.devlille.partners.connect.partnership.domain.PackCount
 import fr.devlille.partners.connect.partnership.domain.Partnership
 import fr.devlille.partners.connect.partnership.domain.PartnershipDetail
 import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
 import fr.devlille.partners.connect.partnership.domain.PartnershipItem
+import fr.devlille.partners.connect.partnership.domain.PartnershipListMetadata
 import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.RegisterPartnership
 import fr.devlille.partners.connect.partnership.domain.UpdatePartnershipContactInfo
@@ -255,7 +256,7 @@ class PartnershipRepositoryExposed : PartnershipRepository {
         direction: String,
         page: Int,
         pageSize: Int,
-    ): PaginatedResponse<PartnershipItem> = transaction {
+    ): PaginatedResponse<PartnershipItem, PartnershipListMetadata> = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
         val eventId = event.id.value
@@ -305,16 +306,34 @@ class PartnershipRepositoryExposed : PartnershipRepository {
         )
     }
 
-    private fun buildMetadata(eventId: UUID, organisationId: UUID): PaginationMetadata {
+    private fun buildMetadata(eventId: UUID, organisationId: UUID): PartnershipListMetadata {
         // Query packs for filter values
-        val packValues = SponsoringPackEntity
+        val packs = SponsoringPackEntity
             .find { SponsoringPacksTable.eventId eq eventId }
-            .map { pack ->
-                FilterValue(
-                    value = pack.id.value.toString(),
-                    displayValue = pack.name,
-                )
-            }
+            .toList()
+        val packValues = packs.map { pack ->
+            FilterValue(
+                value = pack.id.value.toString(),
+                displayValue = pack.name,
+            )
+        }
+
+        // Count partnerships per pack
+        val packCounts = packs.map { pack ->
+            val count = PartnershipEntity
+                .find {
+                    (PartnershipsTable.eventId eq eventId) and
+                        (PartnershipsTable.selectedPackId eq pack.id) and
+                        PartnershipsTable.declinedAt.isNull()
+                }
+                .count()
+                .toInt()
+            PackCount(
+                packId = pack.id.value.toString(),
+                packName = pack.name,
+                count = count,
+            )
+        }
 
         // Query organisation editors for available organisers
         val editors = OrganisationPermissionEntity.listUserGrantedByOrgId(organisationId)
@@ -325,7 +344,7 @@ class PartnershipRepositoryExposed : PartnershipRepository {
             )
         }.distinctBy { it.value }
 
-        return PaginationMetadata(
+        return PartnershipListMetadata(
             filters = listOf(
                 FilterDefinition("pack_id", FilterType.STRING, packValues),
                 FilterDefinition("validated", FilterType.BOOLEAN),
@@ -337,6 +356,7 @@ class PartnershipRepositoryExposed : PartnershipRepository {
                 FilterDefinition("declined", FilterType.BOOLEAN),
             ),
             sorts = listOf("asc", "desc"),
+            packCounts = packCounts,
         )
     }
 

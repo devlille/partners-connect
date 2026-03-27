@@ -7,6 +7,7 @@ import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedRespons
 import fr.devlille.partners.connect.internal.moduleSharedDb
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.partnership.domain.PartnershipItem
+import fr.devlille.partners.connect.partnership.domain.PartnershipListMetadata
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
 import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
@@ -96,7 +97,9 @@ class PartnershipDeclinedFilterRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val body = json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val body = json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
         assertEquals(1, body.total)
         assertEquals(1, body.items.size)
         assertEquals(activePartnershipId.toString(), body.items.first().id)
@@ -146,7 +149,9 @@ class PartnershipDeclinedFilterRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val body = json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val body = json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
         assertEquals(1, body.total)
         assertEquals(1, body.items.size)
         assertEquals(activePartnershipId.toString(), body.items.first().id)
@@ -196,7 +201,9 @@ class PartnershipDeclinedFilterRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val body = json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val body = json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
         assertEquals(1, body.total)
         assertEquals(1, body.items.size)
     }
@@ -265,7 +272,9 @@ class PartnershipDeclinedFilterRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val body = json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val body = json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
         // Returns only the declined+validated partnership
         assertEquals(1, body.total)
         assertEquals(1, body.items.size)
@@ -316,7 +325,9 @@ class PartnershipDeclinedFilterRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val body = json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val body = json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
         assertEquals(0, body.total)
         assertTrue(body.items.isEmpty())
     }
@@ -342,7 +353,9 @@ class PartnershipDeclinedFilterRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val body = json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val body = json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
         val metadata = body.metadata
         assertNotNull(metadata)
         val declinedFilter = metadata.filters.find { it.name == "declined" }

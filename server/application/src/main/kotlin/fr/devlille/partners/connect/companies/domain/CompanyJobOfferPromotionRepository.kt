@@ -73,5 +73,5 @@ interface CompanyJobOfferPromotionRepository {
         partnershipId: UUID? = null,
         page: Int = 1,
         pageSize: Int = 20,
-    ): PaginatedResponse<JobOfferPromotionResponse>
+    ): PaginatedResponse<JobOfferPromotionResponse, Unit>
 }

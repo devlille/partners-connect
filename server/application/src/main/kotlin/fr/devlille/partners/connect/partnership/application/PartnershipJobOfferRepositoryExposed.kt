@@ -40,7 +40,7 @@ class PartnershipJobOfferRepositoryExposed : PartnershipJobOfferRepository {
         status: PromotionStatus?,
         page: Int,
         pageSize: Int,
-    ): PaginatedResponse<JobOfferPromotionResponse> = transaction {
+    ): PaginatedResponse<JobOfferPromotionResponse, Unit> = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug '$eventSlug' not found")
         PartnershipEntity.singleByEventAndPartnership(event.id.value, partnershipId)
@@ -58,7 +58,7 @@ class PartnershipJobOfferRepositoryExposed : PartnershipJobOfferRepository {
         status: PromotionStatus?,
         page: Int,
         pageSize: Int,
-    ): PaginatedResponse<JobOfferPromotionResponse> = transaction {
+    ): PaginatedResponse<JobOfferPromotionResponse, Unit> = transaction {
         val org = OrganisationEntity.orgFindBySlug(orgSlug)
             ?: throw NotFoundException("Organisation with slug '$orgSlug' not found")
         val event = EventEntity

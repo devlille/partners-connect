@@ -4,13 +4,13 @@ import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedRespons
 import java.util.UUID
 
 interface EventRepository {
-    fun getAllEvents(page: Int, pageSize: Int): PaginatedResponse<EventSummary>
+    fun getAllEvents(page: Int, pageSize: Int): PaginatedResponse<EventSummary, Unit>
 
     fun getBySlug(eventSlug: String): EventWithOrganisation
 
     fun findByOrgSlug(orgSlug: String): List<EventSummary>
 
-    fun findByOrgSlugPaginated(orgSlug: String, page: Int, pageSize: Int): PaginatedResponse<EventSummary>
+    fun findByOrgSlugPaginated(orgSlug: String, page: Int, pageSize: Int): PaginatedResponse<EventSummary, Unit>
 
     fun createEvent(orgSlug: String, event: Event): String
 

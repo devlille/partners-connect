@@ -22,7 +22,7 @@ interface PartnershipRepository {
         direction: String = "asc",
         page: Int = 1,
         pageSize: Int = DEFAULT_PAGE_SIZE,
-    ): PaginatedResponse<PartnershipItem>
+    ): PaginatedResponse<PartnershipItem, PartnershipListMetadata>
 
     fun listByCompany(companyId: UUID): List<PartnershipItem>
 

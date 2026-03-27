@@ -58,7 +58,7 @@ class PartnershipEmailHistoryRepositoryExposed : PartnershipEmailHistoryReposito
         partnershipId: UUID,
         page: Int,
         pageSize: Int,
-    ): PaginatedResponse<PartnershipEmailHistory> = transaction {
+    ): PaginatedResponse<PartnershipEmailHistory, Unit> = transaction {
         val emailHistory = PartnershipEmailHistoryEntity
             .find { PartnershipEmailHistoryTable.partnershipId eq partnershipId }
             .orderBy(PartnershipEmailHistoryTable.sentAt to SortOrder.DESC)

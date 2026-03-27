@@ -49,7 +49,7 @@ class ProviderRepositoryExposed : ProviderRepository {
         direction: String?,
         page: Int,
         pageSize: Int,
-    ): PaginatedResponse<Provider> = transaction {
+    ): PaginatedResponse<Provider, Unit> = transaction {
         var queryBuilder = if (orgSlug != null) {
             // Organization-scoped listing
             val organisation = OrganisationEntity.orgFindBySlug(orgSlug)
@@ -113,7 +113,11 @@ class ProviderRepositoryExposed : ProviderRepository {
             ?: throw NotFoundException("Provider not found")
     }
 
-    override fun findByEvent(eventSlug: String, page: Int, pageSize: Int): PaginatedResponse<Provider> = transaction {
+    override fun findByEvent(
+        eventSlug: String,
+        page: Int,
+        pageSize: Int,
+    ): PaginatedResponse<Provider, Unit> = transaction {
         val eventEntity = EventEntity.eventFindBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
         val eventProviders = EventProviderEntity

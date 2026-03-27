@@ -45,7 +45,7 @@ interface PartnershipJobOfferRepository {
         status: PromotionStatus? = null,
         page: Int = 1,
         pageSize: Int = 20,
-    ): PaginatedResponse<JobOfferPromotionResponse>
+    ): PaginatedResponse<JobOfferPromotionResponse, Unit>
 
     /**
      * Lists all promoted job offers across all partnerships for an event.
@@ -76,7 +76,7 @@ interface PartnershipJobOfferRepository {
         status: PromotionStatus? = null,
         page: Int = 1,
         pageSize: Int = 20,
-    ): PaginatedResponse<JobOfferPromotionResponse>
+    ): PaginatedResponse<JobOfferPromotionResponse, Unit>
 
     /**
      * Approves a pending job offer promotion.

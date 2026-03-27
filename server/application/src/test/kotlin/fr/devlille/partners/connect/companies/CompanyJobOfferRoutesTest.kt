@@ -97,7 +97,7 @@ class CompanyJobOfferRoutesTest {
         // Verify promotion was CASCADE deleted
         val listAfterDelete = client.get("/events/$eventId/partnerships/$partnershipId/job-offers")
         assertEquals(HttpStatusCode.OK, listAfterDelete.status)
-        val offersAfterDelete = json.decodeFromString<PaginatedResponse<JobOfferPromotionResponse>>(
+        val offersAfterDelete = json.decodeFromString<PaginatedResponse<JobOfferPromotionResponse, Unit>>(
             listAfterDelete.bodyAsText(),
         )
         assertEquals(0, offersAfterDelete.items.size) // Promotion should be gone
