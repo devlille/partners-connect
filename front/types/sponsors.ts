@@ -66,6 +66,8 @@ export interface FilterValueOption {
   display_value: string;
 }
 
+import type { PaginationMetadataSchemaPackCountsItem } from "~/utils/api";
+
 /**
  * Filter metadata from API
  */
@@ -76,21 +78,12 @@ export interface FilterMetadata {
 }
 
 /**
- * Pack count from API metadata
- */
-export interface PackCount {
-  pack_id: string;
-  pack_name: string;
-  count: number;
-}
-
-/**
  * Metadata returned by the API for partnerships list
  */
 export interface PartnershipsMetadata {
   filters: FilterMetadata[];
   sorts: string[];
-  pack_counts: PackCount[];
+  pack_counts: PaginationMetadataSchemaPackCountsItem[];
 }
 
 /**
