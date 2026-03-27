@@ -275,25 +275,20 @@ class OptionRepositoryExposed(
 
         val optionIds = options.map { it.id.value }.toSet()
 
-        val packOptionMap = PackOptionsTable
-            .selectAll()
-            .where { PackOptionsTable.option inList optionIds }
-            .groupBy(
-                { it[PackOptionsTable.pack].value },
-                { it[PackOptionsTable.option].value },
-            )
-
-        val validatedPackIds = PartnershipEntity
+        val validatedPartnershipIds = PartnershipEntity
             .find { PartnershipsTable.eventId eq event.id.value }
-            .mapNotNull { partnership -> partnership.validatedPack()?.id?.value }
+            .filter { partnership -> partnership.validatedPack() != null }
+            .map { it.id.value }
+            .toSet()
 
-        val countMap = mutableMapOf<UUID, Int>()
-        for (packId in validatedPackIds) {
-            val packOptionIds = packOptionMap[packId] ?: continue
-            for (optionId in packOptionIds) {
-                countMap[optionId] = (countMap[optionId] ?: 0) + 1
+        val countMap = PartnershipOptionsTable
+            .selectAll()
+            .where {
+                (PartnershipOptionsTable.optionId inList optionIds) and
+                    (PartnershipOptionsTable.partnershipId inList validatedPartnershipIds)
             }
-        }
+            .groupBy { it[PartnershipOptionsTable.optionId].value }
+            .mapValues { (_, rows) -> rows.size }
 
         options.map { option ->
             SponsoringOptionWithCount(
@@ -332,18 +327,18 @@ class OptionRepositoryExposed(
             throw NotFoundException("Option not found")
         }
 
-        val packIdsWithOption = PackOptionsTable
+        val partnershipIdsWithOption = PartnershipOptionsTable
             .selectAll()
-            .where { PackOptionsTable.option eq optionId }
-            .map { it[PackOptionsTable.pack].value }
+            .where { PartnershipOptionsTable.optionId eq optionId }
+            .map { it[PartnershipOptionsTable.partnershipId].value }
             .toSet()
 
         val partnerships = PartnershipEntity
-            .find { PartnershipsTable.eventId eq event.id.value }
-            .filter { partnership ->
-                val validatedPack = partnership.validatedPack()
-                validatedPack != null && validatedPack.id.value in packIdsWithOption
+            .find {
+                (PartnershipsTable.eventId eq event.id.value) and
+                    (PartnershipsTable.id inList partnershipIdsWithOption)
             }
+            .filter { partnership -> partnership.validatedPack() != null }
             .map { partnership ->
                 partnership.toDomain(PartnershipEmailEntity.emails(partnership.id.value))
             }
