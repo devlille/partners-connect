@@ -7,6 +7,7 @@ import fr.devlille.partners.connect.internal.moduleSharedDb
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.partnership.domain.InvoiceStatus
 import fr.devlille.partners.connect.partnership.domain.PartnershipItem
+import fr.devlille.partners.connect.partnership.domain.PartnershipListMetadata
 import fr.devlille.partners.connect.partnership.factories.insertMockedBilling
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
@@ -81,7 +82,9 @@ class PartnershipPaginationWithFiltersRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, responsePage1.status)
-        val page1 = json.decodeFromString<PaginatedResponse<PartnershipItem>>(responsePage1.bodyAsText())
+        val page1 = json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            responsePage1.bodyAsText(),
+        )
         assertEquals(1, page1.page)
         assertEquals(2, page1.pageSize)
         assertEquals(5, page1.total)
@@ -94,7 +97,9 @@ class PartnershipPaginationWithFiltersRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, responsePage2.status)
-        val page2 = json.decodeFromString<PaginatedResponse<PartnershipItem>>(responsePage2.bodyAsText())
+        val page2 = json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            responsePage2.bodyAsText(),
+        )
         assertEquals(2, page2.page)
         assertEquals(2, page2.pageSize)
         assertEquals(5, page2.total)
@@ -167,7 +172,9 @@ class PartnershipPaginationWithFiltersRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, responsePage1.status)
-        val page1 = json.decodeFromString<PaginatedResponse<PartnershipItem>>(responsePage1.bodyAsText())
+        val page1 = json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            responsePage1.bodyAsText(),
+        )
         assertEquals(1, page1.page)
         assertEquals(2, page1.pageSize)
         assertEquals(4, page1.total)
@@ -180,7 +187,9 @@ class PartnershipPaginationWithFiltersRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, responsePage2.status)
-        val page2 = json.decodeFromString<PaginatedResponse<PartnershipItem>>(responsePage2.bodyAsText())
+        val page2 = json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            responsePage2.bodyAsText(),
+        )
         assertEquals(2, page2.page)
         assertEquals(2, page2.pageSize)
         assertEquals(4, page2.total)
@@ -241,7 +250,9 @@ class PartnershipPaginationWithFiltersRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val body = json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val body = json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
         assertEquals(1, body.page)
         assertEquals(2, body.pageSize)
         assertEquals(3, body.total)
@@ -254,7 +265,9 @@ class PartnershipPaginationWithFiltersRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, responsePage2.status)
-        val page2 = json.decodeFromString<PaginatedResponse<PartnershipItem>>(responsePage2.bodyAsText())
+        val page2 = json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            responsePage2.bodyAsText(),
+        )
         assertEquals(2, page2.page)
         assertEquals(3, page2.total)
         assertEquals(1, page2.items.size)

@@ -35,7 +35,7 @@ class CompanyStatusFilterRouteGetTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
 
-        val result = json.decodeFromString<PaginatedResponse<Company>>(response.bodyAsText())
+        val result = json.decodeFromString<PaginatedResponse<Company, Unit>>(response.bodyAsText())
         assertEquals(0, result.total)
         assertEquals(0, result.items.size)
     }
@@ -57,7 +57,7 @@ class CompanyStatusFilterRouteGetTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
 
-        val result = json.decodeFromString<PaginatedResponse<Company>>(response.bodyAsText())
+        val result = json.decodeFromString<PaginatedResponse<Company, Unit>>(response.bodyAsText())
         assertTrue { result.total > 0 }
     }
 
@@ -78,7 +78,7 @@ class CompanyStatusFilterRouteGetTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
 
-        val result = json.decodeFromString<PaginatedResponse<Company>>(response.bodyAsText())
+        val result = json.decodeFromString<PaginatedResponse<Company, Unit>>(response.bodyAsText())
         assertTrue { result.total > 0 }
         val active = result.items
             .filter { it.status == CompanyStatus.ACTIVE }
@@ -103,7 +103,7 @@ class CompanyStatusFilterRouteGetTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
 
-        val result = json.decodeFromString<PaginatedResponse<Company>>(response.bodyAsText())
+        val result = json.decodeFromString<PaginatedResponse<Company, Unit>>(response.bodyAsText())
         assertTrue { result.total > 0 }
         val inactive = result.items
             .filter { it.status == CompanyStatus.INACTIVE }
@@ -150,7 +150,7 @@ class CompanyStatusFilterRouteGetTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
 
-        val result = json.decodeFromString<PaginatedResponse<Company>>(response.bodyAsText())
+        val result = json.decodeFromString<PaginatedResponse<Company, Unit>>(response.bodyAsText())
         assertEquals(10, result.items.size) // Should return only 10 items per page
         assertEquals(15, result.total) // Total should be 15 active companies
         assertEquals(1, result.page)

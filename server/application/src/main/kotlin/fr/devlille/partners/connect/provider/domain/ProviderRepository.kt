@@ -31,7 +31,7 @@ interface ProviderRepository {
         direction: String? = "asc",
         page: Int = 1,
         pageSize: Int = 20,
-    ): PaginatedResponse<Provider>
+    ): PaginatedResponse<Provider, Unit>
 
     /**
      * Get a specific provider by ID within organisation scope.
@@ -51,7 +51,7 @@ interface ProviderRepository {
      * @param pageSize Number of items per page (default: 20)
      * @return Paginated response containing event's attached providers
      */
-    fun findByEvent(eventSlug: String, page: Int = 1, pageSize: Int = 20): PaginatedResponse<Provider>
+    fun findByEvent(eventSlug: String, page: Int = 1, pageSize: Int = 20): PaginatedResponse<Provider, Unit>
 
     /**
      * Create a new provider within organisation scope.

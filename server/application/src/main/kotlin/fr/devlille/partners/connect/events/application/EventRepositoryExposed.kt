@@ -43,7 +43,7 @@ import fr.devlille.partners.connect.organisations.infrastructure.db.findBySlug a
 class EventRepositoryExposed(
     private val entity: UUIDEntityClass<EventEntity>,
 ) : EventRepository {
-    override fun getAllEvents(page: Int, pageSize: Int): PaginatedResponse<EventSummary> = transaction {
+    override fun getAllEvents(page: Int, pageSize: Int): PaginatedResponse<EventSummary, Unit> = transaction {
         val total = entity.count()
         entity.all()
             .orderBy(EventsTable.startTime to SortOrder.ASC)
@@ -80,7 +80,7 @@ class EventRepositoryExposed(
         orgSlug: String,
         page: Int,
         pageSize: Int,
-    ): PaginatedResponse<EventSummary> = transaction {
+    ): PaginatedResponse<EventSummary, Unit> = transaction {
         val organisation = OrganisationEntity.orgFindBySlug(orgSlug)
             ?: throw NotFoundException("Organisation with slug $orgSlug not found")
         val eventQuery = entity.find { EventsTable.organisationId eq organisation.id }

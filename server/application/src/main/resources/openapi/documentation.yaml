@@ -8332,6 +8332,28 @@ components:
               - validated
             - - name
               - created_at
+        pack_counts:
+          type: array
+          description: Count of active (non-declined) partnerships per sponsoring pack. Only present on partnership list endpoints.
+          items:
+            type: object
+            required:
+              - pack_id
+              - pack_name
+              - count
+            properties:
+              pack_id:
+                type: string
+                format: uuid
+                description: Sponsoring pack unique identifier
+              pack_name:
+                type: string
+                description: Display name of the sponsoring pack
+              count:
+                type: integer
+                minimum: 0
+                description: Number of active partnerships using this pack
+            additionalProperties: false
       additionalProperties: false
     partnership_list_response.schema:
       $schema: http://json-schema.org/draft-07/schema#

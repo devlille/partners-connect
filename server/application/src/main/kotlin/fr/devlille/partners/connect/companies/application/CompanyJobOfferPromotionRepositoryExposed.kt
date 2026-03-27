@@ -90,7 +90,7 @@ class CompanyJobOfferPromotionRepositoryExposed : CompanyJobOfferPromotionReposi
         partnershipId: UUID?,
         page: Int,
         pageSize: Int,
-    ): PaginatedResponse<JobOfferPromotionResponse> = transaction {
+    ): PaginatedResponse<JobOfferPromotionResponse, Unit> = transaction {
         CompanyJobOfferEntity.singleByCompanyAndJobOffer(companyId, jobOfferId)
             ?: throw NotFoundException("Job offer $jobOfferId not found for company $companyId")
         val baseQuery = CompanyJobOfferPromotionsTable.jobOfferId eq jobOfferId

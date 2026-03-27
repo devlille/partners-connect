@@ -18,7 +18,7 @@ interface CompanyRepository {
         status: CompanyStatus?,
         page: Int,
         pageSize: Int,
-    ): PaginatedResponse<Company>
+    ): PaginatedResponse<Company, Unit>
 
     fun getById(id: UUID): Company
 

@@ -6,6 +6,7 @@ import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedRespons
 import fr.devlille.partners.connect.internal.moduleSharedDb
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.partnership.domain.PartnershipItem
+import fr.devlille.partners.connect.partnership.domain.PartnershipListMetadata
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
 import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
@@ -107,7 +108,9 @@ class PartnershipOrganiserFilterRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val body = json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val body = json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
 
         // Should return only partnerships assigned to organiser1
         assertEquals(2, body.total)
@@ -174,7 +177,9 @@ class PartnershipOrganiserFilterRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val body = json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val body = json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
 
         // Should return only partnership with organiser, exclude null organiser
         assertEquals(1, body.total)
@@ -243,7 +248,9 @@ class PartnershipOrganiserFilterRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val body = json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val body = json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
 
         // Should return only validated partnership with organiser
         assertEquals(1, body.total)

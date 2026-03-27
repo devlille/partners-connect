@@ -67,5 +67,5 @@ interface PartnershipEmailHistoryRepository {
         partnershipId: UUID,
         page: Int = 0,
         pageSize: Int = 20,
-    ): PaginatedResponse<PartnershipEmailHistory>
+    ): PaginatedResponse<PartnershipEmailHistory, Unit>
 }

@@ -73,7 +73,7 @@ class CompanyJobOfferRepositoryExposed : CompanyJobOfferRepository {
         companyId: UUID,
         page: Int,
         pageSize: Int,
-    ): PaginatedResponse<JobOfferResponse> = transaction {
+    ): PaginatedResponse<JobOfferResponse, Unit> = transaction {
         // Verify company exists
         CompanyEntity.findById(companyId)
             ?: throw NotFoundException("Company not found: $companyId")

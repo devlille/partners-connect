@@ -15,6 +15,7 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
@@ -85,7 +86,7 @@ class ListJobOfferPromotionsRouteGetTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
         val body = json.decodeFromString(
-            PaginatedResponse.serializer(JobOfferPromotionResponse.serializer()),
+            PaginatedResponse.serializer(JobOfferPromotionResponse.serializer(), Unit.serializer()),
             response.bodyAsText(),
         )
         assertTrue { body.items.isNotEmpty() }
@@ -128,7 +129,7 @@ class ListJobOfferPromotionsRouteGetTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
         val body = json.decodeFromString(
-            PaginatedResponse.serializer(JobOfferPromotionResponse.serializer()),
+            PaginatedResponse.serializer(JobOfferPromotionResponse.serializer(), Unit.serializer()),
             response.bodyAsText(),
         )
         assertTrue { body.items.isNotEmpty() }

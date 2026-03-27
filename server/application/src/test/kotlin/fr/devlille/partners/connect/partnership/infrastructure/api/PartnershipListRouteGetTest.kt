@@ -7,6 +7,7 @@ import fr.devlille.partners.connect.internal.moduleSharedDb
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.partnership.domain.InvoiceStatus
 import fr.devlille.partners.connect.partnership.domain.PartnershipItem
+import fr.devlille.partners.connect.partnership.domain.PartnershipListMetadata
 import fr.devlille.partners.connect.partnership.factories.insertMockedBilling
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
@@ -63,7 +64,9 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
         assertEquals(1, paginatedResponse.items.size)
     }
 
@@ -111,7 +114,9 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
         val partnerships = paginatedResponse.items
         assertEquals(2, partnerships.size)
 
@@ -171,7 +176,9 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
         val partnerships = paginatedResponse.items
         assertEquals(1, partnerships.size)
         assertEquals("John Doe", partnerships[0].contact.displayName)
@@ -219,7 +226,9 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
         val partnerships = paginatedResponse.items
         assertEquals(1, partnerships.size)
         assertEquals("John Doe", partnerships[0].contact.displayName)
@@ -266,7 +275,9 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
         val partnerships = paginatedResponse.items
         assertEquals(1, partnerships.size)
         assertEquals("Jane Smith", partnerships[0].contact.displayName)
@@ -315,7 +326,9 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
         val partnerships = paginatedResponse.items
         assertEquals(1, partnerships.size)
         val partnership = partnerships[0]
@@ -368,7 +381,9 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
         val partnerships = paginatedResponse.items
         assertEquals(1, partnerships.size)
         assertEquals("John Doe", partnerships[0].contact.displayName)
@@ -415,7 +430,9 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
         val partnerships = paginatedResponse.items
         assertEquals(1, partnerships.size)
         assertEquals("John Doe", partnerships[0].contact.displayName)
@@ -470,7 +487,9 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
         val partnerships = paginatedResponse.items
         assertEquals(1, partnerships.size)
         assertEquals("John Doe", partnerships[0].contact.displayName)
@@ -502,7 +521,9 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
         assertTrue(paginatedResponse.items.isEmpty())
     }
 
@@ -580,7 +601,9 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
 
         // Verify metadata exists
         val metadata = paginatedResponse.metadata
@@ -637,7 +660,9 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
 
         val metadata = paginatedResponse.metadata
         assertTrue(metadata != null)
@@ -694,7 +719,9 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
 
         val metadata = paginatedResponse.metadata
         val organiserFilter = metadata?.filters?.find { it.name == "organiser" }
@@ -737,7 +764,9 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
 
         val metadata = paginatedResponse.metadata
         assertTrue(metadata != null)
@@ -771,7 +800,9 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
 
         // Metadata should be present even when there are no partnerships
         assertTrue(paginatedResponse.metadata != null, "Metadata should be present in empty results")
@@ -811,7 +842,9 @@ class PartnershipListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem>>(response.bodyAsText())
+        val paginatedResponse = Json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
+            response.bodyAsText(),
+        )
 
         val metadata = paginatedResponse.metadata
         val organiserFilter = metadata?.filters?.find { it.name == "organiser" }

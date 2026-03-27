@@ -25,7 +25,7 @@ class CompanyRepositoryExposed(
         status: CompanyStatus?,
         page: Int,
         pageSize: Int,
-    ): PaginatedResponse<Company> = transaction {
+    ): PaginatedResponse<Company, Unit> = transaction {
         val companies = CompanyEntity.listByQueryAndStatus(query, status)
         val total = companies.count()
         companies

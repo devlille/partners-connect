@@ -67,7 +67,7 @@ class CompanyCreateRoutesTest {
 
         val response = client.get("/companies")
         assertEquals(HttpStatusCode.OK, response.status)
-        val paginated = json.decodeFromString<PaginatedResponse<Company>>(response.bodyAsText())
+        val paginated = json.decodeFromString<PaginatedResponse<Company, Unit>>(response.bodyAsText())
         assertTrue(paginated.items.any { it.toString().contains(id!!) })
         assertEquals(1, paginated.items.first().socials.size)
         assertEquals(SocialType.LINKEDIN, paginated.items.first().socials.first().type)
