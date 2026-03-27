@@ -987,7 +987,7 @@ paths:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/company_billing_data.schema'
         '400':
