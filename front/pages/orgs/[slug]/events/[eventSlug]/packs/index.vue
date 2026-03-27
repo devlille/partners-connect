@@ -38,7 +38,7 @@
             </div>
             <div class="flex items-baseline gap-2">
               <span class="text-3xl font-bold text-gray-900">
-                {{ getPackPartnershipCount(pack.id) }}
+                {{ getPackCount(pack.id) }}
               </span>
               <span v-if="pack.max_quantity" class="text-sm text-gray-500">
                 / {{ pack.max_quantity }}
@@ -49,8 +49,8 @@
               <div class="w-full bg-gray-200 rounded-full h-2">
                 <div
                   class="h-2 rounded-full transition-all"
-                  :class="getProgressBarColor(pack.id, pack.max_quantity)"
-                  :style="{ width: `${getProgressPercentage(pack.id, pack.max_quantity)}%` }"
+                  :class="getProgressBarColor(getPackCount(pack.id), pack.max_quantity)"
+                  :style="{ width: `${getProgressPercentage(getPackCount(pack.id), pack.max_quantity)}%` }"
                 />
               </div>
             </div>
@@ -163,7 +163,7 @@
 </template>
 
 <script setup lang="ts">
-import { getOrgsEventsPacks, getEventBySlug, deleteOrgsEventsPacks, getOrgsEventsPartnership, type SponsoringPack, type PartnershipItemSchema } from "~/utils/api";
+import { getOrgsEventsPacks, getEventBySlug, deleteOrgsEventsPacks, getOrgsEventsPartnership, type SponsoringPack, type PaginationMetadataSchemaPackCountsItem } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 
 const route = useRoute();
@@ -185,7 +185,7 @@ const eventSlug = computed(() => {
 });
 
 const packs = ref<SponsoringPack[]>([]);
-const partnerships = ref<PartnershipItemSchema[]>([]);
+const packCounts = ref<PaginationMetadataSchemaPackCountsItem[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const eventName = ref<string>('');
@@ -197,20 +197,19 @@ const isDeleteModalOpen = ref(false);
 const packToDelete = ref<SponsoringPack | null>(null);
 const deletingPackId = ref<string | null>(null);
 
-// Calculer le nombre de partnerships par pack
-function getPackPartnershipCount(packId: string): number {
-  return partnerships.value.filter(p => p.selected_pack_id === packId).length;
+// Obtenir le nombre de partnerships pour un pack depuis les métadonnées
+function getPackCount(packId: string): number {
+  return packCounts.value.find(pc => pc.pack_id === packId)?.count ?? 0;
 }
 
 // Calculer le pourcentage de remplissage
-function getProgressPercentage(packId: string, maxQuantity: number): number {
-  const count = getPackPartnershipCount(packId);
+function getProgressPercentage(count: number, maxQuantity: number): number {
   return Math.min((count / maxQuantity) * 100, 100);
 }
 
 // Déterminer la couleur de la barre de progression
-function getProgressBarColor(packId: string, maxQuantity: number): string {
-  const percentage = getProgressPercentage(packId, maxQuantity);
+function getProgressBarColor(count: number, maxQuantity: number): string {
+  const percentage = getProgressPercentage(count, maxQuantity);
   if (percentage >= 90) return 'bg-red-500';
   if (percentage >= 70) return 'bg-yellow-500';
   return 'bg-green-500';
@@ -262,9 +261,9 @@ async function loadPacks() {
     eventName.value = eventResponse.data.event.name;
     packs.value = packsResponse.data;
 
-    // Extraire les items de la réponse paginée
-    const partnershipsData = partnershipsResponse.data as unknown as { items: PartnershipItemSchema[] };
-    partnerships.value = partnershipsData.items || [];
+    // Extraire les pack_counts depuis les métadonnées de la réponse paginée
+    const partnershipsData = partnershipsResponse.data as unknown as { metadata?: { pack_counts?: PaginationMetadataSchemaPackCountsItem[] } };
+    packCounts.value = partnershipsData.metadata?.pack_counts ?? [];
   } catch (err) {
     console.error('Failed to load packs:', err);
     error.value = 'Impossible de charger les packs';
