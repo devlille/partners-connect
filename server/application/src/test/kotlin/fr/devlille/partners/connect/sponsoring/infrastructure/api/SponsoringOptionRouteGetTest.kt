@@ -4,6 +4,7 @@ import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.events.factories.insertMockedFutureEvent
 import fr.devlille.partners.connect.internal.moduleSharedDb
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
+import fr.devlille.partners.connect.partnership.factories.insertMockedOptionPartnership
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedPackOptions
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringOption
@@ -58,6 +59,11 @@ class SponsoringOptionRouteGetTest {
                     companyId = companyId,
                     selectedPackId = packId,
                     validatedAt = now,
+                )
+                insertMockedOptionPartnership(
+                    partnershipId = partnershipId,
+                    packId = packId,
+                    optionId = optionId,
                 )
             }
         }

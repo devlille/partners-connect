@@ -4,6 +4,7 @@ import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.events.factories.insertMockedFutureEvent
 import fr.devlille.partners.connect.internal.moduleSharedDb
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
+import fr.devlille.partners.connect.partnership.factories.insertMockedOptionPartnership
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedPackOptions
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringOption
@@ -110,17 +111,27 @@ class SponsoringListOptionRouteGetTest {
                 insertMockedPackOptions(packId = packId, optionId = optionId)
                 insertMockedCompany(companyId1)
                 insertMockedCompany(companyId2)
-                insertMockedPartnership(
+                val partnership1 = insertMockedPartnership(
                     eventId = eventId,
                     companyId = companyId1,
                     selectedPackId = packId,
                     validatedAt = now,
                 )
-                insertMockedPartnership(
+                insertMockedOptionPartnership(
+                    partnershipId = partnership1.id.value,
+                    packId = packId,
+                    optionId = optionId,
+                )
+                val partnership2 = insertMockedPartnership(
                     eventId = eventId,
                     companyId = companyId2,
                     selectedPackId = packId,
                     validatedAt = now,
+                )
+                insertMockedOptionPartnership(
+                    partnershipId = partnership2.id.value,
+                    packId = packId,
+                    optionId = optionId,
                 )
             }
         }
