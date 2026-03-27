@@ -182,7 +182,8 @@ import { useSponsorFilters } from '~/composables/useSponsorFilters'
 import FilterPanel from '~/components/sponsors/FilterPanel.vue'
 import ActiveFilters from '~/components/sponsors/ActiveFilters.vue'
 
-import type { PartnershipsMetadata, PackCount } from '~/types/sponsors'
+import type { PartnershipsMetadata } from '~/types/sponsors'
+import type { PaginationMetadataSchemaPackCountsItem } from '~/utils/api'
 
 // Type pour la réponse paginée de l'API
 interface PaginatedPartnershipsResponse {
@@ -414,7 +415,7 @@ function handleEmailSent(recipientCount: number) {
 }
 
 // Pack stats: merge metadata pack_counts with packs max_quantity
-interface PackStat extends PackCount {
+interface PackStat extends PaginationMetadataSchemaPackCountsItem {
   max_quantity: number | null;
 }
 
