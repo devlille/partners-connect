@@ -86,6 +86,11 @@ export const useSponsorLinks = (
         to: `${basePath}/documents`,
       },
       {
+        label: "Activités",
+        icon: "i-heroicons-calendar-days",
+        to: `${basePath}/activities`,
+      },
+      {
         label: "Offres d'emploi",
         icon: "i-heroicons-briefcase",
         to: `${basePath}/job-offers`,

@@ -1960,6 +1960,60 @@ export type BoothActivityListResponseSchema = BoothActivityResponseSchema[];
 
 export type BoothActivityListResponse = BoothActivityListResponseSchema;
 
+export interface OptionTranslationSchema {
+  /** ISO 639-1 language code (e.g., 'en', 'fr') */
+  language: string;
+  /** Translated option name */
+  name: string;
+  /**
+   * Translated option description (optional)
+   * @nullable
+   */
+  description: string | null;
+}
+
+/**
+ * Map of translations keyed by language code (e.g., 'en', 'fr', 'de')
+ */
+export type SponsoringOptionWithTranslationsSchemaTranslations = {
+  [key: string]: OptionTranslationSchema;
+};
+
+export interface SponsoringOptionWithTranslationsSchema {
+  /** Unique identifier for the sponsoring option */
+  id: string;
+  /** Type of the sponsoring option */
+  type: string;
+  /** Map of translations keyed by language code (e.g., 'en', 'fr', 'de') */
+  translations: SponsoringOptionWithTranslationsSchemaTranslations;
+  /**
+   * Additional cost in cents (null for free options)
+   * @nullable
+   */
+  price: number | null;
+  /** Fixed quantity for typed_number options */
+  fixed_quantity?: number;
+}
+
+export interface SponsoringOptionWithPartnershipsSchema {
+  option: SponsoringOptionWithTranslationsSchema;
+  /** List of validated partnerships associated with this option */
+  partnerships: PartnershipItemSchema[];
+}
+
+export type SponsoringOptionDetailWithPartners = SponsoringOptionWithPartnershipsSchema;
+
+export interface SponsoringOptionWithCountSchema {
+  option: SponsoringOptionWithTranslationsSchema;
+  /**
+   * Number of validated partnerships whose validated pack contains this option
+   * @minimum 0
+   */
+  partnership_count: number;
+}
+
+export type SponsoringOptionWithCount = SponsoringOptionWithCountSchema;
+
 export type GetCompaniesParams = {
   /**
    * Search companies by name
@@ -2212,6 +2266,17 @@ export type GetOrgsEventsPartnershipParams = {
    * Sort direction
    */
   direction?: GetOrgsEventsPartnershipDirection;
+  /**
+   * Page number (must be >= 1)
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * Number of items per page (must be between 1 and 100)
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
 };
 
 export type GetOrgsEventsPartnershipDirection =
@@ -2831,16 +2896,18 @@ export const putEventsPartnershipBilling = (
 };
 
 /**
+ * Generate an invoice for a partnership
  * @summary Generate partnership invoice
  */
-export const postEventsPartnershipBillingInvoice = (
+export const postOrgsEventsPartnershipBillingInvoice = (
+  orgSlug: string,
   eventSlug: string,
   partnershipId: string,
   options?: SecondParameter<typeof customFetch<Blob>>,
 ) => {
   return customFetch<Blob>(
     {
-      url: `/events/${eventSlug}/partnerships/${partnershipId}/billing/invoice`,
+      url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/billing/invoice`,
       method: "POST",
       responseType: "blob",
     },
@@ -2849,16 +2916,18 @@ export const postEventsPartnershipBillingInvoice = (
 };
 
 /**
+ * Generate a quote for a partnership
  * @summary Generate partnership quote
  */
-export const postEventsPartnershipBillingQuote = (
+export const postOrgsEventsPartnershipBillingQuote = (
+  orgSlug: string,
   eventSlug: string,
   partnershipId: string,
   options?: SecondParameter<typeof customFetch<Blob>>,
 ) => {
   return customFetch<Blob>(
     {
-      url: `/events/${eventSlug}/partnerships/${partnershipId}/billing/quote`,
+      url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/billing/quote`,
       method: "POST",
       responseType: "blob",
     },
@@ -3410,9 +3479,9 @@ export const getStatusIntegration = (
 export const getOrgsEventsOptions = (
   orgSlug: string,
   eventSlug: string,
-  options?: SecondParameter<typeof customFetch<SponsoringOptionSchema[]>>,
+  options?: SecondParameter<typeof customFetch<SponsoringOptionWithCountSchema[]>>,
 ) => {
-  return customFetch<SponsoringOptionSchema[]>(
+  return customFetch<SponsoringOptionWithCountSchema[]>(
     { url: `/orgs/${orgSlug}/events/${eventSlug}/options`, method: "GET" },
     options,
   );
@@ -3435,6 +3504,22 @@ export const postOrgsEventsOptions = (
       headers: { "Content-Type": "application/json" },
       data: createSponsoringOptionSchema,
     },
+    options,
+  );
+};
+
+/**
+ * Get a single sponsoring option with all translations and the list of validated partnerships
+ * @summary Get sponsoring option detail with partnerships
+ */
+export const getOrgsEventsOptionsById = (
+  orgSlug: string,
+  eventSlug: string,
+  optionId: string,
+  options?: SecondParameter<typeof customFetch<SponsoringOptionWithPartnershipsSchema>>,
+) => {
+  return customFetch<SponsoringOptionWithPartnershipsSchema>(
+    { url: `/orgs/${orgSlug}/events/${eventSlug}/options/${optionId}`, method: "GET" },
     options,
   );
 };
@@ -4362,11 +4447,11 @@ export type PostEventsPartnershipBillingResult = NonNullable<
 export type PutEventsPartnershipBillingResult = NonNullable<
   Awaited<ReturnType<typeof putEventsPartnershipBilling>>
 >;
-export type PostEventsPartnershipBillingInvoiceResult = NonNullable<
-  Awaited<ReturnType<typeof postEventsPartnershipBillingInvoice>>
+export type PostOrgsEventsPartnershipBillingInvoiceResult = NonNullable<
+  Awaited<ReturnType<typeof postOrgsEventsPartnershipBillingInvoice>>
 >;
-export type PostEventsPartnershipBillingQuoteResult = NonNullable<
-  Awaited<ReturnType<typeof postEventsPartnershipBillingQuote>>
+export type PostOrgsEventsPartnershipBillingQuoteResult = NonNullable<
+  Awaited<ReturnType<typeof postOrgsEventsPartnershipBillingQuote>>
 >;
 export type PostEventsPartnershipSignedAgreementResult = NonNullable<
   Awaited<ReturnType<typeof postEventsPartnershipSignedAgreement>>
@@ -4440,6 +4525,9 @@ export type GetOrgsEventsOptionsResult = NonNullable<
 >;
 export type PostOrgsEventsOptionsResult = NonNullable<
   Awaited<ReturnType<typeof postOrgsEventsOptions>>
+>;
+export type GetOrgsEventsOptionsByIdResult = NonNullable<
+  Awaited<ReturnType<typeof getOrgsEventsOptionsById>>
 >;
 export type DeleteOrgsEventsOptionsResult = NonNullable<
   Awaited<ReturnType<typeof deleteOrgsEventsOptions>>

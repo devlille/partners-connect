@@ -158,6 +158,11 @@ const sidebarLinks = computed(() => {
     to: `/${eventSlug.value}/${partnershipId.value}/job-offers`
   },
   {
+    label: 'Vos Activités',
+    icon: 'i-heroicons-calendar-days',
+    to: `/${eventSlug.value}/${partnershipId.value}/activities`
+  },
+  {
     label: 'Liens utiles',
     icon: 'i-heroicons-link',
     to: `/${eventSlug.value}/${partnershipId.value}/external-links`

@@ -1,7 +1,7 @@
-import type { SponsoringOption } from "~/utils/api";
+import type { SponsoringOptionWithTranslationsSchema } from "~/utils/api";
 
 export const useSponsoringOptions = () => {
-  const options = ref<SponsoringOption[]>([]);
+  const options = ref<SponsoringOptionWithTranslationsSchema[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
 
@@ -15,7 +15,7 @@ export const useSponsoringOptions = () => {
 
       const { getOrgsEventsOptions } = await import("~/utils/api");
       const response = await getOrgsEventsOptions(orgSlug, eventSlug);
-      options.value = response.data;
+      options.value = response.data.map((item) => item.option);
     } catch (err) {
       console.error("Failed to load sponsoring options:", err);
       error.value = "Impossible de charger les options";
@@ -27,7 +27,7 @@ export const useSponsoringOptions = () => {
   /**
    * Récupère une option par son ID
    */
-  function getOptionById(optionId: string): SponsoringOption | undefined {
+  function getOptionById(optionId: string): SponsoringOptionWithTranslationsSchema | undefined {
     return options.value.find((opt) => opt.id === optionId);
   }
 
@@ -57,5 +57,5 @@ export const useSponsoringOptions = () => {
     getOptionById,
     getOptionName,
     getOptionNames,
-  };
+  } as const;
 };

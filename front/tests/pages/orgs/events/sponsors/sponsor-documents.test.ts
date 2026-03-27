@@ -202,17 +202,19 @@ describe("Sponsor Documents Page", () => {
     describe("Generate Quote API Call", () => {
       it("should call API with correct parameters", async () => {
         const mockApi = {
-          postEventsPartnershipBillingQuote: vi.fn().mockResolvedValue({
+          postOrgsEventsPartnershipBillingQuote: vi.fn().mockResolvedValue({
             data: { id: "doc-quote-123" },
           }),
         };
 
+        const orgSlug = "test-org";
         const eventSlug = "test-event";
         const sponsorId = "sponsor-123";
 
-        await mockApi.postEventsPartnershipBillingQuote(eventSlug, sponsorId);
+        await mockApi.postOrgsEventsPartnershipBillingQuote(orgSlug, eventSlug, sponsorId);
 
-        expect(mockApi.postEventsPartnershipBillingQuote).toHaveBeenCalledWith(
+        expect(mockApi.postOrgsEventsPartnershipBillingQuote).toHaveBeenCalledWith(
+          orgSlug,
           eventSlug,
           sponsorId,
         );
@@ -221,12 +223,12 @@ describe("Sponsor Documents Page", () => {
       it("should return document ID on success", async () => {
         const expectedId = "doc-quote-456";
         const mockApi = {
-          postEventsPartnershipBillingQuote: vi.fn().mockResolvedValue({
+          postOrgsEventsPartnershipBillingQuote: vi.fn().mockResolvedValue({
             data: { id: expectedId },
           }),
         };
 
-        const result = await mockApi.postEventsPartnershipBillingQuote("event", "sponsor");
+        const result = await mockApi.postOrgsEventsPartnershipBillingQuote("event", "sponsor");
 
         expect(result.data.id).toBe(expectedId);
       });
@@ -240,13 +242,13 @@ describe("Sponsor Documents Page", () => {
 
       it("should handle 404 error when partnership not found", async () => {
         const mockApi = {
-          postEventsPartnershipBillingQuote: vi.fn().mockRejectedValue({
+          postOrgsEventsPartnershipBillingQuote: vi.fn().mockRejectedValue({
             response: { status: 404 },
           }),
         };
 
         await expect(
-          mockApi.postEventsPartnershipBillingQuote("event", "invalid-id"),
+          mockApi.postOrgsEventsPartnershipBillingQuote("event", "invalid-id"),
         ).rejects.toMatchObject({
           response: { status: 404 },
         });
@@ -254,13 +256,13 @@ describe("Sponsor Documents Page", () => {
 
       it("should handle 403 error when not authorized", async () => {
         const mockApi = {
-          postEventsPartnershipBillingQuote: vi.fn().mockRejectedValue({
+          postOrgsEventsPartnershipBillingQuote: vi.fn().mockRejectedValue({
             response: { status: 403 },
           }),
         };
 
         await expect(
-          mockApi.postEventsPartnershipBillingQuote("event", "sponsor"),
+          mockApi.postOrgsEventsPartnershipBillingQuote("event", "sponsor"),
         ).rejects.toMatchObject({
           response: { status: 403 },
         });
@@ -268,13 +270,13 @@ describe("Sponsor Documents Page", () => {
 
       it("should handle generic API error", async () => {
         const mockApi = {
-          postEventsPartnershipBillingQuote: vi.fn().mockRejectedValue({
+          postOrgsEventsPartnershipBillingQuote: vi.fn().mockRejectedValue({
             response: { status: 500 },
           }),
         };
 
         await expect(
-          mockApi.postEventsPartnershipBillingQuote("event", "sponsor"),
+          mockApi.postOrgsEventsPartnershipBillingQuote("event", "sponsor"),
         ).rejects.toMatchObject({
           response: { status: 500 },
         });
@@ -282,12 +284,14 @@ describe("Sponsor Documents Page", () => {
 
       it("should handle network error", async () => {
         const mockApi = {
-          postEventsPartnershipBillingQuote: vi.fn().mockRejectedValue(new Error("Network error")),
+          postOrgsEventsPartnershipBillingQuote: vi
+            .fn()
+            .mockRejectedValue(new Error("Network error")),
         };
 
-        await expect(mockApi.postEventsPartnershipBillingQuote("event", "sponsor")).rejects.toThrow(
-          "Network error",
-        );
+        await expect(
+          mockApi.postOrgsEventsPartnershipBillingQuote("event", "sponsor"),
+        ).rejects.toThrow("Network error");
       });
     });
 
@@ -491,17 +495,19 @@ describe("Sponsor Documents Page", () => {
     describe("Generate Invoice API Call", () => {
       it("should call API with correct parameters", async () => {
         const mockApi = {
-          postEventsPartnershipBillingInvoice: vi.fn().mockResolvedValue({
+          postOrgsEventsPartnershipBillingInvoice: vi.fn().mockResolvedValue({
             data: { id: "doc-invoice-123" },
           }),
         };
 
+        const orgSlug = "test-org";
         const eventSlug = "test-event";
         const sponsorId = "sponsor-123";
 
-        await mockApi.postEventsPartnershipBillingInvoice(eventSlug, sponsorId);
+        await mockApi.postOrgsEventsPartnershipBillingInvoice(orgSlug, eventSlug, sponsorId);
 
-        expect(mockApi.postEventsPartnershipBillingInvoice).toHaveBeenCalledWith(
+        expect(mockApi.postOrgsEventsPartnershipBillingInvoice).toHaveBeenCalledWith(
+          orgSlug,
           eventSlug,
           sponsorId,
         );
@@ -510,12 +516,12 @@ describe("Sponsor Documents Page", () => {
       it("should return document ID on success", async () => {
         const expectedId = "doc-invoice-456";
         const mockApi = {
-          postEventsPartnershipBillingInvoice: vi.fn().mockResolvedValue({
+          postOrgsEventsPartnershipBillingInvoice: vi.fn().mockResolvedValue({
             data: { id: expectedId },
           }),
         };
 
-        const result = await mockApi.postEventsPartnershipBillingInvoice("event", "sponsor");
+        const result = await mockApi.postOrgsEventsPartnershipBillingInvoice("event", "sponsor");
 
         expect(result.data.id).toBe(expectedId);
       });
@@ -529,13 +535,13 @@ describe("Sponsor Documents Page", () => {
 
       it("should handle 404 error when partnership not found", async () => {
         const mockApi = {
-          postEventsPartnershipBillingInvoice: vi.fn().mockRejectedValue({
+          postOrgsEventsPartnershipBillingInvoice: vi.fn().mockRejectedValue({
             response: { status: 404 },
           }),
         };
 
         await expect(
-          mockApi.postEventsPartnershipBillingInvoice("event", "invalid-id"),
+          mockApi.postOrgsEventsPartnershipBillingInvoice("event", "invalid-id"),
         ).rejects.toMatchObject({
           response: { status: 404 },
         });
@@ -543,13 +549,13 @@ describe("Sponsor Documents Page", () => {
 
       it("should handle 403 error when not authorized", async () => {
         const mockApi = {
-          postEventsPartnershipBillingInvoice: vi.fn().mockRejectedValue({
+          postOrgsEventsPartnershipBillingInvoice: vi.fn().mockRejectedValue({
             response: { status: 403 },
           }),
         };
 
         await expect(
-          mockApi.postEventsPartnershipBillingInvoice("event", "sponsor"),
+          mockApi.postOrgsEventsPartnershipBillingInvoice("event", "sponsor"),
         ).rejects.toMatchObject({
           response: { status: 403 },
         });
@@ -557,13 +563,13 @@ describe("Sponsor Documents Page", () => {
 
       it("should handle generic API error", async () => {
         const mockApi = {
-          postEventsPartnershipBillingInvoice: vi.fn().mockRejectedValue({
+          postOrgsEventsPartnershipBillingInvoice: vi.fn().mockRejectedValue({
             response: { status: 500 },
           }),
         };
 
         await expect(
-          mockApi.postEventsPartnershipBillingInvoice("event", "sponsor"),
+          mockApi.postOrgsEventsPartnershipBillingInvoice("event", "sponsor"),
         ).rejects.toMatchObject({
           response: { status: 500 },
         });
@@ -571,13 +577,13 @@ describe("Sponsor Documents Page", () => {
 
       it("should handle network error", async () => {
         const mockApi = {
-          postEventsPartnershipBillingInvoice: vi
+          postOrgsEventsPartnershipBillingInvoice: vi
             .fn()
             .mockRejectedValue(new Error("Network error")),
         };
 
         await expect(
-          mockApi.postEventsPartnershipBillingInvoice("event", "sponsor"),
+          mockApi.postOrgsEventsPartnershipBillingInvoice("event", "sponsor"),
         ).rejects.toThrow("Network error");
       });
     });

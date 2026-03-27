@@ -4,33 +4,92 @@
       <div class="flex items-center justify-between">
         <div>
           <BackButton :to="`/orgs/${orgSlug}/events/${eventSlug}/options`" label="Retour" />
-          <PageTitle>{{ option?.name || 'Option' }}</PageTitle>
+          <PageTitle>{{ optionDetail ? getOptionName(optionDetail.option) : 'Option' }}</PageTitle>
         </div>
       </div>
     </div>
 
-    <div class="p-6">
+    <div class="p-6 space-y-6">
       <TableSkeleton v-if="loading" :columns="4" :rows="6" />
 
       <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
         {{ error }}
       </div>
 
-      <div v-else-if="option" class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations de l'option</h2>
-        <SponsoringOptionForm :data="optionFormData" @save="onSave" />
-      </div>
+      <template v-else-if="optionDetail">
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations de l'option</h2>
+          <SponsoringOptionForm :data="optionDetail.option" @save="onSave" />
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <h2 class="text-lg font-semibold text-gray-900">Partenariats utilisant cette option</h2>
+            <UBadge
+              :color="optionDetail.partnerships.length > 0 ? 'primary' : 'neutral'"
+              variant="subtle"
+            >
+              {{ optionDetail.partnerships.length }}
+            </UBadge>
+          </div>
+
+          <div v-if="optionDetail.partnerships.length === 0" class="text-sm text-gray-500">
+            Aucun partenariat validé n'utilise cette option.
+          </div>
+
+          <table v-else class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Entreprise
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Contact
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Pack validé
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr
+                v-for="partnership in optionDetail.partnerships"
+                :key="partnership.id"
+                class="hover:bg-gray-50 cursor-pointer"
+                @click="navigateTo(`/orgs/${orgSlug}/events/${eventSlug}/sponsors/${partnership.id}`)"
+              >
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {{ partnership.company_name }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  {{ partnership.contact.first_name }} {{ partnership.contact.last_name }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  {{ partnership.validated_pack_id ? (partnership.selected_pack_name || partnership.validated_pack_id) : '—' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
     </div>
   </Dashboard>
 </template>
 
 <script setup lang="ts">
-import { getOrgsEventsOptions, putOrgsEventsOptions, type SponsoringOption } from "~/utils/api";
+import { getOrgsEventsOptionsById, putOrgsEventsOptions, type SponsoringOptionWithPartnershipsSchema } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 
 const route = useRoute();
 const router = useRouter();
 const { footerLinks } = useDashboardLinks();
+const { getOptionName } = useOptionTranslation();
 
 definePageMeta({
   middleware: authMiddleware,
@@ -52,36 +111,19 @@ const optionId = computed(() => {
   return Array.isArray(params) ? params[0] as string : params as string;
 });
 
-const option = ref<SponsoringOption | null>(null);
+const optionDetail = ref<SponsoringOptionWithPartnershipsSchema | null>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
 
 const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
-
-// Préparer les données pour le formulaire
-const optionFormData = computed(() => {
-  if (!option.value) return {};
-
-  // Passer toutes les données de l'option au formulaire
-  // Le formulaire gérera l'initialisation des traductions et des champs spécifiques
-  return option.value;
-});
 
 async function loadOption() {
   try {
     loading.value = true;
     error.value = null;
 
-    // Charger toutes les options et trouver celle qui correspond
-    const response = await getOrgsEventsOptions(orgSlug.value, eventSlug.value);
-    const found = response.data.find(o => o.id === optionId.value);
-
-    if (!found) {
-      error.value = 'Option non trouvée';
-      return;
-    }
-
-    option.value = found;
+    const response = await getOrgsEventsOptionsById(orgSlug.value, eventSlug.value, optionId.value);
+    optionDetail.value = response.data;
   } catch (err) {
     console.error('Failed to load option:', err);
     error.value = 'Impossible de charger l\'option';
@@ -94,12 +136,10 @@ async function onSave(data: any) {
   try {
     error.value = null;
 
-    // Le formulaire envoie { option: CreateSponsoringOption, selectedPacks: string[] }
     const optionData = data.option;
 
     await putOrgsEventsOptions(orgSlug.value, eventSlug.value, optionId.value, optionData);
 
-    // Rediriger vers la liste
     router.push(`/orgs/${orgSlug.value}/events/${eventSlug.value}/options`);
   } catch (err) {
     console.error('Failed to update option:', err);
@@ -116,6 +156,6 @@ watch([orgSlug, eventSlug, optionId], () => {
 });
 
 useHead({
-  title: computed(() => `${option.value?.name || 'Option'} | DevLille`)
+  title: computed(() => `${optionDetail.value ? getOptionName(optionDetail.value.option) : 'Option'} | DevLille`)
 });
 </script>

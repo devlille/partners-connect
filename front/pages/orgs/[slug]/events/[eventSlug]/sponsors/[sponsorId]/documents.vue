@@ -449,8 +449,9 @@ async function handleGenerateQuote() {
 
   await generateDocument(
     async () => {
-      const { postEventsPartnershipBillingQuote } = await import('~/utils/api');
-      return await postEventsPartnershipBillingQuote(
+      const { postOrgsEventsPartnershipBillingQuote } = await import('~/utils/api');
+      return await postOrgsEventsPartnershipBillingQuote(
+        orgSlug.value,
         eventSlug.value,
         sponsorId.value
       );
@@ -472,8 +473,9 @@ async function handleGenerateInvoice() {
 
   await generateDocument(
     async () => {
-      const { postEventsPartnershipBillingInvoice } = await import('~/utils/api');
-      return await postEventsPartnershipBillingInvoice(
+      const { postOrgsEventsPartnershipBillingInvoice } = await import('~/utils/api');
+      return await postOrgsEventsPartnershipBillingInvoice(
+        orgSlug.value,
         eventSlug.value,
         sponsorId.value
       );

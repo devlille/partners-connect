@@ -3,6 +3,8 @@ import type { SponsoringOption, DefinitionsTranslatedLabel } from "~/utils/api";
 // Type pour les traductions sous forme d'objet (dictionnaire)
 type TranslationsDict = Record<string, DefinitionsTranslatedLabel>;
 
+type OptionLike = { translations?: TranslationsDict; name?: string; description?: string };
+
 /**
  * Composable pour gérer les traductions des options de sponsoring
  * Centralise la logique d'extraction du nom traduit
@@ -13,9 +15,7 @@ export const useOptionTranslation = () => {
    * @param option - L'option de sponsoring
    * @returns Le nom traduit ou un fallback
    */
-  const getOptionName = (
-    option: SponsoringOption | (SponsoringOption & { translations?: TranslationsDict }),
-  ): string => {
+  const getOptionName = (option: SponsoringOption | OptionLike): string => {
     // Si l'option a des traductions (objet avec langues comme clés)
     if (
       "translations" in option &&
@@ -41,9 +41,7 @@ export const useOptionTranslation = () => {
    * @param option - L'option de sponsoring
    * @returns La description traduite ou null
    */
-  const getOptionDescription = (
-    option: SponsoringOption | (SponsoringOption & { translations?: TranslationsDict }),
-  ): string | null => {
+  const getOptionDescription = (option: SponsoringOption | OptionLike): string | null => {
     // Si l'option a des traductions (objet avec langues comme clés)
     if (
       "translations" in option &&

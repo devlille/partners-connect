@@ -22,9 +22,8 @@
 </template>
 
 <script setup lang="ts">
-import { getOrgsEventsPartnership } from '~/utils/api';
+import { getEventsPartnershipDetailed } from '~/utils/api';
 import authMiddleware from '~/middleware/auth';
-import type { ExtendedPartnershipItem } from '~/types/partnership';
 
 const route = useRoute();
 const { footerLinks } = useDashboardLinks();
@@ -49,7 +48,7 @@ const sponsorId = computed(() => {
   return Array.isArray(params) ? params[0] as string : params as string;
 });
 
-const partnership = ref<ExtendedPartnershipItem | null>(null);
+const partnership = ref<{ company_name: string } | null>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
 
@@ -59,14 +58,8 @@ async function loadPartnership() {
   try {
     loading.value = true;
     error.value = null;
-    const response = await getOrgsEventsPartnership(orgSlug.value, eventSlug.value);
-    const items = Array.isArray(response.data) ? response.data : response.data.items;
-    const found = items.find((p) => p.id === sponsorId.value);
-    if (!found) {
-      error.value = 'Sponsor non trouvé';
-      return;
-    }
-    partnership.value = found;
+    const response = await getEventsPartnershipDetailed(eventSlug.value, sponsorId.value);
+    partnership.value = { company_name: response.data.company.name };
   } catch {
     error.value = 'Impossible de charger les informations du sponsor';
   } finally {

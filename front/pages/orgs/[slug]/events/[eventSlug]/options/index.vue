@@ -126,6 +126,11 @@
                   Prix
                 </th>
                 <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Partenariats
+                </th>
+                <th
                   class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Actions
@@ -133,20 +138,28 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="option in filteredOptions" :key="option.id" class="hover:bg-gray-50">
+              <tr v-for="item in filteredOptions" :key="item.option.id" class="hover:bg-gray-50">
                 <td
                   class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 cursor-pointer"
-                  @click="onRowClick(option)"
+                  @click="onRowClick(item)"
                 >
-                  {{ getOptionName(option) }}
+                  {{ getOptionName(item.option) }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  <span :class="getTypeClass(option.type)">
-                    {{ getTypeLabel(option.type) }}
+                  <span :class="getTypeClass(item.option.type)">
+                    {{ getTypeLabel(item.option.type) }}
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ formatPrice(option) }}
+                  {{ formatPrice(item.option) }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  <UBadge
+                    :color="item.partnership_count > 0 ? 'primary' : 'neutral'"
+                    variant="subtle"
+                  >
+                    {{ item.partnership_count }}
+                  </UBadge>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <UButton
@@ -154,8 +167,8 @@
                     variant="ghost"
                     size="sm"
                     icon="i-heroicons-trash"
-                    :loading="deletingOptionId === option.id"
-                    @click.stop="confirmDelete(option)"
+                    :loading="deletingOptionId === item.option.id"
+                    @click.stop="confirmDelete(item)"
                   >
                     Supprimer
                   </UButton>
@@ -182,7 +195,7 @@
           <div class="px-6 py-4 space-y-4">
             <p class="text-sm text-gray-700">
               Êtes-vous sûr de vouloir supprimer l'option
-              <strong>{{ optionToDelete ? getOptionName(optionToDelete) : '' }}</strong> ?
+              <strong>{{ optionToDelete ? getOptionName(optionToDelete.option) : '' }}</strong> ?
             </p>
             <p class="text-sm text-gray-500">Cette action est irréversible.</p>
           </div>
@@ -207,7 +220,7 @@
 </template>
 
 <script setup lang="ts">
-import { getOrgsEventsOptions, getEventBySlug, deleteOrgsEventsOptions, type SponsoringOption } from "~/utils/api";
+import { getOrgsEventsOptions, getEventBySlug, deleteOrgsEventsOptions, type SponsoringOptionWithCountSchema } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 
 const route = useRoute();
@@ -228,7 +241,7 @@ const eventSlug = computed(() => {
   return Array.isArray(params) ? params[1] as string : params as string;
 });
 
-const options = ref<SponsoringOption[]>([]);
+const options = ref<SponsoringOptionWithCountSchema[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const eventName = ref<string>('');
@@ -241,7 +254,7 @@ const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
 const { getOptionName } = useOptionTranslation();
 
 const isDeleteModalOpen = ref(false);
-const optionToDelete = ref<SponsoringOption | null>(null);
+const optionToDelete = ref<SponsoringOptionWithCountSchema | null>(null);
 const deletingOptionId = ref<string | null>(null);
 
 // Options filtrées
@@ -251,15 +264,15 @@ const filteredOptions = computed(() => {
   // Filtre par recherche textuelle
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase().trim();
-    filtered = filtered.filter(option => {
-      const name = getOptionName(option).toLowerCase();
+    filtered = filtered.filter(item => {
+      const name = getOptionName(item.option).toLowerCase();
       return name.includes(query);
     });
   }
 
   // Filtre par type
   if (selectedType.value) {
-    filtered = filtered.filter(option => option.type === selectedType.value);
+    filtered = filtered.filter(item => item.option.type === selectedType.value);
   }
 
   return filtered;
@@ -317,13 +330,13 @@ function getTypeClass(type: string): string {
   return typeClasses[type] || defaultClass;
 }
 
-function formatPrice(option: SponsoringOption): string {
+function formatPrice(option: SponsoringOptionWithCountSchema['option']): string {
   // Pour typed_selectable, afficher "Variable" car le prix dépend de la sélection
   if (option.type === 'typed_selectable') {
     return 'Variable';
   }
   // Pour typed_number, afficher le prix avec la quantité
-  if (option.type === 'typed_number' && 'fixed_quantity' in option) {
+  if (option.type === 'typed_number' && option.fixed_quantity != null) {
     const price = option.price ? `${option.price}€` : 'Gratuit';
     return `${price} (×${option.fixed_quantity})`;
   }
@@ -331,12 +344,12 @@ function formatPrice(option: SponsoringOption): string {
   return option.price ? `${option.price}€` : 'Gratuit';
 }
 
-function onRowClick(row: SponsoringOption) {
-  navigateTo(`/orgs/${orgSlug.value}/events/${eventSlug.value}/options/${row.id}`);
+function onRowClick(item: SponsoringOptionWithCountSchema) {
+  navigateTo(`/orgs/${orgSlug.value}/events/${eventSlug.value}/options/${item.option.id}`);
 }
 
-function confirmDelete(option: SponsoringOption) {
-  optionToDelete.value = option;
+function confirmDelete(item: SponsoringOptionWithCountSchema) {
+  optionToDelete.value = item;
   isDeleteModalOpen.value = true;
 }
 
@@ -344,9 +357,9 @@ async function handleDelete() {
   if (!optionToDelete.value) return;
 
   try {
-    deletingOptionId.value = optionToDelete.value.id;
+    deletingOptionId.value = optionToDelete.value.option.id;
 
-    await deleteOrgsEventsOptions(orgSlug.value, eventSlug.value, optionToDelete.value.id);
+    await deleteOrgsEventsOptions(orgSlug.value, eventSlug.value, optionToDelete.value.option.id);
 
     // Recharger la liste
     await loadOptions();
