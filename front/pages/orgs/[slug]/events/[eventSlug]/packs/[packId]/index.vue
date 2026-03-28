@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { getEventBySlug, getOrgsEventsPacks, putOrgsEventsPacks, getOrgsEventsOptions, postOrgsEventsPacksOptions, type SponsoringPack, type CreateSponsoringPack, type SponsoringOption } from "~/utils/api";
+import { getEventBySlug, getOrgsEventsPacks, putOrgsEventsPacks, postOrgsEventsPacksOptions, type SponsoringPack, type CreateSponsoringPack, type SponsoringOption } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 
 const route = useRoute();
@@ -53,7 +53,6 @@ const eventSlug = computed(() => {
 const packId = computed(() => route.params.packId as string);
 
 const pack = ref<SponsoringPack | null>(null);
-const options = ref<SponsoringOption[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const eventName = ref<string>('');
@@ -68,6 +67,12 @@ const initialRequiredOptions = computed(() => {
 
 const initialOptionalOptions = computed(() => {
   return pack.value?.optional_options.map(o => o.id) || [];
+});
+
+// Derive available options from the pack's own required and optional options
+const options = computed(() => {
+  if (!pack.value) return [];
+  return [...pack.value.required_options, ...pack.value.optional_options];
 });
 
 // Convertir SponsoringPack en CreateSponsoringPack pour le formulaire
@@ -97,14 +102,12 @@ async function loadPack() {
     error.value = null;
 
     // Charger toutes les données en parallèle
-    const [eventResponse, packsResponse, optionsResponse] = await Promise.all([
+    const [eventResponse, packsResponse] = await Promise.all([
       getEventBySlug(eventSlug.value),
-      getOrgsEventsPacks(orgSlug.value, eventSlug.value),
-      getOrgsEventsOptions(orgSlug.value, eventSlug.value)
+      getOrgsEventsPacks(orgSlug.value, eventSlug.value)
     ]);
 
     eventName.value = eventResponse.data.event.name;
-    options.value = optionsResponse.data;
 
     // Trouver le pack correspondant
     const foundPack = packsResponse.data.find(p => p.id === packId.value);
