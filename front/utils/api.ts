@@ -2224,12 +2224,6 @@ export type GetStatusIntegration401 = {
   status?: boolean;
 };
 
-export type DeleteOrgsEventsOptions204 = { [key: string]: unknown };
-
-export type DeleteOrgsEventsPacks204 = { [key: string]: unknown };
-
-export type DeleteOrgsEventsPacksOptions204 = { [key: string]: unknown };
-
 export type GetOrgsEventsPartnershipParams = {
 /**
  * Filter by sponsoring pack ID
@@ -2507,11 +2501,10 @@ export const getAuthMe = (
  */
 export const getCompanies = (
     params?: GetCompaniesParams,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
+ options?: SecondParameter<typeof customFetch<PaginatedCompanySchema>>,) => {
+      return customFetch<PaginatedCompanySchema>(
       {url: `/companies`, method: 'GET',
-        params,
-        responseType: 'blob'
+        params
     },
       options);
     }
@@ -2522,12 +2515,11 @@ export const getCompanies = (
  */
 export const postCompanies = (
     createCompanySchema: CreateCompanySchema,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
+ options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
+      return customFetch<IdentifierSchema>(
       {url: `/companies`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: createCompanySchema,
-        responseType: 'blob'
+      data: createCompanySchema
     },
       options);
     }
@@ -2599,10 +2591,9 @@ if(postCompaniesLogoBody.file !== undefined) {
  */
 export const getCompaniesPartnership = (
     companyId: string,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
-      {url: `/companies/${companyId}/partnerships`, method: 'GET',
-        responseType: 'blob'
+ options?: SecondParameter<typeof customFetch<PartnershipItemSchema[]>>,) => {
+      return customFetch<PartnershipItemSchema[]>(
+      {url: `/companies/${companyId}/partnerships`, method: 'GET'
     },
       options);
     }
@@ -2722,11 +2713,10 @@ export const listJobOfferPromotions = (
  */
 export const getEvents = (
     params?: GetEventsParams,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
+ options?: SecondParameter<typeof customFetch<PaginatedEventSummarySchema>>,) => {
+      return customFetch<PaginatedEventSummarySchema>(
       {url: `/events`, method: 'GET',
-        params,
-        responseType: 'blob'
+        params
     },
       options);
     }
@@ -2776,12 +2766,11 @@ export const getEventsSponsoringPacks = (
 export const postEventsPartnership = (
     eventSlug: string,
     registerPartnershipSchema: RegisterPartnershipSchema,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
+ options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
+      return customFetch<IdentifierSchema>(
       {url: `/events/${eventSlug}/partnerships`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: registerPartnershipSchema,
-        responseType: 'blob'
+      data: registerPartnershipSchema
     },
       options);
     }
@@ -2846,12 +2835,11 @@ export const postEventsPartnershipBilling = (
     eventSlug: string,
     partnershipId: string,
     companyBillingDataSchema: CompanyBillingDataSchema,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
+ options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
+      return customFetch<IdentifierSchema>(
       {url: `/events/${eventSlug}/partnerships/${partnershipId}/billing`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: companyBillingDataSchema,
-        responseType: 'blob'
+      data: companyBillingDataSchema
     },
       options);
     }
@@ -2863,12 +2851,11 @@ export const putEventsPartnershipBilling = (
     eventSlug: string,
     partnershipId: string,
     companyBillingDataSchema: CompanyBillingDataSchema,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
+ options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
+      return customFetch<IdentifierSchema>(
       {url: `/events/${eventSlug}/partnerships/${partnershipId}/billing`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
-      data: companyBillingDataSchema,
-        responseType: 'blob'
+      data: companyBillingDataSchema
     },
       options);
     }
@@ -2881,10 +2868,9 @@ export const postOrgsEventsPartnershipBillingInvoice = (
     orgSlug: string,
     eventSlug: string,
     partnershipId: string,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/billing/invoice`, method: 'POST',
-        responseType: 'blob'
+ options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
+      return customFetch<IdentifierSchema>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/billing/invoice`, method: 'POST'
     },
       options);
     }
@@ -2897,10 +2883,9 @@ export const postOrgsEventsPartnershipBillingQuote = (
     orgSlug: string,
     eventSlug: string,
     partnershipId: string,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/billing/quote`, method: 'POST',
-        responseType: 'blob'
+ options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
+      return customFetch<IdentifierSchema>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/billing/quote`, method: 'POST'
     },
       options);
     }
@@ -2931,10 +2916,9 @@ if(postEventsPartnershipSignedAgreementBody.file !== undefined) {
 export const postEventsPartnershipSuggestionApprove = (
     eventSlug: string,
     partnershipId: string,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
-      {url: `/events/${eventSlug}/partnerships/${partnershipId}/suggestion-approve`, method: 'POST',
-        responseType: 'blob'
+ options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
+      return customFetch<IdentifierSchema>(
+      {url: `/events/${eventSlug}/partnerships/${partnershipId}/suggestion-approve`, method: 'POST'
     },
       options);
     }
@@ -2945,10 +2929,9 @@ export const postEventsPartnershipSuggestionApprove = (
 export const postEventsPartnershipSuggestionDecline = (
     eventSlug: string,
     partnershipId: string,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
-      {url: `/events/${eventSlug}/partnerships/${partnershipId}/suggestion-decline`, method: 'POST',
-        responseType: 'blob'
+ options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
+      return customFetch<IdentifierSchema>(
+      {url: `/events/${eventSlug}/partnerships/${partnershipId}/suggestion-decline`, method: 'POST'
     },
       options);
     }
@@ -2959,10 +2942,9 @@ export const postEventsPartnershipSuggestionDecline = (
 export const getEventsPartnershipTickets = (
     eventSlug: string,
     partnershipId: string,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
-      {url: `/events/${eventSlug}/partnerships/${partnershipId}/tickets`, method: 'GET',
-        responseType: 'blob'
+ options?: SecondParameter<typeof customFetch<TicketSchema[]>>,) => {
+      return customFetch<TicketSchema[]>(
+      {url: `/events/${eventSlug}/partnerships/${partnershipId}/tickets`, method: 'GET'
     },
       options);
     }
@@ -2974,12 +2956,11 @@ export const postEventsPartnershipTickets = (
     eventSlug: string,
     partnershipId: string,
     ticketDataSchema: TicketDataSchema[],
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
+ options?: SecondParameter<typeof customFetch<TicketOrderSchema>>,) => {
+      return customFetch<TicketOrderSchema>(
       {url: `/events/${eventSlug}/partnerships/${partnershipId}/tickets`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: ticketDataSchema,
-        responseType: 'blob'
+      data: ticketDataSchema
     },
       options);
     }
@@ -2992,12 +2973,11 @@ export const putEventsPartnershipTickets = (
     partnershipId: string,
     ticketId: string,
     ticketDataSchema: TicketDataSchema,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
+ options?: SecondParameter<typeof customFetch<TicketSchema>>,) => {
+      return customFetch<TicketSchema>(
       {url: `/events/${eventSlug}/partnerships/${partnershipId}/tickets/${ticketId}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
-      data: ticketDataSchema,
-        responseType: 'blob'
+      data: ticketDataSchema
     },
       options);
     }
@@ -3142,12 +3122,11 @@ export const postProviders = (
  */
 export const postOrgs = (
     organisationSchema: OrganisationSchema,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
+ options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
+      return customFetch<IdentifierSchema>(
       {url: `/orgs`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: organisationSchema,
-        responseType: 'blob'
+      data: organisationSchema
     },
       options);
     }
@@ -3157,10 +3136,9 @@ export const postOrgs = (
  */
 export const getOrgs = (
     orgSlug: string,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
-      {url: `/orgs/${orgSlug}`, method: 'GET',
-        responseType: 'blob'
+ options?: SecondParameter<typeof customFetch<OrganisationSchema>>,) => {
+      return customFetch<OrganisationSchema>(
+      {url: `/orgs/${orgSlug}`, method: 'GET'
     },
       options);
     }
@@ -3171,12 +3149,11 @@ export const getOrgs = (
 export const putOrgs = (
     orgSlug: string,
     organisationSchema: OrganisationSchema,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
+ options?: SecondParameter<typeof customFetch<OrganisationSchema>>,) => {
+      return customFetch<OrganisationSchema>(
       {url: `/orgs/${orgSlug}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
-      data: organisationSchema,
-        responseType: 'blob'
+      data: organisationSchema
     },
       options);
     }
@@ -3266,12 +3243,11 @@ export const putOrgsEvents = (
     orgSlug: string,
     eventSlug: string,
     createEventSchema: CreateEventSchema,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
+ options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
+      return customFetch<IdentifierSchema>(
       {url: `/orgs/${orgSlug}/events/${eventSlug}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
-      data: createEventSchema,
-        responseType: 'blob'
+      data: createEventSchema
     },
       options);
     }
@@ -3412,10 +3388,9 @@ export const deleteOrgsEventsOptions = (
     orgSlug: string,
     eventSlug: string,
     optionId: string,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/options/${optionId}`, method: 'DELETE',
-        responseType: 'blob'
+ options?: SecondParameter<typeof customFetch<void>>,) => {
+      return customFetch<void>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/options/${optionId}`, method: 'DELETE'
     },
       options);
     }
@@ -3428,12 +3403,11 @@ export const putOrgsEventsOptions = (
     eventSlug: string,
     optionId: string,
     createSponsoringOptionSchema: CreateSponsoringOptionSchema,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
+ options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
+      return customFetch<IdentifierSchema>(
       {url: `/orgs/${orgSlug}/events/${eventSlug}/options/${optionId}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
-      data: createSponsoringOptionSchema,
-        responseType: 'blob'
+      data: createSponsoringOptionSchema
     },
       options);
     }
@@ -3476,10 +3450,9 @@ export const deleteOrgsEventsPacks = (
     orgSlug: string,
     eventSlug: string,
     packId: string,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/packs/${packId}`, method: 'DELETE',
-        responseType: 'blob'
+ options?: SecondParameter<typeof customFetch<void>>,) => {
+      return customFetch<void>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/packs/${packId}`, method: 'DELETE'
     },
       options);
     }
@@ -3492,12 +3465,11 @@ export const putOrgsEventsPacks = (
     eventSlug: string,
     packId: string,
     createSponsoringPackSchema: CreateSponsoringPackSchema,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
+ options?: SecondParameter<typeof customFetch<IdentifierSchema>>,) => {
+      return customFetch<IdentifierSchema>(
       {url: `/orgs/${orgSlug}/events/${eventSlug}/packs/${packId}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
-      data: createSponsoringPackSchema,
-        responseType: 'blob'
+      data: createSponsoringPackSchema
     },
       options);
     }
@@ -3540,10 +3512,9 @@ export const deleteOrgsEventsPacksOptions = (
     eventSlug: string,
     packId: string,
     optionId: string,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
-      {url: `/orgs/${orgSlug}/events/${eventSlug}/packs/${packId}/options/${optionId}`, method: 'DELETE',
-        responseType: 'blob'
+ options?: SecondParameter<typeof customFetch<void>>,) => {
+      return customFetch<void>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/packs/${packId}/options/${optionId}`, method: 'DELETE'
     },
       options);
     }
@@ -4065,10 +4036,9 @@ export const deleteOrgsEventsProviders = (
  */
 export const getOrgsUsers = (
     orgSlug: string,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
-      {url: `/orgs/${orgSlug}/users`, method: 'GET',
-        responseType: 'blob'
+ options?: SecondParameter<typeof customFetch<UserSchema[]>>,) => {
+      return customFetch<UserSchema[]>(
+      {url: `/orgs/${orgSlug}/users`, method: 'GET'
     },
       options);
     }
@@ -4079,12 +4049,11 @@ export const getOrgsUsers = (
 export const postOrgsUsersGrant = (
     orgSlug: string,
     grantPermissionRequestSchema: GrantPermissionRequestSchema,
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
+ options?: SecondParameter<typeof customFetch<string>>,) => {
+      return customFetch<string>(
       {url: `/orgs/${orgSlug}/users/grant`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: grantPermissionRequestSchema,
-        responseType: 'blob'
+      data: grantPermissionRequestSchema
     },
       options);
     }
@@ -4125,10 +4094,9 @@ export const postDigestJob = (
  */
 export const getUsersMeEvents = (
 
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
-      {url: `/users/me/events`, method: 'GET',
-        responseType: 'blob'
+ options?: SecondParameter<typeof customFetch<EventSummarySchema[]>>,) => {
+      return customFetch<EventSummarySchema[]>(
+      {url: `/users/me/events`, method: 'GET'
     },
       options);
     }
@@ -4138,10 +4106,9 @@ export const getUsersMeEvents = (
  */
 export const getUsersMeOrgs = (
 
- options?: SecondParameter<typeof customFetch<Blob>>,) => {
-      return customFetch<Blob>(
-      {url: `/users/me/orgs`, method: 'GET',
-        responseType: 'blob'
+ options?: SecondParameter<typeof customFetch<OrganisationItemSchema[]>>,) => {
+      return customFetch<OrganisationItemSchema[]>(
+      {url: `/users/me/orgs`, method: 'GET'
     },
       options);
     }

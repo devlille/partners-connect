@@ -122,7 +122,7 @@ paths:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/paginated_company.schema'
     post:
@@ -141,7 +141,7 @@ paths:
         '201':
           description: Created
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/identifier.schema'
   /companies/{companyId}:
@@ -310,7 +310,7 @@ paths:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 type: array
                 items:
@@ -726,7 +726,7 @@ paths:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/paginated_event_summary.schema'
   /events/{eventSlug}:
@@ -853,7 +853,7 @@ paths:
         '201':
           description: Created
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/identifier.schema'
         '400':
@@ -1023,7 +1023,7 @@ paths:
         '201':
           description: Created
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/identifier.schema'
         '400':
@@ -1059,7 +1059,7 @@ paths:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/identifier.schema'
         '400':
@@ -1099,7 +1099,7 @@ paths:
         '201':
           description: Created
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/identifier.schema'
         '400':
@@ -1145,7 +1145,7 @@ paths:
         '201':
           description: Created
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/identifier.schema'
         '400':
@@ -1224,7 +1224,7 @@ paths:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/identifier.schema'
         '400':
@@ -1255,7 +1255,7 @@ paths:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/identifier.schema'
         '400':
@@ -1286,7 +1286,7 @@ paths:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 type: array
                 items:
@@ -1326,7 +1326,7 @@ paths:
         '201':
           description: Created
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/ticket_order.schema'
         '400':
@@ -1368,7 +1368,7 @@ paths:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/ticket.schema'
         '400':
@@ -1855,7 +1855,7 @@ paths:
         '201':
           description: Created
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/identifier.schema'
   /orgs/{orgSlug}:
@@ -1875,7 +1875,7 @@ paths:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/organisation.schema'
         '400':
@@ -1906,7 +1906,7 @@ paths:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/organisation.schema'
         '400':
@@ -2185,7 +2185,7 @@ paths:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/identifier.schema'
         '400':
@@ -2624,10 +2624,6 @@ paths:
       responses:
         '204':
           description: No Content
-          content:
-            '*/*':
-              schema:
-                type: object
         '400':
           description: Bad Request
           content:
@@ -2666,7 +2662,7 @@ paths:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/identifier.schema'
         '400':
@@ -2788,10 +2784,6 @@ paths:
       responses:
         '204':
           description: No Content
-          content:
-            '*/*':
-              schema:
-                type: object
         '400':
           description: Bad Request
           content:
@@ -2830,7 +2822,7 @@ paths:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/identifier.schema'
         '400':
@@ -2944,10 +2936,6 @@ paths:
       responses:
         '204':
           description: No Content
-          content:
-            '*/*':
-              schema:
-                type: object
         '400':
           description: Bad Request
           content:
@@ -4881,7 +4869,7 @@ paths:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 type: array
                 items:
@@ -4915,7 +4903,7 @@ paths:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 type: string
               examples:
@@ -5031,7 +5019,7 @@ paths:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 type: array
                 items:
@@ -5047,7 +5035,7 @@ paths:
         '200':
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 type: array
                 items:
