@@ -85,6 +85,48 @@ Use union types — **NEVER use `nullable: true`** (not OpenAPI 3.1.0 compliant)
 }
 ```
 
+### Response content type
+
+**NEVER use `'*/*'`** as the content type for responses returning JSON. Using `'*/*'` causes the frontend code generator (Orval) to treat the response as a `Blob` instead of parsed JSON, breaking data binding.
+
+```yaml
+# ✅ CORRECT — explicit JSON content type
+responses:
+  "200":
+    description: "OK"
+    content:
+      application/json:
+        schema:
+          $ref: "#/components/schemas/YourSchema"
+
+# ❌ WRONG — causes Blob response in generated client
+responses:
+  "200":
+    description: "OK"
+    content:
+      '*/*':
+        schema:
+          $ref: "#/components/schemas/YourSchema"
+```
+
+For `204 No Content` responses, do **not** include a `content` block at all:
+
+```yaml
+# ✅ CORRECT — no body for 204
+responses:
+  "204":
+    description: "No Content"
+
+# ❌ WRONG — 204 should not have a content block
+responses:
+  "204":
+    description: "No Content"
+    content:
+      application/json:
+        schema:
+          type: "object"
+```
+
 ### Cross-references between schemas
 
 Use relative file references (same directory):
@@ -245,7 +287,7 @@ Use `oneOf` with a discriminator `const` field:
       "201":
         description: "Created"
         content:
-          '*/*':
+          application/json:
             schema:
               $ref: "#/components/schemas/Identifier"
 ```
@@ -441,4 +483,6 @@ If `npm run validate` reports errors, fix the `openapi.yaml` or schema files and
 - Missing `operationId` on a path operation
 - Schema `$ref` pointing to a non-existent file
 - Using `nullable: true` instead of union types
+- Using `'*/*'` content type instead of `application/json`
+- Adding `content` block to `204 No Content` responses
 - Missing `security` declaration on an operation
