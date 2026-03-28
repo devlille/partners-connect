@@ -8,6 +8,17 @@
         </div>
         <div class="flex gap-3">
           <UButton
+            v-if="webhookEnabled"
+            color="neutral"
+            variant="outline"
+            :loading="triggeringWebhook"
+            :aria-label="`Déclencher le webhook pour ${partnership?.company_name || 'ce sponsor'}`"
+            @click="handleTriggerWebhook"
+          >
+            <i class="i-heroicons-arrow-path mr-2" aria-hidden="true" />
+            Déclencher le webhook
+          </UButton>
+          <UButton
             color="neutral"
             variant="outline"
             :to="`/${eventSlug}/${sponsorId}`"
@@ -500,7 +511,7 @@
 
 <script setup lang="ts">
 import DOMPurify from 'dompurify';
-import { getEventsPartnershipDetailed, getEventsPartnershipBilling, updatePartnershipContactInfo, postOrgsEventsPartnershipSuggestion, postOrgsEventsPartnershipBilling, postPartnershipOrganiser, deletePartnershipOrganiser, getOrgsUsers, getPartnershipEmailHistory, putPartnershipPricing, type UserSchema, type CompanyBillingDataSchema } from "~/utils/api";
+import { getEventsPartnershipDetailed, getEventsPartnershipBilling, updatePartnershipContactInfo, postOrgsEventsPartnershipSuggestion, postOrgsEventsPartnershipBilling, postPartnershipOrganiser, deletePartnershipOrganiser, getOrgsUsers, getPartnershipEmailHistory, putPartnershipPricing, getOrgsEventsIntegrations, postPartnershipTriggerWebhook, type UserSchema, type CompanyBillingDataSchema } from "~/utils/api";
 
 interface EmailRecipient {
   value: string;
@@ -577,6 +588,10 @@ const loadingUsers = ref(false);
 const isAssigning = ref(false);
 const isUnassigning = ref(false);
 const assignError = ref<string | null>(null);
+
+// État pour le webhook
+const webhookEnabled = ref(false);
+const triggeringWebhook = ref(false);
 
 // États pour l'historique des emails
 const emailHistory = ref<EmailHistoryItem[]>([]);
@@ -940,6 +955,51 @@ function getInitials(name: string): string {
 }
 
 /**
+ * Charger les intégrations pour vérifier si le webhook est activé
+ */
+async function loadIntegrations() {
+  try {
+    const response = await getOrgsEventsIntegrations(orgSlug.value, eventSlug.value);
+    webhookEnabled.value = response.data.some(
+      (integration) => integration.provider === 'webhook' && integration.usage === 'webhook'
+    );
+  } catch (err) {
+    console.error('Failed to load integrations:', err);
+    webhookEnabled.value = false;
+  }
+}
+
+/**
+ * Déclencher le webhook pour ce partenariat
+ */
+async function handleTriggerWebhook() {
+  if (!partnership.value) return;
+
+  try {
+    triggeringWebhook.value = true;
+    await postPartnershipTriggerWebhook(
+      orgSlug.value,
+      eventSlug.value,
+      sponsorId.value
+    );
+    toast.add({
+      title: 'Succès',
+      description: 'Le webhook a été déclenché avec succès.',
+      color: 'green'
+    });
+  } catch (err) {
+    console.error('Failed to trigger webhook:', err);
+    toast.add({
+      title: 'Erreur',
+      description: 'Impossible de déclencher le webhook.',
+      color: 'red'
+    });
+  } finally {
+    triggeringWebhook.value = false;
+  }
+}
+
+/**
  * Charger les utilisateurs de l'organisation
  */
 async function loadOrgUsers() {
@@ -1199,6 +1259,7 @@ onMounted(() => {
   loadBilling();
   loadOrgUsers();
   loadEmailHistory();
+  loadIntegrations();
 });
 
 // Recharger si les slugs changent
@@ -1206,6 +1267,7 @@ watch([orgSlug, eventSlug, sponsorId], () => {
   loadPartnership();
   loadBilling();
   loadEmailHistory();
+  loadIntegrations();
 });
 
 useHead({
