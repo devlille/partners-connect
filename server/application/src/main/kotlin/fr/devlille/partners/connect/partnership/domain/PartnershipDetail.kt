@@ -28,6 +28,8 @@ data class PartnershipDetail(
     @SerialName("created_at")
     val createdAt: String,
     val currency: String = "EUR",
+    @SerialName("booth_location")
+    val boothLocation: String? = null,
 )
 
 fun PartnershipDetail.link(

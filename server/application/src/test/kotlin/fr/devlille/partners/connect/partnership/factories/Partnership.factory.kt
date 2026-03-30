@@ -33,6 +33,7 @@ fun insertMockedPartnership(
     communicationSupportUrl: String? = null,
     organiserId: UUID? = null,
     packPriceOverride: Int? = null,
+    boothLocation: String? = null,
 ): PartnershipEntity = PartnershipEntity.new(id) {
     this.event = EventEntity[eventId]
     this.company = CompanyEntity[companyId]
@@ -53,6 +54,7 @@ fun insertMockedPartnership(
     this.communicationSupportUrl = communicationSupportUrl
     this.organiser = organiserId?.let { UserEntity[it] }
     this.packPriceOverride = packPriceOverride
+    this.boothLocation = boothLocation
 }
 
 fun insertMockedOptionPartnership(
