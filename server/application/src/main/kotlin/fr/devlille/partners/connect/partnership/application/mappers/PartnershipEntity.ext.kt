@@ -50,6 +50,7 @@ fun PartnershipEntity.toDetailedDomain(
     createdAt = createdAt.toString(),
     organiser = organiser?.toDomain(),
     currency = "EUR",
+    boothLocation = boothLocation,
 )
 
 fun PartnershipEntity.toProcessStatus(billing: BillingEntity?): PartnershipProcessStatus = PartnershipProcessStatus(

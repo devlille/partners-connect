@@ -18,6 +18,8 @@ import io.ktor.server.testing.testApplication
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
@@ -124,5 +126,84 @@ class PartnershipDetailedRouteGetTest {
         val response = client.get("/events/${UUID.randomUUID()}/partnerships/$partnershipId")
 
         assertEquals(HttpStatusCode.NotFound, response.status)
+    }
+
+    @Test
+    fun `GET detailed partnership returns booth_location when set`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val partnershipId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId = userId)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyId)
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedPartnership(
+                    id = partnershipId,
+                    eventId = eventId,
+                    companyId = companyId,
+                    selectedPackId = packId,
+                    boothLocation = "A-12",
+                )
+                insertMockedBilling(eventId, partnershipId)
+            }
+        }
+
+        val response = client.get("/events/$eventId/partnerships/$partnershipId") {
+            header(HttpHeaders.Accept, "application/json")
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val responseBody = response.bodyAsText()
+        assertTrue(responseBody.contains("\"booth_location\""))
+        assertTrue(responseBody.contains("A-12"))
+    }
+
+    @Test
+    fun `GET detailed partnership returns null booth_location when not set`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val partnershipId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId = userId)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyId)
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedPartnership(
+                    id = partnershipId,
+                    eventId = eventId,
+                    companyId = companyId,
+                    selectedPackId = packId,
+                )
+                insertMockedBilling(eventId, partnershipId)
+            }
+        }
+
+        val response = client.get("/events/$eventId/partnerships/$partnershipId") {
+            header(HttpHeaders.Accept, "application/json")
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val responseBody = response.bodyAsText()
+        val json = Json.parseToJsonElement(responseBody).jsonObject
+        val partnership = json["partnership"]!!.jsonObject
+        val boothLocation = partnership["booth_location"]
+        assertTrue(boothLocation == null || boothLocation.toString() == "null")
     }
 }

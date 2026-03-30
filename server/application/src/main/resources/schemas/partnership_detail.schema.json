@@ -62,6 +62,9 @@
       "type": "string",
       "enum": ["EUR"],
       "default": "EUR"
+    },
+    "booth_location": {
+      "type": ["string", "null"]
     }
   },
   "required": [
