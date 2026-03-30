@@ -40,6 +40,11 @@ export const useEventLinks = (orgSlug: string, eventSlug: string) => {
       icon: "i-heroicons-puzzle-piece",
       to: `/orgs/${orgSlug}/events/${eventSlug}/integrations`,
     },
+    {
+      label: "Plan des Booths",
+      icon: "i-heroicons-map",
+      to: `/orgs/${orgSlug}/events/${eventSlug}/booth-plan`,
+    },
   ];
 
   return {

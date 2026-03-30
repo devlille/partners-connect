@@ -92,6 +92,11 @@ const sidebarLinks = computed(() => {
       icon: 'i-heroicons-user-group',
       to: `/${eventSlug.value}/${partnershipId.value}/providers`,
     },
+    {
+      label: 'Booth',
+      icon: 'i-heroicons-map-pin',
+      to: `/${eventSlug.value}/${partnershipId.value}/booth`,
+    },
   ];
 });
 

@@ -19,6 +19,8 @@ export const usePublicPartnership = () => {
   const error = useState<string | null>("partnership-error", () => null);
   const savingCompany = useState<boolean>("saving-company", () => false);
   const savingBilling = useState<boolean>("saving-billing", () => false);
+  const boothLocation = useState<string | null>("booth-location", () => null);
+  const boothPlanImageUrl = useState<string | null>("booth-plan-image-url", () => null);
 
   /**
    * Load partnership data using public API endpoints
@@ -35,6 +37,8 @@ export const usePublicPartnership = () => {
       // Store company and organisation data
       company.value = c;
       organisation.value = org;
+      boothLocation.value = (p as any).booth_location || null;
+      boothPlanImageUrl.value = (event as any).booth_plan_image_url || null;
 
       // Load billing data
       try {
@@ -209,6 +213,8 @@ export const usePublicPartnership = () => {
     error,
     savingCompany,
     savingBilling,
+    boothLocation,
+    boothPlanImageUrl,
     loadPartnership,
     handleCompanySave,
     handleBillingSave,
