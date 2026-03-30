@@ -23,4 +23,6 @@ data class EventDisplay(
     @SerialName("external_links")
     val externalLinks: List<EventExternalLink>,
     val providers: List<Provider>,
+    @SerialName("booth_plan_image_url")
+    val boothPlanImageUrl: String? = null,
 )

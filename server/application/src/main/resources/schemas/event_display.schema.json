@@ -38,6 +38,9 @@
     },
     "providers": {
       "$ref": "provider.schema.json"
+    },
+    "booth_plan_image_url": {
+      "type": ["string", "null"]
     }
   },
   "required": [
