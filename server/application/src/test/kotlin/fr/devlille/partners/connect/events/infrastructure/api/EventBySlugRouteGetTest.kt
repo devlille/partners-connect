@@ -12,6 +12,7 @@ import io.ktor.server.testing.testApplication
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
@@ -89,5 +90,63 @@ class EventBySlugRouteGetTest {
         val response = client.get("/events/$nonExistentEventSlug")
 
         assertEquals(HttpStatusCode.NotFound, response.status)
+    }
+
+    @Test
+    fun `GET events by slug returns booth_plan_image_url when set`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedOrganisationEntity(orgId)
+                insertMockedFutureEvent(
+                    eventId,
+                    orgId = orgId,
+                    boothPlanImageUrl = "https://storage.example.com/booth-plan.png",
+                )
+                insertMockedUser(userId)
+                insertMockedOrgaPermission(orgId = orgId, userId = userId)
+            }
+        }
+
+        val response = client.get("/events/$eventId")
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val responseBody = response.bodyAsText()
+        val eventWithOrg = Json.parseToJsonElement(responseBody).jsonObject
+        val eventObject = eventWithOrg["event"]!!.jsonObject
+        assertEquals(
+            "https://storage.example.com/booth-plan.png",
+            eventObject["booth_plan_image_url"]!!.jsonPrimitive.content,
+        )
+    }
+
+    @Test
+    fun `GET events by slug returns null booth_plan_image_url when not set`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedOrganisationEntity(orgId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedUser(userId)
+                insertMockedOrgaPermission(orgId = orgId, userId = userId)
+            }
+        }
+
+        val response = client.get("/events/$eventId")
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val responseBody = response.bodyAsText()
+        val eventWithOrg = Json.parseToJsonElement(responseBody).jsonObject
+        val eventObject = eventWithOrg["event"]!!.jsonObject
+        val boothPlanUrl = eventObject["booth_plan_image_url"]
+        assertTrue(boothPlanUrl == null || boothPlanUrl.toString() == "null")
     }
 }

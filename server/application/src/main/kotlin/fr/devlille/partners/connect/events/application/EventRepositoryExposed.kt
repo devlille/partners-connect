@@ -145,6 +145,7 @@ class EventRepositoryExposed(
             contact = Contact(phone = eventEntity.contactPhone, email = eventEntity.contactEmail),
             externalLinks = externalLinks,
             providers = providers,
+            boothPlanImageUrl = eventEntity.boothPlanImageUrl,
         )
 
         val organisation = eventEntity.organisation.toItemDomain()

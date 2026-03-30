@@ -21,6 +21,7 @@ fun insertMockedFutureEvent(
     submissionStartTime: LocalDateTime? = null,
     submissionEndTime: LocalDateTime? = null,
     orgId: UUID = UUID.randomUUID(),
+    boothPlanImageUrl: String? = null,
 ): EventEntity {
     val now = Clock.System.now().toLocalDateTime(TimeZone.UTC)
     val yesterday = now.toInstant(TimeZone.UTC).minus(duration = 1.days).toLocalDateTime(TimeZone.UTC)
@@ -36,6 +37,7 @@ fun insertMockedFutureEvent(
         this.contactPhone = contactPhone
         this.contactEmail = contactEmail
         this.organisation = OrganisationEntity[orgId]
+        this.boothPlanImageUrl = boothPlanImageUrl
     }
 }
 
