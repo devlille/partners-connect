@@ -1,0 +1,16 @@
+{
+  "$id": "qanda_answer.schema.json",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "answer": {
+      "type": "string"
+    },
+    "is_correct": {
+      "type": "boolean"
+    }
+  },
+  "required": ["id", "answer", "is_correct"]
+}

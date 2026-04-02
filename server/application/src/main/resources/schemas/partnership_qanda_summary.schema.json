@@ -1,0 +1,19 @@
+{
+  "$id": "partnership_qanda_summary.schema.json",
+  "type": "object",
+  "properties": {
+    "partnership_id": {
+      "type": "string"
+    },
+    "company_name": {
+      "type": "string"
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "$ref": "qanda_question.schema.json"
+      }
+    }
+  },
+  "required": ["partnership_id", "company_name", "questions"]
+}

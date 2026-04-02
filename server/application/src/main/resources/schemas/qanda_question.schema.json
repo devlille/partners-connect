@@ -1,0 +1,26 @@
+{
+  "$id": "qanda_question.schema.json",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "partnership_id": {
+      "type": "string"
+    },
+    "question": {
+      "type": "string"
+    },
+    "answers": {
+      "type": "array",
+      "items": {
+        "$ref": "qanda_answer.schema.json"
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "datetime"
+    }
+  },
+  "required": ["id", "partnership_id", "question", "answers", "created_at"]
+}
