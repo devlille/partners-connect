@@ -17,6 +17,12 @@ data class Event(
     val submissionEndTime: LocalDateTime,
     val address: String,
     val contact: Contact,
+    @SerialName("qanda_enabled")
+    val qandaEnabled: Boolean = false,
+    @SerialName("qanda_max_questions")
+    val qandaMaxQuestions: Int? = null,
+    @SerialName("qanda_max_answers")
+    val qandaMaxAnswers: Int? = null,
 )
 
 @Serializable

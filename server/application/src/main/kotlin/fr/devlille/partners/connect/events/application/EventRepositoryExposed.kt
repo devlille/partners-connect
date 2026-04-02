@@ -8,6 +8,7 @@ import fr.devlille.partners.connect.events.domain.EventExternalLink
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventSummary
 import fr.devlille.partners.connect.events.domain.EventWithOrganisation
+import fr.devlille.partners.connect.events.domain.QandaConfig
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinkEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventExternalLinksTable
@@ -31,6 +32,7 @@ import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissi
 import fr.devlille.partners.connect.users.infrastructure.db.OrganisationPermissionsTable
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
+import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.and
@@ -146,6 +148,14 @@ class EventRepositoryExposed(
             externalLinks = externalLinks,
             providers = providers,
             boothPlanImageUrl = eventEntity.boothPlanImageUrl,
+            qandaConfig = if (eventEntity.qandaEnabled) {
+                QandaConfig(
+                    maxQuestions = eventEntity.qandaMaxQuestions ?: 1,
+                    maxAnswers = eventEntity.qandaMaxAnswers ?: 2,
+                )
+            } else {
+                null
+            },
         )
 
         val organisation = eventEntity.organisation.toItemDomain()
@@ -176,6 +186,9 @@ class EventRepositoryExposed(
             this.contactPhone = event.contact.phone
             this.contactEmail = event.contact.email
             this.organisation = organisation
+            this.qandaEnabled = event.qandaEnabled
+            this.qandaMaxQuestions = if (event.qandaEnabled) event.qandaMaxQuestions else null
+            this.qandaMaxAnswers = if (event.qandaEnabled) event.qandaMaxAnswers else null
         }
         slug
     }
@@ -192,6 +205,19 @@ class EventRepositoryExposed(
         eventEntity.address = event.address
         eventEntity.contactPhone = event.contact.phone
         eventEntity.contactEmail = event.contact.email
+
+        eventEntity.qandaEnabled = event.qandaEnabled
+        if (event.qandaEnabled) {
+            val maxQuestions = event.qandaMaxQuestions
+                ?: throw BadRequestException("qanda_max_questions is required when Q&A is enabled")
+            val maxAnswers = event.qandaMaxAnswers
+                ?: throw BadRequestException("qanda_max_answers is required when Q&A is enabled")
+            eventEntity.qandaMaxQuestions = maxQuestions
+            eventEntity.qandaMaxAnswers = maxAnswers
+        } else {
+            eventEntity.qandaMaxQuestions = null
+            eventEntity.qandaMaxAnswers = null
+        }
         eventSlug
     }
 

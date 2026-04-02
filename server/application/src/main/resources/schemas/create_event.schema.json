@@ -26,6 +26,17 @@
     },
     "contact": {
       "$ref": "event_contact.schema.json"
+    },
+    "qanda_enabled": {
+      "type": "boolean"
+    },
+    "qanda_max_questions": {
+      "type": ["integer", "null"],
+      "minimum": 1
+    },
+    "qanda_max_answers": {
+      "type": ["integer", "null"],
+      "minimum": 2
     }
   },
   "required": [

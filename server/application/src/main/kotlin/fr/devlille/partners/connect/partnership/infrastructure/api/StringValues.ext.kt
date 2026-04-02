@@ -14,6 +14,9 @@ val StringValues.partnershipId: UUID
 val StringValues.activityId: UUID
     get() = getValue("activityId").toUUID()
 
+val StringValues.questionId: UUID
+    get() = getValue("questionId").toUUID()
+
 val StringValues.communicationPlanId: UUID
     get() = getValue("id").toUUID()
 

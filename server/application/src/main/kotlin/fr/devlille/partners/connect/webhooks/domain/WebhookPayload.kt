@@ -5,6 +5,7 @@ import fr.devlille.partners.connect.companies.domain.JobOffer
 import fr.devlille.partners.connect.events.domain.EventSummary
 import fr.devlille.partners.connect.partnership.domain.BoothActivity
 import fr.devlille.partners.connect.partnership.domain.PartnershipDetail
+import fr.devlille.partners.connect.partnership.domain.QandaQuestion
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -15,5 +16,6 @@ data class WebhookPayload(
     val event: EventSummary,
     val jobs: List<JobOffer>,
     val activities: List<BoothActivity>,
+    val questions: List<QandaQuestion>,
     val timestamp: String,
 )

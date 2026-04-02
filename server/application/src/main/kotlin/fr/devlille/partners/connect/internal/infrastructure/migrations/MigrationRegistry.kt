@@ -18,6 +18,7 @@ import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateCommunicationPlansTableMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateCompanyJobOffersTableMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateJobOfferPromotionsTableMigration
+import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateQandaTablesMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.InitialSchemaMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.MakeOrganisationFieldsNullableMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.MigrateNullableColumnInCompanyTableMigration
@@ -55,6 +56,7 @@ object MigrationRegistry {
         CreateCommunicationPlansTableMigration,
         MigratePartnershipCommunicationsMigration,
         CreateBoothActivitiesTableMigration,
+        CreateQandaTablesMigration,
     )
 
     /**
