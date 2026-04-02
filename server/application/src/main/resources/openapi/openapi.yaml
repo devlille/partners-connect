@@ -1723,6 +1723,195 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /events/{eventSlug}/partnerships/{partnershipId}/qanda/questions:
+    get:
+      summary: "List Q&A questions for a partnership"
+      operationId: "listPartnershipQandaQuestions"
+      tags:
+        - QandA
+      security:
+        - {}
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      responses:
+        "200":
+          description: "List of Q&A questions for the partnership"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QandaQuestionList"
+        "404":
+          description: "Partnership not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      summary: "Create a Q&A question"
+      operationId: "createQandaQuestion"
+      tags:
+        - QandA
+      security:
+        - {}
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QandaQuestionRequest"
+      responses:
+        "201":
+          description: "Question created"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QandaQuestion"
+        "400":
+          description: "Validation error (e.g. missing correct answer, max questions reached)"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Partnership not found or Q&A not enabled"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /events/{eventSlug}/partnerships/{partnershipId}/qanda/questions/{questionId}:
+    put:
+      summary: "Update a Q&A question"
+      operationId: "updateQandaQuestion"
+      tags:
+        - QandA
+      security:
+        - {}
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+        - name: "questionId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QandaQuestionRequest"
+      responses:
+        "200":
+          description: "Question updated"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QandaQuestion"
+        "400":
+          description: "Validation error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Question or partnership not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      summary: "Delete a Q&A question"
+      operationId: "deleteQandaQuestion"
+      tags:
+        - QandA
+      security:
+        - {}
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+        - name: "questionId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      responses:
+        "204":
+          description: "Question deleted"
+        "404":
+          description: "Question or partnership not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /events/{eventSlug}/qanda/questions:
+    get:
+      summary: "List all Q&A questions for an event"
+      operationId: "listEventQandaQuestions"
+      tags:
+        - QandA
+      security:
+        - {}
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Questions grouped by partnership"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PartnershipQandaSummaryList"
+        "404":
+          description: "Event not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /providers:
     get:
       summary: "List providers"
@@ -5199,3 +5388,15 @@ components:
       $ref: "../schemas/sponsoring_option_with_partnerships.schema.json"
     SponsoringOptionWithCount:
       $ref: "../schemas/sponsoring_option_with_count.schema.json"
+    QandaAnswer:
+      $ref: "../schemas/qanda_answer.schema.json"
+    QandaQuestion:
+      $ref: "../schemas/qanda_question.schema.json"
+    QandaQuestionList:
+      $ref: "../schemas/qanda_question_list.schema.json"
+    QandaQuestionRequest:
+      $ref: "../schemas/qanda_question_request.schema.json"
+    PartnershipQandaSummary:
+      $ref: "../schemas/partnership_qanda_summary.schema.json"
+    PartnershipQandaSummaryList:
+      $ref: "../schemas/partnership_qanda_summary_list.schema.json"

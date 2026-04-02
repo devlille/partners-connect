@@ -1,0 +1,7 @@
+{
+  "$id": "qanda_question_list.schema.json",
+  "type": "array",
+  "items": {
+    "$ref": "qanda_question.schema.json"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "$id": "partnership_qanda_summary_list.schema.json",
+  "type": "array",
+  "items": {
+    "$ref": "partnership_qanda_summary.schema.json"
+  }
+}
