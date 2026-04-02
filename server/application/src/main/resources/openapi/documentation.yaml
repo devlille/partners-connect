@@ -1728,6 +1728,195 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
+  /events/{eventSlug}/partnerships/{partnershipId}/qanda/questions:
+    get:
+      summary: List Q&A questions for a partnership
+      operationId: listPartnershipQandaQuestions
+      tags:
+        - QandA
+      security:
+        - {}
+      parameters:
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of Q&A questions for the partnership
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/qanda_question_list.schema'
+        '404':
+          description: Partnership not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+    post:
+      summary: Create a Q&A question
+      operationId: createQandaQuestion
+      tags:
+        - QandA
+      security:
+        - {}
+      parameters:
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/qanda_question_request.schema'
+      responses:
+        '201':
+          description: Question created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/qanda_question.schema'
+        '400':
+          description: Validation error (e.g. missing correct answer, max questions reached)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Partnership not found or Q&A not enabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+  /events/{eventSlug}/partnerships/{partnershipId}/qanda/questions/{questionId}:
+    put:
+      summary: Update a Q&A question
+      operationId: updateQandaQuestion
+      tags:
+        - QandA
+      security:
+        - {}
+      parameters:
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/qanda_question_request.schema'
+      responses:
+        '200':
+          description: Question updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/qanda_question.schema'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Question or partnership not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+    delete:
+      summary: Delete a Q&A question
+      operationId: deleteQandaQuestion
+      tags:
+        - QandA
+      security:
+        - {}
+      parameters:
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Question deleted
+        '404':
+          description: Question or partnership not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+  /events/{eventSlug}/qanda/questions:
+    get:
+      summary: List all Q&A questions for an event
+      operationId: listEventQandaQuestions
+      tags:
+        - QandA
+      security:
+        - {}
+      parameters:
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Questions grouped by partnership
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/partnership_qanda_summary_list.schema'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /providers:
     get:
       summary: List providers
@@ -5220,6 +5409,18 @@ components:
       $ref: '#/components/schemas/sponsoring_option_with_partnerships.schema'
     SponsoringOptionWithCount:
       $ref: '#/components/schemas/sponsoring_option_with_count.schema'
+    QandaAnswer:
+      $ref: '#/components/schemas/qanda_answer.schema'
+    QandaQuestion:
+      $ref: '#/components/schemas/qanda_question.schema'
+    QandaQuestionList:
+      $ref: '#/components/schemas/qanda_question_list.schema'
+    QandaQuestionRequest:
+      $ref: '#/components/schemas/qanda_question_request.schema'
+    PartnershipQandaSummary:
+      $ref: '#/components/schemas/partnership_qanda_summary.schema'
+    PartnershipQandaSummaryList:
+      $ref: '#/components/schemas/partnership_qanda_summary_list.schema'
     user_session.schema:
       $id: user_session.schema.json
       type: object
@@ -7503,6 +7704,94 @@ components:
       required:
         - title
         - description
+    qanda_answer.schema:
+      $id: qanda_answer.schema.json
+      type: object
+      properties:
+        id:
+          type: string
+        answer:
+          type: string
+        is_correct:
+          type: boolean
+      required:
+        - id
+        - answer
+        - is_correct
+    qanda_question.schema:
+      $id: qanda_question.schema.json
+      type: object
+      properties:
+        id:
+          type: string
+        partnership_id:
+          type: string
+        question:
+          type: string
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/qanda_answer.schema'
+        created_at:
+          type: string
+          format: datetime
+      required:
+        - id
+        - partnership_id
+        - question
+        - answers
+        - created_at
+    qanda_question_list.schema:
+      $id: qanda_question_list.schema.json
+      type: array
+      items:
+        $ref: '#/components/schemas/qanda_question.schema'
+    qanda_question_request.schema:
+      type: object
+      required:
+        - question
+        - answers
+      properties:
+        question:
+          type: string
+          minLength: 1
+        answers:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            required:
+              - answer
+              - is_correct
+            properties:
+              answer:
+                type: string
+                minLength: 1
+              is_correct:
+                type: boolean
+            additionalProperties: false
+      additionalProperties: false
+    partnership_qanda_summary.schema:
+      $id: partnership_qanda_summary.schema.json
+      type: object
+      properties:
+        partnership_id:
+          type: string
+        company_name:
+          type: string
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/qanda_question.schema'
+      required:
+        - partnership_id
+        - company_name
+        - questions
+    partnership_qanda_summary_list.schema:
+      $id: partnership_qanda_summary_list.schema.json
+      type: array
+      items:
+        $ref: '#/components/schemas/partnership_qanda_summary.schema'
     paginated_provider.schema:
       $id: paginated_provider.schema.json
       type: object
@@ -7700,6 +7989,18 @@ components:
           type: string
         contact:
           $ref: '#/components/schemas/event_contact.schema'
+        qanda_enabled:
+          type: boolean
+        qanda_max_questions:
+          type:
+            - integer
+            - 'null'
+          minimum: 1
+        qanda_max_answers:
+          type:
+            - integer
+            - 'null'
+          minimum: 2
       required:
         - name
         - start_time
