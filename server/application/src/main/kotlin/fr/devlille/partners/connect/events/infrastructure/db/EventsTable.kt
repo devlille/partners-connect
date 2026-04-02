@@ -23,6 +23,9 @@ object EventsTable : UUIDTable("events") {
     val contactPhone = varchar("contact_phone", 30).nullable()
     val organisationId = reference("organisation_id", OrganisationsTable)
     val boothPlanImageUrl = text("booth_plan_image_url").nullable()
+    val qandaEnabled = bool("qanda_enabled").default(false)
+    val qandaMaxQuestions = integer("qanda_max_questions").nullable()
+    val qandaMaxAnswers = integer("qanda_max_answers").nullable()
     val createdAt = datetime("created_at").clientDefault {
         Clock.System.now().toLocalDateTime(TimeZone.UTC)
     }

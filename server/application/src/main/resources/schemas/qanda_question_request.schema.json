@@ -1,0 +1,29 @@
+{
+  "type": "object",
+  "required": ["question", "answers"],
+  "properties": {
+    "question": {
+      "type": "string",
+      "minLength": 1
+    },
+    "answers": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["answer", "is_correct"],
+        "properties": {
+          "answer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "is_correct": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

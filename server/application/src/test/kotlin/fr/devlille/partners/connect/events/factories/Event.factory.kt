@@ -14,6 +14,9 @@ fun createEvent(
     address: String = "Lille Grand Palais, Lille, France",
     phone: String = "+33 6 12 34 56 78",
     email: String = "contact@mail.com",
+    qandaEnabled: Boolean = false,
+    qandaMaxQuestions: Int? = null,
+    qandaMaxAnswers: Int? = null,
 ): Event = Event(
     name = name,
     startTime = startTime,
@@ -22,4 +25,7 @@ fun createEvent(
     submissionEndTime = submissionEndTime,
     address = address,
     contact = Contact(phone = phone, email = email),
+    qandaEnabled = qandaEnabled,
+    qandaMaxQuestions = qandaMaxQuestions,
+    qandaMaxAnswers = qandaMaxAnswers,
 )
