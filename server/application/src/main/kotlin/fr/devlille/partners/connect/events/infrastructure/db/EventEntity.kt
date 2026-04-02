@@ -20,6 +20,9 @@ class EventEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var contactEmail by EventsTable.contactEmail
     var organisation by OrganisationEntity referencedOn EventsTable.organisationId
     var boothPlanImageUrl by EventsTable.boothPlanImageUrl
+    var qandaEnabled by EventsTable.qandaEnabled
+    var qandaMaxQuestions by EventsTable.qandaMaxQuestions
+    var qandaMaxAnswers by EventsTable.qandaMaxAnswers
 }
 
 fun UUIDEntityClass<EventEntity>.findBySlug(slug: String): EventEntity? =

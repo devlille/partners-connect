@@ -25,4 +25,6 @@ data class EventDisplay(
     val providers: List<Provider>,
     @SerialName("booth_plan_image_url")
     val boothPlanImageUrl: String? = null,
+    @SerialName("qanda_config")
+    val qandaConfig: QandaConfig? = null,
 )

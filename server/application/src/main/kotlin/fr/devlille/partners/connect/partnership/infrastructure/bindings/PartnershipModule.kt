@@ -16,6 +16,7 @@ import fr.devlille.partners.connect.partnership.application.PartnershipSpeakerRe
 import fr.devlille.partners.connect.partnership.application.PartnershipStorageRepositoryGoogleStorage
 import fr.devlille.partners.connect.partnership.application.PartnershipSuggestionRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipTicketRepositoryExposed
+import fr.devlille.partners.connect.partnership.application.QandaRepositoryExposed
 import fr.devlille.partners.connect.partnership.domain.BoothActivityRepository
 import fr.devlille.partners.connect.partnership.domain.CommunicationPlanRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipAgreementRepository
@@ -31,6 +32,7 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipSpeakerReposit
 import fr.devlille.partners.connect.partnership.domain.PartnershipStorageRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipSuggestionRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipTicketRepository
+import fr.devlille.partners.connect.partnership.domain.QandaRepository
 import org.koin.dsl.module
 
 val partnershipModule = module {
@@ -80,5 +82,8 @@ val partnershipModule = module {
     }
     single<CommunicationPlanRepository> {
         CommunicationPlanRepositoryExposed()
+    }
+    single<QandaRepository> {
+        QandaRepositoryExposed()
     }
 }

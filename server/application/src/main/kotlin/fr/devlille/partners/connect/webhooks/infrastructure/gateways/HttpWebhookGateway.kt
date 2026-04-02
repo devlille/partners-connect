@@ -16,6 +16,8 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.BoothActivitiesTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.BoothActivityEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.QandaQuestionEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.QandaQuestionsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
 import fr.devlille.partners.connect.webhooks.domain.WebhookGateway
@@ -39,6 +41,7 @@ class HttpWebhookGateway(
 ) : WebhookGateway {
     override val provider = IntegrationProvider.WEBHOOK
 
+    @Suppress("LongMethod")
     override suspend fun sendWebhook(
         integrationId: UUID,
         eventId: UUID,
@@ -73,6 +76,9 @@ class HttpWebhookGateway(
             val activities = BoothActivityEntity
                 .find { BoothActivitiesTable.partnershipId eq partnershipId }
                 .map { it.toDomain() }
+            val questions = QandaQuestionEntity
+                .find { QandaQuestionsTable.partnershipId eq partnershipId }
+                .map { it.toDomain() }
             WebhookPayload(
                 eventType = eventType,
                 partnership = partnership.toDetailedDomain(
@@ -96,6 +102,7 @@ class HttpWebhookGateway(
                 ),
                 jobs = jobs,
                 activities = activities,
+                questions = questions,
                 timestamp = Clock.System.now().toString(),
             )
         }
