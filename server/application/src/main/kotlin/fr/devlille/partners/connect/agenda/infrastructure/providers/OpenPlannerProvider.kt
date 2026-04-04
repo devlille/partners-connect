@@ -8,7 +8,13 @@ import io.ktor.client.request.get
 import io.ktor.http.HttpHeaders
 import io.ktor.http.isSuccess
 import kotlinx.datetime.Instant
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 class OpenPlannerProvider(
     private val httpClient: HttpClient,
@@ -74,12 +80,27 @@ data class OpenPlannerSpeaker(
     val photoUrl: String? = null,
 )
 
+private object InstantOrNullSerializer : KSerializer<Instant?> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("NullableInstant", PrimitiveKind.STRING)
+
+    override fun deserialize(decoder: Decoder): Instant? {
+        val value = decoder.decodeString()
+        return if (value.isEmpty()) null else Instant.parse(value)
+    }
+
+    override fun serialize(encoder: Encoder, value: Instant?) {
+        encoder.encodeString(value?.toString() ?: "")
+    }
+}
+
 @Serializable
 data class OpenPlannerSession(
     val id: String,
     val title: String,
     val abstract: String? = null,
+    @Serializable(with = InstantOrNullSerializer::class)
     val dateStart: Instant? = null,
+    @Serializable(with = InstantOrNullSerializer::class)
     val dateEnd: Instant? = null,
     val speakerIds: List<String> = emptyList(),
     val trackId: String? = null,
