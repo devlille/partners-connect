@@ -6309,6 +6309,14 @@ components:
             - she/her
             - he/him
             - they/them
+        company:
+          type:
+            - string
+            - 'null'
+          description: Company name of the speaker
+          examples:
+            - TechCorp
+            - Acme Inc.
       required:
         - id
         - name

@@ -96,6 +96,11 @@ export const useSponsorLinks = (
         to: `${basePath}/job-offers`,
       },
       {
+        label: "Speakers",
+        icon: "i-heroicons-microphone",
+        to: `${basePath}/speakers`,
+      },
+      {
         label: "Booth",
         icon: "i-heroicons-map-pin",
         to: `${basePath}/booth`,

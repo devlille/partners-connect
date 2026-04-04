@@ -93,6 +93,7 @@ class HttpWebhookGateway(
                         jobTitle = s.jobTitle,
                         photoUrl = s.photoUrl,
                         pronouns = s.pronouns,
+                        company = s.company?.name,
                     )
                 }
                 .sortedBy { it.name }
