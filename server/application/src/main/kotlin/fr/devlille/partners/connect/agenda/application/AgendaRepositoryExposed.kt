@@ -58,6 +58,7 @@ class AgendaRepositoryExposed(
                     jobTitle = speakerEntity.jobTitle,
                     photoUrl = speakerEntity.photoUrl,
                     pronouns = speakerEntity.pronouns,
+                    company = speakerEntity.company?.name,
                 )
             }
             .sortedBy { it.name }

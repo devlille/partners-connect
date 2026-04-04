@@ -88,6 +88,7 @@ class PartnershipSpeakerRepositoryExposed : PartnershipSpeakerRepository {
                 jobTitle = speaker.jobTitle,
                 photoUrl = speaker.photoUrl,
                 pronouns = speaker.pronouns,
+                company = speaker.company?.name,
             )
         }.sortedBy { it.name }
     }
