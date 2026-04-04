@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.webhooks.domain
 
+import fr.devlille.partners.connect.agenda.domain.Speaker
 import fr.devlille.partners.connect.companies.domain.Company
 import fr.devlille.partners.connect.companies.domain.JobOffer
 import fr.devlille.partners.connect.events.domain.EventSummary
@@ -17,5 +18,6 @@ data class WebhookPayload(
     val jobs: List<JobOffer>,
     val activities: List<BoothActivity>,
     val questions: List<QandaQuestion>,
+    val speakers: List<Speaker>,
     val timestamp: String,
 )
