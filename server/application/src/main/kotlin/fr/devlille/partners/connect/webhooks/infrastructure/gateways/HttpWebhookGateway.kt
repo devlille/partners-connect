@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.webhooks.infrastructure.gateways
 
+import fr.devlille.partners.connect.agenda.domain.Speaker
 import fr.devlille.partners.connect.companies.application.mappers.toDomain
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyJobOfferPromotionEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanySocialEntity
@@ -18,6 +19,8 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.BoothActivityE
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.QandaQuestionEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.QandaQuestionsTable
+import fr.devlille.partners.connect.partnership.infrastructure.db.SpeakerPartnershipEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.SpeakerPartnershipTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
 import fr.devlille.partners.connect.webhooks.domain.WebhookGateway
@@ -79,6 +82,20 @@ class HttpWebhookGateway(
             val questions = QandaQuestionEntity
                 .find { QandaQuestionsTable.partnershipId eq partnershipId }
                 .map { it.toDomain() }
+            val speakers = SpeakerPartnershipEntity
+                .find { SpeakerPartnershipTable.partnershipId eq partnershipId }
+                .map { association ->
+                    val s = association.speaker
+                    Speaker(
+                        id = s.id.value.toString(),
+                        name = s.name,
+                        biography = s.biography,
+                        jobTitle = s.jobTitle,
+                        photoUrl = s.photoUrl,
+                        pronouns = s.pronouns,
+                    )
+                }
+                .sortedBy { it.name }
             WebhookPayload(
                 eventType = eventType,
                 partnership = partnership.toDetailedDomain(
@@ -103,6 +120,7 @@ class HttpWebhookGateway(
                 jobs = jobs,
                 activities = activities,
                 questions = questions,
+                speakers = speakers,
                 timestamp = Clock.System.now().toString(),
             )
         }
