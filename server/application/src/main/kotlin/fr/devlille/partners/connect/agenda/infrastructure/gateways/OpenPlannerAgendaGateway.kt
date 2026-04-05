@@ -47,6 +47,7 @@ class OpenPlannerAgendaGateway(
                         this.photoUrl = speaker.photoUrl
                         this.jobTitle = speaker.jobTitle
                         this.pronouns = speaker.pronouns
+                        this.sourceProvider = provider
                         this.event = event
                     }
                 }
