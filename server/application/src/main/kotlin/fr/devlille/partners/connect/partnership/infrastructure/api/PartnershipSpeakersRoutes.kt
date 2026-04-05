@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.agenda.infrastructure.api.speakerId
+import fr.devlille.partners.connect.internal.infrastructure.ktor.WebhookPartnershipPlugin
 import fr.devlille.partners.connect.partnership.domain.PartnershipSpeakerRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
@@ -19,6 +20,8 @@ fun Route.publicPartnershipSpeakersRoutes() {
     val partnershipSpeakerRepository by inject<PartnershipSpeakerRepository>()
 
     route("/events/{eventSlug}/partnerships/{partnershipId}/speakers/{speakerId}") {
+        install(WebhookPartnershipPlugin)
+
         post {
             val partnershipId = call.parameters.partnershipId
             val speakerId = call.parameters.speakerId
