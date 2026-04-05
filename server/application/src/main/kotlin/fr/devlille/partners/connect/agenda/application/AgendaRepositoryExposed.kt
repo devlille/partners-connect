@@ -59,6 +59,8 @@ class AgendaRepositoryExposed(
                     photoUrl = speakerEntity.photoUrl,
                     pronouns = speakerEntity.pronouns,
                     company = speakerEntity.company?.name,
+                    externalId = speakerEntity.externalId,
+                    source = "openplanner",
                 )
             }
             .sortedBy { it.name }

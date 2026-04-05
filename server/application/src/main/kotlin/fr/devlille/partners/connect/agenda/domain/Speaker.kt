@@ -18,4 +18,7 @@ data class Speaker(
     val photoUrl: String?,
     val pronouns: String?,
     val company: String?,
+    @SerialName("external_id")
+    val externalId: String,
+    val source: String,
 )
