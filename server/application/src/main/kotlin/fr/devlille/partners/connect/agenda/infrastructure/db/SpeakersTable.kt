@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.agenda.infrastructure.db
 
 import fr.devlille.partners.connect.companies.infrastructure.db.CompaniesTable
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
+import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -15,6 +16,8 @@ object SpeakersTable : UUIDTable("speakers") {
     val photoUrl = text("photo_url").nullable()
     val jobTitle = varchar("job_title", length = 255).nullable()
     val pronouns = varchar("pronouns", length = 50).nullable()
+    val sourceProvider = enumeration<IntegrationProvider>("source")
+        .clientDefault { IntegrationProvider.OPENPLANNER }
     val eventId = reference("event_id", EventsTable)
     val companyId = reference("company_id", CompaniesTable).nullable()
     val createdAt = datetime("created_at").clientDefault {

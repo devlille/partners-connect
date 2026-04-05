@@ -3,6 +3,7 @@ package fr.devlille.partners.connect.agenda.factories
 import fr.devlille.partners.connect.agenda.infrastructure.db.SpeakerEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
+import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import java.util.UUID
 
 @Suppress("LongParameterList")
@@ -14,6 +15,7 @@ fun insertMockedSpeaker(
     photoUrl: String? = "https://example.com/photo.jpg",
     jobTitle: String? = "Developer",
     pronouns: String? = "they/them",
+    source: IntegrationProvider = IntegrationProvider.OPENPLANNER,
     eventId: UUID = UUID.randomUUID(),
     companyId: UUID? = null,
 ): SpeakerEntity = SpeakerEntity.new(id) {
@@ -23,6 +25,7 @@ fun insertMockedSpeaker(
     this.photoUrl = photoUrl
     this.jobTitle = jobTitle
     this.pronouns = pronouns
+    this.sourceProvider = source
     this.event = EventEntity[eventId]
     this.company = companyId?.let { CompanyEntity[it] }
 }

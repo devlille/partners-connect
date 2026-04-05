@@ -60,7 +60,7 @@ class AgendaRepositoryExposed(
                     pronouns = speakerEntity.pronouns,
                     company = speakerEntity.company?.name,
                     externalId = speakerEntity.externalId,
-                    source = "openplanner",
+                    source = speakerEntity.sourceProvider.name.lowercase(),
                 )
             }
             .sortedBy { it.name }

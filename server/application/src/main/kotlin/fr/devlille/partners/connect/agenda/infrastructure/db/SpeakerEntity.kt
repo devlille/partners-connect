@@ -16,6 +16,7 @@ class SpeakerEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var photoUrl by SpeakersTable.photoUrl
     var jobTitle by SpeakersTable.jobTitle
     var pronouns by SpeakersTable.pronouns
+    var sourceProvider by SpeakersTable.sourceProvider
     var createdAt by SpeakersTable.createdAt
 
     var event by EventEntity referencedOn SpeakersTable.eventId

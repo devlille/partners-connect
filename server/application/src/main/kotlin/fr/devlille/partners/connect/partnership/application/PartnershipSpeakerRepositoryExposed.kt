@@ -90,7 +90,7 @@ class PartnershipSpeakerRepositoryExposed : PartnershipSpeakerRepository {
                 pronouns = speaker.pronouns,
                 company = speaker.company?.name,
                 externalId = speaker.externalId,
-                source = "openplanner",
+                source = speaker.sourceProvider.name.lowercase(),
             )
         }.sortedBy { it.name }
     }
