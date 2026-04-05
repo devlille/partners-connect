@@ -89,6 +89,8 @@ class PartnershipSpeakerRepositoryExposed : PartnershipSpeakerRepository {
                 photoUrl = speaker.photoUrl,
                 pronouns = speaker.pronouns,
                 company = speaker.company?.name,
+                externalId = speaker.externalId,
+                source = "openplanner",
             )
         }.sortedBy { it.name }
     }

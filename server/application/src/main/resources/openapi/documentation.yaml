@@ -6317,9 +6317,22 @@ components:
           examples:
             - TechCorp
             - Acme Inc.
+        external_id:
+          type: string
+          description: External identifier of the speaker from the source system
+          examples:
+            - abc123
+            - spk-456
+        source:
+          type: string
+          description: Source system that provided the speaker data
+          examples:
+            - openplanner
       required:
         - id
         - name
+        - external_id
+        - source
       additionalProperties: false
     agenda_response.schema:
       $id: agenda_response.schema.json

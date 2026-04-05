@@ -94,6 +94,8 @@ class HttpWebhookGateway(
                         photoUrl = s.photoUrl,
                         pronouns = s.pronouns,
                         company = s.company?.name,
+                        externalId = s.externalId,
+                        source = "openplanner",
                     )
                 }
                 .sortedBy { it.name }

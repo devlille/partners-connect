@@ -1581,6 +1581,10 @@ export interface SpeakerSchema {
      * @nullable
      */
   company?: string | null;
+  /** External identifier of the speaker from the source system */
+  external_id: string;
+  /** Source system that provided the speaker data */
+  source: string;
 }
 
 export interface DetailedPartnershipResponseSchema {
