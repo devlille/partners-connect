@@ -1,0 +1,29 @@
+{
+  "$schema": "https://unpkg.com/knip@latest/schema.json",
+  "ignoreDependencies": [
+    "import-in-the-middle",
+    "vitest-environment-nuxt",
+    "@nuxtjs/tailwindcss",
+    "@tailwindcss/postcss"
+  ],
+  "ignoreBinaries": ["orval", "tsx"],
+  "ignoreExportsUsedInFile": true,
+  "paths": {
+    "~/*": ["./*"]
+  },
+  "entry": [
+    "i18n.config.ts!",
+    "orval.config.ts!",
+    "postcss.config.js!",
+    "custom-instance.ts!",
+    "pages/**/*.vue!",
+    "layouts/**/*.vue!",
+    "plugins/**/*.{ts,js}!",
+    "middleware/**/*.ts!",
+    "server/**/*.ts!",
+    "components/**/*.vue!",
+    "assets/**/*.css!",
+    "public/**/*.css!",
+    "scripts/**/*.ts!"
+  ]
+}

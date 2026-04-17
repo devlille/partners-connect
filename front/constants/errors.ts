@@ -63,19 +63,3 @@ export const SUCCESS_MESSAGES = {
   DELETED: (resource: string) => `${resource} supprimé avec succès`,
   SAVED: "Modifications enregistrées",
 } as const;
-
-/**
- * Messages de confirmation
- */
-export const CONFIRMATION_MESSAGES = {
-  DELETE: (resource: string, name?: string) =>
-    name
-      ? `Êtes-vous sûr de vouloir supprimer ${resource} "${name}" ?`
-      : `Êtes-vous sûr de vouloir supprimer ce ${resource} ?`,
-  DELETE_TITLE: (resource: string) => `Confirmer la suppression du ${resource}`,
-  DELETE_MESSAGE: (resource: string, name: string) =>
-    `Êtes-vous sûr de vouloir supprimer le ${resource} <strong>${name}</strong> ?`,
-  UNSAVED_CHANGES:
-    "Vous avez des modifications non sauvegardées. Voulez-vous quitter sans enregistrer ?",
-  IRREVERSIBLE_ACTION: "Cette action est irréversible.",
-} as const;

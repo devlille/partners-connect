@@ -87,21 +87,6 @@ export interface PartnershipsMetadata {
 }
 
 /**
- * Zod validation schema for FilterState
- * Used for validating data restored from sessionStorage
- */
-export const FilterStateSchema = z.object({
-  packId: z.string().nullable(),
-  validated: z.boolean().nullable(),
-  paid: z.boolean().nullable(),
-  agreementGenerated: z.boolean().nullable(),
-  agreementSigned: z.boolean().nullable(),
-  suggestion: z.boolean().nullable(),
-  declined: z.boolean().nullable(),
-  organiser: z.string().nullable(),
-});
-
-/**
  * Initial filter state with all filters set to null (no filter applied)
  * Exception: declined is set to false by default to hide declined sponsors
  */
@@ -119,7 +104,7 @@ export const initialFilterState: FilterState = {
 /**
  * Mapping from FilterState keys to API parameter names
  */
-export const filterToApiParamMapping: Record<keyof FilterState, string> = {
+const filterToApiParamMapping: Record<keyof FilterState, string> = {
   packId: "filter[pack_id]",
   validated: "filter[validated]",
   paid: "filter[paid]",

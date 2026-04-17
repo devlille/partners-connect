@@ -64,11 +64,3 @@ export const sponsorSchema = z.object({
   option_ids: z.array(z.string()).optional(),
 });
 
-/**
- * Types TypeScript générés à partir des schemas Zod
- */
-export type OptionTranslation = z.infer<typeof optionTranslationSchema>;
-export type SponsoringOptionInput = z.infer<typeof sponsoringOptionSchema>;
-export type SponsoringPackInput = z.infer<typeof sponsoringPackSchema>;
-export type PackOptionsInput = z.infer<typeof packOptionsSchema>;
-export type SponsorInput = z.infer<typeof sponsorSchema>;

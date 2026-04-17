@@ -1,5 +1,4 @@
 import axios, {
-  type AxiosError,
   type AxiosResponse,
   type AxiosInstance,
   type AxiosRequestConfig,
@@ -67,7 +66,7 @@ const createCustomAxiosInstance = (baseUrl: string): AxiosInstance => {
 };
 
 // Function to get axios instance with runtime config
-export const getAxiosInstance = () => {
+const getAxiosInstance = () => {
   const config = useRuntimeConfig();
   return createCustomAxiosInstance(config.public.apiBaseUrl);
 };
@@ -80,4 +79,3 @@ export const customFetch = <T>(
   return axiosInstance({ ...config, ...options });
 };
 
-export type ErrorType<Error> = AxiosError<Error>;
