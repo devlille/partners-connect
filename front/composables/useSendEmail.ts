@@ -1,4 +1,8 @@
-import { postPartnershipEmail, type PostPartnershipEmailParams } from "~/utils/api";
+import { toValue, type MaybeRefOrGetter } from "vue";
+import {
+  postPartnershipEmail,
+  type PostPartnershipEmailParams,
+} from "~/utils/api";
 
 export interface SendEmailFormData {
   subject: string;
@@ -8,7 +12,7 @@ export interface SendEmailFormData {
 export interface UseSendEmailOptions {
   orgSlug: string;
   eventSlug: string;
-  filterParams?: PostPartnershipEmailParams;
+  filterParams?: MaybeRefOrGetter<PostPartnershipEmailParams | undefined>;
   onSuccess?: (recipientCount: number) => void;
   onError?: (error: Error) => void;
 }
@@ -32,8 +36,9 @@ export function useSendEmail(options: UseSendEmailOptions) {
   });
 
   const hasFilters = computed(() => {
-    if (!options.filterParams) return false;
-    return Object.values(options.filterParams).some((v) => v !== undefined && v !== null);
+    const params = toValue(options.filterParams);
+    if (!params) return false;
+    return Object.values(params).some((v) => v !== undefined && v !== null);
   });
 
   /**
@@ -73,17 +78,21 @@ export function useSendEmail(options: UseSendEmailOptions) {
           subject: formData.value.subject.trim(),
           body: formData.value.body.trim(),
         },
-        options.filterParams,
+        toValue(options.filterParams),
       );
 
       const recipientCount = response.data.recipients;
-      successMessage.value = t("email.modal.success", { count: recipientCount });
+      successMessage.value = t("email.modal.success", {
+        count: recipientCount,
+      });
       options.onSuccess?.(recipientCount);
       return recipientCount;
     } catch (err: unknown) {
       console.error("Failed to send email:", err);
       const errorMessage =
-        err instanceof Error && "response" in err ? (err as any).response?.data?.message : null;
+        err instanceof Error && "response" in err
+          ? (err as any).response?.data?.message
+          : null;
       error.value = errorMessage || t("email.modal.error");
       options.onError?.(err instanceof Error ? err : new Error(String(err)));
       return null;

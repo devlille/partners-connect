@@ -236,7 +236,7 @@ const {
 } = useSendEmail({
   orgSlug: props.orgSlug,
   eventSlug: props.eventSlug,
-  filterParams: props.filterParams,
+  filterParams: () => props.filterParams,
   onSuccess: (recipientCount) => {
     emit('sent', recipientCount);
     // Fermer la modale après 2 secondes
