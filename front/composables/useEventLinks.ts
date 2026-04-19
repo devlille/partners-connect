@@ -22,6 +22,11 @@ export const useEventLinks = (orgSlug: string, eventSlug: string) => {
         to: `/orgs/${orgSlug}/events/${eventSlug}/sponsors`,
       },
       {
+        label: "Offres d'emploi",
+        icon: "i-heroicons-briefcase",
+        to: `/orgs/${orgSlug}/events/${eventSlug}/job-offers`,
+      },
+      {
         label: "Prestataires",
         icon: "i-heroicons-user-group",
         to: `/orgs/${orgSlug}/events/${eventSlug}/providers`,

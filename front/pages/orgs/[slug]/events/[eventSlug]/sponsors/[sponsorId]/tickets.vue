@@ -46,7 +46,7 @@ const orgSlug = computed(() => {
 
 const eventSlug = computed(() => {
   const params = route.params.eventSlug;
-  return Array.isArray(params) ? params[1] as string : params as string;
+  return Array.isArray(params) ? params[0] as string : params as string;
 });
 
 const sponsorId = computed(() => {
@@ -85,9 +85,7 @@ async function loadPartnership() {
   }
 }
 
-function handleTicketsUpdated(_updatedTickets: any) {
-  console.log('Tickets updated');
-}
+function handleTicketsUpdated(_updatedTickets: any) {}
 
 onMounted(() => {
   loadPartnership();

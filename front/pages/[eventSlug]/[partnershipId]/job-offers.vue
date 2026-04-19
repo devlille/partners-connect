@@ -61,9 +61,12 @@
 
           <ul v-else class="divide-y divide-gray-200">
             <li v-for="job in jobOffers" :key="job.id" class="px-6 py-4 hover:bg-gray-50">
-              <div class="flex items-start justify-between">
-                <div class="flex-1">
-                  <h3 class="text-base font-semibold text-gray-900">{{ job.title }}</h3>
+              <div class="flex items-start justify-between gap-4">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="text-base font-semibold text-gray-900">{{ job.title }}</h3>
+                    <StatusBadge v-if="promotionByJobId[job.id]" :status="promotionByJobId[job.id].status" />
+                  </div>
                   <div class="mt-2 space-y-1">
                     <p class="text-sm text-gray-600">
                       <span class="font-medium">Localisation:</span> {{ job.location }}
@@ -99,6 +102,7 @@
                   size="sm"
                   icon="i-heroicons-trash"
                   :loading="deletingJobId === job.id"
+                  :disabled="!!deletingJobId"
                   @click="confirmDelete(job)"
                 >
                   Supprimer
@@ -294,7 +298,16 @@
 </template>
 
 <script setup lang="ts">
-import { getCompaniesJobOffers, postCompaniesJobOffers, deleteCompaniesJobOffersById, type JobOfferResponseSchema, type CreateJobOfferSchema } from '~/utils/api';
+import {
+  getCompaniesJobOffers,
+  postCompaniesJobOffers,
+  deleteCompaniesJobOffersById,
+  getPartnershipJobOffers,
+  promoteJobOfferToPartnership,
+  type JobOfferResponseSchema,
+  type CreateJobOfferSchema,
+  type JobOfferPromotionResponseSchema,
+} from '~/utils/api';
 
 definePageMeta({
   auth: false,
@@ -372,14 +385,22 @@ const sidebarLinks = computed(() => {
       label: 'Booth',
       icon: 'i-heroicons-map-pin',
       to: `/${eventSlug.value}/${partnershipId.value}/booth`
+    },
+    {
+      label: 'Tickets',
+      icon: 'i-heroicons-ticket',
+      to: `/${eventSlug.value}/${partnershipId.value}/tickets`,
     }
   ];
 });
 
-// Job offers state
 const jobOffers = ref<JobOfferResponseSchema[]>([]);
+const promotions = ref<JobOfferPromotionResponseSchema[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
+const promotionByJobId = computed(() =>
+  Object.fromEntries(promotions.value.map((p) => [p.job_offer_id, p])),
+);
 
 // Add modal state
 const isAddModalOpen = ref(false);
@@ -404,19 +425,19 @@ const deletingJobId = ref<string | null>(null);
  * Load job offers for the company
  */
 async function loadJobOffers() {
-  if (!company.value?.id) {
-    // Wait for company data to be loaded
-    return;
-  }
+  if (!company.value?.id) return;
 
   try {
     loading.value = true;
     error.value = null;
-    const response = await getCompaniesJobOffers(company.value.id);
-    jobOffers.value = response.data.items;
-  } catch (err: any) {
-    console.error('Failed to load job offers:', err);
-    error.value = 'Impossible de charger les offres d\'emploi';
+    const [offersRes, promotionsRes] = await Promise.all([
+      getCompaniesJobOffers(company.value.id),
+      getPartnershipJobOffers(eventSlug.value, partnershipId.value),
+    ]);
+    jobOffers.value = offersRes.data.items;
+    promotions.value = promotionsRes.data.items ?? [];
+  } catch {
+    error.value = "Impossible de charger les offres d'emploi";
   } finally {
     loading.value = false;
   }
@@ -481,14 +502,12 @@ async function handleAddJob() {
 
     await postCompaniesJobOffers(company.value.id, jobData);
 
-    // Reload job offers list
     await loadJobOffers();
 
-    // Show success toast
     toast.add({
       title: 'Offre ajoutée',
-      description: 'L\'offre d\'emploi a été ajoutée avec succès',
-      color: 'success'
+      description: "L'offre d'emploi a été ajoutée avec succès",
+      color: 'success',
     });
 
     // Close modal and reset form

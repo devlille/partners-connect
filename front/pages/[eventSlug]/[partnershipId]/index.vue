@@ -686,6 +686,11 @@ const sidebarLinks = computed(() => {
       label: 'Booth',
       icon: 'i-heroicons-map-pin',
       to: `/${eventSlug.value}/${partnershipId.value}/booth`
+    },
+    {
+      label: 'Tickets',
+      icon: 'i-heroicons-ticket',
+      to: `/${eventSlug.value}/${partnershipId.value}/tickets`,
     }
   ];
 });

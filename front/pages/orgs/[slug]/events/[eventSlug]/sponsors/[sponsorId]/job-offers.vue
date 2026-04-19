@@ -1,33 +1,18 @@
 <template>
   <Dashboard :main-links="sponsorLinks" :footer-links="footerLinks">
     <div class="bg-white border-b border-gray-200 p-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <PageTitle>Offres d'emploi</PageTitle>
-          <p class="mt-1 text-sm text-gray-500">Gérez les offres d'emploi de {{ companyName }}</p>
-        </div>
-        <UButton
-          color="primary"
-          size="lg"
-          icon="i-heroicons-plus"
-          @click="isAddModalOpen = true"
-          :disabled="!companyId"
-        >
-          Ajouter une offre
-        </UButton>
+      <div>
+        <PageTitle>Offres d'emploi</PageTitle>
+        <p class="mt-1 text-sm text-gray-500">
+          Offres d'emploi de {{ partnershipName }}
+        </p>
       </div>
     </div>
 
     <div class="p-6">
-      <!-- Loading state -->
       <TableSkeleton v-if="loading" :columns="4" :rows="8" />
+      <AlertMessage v-else-if="error" type="error" :message="error" />
 
-      <!-- Error state -->
-      <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-        {{ error }}
-      </div>
-
-      <!-- Job offers list -->
       <div v-else class="bg-white rounded-lg shadow">
         <div class="px-6 py-4 border-b border-gray-200">
           <h2 class="text-lg font-semibold text-gray-900">
@@ -36,484 +21,328 @@
         </div>
 
         <div v-if="jobOffers.length === 0" class="px-6 py-12 text-center">
-          <svg
-            class="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-            />
-          </svg>
+          <i class="i-heroicons-briefcase text-gray-400 text-5xl mx-auto block mb-4" aria-hidden="true" />
           <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune offre d'emploi</h3>
-          <p class="mt-1 text-sm text-gray-500">Commencez par ajouter une offre d'emploi.</p>
+          <p class="mt-1 text-sm text-gray-500">Cette entreprise n'a pas encore créé d'offre d'emploi.</p>
         </div>
 
         <ul v-else class="divide-y divide-gray-200">
-          <li v-for="job in jobOffers" :key="job.id" class="px-6 py-4 hover:bg-gray-50">
-            <div class="flex items-start justify-between">
-              <div class="flex-1">
-                <h3 class="text-base font-semibold text-gray-900">{{ job.title }}</h3>
+          <li
+            v-for="job in jobOffers"
+            :key="job.id"
+            class="px-6 py-4 hover:bg-gray-50"
+          >
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="text-base font-semibold text-gray-900">{{ job.title }}</h3>
+                  <StatusBadge v-if="promotionByJobId[job.id]" :status="promotionByJobId[job.id].status" />
+                </div>
                 <div class="mt-2 space-y-1">
                   <p class="text-sm text-gray-600">
-                    <span class="font-medium">Localisation:</span> {{ job.location }}
+                    <span class="font-medium">Localisation :</span> {{ job.location }}
                   </p>
                   <p v-if="job.salary" class="text-sm text-gray-600">
-                    <span class="font-medium">Salaire:</span> {{ job.salary }}
+                    <span class="font-medium">Salaire :</span> {{ job.salary }}
                   </p>
                   <p v-if="job.experience_years" class="text-sm text-gray-600">
-                    <span class="font-medium">Expérience:</span> {{ job.experience_years }} an(s)
+                    <span class="font-medium">Expérience :</span> {{ job.experience_years }} an(s)
                   </p>
                   <p class="text-sm text-gray-600">
-                    <span class="font-medium">Publié le:</span>
-                    {{ formatDate(job.publication_date) }}
+                    <span class="font-medium">Publié le :</span> {{ formatDate(job.publication_date) }}
                   </p>
-                  <p v-if="job.end_date" class="text-sm text-gray-600">
-                    <span class="font-medium">Date limite:</span> {{ formatDate(job.end_date) }}
+                  <p v-if="promotionByJobId[job.id]?.decline_reason" class="text-sm text-red-600">
+                    Motif de refus : {{ promotionByJobId[job.id].decline_reason }}
                   </p>
-                  <p class="text-sm text-gray-600">
-                    <a
-                      :href="job.url"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="text-primary-600 hover:text-primary-800 underline"
-                    >
-                      Voir l'offre complète
-                    </a>
-                  </p>
+                  <a
+                    :href="job.url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-sm text-primary-600 hover:text-primary-800 underline"
+                  >
+                    Voir l'offre complète
+                  </a>
                 </div>
               </div>
-              <UButton
-                color="error"
-                variant="ghost"
-                size="sm"
-                icon="i-heroicons-trash"
-                :loading="deletingJobId === job.id"
-                @click="confirmDelete(job)"
-              >
-                Supprimer
-              </UButton>
+
+              <div class="flex flex-col items-end gap-2 shrink-0">
+                <UButton
+                  v-if="!promotionByJobId[job.id]"
+                  color="primary"
+                  variant="outline"
+                  size="sm"
+                  icon="i-heroicons-paper-airplane"
+                  :loading="promotingJobId === job.id"
+                  :disabled="!!promotingJobId"
+                  @click="handlePromote(job)"
+                >
+                  Associer à l'événement
+                </UButton>
+
+                <template v-if="promotionByJobId[job.id]?.status === 'pending'">
+                  <UButton
+                    color="success"
+                    variant="outline"
+                    size="sm"
+                    icon="i-heroicons-check"
+                    :loading="approvingId === promotionByJobId[job.id].id"
+                    :disabled="!!approvingId || !!decliningId"
+                    @click="handleApprove(promotionByJobId[job.id])"
+                  >
+                    Approuver
+                  </UButton>
+                  <UButton
+                    color="error"
+                    variant="outline"
+                    size="sm"
+                    icon="i-heroicons-x-mark"
+                    :disabled="!!approvingId || !!decliningId"
+                    @click="openDeclineModal(promotionByJobId[job.id])"
+                  >
+                    Refuser
+                  </UButton>
+                </template>
+              </div>
             </div>
           </li>
         </ul>
       </div>
     </div>
 
-    <!-- Modal d'ajout (identique à la page companies) -->
+    <!-- Modale de refus -->
     <Teleport to="body">
-      <div
-        v-if="isAddModalOpen"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
-        @click.self="isAddModalOpen = false"
-      >
+      <Transition name="modal">
         <div
-          class="w-full max-w-2xl bg-white rounded-lg shadow-xl max-h-[90vh] overflow-y-auto"
-          @click.stop
+          v-if="declineModalOpen"
+          class="fixed inset-0 z-50 flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="decline-modal-title"
         >
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-900">Ajouter une offre d'emploi</h3>
-          </div>
-
-          <div class="px-6 py-4">
-            <form @submit.prevent="handleAddJob" class="space-y-4">
+          <div class="fixed inset-0 bg-black bg-opacity-50" aria-hidden="true" @click="closeDeclineModal" />
+          <div class="relative bg-white rounded-lg shadow-xl max-w-lg w-full transform transition-all">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h3 id="decline-modal-title" class="text-lg font-semibold text-gray-900">
+                Refuser l'offre
+              </h3>
+            </div>
+            <div class="px-6 py-4 space-y-4">
+              <p class="text-sm text-gray-700">
+                Refuser la promotion de <strong>{{ promotionToDecline?.job_offer.title }}</strong> ?
+              </p>
               <div>
-                <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
-                  Titre du poste <span class="text-red-500">*</span>
+                <label for="decline-reason" class="block text-sm font-medium text-gray-700 mb-1">
+                  Motif (optionnel)
                 </label>
-                <UInput
-                  id="title"
-                  v-model="newJob.title"
-                  placeholder="Ex: Développeur Full Stack"
-                  :disabled="isSubmitting"
-                  class="w-full"
+                <textarea
+                  id="decline-reason"
+                  v-model="declineReason"
+                  rows="3"
+                  :disabled="!!decliningId"
+                  placeholder="Expliquez pourquoi cette offre est refusée..."
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:opacity-50"
                 />
               </div>
-
-              <div>
-                <label for="location" class="block text-sm font-medium text-gray-700 mb-2">
-                  Localisation <span class="text-red-500">*</span>
-                </label>
-                <UInput
-                  id="location"
-                  v-model="newJob.location"
-                  placeholder="Ex: Paris, France"
-                  :disabled="isSubmitting"
-                  class="w-full"
-                />
-              </div>
-
-              <div>
-                <label for="url" class="block text-sm font-medium text-gray-700 mb-2">
-                  URL de l'offre <span class="text-red-500">*</span>
-                </label>
-                <UInput
-                  id="url"
-                  v-model="newJob.url"
-                  type="url"
-                  placeholder="https://exemple.com/jobs/123"
-                  :disabled="isSubmitting"
-                  class="w-full"
-                />
-              </div>
-
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label
-                    for="publication_date"
-                    class="block text-sm font-medium text-gray-700 mb-2"
-                  >
-                    Date de publication <span class="text-red-500">*</span>
-                  </label>
-                  <UInput
-                    id="publication_date"
-                    v-model="newJob.publication_date"
-                    type="date"
-                    :disabled="isSubmitting"
-                    class="w-full"
-                  />
-                </div>
-
-                <div>
-                  <label for="end_date" class="block text-sm font-medium text-gray-700 mb-2">
-                    Date limite (optionnel)
-                  </label>
-                  <UInput
-                    id="end_date"
-                    v-model="newJob.end_date"
-                    type="date"
-                    :disabled="isSubmitting"
-                    class="w-full"
-                  />
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label
-                    for="experience_years"
-                    class="block text-sm font-medium text-gray-700 mb-2"
-                  >
-                    Années d'expérience (optionnel)
-                  </label>
-                  <UInput
-                    id="experience_years"
-                    v-model.number="newJob.experience_years"
-                    type="number"
-                    min="1"
-                    max="20"
-                    placeholder="Ex: 3"
-                    :disabled="isSubmitting"
-                    class="w-full"
-                  />
-                </div>
-
-                <div>
-                  <label for="salary" class="block text-sm font-medium text-gray-700 mb-2">
-                    Salaire (optionnel)
-                  </label>
-                  <UInput
-                    id="salary"
-                    v-model="newJob.salary"
-                    placeholder="Ex: 40k-50k €"
-                    :disabled="isSubmitting"
-                    class="w-full"
-                  />
-                </div>
-              </div>
-
-              <div v-if="addError" class="text-sm text-red-600">
-                {{ addError }}
-              </div>
-            </form>
-          </div>
-
-          <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
-            <UButton
-              color="neutral"
-              variant="ghost"
-              :disabled="isSubmitting"
-              @click="isAddModalOpen = false"
-            >
-              Annuler
-            </UButton>
-            <UButton color="primary" :loading="isSubmitting" @click="handleAddJob">
-              Ajouter
-            </UButton>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+              <UButton color="neutral" variant="ghost" :disabled="!!decliningId" @click="closeDeclineModal">
+                Annuler
+              </UButton>
+              <UButton color="error" :loading="!!decliningId" @click="handleDecline">
+                Refuser
+              </UButton>
+            </div>
           </div>
         </div>
-      </div>
-    </Teleport>
-
-    <!-- Modal de confirmation de suppression -->
-    <Teleport to="body">
-      <div
-        v-if="isDeleteModalOpen"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
-        @click.self="isDeleteModalOpen = false"
-      >
-        <div class="w-full max-w-lg bg-white rounded-lg shadow-xl" @click.stop>
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-900">Confirmer la suppression</h3>
-          </div>
-
-          <div class="px-6 py-4 space-y-4">
-            <p class="text-sm text-gray-700">
-              Êtes-vous sûr de vouloir supprimer l'offre <strong>{{ jobToDelete?.title }}</strong> ?
-            </p>
-            <p class="text-sm text-gray-500">Cette action est irréversible.</p>
-          </div>
-
-          <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
-            <UButton
-              color="neutral"
-              variant="ghost"
-              :disabled="!!deletingJobId"
-              @click="isDeleteModalOpen = false"
-            >
-              Annuler
-            </UButton>
-            <UButton color="error" :loading="!!deletingJobId" @click="handleDelete">
-              Supprimer
-            </UButton>
-          </div>
-        </div>
-      </div>
+      </Transition>
     </Teleport>
   </Dashboard>
 </template>
 
 <script setup lang="ts">
-import { getEventsPartnershipDetailed, getCompaniesJobOffers, postCompaniesJobOffers, deleteCompaniesJobOffersById, type JobOfferResponseSchema, type CreateJobOfferSchema } from '~/utils/api';
 import authMiddleware from '~/middleware/auth';
+import {
+  getEventsPartnershipDetailed,
+  getCompaniesJobOffers,
+  listEventJobOfferPromotions,
+  promoteJobOfferToPartnership,
+  approveJobOfferPromotion,
+  declineJobOfferPromotion,
+  type JobOfferResponseSchema,
+  type JobOfferPromotionResponseSchema,
+} from '~/utils/api';
+
+definePageMeta({ middleware: authMiddleware, ssr: false });
 
 const route = useRoute();
-const { footerLinks } = useDashboardLinks();
 const toast = useToast();
-
-definePageMeta({
-  middleware: authMiddleware,
-  ssr: false
-});
+const { footerLinks } = useDashboardLinks();
 
 const orgSlug = computed(() => {
-  const params = route.params.slug;
-  return Array.isArray(params) ? params[0] as string : params as string;
+  const p = route.params.slug;
+  return Array.isArray(p) ? p[0] : p;
 });
-
 const eventSlug = computed(() => {
-  const params = route.params.eventSlug;
-  return Array.isArray(params) ? params[0] as string : params as string;
+  const p = route.params.eventSlug;
+  return Array.isArray(p) ? p[0] : p;
 });
-
 const sponsorId = computed(() => {
-  const params = route.params.sponsorId;
-  return Array.isArray(params) ? params[0] as string : params as string;
+  const p = route.params.sponsorId;
+  return Array.isArray(p) ? p[0] : p;
 });
 
 const { sponsorLinks } = useSponsorLinks(orgSlug.value, eventSlug.value, sponsorId.value);
 
-const companyId = ref<string | null>(null);
-const companyName = ref<string>('');
+const partnershipName = ref('');
+const companyId = ref('');
 const jobOffers = ref<JobOfferResponseSchema[]>([]);
+const promotions = ref<JobOfferPromotionResponseSchema[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 
-const isAddModalOpen = ref(false);
-const newJob = ref<Partial<CreateJobOfferSchema>>({
-  title: '',
-  location: '',
-  url: '',
-  publication_date: new Date().toISOString().split('T')[0],
-  end_date: null,
-  experience_years: null,
-  salary: null
-});
-const isSubmitting = ref(false);
-const addError = ref<string | null>(null);
+const promotingJobId = ref<string | null>(null);
+const approvingId = ref<string | null>(null);
+const decliningId = ref<string | null>(null);
+const declineModalOpen = ref(false);
+const promotionToDecline = ref<JobOfferPromotionResponseSchema | null>(null);
+const declineReason = ref('');
 
-const isDeleteModalOpen = ref(false);
-const jobToDelete = ref<JobOfferResponseSchema | null>(null);
-const deletingJobId = ref<string | null>(null);
+const promotionByJobId = computed(() =>
+  Object.fromEntries(promotions.value.map((p) => [p.job_offer_id, p])),
+);
 
-// Charger le company_id à partir du sponsorId en utilisant l'API getEventsPartnershipDetailed
-async function loadCompanyId() {
-  try {
-    loading.value = true;
-    error.value = null;
-
-    // Utiliser l'API qui retourne directement les infos du partenariat et de la company
-    const response = await getEventsPartnershipDetailed(eventSlug.value, sponsorId.value);
-    const { company } = response.data;
-
-    if (company && company.id) {
-      companyId.value = company.id;
-      companyName.value = company.name;
-    } else {
-      error.value = 'Impossible de trouver la compagnie associée à ce partenariat';
-    }
-  } catch (err: any) {
-    console.error('Failed to load company ID:', err);
-
-    if (err.response?.status === 404) {
-      error.value = 'Partenariat introuvable';
-    } else {
-      error.value = 'Impossible de charger les informations de la compagnie';
-    }
-  } finally {
-    loading.value = false;
-  }
-}
-
-async function loadJobOffers() {
-  if (!companyId.value) return;
-
-  try {
-    loading.value = true;
-    error.value = null;
-    const response = await getCompaniesJobOffers(companyId.value);
-    jobOffers.value = response.data.items;
-  } catch (err) {
-    console.error('Failed to load job offers:', err);
-    error.value = 'Impossible de charger les offres d\'emploi';
-  } finally {
-    loading.value = false;
-  }
-}
-
-function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('fr-FR', {
+function formatDate(dateString: string) {
+  return new Date(dateString).toLocaleDateString('fr-FR', {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   });
 }
 
-async function handleAddJob() {
-  addError.value = null;
-
-  // Validation
-  if (!newJob.value.title || !newJob.value.title.trim()) {
-    addError.value = 'Le titre est obligatoire';
-    return;
-  }
-
-  if (!newJob.value.location || !newJob.value.location.trim()) {
-    addError.value = 'La localisation est obligatoire';
-    return;
-  }
-
-  if (!newJob.value.url || !newJob.value.url.trim()) {
-    addError.value = 'L\'URL est obligatoire';
-    return;
-  }
-
-  if (!newJob.value.publication_date) {
-    addError.value = 'La date de publication est obligatoire';
-    return;
-  }
-
-  if (!companyId.value) {
-    addError.value = 'Impossible de déterminer la compagnie';
-    return;
-  }
-
+async function load() {
   try {
-    isSubmitting.value = true;
+    loading.value = true;
+    error.value = null;
 
-    const jobData: CreateJobOfferSchema = {
-      title: newJob.value.title!,
-      location: newJob.value.location!,
-      url: newJob.value.url!,
-      publication_date: newJob.value.publication_date! + 'T00:00:00',
-      end_date: newJob.value.end_date ? newJob.value.end_date + 'T23:59:59' : null,
-      experience_years: newJob.value.experience_years || null,
-      salary: newJob.value.salary || null
-    };
+    const partnershipRes = await getEventsPartnershipDetailed(eventSlug.value, sponsorId.value);
+    const { company } = partnershipRes.data;
+    partnershipName.value = company.name;
+    companyId.value = company.id;
 
-    await postCompaniesJobOffers(companyId.value, jobData);
+    const [firstPageRes, promotionsRes] = await Promise.all([
+      getCompaniesJobOffers(company.id, { page: 1, page_size: 100 }),
+      listEventJobOfferPromotions(orgSlug.value, eventSlug.value, { page_size: 100 }),
+    ]);
 
-    // Recharger la liste
-    await loadJobOffers();
+    const allOffers = [...firstPageRes.data.items];
+    const totalPages = Math.ceil(firstPageRes.data.total / 100);
+    if (totalPages > 1) {
+      const remainingPages = await Promise.all(
+        Array.from({ length: totalPages - 1 }, (_, i) =>
+          getCompaniesJobOffers(company.id, { page: i + 2, page_size: 100 }),
+        ),
+      );
+      for (const page of remainingPages) allOffers.push(...page.data.items);
+    }
 
-    // Show success toast
-    toast.add({
-      title: 'Offre ajoutée',
-      description: 'L\'offre d\'emploi a été ajoutée avec succès',
-      color: 'success'
-    });
-
-    // Fermer le modal et réinitialiser
-    isAddModalOpen.value = false;
-    newJob.value = {
-      title: '',
-      location: '',
-      url: '',
-      publication_date: new Date().toISOString().split('T')[0],
-      end_date: null,
-      experience_years: null,
-      salary: null
-    };
-  } catch (err) {
-    console.error('Failed to add job offer:', err);
-    addError.value = 'Impossible d\'ajouter l\'offre d\'emploi. Vérifiez les informations.';
+    jobOffers.value = allOffers;
+    promotions.value = (promotionsRes.data.items ?? []).filter(
+      (p) => p.partnership_id === sponsorId.value,
+    );
+  } catch {
+    error.value = "Impossible de charger les offres d'emploi";
   } finally {
-    isSubmitting.value = false;
+    loading.value = false;
   }
 }
 
-function confirmDelete(job: JobOfferResponseSchema) {
-  jobToDelete.value = job;
-  isDeleteModalOpen.value = true;
-}
-
-async function handleDelete() {
-  if (!jobToDelete.value || !companyId.value) return;
-
+async function handlePromote(job: JobOfferResponseSchema) {
   try {
-    deletingJobId.value = jobToDelete.value.id;
-
-    await deleteCompaniesJobOffersById(companyId.value, jobToDelete.value.id);
-
-    // Recharger la liste
-    await loadJobOffers();
-
-    // Show success toast
-    toast.add({
-      title: 'Offre supprimée',
-      description: 'L\'offre d\'emploi a été supprimée avec succès',
-      color: 'success'
-    });
-
-    // Fermer le modal
-    isDeleteModalOpen.value = false;
-    jobToDelete.value = null;
+    promotingJobId.value = job.id;
+    await promoteJobOfferToPartnership(companyId.value, sponsorId.value, { job_offer_id: job.id });
+    toast.add({ title: 'Offre associée', description: `"${job.title}" a été soumise à l'événement`, color: 'success' });
+    const promotionsRes = await listEventJobOfferPromotions(orgSlug.value, eventSlug.value, { page_size: 100 });
+    promotions.value = (promotionsRes.data.items ?? []).filter((p) => p.partnership_id === sponsorId.value);
   } catch (err: any) {
-    console.error('Failed to delete job offer:', err);
-    error.value = 'Impossible de supprimer l\'offre d\'emploi';
-
     toast.add({
       title: 'Erreur',
-      description: 'Impossible de supprimer l\'offre d\'emploi',
-      color: 'error'
+      description: err?.response?.data?.message ?? "Impossible d'associer cette offre",
+      color: 'error',
     });
   } finally {
-    deletingJobId.value = null;
+    promotingJobId.value = null;
   }
 }
 
-onMounted(async () => {
-  await loadCompanyId();
-  if (companyId.value) {
-    await loadJobOffers();
+async function handleApprove(promotion: JobOfferPromotionResponseSchema) {
+  try {
+    approvingId.value = promotion.id;
+    await approveJobOfferPromotion(orgSlug.value, eventSlug.value, sponsorId.value, promotion.id, {});
+    toast.add({ title: 'Offre approuvée', description: `"${promotion.job_offer.title}" a été approuvée`, color: 'success' });
+    const promotionsRes = await listEventJobOfferPromotions(orgSlug.value, eventSlug.value, { page_size: 100 });
+    promotions.value = (promotionsRes.data.items ?? []).filter((p) => p.partnership_id === sponsorId.value);
+  } catch {
+    toast.add({ title: 'Erreur', description: "Impossible d'approuver cette offre", color: 'error' });
+  } finally {
+    approvingId.value = null;
   }
-});
+}
 
-useHead({
-  title: computed(() => `Offres d'emploi - ${companyName.value} | DevLille`)
-});
+function openDeclineModal(promotion: JobOfferPromotionResponseSchema) {
+  promotionToDecline.value = promotion;
+  declineReason.value = '';
+  declineModalOpen.value = true;
+}
+
+function closeDeclineModal() {
+  if (decliningId.value) return;
+  declineModalOpen.value = false;
+  promotionToDecline.value = null;
+}
+
+async function handleDecline() {
+  if (!promotionToDecline.value) return;
+  try {
+    decliningId.value = promotionToDecline.value.id;
+    await declineJobOfferPromotion(
+      orgSlug.value,
+      eventSlug.value,
+      sponsorId.value,
+      promotionToDecline.value.id,
+      { reason: declineReason.value || null },
+    );
+    toast.add({ title: 'Offre refusée', description: `"${promotionToDecline.value.job_offer.title}" a été refusée`, color: 'success' });
+    const promotionsRes = await listEventJobOfferPromotions(orgSlug.value, eventSlug.value, { page_size: 100 });
+    promotions.value = (promotionsRes.data.items ?? []).filter((p) => p.partnership_id === sponsorId.value);
+    closeDeclineModal();
+  } catch {
+    toast.add({ title: 'Erreur', description: 'Impossible de refuser cette offre', color: 'error' });
+  } finally {
+    decliningId.value = null;
+  }
+}
+
+onMounted(load);
+
+useHead({ title: computed(() => `Offres d'emploi - ${partnershipName.value} | DevLille`) });
 </script>
+
+<style scoped>
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.2s ease;
+}
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+.modal-enter-active .relative,
+.modal-leave-active .relative {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.modal-enter-from .relative,
+.modal-leave-to .relative {
+  transform: scale(0.95);
+  opacity: 0;
+}
+</style>
