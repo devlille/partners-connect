@@ -89,7 +89,10 @@ async function onSave(updatedEvent: Omit<EventDisplay, 'slug'>) {
       address: updatedEvent.address,
       contact: updatedEvent.contact,
       external_links: updatedEvent.external_links,
-      providers: updatedEvent.providers
+      providers: updatedEvent.providers,
+      qanda_enabled: !!updatedEvent.qanda_config,
+      qanda_max_questions: updatedEvent.qanda_config?.max_questions ?? null,
+      qanda_max_answers: updatedEvent.qanda_config?.max_answers ?? null,
     };
 
     await putOrgsEvents(orgSlug.value, eventSlug.value, eventPayload);

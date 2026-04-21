@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { getEventsPartnershipDetailed, getEventsPartnershipBilling, putCompanyById, type CompanySchema, type MediaSchema, type UpdateCompanySchema, type CompanyBillingDataSchema } from "~/utils/api";
+import { getEventsPartnershipDetailed, getEventsPartnershipBilling, putCompanyById, type CompanySchema, type UpdateCompanySchema, type CompanyBillingDataSchema } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 import type { ExtendedPartnershipItem } from "~/types/partnership";
 
@@ -189,18 +189,6 @@ async function handleSaveCompany(updateData: UpdateCompanySchema) {
   }
 }
 
-function handleLogoUploaded(media: MediaSchema) {
-  if (company.value) {
-    company.value = {
-      ...company.value,
-      medias: media
-    };
-  }
-}
-
-function handleLogoError(errorMessage: string) {
-  companyError.value = errorMessage;
-}
 
 async function loadBilling() {
   try {

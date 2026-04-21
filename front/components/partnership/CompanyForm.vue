@@ -364,27 +364,9 @@ onMounted(() => {
   initializeSocials();
 });
 
-/**
- * Handle logo upload success
- */
-function handleLogoUploaded(media: MediaSchema) {
-  console.log('Logo uploaded successfully:', media);
-  // Reload company data could be done via emit to parent
-  emit('save' as any, form.value); // Trigger parent reload
+function handleLogoUploaded(_media: MediaSchema) {
+  emit('save' as any, form.value);
 }
 
-/**
- * Handle logo deletion
- */
-function handleLogoDeleted() {
-  console.log('Logo deleted successfully');
-  emit('save' as any, form.value); // Trigger parent reload
-}
-
-/**
- * Handle logo upload error
- */
-function handleLogoError(message: string) {
-  console.error('Logo upload error:', message);
-}
+function handleLogoError(_message: string) {}
 </script>

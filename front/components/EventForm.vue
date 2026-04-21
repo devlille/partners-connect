@@ -69,6 +69,45 @@
         />
       </div>
 
+      <UDivider label="Questions & Réponses" />
+
+      <div class="flex items-center gap-3">
+        <USwitch v-model="form.qanda_enabled" />
+        <label class="text-sm font-medium text-gray-700">Activer les questions & réponses</label>
+      </div>
+
+      <div v-if="form.qanda_enabled" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label for="qanda_max_questions" class="block text-sm font-medium text-gray-700 mb-2">
+            Nombre max de questions
+          </label>
+          <UInput
+            id="qanda_max_questions"
+            :model-value="form.qanda_max_questions ?? ''"
+            type="number"
+            min="1"
+            placeholder="Illimité"
+            class="w-full"
+            @update:model-value="val => form.qanda_max_questions = val === '' ? null : Number(val)"
+          />
+        </div>
+
+        <div>
+          <label for="qanda_max_answers" class="block text-sm font-medium text-gray-700 mb-2">
+            Nombre max de réponses
+          </label>
+          <UInput
+            id="qanda_max_answers"
+            :model-value="form.qanda_max_answers ?? ''"
+            type="number"
+            min="2"
+            placeholder="Illimité"
+            class="w-full"
+            @update:model-value="val => form.qanda_max_answers = val === '' ? null : Number(val)"
+          />
+        </div>
+      </div>
+
       <UDivider label="Contact" />
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -114,9 +153,27 @@ const { data } = defineProps<{ data: Omit<EventDisplay, 'slug'>}>()
 const emit = defineEmits<{
   (e: 'save', payload: Omit<EventDisplay, 'slug'>): void
 }>()
-const form = ref<Omit<EventDisplay, 'slug'>>(data)
+
+type FormState = Omit<EventDisplay, 'slug' | 'qanda_config'> & {
+  qanda_enabled: boolean
+  qanda_max_questions: number | null
+  qanda_max_answers: number | null
+}
+
+const form = ref<FormState>({
+  ...data,
+  qanda_enabled: !!data.qanda_config,
+  qanda_max_questions: data.qanda_config?.max_questions ?? null,
+  qanda_max_answers: data.qanda_config?.max_answers ?? null,
+})
 
 function onSave() {
-  emit('save', form.value)
+  const { qanda_enabled, qanda_max_questions, qanda_max_answers, ...rest } = form.value
+  emit('save', {
+    ...rest,
+    qanda_config: qanda_enabled
+      ? { max_questions: qanda_max_questions, max_answers: qanda_max_answers }
+      : null,
+  })
 }
 </script>

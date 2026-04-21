@@ -77,7 +77,8 @@ const initialData: Omit<EventDisplay, 'slug'> = {
   providers: {
     cfp: null,
     communication: null
-  }
+  },
+  qanda_config: null,
 };
 
 async function loadOrganisation() {
@@ -105,7 +106,10 @@ async function onSave(eventData: Omit<EventDisplay, 'slug'>) {
       address: eventData.address,
       contact: eventData.contact,
       external_links: eventData.external_links,
-      providers: eventData.providers
+      providers: eventData.providers,
+      qanda_enabled: !!eventData.qanda_config,
+      qanda_max_questions: eventData.qanda_config?.max_questions ?? null,
+      qanda_max_answers: eventData.qanda_config?.max_answers ?? null,
     };
 
     const response = await postOrgsEvents(slug.value, eventPayload);

@@ -635,6 +635,8 @@ function closeEmailModal() {
   window.history.replaceState({}, '', url.toString());
 }
 
+const qandaEnabled = ref(false);
+
 // Menu contextuel pour la page du sponsor avec indicateurs d'informations manquantes
 const { sponsorLinks } = useSponsorLinks({
   orgSlug: orgSlug.value,
@@ -643,6 +645,7 @@ const { sponsorLinks } = useSponsorLinks({
   partnership,
   company,
   billing,
+  qandaEnabled,
 });
 
 /**
@@ -664,6 +667,8 @@ async function loadPartnership() {
     // Charger directement le partenariat par son ID
     const response = await getEventsPartnershipDetailed(eventSlug.value, sponsorId.value);
     const { partnership: p, company: c, event } = response.data;
+
+    qandaEnabled.value = !!event.qanda_config;
 
     // Extraire les options du pack sélectionné avec leurs informations complètes
     // Note: L'API retourne "options" alors que le schéma TypeScript définit "optional_options"

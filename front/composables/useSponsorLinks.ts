@@ -1,4 +1,4 @@
-import { computed, type Ref } from "vue";
+import { computed, isRef, type Ref } from "vue";
 import type { ExtendedPartnershipItem } from "~/types/partnership";
 
 interface SponsorLinksOptions {
@@ -8,6 +8,7 @@ interface SponsorLinksOptions {
   partnership?: Ref<ExtendedPartnershipItem | null>;
   company?: Ref<any | null>;
   billing?: Ref<any | null>;
+  qandaEnabled?: Ref<boolean> | boolean;
 }
 
 export const useSponsorLinks = (
@@ -27,6 +28,12 @@ export const useSponsorLinks = (
 
   const { isPartnershipComplete, isCompanyComplete, isBillingComplete } =
     usePartnershipValidation();
+
+  const qandaActive = computed(() => {
+    const val = options.qandaEnabled;
+    if (!val) return false;
+    return isRef(val) ? val.value : val;
+  });
 
   const sponsorLinks = computed(() => {
     const basePath = `/orgs/${options.orgSlug}/events/${options.eventSlug}/sponsors/${options.sponsorId}`;
@@ -110,6 +117,15 @@ export const useSponsorLinks = (
         icon: "i-heroicons-link",
         to: `${basePath}/external-links`,
       },
+      ...(qandaActive.value
+        ? [
+            {
+              label: "Scanzee",
+              icon: "i-heroicons-qr-code",
+              to: `${basePath}/scanzee`,
+            },
+          ]
+        : []),
     ];
   });
 
