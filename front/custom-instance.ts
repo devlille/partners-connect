@@ -4,12 +4,18 @@ import axios, {
   type AxiosRequestConfig,
 } from "axios";
 
-// Function to create a custom Axios instance
+let _apiBaseUrl = '';
+let _axiosInstance: AxiosInstance | null = null;
+
+export function setApiBaseUrl(url: string) {
+  _apiBaseUrl = url;
+  _axiosInstance = null;
+}
+
 const createCustomAxiosInstance = (baseUrl: string): AxiosInstance => {
   const instance = axios.create({ baseURL: baseUrl });
 
   instance.interceptors.request.use(async (config) => {
-    // Get token from localStorage if available
     let accessToken = null;
     if (typeof window !== "undefined") {
       accessToken = localStorage.getItem("auth_token");
@@ -33,13 +39,11 @@ const createCustomAxiosInstance = (baseUrl: string): AxiosInstance => {
     },
     (error) => {
       if (error.response) {
-        // Redirect to login only if token is invalid (401 Unauthorized)
         if (error.response.status === 401) {
           if (typeof window !== "undefined") {
             localStorage.removeItem("auth_token");
             localStorage.removeItem("user_info");
 
-            const config = useRuntimeConfig();
             const redirectUrl = encodeURIComponent(
               `${
                 process.env.NODE_ENV === "development"
@@ -47,11 +51,10 @@ const createCustomAxiosInstance = (baseUrl: string): AxiosInstance => {
                   : window.location.origin
               }/auth/callback`,
             );
-            window.location.href = `${config.public.apiBaseUrl}/auth/login?redirectUrl=${redirectUrl}`;
+            window.location.href = `${_apiBaseUrl}/auth/login?redirectUrl=${redirectUrl}`;
           }
         }
 
-        // Créer une erreur personnalisée qui préserve les données de la réponse
         const customError = new Error(`HTTP error! Status: ${error.response.status}`) as Error & {
           response?: typeof error.response;
         };
@@ -65,10 +68,18 @@ const createCustomAxiosInstance = (baseUrl: string): AxiosInstance => {
   return instance;
 };
 
-// Function to get axios instance with runtime config
-const getAxiosInstance = () => {
-  const config = useRuntimeConfig();
-  return createCustomAxiosInstance(config.public.apiBaseUrl);
+const getAxiosInstance = (): AxiosInstance => {
+  if (!_axiosInstance) {
+    if (!_apiBaseUrl) {
+      try {
+        _apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
+      } catch {
+        // Nuxt context not available; URL will be set by the plugin before API calls
+      }
+    }
+    _axiosInstance = createCustomAxiosInstance(_apiBaseUrl);
+  }
+  return _axiosInstance;
 };
 
 export const customFetch = <T>(
@@ -78,4 +89,3 @@ export const customFetch = <T>(
   const axiosInstance = getAxiosInstance();
   return axiosInstance({ ...config, ...options });
 };
-

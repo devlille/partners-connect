@@ -8,7 +8,6 @@
         :current-logo-media="company.medias || null"
         :disabled="loading"
         @uploaded="handleLogoUploaded"
-        @deleted="handleLogoDeleted"
         @error="handleLogoError"
       />
     </div>

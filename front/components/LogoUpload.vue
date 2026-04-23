@@ -175,7 +175,7 @@ async function handleUpload() {
     preview.value = null;
     if (fileInput.value) fileInput.value.value = '';
 
-    emit('uploaded', media);
+    emit('uploaded', media.data);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Impossible d\'uploader le logo';
     toast.add({ title: 'Erreur', description: errorMessage, color: 'error' });

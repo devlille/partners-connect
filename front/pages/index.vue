@@ -296,18 +296,14 @@ const totalPrice = computed(() => {
 
 onMounted(async () => {
   const config = useRuntimeConfig();
-  const orgSlug = config.public.defaultOrgSlug;
   const eventSlug = config.public.defaultEventSlug;
 
-  if (orgSlug && eventSlug) {
-    try {
-      const packsResponse = await getEventsSponsoringPacks(eventSlug);
-      console.log(packsResponse.data)
-      packs.value = packsResponse.data;
-      //options.value = optionsResponse.data;
-    } catch (error) {
-      console.error('Failed to load sponsoring data:', error);
-    }
+  try {
+    const packsResponse = await getEventsSponsoringPacks(eventSlug);
+    packs.value = packsResponse.data;
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    error.value = `Impossible de charger les packs : ${message}`;
   }
 });
 

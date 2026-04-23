@@ -41,3 +41,5 @@ export interface ExtendedPartnershipItem extends PartnershipItemSchema {
     pack_price_override?: number | null;
   };
 }
+
+export type PublicPartnership = ExtendedPartnershipItem;

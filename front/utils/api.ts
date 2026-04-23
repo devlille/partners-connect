@@ -553,7 +553,7 @@ export interface TypedSelectable {
      * Predefined values that users can select from
      * @minItems 1
      */
-  selectable_values: string[];
+  selectable_values: SelectedValue[];
 }
 
 /**

@@ -82,7 +82,10 @@ describe("useOptionTranslation", () => {
         description: "Choisissez votre stand",
         price: 1000,
         type_descriptor: "booth",
-        selectable_values: ["3x3", "6x3"],
+        selectable_values: [
+          { id: "1", value: "3x3", price: 0 },
+          { id: "2", value: "6x3", price: 0 },
+        ],
       };
 
       const description = getOptionDescription(option);
