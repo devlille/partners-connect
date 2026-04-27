@@ -221,27 +221,6 @@ sealed interface NotificationVariables {
         }
     }
 
-    data class JobOfferPromoted(
-        override val language: String,
-        override val event: EventWithOrganisation,
-        override val company: Company,
-        val partnership: Partnership,
-        val jobOffer: JobOffer,
-    ) : NotificationVariables {
-        override val usageName: String = "job_offer_promoted"
-
-        override fun populate(content: String): String {
-            val partnershipLink = partnership.link(event)
-            return content
-                .replace("{{event_name}}", event.event.name)
-                .replace("{{event_contact}}", event.event.contact.email)
-                .replace("{{company_name}}", company.name)
-                .replace("{{job_title}}", jobOffer.title)
-                .replace("{{job_offer_url}}", jobOffer.url)
-                .replace("{{partnership_link}}", partnershipLink)
-        }
-    }
-
     data class JobOfferApproved(
         override val language: String,
         override val event: EventWithOrganisation,

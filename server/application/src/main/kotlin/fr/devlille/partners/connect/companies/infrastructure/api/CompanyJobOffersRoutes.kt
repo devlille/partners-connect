@@ -2,18 +2,12 @@ package fr.devlille.partners.connect.companies.infrastructure.api
 
 import fr.devlille.partners.connect.companies.domain.CompanyJobOfferPromotionRepository
 import fr.devlille.partners.connect.companies.domain.CompanyJobOfferRepository
-import fr.devlille.partners.connect.companies.domain.CompanyRepository
 import fr.devlille.partners.connect.companies.domain.CreateJobOffer
 import fr.devlille.partners.connect.companies.domain.PromoteJobOfferRequest
 import fr.devlille.partners.connect.companies.domain.UpdateJobOffer
-import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.internal.infrastructure.api.DEFAULT_PAGE_SIZE
-import fr.devlille.partners.connect.internal.infrastructure.ktor.NotificationPartnershipPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
-import fr.devlille.partners.connect.internal.infrastructure.ktor.variables
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
-import fr.devlille.partners.connect.notifications.domain.NotificationVariables
-import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.infrastructure.api.partnershipId
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.NotFoundException
@@ -75,9 +69,6 @@ fun Route.publicCompanyJobOfferRoutes() {
 
 @Suppress("LongMethod")
 fun Route.publicCompanyJobOfferPromotionsRoutes() {
-    val companyRepository by inject<CompanyRepository>()
-    val partnershipRepository by inject<PartnershipRepository>()
-    val eventRepository by inject<EventRepository>()
     val promotionRepository by inject<CompanyJobOfferPromotionRepository>()
 
     route("/companies/{companyId}/job-offers/{jobOfferId}/promotions") {
@@ -99,8 +90,6 @@ fun Route.publicCompanyJobOfferPromotionsRoutes() {
     }
 
     route("/companies/{companyId}/partnerships/{partnershipId}/promote") {
-        install(NotificationPartnershipPlugin)
-
         post {
             val companyId = call.parameters.companyUUID
             val partnershipId = call.parameters.partnershipId
@@ -113,27 +102,6 @@ fun Route.publicCompanyJobOfferPromotionsRoutes() {
                 jobOfferId = jobOfferId,
             )
 
-            // Fetch the promotion to get complete data including eventSlug for notification
-            val promotions = promotionRepository.listJobOfferPromotions(
-                companyId = companyId,
-                jobOfferId = jobOfferId,
-                partnershipId = partnershipId,
-                page = 1,
-                pageSize = 1,
-            )
-            val promotion = promotions.items.firstOrNull()
-                ?: throw NotFoundException("Promotion not found after creation")
-
-            // Send notification to organizers
-            val partnership = partnershipRepository.getById(promotion.eventSlug, partnershipId)
-            val variables = NotificationVariables.JobOfferPromoted(
-                language = partnership.language,
-                event = eventRepository.getBySlug(promotion.eventSlug),
-                company = companyRepository.getById(companyId),
-                partnership = partnership,
-                jobOffer = promotion.jobOffer,
-            )
-            call.attributes.variables = variables
             call.respond(HttpStatusCode.Created, mapOf("id" to promotionId.toString()))
         }
     }
