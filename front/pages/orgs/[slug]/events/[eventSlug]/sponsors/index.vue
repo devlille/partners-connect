@@ -337,7 +337,6 @@ const visiblePages = computed(() => {
 function goToPage(page: number) {
   if (page < 1 || page > totalPages.value) return;
   currentPage.value = page;
-  loadPartnerships();
 }
 
 // Gestion de la suppression
@@ -500,28 +499,31 @@ async function confirmDelete() {
   }
 }
 
+let loadSequence = 0;
+
 async function loadPartnerships() {
+  const seq = ++loadSequence;
+  const page = currentPage.value;
+  const paginationParams = {
+    ...queryParams.value,
+    page,
+    page_size: pageSize.value,
+  };
+
   try {
     loading.value = true;
     error.value = null;
 
-    // Construire les paramètres avec pagination
-    const paginationParams = {
-      ...queryParams.value,
-      page: currentPage.value,
-      page_size: pageSize.value,
-    };
-
-    // Charger toutes les données en parallèle
     const [eventResponse, partnershipsResponse, packsResponse] = await Promise.all([
       getEventBySlug(eventSlug.value),
       getOrgsEventsPartnership(orgSlug.value, eventSlug.value, paginationParams),
       getOrgsEventsPacks(orgSlug.value, eventSlug.value)
     ]);
 
+    if (seq !== loadSequence) return;
+
     eventName.value = eventResponse.data.event.name;
 
-    // Gérer la nouvelle structure paginée de l'API
     const data = partnershipsResponse.data as unknown as PaginatedPartnershipsResponse;
     partnerships.value = data.items;
     totalItems.value = data.total;
@@ -529,10 +531,11 @@ async function loadPartnerships() {
 
     packs.value = packsResponse.data;
   } catch (err) {
+    if (seq !== loadSequence) return;
     console.error('Failed to load partnerships:', err);
     error.value = 'Impossible de charger les sponsors';
   } finally {
-    loading.value = false;
+    if (seq === loadSequence) loading.value = false;
   }
 }
 
@@ -542,17 +545,27 @@ onMounted(() => {
 
 // Recharger si les slugs changent
 watch([orgSlug, eventSlug], () => {
-  loadPartnerships();
+  if (currentPage.value !== 1) {
+    currentPage.value = 1;
+  } else {
+    loadPartnerships();
+  }
 });
 
-// Watch for filter changes and reload partnerships (reset to page 1)
+// Unified watch: handles both page navigation and filter changes.
+// When filters change, reset to page 1 (which re-fires the watch and triggers the actual load).
+// When only the page changes, load directly.
 watch(
-  () => queryParams.value,
-  () => {
-    currentPage.value = 1;
+  [currentPage, () => JSON.stringify(queryParams.value)],
+  ([, newFilters], [, oldFilters]) => {
+    if (oldFilters !== undefined && newFilters !== oldFilters) {
+      if (currentPage.value !== 1) {
+        currentPage.value = 1;
+        return;
+      }
+    }
     loadPartnerships();
-  },
-  { deep: true }
+  }
 );
 
 useHead({

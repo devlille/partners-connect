@@ -21,6 +21,9 @@ export const usePublicPartnership = () => {
   const savingBilling = useState<boolean>("saving-billing", () => false);
   const boothLocation = useState<string | null>("booth-location", () => null);
   const boothPlanImageUrl = useState<string | null>("booth-plan-image-url", () => null);
+  const qandaEnabled = useState<boolean>("qanda-enabled", () => false);
+  const qandaMaxQuestions = useState<number | null>("qanda-max-questions", () => null);
+  const qandaMaxAnswers = useState<number | null>("qanda-max-answers", () => null);
 
   /**
    * Load partnership data using public API endpoints
@@ -39,6 +42,9 @@ export const usePublicPartnership = () => {
       organisation.value = org;
       boothLocation.value = (p as any).booth_location || null;
       boothPlanImageUrl.value = (event as any).booth_plan_image_url || null;
+      qandaEnabled.value = event.qanda_config !== null && event.qanda_config !== undefined;
+      qandaMaxQuestions.value = event.qanda_config?.max_questions ?? null;
+      qandaMaxAnswers.value = event.qanda_config?.max_answers ?? null;
 
       // Load billing data
       try {
@@ -215,6 +221,9 @@ export const usePublicPartnership = () => {
     savingBilling,
     boothLocation,
     boothPlanImageUrl,
+    qandaEnabled,
+    qandaMaxQuestions,
+    qandaMaxAnswers,
     loadPartnership,
     handleCompanySave,
     handleBillingSave,

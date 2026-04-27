@@ -1,8 +1,9 @@
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event);
-  const baseUrl = config.public.apiBaseUrl || 'http://localhost:8080';
+  const baseUrl = (config.public.apiBaseUrl || 'http://localhost:8080').replace(/\/$/, '');
   const path = getRouterParam(event, 'path');
-  const target = `${baseUrl}/${path}`;
+  const { search } = getRequestURL(event);
+  const target = `${baseUrl}/${path}${search}`;
 
   return proxyRequest(event, target);
 });
