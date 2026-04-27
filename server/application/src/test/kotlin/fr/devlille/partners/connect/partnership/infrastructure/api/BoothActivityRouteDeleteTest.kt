@@ -51,37 +51,6 @@ class BoothActivityRouteDeleteTest {
     }
 
     @Test
-    fun `DELETE returns 403 when partnership has no booth option`() = testApplication {
-        val userId = UUID.randomUUID()
-        val orgId = UUID.randomUUID()
-        val eventId = UUID.randomUUID()
-        val packId = UUID.randomUUID()
-        val companyId = UUID.randomUUID()
-        val partnershipId = UUID.randomUUID()
-
-        application {
-            moduleSharedDb(userId)
-            transaction {
-                insertMockedOrganisationEntity(orgId)
-                insertMockedFutureEvent(eventId, orgId = orgId)
-                insertMockedCompany(companyId)
-                insertMockedSponsoringPack(packId, eventId)
-                insertMockedPartnership(
-                    id = partnershipId,
-                    eventId = eventId,
-                    companyId = companyId,
-                    selectedPackId = packId,
-                )
-                // No booth option
-            }
-        }
-
-        val response = client.delete("/events/$eventId/partnerships/$partnershipId/activities/${UUID.randomUUID()}")
-
-        assertEquals(HttpStatusCode.Forbidden, response.status)
-    }
-
-    @Test
     fun `DELETE returns 404 for unknown activity`() = testApplication {
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()

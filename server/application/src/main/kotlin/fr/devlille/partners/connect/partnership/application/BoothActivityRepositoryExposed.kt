@@ -1,6 +1,5 @@
 package fr.devlille.partners.connect.partnership.application
 
-import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
 import fr.devlille.partners.connect.partnership.application.mappers.toDomain
 import fr.devlille.partners.connect.partnership.domain.BoothActivity
 import fr.devlille.partners.connect.partnership.domain.BoothActivityRepository
@@ -8,11 +7,9 @@ import fr.devlille.partners.connect.partnership.domain.BoothActivityRequest
 import fr.devlille.partners.connect.partnership.infrastructure.db.BoothActivitiesTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.BoothActivityEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
-import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionEntity
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.core.SortOrder
-import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
@@ -38,10 +35,6 @@ class BoothActivityRepositoryExposed : BoothActivityRepository {
         PartnershipEntity.findById(partnershipId)
             ?: throw NotFoundException("Partnership $partnershipId not found")
 
-        if (!PartnershipOptionEntity.hasBoothOption(partnershipId)) {
-            throw ForbiddenException("Partnership does not have a booth option")
-        }
-
         BoothActivityEntity.new {
             this.partnership = PartnershipEntity[partnershipId]
             this.title = request.title
@@ -55,10 +48,6 @@ class BoothActivityRepositoryExposed : BoothActivityRepository {
         transaction {
             PartnershipEntity.findById(partnershipId)
                 ?: throw NotFoundException("Partnership $partnershipId not found")
-
-            if (!PartnershipOptionEntity.hasBoothOption(partnershipId)) {
-                throw ForbiddenException("Partnership does not have a booth option")
-            }
 
             val entity = BoothActivityEntity.findById(activityId)
                 ?.takeIf { it.partnership.id.value == partnershipId }
@@ -74,10 +63,6 @@ class BoothActivityRepositoryExposed : BoothActivityRepository {
     override fun delete(partnershipId: UUID, activityId: UUID): Unit = transaction {
         PartnershipEntity.findById(partnershipId)
             ?: throw NotFoundException("Partnership $partnershipId not found")
-
-        if (!PartnershipOptionEntity.hasBoothOption(partnershipId)) {
-            throw ForbiddenException("Partnership does not have a booth option")
-        }
 
         val entity = BoothActivityEntity.findById(activityId)
             ?.takeIf { it.partnership.id.value == partnershipId }
