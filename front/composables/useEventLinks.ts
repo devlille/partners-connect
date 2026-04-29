@@ -2,6 +2,11 @@ export const useEventLinks = (orgSlug: string, eventSlug: string) => {
   const eventLinks = computed(() => {
     const links = [
       {
+        label: "Dashboard",
+        icon: "i-heroicons-chart-bar",
+        to: `/orgs/${orgSlug}/events/${eventSlug}/dashboard`,
+      },
+      {
         label: "Informations",
         icon: "i-heroicons-information-circle",
         to: `/orgs/${orgSlug}/events/${eventSlug}`,
