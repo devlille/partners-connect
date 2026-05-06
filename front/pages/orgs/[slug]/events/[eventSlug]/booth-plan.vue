@@ -58,6 +58,19 @@
           </span>
         </div>
       </div>
+
+      <div class="bg-white rounded-lg shadow p-6 mt-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">
+          {{ t('boothPlan.sponsors.title') }}
+        </h2>
+        <BoothLocationsList
+          :sponsors="boothSponsors"
+          :loading="loadingSponsors"
+          :error="sponsorsError"
+          :org-slug="orgSlug"
+          :event-slug="eventSlug"
+        />
+      </div>
     </div>
   </Dashboard>
 </template>
@@ -65,9 +78,12 @@
 <script setup lang="ts">
 import { postOrgsEventsBoothPlan } from "~/utils/api";
 import { useBoothPlanStore } from "~/stores/boothPlan";
+import { useBoothSponsors } from "~/composables/useBoothSponsors";
+import BoothLocationsList from "~/components/booth/BoothLocationsList.vue";
 import authMiddleware from "~/middleware/auth";
 
 const route = useRoute();
+const { t } = useI18n();
 const { footerLinks } = useDashboardLinks();
 const boothPlanStore = useBoothPlanStore();
 
@@ -87,6 +103,12 @@ const eventSlug = computed(() => {
 });
 
 const { eventLinks: orgLinks } = useEventLinks(orgSlug.value, eventSlug.value);
+
+const {
+  sponsors: boothSponsors,
+  loading: loadingSponsors,
+  error: sponsorsError,
+} = useBoothSponsors(orgSlug.value, eventSlug.value);
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const selectedFile = ref<File | null>(null);

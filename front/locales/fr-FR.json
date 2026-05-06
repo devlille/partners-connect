@@ -265,5 +265,17 @@
     "backToHome": "Retour à l'accueil",
     "sponsors": "sponsor(s)",
     "year": "an(s)"
+  },
+  "boothPlan": {
+    "sponsors": {
+      "title": "Sponsors Pack Silver / Pack Gold et leurs emplacements",
+      "columns": {
+        "location": "Emplacement",
+        "company": "Entreprise",
+        "pack": "Pack"
+      },
+      "noSponsors": "Aucun sponsor Pack Silver ou Pack Gold validé pour cet événement.",
+      "noLocation": "Non assigné"
+    }
   }
 }

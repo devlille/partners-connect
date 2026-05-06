@@ -113,6 +113,18 @@ export default defineI18nConfig(() => ({
           linkPrompt: "URL du lien:",
         },
       },
+      boothPlan: {
+        sponsors: {
+          title: "Sponsors Pack Silver / Pack Gold et leurs emplacements",
+          columns: {
+            location: "Emplacement",
+            company: "Entreprise",
+            pack: "Pack",
+          },
+          noSponsors: "Aucun sponsor Pack Silver ou Pack Gold validé pour cet événement.",
+          noLocation: "Non assigné",
+        },
+      },
     },
     en: {
       common: {
@@ -213,6 +225,18 @@ export default defineI18nConfig(() => ({
           undo: "Undo",
           redo: "Redo",
           linkPrompt: "Link URL:",
+        },
+      },
+      boothPlan: {
+        sponsors: {
+          title: "Pack Silver / Pack Gold sponsors and their booth locations",
+          columns: {
+            location: "Location",
+            company: "Company",
+            pack: "Pack",
+          },
+          noSponsors: "No validated Pack Silver or Pack Gold sponsor for this event.",
+          noLocation: "Unassigned",
         },
       },
     },
@@ -316,6 +340,18 @@ export default defineI18nConfig(() => ({
           undo: "Deshacer",
           redo: "Rehacer",
           linkPrompt: "URL del enlace:",
+        },
+      },
+      boothPlan: {
+        sponsors: {
+          title: "Patrocinadores Pack Silver / Pack Gold y sus ubicaciones",
+          columns: {
+            location: "Ubicación",
+            company: "Empresa",
+            pack: "Paquete",
+          },
+          noSponsors: "Ningún patrocinador Pack Silver o Pack Gold validado para este evento.",
+          noLocation: "Sin asignar",
         },
       },
     },

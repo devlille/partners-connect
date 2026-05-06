@@ -135,5 +135,17 @@
     "validationError": "Validation error. Please check the form fields.",
     "formIncomplete": "Form is incomplete. Some required fields are not filled.",
     "savingInProgress": "Saving in progress..."
+  },
+  "boothPlan": {
+    "sponsors": {
+      "title": "Pack Silver / Pack Gold sponsors and their booth locations",
+      "columns": {
+        "location": "Location",
+        "company": "Company",
+        "pack": "Pack"
+      },
+      "noSponsors": "No validated Pack Silver or Pack Gold sponsor for this event.",
+      "noLocation": "Unassigned"
+    }
   }
 }

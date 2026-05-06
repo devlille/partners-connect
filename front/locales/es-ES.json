@@ -85,5 +85,17 @@
     "notFound": "No se encontró el recurso solicitado.",
     "server": "Se produjo un error del servidor. Inténtelo más tarde.",
     "unknown": "Se produjo un error inesperado."
+  },
+  "boothPlan": {
+    "sponsors": {
+      "title": "Patrocinadores Pack Silver / Pack Gold y sus ubicaciones",
+      "columns": {
+        "location": "Ubicación",
+        "company": "Empresa",
+        "pack": "Paquete"
+      },
+      "noSponsors": "Ningún patrocinador Pack Silver o Pack Gold validado para este evento.",
+      "noLocation": "Sin asignar"
+    }
   }
 }
