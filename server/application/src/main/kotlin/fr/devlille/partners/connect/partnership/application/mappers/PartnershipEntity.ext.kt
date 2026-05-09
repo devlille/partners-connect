@@ -1,6 +1,7 @@
 package fr.devlille.partners.connect.partnership.application.mappers
 
 import fr.devlille.partners.connect.partnership.domain.Contact
+import fr.devlille.partners.connect.partnership.domain.PartnershipBoothLocationItem
 import fr.devlille.partners.connect.partnership.domain.PartnershipDetail
 import fr.devlille.partners.connect.partnership.domain.PartnershipItem
 import fr.devlille.partners.connect.partnership.domain.PartnershipPack
@@ -65,3 +66,9 @@ fun PartnershipEntity.toProcessStatus(billing: BillingEntity?): PartnershipProce
     invoiceUrl = billing?.invoicePdfUrl,
     billingStatus = billing?.status?.name,
 )
+
+fun PartnershipEntity.toBoothLocationDomain(emails: List<String>): PartnershipBoothLocationItem =
+    PartnershipBoothLocationItem(
+        partnership = toDomain(emails),
+        boothLocation = boothLocation,
+    )
