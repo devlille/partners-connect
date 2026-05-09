@@ -25,48 +25,52 @@
     </div>
 
     <div class="p-6 space-y-6">
-      <TableSkeleton v-if="loading" :columns="2" :rows="10" />
+      <UInput
+        v-model="search"
+        icon="i-heroicons-magnifying-glass"
+        placeholder="Rechercher un partenaire par nom"
+        class="w-full max-w-md"
+      />
 
-      <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+      <!-- Filter Panel -->
+      <FilterPanel
+        v-model="filters"
+        :metadata="filterMetadata"
+        :loading="loading"
+        :active-filter-count="activeFilterCount"
+        @clear-all="clearAllFilters"
+      />
+
+      <!-- Active Filters Badges -->
+      <ActiveFilters
+        :filters="filters"
+        :metadata="filterMetadata"
+        @clear="clearFilter"
+        @clear-all="clearAllFilters"
+      />
+
+      <!-- Result Count with ARIA live region for screen readers -->
+      <div
+        v-if="hasLoadedOnce"
+        class="text-sm text-gray-600 mb-4"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {{ $t('sponsors.filters.showingResults', { count: totalItems }) }}
+      </div>
+
+      <div v-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
         {{ error }}
       </div>
 
-      <template v-else>
-        <UInput
-          v-model="search"
-          icon="i-heroicons-magnifying-glass"
-          placeholder="Rechercher un partenaire par nom"
-          class="w-full max-w-md"
-        />
+      <!-- Initial load: skeleton. Subsequent reloads: keep showing the previous data, dimmed. -->
+      <TableSkeleton v-if="loading && !hasLoadedOnce" :columns="2" :rows="10" />
 
-        <!-- Filter Panel -->
-        <FilterPanel
-          v-model="filters"
-          :metadata="filterMetadata"
-          :loading="loading"
-          :active-filter-count="activeFilterCount"
-          @clear-all="clearAllFilters"
-        />
-
-        <!-- Active Filters Badges -->
-        <ActiveFilters
-          :filters="filters"
-          :metadata="filterMetadata"
-          @clear="clearFilter"
-          @clear-all="clearAllFilters"
-        />
-
-        <!-- Result Count with ARIA live region for screen readers -->
-        <div
-          v-if="!loading"
-          class="text-sm text-gray-600 mb-4"
-          role="status"
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          {{ $t('sponsors.filters.showingResults', { count: totalItems }) }}
-        </div>
-
+      <div
+        v-else-if="hasLoadedOnce"
+        :class="{ 'opacity-60 pointer-events-none transition-opacity duration-150': loading }"
+      >
         <!-- Statistiques -->
         <div
           v-if="packStats.length > 0"
@@ -148,7 +152,7 @@
             </div>
           </div>
         </div>
-      </template>
+      </div>
     </div>
 
     <!-- Modale de confirmation de suppression -->
@@ -306,6 +310,7 @@ const partnerships = ref<PartnershipItemSchema[]>([]);
 const packs = ref<SponsoringPackSchema[]>([]);
 const filterMetadata = ref<PartnershipsMetadata | null>(null);
 const loading = ref(true);
+const hasLoadedOnce = ref(false);
 const error = ref<string | null>(null);
 const eventName = ref<string>('');
 
@@ -549,6 +554,7 @@ async function loadPartnerships() {
     filterMetadata.value = data.metadata || null;
 
     packs.value = packsResponse.data;
+    hasLoadedOnce.value = true;
   } catch (err) {
     if (seq !== loadSequence) return;
     console.error('Failed to load partnerships:', err);
