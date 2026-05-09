@@ -14,7 +14,15 @@
         {{ error }}
       </div>
 
-      <UTable v-else :data="rows" :columns="columns" />
+      <template v-else>
+        <UInput
+          v-model="search"
+          icon="i-heroicons-magnifying-glass"
+          placeholder="Rechercher un partenaire par nom"
+          class="mb-4 w-full max-w-md"
+        />
+        <UTable :data="filteredRows" :columns="columns" />
+      </template>
     </div>
   </Dashboard>
 </template>
@@ -54,6 +62,13 @@ const loading = ref(true);
 const error = ref<string | null>(null);
 const eventName = ref('');
 const rows = ref<DashboardRow[]>([]);
+const search = ref('');
+
+const filteredRows = computed(() => {
+  const query = search.value.trim().toLowerCase();
+  if (!query) return rows.value;
+  return rows.value.filter((r) => r.company_name.toLowerCase().includes(query));
+});
 
 function partnershipPath(partnershipId: string) {
   return `/orgs/${orgSlug.value}/events/${eventSlug.value}/sponsors/${partnershipId}`;
