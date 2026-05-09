@@ -1,0 +1,14 @@
+{
+  "$id": "event_stats.schema.json",
+  "type": "object",
+  "properties": {
+    "partners": {
+      "type": "array",
+      "items": {
+        "$ref": "partner_stats.schema.json"
+      }
+    }
+  },
+  "required": ["partners"],
+  "additionalProperties": false
+}

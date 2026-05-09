@@ -4,6 +4,7 @@ import fr.devlille.partners.connect.agenda.infrastructure.db.SpeakerEntity
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.UUIDEntity
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
+import org.jetbrains.exposed.v1.jdbc.selectAll
 import java.util.UUID
 
 /**
@@ -18,7 +19,13 @@ import java.util.UUID
  * - createdAt: Timestamp when the association was created
  */
 class SpeakerPartnershipEntity(id: EntityID<UUID>) : UUIDEntity(id) {
-    companion object : UUIDEntityClass<SpeakerPartnershipEntity>(SpeakerPartnershipTable)
+    companion object : UUIDEntityClass<SpeakerPartnershipEntity>(SpeakerPartnershipTable) {
+        fun countByPartnerships(partnershipIds: Set<UUID>): Map<UUID, Int> = SpeakerPartnershipTable
+            .selectAll()
+            .where { SpeakerPartnershipTable.partnershipId inList partnershipIds }
+            .groupingBy { it[SpeakerPartnershipTable.partnershipId].value }
+            .eachCount()
+    }
 
     /** The speaker associated with this partnership */
     var speaker by SpeakerEntity referencedOn SpeakerPartnershipTable.speakerId

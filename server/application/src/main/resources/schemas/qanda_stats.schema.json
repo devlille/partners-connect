@@ -1,0 +1,16 @@
+{
+  "$id": "qanda_stats.schema.json",
+  "type": "object",
+  "properties": {
+    "questions": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "answers": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "required": ["questions", "answers"],
+  "additionalProperties": false
+}

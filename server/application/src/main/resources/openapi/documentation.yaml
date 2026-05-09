@@ -2383,6 +2383,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
+  /orgs/{orgSlug}/events/{eventSlug}/stats:
+    get:
+      summary: Get event partner stats
+      operationId: getOrgsEventsStats
+      description: Returns per-partner statistics (job offers, activities, Q&A, tickets, social links, communication plan, speakers) for every non-declined partnership of the event.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/event_stats.schema'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/booth-plan:
     post:
       summary: Upload booth plan
@@ -5259,6 +5296,14 @@ components:
       $ref: '#/components/schemas/contact.schema'
     PartnershipItem:
       $ref: '#/components/schemas/partnership_item.schema'
+    EventStats:
+      $ref: '#/components/schemas/event_stats.schema'
+    PartnerStats:
+      $ref: '#/components/schemas/partner_stats.schema'
+    JobOfferStats:
+      $ref: '#/components/schemas/job_offer_stats.schema'
+    QandaStats:
+      $ref: '#/components/schemas/qanda_stats.schema'
     EventSummary:
       $ref: '#/components/schemas/event_summary.schema'
     CreateEvent:
@@ -8030,6 +8075,80 @@ components:
         - submission_end_time
         - address
         - contact
+    job_offer_stats.schema:
+      $id: job_offer_stats.schema.json
+      type: object
+      properties:
+        total:
+          type: integer
+          minimum: 0
+        validated:
+          type: integer
+          minimum: 0
+      required:
+        - total
+        - validated
+      additionalProperties: false
+    qanda_stats.schema:
+      $id: qanda_stats.schema.json
+      type: object
+      properties:
+        questions:
+          type: integer
+          minimum: 0
+        answers:
+          type: integer
+          minimum: 0
+      required:
+        - questions
+        - answers
+      additionalProperties: false
+    partner_stats.schema:
+      $id: partner_stats.schema.json
+      type: object
+      properties:
+        partnership:
+          $ref: '#/components/schemas/partnership_item.schema'
+        job_offers:
+          $ref: '#/components/schemas/job_offer_stats.schema'
+        activities:
+          type: integer
+          minimum: 0
+        qanda:
+          $ref: '#/components/schemas/qanda_stats.schema'
+        tickets:
+          type: integer
+          minimum: 0
+        social_links:
+          type: integer
+          minimum: 0
+        communication_plan:
+          type: integer
+          minimum: 0
+        speakers:
+          type: integer
+          minimum: 0
+      required:
+        - partnership
+        - job_offers
+        - activities
+        - qanda
+        - tickets
+        - social_links
+        - communication_plan
+        - speakers
+      additionalProperties: false
+    event_stats.schema:
+      $id: event_stats.schema.json
+      type: object
+      properties:
+        partners:
+          type: array
+          items:
+            $ref: '#/components/schemas/partner_stats.schema'
+      required:
+        - partners
+      additionalProperties: false
     integration.schema:
       $schema: http://json-schema.org/draft-07/schema#
       type: object

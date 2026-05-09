@@ -11,6 +11,7 @@ import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.UUIDEntity
 import org.jetbrains.exposed.v1.dao.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.SizedIterable
+import org.jetbrains.exposed.v1.jdbc.selectAll
 import java.util.UUID
 
 /**
@@ -71,6 +72,22 @@ class CompanyJobOfferPromotionEntity(id: EntityID<UUID>) : UUIDEntity(id) {
             }
             return find { query }.orderBy(CompanyJobOfferPromotionsTable.promotedAt to SortOrder.ASC)
         }
+
+        fun countByPartnerships(
+            partnershipIds: Set<UUID>,
+            status: PromotionStatus? = null,
+        ): Map<UUID, Int> = CompanyJobOfferPromotionsTable
+            .selectAll()
+            .where {
+                val byPartnership = CompanyJobOfferPromotionsTable.partnershipId inList partnershipIds
+                if (status != null) {
+                    byPartnership and (CompanyJobOfferPromotionsTable.status eq status)
+                } else {
+                    byPartnership
+                }
+            }
+            .groupingBy { it[CompanyJobOfferPromotionsTable.partnershipId].value }
+            .eachCount()
     }
 
     /** The job offer being promoted (CASCADE DELETE) */

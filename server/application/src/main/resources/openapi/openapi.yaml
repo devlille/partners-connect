@@ -2372,6 +2372,43 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Identifier"
+  /orgs/{orgSlug}/events/{eventSlug}/stats:
+    get:
+      summary: "Get event partner stats"
+      operationId: "getOrgsEventsStats"
+      description: "Returns per-partner statistics (job offers, activities, Q&A, tickets, social links, communication plan, speakers) for every non-declined partnership of the event."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventStats"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Event not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /orgs/{orgSlug}/events/{eventSlug}/booth-plan:
     post:
       summary: "Upload booth plan"
@@ -5238,6 +5275,14 @@ components:
       $ref: "../schemas/contact.schema.json"
     PartnershipItem:
       $ref: "../schemas/partnership_item.schema.json"
+    EventStats:
+      $ref: "../schemas/event_stats.schema.json"
+    PartnerStats:
+      $ref: "../schemas/partner_stats.schema.json"
+    JobOfferStats:
+      $ref: "../schemas/job_offer_stats.schema.json"
+    QandaStats:
+      $ref: "../schemas/qanda_stats.schema.json"
     EventSummary:
       $ref: "../schemas/event_summary.schema.json"
     CreateEvent:

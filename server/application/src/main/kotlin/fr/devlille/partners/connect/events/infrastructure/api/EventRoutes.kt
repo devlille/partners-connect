@@ -68,4 +68,5 @@ fun Route.eventRoutes() {
 
     publicEventAgendaRoutes()
     orgsEventAgendaRoutes()
+    eventStatsRoutes()
 }

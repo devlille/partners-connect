@@ -1,0 +1,46 @@
+{
+  "$id": "partner_stats.schema.json",
+  "type": "object",
+  "properties": {
+    "partnership": {
+      "$ref": "partnership_item.schema.json"
+    },
+    "job_offers": {
+      "$ref": "job_offer_stats.schema.json"
+    },
+    "activities": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "qanda": {
+      "$ref": "qanda_stats.schema.json"
+    },
+    "tickets": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "social_links": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "communication_plan": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "speakers": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "required": [
+    "partnership",
+    "job_offers",
+    "activities",
+    "qanda",
+    "tickets",
+    "social_links",
+    "communication_plan",
+    "speakers"
+  ],
+  "additionalProperties": false
+}
