@@ -40,6 +40,7 @@ data class Contact(
 
 @Serializable
 data class PartnershipFilters(
+    val query: String? = null,
     val packId: String? = null,
     val validated: Boolean? = null,
     val suggestion: Boolean? = null,

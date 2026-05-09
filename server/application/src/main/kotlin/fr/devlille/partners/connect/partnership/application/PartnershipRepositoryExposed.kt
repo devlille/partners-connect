@@ -278,14 +278,24 @@ class PartnershipRepositoryExposed : PartnershipRepository {
                 declined = filters.declined,
             )
             .orderBy(PartnershipsTable.createdAt to sort)
-        val filteredPartnerships = if (filters.paid != null) {
-            partnerships.filter {
-                val billing = BillingEntity.singleByEventAndPartnership(eventId, it.id.value)
-                if (filters.paid) billing?.status == InvoiceStatus.PAID else billing?.status != InvoiceStatus.PAID
+        val filteredPartnerships = partnerships
+            .filter { partnership ->
+                if (filters.paid == null) {
+                    true
+                } else {
+                    val billing = BillingEntity.singleByEventAndPartnership(eventId, partnership.id.value)
+                    if (filters.paid) {
+                        billing?.status == InvoiceStatus.PAID
+                    } else {
+                        billing?.status != InvoiceStatus.PAID
+                    }
+                }
             }
-        } else {
-            partnerships
-        }
+            .filter { partnership ->
+                val q = filters.query?.trim()?.takeIf { it.isNotEmpty() }?.lowercase() ?: return@filter true
+                partnership.company.name.lowercase().contains(q) ||
+                    partnership.contactName.lowercase().contains(q)
+            }
         val allItems = filteredPartnerships.map { partnership ->
             partnership.toDomain(PartnershipEmailEntity.emails(partnership.id.value))
         }
