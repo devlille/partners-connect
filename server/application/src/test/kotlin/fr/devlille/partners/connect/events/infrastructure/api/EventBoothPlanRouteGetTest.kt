@@ -1,4 +1,4 @@
-package fr.devlille.partners.connect.partnership.infrastructure.api
+package fr.devlille.partners.connect.events.infrastructure.api
 
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.events.factories.insertMockedFutureEvent
@@ -24,7 +24,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class BoothLocationsRouteGetTest {
+class EventBoothPlanRouteGetTest {
     private val json = Json { ignoreUnknownKeys = true }
 
     @Test
@@ -65,7 +65,7 @@ class BoothLocationsRouteGetTest {
             }
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventId/booth-locations") {
+        val response = client.get("/orgs/$orgId/events/$eventId/booth-plan") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -117,7 +117,7 @@ class BoothLocationsRouteGetTest {
             }
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventId/booth-locations") {
+        val response = client.get("/orgs/$orgId/events/$eventId/booth-plan") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -143,7 +143,7 @@ class BoothLocationsRouteGetTest {
             }
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventId/booth-locations") {
+        val response = client.get("/orgs/$orgId/events/$eventId/booth-plan") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -168,7 +168,7 @@ class BoothLocationsRouteGetTest {
             }
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventId/booth-locations")
+        val response = client.get("/orgs/$orgId/events/$eventId/booth-plan")
 
         assertEquals(HttpStatusCode.Unauthorized, response.status)
     }
@@ -189,7 +189,7 @@ class BoothLocationsRouteGetTest {
             }
         }
 
-        val response = client.get("/orgs/$orgId/events/$eventId/booth-locations") {
+        val response = client.get("/orgs/$orgId/events/$eventId/booth-plan") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 
@@ -211,7 +211,7 @@ class BoothLocationsRouteGetTest {
         }
 
         val unknownEventId = UUID.randomUUID()
-        val response = client.get("/orgs/$orgId/events/$unknownEventId/booth-locations") {
+        val response = client.get("/orgs/$orgId/events/$unknownEventId/booth-plan") {
             header(HttpHeaders.Authorization, "Bearer valid")
         }
 

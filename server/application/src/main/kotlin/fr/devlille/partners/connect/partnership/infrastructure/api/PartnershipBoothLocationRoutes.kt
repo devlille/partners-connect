@@ -8,7 +8,6 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipBoothRepositor
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
-import io.ktor.server.routing.get
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import kotlinx.serialization.Serializable
@@ -44,19 +43,6 @@ fun Route.orgsPartnershipBoothLocationRoutes() {
                 status = HttpStatusCode.OK,
                 message = BoothLocationResponse(id = partnershipId.toString(), location = location),
             )
-        }
-    }
-}
-
-fun Route.orgsBoothLocationRoutes() {
-    val repository by inject<PartnershipBoothRepository>()
-
-    route("/orgs/{orgSlug}/events/{eventSlug}/booth-locations") {
-        install(AuthorizedOrganisationPlugin)
-
-        get {
-            val eventSlug = call.parameters.eventSlug
-            call.respond(HttpStatusCode.OK, repository.listBoothLocations(eventSlug))
         }
     }
 }

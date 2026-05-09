@@ -47,7 +47,6 @@ fun Route.partnershipRoutes() {
     orgsPartnershipBillingRoutes()
     orgsPartnershipCommunicationRoutes()
     orgsPartnershipBoothLocationRoutes()
-    orgsBoothLocationRoutes()
     orgsPartnershipJobOfferRoutes()
     orgsPartnershipJobOfferDecisionRoutes()
     orgsPartnershipOrganiserRoutes()
