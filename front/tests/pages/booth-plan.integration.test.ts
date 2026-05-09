@@ -6,8 +6,7 @@ import BoothLocationsList from "~/components/booth/BoothLocationsList.vue";
 
 vi.mock("~/utils/api", () => ({
   getOrgsEventsPacks: vi.fn(),
-  getOrgsEventsPartnership: vi.fn(),
-  getEventsPartnershipDetailed: vi.fn(),
+  getOrgsEventsBoothPlan: vi.fn(),
 }));
 
 const ORG_SLUG = "devlille";
@@ -22,16 +21,15 @@ describe("booth-plan page integration — sponsors section", () => {
   });
 
   it("wires the composable to BoothLocationsList and renders fetched sponsors", async () => {
-    const { getOrgsEventsPacks, getOrgsEventsPartnership, getEventsPartnershipDetailed } =
-      await import("~/utils/api");
+    const { getOrgsEventsPacks, getOrgsEventsBoothPlan } = await import("~/utils/api");
 
     vi.mocked(getOrgsEventsPacks).mockResolvedValue({
       data: [SILVER_PACK, GOLD_PACK],
     } as any);
-    vi.mocked(getOrgsEventsPartnership).mockResolvedValue({
-      data: {
-        items: [
-          {
+    vi.mocked(getOrgsEventsBoothPlan).mockResolvedValue({
+      data: [
+        {
+          partnership: {
             id: "p-gold",
             company_name: "Acme",
             event_name: "DevLille 2026",
@@ -40,37 +38,9 @@ describe("booth-plan page integration — sponsors section", () => {
             created_at: "2026-01-01T00:00:00Z",
             validated_pack_id: "gold-id",
           },
-        ],
-        page: 1,
-        page_size: 100,
-        total: 1,
-      },
-    } as any);
-    vi.mocked(getEventsPartnershipDetailed).mockResolvedValue({
-      data: {
-        partnership: {
-          id: "p-gold",
-          contact_name: "X",
-          contact_role: "Y",
-          language: "fr",
-          emails: [],
-          validated_pack: {
-            id: "gold-id",
-            name: "Pack Gold",
-            base_price: 200,
-            required_options: [],
-            optional_options: [],
-            total_price: 200,
-          },
-          process_status: {},
-          created_at: "2026-01-01T00:00:00Z",
-          currency: "EUR",
           booth_location: "A1",
         },
-        company: { name: "Acme" },
-        event: {},
-        organisation: {},
-      },
+      ],
     } as any);
 
     const Wrapper = defineComponent({
@@ -101,11 +71,6 @@ describe("booth-plan page integration — sponsors section", () => {
     expect(wrapper.text()).toContain("A1");
 
     expect(getOrgsEventsPacks).toHaveBeenCalledWith(ORG_SLUG, EVENT_SLUG);
-    expect(getOrgsEventsPartnership).toHaveBeenCalledWith(
-      ORG_SLUG,
-      EVENT_SLUG,
-      expect.objectContaining({ page_size: 100 }),
-    );
-    expect(getEventsPartnershipDetailed).toHaveBeenCalledWith(EVENT_SLUG, "p-gold");
+    expect(getOrgsEventsBoothPlan).toHaveBeenCalledWith(ORG_SLUG, EVENT_SLUG);
   });
 });
