@@ -2411,7 +2411,7 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
   /orgs/{orgSlug}/events/{eventSlug}/booth-plan:
     get:
-      summary: "List booth plan"
+      summary: "List booth locations"
       operationId: "getOrgsEventsBoothPlan"
       description: "List every non-declined partnership of the event with its booth location (or null)."
       parameters:
