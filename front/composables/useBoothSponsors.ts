@@ -1,9 +1,5 @@
 import { ref } from "vue";
-import {
-  getEventsPartnershipDetailed,
-  getOrgsEventsPacks,
-  getOrgsEventsPartnership,
-} from "~/utils/api";
+import { getOrgsEventsBoothPlan, getOrgsEventsPacks } from "~/utils/api";
 import { isHighlightedPack, type HighlightedPackName } from "~/utils/booth/isHighlightedPack";
 
 export interface BoothSponsor {
@@ -33,39 +29,31 @@ export function useBoothSponsors(orgSlug: string, eventSlug: string) {
     loading.value = true;
     error.value = null;
     try {
-      const [packsResponse, partnershipsResponse] = await Promise.all([
+      const [packsResponse, boothLocationsResponse] = await Promise.all([
         getOrgsEventsPacks(orgSlug, eventSlug),
-        getOrgsEventsPartnership(orgSlug, eventSlug, { page_size: 100 }),
+        getOrgsEventsBoothPlan(orgSlug, eventSlug),
       ]);
 
-      const highlightedPackIds = new Set(
-        packsResponse.data.filter((p) => isHighlightedPack(p.name)).map((p) => p.id),
+      const highlightedPackById = new Map<string, HighlightedPackName>(
+        packsResponse.data.flatMap((p) => (isHighlightedPack(p.name) ? [[p.id, p.name]] : [])),
       );
 
-      if (highlightedPackIds.size === 0) {
+      if (highlightedPackById.size === 0) {
         sponsors.value = [];
         return;
       }
 
-      const candidatePartnerships = partnershipsResponse.data.items.filter(
-        (item) => item.validated_pack_id != null && highlightedPackIds.has(item.validated_pack_id),
-      );
-
-      const detailResponses = await Promise.all(
-        candidatePartnerships.map((p) => getEventsPartnershipDetailed(eventSlug, p.id)),
-      );
-
-      const mapped: BoothSponsor[] = detailResponses.flatMap((response) => {
-        const partnership = response.data.partnership;
-        const company = response.data.company;
-        const packName = partnership.validated_pack?.name;
-        if (!isHighlightedPack(packName)) return [];
+      const mapped: BoothSponsor[] = boothLocationsResponse.data.flatMap((item) => {
+        const validatedPackId = item.partnership.validated_pack_id;
+        if (!validatedPackId) return [];
+        const packName = highlightedPackById.get(validatedPackId);
+        if (!packName) return [];
         return [
           {
-            id: partnership.id,
-            companyName: company.name,
+            id: item.partnership.id,
+            companyName: item.partnership.company_name,
             packName,
-            boothLocation: partnership.booth_location ?? null,
+            boothLocation: item.booth_location ?? null,
           },
         ];
       });
