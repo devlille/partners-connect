@@ -401,9 +401,10 @@ watch(loading, (isLoading) => {
 const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
 
 // Paramètres de filtre pour l'envoi d'email (convertis au format API)
-const emailFilterParams = computed<PostPartnershipEmailParams>(() => {
-  return filterStateToApiParams<PostPartnershipEmailParams>(filters.value);
-});
+const emailFilterParams = computed<PostPartnershipEmailParams>(() => ({
+  ...filterStateToApiParams<PostPartnershipEmailParams>(filters.value),
+  query: debouncedSearch.value || undefined,
+}));
 
 // Liste des emails des destinataires (extraite des partenariats filtrés)
 const recipientEmails = computed<string[]>(() => {

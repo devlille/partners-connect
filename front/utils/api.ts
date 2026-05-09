@@ -2520,6 +2520,10 @@ export type GetPartnershipEmailHistory200 = {
 
 export type PostPartnershipEmailParams = {
 /**
+ * Free-text search applied to the partnership's company name (case-insensitive substring match). Combined with the other filters using AND.
+ */
+query?: string;
+/**
  * Filter by validation status (true = validated, false = not validated)
  */
 'filter[validated]'?: boolean;

@@ -226,6 +226,33 @@ describe("useSendEmail", () => {
       );
     });
 
+    it("forwards the search query alongside filters", async () => {
+      const { postPartnershipEmail } = await import("~/utils/api");
+      vi.mocked(postPartnershipEmail).mockResolvedValue({
+        data: { recipients: 1 },
+      } as any);
+
+      const filterParams: PostPartnershipEmailParams = {
+        query: "acme",
+        "filter[validated]": true,
+      };
+      const { formData, sendEmail } = await buildComposable({
+        ...DEFAULT_OPTIONS,
+        filterParams,
+      });
+      formData.value.subject = "Hello";
+      formData.value.body = "Body";
+
+      await sendEmail();
+
+      expect(postPartnershipEmail).toHaveBeenCalledWith(
+        "devlille",
+        "devlille-2026",
+        expect.any(Object),
+        filterParams,
+      );
+    });
+
     it("uses the getter current value at send time", async () => {
       const { postPartnershipEmail } = await import("~/utils/api");
       vi.mocked(postPartnershipEmail).mockResolvedValue({
