@@ -3539,7 +3539,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Free-text search applied across the partnership's company name and contact name (case-insensitive substring match). Combined with the other filters using AND.
+          description: Free-text search applied to the partnership's company name (case-insensitive substring match). Combined with the other filters using AND.
         - name: filter[pack_id]
           in: query
           required: false

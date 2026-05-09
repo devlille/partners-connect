@@ -293,8 +293,7 @@ class PartnershipRepositoryExposed : PartnershipRepository {
             }
             .filter { partnership ->
                 val q = filters.query?.trim()?.takeIf { it.isNotEmpty() }?.lowercase() ?: return@filter true
-                partnership.company.name.lowercase().contains(q) ||
-                    partnership.contactName.lowercase().contains(q)
+                partnership.company.name.lowercase().contains(q)
             }
         val allItems = filteredPartnerships.map { partnership ->
             partnership.toDomain(PartnershipEmailEntity.emails(partnership.id.value))

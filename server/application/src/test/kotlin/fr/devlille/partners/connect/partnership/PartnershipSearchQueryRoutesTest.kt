@@ -29,7 +29,7 @@ import kotlin.test.assertTrue
 
 /**
  * Tests for GET /orgs/{orgSlug}/events/{eventSlug}/partnerships?query=...
- * Search is case-insensitive substring match across company name and partnership contact name.
+ * Search is a case-insensitive substring match on the partnership's company name.
  */
 class PartnershipSearchQueryRoutesTest {
     private val json = Json { ignoreUnknownKeys = true }
@@ -81,7 +81,7 @@ class PartnershipSearchQueryRoutesTest {
     }
 
     @Test
-    fun `query matches partnerships by contact display name`() = testApplication {
+    fun `query does not match against contact name`() = testApplication {
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
@@ -123,8 +123,8 @@ class PartnershipSearchQueryRoutesTest {
         val body = json.decodeFromString<PaginatedResponse<PartnershipItem, PartnershipListMetadata>>(
             response.bodyAsText(),
         )
-        assertEquals(1, body.total)
-        assertEquals("Alice Martin", body.items.first().contact.displayName)
+        assertEquals(0, body.total)
+        assertTrue(body.items.isEmpty())
     }
 
     @Test
