@@ -4,12 +4,12 @@ export const useEventLinks = (orgSlug: string, eventSlug: string) => {
       {
         label: "Dashboard",
         icon: "i-heroicons-chart-bar",
-        to: `/orgs/${orgSlug}/events/${eventSlug}/dashboard`,
+        to: `/orgs/${orgSlug}/events/${eventSlug}`,
       },
       {
         label: "Informations",
         icon: "i-heroicons-information-circle",
-        to: `/orgs/${orgSlug}/events/${eventSlug}`,
+        to: `/orgs/${orgSlug}/events/${eventSlug}/information`,
       },
       {
         label: "Mes Packs",
