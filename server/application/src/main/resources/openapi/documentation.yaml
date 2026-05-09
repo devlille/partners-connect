@@ -2421,6 +2421,44 @@ paths:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/booth-plan:
+    get:
+      summary: List booth plan
+      operationId: getOrgsEventsBoothPlan
+      description: List every non-declined partnership of the event with its booth location (or null).
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/partnership_booth_location_item.schema'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Not Found - Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
     post:
       summary: Upload booth plan
       operationId: postOrgsEventsBoothPlan
@@ -5372,6 +5410,8 @@ components:
       $ref: '#/components/schemas/booth_location_request.schema'
     BoothLocationResponse:
       $ref: '#/components/schemas/booth_location_response.schema'
+    PartnershipBoothLocationItem:
+      $ref: '#/components/schemas/partnership_booth_location_item.schema'
     PublicationDateRequest:
       $ref: '#/components/schemas/publication_date_request.schema'
     PublicationDateResponse:
@@ -8155,6 +8195,18 @@ components:
       required:
         - partners
       additionalProperties: false
+    partnership_booth_location_item.schema:
+      $id: partnership_booth_location_item.schema.json
+      type: object
+      properties:
+        partnership:
+          $ref: '#/components/schemas/partnership_item.schema'
+        booth_location:
+          type:
+            - string
+            - 'null'
+      required:
+        - partnership
     integration.schema:
       $schema: http://json-schema.org/draft-07/schema#
       type: object

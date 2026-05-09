@@ -1,0 +1,13 @@
+{
+  "$id": "partnership_booth_location_item.schema.json",
+  "type": "object",
+  "properties": {
+    "partnership": {
+      "$ref": "partnership_item.schema.json"
+    },
+    "booth_location": {
+      "type": ["string", "null"]
+    }
+  },
+  "required": ["partnership"]
+}
