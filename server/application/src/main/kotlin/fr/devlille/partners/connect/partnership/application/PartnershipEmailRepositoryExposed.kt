@@ -54,13 +54,17 @@ class PartnershipEmailRepositoryExposed(
             )
 
         // Apply additional filters that require entity-level checks
-        val filteredPartnerships = if (filters.paid != null) {
+        val paidFiltered = if (filters.paid != null) {
             partnerships.filter {
                 val billing = BillingEntity.singleByEventAndPartnership(eventId, it.id.value)
                 if (filters.paid) billing?.status == InvoiceStatus.PAID else billing?.status != InvoiceStatus.PAID
             }
         } else {
             partnerships
+        }
+        val filteredPartnerships = paidFiltered.filter { partnership ->
+            val q = filters.query?.trim()?.takeIf { it.isNotEmpty() }?.lowercase() ?: return@filter true
+            partnership.company.name.lowercase().contains(q)
         }
 
         // Convert to domain objects with pre-structured EmailContact objects

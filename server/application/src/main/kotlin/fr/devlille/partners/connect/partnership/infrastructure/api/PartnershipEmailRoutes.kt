@@ -49,6 +49,7 @@ fun Route.partnershipEmailRoutes() {
 
             // Parse query filters
             val filters = PartnershipFilters(
+                query = call.request.queryParameters["query"]?.trim(),
                 packId = call.request.queryParameters["filter[pack_id]"],
                 validated = call.request.queryParameters["filter[validated]"]?.toBoolean(),
                 suggestion = call.request.queryParameters["filter[suggestion]"]?.toBoolean(),
