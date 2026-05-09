@@ -2310,6 +2310,10 @@ export type GetStatusIntegration401 = {
 
 export type GetOrgsEventsPartnershipParams = {
 /**
+ * Search partnerships by company name (case-insensitive substring match)
+ */
+query?: string;
+/**
  * Filter by sponsoring pack ID
  */
 'filter[pack_id]'?: string;

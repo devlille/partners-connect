@@ -32,6 +32,13 @@
       </div>
 
       <template v-else>
+        <UInput
+          v-model="search"
+          icon="i-heroicons-magnifying-glass"
+          placeholder="Rechercher un partenaire par nom"
+          class="w-full max-w-md"
+        />
+
         <!-- Filter Panel -->
         <FilterPanel
           v-model="filters"
@@ -302,6 +309,17 @@ const loading = ref(true);
 const error = ref<string | null>(null);
 const eventName = ref<string>('');
 
+// Search (debounced server-side query)
+const search = ref('');
+const debouncedSearch = ref('');
+let searchTimer: ReturnType<typeof setTimeout> | null = null;
+watch(search, (val) => {
+  if (searchTimer) clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    debouncedSearch.value = val.trim();
+  }, 300);
+});
+
 // Pagination
 const currentPage = ref(1);
 const pageSize = ref(20);
@@ -508,6 +526,7 @@ async function loadPartnerships() {
     ...queryParams.value,
     page,
     page_size: pageSize.value,
+    query: debouncedSearch.value || undefined,
   };
 
   try {
@@ -552,13 +571,15 @@ watch([orgSlug, eventSlug], () => {
   }
 });
 
-// Unified watch: handles both page navigation and filter changes.
-// When filters change, reset to page 1 (which re-fires the watch and triggers the actual load).
+// Unified watch: handles page navigation, filter changes, and search changes.
+// When filters or search change, reset to page 1 (which re-fires the watch and triggers the actual load).
 // When only the page changes, load directly.
 watch(
-  [currentPage, () => JSON.stringify(queryParams.value)],
-  ([, newFilters], [, oldFilters]) => {
-    if (oldFilters !== undefined && newFilters !== oldFilters) {
+  [currentPage, () => JSON.stringify(queryParams.value), debouncedSearch],
+  ([, newFilters, newSearch], [, oldFilters, oldSearch]) => {
+    const filtersChanged = oldFilters !== undefined && newFilters !== oldFilters;
+    const searchChanged = oldSearch !== undefined && newSearch !== oldSearch;
+    if (filtersChanged || searchChanged) {
       if (currentPage.value !== 1) {
         currentPage.value = 1;
         return;
