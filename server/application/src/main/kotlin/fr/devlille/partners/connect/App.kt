@@ -17,6 +17,7 @@ import fr.devlille.partners.connect.integrations.infrastructure.api.integrationR
 import fr.devlille.partners.connect.integrations.infrastructure.bindings.integrationModule
 import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
+import fr.devlille.partners.connect.internal.infrastructure.api.PayloadTooLargeException
 import fr.devlille.partners.connect.internal.infrastructure.api.RequestBodyValidationException
 import fr.devlille.partners.connect.internal.infrastructure.api.ResponseException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
@@ -269,6 +270,15 @@ private fun Application.configureStatusPage() {
                 status = HttpStatusCode.UnsupportedMediaType,
                 message = ResponseException(
                     message = cause.message ?: "415 Unsupported Media Type",
+                    stack = cause.cause?.stackTraceToString(),
+                ),
+            )
+        }
+        exception<PayloadTooLargeException> { call, cause ->
+            call.respond(
+                status = HttpStatusCode.PayloadTooLarge,
+                message = ResponseException(
+                    message = cause.message ?: "413 Payload Too Large",
                     stack = cause.cause?.stackTraceToString(),
                 ),
             )

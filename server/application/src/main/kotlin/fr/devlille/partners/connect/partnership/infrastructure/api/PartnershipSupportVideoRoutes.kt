@@ -4,6 +4,7 @@ import fr.devlille.partners.connect.auth.domain.AuthRepository
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.internal.infrastructure.api.DEFAULT_PAGE_SIZE
+import fr.devlille.partners.connect.internal.infrastructure.api.PayloadTooLargeException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnsupportedMediaTypeException
 import fr.devlille.partners.connect.internal.infrastructure.api.getValue
 import fr.devlille.partners.connect.internal.infrastructure.api.token
@@ -24,6 +25,7 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipSupportVideoRe
 import fr.devlille.partners.connect.partnership.domain.SupportVideoRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.MissingRequestParameterException
+import io.ktor.server.request.contentLength
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -31,10 +33,16 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
+import java.io.IOException
 
 private val SUPPORTED_VIDEO_TYPES = setOf("video/mp4", "video/webm")
 
 private const val SUPPORT_VIDEO_MAX_BYTES: Long = 500L * 1024 * 1024
+private const val SUPPORT_VIDEO_MAX_MB: Long = SUPPORT_VIDEO_MAX_BYTES / (1024 * 1024)
+
+private fun supportVideoTooLargeMessage(): String =
+    "Support video exceeds the maximum upload size of $SUPPORT_VIDEO_MAX_MB MB. " +
+        "Please compress the file or use a shorter clip."
 
 @Suppress("ThrowsCount")
 fun Route.publicPartnershipSupportVideoRoutes() {
@@ -46,14 +54,33 @@ fun Route.publicPartnershipSupportVideoRoutes() {
             val eventSlug = call.parameters.eventSlug
             val partnershipId = call.parameters.partnershipId
 
-            val multipart = call.receiveMultipart(formFieldLimit = SUPPORT_VIDEO_MAX_BYTES)
-            val part = multipart.readPart() ?: throw MissingRequestParameterException("file")
+            val declaredLength = call.request.contentLength()
+            if (declaredLength != null && declaredLength > SUPPORT_VIDEO_MAX_BYTES) {
+                throw PayloadTooLargeException(supportVideoTooLargeMessage())
+            }
+
+            val part = try {
+                val multipart = call.receiveMultipart(formFieldLimit = SUPPORT_VIDEO_MAX_BYTES)
+                multipart.readPart() ?: throw MissingRequestParameterException("file")
+            } catch (e: IOException) {
+                if (e.message?.startsWith("Limit of") == true) {
+                    throw PayloadTooLargeException(supportVideoTooLargeMessage())
+                }
+                throw e
+            }
             val mimeType = part.contentType?.toString()
                 ?: throw UnsupportedMediaTypeException("Missing content type on uploaded file")
             if (mimeType !in SUPPORTED_VIDEO_TYPES) {
                 throw UnsupportedMediaTypeException("Unsupported video type: $mimeType")
             }
-            val bytes = part.asByteArray()
+            val bytes = try {
+                part.asByteArray()
+            } catch (e: IOException) {
+                if (e.message?.startsWith("Limit of") == true) {
+                    throw PayloadTooLargeException(supportVideoTooLargeMessage())
+                }
+                throw e
+            }
 
             repository.preCheckSubmission(eventSlug, partnershipId)
             val url = storageRepository.uploadSupportVideo(eventSlug, partnershipId, bytes, mimeType)
