@@ -19,5 +19,6 @@ data class WebhookPayload(
     val activities: List<BoothActivity>,
     val questions: List<QandaQuestion>,
     val speakers: List<Speaker>,
+    val supportVideoUrl: String? = null,
     val timestamp: String,
 )
