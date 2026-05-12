@@ -18,6 +18,8 @@ enum class MimeType(val value: String, val extension: String) {
     JSON("application/json", "json"),
     PDF("application/pdf", "pdf"),
     OCTET_STREAM("application/octet-stream", "bin"),
+    MP4("video/mp4", "mp4"),
+    WEBM("video/webm", "webm"),
 }
 
 data class Upload(
