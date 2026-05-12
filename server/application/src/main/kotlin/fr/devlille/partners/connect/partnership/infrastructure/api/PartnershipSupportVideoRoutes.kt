@@ -34,6 +34,8 @@ import org.koin.ktor.ext.inject
 
 private val SUPPORTED_VIDEO_TYPES = setOf("video/mp4", "video/webm")
 
+private const val SUPPORT_VIDEO_MAX_BYTES: Long = 500L * 1024 * 1024
+
 @Suppress("ThrowsCount")
 fun Route.publicPartnershipSupportVideoRoutes() {
     val storageRepository by inject<PartnershipStorageRepository>()
@@ -44,7 +46,7 @@ fun Route.publicPartnershipSupportVideoRoutes() {
             val eventSlug = call.parameters.eventSlug
             val partnershipId = call.parameters.partnershipId
 
-            val multipart = call.receiveMultipart()
+            val multipart = call.receiveMultipart(formFieldLimit = SUPPORT_VIDEO_MAX_BYTES)
             val part = multipart.readPart() ?: throw MissingRequestParameterException("file")
             val mimeType = part.contentType?.toString()
                 ?: throw UnsupportedMediaTypeException("Missing content type on uploaded file")
