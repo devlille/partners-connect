@@ -10,6 +10,7 @@ import io.ktor.server.plugins.MissingRequestParameterException
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
+import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
@@ -37,6 +38,11 @@ fun Route.publicPartnershipSupportVideoRoutes() {
             val url = storageRepository.uploadSupportVideo(eventSlug, partnershipId, bytes, mimeType)
             val id = repository.submit(eventSlug, partnershipId, url)
             call.respond(HttpStatusCode.Created, mapOf("id" to id.toString()))
+        }
+        get {
+            val eventSlug = call.parameters.eventSlug
+            val partnershipId = call.parameters.partnershipId
+            call.respond(HttpStatusCode.OK, repository.get(eventSlug, partnershipId))
         }
     }
 }
