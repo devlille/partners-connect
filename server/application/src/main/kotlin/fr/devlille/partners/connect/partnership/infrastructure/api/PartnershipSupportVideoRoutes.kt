@@ -34,6 +34,7 @@ import org.koin.ktor.ext.inject
 
 private val SUPPORTED_VIDEO_TYPES = setOf("video/mp4", "video/webm")
 
+@Suppress("ThrowsCount")
 fun Route.publicPartnershipSupportVideoRoutes() {
     val storageRepository by inject<PartnershipStorageRepository>()
     val repository by inject<SupportVideoRepository>()

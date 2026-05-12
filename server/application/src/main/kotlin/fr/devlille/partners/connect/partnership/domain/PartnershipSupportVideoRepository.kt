@@ -15,5 +15,6 @@ interface PartnershipSupportVideoRepository {
     ): PaginatedResponse<SupportVideoResponse, Unit>
 
     fun approve(videoId: UUID, reviewer: UserInfo): SupportVideoResponse
+
     fun decline(videoId: UUID, reviewer: UserInfo, reason: String? = null): SupportVideoResponse
 }

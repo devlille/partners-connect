@@ -17,8 +17,8 @@ import fr.devlille.partners.connect.partnership.application.PartnershipStorageRe
 import fr.devlille.partners.connect.partnership.application.PartnershipSuggestionRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipSupportVideoRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipTicketRepositoryExposed
-import fr.devlille.partners.connect.partnership.application.SupportVideoRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.QandaRepositoryExposed
+import fr.devlille.partners.connect.partnership.application.SupportVideoRepositoryExposed
 import fr.devlille.partners.connect.partnership.domain.BoothActivityRepository
 import fr.devlille.partners.connect.partnership.domain.CommunicationPlanRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipAgreementRepository

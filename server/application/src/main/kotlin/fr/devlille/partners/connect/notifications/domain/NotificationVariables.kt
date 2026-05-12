@@ -309,6 +309,7 @@ sealed interface NotificationVariables {
      * The [company] property is not applicable for a digest (digest covers multiple
      * companies) and throws [UnsupportedOperationException] if accessed.
      */
+    @Suppress("LongParameterList")
     class MorningDigest(
         override val language: String,
         override val event: EventWithOrganisation,
