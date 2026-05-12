@@ -36,6 +36,7 @@ fun Route.partnershipRoutes() {
     publicPartnershipBillingRoutes()
     publicPartnershipTicketingRoutes()
     publicPartnershipJobOfferRoutes()
+    publicPartnershipSupportVideoRoutes()
     publicPartnershipSpeakersRoutes()
     boothActivityRoutes()
     qandaRoutes()

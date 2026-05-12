@@ -11,6 +11,31 @@ import java.util.UUID
 import kotlin.time.Duration.Companion.days
 
 @Suppress("LongParameterList")
+fun insertMockedFutureEventWithSlug(
+    id: UUID = UUID.randomUUID(),
+    slug: String,
+    name: String = slug,
+    address: String = "123 Test St, Test City, TC 12345",
+    contactEmail: String = "contact@mail.com",
+    contactPhone: String? = null,
+    submissionStartTime: LocalDateTime? = null,
+    submissionEndTime: LocalDateTime? = null,
+    orgId: UUID = UUID.randomUUID(),
+    boothPlanImageUrl: String? = null,
+): EventEntity = insertMockedFutureEvent(
+    id = id,
+    name = name,
+    slug = slug,
+    address = address,
+    contactEmail = contactEmail,
+    contactPhone = contactPhone,
+    submissionStartTime = submissionStartTime,
+    submissionEndTime = submissionEndTime,
+    orgId = orgId,
+    boothPlanImageUrl = boothPlanImageUrl,
+)
+
+@Suppress("LongParameterList")
 fun insertMockedFutureEvent(
     id: UUID = UUID.randomUUID(),
     name: String = id.toString(),
