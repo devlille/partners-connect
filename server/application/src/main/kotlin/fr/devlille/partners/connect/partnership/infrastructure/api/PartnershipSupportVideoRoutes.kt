@@ -35,6 +35,7 @@ fun Route.publicPartnershipSupportVideoRoutes() {
             }
             val bytes = part.asByteArray()
 
+            repository.preCheckSubmission(eventSlug, partnershipId)
             val url = storageRepository.uploadSupportVideo(eventSlug, partnershipId, bytes, mimeType)
             val id = repository.submit(eventSlug, partnershipId, url)
             call.respond(HttpStatusCode.Created, mapOf("id" to id.toString()))
