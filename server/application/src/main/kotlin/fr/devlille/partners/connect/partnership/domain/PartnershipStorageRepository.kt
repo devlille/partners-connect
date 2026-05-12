@@ -21,4 +21,16 @@ interface PartnershipStorageRepository {
         content: ByteArray,
         mimeType: String,
     ): String
+
+    /**
+     * Uploads a partner's support video to Google Cloud Storage and returns its public URL.
+     * Throws [UnsupportedMediaTypeException] if [mimeType] is not in the allow-list
+     * ("video/mp4", "video/webm").
+     */
+    fun uploadSupportVideo(
+        eventSlug: String,
+        partnershipId: UUID,
+        content: ByteArray,
+        mimeType: String,
+    ): String
 }

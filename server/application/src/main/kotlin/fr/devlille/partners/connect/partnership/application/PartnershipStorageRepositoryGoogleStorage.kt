@@ -79,4 +79,32 @@ class PartnershipStorageRepositoryGoogleStorage(
         )
         uploaded.url
     }
+
+    override fun uploadSupportVideo(
+        eventSlug: String,
+        partnershipId: UUID,
+        content: ByteArray,
+        mimeType: String,
+    ): String = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val eventId = event.id.value
+
+        if (content.isEmpty()) {
+            throw EmptyStringValidationException("file")
+        }
+
+        val videoMimeType = when (mimeType) {
+            "video/mp4" -> MimeType.MP4
+            "video/webm" -> MimeType.WEBM
+            else -> throw UnsupportedMediaTypeException("Unsupported video type: $mimeType")
+        }
+
+        val uploaded = storage.upload(
+            filename = "events/$eventId/partnerships/$partnershipId/support-video.${videoMimeType.extension}",
+            content = content,
+            mimeType = videoMimeType,
+        )
+        uploaded.url
+    }
 }
