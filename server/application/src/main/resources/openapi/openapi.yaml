@@ -1446,7 +1446,7 @@ paths:
     post:
       summary: "Upload support video"
       operationId: "uploadSupportVideo"
-      description: "Upload (or replace) the partnership's support video file. The server stores it on Google Cloud Storage and records the public URL. Validation by an organiser is required before the URL is propagated via webhook."
+      description: "Upload (or replace) the partnership's support video file (max 500 MB, video/mp4 or video/webm). The server stores it on Google Cloud Storage and records the public URL. Validation by an organiser is required before the URL is propagated via webhook."
       tags:
         - partnerships
         - support-video
