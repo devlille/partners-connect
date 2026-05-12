@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "support_video_response.schema.json",
+  "title": "SupportVideoResponse",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "partnership_id": { "type": "string", "format": "uuid" },
+    "event_slug": { "type": "string" },
+    "url": { "type": "string" },
+    "status": { "type": "string", "enum": ["PENDING", "APPROVED", "DECLINED"] },
+    "submitted_at": { "type": "string", "format": "date-time" },
+    "reviewed_at": { "type": ["string", "null"], "format": "date-time" },
+    "reviewed_by": { "type": ["string", "null"] },
+    "decline_reason": { "type": ["string", "null"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  },
+  "required": ["id", "partnership_id", "event_slug", "url", "status", "submitted_at", "created_at", "updated_at"],
+  "additionalProperties": false
+}
