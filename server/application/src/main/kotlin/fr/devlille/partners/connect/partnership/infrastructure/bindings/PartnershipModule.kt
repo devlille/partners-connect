@@ -15,7 +15,9 @@ import fr.devlille.partners.connect.partnership.application.PartnershipRepositor
 import fr.devlille.partners.connect.partnership.application.PartnershipSpeakerRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipStorageRepositoryGoogleStorage
 import fr.devlille.partners.connect.partnership.application.PartnershipSuggestionRepositoryExposed
+import fr.devlille.partners.connect.partnership.application.PartnershipSupportVideoRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipTicketRepositoryExposed
+import fr.devlille.partners.connect.partnership.application.SupportVideoRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.QandaRepositoryExposed
 import fr.devlille.partners.connect.partnership.domain.BoothActivityRepository
 import fr.devlille.partners.connect.partnership.domain.CommunicationPlanRepository
@@ -31,8 +33,10 @@ import fr.devlille.partners.connect.partnership.domain.PartnershipRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipSpeakerRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipStorageRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipSuggestionRepository
+import fr.devlille.partners.connect.partnership.domain.PartnershipSupportVideoRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipTicketRepository
 import fr.devlille.partners.connect.partnership.domain.QandaRepository
+import fr.devlille.partners.connect.partnership.domain.SupportVideoRepository
 import org.koin.dsl.module
 
 val partnershipModule = module {
@@ -86,4 +90,6 @@ val partnershipModule = module {
     single<QandaRepository> {
         QandaRepositoryExposed()
     }
+    single<SupportVideoRepository> { SupportVideoRepositoryExposed() }
+    single<PartnershipSupportVideoRepository> { PartnershipSupportVideoRepositoryExposed() }
 }
