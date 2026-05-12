@@ -14,7 +14,30 @@ interface PartnershipSupportVideoRepository {
         pageSize: Int = 20,
     ): PaginatedResponse<SupportVideoResponse, Unit>
 
-    fun approve(videoId: UUID, reviewer: UserInfo): SupportVideoResponse
+    /**
+     * Approves a pending support video.
+     *
+     * Throws [io.ktor.server.plugins.NotFoundException] when the event does not exist or when the video does not
+     * exist or does not belong to the event/partnership scope identified by [eventSlug] and [partnershipId] (404).
+     */
+    fun approve(
+        eventSlug: String,
+        partnershipId: UUID,
+        videoId: UUID,
+        reviewer: UserInfo,
+    ): SupportVideoResponse
 
-    fun decline(videoId: UUID, reviewer: UserInfo, reason: String? = null): SupportVideoResponse
+    /**
+     * Declines a pending support video.
+     *
+     * Throws [io.ktor.server.plugins.NotFoundException] when the event does not exist or when the video does not
+     * exist or does not belong to the event/partnership scope identified by [eventSlug] and [partnershipId] (404).
+     */
+    fun decline(
+        eventSlug: String,
+        partnershipId: UUID,
+        videoId: UUID,
+        reviewer: UserInfo,
+        reason: String? = null,
+    ): SupportVideoResponse
 }

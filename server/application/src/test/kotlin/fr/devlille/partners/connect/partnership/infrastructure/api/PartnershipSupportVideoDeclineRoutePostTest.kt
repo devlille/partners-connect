@@ -2,6 +2,7 @@ package fr.devlille.partners.connect.partnership.infrastructure.api
 
 import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.events.factories.insertMockedFutureEvent
+import fr.devlille.partners.connect.events.factories.insertMockedFutureEventWithSlug
 import fr.devlille.partners.connect.internal.infrastructure.db.PromotionStatus
 import fr.devlille.partners.connect.internal.moduleSharedDb
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
@@ -323,5 +324,116 @@ class PartnershipSupportVideoDeclineRoutePostTest {
         }
 
         assertEquals(HttpStatusCode.Conflict, response.status)
+    }
+
+    @Test
+    fun `decline returns 404 when video belongs to a different partnership`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val companyAId = UUID.randomUUID()
+        val companyBId = UUID.randomUUID()
+        val partnershipAId = UUID.randomUUID()
+        val partnershipBId = UUID.randomUUID()
+        val videoId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyAId)
+                insertMockedCompany(companyBId)
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedPartnership(
+                    id = partnershipAId,
+                    eventId = eventId,
+                    companyId = companyAId,
+                    selectedPackId = packId,
+                )
+                insertMockedPartnership(
+                    id = partnershipBId,
+                    eventId = eventId,
+                    companyId = companyBId,
+                    selectedPackId = packId,
+                )
+                insertMockedSupportVideo(
+                    id = videoId,
+                    partnershipId = partnershipAId,
+                    eventId = eventId,
+                    status = PromotionStatus.PENDING,
+                )
+            }
+        }
+
+        val input = json.encodeToString(
+            DeclineSupportVideoRequest.serializer(),
+            DeclineSupportVideoRequest(reason = "any"),
+        )
+        val response = client.post(
+            "/orgs/$orgId/events/$eventId/partnerships/$partnershipBId/support-videos/$videoId/decline",
+        ) {
+            header(HttpHeaders.Authorization, "Bearer valid")
+            contentType(ContentType.Application.Json)
+            setBody(input)
+        }
+
+        assertEquals(HttpStatusCode.NotFound, response.status)
+    }
+
+    @Test
+    fun `decline returns 404 when video belongs to a different event`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventAId = UUID.randomUUID()
+        val eventBId = UUID.randomUUID()
+        val eventASlug = "event-a-${UUID.randomUUID()}"
+        val eventBSlug = "event-b-${UUID.randomUUID()}"
+        val packId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val partnershipId = UUID.randomUUID()
+        val videoId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                insertMockedFutureEventWithSlug(id = eventAId, slug = eventASlug, orgId = orgId)
+                insertMockedFutureEventWithSlug(id = eventBId, slug = eventBSlug, orgId = orgId)
+                insertMockedCompany(companyId)
+                insertMockedSponsoringPack(packId, eventAId)
+                insertMockedPartnership(
+                    id = partnershipId,
+                    eventId = eventAId,
+                    companyId = companyId,
+                    selectedPackId = packId,
+                )
+                insertMockedSupportVideo(
+                    id = videoId,
+                    partnershipId = partnershipId,
+                    eventId = eventAId,
+                    status = PromotionStatus.PENDING,
+                )
+            }
+        }
+
+        val input = json.encodeToString(
+            DeclineSupportVideoRequest.serializer(),
+            DeclineSupportVideoRequest(reason = "any"),
+        )
+        val response = client.post(
+            "/orgs/$orgId/events/$eventBSlug/partnerships/$partnershipId/support-videos/$videoId/decline",
+        ) {
+            header(HttpHeaders.Authorization, "Bearer valid")
+            contentType(ContentType.Application.Json)
+            setBody(input)
+        }
+
+        assertEquals(HttpStatusCode.NotFound, response.status)
     }
 }

@@ -102,10 +102,10 @@ fun Route.orgsPartnershipSupportVideoDecisionRoutes() {
         post {
             val videoId = call.parameters.getValue("videoId").toUUID()
             val eventSlug = call.parameters.eventSlug
+            val partnershipId = call.parameters.partnershipId
             val userInfo = authRepository.getUserInfo(call.token)
-            val video = repository.approve(videoId, userInfo)
+            val video = repository.approve(eventSlug, partnershipId, videoId, userInfo)
 
-            val partnershipId = video.partnershipId.toUUID()
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             call.attributes.variables = NotificationVariables.SupportVideoApproved(
                 language = partnership.language,
@@ -125,11 +125,11 @@ fun Route.orgsPartnershipSupportVideoDecisionRoutes() {
         post {
             val videoId = call.parameters.getValue("videoId").toUUID()
             val eventSlug = call.parameters.eventSlug
+            val partnershipId = call.parameters.partnershipId
             val request = call.receive<DeclineSupportVideoRequest>(schema = "decline_support_video.schema.json")
             val userInfo = authRepository.getUserInfo(call.token)
-            val video = repository.decline(videoId, userInfo, request.reason)
+            val video = repository.decline(eventSlug, partnershipId, videoId, userInfo, request.reason)
 
-            val partnershipId = video.partnershipId.toUUID()
             val partnership = partnershipRepository.getById(eventSlug, partnershipId)
             call.attributes.variables = NotificationVariables.SupportVideoDeclined(
                 language = partnership.language,

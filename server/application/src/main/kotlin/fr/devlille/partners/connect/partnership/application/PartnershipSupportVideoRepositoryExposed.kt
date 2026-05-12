@@ -3,6 +3,7 @@ package fr.devlille.partners.connect.partnership.application
 import fr.devlille.partners.connect.auth.domain.UserInfo
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
+import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
 import fr.devlille.partners.connect.internal.infrastructure.api.PaginatedResponse
 import fr.devlille.partners.connect.internal.infrastructure.api.paginated
@@ -43,9 +44,19 @@ class PartnershipSupportVideoRepositoryExposed : PartnershipSupportVideoReposito
         items.toPaginatedResponse(videos.count(), page, pageSize)
     }
 
-    override fun approve(videoId: UUID, reviewer: UserInfo): SupportVideoResponse = transaction {
+    override fun approve(
+        eventSlug: String,
+        partnershipId: UUID,
+        videoId: UUID,
+        reviewer: UserInfo,
+    ): SupportVideoResponse = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event '$eventSlug' not found")
         val video = PartnershipSupportVideoEntity.findById(videoId)
             ?: throw NotFoundException("Support video $videoId not found")
+        if (video.event.id.value != event.id.value || video.partnership.id.value != partnershipId) {
+            throw NotFoundException("Support video $videoId not found for partnership $partnershipId")
+        }
         if (video.status != PromotionStatus.PENDING) {
             throw ConflictException(
                 "Cannot approve support video with status ${video.status}. Only PENDING videos can be approved.",
@@ -61,9 +72,21 @@ class PartnershipSupportVideoRepositoryExposed : PartnershipSupportVideoReposito
         video.toDomain()
     }
 
-    override fun decline(videoId: UUID, reviewer: UserInfo, reason: String?): SupportVideoResponse = transaction {
+    @Suppress("LongParameterList")
+    override fun decline(
+        eventSlug: String,
+        partnershipId: UUID,
+        videoId: UUID,
+        reviewer: UserInfo,
+        reason: String?,
+    ): SupportVideoResponse = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event '$eventSlug' not found")
         val video = PartnershipSupportVideoEntity.findById(videoId)
             ?: throw NotFoundException("Support video $videoId not found")
+        if (video.event.id.value != event.id.value || video.partnership.id.value != partnershipId) {
+            throw NotFoundException("Support video $videoId not found for partnership $partnershipId")
+        }
         if (video.status != PromotionStatus.PENDING) {
             throw ConflictException(
                 "Cannot decline support video with status ${video.status}. Only PENDING videos can be declined.",
