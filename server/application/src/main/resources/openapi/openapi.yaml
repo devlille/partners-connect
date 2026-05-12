@@ -1442,6 +1442,103 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /events/{eventSlug}/partnerships/{partnershipId}/support-video:
+    post:
+      summary: "Upload support video"
+      operationId: "uploadSupportVideo"
+      description: "Upload (or replace) the partnership's support video file. The server stores it on Google Cloud Storage and records the public URL. Validation by an organiser is required before the URL is propagated via webhook."
+      tags:
+        - partnerships
+        - support-video
+      security:
+        - {}
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "Partnership UUID"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: "object"
+              properties:
+                file:
+                  type: "string"
+                  format: "binary"
+              required:
+                - file
+      responses:
+        "201":
+          description: "Created - Support video uploaded successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Identifier"
+        "404":
+          description: "Not Found - Partnership or event not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: "Conflict - A support video is already approved for this partnership"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "415":
+          description: "Unsupported Media Type - Video format not supported"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    get:
+      summary: "Get support video"
+      operationId: "getSupportVideo"
+      description: "Get the partnership's support video. Public endpoint accessible without authentication."
+      tags:
+        - partnerships
+        - support-video
+      security:
+        - {}
+      parameters:
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "Partnership UUID"
+      responses:
+        "200":
+          description: "OK - Support video retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupportVideoResponse"
+        "404":
+          description: "Not Found - Partnership, event, or support video not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /events/{eventSlug}/partnerships/{partnershipId}/speakers/{speakerId}:
     post:
       summary: "Attach speaker to partnership"
@@ -4498,6 +4595,238 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /orgs/{orgSlug}/events/{eventSlug}/support-videos:
+    get:
+      summary: "List support videos"
+      operationId: "listSupportVideos"
+      description: "List support videos for an event, optionally filtered by status. Requires organization edit permissions."
+      tags:
+        - partnerships
+        - support-video
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organization slug"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug"
+        - name: "status"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            enum: ["pending", "approved", "declined"]
+          description: "Filter by support video status"
+        - name: "page"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            minimum: 1
+            default: 1
+          description: "Page number (1-indexed)"
+        - name: "page_size"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: "Number of items per page"
+      responses:
+        "200":
+          description: "OK - Successfully retrieved support videos"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  items:
+                    type: "array"
+                    items:
+                      $ref: "#/components/schemas/SupportVideoResponse"
+                  total:
+                    type: "integer"
+                  page:
+                    type: "integer"
+                  page_size:
+                    type: "integer"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Forbidden - User does not have edit permissions"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Not Found - Event not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/support-videos/{videoId}/approve:
+    post:
+      summary: "Approve support video"
+      operationId: "approveSupportVideo"
+      description: "Approve a pending support video. Requires organization edit permissions. Sends notification to company and triggers webhook."
+      tags:
+        - partnerships
+        - support-video
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organization slug"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "Partnership UUID"
+        - name: "videoId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "Support video UUID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties: {}
+      responses:
+        "200":
+          description: "OK - Support video approved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupportVideoResponse"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Forbidden - User does not have edit permissions"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Not Found - Support video, partnership, or event not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: "Conflict - Support video already processed"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/support-videos/{videoId}/decline:
+    post:
+      summary: "Decline support video"
+      operationId: "declineSupportVideo"
+      description: "Decline a pending support video with an optional reason. Requires organization edit permissions. Sends notification to company."
+      tags:
+        - partnerships
+        - support-video
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organization slug"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug"
+        - name: "partnershipId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "Partnership UUID"
+        - name: "videoId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+          description: "Support video UUID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeclineSupportVideoRequest"
+      responses:
+        "200":
+          description: "OK - Support video declined successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupportVideoResponse"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Forbidden - User does not have edit permissions"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Not Found - Support video, partnership, or event not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: "Conflict - Support video already processed"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/organiser:
     post:
       summary: "Assign organiser to partnership"
@@ -5439,6 +5768,10 @@ components:
       $ref: "../schemas/job_offer_promotion_response.schema.json"
     DeclineJobOfferRequest:
       $ref: "../schemas/decline_job_offer_promotion.schema.json"
+    DeclineSupportVideoRequest:
+      $ref: "../schemas/decline_support_video.schema.json"
+    SupportVideoResponse:
+      $ref: "../schemas/support_video_response.schema.json"
     DetailedPartnershipResponse:
       $ref: "../schemas/detailed_partnership_response.schema.json"
     PartnershipDetail:
