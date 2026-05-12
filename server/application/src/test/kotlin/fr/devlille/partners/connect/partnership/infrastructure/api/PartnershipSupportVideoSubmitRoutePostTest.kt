@@ -11,6 +11,7 @@ import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisa
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.partnership.factories.insertMockedSupportVideo
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack
+import fr.devlille.partners.connect.users.factories.insertMockedUser
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.statement.bodyAsText
@@ -134,7 +135,7 @@ class PartnershipSupportVideoSubmitRoutePostTest {
         application {
             moduleMocked(mockStorage = module { single<Storage> { storage } })
             transaction {
-                fr.devlille.partners.connect.users.factories.insertMockedUser(userId)
+                insertMockedUser(userId)
                 insertMockedOrganisationEntity(orgId)
                 insertMockedFutureEventWithSlug(eventId, orgId = orgId, slug = "dev-fest")
                 insertMockedSponsoringPack(packId, eventId)

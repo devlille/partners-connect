@@ -50,6 +50,19 @@ class SupportVideoRepositoryExposed : SupportVideoRepository {
         entity.id.value
     }
 
+    override fun preCheckSubmission(eventSlug: String, partnershipId: UUID): Unit = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event '$eventSlug' not found")
+        PartnershipEntity.singleByEventAndPartnership(event.id.value, partnershipId)
+            ?: throw NotFoundException("Partnership $partnershipId not found for event '$eventSlug'")
+        val existing = PartnershipSupportVideoEntity.singleByPartnership(partnershipId)
+        if (existing?.status == PromotionStatus.APPROVED) {
+            throw ConflictException(
+                "Support video already approved. Contact organisers to revoke before re-submitting.",
+            )
+        }
+    }
+
     override fun get(eventSlug: String, partnershipId: UUID): SupportVideoResponse = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event '$eventSlug' not found")
