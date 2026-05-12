@@ -50,6 +50,8 @@ fun Route.partnershipRoutes() {
     orgsPartnershipBoothLocationRoutes()
     orgsPartnershipJobOfferRoutes()
     orgsPartnershipJobOfferDecisionRoutes()
+    orgsPartnershipSupportVideoRoutes()
+    orgsPartnershipSupportVideoDecisionRoutes()
     orgsPartnershipOrganiserRoutes()
     orgsPartnershipPricingRoutes()
     partnershipEmailRoutes()
