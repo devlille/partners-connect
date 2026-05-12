@@ -266,6 +266,42 @@ sealed interface NotificationVariables {
         }
     }
 
+    data class SupportVideoApproved(
+        override val language: String,
+        override val event: EventWithOrganisation,
+        override val company: Company,
+        val partnership: Partnership,
+        val videoUrl: String,
+    ) : NotificationVariables {
+        override val usageName: String = "support_video_approved"
+
+        override fun populate(content: String): String = content
+            .replace("{{event_name}}", event.event.name)
+            .replace("{{event_contact}}", event.event.contact.email)
+            .replace("{{company_name}}", company.name)
+            .replace("{{video_url}}", videoUrl)
+            .replace("{{partnership_link}}", partnership.link(event))
+    }
+
+    data class SupportVideoDeclined(
+        override val language: String,
+        override val event: EventWithOrganisation,
+        override val company: Company,
+        val partnership: Partnership,
+        val videoUrl: String,
+        val declineReason: String?,
+    ) : NotificationVariables {
+        override val usageName: String = "support_video_declined"
+
+        override fun populate(content: String): String = content
+            .replace("{{event_name}}", event.event.name)
+            .replace("{{event_contact}}", event.event.contact.email)
+            .replace("{{company_name}}", company.name)
+            .replace("{{video_url}}", videoUrl)
+            .replace("{{decline_reason}}", declineReason ?: "No reason provided")
+            .replace("{{partnership_link}}", partnership.link(event))
+    }
+
     /**
      * Notification variables for the morning organiser daily digest.
      *
