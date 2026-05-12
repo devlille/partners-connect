@@ -17,6 +17,7 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.BoothActivitiesTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.BoothActivityEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipSupportVideoEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.QandaQuestionEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.QandaQuestionsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.SpeakerPartnershipEntity
@@ -99,6 +100,9 @@ class HttpWebhookGateway(
                     )
                 }
                 .sortedBy { it.name }
+            val supportVideoUrl = PartnershipSupportVideoEntity.singleByPartnership(partnershipId)
+                ?.takeIf { it.status == PromotionStatus.APPROVED }
+                ?.url
             WebhookPayload(
                 eventType = eventType,
                 partnership = partnership.toDetailedDomain(
@@ -124,6 +128,7 @@ class HttpWebhookGateway(
                 activities = activities,
                 questions = questions,
                 speakers = speakers,
+                supportVideoUrl = supportVideoUrl,
                 timestamp = Clock.System.now().toString(),
             )
         }
