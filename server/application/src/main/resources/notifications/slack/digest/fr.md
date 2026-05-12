@@ -11,3 +11,6 @@
 
 💼 Offres d'emploi à valider :
 {{job_offer_section}}
+
+🎥 Vidéos de support à valider :
+{{support_video_section}}

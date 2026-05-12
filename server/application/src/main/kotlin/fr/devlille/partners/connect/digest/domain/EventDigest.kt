@@ -19,9 +19,11 @@ data class EventDigest(
     val billingItems: List<DigestEntry>,
     val socialMediaItems: List<DigestEntry>,
     val jobOfferItems: List<DigestEntry>,
+    val supportVideoItems: List<DigestEntry>,
 ) {
     /** `true` when at least one section has items; used by the route to gate Slack dispatch. */
     val hasItems: Boolean
         get() = agreementItems.isNotEmpty() || billingItems.isNotEmpty() ||
-            socialMediaItems.isNotEmpty() || jobOfferItems.isNotEmpty()
+            socialMediaItems.isNotEmpty() || jobOfferItems.isNotEmpty() ||
+            supportVideoItems.isNotEmpty()
 }
