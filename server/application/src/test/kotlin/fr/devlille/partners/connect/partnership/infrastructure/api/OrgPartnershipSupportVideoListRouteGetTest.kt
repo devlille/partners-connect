@@ -24,7 +24,6 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class OrgPartnershipSupportVideoListRouteGetTest {
     @Test
@@ -95,8 +94,9 @@ class OrgPartnershipSupportVideoListRouteGetTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val body = response.bodyAsText()
-        assertTrue(body.contains("\"items\": []") || body.contains("\"items\":[]"))
+        val responseMap = Json.parseToJsonElement(response.bodyAsText()).jsonObject
+        val items = responseMap["items"]?.jsonArray
+        assertEquals(0, items!!.size)
     }
 
     @Test
