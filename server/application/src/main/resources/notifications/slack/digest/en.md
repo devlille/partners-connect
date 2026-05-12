@@ -11,3 +11,6 @@
 
 💼 Job offers to validate:
 {{job_offer_section}}
+
+🎥 Support videos to validate:
+{{support_video_section}}

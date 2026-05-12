@@ -15,6 +15,7 @@ import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.organisations.application.mappers.toItemDomain
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipSupportVideoEntity
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -41,6 +42,7 @@ class DigestRepositoryExposed : DigestRepository {
             billingItems = queryBillingReady(eventEntity.id.value, eventSlug),
             socialMediaItems = querySocialMediaDue(eventEntity.id.value, today, eventSlug),
             jobOfferItems = queryPendingJobOffers(eventEntity.id.value, eventSlug),
+            supportVideoItems = querySupportVideoPending(eventEntity.id.value, eventSlug),
         )
     }
 
@@ -103,4 +105,9 @@ class DigestRepositoryExposed : DigestRepository {
     private fun queryPendingJobOffers(eventId: UUID, eventSlug: String): List<DigestEntry> =
         CompanyJobOfferPromotionEntity.listByEventAndStatus(eventId, PromotionStatus.PENDING)
             .map { DigestEntry(it.jobOffer.title, buildLink(eventSlug, it.partnership.id.value)) }
+
+    private fun querySupportVideoPending(eventId: UUID, eventSlug: String): List<DigestEntry> =
+        PartnershipSupportVideoEntity
+            .listByEventAndStatus(eventId, PromotionStatus.PENDING)
+            .map { DigestEntry(it.partnership.company.name, buildLink(eventSlug, it.partnership.id.value)) }
 }
