@@ -47,6 +47,11 @@ export const useEventLinks = (orgSlug: string, eventSlug: string) => {
         to: `/orgs/${orgSlug}/events/${eventSlug}/communication`,
       },
       {
+        label: "Vidéos de présentation",
+        icon: "i-heroicons-video-camera",
+        to: `/orgs/${orgSlug}/events/${eventSlug}/support-videos`,
+      },
+      {
         label: "Intégrations",
         icon: "i-heroicons-puzzle-piece",
         to: `/orgs/${orgSlug}/events/${eventSlug}/integrations`,

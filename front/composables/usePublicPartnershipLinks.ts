@@ -8,56 +8,65 @@ export const usePublicPartnershipLinks = () => {
 
     return [
       {
-        label: 'Partenariat',
-        icon: 'i-heroicons-hand-raised',
+        label: "Partenariat",
+        icon: "i-heroicons-hand-raised",
         to: `/${eventSlug.value}/${partnershipId.value}`,
         badge: !partnershipComplete
-          ? { label: '!', color: 'error' as const, title: 'Informations incomplètes' }
+          ? { label: "!", color: "error" as const, title: "Informations incomplètes" }
           : undefined,
       },
       {
-        label: 'Entreprise',
-        icon: 'i-heroicons-building-office',
+        label: "Entreprise",
+        icon: "i-heroicons-building-office",
         to: `/${eventSlug.value}/${partnershipId.value}/company`,
         badge: !companyComplete
-          ? { label: '!', color: 'error' as const, title: 'Informations incomplètes' }
+          ? { label: "!", color: "error" as const, title: "Informations incomplètes" }
           : undefined,
       },
       {
         label: "Offres d'emploi",
-        icon: 'i-heroicons-briefcase',
+        icon: "i-heroicons-briefcase",
         to: `/${eventSlug.value}/${partnershipId.value}/job-offers`,
       },
       {
-        label: 'Vos Activités',
-        icon: 'i-heroicons-calendar-days',
+        label: "Vos Activités",
+        icon: "i-heroicons-calendar-days",
         to: `/${eventSlug.value}/${partnershipId.value}/activities`,
       },
       {
-        label: 'Liens utiles',
-        icon: 'i-heroicons-link',
+        label: "Liens utiles",
+        icon: "i-heroicons-link",
         to: `/${eventSlug.value}/${partnershipId.value}/external-links`,
       },
       {
-        label: 'Prestataires',
-        icon: 'i-heroicons-user-group',
+        label: "Prestataires",
+        icon: "i-heroicons-user-group",
         to: `/${eventSlug.value}/${partnershipId.value}/providers`,
       },
       {
-        label: 'Booth',
-        icon: 'i-heroicons-map-pin',
+        label: "Booth",
+        icon: "i-heroicons-map-pin",
         to: `/${eventSlug.value}/${partnershipId.value}/booth`,
       },
       {
-        label: 'Tickets',
-        icon: 'i-heroicons-ticket',
+        label: "Vidéo de présentation",
+        icon: "i-heroicons-video-camera",
+        to: `/${eventSlug.value}/${partnershipId.value}/support-video`,
+      },
+      {
+        label: "Tickets",
+        icon: "i-heroicons-ticket",
         to: `/${eventSlug.value}/${partnershipId.value}/tickets`,
       },
-      ...(qandaEnabled.value ? [{
-        label: 'Scanzee',
-        icon: 'i-heroicons-qr-code',
-        to: `/${eventSlug.value}/${partnershipId.value}/scanzee`,
-      }] : []),
+      ...(qandaEnabled.value
+        ? [
+            {
+              label: "Scanzee",
+              icon: "i-heroicons-qr-code",
+              to: `/${eventSlug.value}/${partnershipId.value}/scanzee`,
+            },
+          ]
+        : []),
     ];
   });
 
