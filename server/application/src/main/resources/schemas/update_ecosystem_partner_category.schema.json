@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "UpdateEcosystemPartnerCategory",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "name": { "type": ["string", "null"], "minLength": 1, "maxLength": 100 },
+    "display_order": { "type": ["integer", "null"], "minimum": 0 }
+  }
+}

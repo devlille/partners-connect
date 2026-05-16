@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "UpdateEcosystemPartner",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "category_id": { "type": ["string", "null"], "format": "uuid" },
+    "display_order": { "type": ["integer", "null"], "minimum": 0 },
+    "language": { "type": ["string", "null"], "minLength": 2, "maxLength": 5 },
+    "emails": {
+      "type": ["array", "null"],
+      "items": { "type": "string", "format": "email" }
+    }
+  }
+}
