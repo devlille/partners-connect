@@ -4,6 +4,7 @@ import fr.devlille.partners.connect.agenda.domain.Speaker
 import fr.devlille.partners.connect.companies.application.mappers.toDomain
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyJobOfferPromotionEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanySocialEntity
+import fr.devlille.partners.connect.ecosystempartners.infrastructure.db.EcosystemPartnerEntity
 import fr.devlille.partners.connect.events.domain.EventSummary
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
@@ -26,6 +27,7 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
 import fr.devlille.partners.connect.webhooks.domain.WebhookGateway
 import fr.devlille.partners.connect.webhooks.domain.WebhookPayload
+import fr.devlille.partners.connect.webhooks.domain.WebhookResourceType
 import io.ktor.client.HttpClient
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
@@ -45,11 +47,11 @@ class HttpWebhookGateway(
 ) : WebhookGateway {
     override val provider = IntegrationProvider.WEBHOOK
 
-    @Suppress("LongMethod")
     override suspend fun sendWebhook(
         integrationId: UUID,
         eventId: UUID,
-        partnershipId: UUID,
+        resourceType: WebhookResourceType,
+        resourceId: UUID,
         eventType: WebhookEventType,
     ): Boolean {
         // Get integration configuration and check permissions in transaction
@@ -59,7 +61,8 @@ class HttpWebhookGateway(
             // Check if we can send webhook based on config type
             val canSend = when (webhookConfig.type) {
                 WebhookType.ALL -> true
-                WebhookType.PARTNERSHIP -> webhookConfig.partnershipId == partnershipId
+                WebhookType.PARTNERSHIP ->
+                    resourceType == WebhookResourceType.PARTNERSHIP && webhookConfig.partnershipId == resourceId
             }
 
             if (!canSend) null else webhookConfig
@@ -68,69 +71,9 @@ class HttpWebhookGateway(
         // If we can't send webhook, return false
         if (config == null) return false
 
-        // Get partnership entity and throw NotFoundException if it doesn't exist
-        val payload = transaction {
-            val eventEntity = EventEntity.findById(eventId) ?: throw NotFoundException("Event not found")
-            val billing = BillingEntity.singleByEventAndPartnership(eventEntity.id.value, partnershipId)
-            val partnership = PartnershipEntity.findById(partnershipId)
-                ?: throw NotFoundException("Partnership not found")
-            val jobs = CompanyJobOfferPromotionEntity
-                .listByPartnershipAndStatus(partnershipId, status = PromotionStatus.APPROVED)
-                .map { it.jobOffer.toDomain() }
-            val activities = BoothActivityEntity
-                .find { BoothActivitiesTable.partnershipId eq partnershipId }
-                .map { it.toDomain() }
-            val questions = QandaQuestionEntity
-                .find { QandaQuestionsTable.partnershipId eq partnershipId }
-                .map { it.toDomain() }
-            val speakers = SpeakerPartnershipEntity
-                .find { SpeakerPartnershipTable.partnershipId eq partnershipId }
-                .map { association ->
-                    val s = association.speaker
-                    Speaker(
-                        id = s.id.value.toString(),
-                        name = s.name,
-                        biography = s.biography,
-                        jobTitle = s.jobTitle,
-                        photoUrl = s.photoUrl,
-                        pronouns = s.pronouns,
-                        company = s.company?.name,
-                        externalId = s.externalId,
-                        source = s.sourceProvider.name.lowercase(),
-                    )
-                }
-                .sortedBy { it.name }
-            val supportVideoUrl = PartnershipSupportVideoEntity.singleByPartnership(partnershipId)
-                ?.takeIf { it.status == PromotionStatus.APPROVED }
-                ?.url
-            WebhookPayload(
-                eventType = eventType,
-                partnership = partnership.toDetailedDomain(
-                    billing = billing,
-                    selectedPack = partnership.selectedPack
-                        ?.toDomain(language = partnership.language, partnershipId = partnershipId),
-                    suggestionPack = partnership.suggestionPack
-                        ?.toDomain(language = partnership.language, partnershipId = partnershipId),
-                    validatedPack = partnership.validatedPack()
-                        ?.toDomain(language = partnership.language, partnershipId = partnershipId),
-                ),
-                company = partnership.company
-                    .toDomain(partnership.company.socials.map(CompanySocialEntity::toDomain)),
-                event = EventSummary(
-                    slug = eventEntity.slug,
-                    name = eventEntity.name,
-                    startTime = eventEntity.startTime,
-                    endTime = eventEntity.endTime,
-                    submissionStartTime = eventEntity.submissionStartTime,
-                    submissionEndTime = eventEntity.submissionEndTime,
-                ),
-                jobs = jobs,
-                activities = activities,
-                questions = questions,
-                speakers = speakers,
-                supportVideoUrl = supportVideoUrl,
-                timestamp = Clock.System.now().toString(),
-            )
+        val payload: WebhookPayload = when (resourceType) {
+            WebhookResourceType.PARTNERSHIP -> buildPartnershipPayload(eventId, resourceId, eventType)
+            WebhookResourceType.ECOSYSTEM_PARTNER -> buildEcosystemPartnerPayload(eventId, resourceId, eventType)
         }
 
         // Send HTTP call
@@ -146,5 +89,100 @@ class HttpWebhookGateway(
         }
 
         return response.status.isSuccess()
+    }
+
+    @Suppress("LongMethod")
+    private fun buildPartnershipPayload(
+        eventId: UUID,
+        resourceId: UUID,
+        eventType: WebhookEventType,
+    ): WebhookPayload.Partnership = transaction {
+        val eventEntity = EventEntity.findById(eventId) ?: throw NotFoundException("Event not found")
+        val billing = BillingEntity.singleByEventAndPartnership(eventEntity.id.value, resourceId)
+        val partnership = PartnershipEntity.findById(resourceId)
+            ?: throw NotFoundException("Partnership not found")
+        val jobs = CompanyJobOfferPromotionEntity
+            .listByPartnershipAndStatus(resourceId, status = PromotionStatus.APPROVED)
+            .map { it.jobOffer.toDomain() }
+        val activities = BoothActivityEntity
+            .find { BoothActivitiesTable.partnershipId eq resourceId }
+            .map { it.toDomain() }
+        val questions = QandaQuestionEntity
+            .find { QandaQuestionsTable.partnershipId eq resourceId }
+            .map { it.toDomain() }
+        val speakers = SpeakerPartnershipEntity
+            .find { SpeakerPartnershipTable.partnershipId eq resourceId }
+            .map { association ->
+                val s = association.speaker
+                Speaker(
+                    id = s.id.value.toString(),
+                    name = s.name,
+                    biography = s.biography,
+                    jobTitle = s.jobTitle,
+                    photoUrl = s.photoUrl,
+                    pronouns = s.pronouns,
+                    company = s.company?.name,
+                    externalId = s.externalId,
+                    source = s.sourceProvider.name.lowercase(),
+                )
+            }
+            .sortedBy { it.name }
+        val supportVideoUrl = PartnershipSupportVideoEntity.singleByPartnership(resourceId)
+            ?.takeIf { it.status == PromotionStatus.APPROVED }
+            ?.url
+        WebhookPayload.Partnership(
+            eventType = eventType,
+            resourceId = resourceId.toString(),
+            partnership = partnership.toDetailedDomain(
+                billing = billing,
+                selectedPack = partnership.selectedPack
+                    ?.toDomain(language = partnership.language, partnershipId = resourceId),
+                suggestionPack = partnership.suggestionPack
+                    ?.toDomain(language = partnership.language, partnershipId = resourceId),
+                validatedPack = partnership.validatedPack()
+                    ?.toDomain(language = partnership.language, partnershipId = resourceId),
+            ),
+            company = partnership.company
+                .toDomain(partnership.company.socials.map(CompanySocialEntity::toDomain)),
+            event = EventSummary(
+                slug = eventEntity.slug,
+                name = eventEntity.name,
+                startTime = eventEntity.startTime,
+                endTime = eventEntity.endTime,
+                submissionStartTime = eventEntity.submissionStartTime,
+                submissionEndTime = eventEntity.submissionEndTime,
+            ),
+            jobs = jobs,
+            activities = activities,
+            questions = questions,
+            speakers = speakers,
+            supportVideoUrl = supportVideoUrl,
+            timestamp = Clock.System.now().toString(),
+        )
+    }
+
+    private fun buildEcosystemPartnerPayload(
+        eventId: UUID,
+        resourceId: UUID,
+        eventType: WebhookEventType,
+    ): WebhookPayload.EcosystemPartner = transaction {
+        val eventEntity = EventEntity.findById(eventId) ?: throw NotFoundException("Event not found")
+        val partner = EcosystemPartnerEntity.findById(resourceId)
+            ?: throw NotFoundException("Ecosystem partner not found")
+        WebhookPayload.EcosystemPartner(
+            eventType = eventType,
+            resourceId = resourceId.toString(),
+            company = partner.company.toDomain(partner.company.socials.map(CompanySocialEntity::toDomain)),
+            event = EventSummary(
+                slug = eventEntity.slug,
+                name = eventEntity.name,
+                startTime = eventEntity.startTime,
+                endTime = eventEntity.endTime,
+                submissionStartTime = eventEntity.submissionStartTime,
+                submissionEndTime = eventEntity.submissionEndTime,
+            ),
+            timestamp = Clock.System.now().toString(),
+            category = partner.category.name,
+        )
     }
 }

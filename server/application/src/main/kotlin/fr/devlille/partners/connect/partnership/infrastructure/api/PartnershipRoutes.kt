@@ -18,6 +18,7 @@ import fr.devlille.partners.connect.partnership.domain.UpdatePartnershipContactI
 import fr.devlille.partners.connect.partnership.domain.UpdatePartnershipPricing
 import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
 import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
+import fr.devlille.partners.connect.webhooks.domain.WebhookResourceType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.response.respond
@@ -87,7 +88,12 @@ private fun Route.publicPartnershipRoutes() {
             // Send notification to partnership contact without log history
             notificationRepository.sendMessage(variables)
             // Send webhook notification for partnership creation
-            webhookRepository.sendWebhooks(eventSlug, id, WebhookEventType.CREATED)
+            webhookRepository.sendWebhooks(
+                eventSlug = eventSlug,
+                resourceType = WebhookResourceType.PARTNERSHIP,
+                resourceId = id,
+                eventType = WebhookEventType.CREATED,
+            )
             call.respond(HttpStatusCode.Created, mapOf("id" to id.toString()))
         }
     }
