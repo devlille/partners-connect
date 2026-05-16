@@ -28,6 +28,7 @@
     </div>
 
     <div class="grid grid-cols-4 gap-2">
+      <!-- X / Y are universal axis symbols and intentionally not translated. -->
       <label class="text-xs font-medium text-gray-700">
         X
         <UInput v-model.number="local.x" type="number" :min="0" @change="emitZone" />

@@ -51,6 +51,8 @@ describe("FlyerZonePicker", () => {
       ...mountOptions,
     });
 
-    expect(wrapper.text()).toMatch(/zone.*fit|hors|outside/i);
+    const alert = wrapper.find('[role="alert"]');
+    expect(alert.exists()).toBe(true);
+    expect(alert.text()).toBe(translations["flyer.zone.errors.outOfBounds"]);
   });
 });
