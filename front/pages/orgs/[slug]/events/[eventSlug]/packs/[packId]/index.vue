@@ -24,6 +24,15 @@
           :initial-optional-options="initialOptionalOptions"
           @save="onSave"
         />
+        <FlyerTemplateConfig
+          :org-slug="orgSlug"
+          :event-slug="eventSlug"
+          :pack-id="packId"
+          :initial-template-url="pack.flyer_template_url ?? null"
+          :initial-zone="flyerInitialZone"
+          @saved="onFlyerSaved"
+          @cleared="onFlyerCleared"
+        />
       </div>
     </div>
   </Dashboard>
@@ -32,6 +41,14 @@
 <script setup lang="ts">
 import { getEventBySlug, getOrgsEventsPacks, putOrgsEventsPacks, postOrgsEventsPacksOptions, type SponsoringPack, type CreateSponsoringPack, type SponsoringOption } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
+
+type PackWithFlyer = SponsoringPack & {
+  flyer_template_url?: string | null;
+  flyer_zone_x?: number | null;
+  flyer_zone_y?: number | null;
+  flyer_zone_width?: number | null;
+  flyer_zone_height?: number | null;
+};
 
 const route = useRoute();
 const router = useRouter();
@@ -52,7 +69,7 @@ const eventSlug = computed(() => {
 });
 const packId = computed(() => route.params.packId as string);
 
-const pack = ref<SponsoringPack | null>(null);
+const pack = ref<PackWithFlyer | null>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const eventName = ref<string>('');
@@ -95,6 +112,49 @@ const packFormData = computed((): Partial<CreateSponsoringPack> => {
     max_quantity: pack.value.max_quantity || undefined
   };
 });
+
+const flyerInitialZone = computed(() => {
+  if (!pack.value) return null;
+  const { flyer_zone_x, flyer_zone_y, flyer_zone_width, flyer_zone_height } = pack.value;
+  if (
+    flyer_zone_x == null ||
+    flyer_zone_y == null ||
+    flyer_zone_width == null ||
+    flyer_zone_height == null
+  ) {
+    return null;
+  }
+  return {
+    x: flyer_zone_x,
+    y: flyer_zone_y,
+    width: flyer_zone_width,
+    height: flyer_zone_height,
+  };
+});
+
+function onFlyerSaved(payload: { templateUrl: string; zone: { x: number; y: number; width: number; height: number } }) {
+  if (!pack.value) return;
+  pack.value = {
+    ...pack.value,
+    flyer_template_url: payload.templateUrl,
+    flyer_zone_x: payload.zone.x,
+    flyer_zone_y: payload.zone.y,
+    flyer_zone_width: payload.zone.width,
+    flyer_zone_height: payload.zone.height,
+  };
+}
+
+function onFlyerCleared() {
+  if (!pack.value) return;
+  pack.value = {
+    ...pack.value,
+    flyer_template_url: null,
+    flyer_zone_x: null,
+    flyer_zone_y: null,
+    flyer_zone_width: null,
+    flyer_zone_height: null,
+  };
+}
 
 async function loadPack() {
   try {
