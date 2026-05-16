@@ -7,6 +7,7 @@ import fr.devlille.partners.connect.ecosystempartners.domain.publicEventUrl
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.internal.infrastructure.ktor.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.ktor.WebhookEcosystemPartnerPlugin
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
@@ -26,6 +27,7 @@ fun Route.ecosystemPartnerDecisionRoutes() {
 
     route("/orgs/{orgSlug}/events/{eventSlug}/ecosystem-partners/{ecosystemPartnerId}/validate") {
         install(AuthorizedOrganisationPlugin)
+        install(WebhookEcosystemPartnerPlugin)
 
         post {
             val eventSlug = call.parameters.eventSlug
@@ -48,6 +50,7 @@ fun Route.ecosystemPartnerDecisionRoutes() {
 
     route("/orgs/{orgSlug}/events/{eventSlug}/ecosystem-partners/{ecosystemPartnerId}/decline") {
         install(AuthorizedOrganisationPlugin)
+        install(WebhookEcosystemPartnerPlugin)
 
         post {
             val eventSlug = call.parameters.eventSlug
