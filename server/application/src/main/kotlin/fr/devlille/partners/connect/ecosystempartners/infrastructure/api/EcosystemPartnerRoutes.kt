@@ -9,11 +9,15 @@ import fr.devlille.partners.connect.ecosystempartners.domain.publicEventUrl
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.internal.infrastructure.ktor.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.ktor.WebhookEcosystemPartnerPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.notifications.domain.NotificationRepository
 import fr.devlille.partners.connect.notifications.domain.NotificationVariables
 import fr.devlille.partners.connect.partnership.infrastructure.api.toBooleanStrict
+import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
+import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
+import fr.devlille.partners.connect.webhooks.domain.WebhookResourceType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -35,6 +39,7 @@ private fun Route.publicEcosystemPartnerRoutes() {
     val eventRepository by inject<EventRepository>()
     val companyRepository by inject<CompanyRepository>()
     val notificationRepository by inject<NotificationRepository>()
+    val webhookRepository by inject<WebhookRepository>()
 
     route("/events/{eventSlug}/ecosystem-partners") {
         post {
@@ -54,6 +59,12 @@ private fun Route.publicEcosystemPartnerRoutes() {
                 publicEventUrl = publicEventUrl(event),
             )
             notificationRepository.sendMessage(variables)
+            webhookRepository.sendWebhooks(
+                eventSlug = eventSlug,
+                resourceType = WebhookResourceType.ECOSYSTEM_PARTNER,
+                resourceId = id,
+                eventType = WebhookEventType.CREATED,
+            )
             call.respond(HttpStatusCode.Created, mapOf("id" to id.toString()))
         }
     }
@@ -64,6 +75,10 @@ private fun Route.publicEcosystemPartnerRoutes() {
             val id = call.parameters.ecosystemPartnerId
             call.respond(HttpStatusCode.OK, repository.getById(eventSlug, id))
         }
+    }
+
+    route("/events/{eventSlug}/ecosystem-partners/{ecosystemPartnerId}") {
+        install(WebhookEcosystemPartnerPlugin)
 
         put {
             val eventSlug = call.parameters.eventSlug
@@ -92,6 +107,7 @@ private fun Route.orgsEcosystemPartnerRoutes() {
     val eventRepository by inject<EventRepository>()
     val companyRepository by inject<CompanyRepository>()
     val notificationRepository by inject<NotificationRepository>()
+    val webhookRepository by inject<WebhookRepository>()
 
     route("/orgs/{orgSlug}/events/{eventSlug}/ecosystem-partners") {
         install(AuthorizedOrganisationPlugin)
@@ -124,6 +140,12 @@ private fun Route.orgsEcosystemPartnerRoutes() {
                 categoryName = partner.category.name,
             )
             notificationRepository.sendMessage(variables)
+            webhookRepository.sendWebhooks(
+                eventSlug = eventSlug,
+                resourceType = WebhookResourceType.ECOSYSTEM_PARTNER,
+                resourceId = id,
+                eventType = WebhookEventType.DELETED,
+            )
             repository.delete(eventSlug, id)
             call.respond(HttpStatusCode.NoContent)
         }
