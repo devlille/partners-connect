@@ -6,7 +6,7 @@
 **Backend Spec**: `../../../server/specs/024-partnership-flyer-generation/spec.md`
 **Input**: User description: "Frontend integration for the partnership flyer generation feature. Organisers attach a PNG flyer template + logo zone to each sponsoring pack; an organiser-triggered action then composes the company logo into that zone and stores the result on the partnership's communication support. The backend endpoints are already shipped; this spec covers only the frontend surfaces."
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Organiser uploads a flyer template and defines the logo zone (Priority: P1)
 
@@ -54,7 +54,7 @@ As an organiser browsing the communication management page, I want to see a "Gen
 - What happens when the user clicks "Generate flyer" twice quickly? The button enters a loading state on the first click and rejects subsequent clicks until the response arrives (no debouncing needed beyond the button's `:loading` state).
 - What happens when an organiser clicks "Generate flyer" on a partnership whose pack template was deleted between page-load and click? The backend returns 409 ("pack is not flyer-enabled") and the toast surfaces this. No client-side polling for pack changes is added.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -82,7 +82,7 @@ As an organiser browsing the communication management page, I want to see a "Gen
 - **Flyer Template Configuration (form state)**: An in-memory composition of `{file: File | null, templateUrl: string | null, zone: {x, y, width, height} | null, naturalWidth: number | null, naturalHeight: number | null}` used by `FlyerTemplateConfig.vue`. Lives only in the pack form; persisted to the backend via the dedicated PUT/DELETE endpoints.
 - **Generated Flyer (URL on the partnership)**: The existing `communication_support_url` string field on a partnership. The frontend mutates only its display, never its meaning. Already rendered in the partner-facing communication tab.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

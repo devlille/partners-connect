@@ -22,14 +22,24 @@ describe("CommunicationCard", () => {
   describe("Title display", () => {
     it("displays item title", () => {
       const wrapper = mount(CommunicationCard, {
-        props: { item: partnershipItem, status: "unplanned", orgSlug: "test-org", eventSlug: "test-event" },
+        props: {
+          item: partnershipItem,
+          status: "unplanned",
+          orgSlug: "test-org",
+          eventSlug: "test-event",
+        },
       });
       expect(wrapper.text()).toContain("Acme Corp");
     });
 
     it("displays standalone item title", () => {
       const wrapper = mount(CommunicationCard, {
-        props: { item: standaloneItem, status: "unplanned", orgSlug: "test-org", eventSlug: "test-event" },
+        props: {
+          item: standaloneItem,
+          status: "unplanned",
+          orgSlug: "test-org",
+          eventSlug: "test-event",
+        },
       });
       expect(wrapper.text()).toContain("Post LinkedIn DevLille 2026");
     });
@@ -38,7 +48,12 @@ describe("CommunicationCard", () => {
   describe("Schedule button label (partnership-linked)", () => {
     it("shows 'Planifier' when unplanned and no date", () => {
       const wrapper = mount(CommunicationCard, {
-        props: { item: partnershipItem, status: "unplanned", orgSlug: "test-org", eventSlug: "test-event" },
+        props: {
+          item: partnershipItem,
+          status: "unplanned",
+          orgSlug: "test-org",
+          eventSlug: "test-event",
+        },
       });
       expect(wrapper.text()).toContain("Planifier");
     });
@@ -71,7 +86,12 @@ describe("CommunicationCard", () => {
   describe("Actions for partnership-linked entries", () => {
     it("shows schedule and upload buttons", () => {
       const wrapper = mount(CommunicationCard, {
-        props: { item: partnershipItem, status: "unplanned", orgSlug: "test-org", eventSlug: "test-event" },
+        props: {
+          item: partnershipItem,
+          status: "unplanned",
+          orgSlug: "test-org",
+          eventSlug: "test-event",
+        },
       });
       expect(wrapper.text()).toContain("Planifier");
       expect(wrapper.text()).toContain("Ajouter");
@@ -79,7 +99,12 @@ describe("CommunicationCard", () => {
 
     it("does not show edit or delete buttons", () => {
       const wrapper = mount(CommunicationCard, {
-        props: { item: partnershipItem, status: "unplanned", orgSlug: "test-org", eventSlug: "test-event" },
+        props: {
+          item: partnershipItem,
+          status: "unplanned",
+          orgSlug: "test-org",
+          eventSlug: "test-event",
+        },
       });
       expect(wrapper.text()).not.toContain("Modifier");
       expect(wrapper.text()).not.toContain("Supprimer");
@@ -101,7 +126,12 @@ describe("CommunicationCard", () => {
   describe("Actions for standalone entries", () => {
     it("shows Modifier and Supprimer buttons", () => {
       const wrapper = mount(CommunicationCard, {
-        props: { item: standaloneItem, status: "unplanned", orgSlug: "test-org", eventSlug: "test-event" },
+        props: {
+          item: standaloneItem,
+          status: "unplanned",
+          orgSlug: "test-org",
+          eventSlug: "test-event",
+        },
       });
       expect(wrapper.text()).toContain("Modifier");
       expect(wrapper.text()).toContain("Supprimer");
@@ -109,7 +139,12 @@ describe("CommunicationCard", () => {
 
     it("does not show schedule or upload buttons", () => {
       const wrapper = mount(CommunicationCard, {
-        props: { item: standaloneItem, status: "unplanned", orgSlug: "test-org", eventSlug: "test-event" },
+        props: {
+          item: standaloneItem,
+          status: "unplanned",
+          orgSlug: "test-org",
+          eventSlug: "test-event",
+        },
       });
       expect(wrapper.text()).not.toContain("Planifier");
       expect(wrapper.text()).not.toContain("Ajouter");
@@ -117,7 +152,12 @@ describe("CommunicationCard", () => {
 
     it("emits edit event when Modifier button clicked", async () => {
       const wrapper = mount(CommunicationCard, {
-        props: { item: standaloneItem, status: "unplanned", orgSlug: "test-org", eventSlug: "test-event" },
+        props: {
+          item: standaloneItem,
+          status: "unplanned",
+          orgSlug: "test-org",
+          eventSlug: "test-event",
+        },
       });
       const buttons = wrapper.findAll("button");
       const editButton = buttons.find((b) => b.text().includes("Modifier"));
@@ -128,7 +168,12 @@ describe("CommunicationCard", () => {
 
     it("emits delete event when Supprimer button clicked", async () => {
       const wrapper = mount(CommunicationCard, {
-        props: { item: standaloneItem, status: "unplanned", orgSlug: "test-org", eventSlug: "test-event" },
+        props: {
+          item: standaloneItem,
+          status: "unplanned",
+          orgSlug: "test-org",
+          eventSlug: "test-event",
+        },
       });
       const buttons = wrapper.findAll("button");
       const deleteButton = buttons.find((b) => b.text().includes("Supprimer"));
@@ -165,7 +210,12 @@ describe("CommunicationCard", () => {
 
     it("shows 'Non planifiée' badge for unplanned status", () => {
       const wrapper = mount(CommunicationCard, {
-        props: { item: partnershipItem, status: "unplanned", orgSlug: "test-org", eventSlug: "test-event" },
+        props: {
+          item: partnershipItem,
+          status: "unplanned",
+          orgSlug: "test-org",
+          eventSlug: "test-event",
+        },
       });
       expect(wrapper.text()).toContain("Non planifiée");
     });

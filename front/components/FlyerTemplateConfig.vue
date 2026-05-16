@@ -1,6 +1,8 @@
 <template>
   <section class="border-t border-gray-200 pt-6 mb-6">
-    <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ $t("flyer.templateSection.title") }}</h3>
+    <h3 class="text-lg font-semibold text-gray-900 mb-1">
+      {{ $t("flyer.templateSection.title") }}
+    </h3>
     <p class="text-sm text-gray-600 mb-4">{{ $t("flyer.templateSection.help") }}</p>
 
     <div v-if="!previewUrl">
@@ -24,7 +26,13 @@
         <p class="text-sm font-medium text-gray-700">{{ $t("flyer.upload.dropPng") }}</p>
         <p class="text-xs text-gray-500 mt-1">PNG ≤ 10 MB</p>
       </div>
-      <input ref="fileInput" type="file" accept="image/png" class="hidden" @change="handleFileSelect" />
+      <input
+        ref="fileInput"
+        type="file"
+        accept="image/png"
+        class="hidden"
+        @change="handleFileSelect"
+      />
     </div>
 
     <div v-else class="space-y-4">
