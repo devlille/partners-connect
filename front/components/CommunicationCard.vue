@@ -46,6 +46,15 @@
       >
         {{ item.support_url ? 'Changer' : 'Ajouter' }}
       </UButton>
+
+      <GenerateFlyerButton
+        v-if="partnership"
+        :org-slug="orgSlug"
+        :event-slug="eventSlug"
+        :partnership-id="partnership.id"
+        :is-validated="!!partnership.validated_pack_id"
+        :has-logo="false"
+      />
     </div>
 
     <!-- Actions pour les communications standalone -->
@@ -74,11 +83,14 @@
 </template>
 
 <script setup lang="ts">
-import type { CommunicationItemSchema } from '~/utils/api';
+import type { CommunicationItemSchema, PartnershipItemSchema } from '~/utils/api';
 
 interface Props {
   item: CommunicationItemSchema;
   status: 'done' | 'planned' | 'unplanned';
+  partnership?: PartnershipItemSchema;
+  orgSlug: string;
+  eventSlug: string;
 }
 
 const props = defineProps<Readonly<Props>>();
