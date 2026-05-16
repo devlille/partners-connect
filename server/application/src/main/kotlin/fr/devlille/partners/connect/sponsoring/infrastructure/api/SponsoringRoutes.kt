@@ -17,7 +17,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
 import io.ktor.server.application.ApplicationCall
-import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.MissingRequestParameterException
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
@@ -29,8 +28,6 @@ import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import kotlinx.serialization.json.Json
 import org.koin.ktor.ext.inject
-import java.io.ByteArrayInputStream
-import javax.imageio.ImageIO
 
 fun Route.sponsoringRoutes() {
     // Public routes (no authentication required)
@@ -185,24 +182,5 @@ private suspend fun receiveFlyerTemplateUpload(call: ApplicationCall): Pair<Byte
     }
     val bytes = pngBytes ?: throw MissingRequestParameterException("file")
     val raw = zoneJson ?: throw MissingRequestParameterException("zone")
-    val zone = Json.decodeFromString(FlyerZone.serializer(), raw)
-    validatePngFitsZone(bytes, zone)
-    return bytes to zone
+    return bytes to Json.decodeFromString(FlyerZone.serializer(), raw)
 }
-
-@Suppress("ThrowsCount")
-private fun validatePngFitsZone(pngBytes: ByteArray, zone: FlyerZone) {
-    val image = ImageIO.read(ByteArrayInputStream(pngBytes))
-        ?: throw BadRequestException("Uploaded file is not a readable PNG image")
-    if (!zone.hasValidShape()) {
-        throw BadRequestException("Zone coordinates must be non-negative with positive width/height")
-    }
-    if (zone.x + zone.width > image.width || zone.y + zone.height > image.height) {
-        throw BadRequestException(
-            "Zone ($zone) does not fit inside template (${image.width}x${image.height})",
-        )
-    }
-}
-
-private fun FlyerZone.hasValidShape(): Boolean =
-    x >= 0 && y >= 0 && width > 0 && height > 0
