@@ -18,8 +18,23 @@ class SponsoringPackEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var name by SponsoringPacksTable.name
     var basePrice by SponsoringPacksTable.basePrice
     var maxQuantity by SponsoringPacksTable.maxQuantity
+    var flyerTemplateUrl by SponsoringPacksTable.flyerTemplateUrl
+    var flyerZoneX by SponsoringPacksTable.flyerZoneX
+    var flyerZoneY by SponsoringPacksTable.flyerZoneY
+    var flyerZoneWidth by SponsoringPacksTable.flyerZoneWidth
+    var flyerZoneHeight by SponsoringPacksTable.flyerZoneHeight
     val options by SponsoringOptionEntity via PackOptionsTable
 }
+
+/**
+ * A pack is "flyer-enabled" only when the template URL and all four zone coordinates are non-null.
+ */
+fun SponsoringPackEntity.hasFlyerTemplate(): Boolean =
+    flyerTemplateUrl != null &&
+        flyerZoneX != null &&
+        flyerZoneY != null &&
+        flyerZoneWidth != null &&
+        flyerZoneHeight != null
 
 fun UUIDEntityClass<SponsoringPackEntity>.listPacksByEvent(eventId: UUID): List<SponsoringPackEntity> = this
     .find { SponsoringPacksTable.eventId eq eventId }

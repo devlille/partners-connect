@@ -12,4 +12,9 @@ object SponsoringPacksTable : UUIDTable("sponsoring_packs") {
     val withBooth = bool("with_booth").default(false)
     val nbTickets = integer("nb_ticket").default(0)
     val maxQuantity = integer("max_quantity").nullable()
+    val flyerTemplateUrl = text("flyer_template_url").nullable()
+    val flyerZoneX = integer("flyer_zone_x").nullable()
+    val flyerZoneY = integer("flyer_zone_y").nullable()
+    val flyerZoneWidth = integer("flyer_zone_width").nullable()
+    val flyerZoneHeight = integer("flyer_zone_height").nullable()
 }
