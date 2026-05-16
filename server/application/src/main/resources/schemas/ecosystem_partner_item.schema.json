@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EcosystemPartnerItem",
+  "type": "object",
+  "required": ["id", "company_name", "category", "created_at"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "company_name": { "type": "string" },
+    "company_logo_url": { "type": ["string", "null"], "format": "uri" },
+    "category": { "$ref": "ecosystem_partner_category.schema.json" },
+    "display_order": { "type": ["integer", "null"], "minimum": 0 },
+    "validated_at": { "type": ["string", "null"], "format": "date-time" },
+    "declined_at": { "type": ["string", "null"], "format": "date-time" },
+    "created_at": { "type": "string", "format": "date-time" }
+  }
+}
