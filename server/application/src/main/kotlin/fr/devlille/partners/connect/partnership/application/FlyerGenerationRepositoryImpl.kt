@@ -3,12 +3,13 @@ package fr.devlille.partners.connect.partnership.application
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.internal.infrastructure.api.ConflictException
+import fr.devlille.partners.connect.internal.infrastructure.bucket.MimeType
+import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
 import fr.devlille.partners.connect.partnership.domain.FlyerGenerationRepository
 import fr.devlille.partners.connect.partnership.domain.GeneratedFlyer
-import fr.devlille.partners.connect.partnership.domain.PartnershipStorageRepository
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
-import fr.devlille.partners.connect.sponsoring.domain.FlyerTemplate
-import fr.devlille.partners.connect.sponsoring.domain.FlyerTemplateRepository
+import fr.devlille.partners.connect.sponsoring.domain.FlyerZone
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.hasFlyerTemplate
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.readRawBytes
@@ -18,48 +19,61 @@ import java.util.UUID
 
 class FlyerGenerationRepositoryImpl(
     private val httpClient: HttpClient,
-    private val flyerTemplateRepository: FlyerTemplateRepository,
-    private val partnershipStorageRepository: PartnershipStorageRepository,
+    private val storage: Storage,
 ) : FlyerGenerationRepository {
     override suspend fun generate(eventSlug: String, partnershipId: UUID): GeneratedFlyer {
-        val context = transaction {
-            val event = EventEntity.findBySlug(eventSlug)
-                ?: throw NotFoundException("Event with slug $eventSlug not found")
-            val partnership = PartnershipEntity.findById(partnershipId)
-                ?: throw NotFoundException("Partnership $partnershipId not found")
-            if (partnership.event.id != event.id) {
-                throw NotFoundException("Partnership $partnershipId not found in event $eventSlug")
-            }
-            if (partnership.validatedAt == null) {
-                throw ConflictException("Partnership must be validated before generating a flyer")
-            }
-            val pack = partnership.selectedPack
-                ?: throw ConflictException("Partnership has no selected pack")
-            val template = flyerTemplateRepository.get(eventSlug, pack.id.value)
-                ?: throw ConflictException("Pack ${pack.id.value} is not flyer-enabled")
-            val logoUrl = partnership.company.logoUrl1000 ?: partnership.company.logoUrlOriginal
-                ?: throw ConflictException("Company has no logo")
-            GenerationContext(template = template, logoUrl = logoUrl)
-        }
+        val context = readGenerationContext(eventSlug, partnershipId)
 
-        val templateBytes = httpClient.get(context.template.templateUrl).readRawBytes()
+        val templateBytes = httpClient.get(context.templateUrl).readRawBytes()
         val logoBytes = httpClient.get(context.logoUrl).readRawBytes()
-        val jpgBytes = FlyerComposer.compose(templateBytes, logoBytes, context.template.zone)
+        val jpgBytes = FlyerComposer.compose(templateBytes, logoBytes, context.zone)
 
-        val storedUrl = partnershipStorageRepository.uploadCommunicationSupport(
-            eventSlug = eventSlug,
-            partnershipId = partnershipId,
-            content = jpgBytes,
-            mimeType = "image/jpeg",
-        )
+        val filename = "events/${context.eventId}/partnerships/$partnershipId/communication-support.jpg"
+        val upload = storage.upload(filename, jpgBytes, MimeType.JPG)
 
         transaction {
-            val partnership = PartnershipEntity[partnershipId]
-            partnership.communicationSupportUrl = storedUrl
+            PartnershipEntity[partnershipId].communicationSupportUrl = upload.url
         }
 
-        return GeneratedFlyer(url = storedUrl)
+        return GeneratedFlyer(url = upload.url)
     }
 
-    private data class GenerationContext(val template: FlyerTemplate, val logoUrl: String)
+    @Suppress("ThrowsCount")
+    private fun readGenerationContext(eventSlug: String, partnershipId: UUID): GenerationContext = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        val partnership = PartnershipEntity.findById(partnershipId)
+            ?: throw NotFoundException("Partnership $partnershipId not found")
+        if (partnership.event.id != event.id) {
+            throw NotFoundException("Partnership $partnershipId not found in event $eventSlug")
+        }
+        if (partnership.validatedAt == null) {
+            throw ConflictException("Partnership must be validated before generating a flyer")
+        }
+        val pack = partnership.selectedPack
+            ?: throw ConflictException("Partnership has no selected pack")
+        if (!pack.hasFlyerTemplate()) {
+            throw ConflictException("Pack ${pack.id.value} is not flyer-enabled")
+        }
+        val logoUrl = partnership.company.logoUrl1000 ?: partnership.company.logoUrlOriginal
+            ?: throw ConflictException("Company has no logo")
+        GenerationContext(
+            eventId = event.id.value,
+            templateUrl = pack.flyerTemplateUrl!!,
+            zone = FlyerZone(
+                x = pack.flyerZoneX!!,
+                y = pack.flyerZoneY!!,
+                width = pack.flyerZoneWidth!!,
+                height = pack.flyerZoneHeight!!,
+            ),
+            logoUrl = logoUrl,
+        )
+    }
+
+    private data class GenerationContext(
+        val eventId: UUID,
+        val templateUrl: String,
+        val zone: FlyerZone,
+        val logoUrl: String,
+    )
 }

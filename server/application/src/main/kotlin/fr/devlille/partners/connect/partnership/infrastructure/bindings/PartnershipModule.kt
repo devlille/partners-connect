@@ -97,8 +97,7 @@ val partnershipModule = module {
     single<FlyerGenerationRepository> {
         FlyerGenerationRepositoryImpl(
             httpClient = get(),
-            flyerTemplateRepository = get(),
-            partnershipStorageRepository = get(),
+            storage = get(),
         )
     }
 }
