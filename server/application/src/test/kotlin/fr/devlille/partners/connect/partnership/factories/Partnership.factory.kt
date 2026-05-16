@@ -8,7 +8,10 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOpt
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
+import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import java.util.UUID
 
 @Suppress("LongParameterList")
@@ -56,6 +59,19 @@ fun insertMockedPartnership(
     this.packPriceOverride = packPriceOverride
     this.boothLocation = boothLocation
 }
+
+fun insertMockedValidatedPartnership(
+    id: UUID,
+    eventId: UUID,
+    companyId: UUID,
+    selectedPackId: UUID,
+): PartnershipEntity = insertMockedPartnership(
+    id = id,
+    eventId = eventId,
+    companyId = companyId,
+    selectedPackId = selectedPackId,
+    validatedAt = Clock.System.now().toLocalDateTime(TimeZone.UTC),
+)
 
 fun insertMockedOptionPartnership(
     partnershipId: UUID,
