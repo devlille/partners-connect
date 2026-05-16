@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PublicEcosystemPartner",
+  "type": "object",
+  "required": ["id", "company_name"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "company_name": { "type": "string" },
+    "logo_url": { "type": ["string", "null"], "format": "uri" },
+    "site_url": { "type": ["string", "null"], "format": "uri" }
+  }
+}
