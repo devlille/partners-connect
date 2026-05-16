@@ -161,6 +161,7 @@ private fun Route.orgsOptionRoutes() {
     }
 }
 
+@Suppress("ThrowsCount")
 private suspend fun receiveFlyerTemplateUpload(call: ApplicationCall): Pair<ByteArray, FlyerZone> {
     val multipart = call.receiveMultipart()
     var pngBytes: ByteArray? = null
@@ -189,10 +190,11 @@ private suspend fun receiveFlyerTemplateUpload(call: ApplicationCall): Pair<Byte
     return bytes to zone
 }
 
+@Suppress("ThrowsCount")
 private fun validatePngFitsZone(pngBytes: ByteArray, zone: FlyerZone) {
     val image = ImageIO.read(ByteArrayInputStream(pngBytes))
         ?: throw BadRequestException("Uploaded file is not a readable PNG image")
-    if (zone.x < 0 || zone.y < 0 || zone.width <= 0 || zone.height <= 0) {
+    if (!zone.hasValidShape()) {
         throw BadRequestException("Zone coordinates must be non-negative with positive width/height")
     }
     if (zone.x + zone.width > image.width || zone.y + zone.height > image.height) {
@@ -201,3 +203,6 @@ private fun validatePngFitsZone(pngBytes: ByteArray, zone: FlyerZone) {
         )
     }
 }
+
+private fun FlyerZone.hasValidShape(): Boolean =
+    x >= 0 && y >= 0 && width > 0 && height > 0

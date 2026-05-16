@@ -21,7 +21,6 @@ class FlyerGenerationRepositoryImpl(
     private val flyerTemplateRepository: FlyerTemplateRepository,
     private val partnershipStorageRepository: PartnershipStorageRepository,
 ) : FlyerGenerationRepository {
-
     override suspend fun generate(eventSlug: String, partnershipId: UUID): GeneratedFlyer {
         val context = transaction {
             val event = EventEntity.findBySlug(eventSlug)

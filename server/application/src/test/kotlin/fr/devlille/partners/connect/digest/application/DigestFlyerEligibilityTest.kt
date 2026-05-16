@@ -21,7 +21,8 @@ import kotlin.test.assertTrue
 
 class DigestFlyerEligibilityTest {
     @Test
-    fun `digest flyerItems lists validated partnerships on flyer-enabled packs without a flyer yet`() = testApplication {
+    @Suppress("LongMethod")
+    fun `flyerItems lists only validated partnerships on flyer-enabled packs without a flyer`() = testApplication {
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
