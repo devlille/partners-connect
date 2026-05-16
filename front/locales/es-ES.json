@@ -97,5 +97,47 @@
       "noSponsors": "Ningún patrocinador Pack Silver o Pack Gold validado para este evento.",
       "noLocation": "Sin asignar"
     }
+  },
+  "flyer": {
+    "templateSection": {
+      "title": "Flyer template",
+      "help": "Upload a PNG template and outline the zone where the partner logo will be composed."
+    },
+    "upload": {
+      "dropPng": "Click to select or drag and drop a PNG",
+      "errors": {
+        "notPng": "Only PNG files are accepted",
+        "tooLarge": "File must not exceed 10 MB"
+      }
+    },
+    "zone": {
+      "widthLabel": "Width",
+      "heightLabel": "Height",
+      "errors": {
+        "outOfBounds": "Zone must be positive and fit inside the template"
+      }
+    },
+    "save": {
+      "button": "Save template",
+      "success": "Template saved",
+      "failure": "Failed to save template"
+    },
+    "clear": {
+      "button": "Remove template",
+      "success": "Template removed",
+      "failure": "Failed to remove template"
+    },
+    "generate": {
+      "button": "Generate flyer",
+      "success": "Flyer generated and attached to the communication support",
+      "failure": "Failed to generate flyer",
+      "disabled": {
+        "notValidated": "Partnership is not yet validated",
+        "noLogo": "Company has no logo yet"
+      }
+    },
+    "errors": {
+      "generic": "Something went wrong. Please try again."
+    }
   }
 }
