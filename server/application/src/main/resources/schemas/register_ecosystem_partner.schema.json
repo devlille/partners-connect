@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RegisterEcosystemPartner",
+  "type": "object",
+  "required": ["company_id", "category_id"],
+  "additionalProperties": false,
+  "properties": {
+    "company_id": { "type": "string", "format": "uuid" },
+    "category_id": { "type": "string", "format": "uuid" },
+    "display_order": { "type": ["integer", "null"], "minimum": 0 },
+    "language": { "type": "string", "minLength": 2, "maxLength": 5 },
+    "emails": {
+      "type": "array",
+      "items": { "type": "string", "format": "email" }
+    }
+  }
+}
