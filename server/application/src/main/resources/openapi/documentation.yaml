@@ -3303,6 +3303,181 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
+  /orgs/{orgSlug}/events/{eventSlug}/packs/{packId}/flyer-template:
+    put:
+      summary: Upload pack flyer template
+      operationId: putOrgsEventsPacksFlyerTemplate
+      description: Upload (or replace) the PNG flyer template for a sponsoring pack along with the rectangular zone where partner logos will be composed. The zone is provided as a JSON object with non-negative integers x, y, width, height in template pixels and must fit entirely inside the template's dimensions.
+      tags:
+        - packs
+        - flyer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: packId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: PNG image to use as the flyer template
+                zone:
+                  type: string
+                  description: JSON object describing the logo zone in template pixels
+                  example: '{"x":100,"y":200,"width":800,"height":500}'
+              required:
+                - file
+                - zone
+      responses:
+        '200':
+          description: OK - Flyer template uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  template_url:
+                    type: string
+        '400':
+          description: Bad Request - Zone does not fit inside template, or file is not a readable PNG
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Not Found - Event or pack not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '415':
+          description: Unsupported Media Type - Only PNG templates are accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+    delete:
+      summary: Clear pack flyer template
+      operationId: deleteOrgsEventsPacksFlyerTemplate
+      description: Clear the flyer template and zone configured on a sponsoring pack. The stored template file is deleted. No-op if the pack is not flyer-enabled.
+      tags:
+        - packs
+        - flyer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: packId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Not Found - Event or pack not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/{partnershipId}/flyer:
+    post:
+      summary: Generate partnership flyer
+      operationId: postOrgsEventsPartnershipsFlyer
+      description: Generate a branded flyer for a validated partnership by compositing the company logo into the configured zone of the pack's template. The resulting JPG is stored and written to the partnership's communication_support_url, overwriting any existing value. Triggers an email notification to partnership contacts and a Slack notification to organisers.
+      tags:
+        - partnerships
+        - flyer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: partnershipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK - Flyer generated and persisted as the partnership communication support
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Not Found - Event or partnership not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '409':
+          description: Conflict - Partnership not validated, no company logo, or pack not flyer-enabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/communication:
     get:
       summary: Get organization details
