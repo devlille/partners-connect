@@ -335,6 +335,7 @@ sealed interface NotificationVariables {
         val socialMediaItems: List<DigestEntry>,
         val jobOfferItems: List<DigestEntry>,
         val supportVideoItems: List<DigestEntry>,
+        val flyerItems: List<DigestEntry>,
     ) : NotificationVariables {
         override val usageName: String = "digest"
 
@@ -356,6 +357,7 @@ sealed interface NotificationVariables {
                 .replace("{{social_media_section}}", formatSection(socialMediaItems, "n/a"))
                 .replace("{{job_offer_section}}", formatSection(jobOfferItems, "n/a"))
                 .replace("{{support_video_section}}", formatSection(supportVideoItems, "n/a"))
+                .replace("{{flyer_section}}", formatSection(flyerItems, "n/a"))
         }
     }
 }

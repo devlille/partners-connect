@@ -14,3 +14,6 @@
 
 🎥 Support videos to validate:
 {{support_video_section}}
+
+🎨 Flyers to generate:
+{{flyer_section}}
