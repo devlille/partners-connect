@@ -15,4 +15,14 @@ data class SponsoringPackWithTranslations(
     val requiredOptions: List<SponsoringOptionWithTranslations>,
     @SerialName("optional_options")
     val optionalOptions: List<SponsoringOptionWithTranslations>,
+    @SerialName("flyer_template_url")
+    val flyerTemplateUrl: String? = null,
+    @SerialName("flyer_zone_x")
+    val flyerZoneX: Int? = null,
+    @SerialName("flyer_zone_y")
+    val flyerZoneY: Int? = null,
+    @SerialName("flyer_zone_width")
+    val flyerZoneWidth: Int? = null,
+    @SerialName("flyer_zone_height")
+    val flyerZoneHeight: Int? = null,
 )
