@@ -17,6 +17,7 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipSupportVideoEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
+import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.hasFlyerTemplate
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.LocalDate
@@ -118,9 +119,8 @@ class DigestRepositoryExposed : DigestRepository {
         PartnershipEntity
             .find { PartnershipsTable.eventId eq eventId }
             .filter { partnership ->
-                partnership.validatedAt != null &&
-                    partnership.communicationSupportUrl == null &&
-                    partnership.selectedPack?.hasFlyerTemplate() == true
+                partnership.communicationSupportUrl == null &&
+                    partnership.validatedPack()?.hasFlyerTemplate() == true
             }
             .map { DigestEntry(it.company.name, buildLink(eventSlug, it.id.value)) }
 }

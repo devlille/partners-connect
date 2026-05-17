@@ -8,6 +8,7 @@ import fr.devlille.partners.connect.internal.infrastructure.bucket.Storage
 import fr.devlille.partners.connect.partnership.domain.FlyerGenerationRepository
 import fr.devlille.partners.connect.partnership.domain.GeneratedFlyer
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 import fr.devlille.partners.connect.sponsoring.domain.FlyerZone
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.hasFlyerTemplate
 import io.ktor.client.HttpClient
@@ -47,11 +48,8 @@ class FlyerGenerationRepositoryImpl(
         if (partnership.event.id != event.id) {
             throw NotFoundException("Partnership $partnershipId not found in event $eventSlug")
         }
-        if (partnership.validatedAt == null) {
-            throw ConflictException("Partnership must be validated before generating a flyer")
-        }
-        val pack = partnership.selectedPack
-            ?: throw ConflictException("Partnership has no selected pack")
+        val pack = partnership.validatedPack()
+            ?: throw ConflictException("Partnership must be validated before generating a flyer")
         if (!pack.hasFlyerTemplate()) {
             throw ConflictException("Pack ${pack.id.value} is not flyer-enabled")
         }
