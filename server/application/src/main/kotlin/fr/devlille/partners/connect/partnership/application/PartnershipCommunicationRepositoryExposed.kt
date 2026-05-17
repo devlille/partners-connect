@@ -51,7 +51,9 @@ class PartnershipCommunicationRepositoryExposed : PartnershipCommunicationReposi
                     partnershipId = partnership.id.value.toString(),
                     title = partnership.company.name,
                     publicationDate = null,
-                    supportUrl = null,
+                    // Fall back to the partnership-level asset (e.g. a generated flyer)
+                    // when no per-publication CommunicationPlanEntry exists yet.
+                    supportUrl = partnership.communicationSupportUrl,
                 )
             }
             .sortedBy { it.title }

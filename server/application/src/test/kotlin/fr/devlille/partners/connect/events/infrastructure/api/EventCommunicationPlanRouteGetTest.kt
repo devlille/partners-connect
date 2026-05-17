@@ -137,6 +137,48 @@ class EventCommunicationPlanRouteGetTest {
     }
 
     @Test
+    fun `GET communication plan surfaces partnership communication_support_url on unplanned cards`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val partnershipId = UUID.randomUUID()
+        val flyerUrl = "https://storage.googleapis.com/bucket/communication-support.jpg"
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyId, "Flyer Company")
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedPartnership(
+                    id = partnershipId,
+                    eventId = eventId,
+                    companyId = companyId,
+                    selectedPackId = packId,
+                    communicationSupportUrl = flyerUrl,
+                )
+                // No CommunicationPlanEntry inserted → partnership goes into "unplanned"
+            }
+        }
+
+        val response = client.get("/orgs/$orgId/events/$eventId/communication") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val unplanned = Json.parseToJsonElement(response.bodyAsText()).jsonObject["unplanned"]!!.jsonArray
+        assertEquals(1, unplanned.size)
+        val unplannedItem = unplanned[0].jsonObject
+        assertEquals(partnershipId.toString(), unplannedItem["partnership_id"]!!.jsonPrimitive.content)
+        assertEquals(flyerUrl, unplannedItem["support_url"]!!.jsonPrimitive.content)
+    }
+
+    @Test
     fun `GET communication plan returns standalone entries alongside partnership-linked entries`() = testApplication {
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
