@@ -7,7 +7,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 
   // French translations
-  $i18n.setLocaleMessage("fr", {
+  $i18n.mergeLocaleMessage("fr", {
     common: {
       save: "Enregistrer",
       cancel: "Annuler",
@@ -148,10 +148,52 @@ export default defineNuxtPlugin((nuxtApp) => {
         noLocation: "Non assigné",
       },
     },
+    flyer: {
+      templateSection: {
+        title: "Modèle de flyer",
+        help: "Téléchargez un modèle PNG et délimitez la zone où le logo du partenaire sera composé.",
+      },
+      upload: {
+        dropPng: "Cliquez pour sélectionner ou glissez-déposez un PNG",
+        errors: {
+          notPng: "Seuls les fichiers PNG sont acceptés",
+          tooLarge: "Le fichier ne doit pas dépasser 10 Mo",
+        },
+      },
+      zone: {
+        widthLabel: "Largeur",
+        heightLabel: "Hauteur",
+        errors: {
+          outOfBounds: "La zone doit être positive et tenir dans le modèle",
+        },
+      },
+      save: {
+        button: "Enregistrer le modèle",
+        success: "Modèle enregistré",
+        failure: "Échec de l'enregistrement du modèle",
+      },
+      clear: {
+        button: "Supprimer le modèle",
+        success: "Modèle supprimé",
+        failure: "Échec de la suppression du modèle",
+      },
+      generate: {
+        button: "Générer le flyer",
+        success: "Flyer généré et attaché au support de communication",
+        failure: "Échec de la génération du flyer",
+        disabled: {
+          notValidated: "Le partenariat n'est pas encore validé",
+          noLogo: "L'entreprise n'a pas encore fourni de logo",
+        },
+      },
+      errors: {
+        generic: "Une erreur est survenue. Veuillez réessayer.",
+      },
+    },
   });
 
   // English translations
-  $i18n.setLocaleMessage("en", {
+  $i18n.mergeLocaleMessage("en", {
     common: {
       save: "Save",
       cancel: "Cancel",
@@ -284,10 +326,52 @@ export default defineNuxtPlugin((nuxtApp) => {
         noLocation: "Unassigned",
       },
     },
+    flyer: {
+      templateSection: {
+        title: "Flyer template",
+        help: "Upload a PNG template and outline the zone where the partner logo will be composed.",
+      },
+      upload: {
+        dropPng: "Click to select or drag and drop a PNG",
+        errors: {
+          notPng: "Only PNG files are accepted",
+          tooLarge: "File must not exceed 10 MB",
+        },
+      },
+      zone: {
+        widthLabel: "Width",
+        heightLabel: "Height",
+        errors: {
+          outOfBounds: "Zone must be positive and fit inside the template",
+        },
+      },
+      save: {
+        button: "Save template",
+        success: "Template saved",
+        failure: "Failed to save template",
+      },
+      clear: {
+        button: "Remove template",
+        success: "Template removed",
+        failure: "Failed to remove template",
+      },
+      generate: {
+        button: "Generate flyer",
+        success: "Flyer generated and attached to the communication support",
+        failure: "Failed to generate flyer",
+        disabled: {
+          notValidated: "Partnership is not yet validated",
+          noLogo: "Company has no logo yet",
+        },
+      },
+      errors: {
+        generic: "Something went wrong. Please try again.",
+      },
+    },
   });
 
   // Spanish translations
-  $i18n.setLocaleMessage("es", {
+  $i18n.mergeLocaleMessage("es", {
     common: {
       save: "Guardar",
       cancel: "Cancelar",
@@ -419,6 +503,48 @@ export default defineNuxtPlugin((nuxtApp) => {
         },
         noSponsors: "Ningún patrocinador Pack Silver o Pack Gold validado para este evento.",
         noLocation: "Sin asignar",
+      },
+    },
+    flyer: {
+      templateSection: {
+        title: "Plantilla del flyer",
+        help: "Cargue una plantilla PNG y delimite la zona donde se compondrá el logo del socio.",
+      },
+      upload: {
+        dropPng: "Haga clic para seleccionar o arrastre y suelte un PNG",
+        errors: {
+          notPng: "Solo se aceptan archivos PNG",
+          tooLarge: "El archivo no debe superar los 10 MB",
+        },
+      },
+      zone: {
+        widthLabel: "Ancho",
+        heightLabel: "Alto",
+        errors: {
+          outOfBounds: "La zona debe ser positiva y caber dentro de la plantilla",
+        },
+      },
+      save: {
+        button: "Guardar plantilla",
+        success: "Plantilla guardada",
+        failure: "Error al guardar la plantilla",
+      },
+      clear: {
+        button: "Eliminar plantilla",
+        success: "Plantilla eliminada",
+        failure: "Error al eliminar la plantilla",
+      },
+      generate: {
+        button: "Generar flyer",
+        success: "Flyer generado y adjuntado al soporte de comunicación",
+        failure: "Error al generar el flyer",
+        disabled: {
+          notValidated: "La asociación aún no ha sido validada",
+          noLogo: "La empresa aún no ha proporcionado un logo",
+        },
+      },
+      errors: {
+        generic: "Se produjo un error. Por favor, inténtelo de nuevo.",
       },
     },
   });
