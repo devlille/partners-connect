@@ -12,6 +12,7 @@ import fr.devlille.partners.connect.events.domain.EventWithOrganisation
  * @param agreementItems Partnerships ready for agreement generation.
  * @param billingItems Partnerships ready for billing generation (no quote or invoice yet).
  * @param socialMediaItems Partnerships scheduled for social media communication today.
+ * @param flyerItems Validated partnerships on flyer-enabled packs without a communication support set.
  */
 data class EventDigest(
     val event: EventWithOrganisation,
@@ -20,10 +21,11 @@ data class EventDigest(
     val socialMediaItems: List<DigestEntry>,
     val jobOfferItems: List<DigestEntry>,
     val supportVideoItems: List<DigestEntry>,
+    val flyerItems: List<DigestEntry>,
 ) {
     /** `true` when at least one section has items; used by the route to gate Slack dispatch. */
     val hasItems: Boolean
         get() = agreementItems.isNotEmpty() || billingItems.isNotEmpty() ||
             socialMediaItems.isNotEmpty() || jobOfferItems.isNotEmpty() ||
-            supportVideoItems.isNotEmpty()
+            supportVideoItems.isNotEmpty() || flyerItems.isNotEmpty()
 }

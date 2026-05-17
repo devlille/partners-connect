@@ -3,6 +3,7 @@ package fr.devlille.partners.connect.partnership.infrastructure.bindings
 import fr.devlille.partners.connect.notifications.infrastructure.gateways.MailjetNotificationGateway
 import fr.devlille.partners.connect.partnership.application.BoothActivityRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.CommunicationPlanRepositoryExposed
+import fr.devlille.partners.connect.partnership.application.FlyerGenerationRepositoryImpl
 import fr.devlille.partners.connect.partnership.application.PartnershipAgreementRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipBillingRepositoryExposed
 import fr.devlille.partners.connect.partnership.application.PartnershipBoothRepositoryExposed
@@ -21,6 +22,7 @@ import fr.devlille.partners.connect.partnership.application.QandaRepositoryExpos
 import fr.devlille.partners.connect.partnership.application.SupportVideoRepositoryExposed
 import fr.devlille.partners.connect.partnership.domain.BoothActivityRepository
 import fr.devlille.partners.connect.partnership.domain.CommunicationPlanRepository
+import fr.devlille.partners.connect.partnership.domain.FlyerGenerationRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipAgreementRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipBillingRepository
 import fr.devlille.partners.connect.partnership.domain.PartnershipBoothRepository
@@ -92,4 +94,10 @@ val partnershipModule = module {
     }
     single<SupportVideoRepository> { SupportVideoRepositoryExposed() }
     single<PartnershipSupportVideoRepository> { PartnershipSupportVideoRepositoryExposed() }
+    single<FlyerGenerationRepository> {
+        FlyerGenerationRepositoryImpl(
+            httpClient = get(),
+            storage = get(),
+        )
+    }
 }

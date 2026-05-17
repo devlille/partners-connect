@@ -2,14 +2,23 @@ package fr.devlille.partners.connect.sponsoring.infrastructure.api
 
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.internal.infrastructure.api.MissingRequestHeaderException
+import fr.devlille.partners.connect.internal.infrastructure.api.UnsupportedMediaTypeException
 import fr.devlille.partners.connect.internal.infrastructure.ktor.AuthorizedOrganisationPlugin
+import fr.devlille.partners.connect.internal.infrastructure.ktor.asByteArray
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
 import fr.devlille.partners.connect.sponsoring.domain.AttachOptionsToPack
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringOption
 import fr.devlille.partners.connect.sponsoring.domain.CreateSponsoringPack
+import fr.devlille.partners.connect.sponsoring.domain.FlyerTemplateRepository
+import fr.devlille.partners.connect.sponsoring.domain.FlyerZone
 import fr.devlille.partners.connect.sponsoring.domain.OptionRepository
 import fr.devlille.partners.connect.sponsoring.domain.PackRepository
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.PartData
+import io.ktor.http.content.forEachPart
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.plugins.MissingRequestParameterException
+import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
@@ -17,6 +26,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
+import kotlinx.serialization.json.Json
 import org.koin.ktor.ext.inject
 
 fun Route.sponsoringRoutes() {
@@ -52,6 +62,7 @@ private fun Route.publicPackRoutes() {
 private fun Route.orgsPackRoutes() {
     val repository by inject<PackRepository>()
     val optRepository by inject<OptionRepository>()
+    val flyerTemplateRepository by inject<FlyerTemplateRepository>()
 
     route("/orgs/{orgSlug}/events/{eventSlug}/packs") {
         install(AuthorizedOrganisationPlugin)
@@ -77,6 +88,19 @@ private fun Route.orgsPackRoutes() {
             val eventSlug = call.parameters.eventSlug
             val packId = call.parameters.packId
             repository.deletePack(eventSlug, packId)
+            call.respond(HttpStatusCode.NoContent)
+        }
+        put("/{packId}/flyer-template") {
+            val eventSlug = call.parameters.eventSlug
+            val packId = call.parameters.packId
+            val (pngBytes, zone) = receiveFlyerTemplateUpload(call)
+            val saved = flyerTemplateRepository.save(eventSlug, packId, pngBytes, zone)
+            call.respond(HttpStatusCode.OK, mapOf("template_url" to saved.templateUrl))
+        }
+        delete("/{packId}/flyer-template") {
+            val eventSlug = call.parameters.eventSlug
+            val packId = call.parameters.packId
+            flyerTemplateRepository.clear(eventSlug, packId)
             call.respond(HttpStatusCode.NoContent)
         }
         post("/{packId}/options") {
@@ -132,4 +156,31 @@ private fun Route.orgsOptionRoutes() {
             call.respond(HttpStatusCode.NoContent)
         }
     }
+}
+
+@Suppress("ThrowsCount")
+private suspend fun receiveFlyerTemplateUpload(call: ApplicationCall): Pair<ByteArray, FlyerZone> {
+    val multipart = call.receiveMultipart()
+    var pngBytes: ByteArray? = null
+    var zoneJson: String? = null
+    multipart.forEachPart { part ->
+        when (part) {
+            is PartData.FileItem -> {
+                val mime = part.contentType?.toString()
+                if (mime != "image/png") {
+                    part.dispose()
+                    throw UnsupportedMediaTypeException("Unsupported template type: $mime — PNG only")
+                }
+                pngBytes = part.asByteArray()
+            }
+            is PartData.FormItem -> {
+                if (part.name == "zone") zoneJson = part.value
+                part.dispose()
+            }
+            else -> part.dispose()
+        }
+    }
+    val bytes = pngBytes ?: throw MissingRequestParameterException("file")
+    val raw = zoneJson ?: throw MissingRequestParameterException("zone")
+    return bytes to Json.decodeFromString(FlyerZone.serializer(), raw)
 }

@@ -33,6 +33,7 @@ fun Application.digestRoutes() {
                     socialMediaItems = digest.socialMediaItems,
                     jobOfferItems = digest.jobOfferItems,
                     supportVideoItems = digest.supportVideoItems,
+                    flyerItems = digest.flyerItems,
                 )
                 notificationRepository.sendMessageFromMessaging(variables)
             }

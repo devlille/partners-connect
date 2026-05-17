@@ -14,3 +14,6 @@
 
 🎥 Vidéos de support à valider :
 {{support_video_section}}
+
+🎨 Flyers à générer :
+{{flyer_section}}

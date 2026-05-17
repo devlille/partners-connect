@@ -16,6 +16,8 @@ import fr.devlille.partners.connect.organisations.application.mappers.toItemDoma
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipSupportVideoEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.hasFlyerTemplate
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -43,6 +45,7 @@ class DigestRepositoryExposed : DigestRepository {
             socialMediaItems = querySocialMediaDue(eventEntity.id.value, today, eventSlug),
             jobOfferItems = queryPendingJobOffers(eventEntity.id.value, eventSlug),
             supportVideoItems = querySupportVideoPending(eventEntity.id.value, eventSlug),
+            flyerItems = queryFlyerEligible(eventEntity.id.value, eventSlug),
         )
     }
 
@@ -110,4 +113,14 @@ class DigestRepositoryExposed : DigestRepository {
         PartnershipSupportVideoEntity
             .listByEventAndStatus(eventId, PromotionStatus.PENDING)
             .map { DigestEntry(it.partnership.company.name, buildLink(eventSlug, it.partnership.id.value)) }
+
+    private fun queryFlyerEligible(eventId: UUID, eventSlug: String): List<DigestEntry> =
+        PartnershipEntity
+            .find { PartnershipsTable.eventId eq eventId }
+            .filter { partnership ->
+                partnership.validatedAt != null &&
+                    partnership.communicationSupportUrl == null &&
+                    partnership.selectedPack?.hasFlyerTemplate() == true
+            }
+            .map { DigestEntry(it.company.name, buildLink(eventSlug, it.id.value)) }
 }

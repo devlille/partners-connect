@@ -302,6 +302,23 @@ sealed interface NotificationVariables {
             .replace("{{partnership_link}}", partnership.link(event))
     }
 
+    data class FlyerGenerated(
+        override val language: String,
+        override val event: EventWithOrganisation,
+        override val company: Company,
+        val partnership: Partnership,
+        val flyerUrl: String,
+    ) : NotificationVariables {
+        override val usageName: String = "flyer_generated"
+
+        override fun populate(content: String): String = content
+            .replace("{{event_name}}", event.event.name)
+            .replace("{{event_contact}}", event.event.contact.email)
+            .replace("{{company_name}}", company.name)
+            .replace("{{flyer_url}}", flyerUrl)
+            .replace("{{partnership_link}}", partnership.link(event))
+    }
+
     /**
      * Notification variables for the morning organiser daily digest.
      *
@@ -318,6 +335,7 @@ sealed interface NotificationVariables {
         val socialMediaItems: List<DigestEntry>,
         val jobOfferItems: List<DigestEntry>,
         val supportVideoItems: List<DigestEntry>,
+        val flyerItems: List<DigestEntry>,
     ) : NotificationVariables {
         override val usageName: String = "digest"
 
@@ -339,6 +357,7 @@ sealed interface NotificationVariables {
                 .replace("{{social_media_section}}", formatSection(socialMediaItems, "n/a"))
                 .replace("{{job_offer_section}}", formatSection(jobOfferItems, "n/a"))
                 .replace("{{support_video_section}}", formatSection(supportVideoItems, "n/a"))
+                .replace("{{flyer_section}}", formatSection(flyerItems, "n/a"))
         }
     }
 }
