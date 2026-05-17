@@ -181,10 +181,6 @@ export default defineNuxtPlugin((nuxtApp) => {
         button: "Générer le flyer",
         success: "Flyer généré et attaché au support de communication",
         failure: "Échec de la génération du flyer",
-        disabled: {
-          notValidated: "Le partenariat n'est pas encore validé",
-          noLogo: "L'entreprise n'a pas encore fourni de logo",
-        },
       },
       errors: {
         generic: "Une erreur est survenue. Veuillez réessayer.",
@@ -359,10 +355,6 @@ export default defineNuxtPlugin((nuxtApp) => {
         button: "Generate flyer",
         success: "Flyer generated and attached to the communication support",
         failure: "Failed to generate flyer",
-        disabled: {
-          notValidated: "Partnership is not yet validated",
-          noLogo: "Company has no logo yet",
-        },
       },
       errors: {
         generic: "Something went wrong. Please try again.",
@@ -538,10 +530,6 @@ export default defineNuxtPlugin((nuxtApp) => {
         button: "Generar flyer",
         success: "Flyer generado y adjuntado al soporte de comunicación",
         failure: "Error al generar el flyer",
-        disabled: {
-          notValidated: "La asociación aún no ha sido validada",
-          noLogo: "La empresa aún no ha proporcionado un logo",
-        },
       },
       errors: {
         generic: "Se produjo un error. Por favor, inténtelo de nuevo.",
