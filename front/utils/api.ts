@@ -2390,6 +2390,21 @@ export type GetStatusIntegration401 = {
   status?: boolean;
 };
 
+export type PutOrgsEventsPacksFlyerTemplateBody = {
+  /** PNG image to use as the flyer template */
+  file: Blob;
+  /** JSON object describing the logo zone in template pixels */
+  zone: string;
+};
+
+export type PutOrgsEventsPacksFlyerTemplate200 = {
+  template_url?: string;
+};
+
+export type PostOrgsEventsPartnershipsFlyer200 = {
+  url?: string;
+};
+
 export type GetOrgsEventsPartnershipParams = {
 /**
  * Free-text search applied to the partnership's company name (case-insensitive substring match). Combined with the other filters using AND.
@@ -3866,6 +3881,57 @@ export const deleteOrgsEventsPacksOptions = (
     }
 
 /**
+ * Upload (or replace) the PNG flyer template for a sponsoring pack along with the rectangular zone where partner logos will be composed. The zone is provided as a JSON object with non-negative integers x, y, width, height in template pixels and must fit entirely inside the template's dimensions.
+ * @summary Upload pack flyer template
+ */
+export const putOrgsEventsPacksFlyerTemplate = (
+    orgSlug: string,
+    eventSlug: string,
+    packId: string,
+    putOrgsEventsPacksFlyerTemplateBody: PutOrgsEventsPacksFlyerTemplateBody,
+ options?: SecondParameter<typeof customFetch<PutOrgsEventsPacksFlyerTemplate200>>,) => {const formData = new FormData();
+formData.append(`file`, putOrgsEventsPacksFlyerTemplateBody.file);
+formData.append(`zone`, putOrgsEventsPacksFlyerTemplateBody.zone);
+
+      return customFetch<PutOrgsEventsPacksFlyerTemplate200>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/packs/${packId}/flyer-template`, method: 'PUT',
+      headers: {'Content-Type': 'multipart/form-data', },
+       data: formData
+    },
+      options);
+    }
+
+/**
+ * Clear the flyer template and zone configured on a sponsoring pack. The stored template file is deleted. No-op if the pack is not flyer-enabled.
+ * @summary Clear pack flyer template
+ */
+export const deleteOrgsEventsPacksFlyerTemplate = (
+    orgSlug: string,
+    eventSlug: string,
+    packId: string,
+ options?: SecondParameter<typeof customFetch<void>>,) => {
+      return customFetch<void>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/packs/${packId}/flyer-template`, method: 'DELETE'
+    },
+      options);
+    }
+
+/**
+ * Generate a branded flyer for a validated partnership by compositing the company logo into the configured zone of the pack's template. The resulting JPG is stored and written to the partnership's communication_support_url, overwriting any existing value. Triggers an email notification to partnership contacts and a Slack notification to organisers.
+ * @summary Generate partnership flyer
+ */
+export const postOrgsEventsPartnershipsFlyer = (
+    orgSlug: string,
+    eventSlug: string,
+    partnershipId: string,
+ options?: SecondParameter<typeof customFetch<PostOrgsEventsPartnershipsFlyer200>>,) => {
+      return customFetch<PostOrgsEventsPartnershipsFlyer200>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/${partnershipId}/flyer`, method: 'POST'
+    },
+      options);
+    }
+
+/**
  * Get communication plan for all partnerships of an event, grouped by status
  * @summary Get organization details
  */
@@ -4592,6 +4658,9 @@ export type DeleteOrgsEventsPacksResult = NonNullable<Awaited<ReturnType<typeof 
 export type PutOrgsEventsPacksResult = NonNullable<Awaited<ReturnType<typeof putOrgsEventsPacks>>>
 export type PostOrgsEventsPacksOptionsResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsPacksOptions>>>
 export type DeleteOrgsEventsPacksOptionsResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsEventsPacksOptions>>>
+export type PutOrgsEventsPacksFlyerTemplateResult = NonNullable<Awaited<ReturnType<typeof putOrgsEventsPacksFlyerTemplate>>>
+export type DeleteOrgsEventsPacksFlyerTemplateResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsEventsPacksFlyerTemplate>>>
+export type PostOrgsEventsPartnershipsFlyerResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsPartnershipsFlyer>>>
 export type GetOrgsEventsCommunicationResult = NonNullable<Awaited<ReturnType<typeof getOrgsEventsCommunication>>>
 export type PostOrgsEventsCommunicationPlanResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsCommunicationPlan>>>
 export type PutOrgsEventsCommunicationPlanByIdResult = NonNullable<Awaited<ReturnType<typeof putOrgsEventsCommunicationPlanById>>>

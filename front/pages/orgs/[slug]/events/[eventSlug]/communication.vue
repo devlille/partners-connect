@@ -121,6 +121,9 @@
                 :key="item.id"
                 :item="item"
                 status="unplanned"
+                :org-slug="orgSlug"
+                :event-slug="eventSlug"
+                :partnership="partnershipFor(item)"
                 @schedule="openScheduleModal"
                 @upload="openUploadModal"
                 @edit="standaloneModal.openEdit"
@@ -149,6 +152,9 @@
                 :key="item.id"
                 :item="item"
                 status="planned"
+                :org-slug="orgSlug"
+                :event-slug="eventSlug"
+                :partnership="partnershipFor(item)"
                 @schedule="openScheduleModal"
                 @upload="openUploadModal"
                 @edit="standaloneModal.openEdit"
@@ -177,6 +183,9 @@
                 :key="item.id"
                 :item="item"
                 status="done"
+                :org-slug="orgSlug"
+                :event-slug="eventSlug"
+                :partnership="partnershipFor(item)"
                 @schedule="openScheduleModal"
                 @upload="openUploadModal"
                 @edit="standaloneModal.openEdit"
@@ -409,6 +418,14 @@ import { useStandaloneCommunicationModal } from '~/composables/useStandaloneComm
 import FilterPanel from '~/components/sponsors/FilterPanel.vue';
 import ActiveFilters from '~/components/sponsors/ActiveFilters.vue';
 import type { PartnershipsMetadata } from '~/types/sponsors';
+import { useSponsorsStore } from "~/stores/sponsors";
+
+const sponsorsStore = useSponsorsStore();
+
+function partnershipFor(item: { partnership_id?: string | null }) {
+  if (!item.partnership_id) return undefined;
+  return sponsorsStore.sponsors.find((s) => s.id === item.partnership_id);
+}
 
 const route = useRoute();
 const toast = useToast();
