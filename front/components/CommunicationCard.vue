@@ -47,14 +47,11 @@
         {{ item.support_url ? 'Changer' : 'Ajouter' }}
       </UButton>
 
-      <!-- has-logo is delegated to the backend (409 toast) — PartnershipItemSchema does not surface company media. -->
       <GenerateFlyerButton
         v-if="partnership"
         :org-slug="orgSlug"
         :event-slug="eventSlug"
         :partnership-id="partnership.id"
-        :is-validated="!!partnership.validated_pack_id"
-        :has-logo="true"
       />
     </div>
 

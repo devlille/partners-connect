@@ -5,8 +5,6 @@
     color="neutral"
     icon="i-heroicons-paint-brush"
     :loading="generating"
-    :disabled="disabled"
-    :title="disabledReason ?? undefined"
     @click="handleClick"
   >
     {{ $t("flyer.generate.button") }}
@@ -21,8 +19,6 @@ interface Props {
   orgSlug: string;
   eventSlug: string;
   partnershipId: string;
-  isValidated: boolean;
-  hasLogo: boolean;
 }
 
 const props = defineProps<Props>();
@@ -33,16 +29,8 @@ const sponsorsStore = useSponsorsStore();
 
 const generating = ref(false);
 
-const disabledReason = computed(() => {
-  if (!props.isValidated) return t("flyer.generate.disabled.notValidated");
-  if (!props.hasLogo) return t("flyer.generate.disabled.noLogo");
-  return null;
-});
-
-const disabled = computed(() => disabledReason.value !== null || generating.value);
-
 async function handleClick() {
-  if (disabled.value) return;
+  if (generating.value) return;
   generating.value = true;
   try {
     const response = await postOrgsEventsPartnershipsFlyer(
