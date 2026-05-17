@@ -19,5 +19,10 @@ internal fun SponsoringPackEntity.toDomainWithAllTranslations(
         maxQuantity = this.maxQuantity,
         requiredOptions = requiredOptionEntities.map { option -> option.toDomainWithAllTranslations() },
         optionalOptions = optionalOptionEntities.map { option -> option.toDomainWithAllTranslations() },
+        flyerTemplateUrl = this.flyerTemplateUrl,
+        flyerZoneX = this.flyerZoneX,
+        flyerZoneY = this.flyerZoneY,
+        flyerZoneWidth = this.flyerZoneWidth,
+        flyerZoneHeight = this.flyerZoneHeight,
     )
 }

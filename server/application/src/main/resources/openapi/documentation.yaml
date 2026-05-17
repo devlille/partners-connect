@@ -7241,6 +7241,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/sponsoring_option.schema'
+        flyer_template_url:
+          type:
+            - string
+            - 'null'
+        flyer_zone_x:
+          type:
+            - integer
+            - 'null'
+        flyer_zone_y:
+          type:
+            - integer
+            - 'null'
+        flyer_zone_width:
+          type:
+            - integer
+            - 'null'
+        flyer_zone_height:
+          type:
+            - integer
+            - 'null'
       required:
         - id
         - name

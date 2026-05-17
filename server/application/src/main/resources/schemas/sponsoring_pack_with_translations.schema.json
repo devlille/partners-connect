@@ -34,6 +34,26 @@
         "$ref": "sponsoring_option_with_translations.schema.json"
       },
       "description": "Optional add-on options with all translations"
+    },
+    "flyer_template_url": {
+      "type": ["string", "null"],
+      "description": "URL of the uploaded PNG flyer template, or null when the pack is not flyer-enabled"
+    },
+    "flyer_zone_x": {
+      "type": ["integer", "null"],
+      "description": "X coordinate of the logo zone in template pixels"
+    },
+    "flyer_zone_y": {
+      "type": ["integer", "null"],
+      "description": "Y coordinate of the logo zone in template pixels"
+    },
+    "flyer_zone_width": {
+      "type": ["integer", "null"],
+      "description": "Width of the logo zone in template pixels"
+    },
+    "flyer_zone_height": {
+      "type": ["integer", "null"],
+      "description": "Height of the logo zone in template pixels"
     }
   },
   "required": [

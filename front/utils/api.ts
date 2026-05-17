@@ -733,6 +733,16 @@ export interface SponsoringPackSchema {
   max_quantity?: number | null;
   required_options: SponsoringOptionSchema[];
   optional_options: SponsoringOptionSchema[];
+  /** @nullable */
+  flyer_template_url?: string | null;
+  /** @nullable */
+  flyer_zone_x?: number | null;
+  /** @nullable */
+  flyer_zone_y?: number | null;
+  /** @nullable */
+  flyer_zone_width?: number | null;
+  /** @nullable */
+  flyer_zone_height?: number | null;
 }
 
 export type SponsoringPack = SponsoringPackSchema;

@@ -42,14 +42,6 @@
 import { getEventBySlug, getOrgsEventsPacks, putOrgsEventsPacks, postOrgsEventsPacksOptions, type SponsoringPack, type CreateSponsoringPack, type SponsoringOption } from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 
-type PackWithFlyer = SponsoringPack & {
-  flyer_template_url?: string | null;
-  flyer_zone_x?: number | null;
-  flyer_zone_y?: number | null;
-  flyer_zone_width?: number | null;
-  flyer_zone_height?: number | null;
-};
-
 const route = useRoute();
 const router = useRouter();
 const { footerLinks } = useDashboardLinks();
@@ -69,7 +61,7 @@ const eventSlug = computed(() => {
 });
 const packId = computed(() => route.params.packId as string);
 
-const pack = ref<PackWithFlyer | null>(null);
+const pack = ref<SponsoringPack | null>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const eventName = ref<string>('');
