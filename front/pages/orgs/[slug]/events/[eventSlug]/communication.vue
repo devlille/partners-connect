@@ -418,14 +418,6 @@ import { useStandaloneCommunicationModal } from '~/composables/useStandaloneComm
 import FilterPanel from '~/components/sponsors/FilterPanel.vue';
 import ActiveFilters from '~/components/sponsors/ActiveFilters.vue';
 import type { PartnershipsMetadata } from '~/types/sponsors';
-import { useSponsorsStore } from "~/stores/sponsors";
-
-const sponsorsStore = useSponsorsStore();
-
-function partnershipFor(item: { partnership_id?: string | null }) {
-  if (!item.partnership_id) return undefined;
-  return sponsorsStore.sponsors.find((s) => s.id === item.partnership_id);
-}
 
 const route = useRoute();
 const toast = useToast();
@@ -463,6 +455,11 @@ const unfilteredCommunicationPlan = ref<CommunicationPlanSchema>({
   unplanned: []
 });
 const partnerships = ref<PartnershipItemSchema[]>([]);
+
+function partnershipFor(item: { partnership_id?: string | null }) {
+  if (!item.partnership_id) return undefined;
+  return partnerships.value.find((s) => s.id === item.partnership_id);
+}
 const loading = ref(true);
 const error = ref<string | null>(null);
 const eventName = ref<string>('');
