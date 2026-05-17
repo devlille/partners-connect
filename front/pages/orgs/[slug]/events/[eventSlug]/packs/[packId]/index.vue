@@ -25,6 +25,7 @@
           @save="onSave"
         />
         <FlyerTemplateConfig
+          :key="packId"
           :org-slug="orgSlug"
           :event-slug="eventSlug"
           :pack-id="packId"
