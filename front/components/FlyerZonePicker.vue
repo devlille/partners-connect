@@ -12,7 +12,9 @@
         ref="image"
         :src="templateUrl"
         class="block max-w-full h-auto"
+        draggable="false"
         @load="onImageLoad"
+        @dragstart.prevent
         alt="Flyer template preview"
       />
       <div
@@ -115,6 +117,8 @@ let dragStart: { x: number; y: number } | null = null;
 
 function onMouseDown(event: MouseEvent) {
   if (!container.value) return;
+  // Prevent the browser's native image-drag gesture (and any focus/selection side-effects).
+  event.preventDefault();
   const rect = container.value.getBoundingClientRect();
   dragStart = { x: event.clientX - rect.left, y: event.clientY - rect.top };
 }
