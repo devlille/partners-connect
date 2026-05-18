@@ -179,6 +179,57 @@ class EventCommunicationPlanRouteGetTest {
     }
 
     @Test
+    fun `GET plan inherits partnership support url on planned entry without one`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val partnershipId = UUID.randomUUID()
+        val flyerUrl = "https://storage.googleapis.com/bucket/communication-support.jpg"
+
+        val now = Clock.System.now()
+        val futureDate = now.plus(duration = 1.days).toLocalDateTime(TimeZone.UTC)
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedCompany(companyId, "Flyer Company")
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedPartnership(
+                    id = partnershipId,
+                    eventId = eventId,
+                    companyId = companyId,
+                    selectedPackId = packId,
+                    communicationSupportUrl = flyerUrl,
+                )
+                insertMockedCommunicationPlan(
+                    eventId = eventId,
+                    partnershipId = partnershipId,
+                    title = "Planned post without its own image",
+                    scheduledDate = futureDate,
+                    supportUrl = null,
+                )
+            }
+        }
+
+        val response = client.get("/orgs/$orgId/events/$eventId/communication") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val planned = Json.parseToJsonElement(response.bodyAsText()).jsonObject["planned"]!!.jsonArray
+        assertEquals(1, planned.size)
+        val plannedItem = planned[0].jsonObject
+        assertEquals(partnershipId.toString(), plannedItem["partnership_id"]!!.jsonPrimitive.content)
+        assertEquals(flyerUrl, plannedItem["support_url"]!!.jsonPrimitive.content)
+    }
+
+    @Test
     fun `GET communication plan returns standalone entries alongside partnership-linked entries`() = testApplication {
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
