@@ -220,4 +220,38 @@ describe("CommunicationCard", () => {
       expect(wrapper.text()).toContain("Non planifiée");
     });
   });
+
+  describe("Clickable surface", () => {
+    it("exposes a link-shaped root when partnership_id is set", () => {
+      const wrapper = mount(CommunicationCard, {
+        props: {
+          item: partnershipItem,
+          status: "unplanned",
+          orgSlug: "test-org",
+          eventSlug: "test-event",
+        },
+      });
+
+      const root = wrapper.element as HTMLElement;
+      expect(root.getAttribute("role")).toBe("link");
+      expect(root.getAttribute("tabindex")).toBe("0");
+      expect(root.getAttribute("aria-label")).toContain("Acme Corp");
+    });
+
+    it("does not expose link semantics for standalone communications", () => {
+      const wrapper = mount(CommunicationCard, {
+        props: {
+          item: standaloneItem,
+          status: "unplanned",
+          orgSlug: "test-org",
+          eventSlug: "test-event",
+        },
+      });
+
+      const root = wrapper.element as HTMLElement;
+      expect(root.getAttribute("role")).toBeNull();
+      expect(root.getAttribute("tabindex")).toBeNull();
+      expect(wrapper.find('[role="link"]').exists()).toBe(false);
+    });
+  });
 });
