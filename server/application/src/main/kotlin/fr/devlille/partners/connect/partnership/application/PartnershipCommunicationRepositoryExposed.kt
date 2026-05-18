@@ -31,7 +31,10 @@ class PartnershipCommunicationRepositoryExposed : PartnershipCommunicationReposi
                     partnershipId = entry.partnership?.id?.value?.toString(),
                     title = entry.title,
                     publicationDate = entry.scheduledDate,
-                    supportUrl = entry.supportUrl,
+                    // Per-entry supportUrl wins (publication-specific asset). When the entry
+                    // hasn't set one yet, fall back to the partnership-level asset (e.g. a
+                    // generated flyer) so the download link still surfaces.
+                    supportUrl = entry.supportUrl ?: entry.partnership?.communicationSupportUrl,
                 )
             }
 
