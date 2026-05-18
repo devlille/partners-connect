@@ -6621,13 +6621,6 @@ components:
         mapping:
           partnership: '#/components/schemas/WebhookPartnershipPayload'
           ecosystem_partner: '#/components/schemas/WebhookEcosystemPartnerPayload'
-    WebhookEventType:
-      type: string
-      description: Type of event that triggered the webhook.
-      enum:
-        - CREATED
-        - UPDATED
-        - DELETED
     WebhookPartnershipPayload:
       type: object
       description: Webhook payload emitted when a partnership resource is created, updated or deleted.
@@ -6647,7 +6640,12 @@ components:
             - partnership
           description: Discriminator value identifying this variant.
         event_type:
-          $ref: '#/components/schemas/WebhookEventType'
+          type: string
+          enum:
+            - CREATED
+            - UPDATED
+            - DELETED
+          description: Type of event that triggered the webhook.
         resource_type:
           type: string
           enum:
@@ -6711,7 +6709,12 @@ components:
             - ecosystem_partner
           description: Discriminator value identifying this variant.
         event_type:
-          $ref: '#/components/schemas/WebhookEventType'
+          type: string
+          enum:
+            - CREATED
+            - UPDATED
+            - DELETED
+          description: Type of event that triggered the webhook.
         resource_type:
           type: string
           enum:
