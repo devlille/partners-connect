@@ -6,12 +6,21 @@
           <BackButton :to="`/orgs/${orgSlug}/events/${eventSlug}`" label="Retour" />
           <PageTitle>Packs de sponsoring - {{ eventName }}</PageTitle>
         </div>
-        <UButton
-          :to="`/orgs/${orgSlug}/events/${eventSlug}/packs/create`"
-          label="Créer un pack"
-          icon="i-heroicons-plus"
-          color="primary"
-        />
+        <div class="flex gap-3">
+          <UButton
+            :to="`/orgs/${orgSlug}/events/${eventSlug}/packs/categories/create`"
+            label="Créer une catégorie"
+            icon="i-heroicons-tag"
+            color="neutral"
+            variant="outline"
+          />
+          <UButton
+            :to="`/orgs/${orgSlug}/events/${eventSlug}/packs/create`"
+            label="Créer un pack"
+            icon="i-heroicons-plus"
+            color="primary"
+          />
+        </div>
       </div>
     </div>
 
@@ -116,6 +125,72 @@
             </table>
           </div>
         </div>
+
+        <!-- Catégories de partenaires - compteurs -->
+        <div
+          v-if="categories.length > 0"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 mt-10"
+        >
+          <div
+            v-for="category in categories"
+            :key="`stat-category-${category.id}`"
+            class="bg-white rounded-lg shadow p-6 border border-gray-200"
+          >
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-sm font-medium text-gray-500">{{ category.name }}</h3>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="text-3xl font-bold text-gray-900">
+                {{ getCategoryCount(category.id) }}
+              </span>
+              <span class="text-sm text-gray-500">partenaire(s)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Liste des catégories de partenaires -->
+        <div v-if="categories.length > 0">
+          <div class="bg-white rounded-lg shadow overflow-hidden">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Nom
+                  </th>
+                  <th
+                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-for="category in categories" :key="category.id" class="hover:bg-gray-50">
+                  <td
+                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 cursor-pointer"
+                    @click="onSelectCategory(category)"
+                  >
+                    {{ category.name }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <UButton
+                      color="error"
+                      variant="ghost"
+                      size="sm"
+                      icon="i-heroicons-trash"
+                      :loading="deletingCategoryId === category.id"
+                      @click.stop="confirmDeleteCategory(category)"
+                    >
+                      Supprimer
+                    </UButton>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </template>
     </div>
 
@@ -159,11 +234,65 @@
         </div>
       </Teleport>
     </ClientOnly>
+
+    <!-- Modal de confirmation de suppression d'une catégorie -->
+    <ClientOnly>
+      <Teleport to="body">
+        <div
+          v-if="isDeleteCategoryModalOpen"
+          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+          @click.self="isDeleteCategoryModalOpen = false"
+        >
+          <div class="w-full max-w-lg bg-white rounded-lg shadow-xl" @click.stop>
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h3 class="text-lg font-semibold text-gray-900">Confirmer la suppression</h3>
+            </div>
+
+            <div class="px-6 py-4 space-y-4">
+              <p class="text-sm text-gray-700">
+                Êtes-vous sûr de vouloir supprimer la catégorie
+                <strong>{{ categoryToDelete?.name }}</strong> ?
+              </p>
+              <p class="text-sm text-gray-500">
+                Cette action est irréversible. Elle échouera si des partenaires utilisent encore
+                cette catégorie.
+              </p>
+            </div>
+
+            <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+              <UButton
+                color="neutral"
+                variant="ghost"
+                :disabled="!!deletingCategoryId"
+                @click="isDeleteCategoryModalOpen = false"
+              >
+                Annuler
+              </UButton>
+              <UButton color="error" :loading="!!deletingCategoryId" @click="handleDeleteCategory">
+                Supprimer
+              </UButton>
+            </div>
+          </div>
+        </div>
+      </Teleport>
+    </ClientOnly>
   </Dashboard>
 </template>
 
 <script setup lang="ts">
-import { getOrgsEventsPacks, getEventBySlug, deleteOrgsEventsPacks, getOrgsEventsPartnership, type SponsoringPack, type PaginationMetadataSchemaPackCountsItem } from "~/utils/api";
+import {
+  getOrgsEventsPacks,
+  getEventBySlug,
+  deleteOrgsEventsPacks,
+  getOrgsEventsPartnership,
+  getOrgsEventsEcosystemPartnerCategories,
+  getOrgsEventsEcosystemPartners,
+  deleteOrgsEventsEcosystemPartnerCategory,
+  type SponsoringPack,
+  type PaginationMetadataSchemaPackCountsItem,
+  type EcosystemPartnerCategory,
+  type EcosystemPartnerItem,
+} from "~/utils/api";
 import authMiddleware from "~/middleware/auth";
 
 const route = useRoute();
@@ -196,6 +325,46 @@ const { eventLinks } = useEventLinks(orgSlug.value, eventSlug.value);
 const isDeleteModalOpen = ref(false);
 const packToDelete = ref<SponsoringPack | null>(null);
 const deletingPackId = ref<string | null>(null);
+
+const categories = ref<EcosystemPartnerCategory[]>([]);
+const partners = ref<EcosystemPartnerItem[]>([]);
+const isDeleteCategoryModalOpen = ref(false);
+const categoryToDelete = ref<EcosystemPartnerCategory | null>(null);
+const deletingCategoryId = ref<string | null>(null);
+
+function getCategoryCount(categoryId: string): number {
+  return partners.value.filter((p) => p.category.id === categoryId).length;
+}
+
+function onSelectCategory(category: EcosystemPartnerCategory) {
+  router.push(`/orgs/${orgSlug.value}/events/${eventSlug.value}/packs/categories/${category.id}`);
+}
+
+function confirmDeleteCategory(category: EcosystemPartnerCategory) {
+  categoryToDelete.value = category;
+  isDeleteCategoryModalOpen.value = true;
+}
+
+async function handleDeleteCategory() {
+  if (!categoryToDelete.value) return;
+  try {
+    deletingCategoryId.value = categoryToDelete.value.id;
+    await deleteOrgsEventsEcosystemPartnerCategory(
+      orgSlug.value,
+      eventSlug.value,
+      categoryToDelete.value.id,
+    );
+    await loadPacks();
+    isDeleteCategoryModalOpen.value = false;
+    categoryToDelete.value = null;
+  } catch (err) {
+    console.error("Failed to delete category:", err);
+    error.value =
+      "Impossible de supprimer la catégorie. Elle est peut-être encore utilisée par un partenaire.";
+  } finally {
+    deletingCategoryId.value = null;
+  }
+}
 
 // Obtenir le nombre de partnerships pour un pack depuis les métadonnées
 function getPackCount(packId: string): number {
@@ -252,10 +421,18 @@ async function loadPacks() {
     error.value = null;
 
     // Charger toutes les données en parallèle
-    const [eventResponse, packsResponse, partnershipsResponse] = await Promise.all([
+    const [
+      eventResponse,
+      packsResponse,
+      partnershipsResponse,
+      categoriesResponse,
+      partnersResponse,
+    ] = await Promise.all([
       getEventBySlug(eventSlug.value),
       getOrgsEventsPacks(orgSlug.value, eventSlug.value),
-      getOrgsEventsPartnership(orgSlug.value, eventSlug.value)
+      getOrgsEventsPartnership(orgSlug.value, eventSlug.value),
+      getOrgsEventsEcosystemPartnerCategories(orgSlug.value, eventSlug.value),
+      getOrgsEventsEcosystemPartners(orgSlug.value, eventSlug.value),
     ]);
 
     eventName.value = eventResponse.data.event.name;
@@ -264,6 +441,9 @@ async function loadPacks() {
     // Extraire les pack_counts depuis les métadonnées de la réponse paginée
     const partnershipsData = partnershipsResponse.data as unknown as { metadata?: { pack_counts?: PaginationMetadataSchemaPackCountsItem[] } };
     packCounts.value = partnershipsData.metadata?.pack_counts ?? [];
+
+    categories.value = categoriesResponse.data;
+    partners.value = partnersResponse.data;
   } catch (err) {
     console.error('Failed to load packs:', err);
     error.value = 'Impossible de charger les packs';
