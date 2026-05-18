@@ -1,5 +1,18 @@
 <template>
-  <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+  <div
+    class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+    :class="
+      item.partnership_id
+        ? 'cursor-pointer hover:border-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-400'
+        : ''
+    "
+    :role="item.partnership_id ? 'link' : undefined"
+    :tabindex="item.partnership_id ? 0 : undefined"
+    :aria-label="item.partnership_id ? `Ouvrir la communication de ${item.title}` : undefined"
+    @click="onCardClick"
+    @keydown.enter="onCardClick"
+    @keydown.space.prevent="onCardClick"
+  >
     <!-- Header avec titre -->
     <div class="flex items-start justify-between mb-3">
       <div class="flex-1">
@@ -32,7 +45,7 @@
         variant="ghost"
         color="neutral"
         icon="i-heroicons-calendar"
-        @click="$emit('schedule', item)"
+        @click.stop="$emit('schedule', item)"
       >
         {{ status === 'done' ? 'Reprogrammer' : item.publication_date ? 'Modifier la date' : 'Planifier' }}
       </UButton>
@@ -42,7 +55,7 @@
         variant="ghost"
         color="neutral"
         icon="i-heroicons-photo"
-        @click="$emit('upload', item)"
+        @click.stop="$emit('upload', item)"
       >
         {{ item.support_url ? 'Changer' : 'Ajouter' }}
       </UButton>
@@ -52,6 +65,7 @@
         :org-slug="orgSlug"
         :event-slug="eventSlug"
         :partnership-id="partnership.id"
+        @click.stop
       />
     </div>
 
@@ -62,7 +76,7 @@
         variant="ghost"
         color="neutral"
         icon="i-heroicons-pencil"
-        @click="$emit('edit', item)"
+        @click.stop="$emit('edit', item)"
       >
         Modifier
       </UButton>
@@ -72,7 +86,7 @@
         variant="ghost"
         color="error"
         icon="i-heroicons-trash"
-        @click="$emit('delete', item)"
+        @click.stop="$emit('delete', item)"
       >
         Supprimer
       </UButton>
@@ -99,6 +113,15 @@ defineEmits<{
   edit: [item: CommunicationItemSchema];
   delete: [item: CommunicationItemSchema];
 }>();
+
+const router = useRouter();
+
+function onCardClick() {
+  if (!props.item.partnership_id) return;
+  router.push(
+    `/orgs/${props.orgSlug}/events/${props.eventSlug}/sponsors/${props.item.partnership_id}/communication`,
+  );
+}
 
 const statusLabel = computed(() => {
   switch (props.status) {
@@ -131,7 +154,7 @@ function formatDate(dateString: string) {
   return new Intl.DateTimeFormat('fr-FR', {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   }).format(date);
 }
 </script>
