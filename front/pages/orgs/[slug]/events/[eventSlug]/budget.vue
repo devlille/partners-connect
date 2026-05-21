@@ -56,7 +56,7 @@ definePageMeta({
   ssr: false,
 });
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { footerLinks } = useDashboardLinks();
 const { getOrgSlug, getEventSlug } = useRouteParams();
 
@@ -139,7 +139,7 @@ const columns = computed(() => {
         h(
           "div",
           { class: "font-medium tabular-nums" },
-          formatPrice(info.getValue() as number, budget.value?.currency ?? "EUR"),
+          formatPrice(info.getValue() as number, budget.value?.currency ?? "EUR", locale.value),
         ),
     },
     {

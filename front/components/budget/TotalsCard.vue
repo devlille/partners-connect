@@ -5,7 +5,7 @@
       <div>
         <div class="text-sm font-medium text-gray-500">{{ t('budget.totals.paid') }}</div>
         <div class="mt-1 text-3xl font-bold text-green-600">
-          {{ formatPrice(totals.paid, currency) }}
+          {{ formatPrice(totals.paid, currency, locale) }}
         </div>
       </div>
 
@@ -13,10 +13,11 @@
       <div>
         <div class="text-sm font-medium text-gray-500">{{ t('budget.totals.validated') }}</div>
         <div class="mt-1 text-3xl font-bold text-blue-600">
-          {{ formatPrice(totals.validated, currency) }}
+          {{ formatPrice(totals.validated, currency, locale) }}
         </div>
         <div class="mt-1 text-xs text-gray-500">
-          ↑ {{ formatPrice(totals.validated_minus_paid, currency) }} {{ t('budget.totals.toCome') }}
+          ↑ {{ formatPrice(totals.validated_minus_paid, currency, locale) }}
+          {{ t('budget.totals.toCome') }}
         </div>
       </div>
 
@@ -24,10 +25,11 @@
       <div>
         <div class="text-sm font-medium text-gray-500">{{ t('budget.totals.total') }}</div>
         <div class="mt-1 text-3xl font-bold text-gray-900">
-          {{ formatPrice(totals.total, currency) }}
+          {{ formatPrice(totals.total, currency, locale) }}
         </div>
         <div class="mt-1 text-xs text-gray-500">
-          ↑ {{ formatPrice(totals.total_minus_validated, currency) }} {{ t('budget.totals.pipeline') }}
+          ↑ {{ formatPrice(totals.total_minus_validated, currency, locale) }}
+          {{ t('budget.totals.pipeline') }}
         </div>
       </div>
     </div>
@@ -43,5 +45,5 @@ defineProps<{
   currency: string;
 }>();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 </script>
