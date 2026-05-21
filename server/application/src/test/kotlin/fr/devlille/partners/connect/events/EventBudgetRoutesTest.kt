@@ -227,4 +227,70 @@ class EventBudgetRoutesTest {
         assertEquals("Gamma", silverPartnerships[0].jsonObject["company_name"]!!.jsonPrimitive.content)
         assertEquals(500, silverPartnerships[0].jsonObject["price_applied"]!!.jsonPrimitive.content.toInt())
     }
+
+    @Test
+    fun `returns 404 when event slug does not exist`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId = userId)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+            }
+        }
+
+        val response = client.get("/orgs/$orgId/events/does-not-exist/budget") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+        assertEquals(HttpStatusCode.NotFound, response.status)
+    }
+
+    @Test
+    fun `returns 401 when no auth header is provided`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val eventSlug = eventId.toString()
+
+        application {
+            moduleSharedDb(userId = userId)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                insertMockedFutureEvent(eventId, slug = eventSlug, orgId = orgId)
+            }
+        }
+
+        val response = client.get("/orgs/$orgId/events/$eventSlug/budget")
+        assertEquals(HttpStatusCode.Unauthorized, response.status)
+    }
+
+    @Test
+    fun `returns 401 when user is not member of the owning organisation`() = testApplication {
+        val ownerUserId = UUID.randomUUID()
+        val outsiderUserId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val eventSlug = eventId.toString()
+
+        application {
+            moduleSharedDb(userId = outsiderUserId)
+            transaction {
+                insertMockedUser(ownerUserId)
+                insertMockedUser(outsiderUserId)
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = ownerUserId)
+                insertMockedFutureEvent(eventId, slug = eventSlug, orgId = orgId)
+            }
+        }
+
+        val response = client.get("/orgs/$orgId/events/$eventSlug/budget") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+        assertEquals(HttpStatusCode.Unauthorized, response.status)
+    }
 }
