@@ -102,18 +102,19 @@ const displayedTotals = computed<BudgetTotalsSchema>(() => {
 
 const displayedPartnerships = computed<BudgetRow[]>(() => {
   if (!budget.value) return [];
-  if (selectedPack.value) {
-    return selectedPack.value.partnerships.map((p) => ({
-      ...p,
-      pack_name: selectedPack.value!.pack_name,
-      pack_id: selectedPack.value!.pack_id,
-    }));
-  }
-  return budget.value.packs.flatMap((pack) =>
-    pack.partnerships.map((p) => ({
+  const pack = selectedPack.value;
+  if (pack) {
+    return pack.partnerships.map((p) => ({
       ...p,
       pack_name: pack.pack_name,
       pack_id: pack.pack_id,
+    }));
+  }
+  return budget.value.packs.flatMap((p) =>
+    p.partnerships.map((item) => ({
+      ...item,
+      pack_name: p.pack_name,
+      pack_id: p.pack_id,
     })),
   );
 });
