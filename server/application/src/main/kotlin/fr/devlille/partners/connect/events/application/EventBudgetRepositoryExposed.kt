@@ -1,11 +1,11 @@
 package fr.devlille.partners.connect.events.application
 
+import fr.devlille.partners.connect.events.application.mappers.computePriceApplied
+import fr.devlille.partners.connect.events.application.mappers.toBudget
+import fr.devlille.partners.connect.events.application.mappers.toBudgetTotals
 import fr.devlille.partners.connect.events.domain.BudgetTotals
 import fr.devlille.partners.connect.events.domain.EventBudget
 import fr.devlille.partners.connect.events.domain.EventBudgetRepository
-import fr.devlille.partners.connect.events.domain.PackBudget
-import fr.devlille.partners.connect.events.domain.PartnershipBudgetItem
-import fr.devlille.partners.connect.events.domain.PartnershipBudgetStatus
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.partnership.domain.InvoiceStatus
@@ -25,7 +25,6 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
 class EventBudgetRepositoryExposed : EventBudgetRepository {
-    @Suppress("LongMethod")
     override fun findByEventSlug(eventSlug: String): EventBudget = transaction {
         val event = EventEntity.findBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
@@ -54,106 +53,53 @@ class EventBudgetRepositoryExposed : EventBudgetRepository {
         }
 
         val partnershipIds = partnerships.map { it.id.value }.toSet()
-
-        val paidPartnershipIds: Set<UUID> = BillingEntity
-            .find {
-                (BillingsTable.eventId eq eventId) and
-                    (BillingsTable.partnershipId inList partnershipIds) and
-                    (BillingsTable.status eq InvoiceStatus.PAID)
-            }
-            .map { it.partnership.id.value }
-            .toSet()
-
-        val optionsByPartnership: Map<UUID, List<PartnershipOptionEntity>> = PartnershipOptionEntity
-            .find { PartnershipOptionsTable.partnershipId inList partnershipIds }
-            .toList()
-            .groupBy { it.partnership.id.value }
-
+        val paidPartnershipIds = loadPaidPartnershipIds(eventId, partnershipIds)
+        val optionsByPartnership = loadOptionsByPartnership(partnershipIds)
         val pricingPackIds = partnerships.mapNotNull { it.pricingPack()?.id?.value }.toSet()
-        val requiredOptionIdsByPack: Map<UUID, Set<UUID>> = if (pricingPackIds.isEmpty()) {
-            emptyMap()
-        } else {
-            PackOptionsTable.listOptionsByPacks(pricingPackIds)
-                .filter { it[PackOptionsTable.required] }
-                .groupBy({ it[PackOptionsTable.pack].value }, { it[PackOptionsTable.option].value })
-                .mapValues { (_, v) -> v.toSet() }
+        val requiredOptionIdsByPack = loadRequiredOptionIdsByPack(pricingPackIds)
+
+        val partnershipsWithPrice: List<Pair<PartnershipEntity, Int>> = partnerships.map { p ->
+            p to p.computePriceApplied(optionsByPartnership, requiredOptionIdsByPack)
         }
 
-        val priceByPartnership: Map<UUID, Int> = partnerships.associate { p ->
-            val pack = p.pricingPack()
-            val price = if (pack == null) {
-                0
-            } else {
-                val effectiveBase = p.packPriceOverride ?: pack.basePrice
-                val requiredIds = requiredOptionIdsByPack[pack.id.value] ?: emptySet()
-                val partnershipOptions = optionsByPartnership[p.id.value] ?: emptyList()
-                val optionalSum = partnershipOptions
-                    .filter { it.pack.id.value == pack.id.value }
-                    .filter { it.option.id.value !in requiredIds }
-                    .sumOf { it.effectivePrice() }
-                effectiveBase + optionalSum
-            }
-            p.id.value to price
-        }
-
-        val paid = partnerships
-            .filter { it.id.value in paidPartnershipIds }
-            .sumOf { priceByPartnership[it.id.value] ?: 0 }
-        val validated = partnerships
-            .filter { it.validatedAt != null }
-            .sumOf { priceByPartnership[it.id.value] ?: 0 }
-        val total = partnerships.sumOf { priceByPartnership[it.id.value] ?: 0 }
-
-        val packBudgets = partnerships
-            .mapNotNull { p ->
-                val pack = p.pricingPack() ?: return@mapNotNull null
-                Triple(pack, p, priceByPartnership[p.id.value] ?: 0)
-            }
+        val packBudgets = partnershipsWithPrice
+            .mapNotNull { (p, price) -> p.pricingPack()?.let { Triple(it, p, price) } }
             .groupBy { (pack, _, _) -> pack.id.value }
             .map { (_, triples) ->
                 val pack = triples.first().first
-                val packPaid = triples
-                    .filter { (_, p, _) -> p.id.value in paidPartnershipIds }
-                    .sumOf { (_, _, price) -> price }
-                val packValidated = triples
-                    .filter { (_, p, _) -> p.validatedAt != null }
-                    .sumOf { (_, _, price) -> price }
-                val packTotal = triples.sumOf { (_, _, price) -> price }
-                PackBudget(
-                    packId = pack.id.value.toString(),
-                    packName = pack.name,
-                    basePrice = pack.basePrice,
-                    totals = BudgetTotals(
-                        paid = packPaid,
-                        validated = packValidated,
-                        validatedMinusPaid = packValidated - packPaid,
-                        total = packTotal,
-                        totalMinusValidated = packTotal - packValidated,
-                    ),
-                    partnerships = triples
-                        .sortedBy { (_, partnership, _) -> partnership.company.name.lowercase() }
-                        .map { (_, partnership, price) ->
-                            PartnershipBudgetItem(
-                                partnershipId = partnership.id.value.toString(),
-                                companyName = partnership.company.name,
-                                priceApplied = price,
-                                status = partnership.budgetStatus(paidPartnershipIds),
-                            )
-                        },
-                )
+                val pairs = triples.map { (_, p, price) -> p to price }
+                pack.toBudget(pairs, paidPartnershipIds)
             }
             .sortedBy { it.packName.lowercase() }
 
         EventBudget(
             currency = "EUR",
-            totals = BudgetTotals(
-                paid = paid,
-                validated = validated,
-                validatedMinusPaid = validated - paid,
-                total = total,
-                totalMinusValidated = total - validated,
-            ),
+            totals = partnershipsWithPrice.toBudgetTotals(paidPartnershipIds),
             packs = packBudgets,
         )
+    }
+
+    private fun loadPaidPartnershipIds(eventId: UUID, partnershipIds: Set<UUID>): Set<UUID> = BillingEntity
+        .find {
+            (BillingsTable.eventId eq eventId) and
+                (BillingsTable.partnershipId inList partnershipIds) and
+                (BillingsTable.status eq InvoiceStatus.PAID)
+        }
+        .map { it.partnership.id.value }
+        .toSet()
+
+    private fun loadOptionsByPartnership(
+        partnershipIds: Set<UUID>,
+    ): Map<UUID, List<PartnershipOptionEntity>> = PartnershipOptionEntity
+        .find { PartnershipOptionsTable.partnershipId inList partnershipIds }
+        .toList()
+        .groupBy { it.partnership.id.value }
+
+    private fun loadRequiredOptionIdsByPack(packIds: Set<UUID>): Map<UUID, Set<UUID>> {
+        if (packIds.isEmpty()) return emptyMap()
+        return PackOptionsTable.listOptionsByPacks(packIds)
+            .filter { it[PackOptionsTable.required] }
+            .groupBy({ it[PackOptionsTable.pack].value }, { it[PackOptionsTable.option].value })
+            .mapValues { (_, v) -> v.toSet() }
     }
 }
