@@ -8888,6 +8888,8 @@ components:
         base_price:
           type: integer
           minimum: 0
+        totals:
+          $ref: '#/components/schemas/budget_totals.schema'
         partnerships:
           type: array
           items:
@@ -8896,6 +8898,7 @@ components:
         - pack_id
         - pack_name
         - base_price
+        - totals
         - partnerships
       additionalProperties: false
     event_budget.schema:

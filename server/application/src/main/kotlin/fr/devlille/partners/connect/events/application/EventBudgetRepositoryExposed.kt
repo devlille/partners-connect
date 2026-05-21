@@ -115,10 +115,24 @@ class EventBudgetRepositoryExposed : EventBudgetRepository {
             .groupBy { (pack, _, _) -> pack.id.value }
             .map { (_, triples) ->
                 val pack = triples.first().first
+                val packPaid = triples
+                    .filter { (_, p, _) -> p.id.value in paidPartnershipIds }
+                    .sumOf { (_, _, price) -> price }
+                val packValidated = triples
+                    .filter { (_, p, _) -> p.validatedAt != null }
+                    .sumOf { (_, _, price) -> price }
+                val packTotal = triples.sumOf { (_, _, price) -> price }
                 PackBudget(
                     packId = pack.id.value.toString(),
                     packName = pack.name,
                     basePrice = pack.basePrice,
+                    totals = BudgetTotals(
+                        paid = packPaid,
+                        validated = packValidated,
+                        validatedMinusPaid = packValidated - packPaid,
+                        total = packTotal,
+                        totalMinusValidated = packTotal - packValidated,
+                    ),
                     partnerships = triples
                         .sortedBy { (_, partnership, _) -> partnership.company.name.lowercase() }
                         .map { (_, partnership, price) ->
