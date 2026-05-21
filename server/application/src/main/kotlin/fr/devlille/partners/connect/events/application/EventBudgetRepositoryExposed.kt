@@ -16,11 +16,11 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOpt
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOptionsTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.PackOptionsTable
+import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionsByPacks
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.v1.core.and
-import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
@@ -73,10 +73,7 @@ class EventBudgetRepositoryExposed : EventBudgetRepository {
         val requiredOptionIdsByPack: Map<UUID, Set<UUID>> = if (pricingPackIds.isEmpty()) {
             emptyMap()
         } else {
-            PackOptionsTable
-                .selectAll()
-                .where { PackOptionsTable.pack inList pricingPackIds }
-                .toList()
+            PackOptionsTable.listOptionsByPacks(pricingPackIds)
                 .filter { it[PackOptionsTable.required] }
                 .groupBy({ it[PackOptionsTable.pack].value }, { it[PackOptionsTable.option].value })
                 .mapValues { (_, v) -> v.toSet() }
