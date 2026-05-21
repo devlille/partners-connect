@@ -8,7 +8,6 @@ import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationsT
 import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
 import fr.devlille.partners.connect.webhooks.domain.WebhookGateway
 import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
-import fr.devlille.partners.connect.webhooks.domain.WebhookResourceType
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -19,8 +18,7 @@ class WebhookRepositoryExposed(
 ) : WebhookRepository {
     override suspend fun sendWebhooks(
         eventSlug: String,
-        resourceType: WebhookResourceType,
-        resourceId: UUID,
+        partnershipId: UUID,
         eventType: WebhookEventType,
     ) {
         val eventId = transaction {
@@ -35,7 +33,7 @@ class WebhookRepositoryExposed(
         for (integration in integrations) {
             val gateway = webhookGateways.find { it.provider == integration.provider }
                 ?: throw NotFoundException("No gateway for provider ${integration.provider}")
-            gateway.sendWebhook(integration.id.value, eventId, resourceType, resourceId, eventType)
+            gateway.sendWebhook(integration.id.value, eventId, partnershipId, eventType)
         }
     }
 }

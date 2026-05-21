@@ -26,7 +26,6 @@ import fr.devlille.partners.connect.tickets.infrastructure.bindings.ticketingMod
 import fr.devlille.partners.connect.users.infrastructure.bindings.userModule
 import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
 import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
-import fr.devlille.partners.connect.webhooks.domain.WebhookResourceType
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.server.application.Application
 import io.mockk.every
@@ -100,12 +99,7 @@ fun Application.moduleMocked(
     mockWebhook: Module = module {
         single<WebhookRepository> {
             object : WebhookRepository {
-                override suspend fun sendWebhooks(
-                    eventSlug: String,
-                    resourceType: WebhookResourceType,
-                    resourceId: UUID,
-                    eventType: WebhookEventType,
-                ) {
+                override suspend fun sendWebhooks(eventSlug: String, partnershipId: UUID, eventType: WebhookEventType) {
                     // Mock implementation - do nothing
                 }
             }
