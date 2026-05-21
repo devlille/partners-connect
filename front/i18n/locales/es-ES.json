@@ -84,5 +84,31 @@
       "redo": "Rehacer",
       "linkPrompt": "URL del enlace:"
     }
+  },
+  "budget": {
+    "title": "Presupuesto",
+    "allPacks": "Todos los paquetes",
+    "packFilterLabel": "Paquete",
+    "columns": {
+      "pack": "Paquete",
+      "company": "Empresa",
+      "price": "Precio",
+      "status": "Estado"
+    },
+    "status": {
+      "paid": "Pagado",
+      "validated": "Validado",
+      "submitted": "Enviado"
+    },
+    "totals": {
+      "paid": "Pagado",
+      "validated": "Validado",
+      "total": "Total",
+      "toCome": "por venir",
+      "pipeline": "en curso"
+    },
+    "empty": "No hay asociaciones para mostrar.",
+    "loading": "Cargando presupuesto…",
+    "error": "No se pudo cargar el presupuesto."
   }
 }

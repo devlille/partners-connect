@@ -128,5 +128,31 @@
       "redo": "Redo",
       "linkPrompt": "Link URL:"
     }
+  },
+  "budget": {
+    "title": "Budget",
+    "allPacks": "All packs",
+    "packFilterLabel": "Pack",
+    "columns": {
+      "pack": "Pack",
+      "company": "Company",
+      "price": "Price",
+      "status": "Status"
+    },
+    "status": {
+      "paid": "Paid",
+      "validated": "Validated",
+      "submitted": "Submitted"
+    },
+    "totals": {
+      "paid": "Paid",
+      "validated": "Validated",
+      "total": "Total",
+      "toCome": "to come",
+      "pipeline": "pipeline"
+    },
+    "empty": "No partnerships to display.",
+    "loading": "Loading budget…",
+    "error": "Unable to load the budget."
   }
 }
