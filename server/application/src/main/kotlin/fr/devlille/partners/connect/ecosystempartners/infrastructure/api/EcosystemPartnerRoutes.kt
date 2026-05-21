@@ -1,19 +1,15 @@
 package fr.devlille.partners.connect.ecosystempartners.infrastructure.api
 
-import fr.devlille.partners.connect.companies.domain.CompanyRepository
 import fr.devlille.partners.connect.ecosystempartners.domain.EcosystemPartnerFilters
+import fr.devlille.partners.connect.ecosystempartners.domain.EcosystemPartnerLifecycleEvent
+import fr.devlille.partners.connect.ecosystempartners.domain.EcosystemPartnerNotificationRepository
 import fr.devlille.partners.connect.ecosystempartners.domain.EcosystemPartnerRepository
 import fr.devlille.partners.connect.ecosystempartners.domain.RegisterEcosystemPartner
 import fr.devlille.partners.connect.ecosystempartners.domain.UpdateEcosystemPartner
-import fr.devlille.partners.connect.ecosystempartners.domain.publicEventUrl
-import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.infrastructure.api.eventSlug
 import fr.devlille.partners.connect.internal.infrastructure.ktor.AuthorizedOrganisationPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.WebhookEcosystemPartnerPlugin
 import fr.devlille.partners.connect.internal.infrastructure.ktor.receive
-import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
-import fr.devlille.partners.connect.notifications.domain.NotificationRepository
-import fr.devlille.partners.connect.notifications.domain.NotificationVariables
 import fr.devlille.partners.connect.partnership.infrastructure.api.toBooleanStrict
 import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
 import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
@@ -36,9 +32,7 @@ fun Route.ecosystemPartnerRoutes() {
 
 private fun Route.publicEcosystemPartnerRoutes() {
     val repository by inject<EcosystemPartnerRepository>()
-    val eventRepository by inject<EventRepository>()
-    val companyRepository by inject<CompanyRepository>()
-    val notificationRepository by inject<NotificationRepository>()
+    val notificationRepository by inject<EcosystemPartnerNotificationRepository>()
     val webhookRepository by inject<WebhookRepository>()
 
     route("/events/{eventSlug}/ecosystem-partners") {
@@ -48,17 +42,7 @@ private fun Route.publicEcosystemPartnerRoutes() {
                 schema = "register_ecosystem_partner.schema.json",
             )
             val id = repository.register(eventSlug, request)
-            val partner = repository.getById(eventSlug, id)
-            val event = eventRepository.getBySlug(eventSlug)
-            val company = companyRepository.getById(request.companyId.toUUID())
-            val variables = NotificationVariables.EcosystemPartnerSubmitted(
-                language = request.language,
-                event = event,
-                company = company,
-                categoryName = partner.category.name,
-                publicEventUrl = publicEventUrl(event),
-            )
-            notificationRepository.sendMessage(variables)
+            notificationRepository.notify(eventSlug, id, EcosystemPartnerLifecycleEvent.SUBMITTED)
             webhookRepository.sendWebhooks(
                 eventSlug = eventSlug,
                 resourceType = WebhookResourceType.ECOSYSTEM_PARTNER,
@@ -104,9 +88,7 @@ private fun Route.publicEcosystemPartnerListingRoute() {
 
 private fun Route.orgsEcosystemPartnerRoutes() {
     val repository by inject<EcosystemPartnerRepository>()
-    val eventRepository by inject<EventRepository>()
-    val companyRepository by inject<CompanyRepository>()
-    val notificationRepository by inject<NotificationRepository>()
+    val notificationRepository by inject<EcosystemPartnerNotificationRepository>()
     val webhookRepository by inject<WebhookRepository>()
 
     route("/orgs/{orgSlug}/events/{eventSlug}/ecosystem-partners") {
@@ -130,16 +112,9 @@ private fun Route.orgsEcosystemPartnerRoutes() {
         delete {
             val eventSlug = call.parameters.eventSlug
             val id = call.parameters.ecosystemPartnerId
-            val partner = repository.getById(eventSlug, id)
-            val event = eventRepository.getBySlug(eventSlug)
-            val company = companyRepository.getById(partner.companyId.toUUID())
-            val variables = NotificationVariables.EcosystemPartnerRemoved(
-                language = partner.language,
-                event = event,
-                company = company,
-                categoryName = partner.category.name,
-            )
-            notificationRepository.sendMessage(variables)
+            // Notify + fire webhook BEFORE deleting so the repository can still
+            // read the partner row to build its payload.
+            notificationRepository.notify(eventSlug, id, EcosystemPartnerLifecycleEvent.REMOVED)
             webhookRepository.sendWebhooks(
                 eventSlug = eventSlug,
                 resourceType = WebhookResourceType.ECOSYSTEM_PARTNER,

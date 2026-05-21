@@ -361,67 +361,8 @@ sealed interface NotificationVariables {
         }
     }
 
-    data class EcosystemPartnerSubmitted(
-        override val language: String,
-        override val event: EventWithOrganisation,
-        override val company: Company,
-        val categoryName: String,
-        val publicEventUrl: String,
-    ) : NotificationVariables {
-        override val usageName: String = "ecosystem_partner_submitted"
-
-        override fun populate(content: String): String = content
-            .replace("{{event_name}}", event.event.name)
-            .replace("{{event_contact}}", event.event.contact.email)
-            .replace("{{company_name}}", company.name)
-            .replace("{{category_name}}", categoryName)
-            .replace("{{public_event_url}}", publicEventUrl)
-    }
-
-    data class EcosystemPartnerValidated(
-        override val language: String,
-        override val event: EventWithOrganisation,
-        override val company: Company,
-        val categoryName: String,
-        val publicEventUrl: String,
-    ) : NotificationVariables {
-        override val usageName: String = "ecosystem_partner_validated"
-
-        override fun populate(content: String): String = content
-            .replace("{{event_name}}", event.event.name)
-            .replace("{{event_contact}}", event.event.contact.email)
-            .replace("{{company_name}}", company.name)
-            .replace("{{category_name}}", categoryName)
-            .replace("{{public_event_url}}", publicEventUrl)
-    }
-
-    data class EcosystemPartnerDeclined(
-        override val language: String,
-        override val event: EventWithOrganisation,
-        override val company: Company,
-        val categoryName: String,
-    ) : NotificationVariables {
-        override val usageName: String = "ecosystem_partner_declined"
-
-        override fun populate(content: String): String = content
-            .replace("{{event_name}}", event.event.name)
-            .replace("{{event_contact}}", event.event.contact.email)
-            .replace("{{company_name}}", company.name)
-            .replace("{{category_name}}", categoryName)
-    }
-
-    data class EcosystemPartnerRemoved(
-        override val language: String,
-        override val event: EventWithOrganisation,
-        override val company: Company,
-        val categoryName: String,
-    ) : NotificationVariables {
-        override val usageName: String = "ecosystem_partner_removed"
-
-        override fun populate(content: String): String = content
-            .replace("{{event_name}}", event.event.name)
-            .replace("{{event_contact}}", event.event.contact.email)
-            .replace("{{company_name}}", company.name)
-            .replace("{{category_name}}", categoryName)
-    }
+    // Ecosystem partner lifecycle notifications live in their own dispatch
+    // pipeline — see `ecosystempartners.domain.EcosystemPartnerNotificationRepository`
+    // and `NotificationEcosystemPartnerPlugin`. They do not flow through the
+    // partnership-centric `NotificationRepository.sendMessage(variables)` path.
 }
