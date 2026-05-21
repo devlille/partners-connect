@@ -10,7 +10,6 @@ import fr.devlille.partners.connect.companies.infrastructure.bindings.companyMod
 import fr.devlille.partners.connect.digest.infrastructure.api.digestRoutes
 import fr.devlille.partners.connect.digest.infrastructure.bindings.digestModule
 import fr.devlille.partners.connect.ecosystempartners.infrastructure.api.ecosystemPartnerCategoryRoutes
-import fr.devlille.partners.connect.ecosystempartners.infrastructure.api.ecosystemPartnerRoutes
 import fr.devlille.partners.connect.ecosystempartners.infrastructure.bindings.ecosystemPartnerModule
 import fr.devlille.partners.connect.events.infrastructure.api.eventBoothPlanRoutes
 import fr.devlille.partners.connect.events.infrastructure.api.eventExternalLinkRoutes
@@ -148,7 +147,6 @@ fun Application.module(config: ApplicationConfig = ApplicationConfig()) {
         sponsoringRoutes()
         partnershipRoutes()
         ecosystemPartnerCategoryRoutes()
-        ecosystemPartnerRoutes()
         integrationRoutes()
         providersRoutes()
         digestRoutes()
