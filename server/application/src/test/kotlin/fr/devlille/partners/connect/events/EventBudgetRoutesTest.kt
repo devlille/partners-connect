@@ -214,6 +214,12 @@ class EventBudgetRoutesTest {
 
         val gold = packs[0].jsonObject
         assertEquals(1000, gold["base_price"]!!.jsonPrimitive.content.toInt())
+        val goldTotals = gold["totals"]!!.jsonObject
+        assertEquals(0, goldTotals["paid"]!!.jsonPrimitive.content.toInt())
+        assertEquals(2500, goldTotals["validated"]!!.jsonPrimitive.content.toInt())
+        assertEquals(2500, goldTotals["validated_minus_paid"]!!.jsonPrimitive.content.toInt())
+        assertEquals(3500, goldTotals["total"]!!.jsonPrimitive.content.toInt())
+        assertEquals(1000, goldTotals["total_minus_validated"]!!.jsonPrimitive.content.toInt())
         val goldPartnerships = gold["partnerships"]!!.jsonArray
         assertEquals(3, goldPartnerships.size)
         assertEquals("Acme", goldPartnerships[0].jsonObject["company_name"]!!.jsonPrimitive.content)
@@ -227,6 +233,12 @@ class EventBudgetRoutesTest {
         assertEquals("submitted", goldPartnerships[2].jsonObject["status"]!!.jsonPrimitive.content)
 
         val silver = packs[1].jsonObject
+        val silverTotals = silver["totals"]!!.jsonObject
+        assertEquals(0, silverTotals["paid"]!!.jsonPrimitive.content.toInt())
+        assertEquals(500, silverTotals["validated"]!!.jsonPrimitive.content.toInt())
+        assertEquals(500, silverTotals["validated_minus_paid"]!!.jsonPrimitive.content.toInt())
+        assertEquals(500, silverTotals["total"]!!.jsonPrimitive.content.toInt())
+        assertEquals(0, silverTotals["total_minus_validated"]!!.jsonPrimitive.content.toInt())
         val silverPartnerships = silver["partnerships"]!!.jsonArray
         assertEquals(1, silverPartnerships.size)
         assertEquals("Gamma", silverPartnerships[0].jsonObject["company_name"]!!.jsonPrimitive.content)

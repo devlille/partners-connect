@@ -29,6 +29,7 @@ data class PackBudget(
     val packName: String,
     @SerialName("base_price")
     val basePrice: Int,
+    val totals: BudgetTotals,
     val partnerships: List<PartnershipBudgetItem>,
 )
 

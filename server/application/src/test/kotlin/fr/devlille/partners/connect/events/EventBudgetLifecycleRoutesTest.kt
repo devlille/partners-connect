@@ -127,6 +127,12 @@ class EventBudgetLifecycleRoutesTest {
         assertEquals(1, packs.size)
         val gold = packs[0].jsonObject
         assertEquals("Gold", gold["pack_name"]!!.jsonPrimitive.content)
+        val goldTotals = gold["totals"]!!.jsonObject
+        assertEquals(1050, goldTotals["paid"]!!.jsonPrimitive.content.toInt())
+        assertEquals(2050, goldTotals["validated"]!!.jsonPrimitive.content.toInt())
+        assertEquals(1000, goldTotals["validated_minus_paid"]!!.jsonPrimitive.content.toInt())
+        assertEquals(3050, goldTotals["total"]!!.jsonPrimitive.content.toInt())
+        assertEquals(1000, goldTotals["total_minus_validated"]!!.jsonPrimitive.content.toInt())
         val partnerships = gold["partnerships"]!!.jsonArray
         assertEquals(3, partnerships.size)
         assertEquals("Acme", partnerships[0].jsonObject["company_name"]!!.jsonPrimitive.content)
