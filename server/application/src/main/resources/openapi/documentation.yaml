@@ -6342,6 +6342,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
+        '409':
+          description: Conflict - Ecosystem partner has already been validated or declined.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/ecosystem-partners/{ecosystemPartnerId}/decline:
     post:
       tags:
@@ -6383,6 +6389,12 @@ paths:
                 $ref: '#/components/schemas/error_response.schema'
         '404':
           description: Not Found - Ecosystem partner or event does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '409':
+          description: Conflict - Ecosystem partner has already been validated or declined.
           content:
             application/json:
               schema:
