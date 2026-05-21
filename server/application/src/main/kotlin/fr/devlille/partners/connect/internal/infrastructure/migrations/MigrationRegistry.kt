@@ -20,7 +20,6 @@ import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateCommunicationPlansTableMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateCompanyJobOffersTableMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateEcosystemPartnerCategoriesTableMigration
-import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateEcosystemPartnersTableMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateJobOfferPromotionsTableMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreatePartnershipSupportVideosTableMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateQandaTablesMigration
@@ -66,7 +65,6 @@ object MigrationRegistry {
         CreatePartnershipSupportVideosTableMigration,
         AddFlyerTemplateColumnsToSponsoringPacksMigration,
         CreateEcosystemPartnerCategoriesTableMigration,
-        CreateEcosystemPartnersTableMigration,
     )
 
     /**
