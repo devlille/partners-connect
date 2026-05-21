@@ -9,8 +9,6 @@ import fr.devlille.partners.connect.companies.infrastructure.api.companyRoutes
 import fr.devlille.partners.connect.companies.infrastructure.bindings.companyModule
 import fr.devlille.partners.connect.digest.infrastructure.api.digestRoutes
 import fr.devlille.partners.connect.digest.infrastructure.bindings.digestModule
-import fr.devlille.partners.connect.ecosystempartners.infrastructure.api.ecosystemPartnerCategoryRoutes
-import fr.devlille.partners.connect.ecosystempartners.infrastructure.bindings.ecosystemPartnerModule
 import fr.devlille.partners.connect.events.infrastructure.api.eventBoothPlanRoutes
 import fr.devlille.partners.connect.events.infrastructure.api.eventExternalLinkRoutes
 import fr.devlille.partners.connect.events.infrastructure.api.eventRoutes
@@ -98,7 +96,6 @@ data class ApplicationConfig(
         sponsoringModule,
         companyModule,
         partnershipModule,
-        ecosystemPartnerModule,
         notificationModule,
         billingModule,
         ticketingModule,
@@ -146,7 +143,6 @@ fun Application.module(config: ApplicationConfig = ApplicationConfig()) {
         userRoutes()
         sponsoringRoutes()
         partnershipRoutes()
-        ecosystemPartnerCategoryRoutes()
         integrationRoutes()
         providersRoutes()
         digestRoutes()
