@@ -1,0 +1,15 @@
+{
+  "$id": "pack_budget.schema.json",
+  "type": "object",
+  "properties": {
+    "pack_id": { "type": "string", "format": "uuid" },
+    "pack_name": { "type": "string" },
+    "base_price": { "type": "integer", "minimum": 0 },
+    "partnerships": {
+      "type": "array",
+      "items": { "$ref": "partnership_budget_item.schema.json" }
+    }
+  },
+  "required": ["pack_id", "pack_name", "base_price", "partnerships"],
+  "additionalProperties": false
+}

@@ -2506,6 +2506,43 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /orgs/{orgSlug}/events/{eventSlug}/budget:
+    get:
+      summary: "Get event budget"
+      operationId: "getOrgsEventsBudget"
+      description: "Returns budget totals (paid, validated, total + diffs) and per-validated-pack breakdown listing partnerships with company name and price applied. Excludes declined partnerships."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventBudget"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Event not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /orgs/{orgSlug}/events/{eventSlug}/booth-plan:
     get:
       summary: "List booth locations"
@@ -5841,6 +5878,14 @@ components:
       $ref: "../schemas/job_offer_stats.schema.json"
     QandaStats:
       $ref: "../schemas/qanda_stats.schema.json"
+    EventBudget:
+      $ref: "../schemas/event_budget.schema.json"
+    BudgetTotals:
+      $ref: "../schemas/budget_totals.schema.json"
+    PackBudget:
+      $ref: "../schemas/pack_budget.schema.json"
+    PartnershipBudgetItem:
+      $ref: "../schemas/partnership_budget_item.schema.json"
     EventSummary:
       $ref: "../schemas/event_summary.schema.json"
     CreateEvent:
