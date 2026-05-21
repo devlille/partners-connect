@@ -19,6 +19,11 @@ fun PackOptionsTable.listOptionsByPack(packId: UUID): List<ResultRow> = this
     .where { PackOptionsTable.pack eq packId }
     .toList()
 
+fun PackOptionsTable.listOptionsByPacks(packIds: Set<UUID>): List<ResultRow> = this
+    .selectAll()
+    .where { PackOptionsTable.pack inList packIds }
+    .toList()
+
 fun PackOptionsTable.listOptionalOptionsByPack(packId: UUID): List<ResultRow> = this
     .selectAll()
     .where { (PackOptionsTable.pack eq packId) and (PackOptionsTable.required eq false) }
