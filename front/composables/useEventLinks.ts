@@ -7,6 +7,11 @@ export const useEventLinks = (orgSlug: string, eventSlug: string) => {
         to: `/orgs/${orgSlug}/events/${eventSlug}`,
       },
       {
+        label: "Budget",
+        icon: "i-heroicons-banknotes",
+        to: `/orgs/${orgSlug}/events/${eventSlug}/budget`,
+      },
+      {
         label: "Informations",
         icon: "i-heroicons-information-circle",
         to: `/orgs/${orgSlug}/events/${eventSlug}/information`,
