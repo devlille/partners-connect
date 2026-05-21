@@ -58,12 +58,12 @@ As the system, I must restrict access to budget data to authorised organisation 
 
 **Why this priority**: Authorisation is non-negotiable but already covered by the existing `AuthorizedOrganisationPlugin`. Listed here for explicit verification.
 
-**Independent Test**: Can be fully tested by issuing a request without authentication, with authentication for an unrelated organisation, and with authentication for the owning organisation — asserting `401`, `403`, and `200` respectively.
+**Independent Test**: Can be fully tested by issuing a request without authentication, with authentication for an unrelated organisation, and with authentication for the owning organisation — asserting `401`, `401`, and `200` respectively. (The existing `AuthorizedOrganisationPlugin` returns `401` for both unauthenticated requests and authenticated non-members; the system does not distinguish between the two cases.)
 
 **Acceptance Scenarios**:
 
 1. **Given** a request without authentication, **When** I call the budget endpoint, **Then** the response is `401`.
-2. **Given** an authenticated user who is not a member of the event's owning organisation, **When** I call the budget endpoint, **Then** the response is `403`.
+2. **Given** an authenticated user who is not a member of the event's owning organisation, **When** I call the budget endpoint, **Then** the response is `401`.
 3. **Given** an authenticated user who is a member of the owning organisation, **When** I call the budget endpoint, **Then** the response is `200` with the payload.
 
 ---
@@ -123,4 +123,4 @@ As the system, I must restrict access to budget data to authorised organisation 
 - **SC-002**: 100% of partnerships in any of the five lifecycle states (non-validated-no-pack, non-validated-with-pack, validated-unpaid, validated-paid, declined) are categorised correctly per FR-004 through FR-011.
 - **SC-003**: The two diff fields always equal their definitions (`validated - paid` and `total - validated`) for every response.
 - **SC-004**: The implementation issues O(1) transaction calls per request (no N+1 patterns) for events with ≤ 200 partnerships, verified by review.
-- **SC-005**: Unauthorised callers (no auth or non-member of owning organisation) receive `401` or `403` 100% of the time; authorised callers receive `200`.
+- **SC-005**: Unauthorised callers (no auth or non-member of owning organisation) receive `401` 100% of the time; authorised callers receive `200`.
