@@ -128,5 +128,31 @@
       "redo": "Rétablir",
       "linkPrompt": "URL du lien:"
     }
+  },
+  "budget": {
+    "title": "Budget",
+    "allPacks": "Tous les packs",
+    "packFilterLabel": "Pack",
+    "columns": {
+      "pack": "Pack",
+      "company": "Entreprise",
+      "price": "Prix",
+      "status": "Statut"
+    },
+    "status": {
+      "paid": "Payé",
+      "validated": "Validé",
+      "submitted": "Soumis"
+    },
+    "totals": {
+      "paid": "Payé",
+      "validated": "Validé",
+      "total": "Total",
+      "toCome": "à venir",
+      "pipeline": "en cours"
+    },
+    "empty": "Aucun partenariat à afficher.",
+    "loading": "Chargement du budget…",
+    "error": "Impossible de charger le budget."
   }
 }
