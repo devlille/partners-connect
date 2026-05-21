@@ -1,8 +1,10 @@
 package fr.devlille.partners.connect.events.infrastructure.bindings
 
+import fr.devlille.partners.connect.events.application.EventBudgetRepositoryExposed
 import fr.devlille.partners.connect.events.application.EventRepositoryExposed
 import fr.devlille.partners.connect.events.application.EventStatsRepositoryExposed
 import fr.devlille.partners.connect.events.application.EventStorageRepositoryGoogleStorage
+import fr.devlille.partners.connect.events.domain.EventBudgetRepository
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventStatsRepository
 import fr.devlille.partners.connect.events.domain.EventStorageRepository
@@ -18,5 +20,8 @@ val eventModule = module {
     }
     single<EventStatsRepository> {
         EventStatsRepositoryExposed()
+    }
+    single<EventBudgetRepository> {
+        EventBudgetRepositoryExposed()
     }
 }
