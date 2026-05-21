@@ -140,4 +140,91 @@ class EventBudgetRoutesTest {
         assertEquals(3000, totals["total"]!!.jsonPrimitive.content.toInt())
         assertEquals(1000, totals["total_minus_validated"]!!.jsonPrimitive.content.toInt())
     }
+
+    @Test
+    @Suppress("LongMethod")
+    fun `groups validated partnerships by pack with company name and price applied`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val eventSlug = eventId.toString()
+        val goldPackId = UUID.randomUUID()
+        val silverPackId = UUID.randomUUID()
+
+        val acmeCompanyId = UUID.randomUUID()
+        val betaCompanyId = UUID.randomUUID()
+        val gammaCompanyId = UUID.randomUUID()
+        val deltaCompanyId = UUID.randomUUID()
+
+        val acmePartnershipId = UUID.randomUUID()
+        val betaPartnershipId = UUID.randomUUID()
+        val gammaPartnershipId = UUID.randomUUID()
+        val deltaPartnershipId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId = userId)
+            transaction {
+                insertMockedUser(userId)
+                insertMockedOrganisationEntity(orgId)
+                insertMockedOrgaPermission(orgId, userId = userId)
+                insertMockedFutureEvent(eventId, slug = eventSlug, orgId = orgId)
+
+                fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack(
+                    id = goldPackId, eventId = eventId, name = "Gold", basePrice = 1000,
+                )
+                fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack(
+                    id = silverPackId, eventId = eventId, name = "Silver", basePrice = 500,
+                )
+
+                fr.devlille.partners.connect.companies.factories.insertMockedCompany(acmeCompanyId, name = "Acme")
+                fr.devlille.partners.connect.companies.factories.insertMockedCompany(betaCompanyId, name = "Beta")
+                fr.devlille.partners.connect.companies.factories.insertMockedCompany(gammaCompanyId, name = "Gamma")
+                fr.devlille.partners.connect.companies.factories.insertMockedCompany(deltaCompanyId, name = "Delta")
+
+                fr.devlille.partners.connect.partnership.factories.insertMockedValidatedPartnership(
+                    id = acmePartnershipId, eventId = eventId, companyId = acmeCompanyId, selectedPackId = goldPackId,
+                ).also { it.packPriceOverride = 1500 }
+                fr.devlille.partners.connect.partnership.factories.insertMockedValidatedPartnership(
+                    id = betaPartnershipId, eventId = eventId, companyId = betaCompanyId, selectedPackId = goldPackId,
+                )
+
+                fr.devlille.partners.connect.partnership.factories.insertMockedValidatedPartnership(
+                    id = gammaPartnershipId,
+                    eventId = eventId,
+                    companyId = gammaCompanyId,
+                    selectedPackId = silverPackId,
+                )
+
+                fr.devlille.partners.connect.partnership.factories.insertMockedPartnership(
+                    id = deltaPartnershipId, eventId = eventId, companyId = deltaCompanyId, selectedPackId = goldPackId,
+                )
+            }
+        }
+
+        val response = client.get("/orgs/$orgId/events/$eventSlug/budget") {
+            header(HttpHeaders.Authorization, "Bearer valid")
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val body = Json.parseToJsonElement(response.bodyAsText()).jsonObject
+        val packs = body["packs"]!!.jsonArray
+        assertEquals(2, packs.size)
+        assertEquals("Gold", packs[0].jsonObject["pack_name"]!!.jsonPrimitive.content)
+        assertEquals("Silver", packs[1].jsonObject["pack_name"]!!.jsonPrimitive.content)
+
+        val gold = packs[0].jsonObject
+        assertEquals(1000, gold["base_price"]!!.jsonPrimitive.content.toInt())
+        val goldPartnerships = gold["partnerships"]!!.jsonArray
+        assertEquals(2, goldPartnerships.size)
+        assertEquals("Acme", goldPartnerships[0].jsonObject["company_name"]!!.jsonPrimitive.content)
+        assertEquals(1500, goldPartnerships[0].jsonObject["price_applied"]!!.jsonPrimitive.content.toInt())
+        assertEquals("Beta", goldPartnerships[1].jsonObject["company_name"]!!.jsonPrimitive.content)
+        assertEquals(1000, goldPartnerships[1].jsonObject["price_applied"]!!.jsonPrimitive.content.toInt())
+
+        val silver = packs[1].jsonObject
+        val silverPartnerships = silver["partnerships"]!!.jsonArray
+        assertEquals(1, silverPartnerships.size)
+        assertEquals("Gamma", silverPartnerships[0].jsonObject["company_name"]!!.jsonPrimitive.content)
+        assertEquals(500, silverPartnerships[0].jsonObject["price_applied"]!!.jsonPrimitive.content.toInt())
+    }
 }

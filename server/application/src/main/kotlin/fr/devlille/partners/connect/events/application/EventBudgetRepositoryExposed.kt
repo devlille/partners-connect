@@ -3,6 +3,9 @@ package fr.devlille.partners.connect.events.application
 import fr.devlille.partners.connect.events.domain.BudgetTotals
 import fr.devlille.partners.connect.events.domain.EventBudget
 import fr.devlille.partners.connect.events.domain.EventBudgetRepository
+import fr.devlille.partners.connect.events.domain.PackBudget
+import fr.devlille.partners.connect.events.domain.PartnershipBudgetItem
+import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.partnership.domain.InvoiceStatus
@@ -103,6 +106,31 @@ class EventBudgetRepositoryExposed : EventBudgetRepository {
             .sumOf { priceByPartnership[it.id.value] ?: 0 }
         val total = partnerships.sumOf { priceByPartnership[it.id.value] ?: 0 }
 
+        val packBudgets = partnerships
+            .mapNotNull { p ->
+                val validatedPack = p.validatedPack() ?: return@mapNotNull null
+                Triple(validatedPack, p, priceByPartnership[p.id.value] ?: 0)
+            }
+            .groupBy { (pack, _, _) -> pack.id.value }
+            .map { (_, triples) ->
+                val pack = triples.first().first
+                PackBudget(
+                    packId = pack.id.value.toString(),
+                    packName = pack.name,
+                    basePrice = pack.basePrice,
+                    partnerships = triples
+                        .sortedBy { (_, partnership, _) -> partnership.company.name.lowercase() }
+                        .map { (_, partnership, price) ->
+                            PartnershipBudgetItem(
+                                partnershipId = partnership.id.value.toString(),
+                                companyName = partnership.company.name,
+                                priceApplied = price,
+                            )
+                        },
+                )
+            }
+            .sortedBy { it.packName.lowercase() }
+
         EventBudget(
             currency = "EUR",
             totals = BudgetTotals(
@@ -112,7 +140,7 @@ class EventBudgetRepositoryExposed : EventBudgetRepository {
                 total = total,
                 totalMinusValidated = total - validated,
             ),
-            packs = emptyList(),
+            packs = packBudgets,
         )
     }
 }
