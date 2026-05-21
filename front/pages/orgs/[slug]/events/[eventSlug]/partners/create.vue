@@ -213,16 +213,18 @@ async function onSave() {
     saving.value = true;
     error.value = null;
 
-    // Step 1: create the legal entity (company). For ecosystem partners we
-    // only collect name + site URL; head_office, siret, and vat stay null so
-    // we don't trip the API's pattern validation (empty string does not match
-    // the SIRET / VAT regex and is not null either).
+    // Step 1: create the legal entity (company)
     const companyData: CreateCompany = {
       name: form.company_name,
-      head_office: null,
-      siret: null,
-      vat: null,
-      site_url: form.site_url || null,
+      head_office: {
+        address: "",
+        city: "",
+        zip_code: "",
+        country: "",
+      },
+      siret: "",
+      vat: "",
+      site_url: form.site_url || "",
     };
     const companyResponse = await postCompanies(companyData);
     const companyId = companyResponse.data.id;
