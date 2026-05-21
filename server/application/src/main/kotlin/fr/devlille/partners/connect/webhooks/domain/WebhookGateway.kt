@@ -9,8 +9,6 @@ enum class WebhookEventType {
     DELETED,
 }
 
-enum class WebhookResourceType { PARTNERSHIP, ECOSYSTEM_PARTNER }
-
 interface WebhookGateway {
     val provider: IntegrationProvider
 
@@ -20,8 +18,7 @@ interface WebhookGateway {
     suspend fun sendWebhook(
         integrationId: UUID,
         eventId: UUID,
-        resourceType: WebhookResourceType,
-        resourceId: UUID,
+        partnershipId: UUID,
         eventType: WebhookEventType,
     ): Boolean
 }
