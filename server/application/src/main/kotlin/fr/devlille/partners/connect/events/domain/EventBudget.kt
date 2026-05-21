@@ -40,4 +40,17 @@ data class PartnershipBudgetItem(
     val companyName: String,
     @SerialName("price_applied")
     val priceApplied: Int,
+    val status: PartnershipBudgetStatus,
 )
+
+@Serializable
+enum class PartnershipBudgetStatus {
+    @SerialName("paid")
+    PAID,
+
+    @SerialName("validated")
+    VALIDATED,
+
+    @SerialName("submitted")
+    SUBMITTED,
+}

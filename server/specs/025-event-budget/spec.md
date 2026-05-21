@@ -35,20 +35,22 @@ As an organiser, I need a single view of the financial state of my event so that
 
 ---
 
-### User Story 2 - View partnerships grouped by validated pack (Priority: P2)
+### User Story 2 - View partnerships grouped by pack with lifecycle status (Priority: P2)
 
-As an organiser, I need to see, for each sponsoring pack, the list of partnerships that have validated under that pack and the price each is paying, so that I can verify per-pack revenue and spot pricing inconsistencies.
+As an organiser, I need to see, for each sponsoring pack, the list of non-declined partnerships and the price each is paying along with their current lifecycle status (paid / validated / submitted), so that I can verify per-pack revenue, spot pricing inconsistencies, and see at a glance where each partnership is in the pipeline.
 
 **Why this priority**: Per-pack breakdown is the second half of the user request and makes the aggregates auditable. Lower priority than US1 because the headline totals are usable on their own.
 
-**Independent Test**: Can be fully tested by creating multiple partnerships across two different validated packs (with at least one override price) and verifying that each appears under the correct pack with the correct `priceApplied` value, while non-validated and declined partnerships are excluded from the per-pack breakdown.
+**Independent Test**: Can be fully tested by creating partnerships across two different packs in mixed lifecycle states (paid, validated, submitted) and verifying that each appears under its pricing pack with the correct `price_applied` and `status` values, while declined partnerships are excluded from the per-pack breakdown.
 
 **Acceptance Scenarios**:
 
-1. **Given** two validated partnerships on pack "Gold" and one validated partnership on pack "Silver", **When** I request the budget, **Then** the response contains two pack entries (Gold with two partnerships, Silver with one) and each partnership entry includes `partnership_id`, `company_name`, and `price_applied`.
+1. **Given** two validated partnerships on pack "Gold" and one validated partnership on pack "Silver", **When** I request the budget, **Then** the response contains two pack entries (Gold with two partnerships, Silver with one) and each partnership entry includes `partnership_id`, `company_name`, `price_applied`, and `status`.
 2. **Given** a partnership on pack "Gold" with `packPriceOverride = 950000` (catalogue base = 800000) and one optional option of `100000`, **When** I request the budget, **Then** that partnership's `price_applied = 1050000` (override + optional option).
-3. **Given** an event with no validated partnerships, **When** I request the budget, **Then** `packs` is an empty array.
-4. **Given** a partnership that has selected a pack but is not yet validated, **When** I request the budget, **Then** that partnership does NOT appear in the `packs` array (it contributes only to `totals.total`).
+3. **Given** an event with no non-declined partnerships that have any pricing pack, **When** I request the budget, **Then** `packs` is an empty array.
+4. **Given** a partnership that has selected a pack but is not yet validated, **When** I request the budget, **Then** that partnership appears in the `packs` array under its `selectedPack` with `status = "submitted"`, and also contributes to `totals.total`.
+5. **Given** a partnership with `validatedAt` set and a `BillingEntity` row with `status = PAID`, **When** I request the budget, **Then** that partnership appears with `status = "paid"`.
+6. **Given** a partnership with `validatedAt` set but no PAID billing row, **When** I request the budget, **Then** that partnership appears with `status = "validated"`.
 
 ---
 
@@ -88,8 +90,8 @@ As the system, I must restrict access to budget data to authorised organisation 
 - **FR-005**: `totals.validated` MUST equal the sum of `price_applied` over partnerships with `validatedAt != null` AND `declinedAt == null`.
 - **FR-006**: `totals.total` MUST equal the sum of `price_applied` over all non-declined partnerships that have a pricing pack (per FR-003).
 - **FR-007**: `totals.validated_minus_paid` MUST equal `totals.validated - totals.paid`; `totals.total_minus_validated` MUST equal `totals.total - totals.validated`. The diffs are computed server-side and included in the response (not left to the client).
-- **FR-008**: The `packs` array MUST contain one entry per distinct `validatedPack()` that has at least one validated, non-declined partnership. Pack entries MUST include `pack_id`, `pack_name`, `base_price` (catalogue base price for reference), and `partnerships`.
-- **FR-009**: Each entry in `pack.partnerships` MUST contain `partnership_id`, `company_name`, and `price_applied` (computed per FR-002 using that pack's validated pricing).
+- **FR-008**: The `packs` array MUST contain one entry per distinct pricing pack (per FR-003) that has at least one non-declined partnership using it. Pack entries MUST include `pack_id`, `pack_name`, `base_price` (catalogue base price for reference), and `partnerships`.
+- **FR-009**: Each entry in `pack.partnerships` MUST contain `partnership_id`, `company_name`, `price_applied` (computed per FR-002 using that partnership's pricing pack), and `status` ∈ {`"paid"`, `"validated"`, `"submitted"`}. The status MUST be derived as: `"paid"` if a `BillingEntity` row exists with `status == PAID`; else `"validated"` if `validatedAt != null`; else `"submitted"`.
 - **FR-010**: `packs` MUST be sorted by `pack_name` ascending; within each pack, `partnerships` MUST be sorted by `company_name` ascending (case-insensitive).
 - **FR-011**: Declined partnerships (`declinedAt != null`) MUST be excluded from all totals and from `packs`.
 - **FR-012**: The endpoint MUST require organisation-level authorisation via `AuthorizedOrganisationPlugin`, identically to `/orgs/{orgSlug}/events/{eventSlug}/stats`.
