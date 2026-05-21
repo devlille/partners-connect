@@ -20,6 +20,7 @@ fun PartnershipEntity.pricingPack(): SponsoringPackEntity? =
  * Defined here as a pure function over the entity so callers can pre-load options in batch
  * and compute totals in memory without re-issuing per-row queries.
  */
+@Suppress("CyclomaticComplexMethod")
 fun PartnershipOptionEntity.effectivePrice(): Int = when (option.optionType) {
     OptionType.TEXT -> priceOverride ?: option.price ?: 0
     OptionType.TYPED_QUANTITATIVE -> (priceOverride ?: option.price ?: 0) * (selectedQuantity ?: 0)
