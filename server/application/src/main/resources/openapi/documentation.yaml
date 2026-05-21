@@ -2517,6 +2517,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
+  /orgs/{orgSlug}/events/{eventSlug}/budget:
+    get:
+      summary: Get event budget
+      operationId: getOrgsEventsBudget
+      description: Returns budget totals (paid, validated, total + diffs) and per-validated-pack breakdown listing partnerships with company name and price applied. Excludes declined partnerships.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/event_budget.schema'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/booth-plan:
     get:
       summary: List booth locations
@@ -5861,6 +5898,14 @@ components:
       $ref: '#/components/schemas/job_offer_stats.schema'
     QandaStats:
       $ref: '#/components/schemas/qanda_stats.schema'
+    EventBudget:
+      $ref: '#/components/schemas/event_budget.schema'
+    BudgetTotals:
+      $ref: '#/components/schemas/budget_totals.schema'
+    PackBudget:
+      $ref: '#/components/schemas/pack_budget.schema'
+    PartnershipBudgetItem:
+      $ref: '#/components/schemas/partnership_budget_item.schema'
     EventSummary:
       $ref: '#/components/schemas/event_summary.schema'
     CreateEvent:
@@ -8785,6 +8830,83 @@ components:
             $ref: '#/components/schemas/partner_stats.schema'
       required:
         - partners
+      additionalProperties: false
+    budget_totals.schema:
+      $id: budget_totals.schema.json
+      type: object
+      properties:
+        paid:
+          type: integer
+        validated:
+          type: integer
+        validated_minus_paid:
+          type: integer
+        total:
+          type: integer
+        total_minus_validated:
+          type: integer
+      required:
+        - paid
+        - validated
+        - validated_minus_paid
+        - total
+        - total_minus_validated
+      additionalProperties: false
+    partnership_budget_item.schema:
+      $id: partnership_budget_item.schema.json
+      type: object
+      properties:
+        partnership_id:
+          type: string
+          format: uuid
+        company_name:
+          type: string
+        price_applied:
+          type: integer
+          minimum: 0
+      required:
+        - partnership_id
+        - company_name
+        - price_applied
+      additionalProperties: false
+    pack_budget.schema:
+      $id: pack_budget.schema.json
+      type: object
+      properties:
+        pack_id:
+          type: string
+          format: uuid
+        pack_name:
+          type: string
+        base_price:
+          type: integer
+          minimum: 0
+        partnerships:
+          type: array
+          items:
+            $ref: '#/components/schemas/partnership_budget_item.schema'
+      required:
+        - pack_id
+        - pack_name
+        - base_price
+        - partnerships
+      additionalProperties: false
+    event_budget.schema:
+      $id: event_budget.schema.json
+      type: object
+      properties:
+        currency:
+          type: string
+        totals:
+          $ref: '#/components/schemas/budget_totals.schema'
+        packs:
+          type: array
+          items:
+            $ref: '#/components/schemas/pack_budget.schema'
+      required:
+        - currency
+        - totals
+        - packs
       additionalProperties: false
     partnership_booth_location_item.schema:
       $id: partnership_booth_location_item.schema.json

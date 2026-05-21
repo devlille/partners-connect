@@ -1,0 +1,11 @@
+{
+  "$id": "partnership_budget_item.schema.json",
+  "type": "object",
+  "properties": {
+    "partnership_id": { "type": "string", "format": "uuid" },
+    "company_name": { "type": "string" },
+    "price_applied": { "type": "integer", "minimum": 0 }
+  },
+  "required": ["partnership_id", "company_name", "price_applied"],
+  "additionalProperties": false
+}

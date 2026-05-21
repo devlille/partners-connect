@@ -1,0 +1,13 @@
+{
+  "$id": "budget_totals.schema.json",
+  "type": "object",
+  "properties": {
+    "paid": { "type": "integer" },
+    "validated": { "type": "integer" },
+    "validated_minus_paid": { "type": "integer" },
+    "total": { "type": "integer" },
+    "total_minus_validated": { "type": "integer" }
+  },
+  "required": ["paid", "validated", "validated_minus_paid", "total", "total_minus_validated"],
+  "additionalProperties": false
+}
