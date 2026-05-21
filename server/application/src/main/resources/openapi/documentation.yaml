@@ -8864,10 +8864,17 @@ components:
         price_applied:
           type: integer
           minimum: 0
+        status:
+          type: string
+          enum:
+            - paid
+            - validated
+            - submitted
       required:
         - partnership_id
         - company_name
         - price_applied
+        - status
       additionalProperties: false
     pack_budget.schema:
       $id: pack_budget.schema.json

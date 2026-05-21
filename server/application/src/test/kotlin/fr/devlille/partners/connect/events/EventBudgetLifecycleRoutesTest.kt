@@ -128,10 +128,15 @@ class EventBudgetLifecycleRoutesTest {
         val gold = packs[0].jsonObject
         assertEquals("Gold", gold["pack_name"]!!.jsonPrimitive.content)
         val partnerships = gold["partnerships"]!!.jsonArray
-        assertEquals(2, partnerships.size)
+        assertEquals(3, partnerships.size)
         assertEquals("Acme", partnerships[0].jsonObject["company_name"]!!.jsonPrimitive.content)
         assertEquals(1050, partnerships[0].jsonObject["price_applied"]!!.jsonPrimitive.content.toInt())
+        assertEquals("paid", partnerships[0].jsonObject["status"]!!.jsonPrimitive.content)
         assertEquals("Beta", partnerships[1].jsonObject["company_name"]!!.jsonPrimitive.content)
         assertEquals(1000, partnerships[1].jsonObject["price_applied"]!!.jsonPrimitive.content.toInt())
+        assertEquals("validated", partnerships[1].jsonObject["status"]!!.jsonPrimitive.content)
+        assertEquals("Gamma", partnerships[2].jsonObject["company_name"]!!.jsonPrimitive.content)
+        assertEquals(1000, partnerships[2].jsonObject["price_applied"]!!.jsonPrimitive.content.toInt())
+        assertEquals("submitted", partnerships[2].jsonObject["status"]!!.jsonPrimitive.content)
     }
 }

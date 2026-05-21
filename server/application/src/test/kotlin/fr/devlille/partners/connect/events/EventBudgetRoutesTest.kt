@@ -143,7 +143,7 @@ class EventBudgetRoutesTest {
 
     @Test
     @Suppress("LongMethod")
-    fun `groups validated partnerships by pack with company name and price applied`() = testApplication {
+    fun `groups non-declined partnerships by pack with company name price applied and status`() = testApplication {
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
@@ -215,17 +215,23 @@ class EventBudgetRoutesTest {
         val gold = packs[0].jsonObject
         assertEquals(1000, gold["base_price"]!!.jsonPrimitive.content.toInt())
         val goldPartnerships = gold["partnerships"]!!.jsonArray
-        assertEquals(2, goldPartnerships.size)
+        assertEquals(3, goldPartnerships.size)
         assertEquals("Acme", goldPartnerships[0].jsonObject["company_name"]!!.jsonPrimitive.content)
         assertEquals(1500, goldPartnerships[0].jsonObject["price_applied"]!!.jsonPrimitive.content.toInt())
+        assertEquals("validated", goldPartnerships[0].jsonObject["status"]!!.jsonPrimitive.content)
         assertEquals("Beta", goldPartnerships[1].jsonObject["company_name"]!!.jsonPrimitive.content)
         assertEquals(1000, goldPartnerships[1].jsonObject["price_applied"]!!.jsonPrimitive.content.toInt())
+        assertEquals("validated", goldPartnerships[1].jsonObject["status"]!!.jsonPrimitive.content)
+        assertEquals("Delta", goldPartnerships[2].jsonObject["company_name"]!!.jsonPrimitive.content)
+        assertEquals(1000, goldPartnerships[2].jsonObject["price_applied"]!!.jsonPrimitive.content.toInt())
+        assertEquals("submitted", goldPartnerships[2].jsonObject["status"]!!.jsonPrimitive.content)
 
         val silver = packs[1].jsonObject
         val silverPartnerships = silver["partnerships"]!!.jsonArray
         assertEquals(1, silverPartnerships.size)
         assertEquals("Gamma", silverPartnerships[0].jsonObject["company_name"]!!.jsonPrimitive.content)
         assertEquals(500, silverPartnerships[0].jsonObject["price_applied"]!!.jsonPrimitive.content.toInt())
+        assertEquals("validated", silverPartnerships[0].jsonObject["status"]!!.jsonPrimitive.content)
     }
 
     @Test

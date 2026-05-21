@@ -5,7 +5,7 @@ import fr.devlille.partners.connect.events.domain.EventBudget
 import fr.devlille.partners.connect.events.domain.EventBudgetRepository
 import fr.devlille.partners.connect.events.domain.PackBudget
 import fr.devlille.partners.connect.events.domain.PartnershipBudgetItem
-import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
+import fr.devlille.partners.connect.events.domain.PartnershipBudgetStatus
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug
 import fr.devlille.partners.connect.partnership.domain.InvoiceStatus
@@ -109,8 +109,8 @@ class EventBudgetRepositoryExposed : EventBudgetRepository {
 
         val packBudgets = partnerships
             .mapNotNull { p ->
-                val validatedPack = p.validatedPack() ?: return@mapNotNull null
-                Triple(validatedPack, p, priceByPartnership[p.id.value] ?: 0)
+                val pack = p.pricingPack() ?: return@mapNotNull null
+                Triple(pack, p, priceByPartnership[p.id.value] ?: 0)
             }
             .groupBy { (pack, _, _) -> pack.id.value }
             .map { (_, triples) ->
@@ -126,6 +126,7 @@ class EventBudgetRepositoryExposed : EventBudgetRepository {
                                 partnershipId = partnership.id.value.toString(),
                                 companyName = partnership.company.name,
                                 priceApplied = price,
+                                status = partnership.budgetStatus(paidPartnershipIds),
                             )
                         },
                 )
