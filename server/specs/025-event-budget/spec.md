@@ -76,6 +76,7 @@ As the system, I must restrict access to budget data to authorised organisation 
 - A partnership is paid (`billing.status = PAID`) but `validatedAt` is null (data inconsistency) → the contract follows `validatedAt` for the `validated` bucket, so this partnership would be counted in `paid` but not in `validated`. This is acceptable: the invariant `paid ⊆ validated` is a business invariant, not a structural one. Tests will document the literal behaviour.
 - A partnership has `packPriceOverride = 0` → contributes the sum of its optional options to its `priceApplied` (zero is a valid override per spec 017).
 - A partnership has `validatedPack()` set but the partner has no optional options → `priceApplied = effectiveBasePrice` only.
+- A partnership has a `TYPED_SELECTABLE` option with no `selectedValue` (legacy or corrupt row) → that option contributes `0` to `priceApplied`. The budget endpoint deliberately diverges here from `PartnershipOptionEntity.toDomain`, which throws — aborting an aggregation over all partnerships of an event due to one bad row is worse than slightly undercounting one line item. Write-path validation in `PartnershipOptionEntity.create` is the canonical guard; this fallback is only reached on already-bad rows.
 - Two partnerships share the same company name (different companies) → both appear independently; sort order between them is undefined but stable within a request.
 - The event slug does not exist → respond `404` with a `NotFoundException`-shaped message (consistent with `/stats`).
 
