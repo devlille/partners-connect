@@ -3,9 +3,7 @@
     <div class="bg-white border-b border-gray-200 p-6">
       <div>
         <PageTitle>Offres d'emploi</PageTitle>
-        <p class="mt-1 text-sm text-gray-500">
-          Offres d'emploi de {{ partnershipName }}
-        </p>
+        <p class="mt-1 text-sm text-gray-500">Offres d'emploi de {{ partnershipName }}</p>
       </div>
     </div>
 
@@ -21,22 +19,26 @@
         </div>
 
         <div v-if="jobOffers.length === 0" class="px-6 py-12 text-center">
-          <i class="i-heroicons-briefcase text-gray-400 text-5xl mx-auto block mb-4" aria-hidden="true" />
+          <i
+            class="i-heroicons-briefcase text-gray-400 text-5xl mx-auto block mb-4"
+            aria-hidden="true"
+          />
           <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune offre d'emploi</h3>
-          <p class="mt-1 text-sm text-gray-500">Cette entreprise n'a pas encore créé d'offre d'emploi.</p>
+          <p class="mt-1 text-sm text-gray-500">
+            Cette entreprise n'a pas encore créé d'offre d'emploi.
+          </p>
         </div>
 
         <ul v-else class="divide-y divide-gray-200">
-          <li
-            v-for="job in jobOffers"
-            :key="job.id"
-            class="px-6 py-4 hover:bg-gray-50"
-          >
+          <li v-for="job in jobOffers" :key="job.id" class="px-6 py-4 hover:bg-gray-50">
             <div class="flex items-start justify-between gap-4">
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
                   <h3 class="text-base font-semibold text-gray-900">{{ job.title }}</h3>
-                  <StatusBadge v-if="promotionByJobId[job.id]" :status="promotionByJobId[job.id].status" />
+                  <StatusBadge
+                    v-if="promotionByJobId[job.id]"
+                    :status="promotionByJobId[job.id].status"
+                  />
                 </div>
                 <div class="mt-2 space-y-1">
                   <p class="text-sm text-gray-600">
@@ -49,7 +51,8 @@
                     <span class="font-medium">Expérience :</span> {{ job.experience_years }} an(s)
                   </p>
                   <p class="text-sm text-gray-600">
-                    <span class="font-medium">Publié le :</span> {{ formatDate(job.publication_date) }}
+                    <span class="font-medium">Publié le :</span>
+                    {{ formatDate(job.publication_date) }}
                   </p>
                   <p v-if="promotionByJobId[job.id]?.decline_reason" class="text-sm text-red-600">
                     Motif de refus : {{ promotionByJobId[job.id].decline_reason }}
@@ -119,8 +122,14 @@
           aria-modal="true"
           aria-labelledby="decline-modal-title"
         >
-          <div class="fixed inset-0 bg-black bg-opacity-50" aria-hidden="true" @click="closeDeclineModal" />
-          <div class="relative bg-white rounded-lg shadow-xl max-w-lg w-full transform transition-all">
+          <div
+            class="fixed inset-0 bg-black bg-opacity-50"
+            aria-hidden="true"
+            @click="closeDeclineModal"
+          />
+          <div
+            class="relative bg-white rounded-lg shadow-xl max-w-lg w-full transform transition-all"
+          >
             <div class="px-6 py-4 border-b border-gray-200">
               <h3 id="decline-modal-title" class="text-lg font-semibold text-gray-900">
                 Refuser l'offre
@@ -145,7 +154,12 @@
               </div>
             </div>
             <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
-              <UButton color="neutral" variant="ghost" :disabled="!!decliningId" @click="closeDeclineModal">
+              <UButton
+                color="neutral"
+                variant="ghost"
+                :disabled="!!decliningId"
+                @click="closeDeclineModal"
+              >
                 Annuler
               </UButton>
               <UButton color="error" :loading="!!decliningId" @click="handleDecline">

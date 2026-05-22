@@ -1,5 +1,5 @@
-import { setApiBaseUrl } from '~/custom-instance';
+import { setApiBaseUrl } from "~/custom-instance";
 
 export default defineNuxtPlugin(() => {
-  setApiBaseUrl('/api-proxy');
+  setApiBaseUrl("/api-proxy");
 });

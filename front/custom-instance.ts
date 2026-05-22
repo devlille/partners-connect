@@ -1,10 +1,6 @@
-import axios, {
-  type AxiosResponse,
-  type AxiosInstance,
-  type AxiosRequestConfig,
-} from "axios";
+import axios, { type AxiosResponse, type AxiosInstance, type AxiosRequestConfig } from "axios";
 
-let _apiBaseUrl = '';
+let _apiBaseUrl = "";
 let _axiosInstance: AxiosInstance | null = null;
 
 export function setApiBaseUrl(url: string) {

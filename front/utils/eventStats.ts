@@ -1,5 +1,5 @@
-import { customFetch } from '../custom-instance';
-import type { PartnershipItemSchema } from './api';
+import { customFetch } from "../custom-instance";
+import type { PartnershipItemSchema } from "./api";
 
 export interface JobOfferStatsSchema {
   total: number;
@@ -33,6 +33,6 @@ export interface EventStatsSchema {
 export const getEventStats = (orgSlug: string, eventSlug: string) => {
   return customFetch<EventStatsSchema>({
     url: `/orgs/${orgSlug}/events/${eventSlug}/stats`,
-    method: 'GET',
+    method: "GET",
   });
 };

@@ -38,19 +38,32 @@
         <template v-else>
           <UCard class="mb-6">
             <div class="flex items-start gap-4">
-              <i class="i-heroicons-qr-code text-4xl text-primary-500 shrink-0" aria-hidden="true" />
+              <i
+                class="i-heroicons-qr-code text-4xl text-primary-500 shrink-0"
+                aria-hidden="true"
+              />
               <div class="space-y-2">
-                <p class="text-sm font-semibold text-gray-900">Jeu de questions / réponses avec Scanzee</p>
+                <p class="text-sm font-semibold text-gray-900">
+                  Jeu de questions / réponses avec Scanzee
+                </p>
                 <p class="text-sm text-gray-600">
-                  Cette fonctionnalité est réservée aux sponsors ayant un stand. Créez vos questions pour
-                  inviter les visiteurs à scanner votre QR code, jouer et venir sur votre stand pendant l'événement.
-                  Les questions seront synchronisées avec
-                  <a href="https://www.scanzee.app" target="_blank" rel="noopener" class="text-primary-600 underline">Scanzee</a>.
+                  Cette fonctionnalité est réservée aux sponsors ayant un stand. Créez vos questions
+                  pour inviter les visiteurs à scanner votre QR code, jouer et venir sur votre stand
+                  pendant l'événement. Les questions seront synchronisées avec
+                  <a
+                    href="https://www.scanzee.app"
+                    target="_blank"
+                    rel="noopener"
+                    class="text-primary-600 underline"
+                    >Scanzee</a
+                  >.
                 </p>
                 <p v-if="qandaMaxQuestions || qandaMaxAnswers" class="text-xs text-gray-400">
                   <span v-if="qandaMaxQuestions">Max {{ qandaMaxQuestions }} question(s)</span>
                   <span v-if="qandaMaxQuestions && qandaMaxAnswers"> · </span>
-                  <span v-if="qandaMaxAnswers">Max {{ qandaMaxAnswers }} réponse(s) par question</span>
+                  <span v-if="qandaMaxAnswers"
+                    >Max {{ qandaMaxAnswers }} réponse(s) par question</span
+                  >
                 </p>
               </div>
             </div>
@@ -73,14 +86,20 @@
             </div>
 
             <div v-if="questions.length === 0" class="text-center py-12 text-gray-400">
-              <i class="i-heroicons-chat-bubble-left-right text-4xl mb-3 block" aria-hidden="true" />
+              <i
+                class="i-heroicons-chat-bubble-left-right text-4xl mb-3 block"
+                aria-hidden="true"
+              />
               Aucune question créée. Cliquez sur "Ajouter une question" pour commencer !
             </div>
 
             <UCard v-for="(q, qi) in questions" :key="q._key" class="space-y-4">
               <div class="flex items-start gap-3">
                 <div class="flex-1">
-                  <label :for="`question-${q._key}`" class="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    :for="`question-${q._key}`"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Question {{ qi + 1 }}
                   </label>
                   <UInput
@@ -105,7 +124,9 @@
                 <div class="flex items-center justify-between">
                   <label class="text-sm font-medium text-gray-600">
                     Réponses
-                    <span class="text-xs text-gray-400 ml-1">(au moins 2 — cocher la bonne réponse)</span>
+                    <span class="text-xs text-gray-400 ml-1"
+                      >(au moins 2 — cocher la bonne réponse)</span
+                    >
                   </label>
                   <UButton
                     size="xs"

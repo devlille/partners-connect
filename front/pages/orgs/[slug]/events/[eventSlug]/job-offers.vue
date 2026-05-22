@@ -52,7 +52,10 @@
           </div>
 
           <div v-if="filteredPromotions.length === 0" class="px-6 py-12 text-center">
-            <i class="i-heroicons-briefcase text-gray-400 text-5xl mx-auto block mb-4" aria-hidden="true" />
+            <i
+              class="i-heroicons-briefcase text-gray-400 text-5xl mx-auto block mb-4"
+              aria-hidden="true"
+            />
             <p class="text-sm text-gray-500">Aucune offre d'emploi pour cet événement</p>
           </div>
 
@@ -131,8 +134,14 @@
           aria-modal="true"
           aria-labelledby="decline-modal-title"
         >
-          <div class="fixed inset-0 bg-black bg-opacity-50" aria-hidden="true" @click="closeDeclineModal" />
-          <div class="relative bg-white rounded-lg shadow-xl max-w-lg w-full transform transition-all">
+          <div
+            class="fixed inset-0 bg-black bg-opacity-50"
+            aria-hidden="true"
+            @click="closeDeclineModal"
+          />
+          <div
+            class="relative bg-white rounded-lg shadow-xl max-w-lg w-full transform transition-all"
+          >
             <div class="px-6 py-4 border-b border-gray-200">
               <h3 id="decline-modal-title" class="text-lg font-semibold text-gray-900">
                 Refuser l'offre
@@ -157,7 +166,12 @@
               </div>
             </div>
             <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
-              <UButton color="neutral" variant="ghost" :disabled="!!decliningId" @click="closeDeclineModal">
+              <UButton
+                color="neutral"
+                variant="ghost"
+                :disabled="!!decliningId"
+                @click="closeDeclineModal"
+              >
                 Annuler
               </UButton>
               <UButton color="error" :loading="!!decliningId" @click="handleDecline">

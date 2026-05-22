@@ -65,7 +65,10 @@
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2 flex-wrap">
                     <h3 class="text-base font-semibold text-gray-900">{{ job.title }}</h3>
-                    <StatusBadge v-if="promotionByJobId[job.id]" :status="promotionByJobId[job.id].status" />
+                    <StatusBadge
+                      v-if="promotionByJobId[job.id]"
+                      :status="promotionByJobId[job.id].status"
+                    />
                   </div>
                   <div class="mt-2 space-y-1">
                     <p class="text-sm text-gray-600">
