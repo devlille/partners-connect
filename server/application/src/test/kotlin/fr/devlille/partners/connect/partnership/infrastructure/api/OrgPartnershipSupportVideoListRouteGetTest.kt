@@ -70,7 +70,7 @@ class OrgPartnershipSupportVideoListRouteGetTest {
         assertEquals(1, items.size)
         val first = items[0].jsonObject
         assertEquals(videoId.toString(), first["id"]?.jsonPrimitive?.content)
-        assertEquals("PENDING", first["status"]?.jsonPrimitive?.content)
+        assertEquals("pending", first["status"]?.jsonPrimitive?.content)
     }
 
     @Test

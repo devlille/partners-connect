@@ -86,7 +86,7 @@ class PartnershipJobOfferDeclineRoutePostTest {
         assertEquals(HttpStatusCode.OK, declineResponse.status)
 
         val declinedJson = Json.parseToJsonElement(declineResponse.bodyAsText()).jsonObject
-        assertEquals("DECLINED", declinedJson["status"]?.jsonPrimitive?.content)
+        assertEquals("declined", declinedJson["status"]?.jsonPrimitive?.content)
         assertEquals(declineReason, declinedJson["decline_reason"]?.jsonPrimitive?.content)
     }
 

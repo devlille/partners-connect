@@ -59,7 +59,7 @@ class PartnershipSupportVideoGetRouteTest {
         assertEquals(videoId.toString(), body["id"]?.jsonPrimitive?.content)
         assertEquals(partnershipId.toString(), body["partnership_id"]?.jsonPrimitive?.content)
         assertEquals(slug, body["event_slug"]?.jsonPrimitive?.content)
-        assertEquals("PENDING", body["status"]?.jsonPrimitive?.content)
+        assertEquals("pending", body["status"]?.jsonPrimitive?.content)
     }
 
     @Test

@@ -8322,9 +8322,9 @@ components:
         status:
           type: string
           enum:
-            - PENDING
-            - APPROVED
-            - DECLINED
+            - pending
+            - approved
+            - declined
         submitted_at:
           type: string
           format: date-time

@@ -96,7 +96,7 @@
                   </div>
                 </div>
 
-                <div v-if="video.status === 'PENDING'" class="flex gap-2 shrink-0">
+                <div v-if="video.status === 'pending'" class="flex gap-2 shrink-0">
                   <UButton
                     color="success"
                     variant="outline"
@@ -225,9 +225,9 @@ const declineModalOpen = ref(false);
 const videoToDecline = ref<SupportVideoResponseSchema | null>(null);
 const declineReason = ref('');
 
-const pendingCount = computed(() => videos.value.filter((v) => v.status === 'PENDING').length);
-const approvedCount = computed(() => videos.value.filter((v) => v.status === 'APPROVED').length);
-const declinedCount = computed(() => videos.value.filter((v) => v.status === 'DECLINED').length);
+const pendingCount = computed(() => videos.value.filter((v) => v.status === 'pending').length);
+const approvedCount = computed(() => videos.value.filter((v) => v.status === 'approved').length);
+const declinedCount = computed(() => videos.value.filter((v) => v.status === 'declined').length);
 
 const filteredVideos = computed(() => {
   if (!statusFilter.value) return videos.value;
