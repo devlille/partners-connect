@@ -99,17 +99,31 @@
                     </p>
                   </div>
                 </div>
-                <UButton
-                  color="error"
-                  variant="ghost"
-                  size="sm"
-                  icon="i-heroicons-trash"
-                  :loading="deletingJobId === job.id"
-                  :disabled="!!deletingJobId"
-                  @click="confirmDelete(job)"
-                >
-                  Supprimer
-                </UButton>
+                <div class="flex items-center gap-2">
+                  <UButton
+                    v-if="promotionByJobId[job.id]?.status === 'declined'"
+                    color="primary"
+                    variant="soft"
+                    size="sm"
+                    icon="i-heroicons-paper-airplane"
+                    :loading="resubmittingJobId === job.id"
+                    :disabled="!!resubmittingJobId || !!deletingJobId"
+                    @click="handleResubmit(job)"
+                  >
+                    Re-soumettre
+                  </UButton>
+                  <UButton
+                    color="error"
+                    variant="ghost"
+                    size="sm"
+                    icon="i-heroicons-trash"
+                    :loading="deletingJobId === job.id"
+                    :disabled="!!deletingJobId || !!resubmittingJobId"
+                    @click="confirmDelete(job)"
+                  >
+                    Supprimer
+                  </UButton>
+                </div>
               </div>
             </li>
           </ul>
@@ -364,6 +378,7 @@ const addError = ref<string | null>(null);
 const isDeleteModalOpen = ref(false);
 const jobToDelete = ref<JobOfferResponseSchema | null>(null);
 const deletingJobId = ref<string | null>(null);
+const resubmittingJobId = ref<string | null>(null);
 
 /**
  * Load job offers for the company
@@ -444,15 +459,35 @@ async function handleAddJob() {
       salary: newJob.value.salary || null
     };
 
-    await postCompaniesJobOffers(company.value.id, jobData);
+    const createRes = await postCompaniesJobOffers(company.value.id, jobData);
+    const createdJobOfferId = createRes.data.id;
+
+    let promoteFailed = false;
+    try {
+      await promoteJobOfferToPartnership(company.value.id, partnershipId.value, {
+        job_offer_id: createdJobOfferId,
+      });
+    } catch (promoteErr) {
+      console.error('Failed to submit job offer for review:', promoteErr);
+      promoteFailed = true;
+    }
 
     await loadJobOffers();
 
-    toast.add({
-      title: 'Offre ajoutée',
-      description: "L'offre d'emploi a été ajoutée avec succès",
-      color: 'success',
-    });
+    if (promoteFailed) {
+      toast.add({
+        title: 'Offre créée mais non soumise',
+        description:
+          "L'offre a été enregistrée, mais sa soumission à l'événement a échoué. Supprimez-la et réessayez.",
+        color: 'warning',
+      });
+    } else {
+      toast.add({
+        title: 'Offre soumise',
+        description: "L'offre d'emploi a été soumise pour validation",
+        color: 'success',
+      });
+    }
 
     // Close modal and reset form
     isAddModalOpen.value = false;
@@ -516,6 +551,39 @@ async function handleDelete() {
     });
   } finally {
     deletingJobId.value = null;
+  }
+}
+
+/**
+ * Re-submit a declined job offer for review.
+ * Server resets the existing promotion row to PENDING and clears review metadata.
+ */
+async function handleResubmit(job: JobOfferResponseSchema) {
+  if (!company.value?.id) return;
+
+  try {
+    resubmittingJobId.value = job.id;
+
+    await promoteJobOfferToPartnership(company.value.id, partnershipId.value, {
+      job_offer_id: job.id,
+    });
+
+    await loadJobOffers();
+
+    toast.add({
+      title: 'Offre re-soumise',
+      description: "L'offre d'emploi a été soumise à nouveau pour validation",
+      color: 'success',
+    });
+  } catch (err: any) {
+    console.error('Failed to resubmit job offer:', err);
+    toast.add({
+      title: 'Erreur',
+      description: "Impossible de re-soumettre l'offre d'emploi",
+      color: 'error',
+    });
+  } finally {
+    resubmittingJobId.value = null;
   }
 }
 
