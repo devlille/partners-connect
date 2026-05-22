@@ -13,12 +13,14 @@
 ## File Structure
 
 **Create:**
+
 - `front/utils/formatPrice.ts` — `Intl.NumberFormat` wrapper.
 - `front/components/budget/StatusBadge.vue` — colored `UBadge` for paid/validated/submitted.
 - `front/components/budget/TotalsCard.vue` — 3-primary + 2-derived totals layout.
 - `front/pages/orgs/[slug]/events/[eventSlug]/budget.vue` — the page.
 
 **Modify:**
+
 - `front/composables/useEventLinks.ts` — insert Budget entry after Dashboard.
 - `front/i18n/locales/fr-FR.json` — add `budget.*` namespace.
 - `front/i18n/locales/en-US.json` — add `budget.*` namespace.
@@ -31,6 +33,7 @@ All work happens on branch `025-event-budget` (already checked out). Front and s
 ## Task 1: Sidebar entry
 
 **Files:**
+
 - Modify: `front/composables/useEventLinks.ts`
 
 - [ ] **Step 1: Insert the Budget entry**
@@ -75,6 +78,7 @@ EOF
 ## Task 2: `formatPrice` helper
 
 **Files:**
+
 - Create: `front/utils/formatPrice.ts`
 
 - [ ] **Step 1: Create the file**
@@ -114,6 +118,7 @@ EOF
 ## Task 3: i18n keys
 
 **Files:**
+
 - Modify: `front/i18n/locales/fr-FR.json`
 - Modify: `front/i18n/locales/en-US.json`
 - Modify: `front/i18n/locales/es-ES.json`
@@ -227,6 +232,7 @@ The repo has an `i18n:check` script that verifies all locale files share the sam
 cd /Users/gpaligot/Documents/workspace/partners-connect-1/front
 pnpm i18n:check
 ```
+
 Expected: exits 0 with no missing-key warnings. If the script reports a missing key, the namespace structure in one of the JSON files differs — fix the diff and re-run.
 
 - [ ] **Step 5: Commit**
@@ -247,6 +253,7 @@ EOF
 ## Task 4: `StatusBadge` component
 
 **Files:**
+
 - Create: `front/components/budget/StatusBadge.vue`
 
 - [ ] **Step 1: Create the component**
@@ -302,6 +309,7 @@ EOF
 ## Task 5: `TotalsCard` component
 
 **Files:**
+
 - Create: `front/components/budget/TotalsCard.vue`
 
 - [ ] **Step 1: Create the component**
@@ -374,6 +382,7 @@ EOF
 ## Task 6: Budget page
 
 **Files:**
+
 - Create: `front/pages/orgs/[slug]/events/[eventSlug]/budget.vue`
 
 - [ ] **Step 1: Create the page**
@@ -568,9 +577,11 @@ useHead({
 cd /Users/gpaligot/Documents/workspace/partners-connect-1/front
 pnpm build
 ```
+
 Expected: exits 0 with no TypeScript errors. (If `pnpm build` is too slow for fast iteration, `npx nuxi typecheck` is acceptable as a quicker substitute.)
 
 Common errors to expect:
+
 - "Cannot find name 'BudgetTotalsSchema'" — confirm Task 7 hasn't been skipped and the orval-generated `front/utils/api.ts` includes the budget types (it does on this branch; `getOrgsEventsBudget` was added in commit `4ef304e`).
 - "Property 'pack_id' does not exist on type 'PartnershipBudgetItemSchema'" — the spread on line `...p, pack_name, pack_id` should resolve via the `BudgetRow extends PartnershipBudgetItemSchema` interface.
 
@@ -581,6 +592,7 @@ cd /Users/gpaligot/Documents/workspace/partners-connect-1/front
 pnpm lint
 pnpm format:check
 ```
+
 Expected: both exit 0. If `pnpm format:check` flags formatting drift, run `pnpm format` once and re-commit the formatted files.
 
 - [ ] **Step 4: Commit**
@@ -608,6 +620,7 @@ This feature is UI-only and the codebase has no automated tests for sibling page
 cd /Users/gpaligot/Documents/workspace/partners-connect-1/front
 pnpm dev
 ```
+
 Expected: server starts on `http://localhost:3000`. Watch the terminal for any HMR errors.
 
 - [ ] **Step 2: Visit the Budget screen for a real event**
@@ -635,6 +648,7 @@ Expected: server starts on `http://localhost:3000`. Watch the terminal for any H
 - [ ] **Step 5: Verify the empty-event case (optional)**
 
 If a test event with zero partnerships is available, navigate there:
+
 - Totals card shows zeros for all five metrics.
 - Empty state message ("No partnerships to display.") appears in place of the table.
 
@@ -653,29 +667,29 @@ If manual verification surfaces issues, fix them and commit. If everything passe
 
 **Spec coverage:**
 
-| Spec requirement | Implemented in |
-| --- | --- |
-| FR-001 sidebar entry after Dashboard | Task 1 |
-| FR-002 page at `pages/.../budget.vue` | Task 6 |
-| FR-003 call `getOrgsEventsBudget` on mount | Task 6 (`loadBudget`) |
-| FR-004 loading / error / success states | Task 6 (template branches) |
-| FR-005 TotalsCard component | Task 5 |
-| FR-006 `Intl.NumberFormat` with active locale | Task 2 (`formatPrice` helper) |
-| FR-007 USelect with packs | Task 6 (`packOptions`) |
-| FR-008 All packs → event totals + flat list with Pack column | Task 6 (`displayedTotals`, `displayedPartnerships`, `columns`) |
-| FR-009 single pack → pack totals + filtered list + Pack column hidden | Task 6 (`selectedPack`, `columns`) |
-| FR-010 UTable columns (Pack / Company / Price / Status) | Task 6 (`columns`) |
-| FR-011 StatusBadge with success/primary/neutral | Task 4 |
-| FR-012 empty state | Task 6 (`v-if="displayedPartnerships.length === 0"`) |
-| FR-013 page meta (auth, no SSR) | Task 6 (`definePageMeta`) |
-| FR-014 i18n keys in fr/en/es | Task 3 |
-| FR-015 `formatPrice` helper consumed by card + table | Task 2 + Task 5 + Task 6 |
-| US1 view global budget | Tasks 5-6 |
-| US2 filter by pack | Task 6 |
-| US3 sidebar entry | Task 1 |
-| Edge: zero partnerships | Task 6 (`displayedTotals` fallback + empty state) |
-| Edge: single pack in dropdown | Task 6 (no special-casing, works by construction) |
-| Edge: auth | Task 6 (`authMiddleware`) |
+| Spec requirement                                                      | Implemented in                                                 |
+| --------------------------------------------------------------------- | -------------------------------------------------------------- |
+| FR-001 sidebar entry after Dashboard                                  | Task 1                                                         |
+| FR-002 page at `pages/.../budget.vue`                                 | Task 6                                                         |
+| FR-003 call `getOrgsEventsBudget` on mount                            | Task 6 (`loadBudget`)                                          |
+| FR-004 loading / error / success states                               | Task 6 (template branches)                                     |
+| FR-005 TotalsCard component                                           | Task 5                                                         |
+| FR-006 `Intl.NumberFormat` with active locale                         | Task 2 (`formatPrice` helper)                                  |
+| FR-007 USelect with packs                                             | Task 6 (`packOptions`)                                         |
+| FR-008 All packs → event totals + flat list with Pack column          | Task 6 (`displayedTotals`, `displayedPartnerships`, `columns`) |
+| FR-009 single pack → pack totals + filtered list + Pack column hidden | Task 6 (`selectedPack`, `columns`)                             |
+| FR-010 UTable columns (Pack / Company / Price / Status)               | Task 6 (`columns`)                                             |
+| FR-011 StatusBadge with success/primary/neutral                       | Task 4                                                         |
+| FR-012 empty state                                                    | Task 6 (`v-if="displayedPartnerships.length === 0"`)           |
+| FR-013 page meta (auth, no SSR)                                       | Task 6 (`definePageMeta`)                                      |
+| FR-014 i18n keys in fr/en/es                                          | Task 3                                                         |
+| FR-015 `formatPrice` helper consumed by card + table                  | Task 2 + Task 5 + Task 6                                       |
+| US1 view global budget                                                | Tasks 5-6                                                      |
+| US2 filter by pack                                                    | Task 6                                                         |
+| US3 sidebar entry                                                     | Task 1                                                         |
+| Edge: zero partnerships                                               | Task 6 (`displayedTotals` fallback + empty state)              |
+| Edge: single pack in dropdown                                         | Task 6 (no special-casing, works by construction)              |
+| Edge: auth                                                            | Task 6 (`authMiddleware`)                                      |
 
 **Placeholder scan:** none — every step contains concrete code or commands.
 

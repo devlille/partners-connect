@@ -1,8 +1,5 @@
 import { toValue, type MaybeRefOrGetter } from "vue";
-import {
-  postPartnershipEmail,
-  type PostPartnershipEmailParams,
-} from "~/utils/api";
+import { postPartnershipEmail, type PostPartnershipEmailParams } from "~/utils/api";
 
 export interface SendEmailFormData {
   subject: string;
@@ -90,9 +87,7 @@ export function useSendEmail(options: UseSendEmailOptions) {
     } catch (err: unknown) {
       console.error("Failed to send email:", err);
       const errorMessage =
-        err instanceof Error && "response" in err
-          ? (err as any).response?.data?.message
-          : null;
+        err instanceof Error && "response" in err ? (err as any).response?.data?.message : null;
       error.value = errorMessage || t("email.modal.error");
       options.onError?.(err instanceof Error ? err : new Error(String(err)));
       return null;

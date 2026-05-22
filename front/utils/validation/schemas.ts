@@ -63,4 +63,3 @@ export const sponsorSchema = z.object({
   pack_id: z.string().min(1, "errors.validation"),
   option_ids: z.array(z.string()).optional(),
 });
-

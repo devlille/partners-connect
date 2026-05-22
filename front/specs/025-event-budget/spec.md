@@ -18,7 +18,7 @@
 - Q: i18n? → A: Page body uses `$t('budget.*')` keys added to fr-FR, en-US, es-ES. Sidebar label stays hardcoded "Budget" matching the existing `useEventLinks.ts` style.
 - Q: Tests? → A: Out of scope for v1 — sibling pages (sponsors, agenda, etc.) have no unit tests; visual verification via `pnpm dev` is the practical gate.
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - View global event budget (Priority: P1)
 
@@ -77,7 +77,7 @@ As an event organiser, I need a clearly labelled Budget entry in the event sideb
 - Locale switching → all formatted prices and labels respect the active i18n locale. The `currency` field is read from the API response, not hardcoded.
 - A user navigates to `/budget` by URL without prior authentication → `authMiddleware` redirects to the auth flow, identical to sibling pages.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -114,7 +114,7 @@ As an event organiser, I need a clearly labelled Budget entry in the event sideb
 - French is the primary language; English and Spanish translations are added with reasonable equivalents but no professional review is required for v1.
 - No client-side caching layer (no Pinia store) — the page fetches on every mount, matching the existing sponsors/dashboard pattern.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

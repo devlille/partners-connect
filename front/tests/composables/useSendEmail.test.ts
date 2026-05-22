@@ -34,8 +34,7 @@ describe("useSendEmail", () => {
 
   describe("initial state", () => {
     it("initializes with empty form and no status", async () => {
-      const { formData, sending, error, successMessage } =
-        await buildComposable();
+      const { formData, sending, error, successMessage } = await buildComposable();
 
       expect(formData.value.subject).toBe("");
       expect(formData.value.body).toBe("");
@@ -140,8 +139,7 @@ describe("useSendEmail", () => {
 
   describe("resetForm", () => {
     it("clears form, error, and successMessage", async () => {
-      const { formData, error, successMessage, resetForm } =
-        await buildComposable();
+      const { formData, error, successMessage, resetForm } = await buildComposable();
 
       formData.value.subject = "Hello";
       formData.value.body = "Body";
@@ -208,7 +206,10 @@ describe("useSendEmail", () => {
         data: { recipients: 2 },
       } as any);
 
-      const filterParams: PostPartnershipEmailParams = { "filter[validated]": true, "filter[declined]": false };
+      const filterParams: PostPartnershipEmailParams = {
+        "filter[validated]": true,
+        "filter[declined]": false,
+      };
       const { formData, sendEmail } = await buildComposable({
         ...DEFAULT_OPTIONS,
         filterParams,
@@ -332,9 +333,7 @@ describe("useSendEmail", () => {
 
     it("falls back to i18n error key when API provides no message", async () => {
       const { postPartnershipEmail } = await import("~/utils/api");
-      vi.mocked(postPartnershipEmail).mockRejectedValue(
-        new Error("Network error"),
-      );
+      vi.mocked(postPartnershipEmail).mockRejectedValue(new Error("Network error"));
 
       const { formData, error, sendEmail } = await buildComposable();
       formData.value.subject = "Hello";
