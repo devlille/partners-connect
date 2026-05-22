@@ -62,7 +62,10 @@ class EventBudgetLifecycleRoutesTest {
 
                 insertMockedSponsoringPack(id = goldPackId, eventId = eventId, name = "Gold", basePrice = 1000)
                 insertMockedSponsoringOption(
-                    optionId = optionId, eventId = eventId, optionType = OptionType.TEXT, price = 200,
+                    optionId = optionId,
+                    eventId = eventId,
+                    optionType = OptionType.TEXT,
+                    price = 200,
                 )
                 insertMockedPackOptions(packId = goldPackId, optionId = optionId, required = false)
 
@@ -72,7 +75,10 @@ class EventBudgetLifecycleRoutesTest {
                 insertMockedCompany(declinedCompanyId, name = "Delta")
 
                 insertMockedValidatedPartnership(
-                    id = paidPartnershipId, eventId = eventId, companyId = paidCompanyId, selectedPackId = goldPackId,
+                    id = paidPartnershipId,
+                    eventId = eventId,
+                    companyId = paidCompanyId,
+                    selectedPackId = goldPackId,
                 )
                 insertMockedOptionPartnership(
                     partnershipId = paidPartnershipId,

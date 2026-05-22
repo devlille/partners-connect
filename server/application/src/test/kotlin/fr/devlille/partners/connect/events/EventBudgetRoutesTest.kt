@@ -170,10 +170,16 @@ class EventBudgetRoutesTest {
                 insertMockedFutureEvent(eventId, slug = eventSlug, orgId = orgId)
 
                 fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack(
-                    id = goldPackId, eventId = eventId, name = "Gold", basePrice = 1000,
+                    id = goldPackId,
+                    eventId = eventId,
+                    name = "Gold",
+                    basePrice = 1000,
                 )
                 fr.devlille.partners.connect.sponsoring.factories.insertMockedSponsoringPack(
-                    id = silverPackId, eventId = eventId, name = "Silver", basePrice = 500,
+                    id = silverPackId,
+                    eventId = eventId,
+                    name = "Silver",
+                    basePrice = 500,
                 )
 
                 fr.devlille.partners.connect.companies.factories.insertMockedCompany(acmeCompanyId, name = "Acme")
@@ -182,10 +188,16 @@ class EventBudgetRoutesTest {
                 fr.devlille.partners.connect.companies.factories.insertMockedCompany(deltaCompanyId, name = "Delta")
 
                 fr.devlille.partners.connect.partnership.factories.insertMockedValidatedPartnership(
-                    id = acmePartnershipId, eventId = eventId, companyId = acmeCompanyId, selectedPackId = goldPackId,
+                    id = acmePartnershipId,
+                    eventId = eventId,
+                    companyId = acmeCompanyId,
+                    selectedPackId = goldPackId,
                 ).also { it.packPriceOverride = 1500 }
                 fr.devlille.partners.connect.partnership.factories.insertMockedValidatedPartnership(
-                    id = betaPartnershipId, eventId = eventId, companyId = betaCompanyId, selectedPackId = goldPackId,
+                    id = betaPartnershipId,
+                    eventId = eventId,
+                    companyId = betaCompanyId,
+                    selectedPackId = goldPackId,
                 )
 
                 fr.devlille.partners.connect.partnership.factories.insertMockedValidatedPartnership(
@@ -196,7 +208,10 @@ class EventBudgetRoutesTest {
                 )
 
                 fr.devlille.partners.connect.partnership.factories.insertMockedPartnership(
-                    id = deltaPartnershipId, eventId = eventId, companyId = deltaCompanyId, selectedPackId = goldPackId,
+                    id = deltaPartnershipId,
+                    eventId = eventId,
+                    companyId = deltaCompanyId,
+                    selectedPackId = goldPackId,
                 )
             }
         }

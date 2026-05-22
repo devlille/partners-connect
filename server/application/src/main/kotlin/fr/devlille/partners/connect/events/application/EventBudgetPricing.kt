@@ -37,7 +37,8 @@ fun PartnershipOptionEntity.effectivePrice(): Int = when (option.optionType) {
     OptionType.TEXT -> priceOverride ?: option.price ?: 0
     OptionType.TYPED_QUANTITATIVE -> (priceOverride ?: option.price ?: 0) * (selectedQuantity ?: 0)
     OptionType.TYPED_NUMBER -> (priceOverride ?: option.price ?: 0) * (option.fixedQuantity ?: 0)
-    OptionType.TYPED_SELECTABLE -> priceOverride
-        ?: selectedValue?.price
-        ?: error("Selectable option ${option.id.value} has no selected value")
+    OptionType.TYPED_SELECTABLE ->
+        priceOverride
+            ?: selectedValue?.price
+            ?: error("Selectable option ${option.id.value} has no selected value")
 }
