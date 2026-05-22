@@ -8,7 +8,7 @@
     "partnership_id": { "type": "string", "format": "uuid" },
     "event_slug": { "type": "string" },
     "url": { "type": "string" },
-    "status": { "type": "string", "enum": ["PENDING", "APPROVED", "DECLINED"] },
+    "status": { "type": "string", "enum": ["pending", "approved", "declined"] },
     "submitted_at": { "type": "string", "format": "date-time" },
     "reviewed_at": { "type": ["string", "null"], "format": "date-time" },
     "reviewed_by": { "type": ["string", "null"] },

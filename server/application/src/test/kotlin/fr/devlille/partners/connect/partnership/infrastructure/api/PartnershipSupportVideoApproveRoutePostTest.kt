@@ -71,7 +71,7 @@ class PartnershipSupportVideoApproveRoutePostTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
         val body = Json.parseToJsonElement(response.bodyAsText()).jsonObject
-        assertEquals("APPROVED", body["status"]?.jsonPrimitive?.content)
+        assertEquals("approved", body["status"]?.jsonPrimitive?.content)
         assertEquals(videoId.toString(), body["id"]?.jsonPrimitive?.content)
     }
 

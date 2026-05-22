@@ -72,7 +72,7 @@ class PartnershipJobOfferApproveRoutePostTest {
         assertEquals(HttpStatusCode.OK, approveResponse.status)
 
         val approvedJson = Json.parseToJsonElement(approveResponse.bodyAsText()).jsonObject
-        assertEquals("APPROVED", approvedJson["status"]?.jsonPrimitive?.content)
+        assertEquals("approved", approvedJson["status"]?.jsonPrimitive?.content)
     }
 
     @Test

@@ -46,7 +46,7 @@
 
             <div v-else class="space-y-4">
               <div
-                v-if="video.status === 'PENDING'"
+                v-if="video.status === 'pending'"
                 class="flex items-start gap-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
               >
                 <i class="i-heroicons-clock text-xl text-yellow-600 mt-0.5" aria-hidden="true" />
@@ -60,7 +60,7 @@
               </div>
 
               <div
-                v-else-if="video.status === 'APPROVED'"
+                v-else-if="video.status === 'approved'"
                 class="flex items-start gap-3 p-4 bg-green-50 border border-green-200 rounded-lg"
               >
                 <i
@@ -76,7 +76,7 @@
               </div>
 
               <div
-                v-else-if="video.status === 'DECLINED'"
+                v-else-if="video.status === 'declined'"
                 class="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg"
               >
                 <i class="i-heroicons-x-circle text-xl text-red-600 mt-0.5" aria-hidden="true" />
@@ -98,7 +98,7 @@
               <div v-if="canResubmit" class="pt-2 border-t border-gray-200">
                 <h3 class="text-sm font-semibold text-gray-900 mb-3">
                   {{
-                    video.status === 'DECLINED'
+                    video.status === 'declined'
                       ? 'Soumettre une nouvelle version'
                       : 'Remplacer la vidéo'
                   }}
@@ -148,7 +148,7 @@ const loading = computed(() => partnershipLoading.value || videoLoading.value);
 const error = computed(() => partnershipError.value || videoError.value);
 
 const canResubmit = computed(
-  () => video.value?.status === 'PENDING' || video.value?.status === 'DECLINED',
+  () => video.value?.status === 'pending' || video.value?.status === 'declined',
 );
 
 async function loadVideo() {

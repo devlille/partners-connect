@@ -81,7 +81,7 @@ class PartnershipSupportVideoDeclineRoutePostTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
         val body = Json.parseToJsonElement(response.bodyAsText()).jsonObject
-        assertEquals("DECLINED", body["status"]?.jsonPrimitive?.content)
+        assertEquals("declined", body["status"]?.jsonPrimitive?.content)
         assertEquals(declineReason, body["decline_reason"]?.jsonPrimitive?.content)
     }
 
@@ -133,7 +133,7 @@ class PartnershipSupportVideoDeclineRoutePostTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
         val body = Json.parseToJsonElement(response.bodyAsText()).jsonObject
-        assertEquals("DECLINED", body["status"]?.jsonPrimitive?.content)
+        assertEquals("declined", body["status"]?.jsonPrimitive?.content)
     }
 
     @Test
