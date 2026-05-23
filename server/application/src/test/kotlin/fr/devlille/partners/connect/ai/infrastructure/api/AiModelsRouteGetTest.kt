@@ -95,7 +95,6 @@ class AiModelsRouteGetTest {
             transaction {
                 insertMockedUser(userId)
                 insertMockedOrganisationEntity(orgId)
-                // NO permission inserted
             }
         }
 
