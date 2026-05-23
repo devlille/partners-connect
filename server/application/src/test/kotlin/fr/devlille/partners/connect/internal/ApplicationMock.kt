@@ -3,6 +3,8 @@ package fr.devlille.partners.connect.internal
 import com.slack.api.Slack
 import fr.devlille.partners.connect.ApplicationConfig
 import fr.devlille.partners.connect.agenda.infrastructure.bindings.agendaModule
+import fr.devlille.partners.connect.ai.FakeLlmGateway
+import fr.devlille.partners.connect.ai.domain.LlmGateway
 import fr.devlille.partners.connect.auth.infrastructure.bindings.authModule
 import fr.devlille.partners.connect.billing.domain.BillingGateway
 import fr.devlille.partners.connect.billing.infrastructure.bindings.billingModule
@@ -39,11 +41,13 @@ import java.util.UUID
  * @param nbProductsForTickets The number of products to be returned by the mock network engine for tickets.
  * @param storage The storage instance to be used in the module. Defaults to a mock instance.
  */
+@Suppress("LongParameterList")
 fun Application.moduleSharedDb(
     userId: UUID,
     nbProductsForTickets: Int = 0,
     storage: Storage = mockk(),
     slack: Slack = mockk(),
+    llmGateway: LlmGateway = FakeLlmGateway(),
 ) {
     moduleMocked(
         databaseUrl = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
@@ -55,6 +59,9 @@ fun Application.moduleSharedDb(
         },
         mockSlack = module {
             single<Slack> { slack }
+        },
+        mockAi = module {
+            single<LlmGateway> { llmGateway }
         },
     )
 }
@@ -104,6 +111,9 @@ fun Application.moduleMocked(
             }
         }
     },
+    mockAi: Module = module {
+        single<LlmGateway> { FakeLlmGateway() }
+    },
 ) {
     module(
         ApplicationConfig(
@@ -133,6 +143,7 @@ fun Application.moduleMocked(
                 mockGeocode,
                 mockBillingIntegration,
                 mockWebhook,
+                mockAi,
             ),
         ),
     )
