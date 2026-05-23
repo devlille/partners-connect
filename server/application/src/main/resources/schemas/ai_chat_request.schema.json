@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["prompt"],
+  "properties": {
+    "prompt": { "type": "string", "minLength": 1 },
+    "model":  { "type": ["string", "null"] },
+    "system": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}
