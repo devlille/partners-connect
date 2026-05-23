@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.bundles.kotlinx.ecosystem)
     implementation(libs.bundles.ktor.server)
     implementation(libs.bundles.ktor.client)
+    implementation(libs.ktor.client.okhttp)
     implementation(libs.bundles.koin.ktor)
     implementation(libs.bundles.slack.api)
     implementation(libs.bundles.image.processing)
