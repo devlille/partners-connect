@@ -5,6 +5,7 @@ import fr.devlille.partners.connect.ApplicationConfig
 import fr.devlille.partners.connect.agenda.infrastructure.bindings.agendaModule
 import fr.devlille.partners.connect.ai.FakeLlmGateway
 import fr.devlille.partners.connect.ai.domain.LlmGateway
+import fr.devlille.partners.connect.ai.infrastructure.bindings.aiModule
 import fr.devlille.partners.connect.auth.infrastructure.bindings.authModule
 import fr.devlille.partners.connect.billing.domain.BillingGateway
 import fr.devlille.partners.connect.billing.infrastructure.bindings.billingModule
@@ -137,6 +138,7 @@ fun Application.moduleMocked(
                 agendaModule,
                 integrationModule,
                 digestModule,
+                aiModule,
                 mockNetwork,
                 mockSlack,
                 mockStorage,
