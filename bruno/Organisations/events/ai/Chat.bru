@@ -1,0 +1,31 @@
+meta {
+  name: Chat
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{scheme}}://{{base_url}}/orgs/:org_slug/ai/chat
+  body: json
+  auth: inherit
+}
+
+params:path {
+  org_slug: {{org_slug}}
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "prompt": "Reply with: hello"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
