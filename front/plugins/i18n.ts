@@ -119,6 +119,14 @@ export default defineNuxtPlugin((nuxtApp) => {
         success: "Email envoyé avec succès à {count} destinataire(s).",
         error: "Impossible d'envoyer l'email. Veuillez réessayer.",
         required: "*",
+        prompt: "Prompt IA",
+        promptPlaceholder:
+          "Décrivez le sujet de l'email (par ex. rappeler la deadline du flyer aux partenaires)",
+        promptHint:
+          "Optionnel. Permet de générer un brouillon du message que vous pouvez ensuite modifier.",
+        generate: "Générer",
+        generating: "Génération en cours...",
+        generateError: "Impossible de générer le brouillon. Veuillez réessayer.",
       },
       editor: {
         loading: "Chargement de l'éditeur...",
@@ -293,6 +301,13 @@ export default defineNuxtPlugin((nuxtApp) => {
         success: "Email sent successfully to {count} recipient(s).",
         error: "Unable to send email. Please try again.",
         required: "*",
+        prompt: "AI prompt",
+        promptPlaceholder:
+          "Describe what the email should be about (e.g. remind partners about the flyer deadline)",
+        promptHint: "Optional. Used to generate a draft message body that you can then edit.",
+        generate: "Generate",
+        generating: "Generating...",
+        generateError: "Unable to generate draft. Please try again.",
       },
       editor: {
         loading: "Loading editor...",
@@ -468,6 +483,13 @@ export default defineNuxtPlugin((nuxtApp) => {
         success: "Email enviado con éxito a {count} destinatario(s).",
         error: "No se pudo enviar el email. Por favor, inténtelo de nuevo.",
         required: "*",
+        prompt: "Prompt de IA",
+        promptPlaceholder:
+          "Describa de qué trata el email (por ej. recordar a los patrocinadores la fecha límite del flyer)",
+        promptHint: "Opcional. Genera un borrador del mensaje que luego puede editar.",
+        generate: "Generar",
+        generating: "Generando...",
+        generateError: "No se pudo generar el borrador. Por favor, inténtelo de nuevo.",
       },
       editor: {
         loading: "Cargando editor...",

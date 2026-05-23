@@ -119,6 +119,46 @@
                 </p>
               </div>
 
+              <!-- Prompt IA pour générer le corps du message -->
+              <div>
+                <label for="email-prompt" class="block text-sm font-medium text-gray-700 mb-2">
+                  {{ $t('email.modal.prompt') }}
+                </label>
+                <UTextarea
+                  id="email-prompt"
+                  v-model="draftPrompt"
+                  :placeholder="$t('email.modal.promptPlaceholder')"
+                  :rows="3"
+                  :disabled="sending || generating"
+                  class="w-full"
+                />
+                <p class="mt-1 text-xs text-gray-500">
+                  {{ $t('email.modal.promptHint') }}
+                </p>
+                <div
+                  v-if="draftError"
+                  role="alert"
+                  aria-live="assertive"
+                  class="mt-2 bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm"
+                >
+                  {{ draftError }}
+                </div>
+              </div>
+
+              <!-- Bouton Generate -->
+              <div class="flex justify-center">
+                <UButton
+                  type="button"
+                  color="primary"
+                  variant="outline"
+                  icon="i-heroicons-sparkles"
+                  :label="generating ? $t('email.modal.generating') : $t('email.modal.generate')"
+                  :loading="generating"
+                  :disabled="!canGenerate || sending"
+                  @click="handleGenerate"
+                />
+              </div>
+
               <!-- Corps du message -->
               <div>
                 <label for="email-body" class="block text-sm font-medium text-gray-700 mb-2">
@@ -129,7 +169,7 @@
                   <LazyWysiwygEditor
                     v-model="formData.body"
                     :placeholder="$t('email.modal.bodyPlaceholder')"
-                    :disabled="sending"
+                    :disabled="sending || generating"
                   />
                   <template #fallback>
                     <div class="wysiwyg-skeleton">
@@ -193,6 +233,7 @@
 <script setup lang="ts">
 import type { PostPartnershipEmailParams } from "~/utils/api";
 import { useSendEmail } from "~/composables/useSendEmail";
+import { useDraftEmail } from "~/composables/useDraftEmail";
 
 // Lazy load du WYSIWYG editor pour réduire la taille du bundle initial
 const LazyWysiwygEditor = defineAsyncComponent({
@@ -206,6 +247,8 @@ interface Props {
   filterParams?: PostPartnershipEmailParams;
   /** Liste des emails des destinataires filtrés */
   recipientEmails?: string[];
+  /** IDs des partenariats à utiliser comme contexte pour le brouillon IA */
+  partnershipIds?: string[];
 }
 
 const props = defineProps<Props>();
@@ -245,6 +288,26 @@ const {
     }, 2000);
   },
 });
+
+const {
+  prompt: draftPrompt,
+  generating,
+  error: draftError,
+  canGenerate,
+  resetDraftState,
+  generate,
+} = useDraftEmail({
+  orgSlug: props.orgSlug,
+  eventSlug: props.eventSlug,
+  partnershipIds: () => props.partnershipIds ?? [],
+  onSuccess: (draft) => {
+    formData.value.body = draft;
+  },
+});
+
+async function handleGenerate() {
+  await generate();
+}
 
 // Sélecteur pour les éléments focusables
 const FOCUSABLE_SELECTOR = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]):not([disabled])';
@@ -330,6 +393,7 @@ function onModalClosed() {
 watch(isOpen, (open) => {
   if (!open) {
     resetForm();
+    resetDraftState();
   }
 });
 

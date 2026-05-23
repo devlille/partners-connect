@@ -180,6 +180,7 @@
       :event-slug="eventSlug"
       :filter-params="emailFilterParams"
       :recipient-emails="recipientEmails"
+      :partnership-ids="partnershipIds"
       @sent="handleEmailSent"
     />
   </Dashboard>
@@ -405,6 +406,9 @@ const emailFilterParams = computed<PostPartnershipEmailParams>(() => ({
   ...filterStateToApiParams<PostPartnershipEmailParams>(filters.value),
   query: debouncedSearch.value || undefined,
 }));
+
+// IDs des partenariats affichés — passés à la modale comme contexte pour le brouillon IA
+const partnershipIds = computed<string[]>(() => partnerships.value.map((p) => p.id));
 
 // Liste des emails des destinataires (extraite des partenariats filtrés)
 const recipientEmails = computed<string[]>(() => {

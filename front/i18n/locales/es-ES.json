@@ -67,7 +67,13 @@
       "sending": "Enviando...",
       "success": "Email enviado con éxito a {count} destinatario(s).",
       "error": "No se pudo enviar el email. Por favor, inténtelo de nuevo.",
-      "required": "*"
+      "required": "*",
+      "prompt": "Prompt de IA",
+      "promptPlaceholder": "Describa de qué trata el email (por ej. recordar a los patrocinadores la fecha límite del flyer)",
+      "promptHint": "Opcional. Genera un borrador del mensaje que luego puede editar.",
+      "generate": "Generar",
+      "generating": "Generando...",
+      "generateError": "No se pudo generar el borrador. Por favor, inténtelo de nuevo."
     },
     "editor": {
       "loading": "Cargando editor...",
