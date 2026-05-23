@@ -21,6 +21,7 @@ mockk = "1.14.5"
 postgresql = "42.7.1"
 imgscalr = "4.2"
 shadow = "9.0.0-rc1"
+koog = "0.5.1"
 
 [libraries]
 apache-xmlgraphics-batik-transcoder = { module = "org.apache.xmlgraphics:batik-transcoder", version.ref = "apache-xmlgraphics-batik" }
@@ -82,6 +83,12 @@ google-maps = { module = "com.google.maps:google-maps-services", version.ref = "
 imgscalr = { module = "org.imgscalr:imgscalr-lib", version.ref = "imgscalr" }
 
 json-schema-validator = { module = "io.github.optimumcode:json-schema-validator", version.ref = "json-schema-validator" }
+
+# Koog — LLM client framework. Use the umbrella ktor artifact for transitive coverage
+# of OllamaClient, SingleLLMPromptExecutor, and the prompt DSL.
+# We do NOT use the install(Koog) Ktor plugin (we wire Koog manually via Koin),
+# but pulling koog-ktor is the simplest way to get all the executor + client classes.
+koog-ktor = { module = "ai.koog:koog-ktor", version.ref = "koog" }
 
 # Libraries can be bundled together for easier import
 [bundles]

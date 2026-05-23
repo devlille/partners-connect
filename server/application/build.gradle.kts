@@ -18,6 +18,8 @@ application {
 
 tasks.withType<ShadowJar> {
     archiveClassifier.set("all")
+    // Koog brings in well over 65 535 zip entries — required to fit them all into a single jar.
+    isZip64 = true
     manifest {
         attributes["Main-Class"] = mainKlass
     }
@@ -48,6 +50,7 @@ dependencies {
     implementation(libs.flexmark)
     implementation(libs.mustache)
     implementation(libs.json.schema.validator)
+    implementation(libs.koog.ktor)
     testImplementation(kotlin("test"))
     testImplementation(libs.ktor.server.test)
     testImplementation(libs.ktor.client.mock)
