@@ -2357,6 +2357,88 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
+  /orgs/{orgSlug}/ai/chat:
+    post:
+      summary: Send a prompt to the self-hosted LLM
+      operationId: postOrgsAiChat
+      description: Single round-trip chat call backed by the organisation-scoped Ollama LLM. Defaults to `gemma3:1b`; pass `model` to override per request. Requires organisation membership.
+      tags:
+        - ai
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ai_chat_request.schema'
+      responses:
+        '200':
+          description: OK - Generated response from the LLM
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ai_chat_response.schema'
+        '400':
+          description: Bad Request - Invalid body or empty/blank prompt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '401':
+          description: Unauthorized - Missing/invalid authentication or no organisation membership
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '503':
+          description: Service Unavailable - LLM backend unreachable or returned an error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+  /orgs/{orgSlug}/ai/models:
+    get:
+      summary: List models pulled into the Ollama instance
+      operationId: getOrgsAiModels
+      description: Returns the list of model names currently available on the Ollama backend, so the caller can pick a valid `model` value for `/ai/chat`. Requires organisation membership.
+      tags:
+        - ai
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug
+      responses:
+        '200':
+          description: OK - List of available model names
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ai_model_list.schema'
+        '401':
+          description: Unauthorized - Missing/invalid authentication or no organisation membership
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '503':
+          description: Service Unavailable - LLM backend unreachable or returned an error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events:
     get:
       summary: Get organization details
@@ -6074,6 +6156,12 @@ components:
       $ref: '#/components/schemas/partnership_qanda_summary.schema'
     PartnershipQandaSummaryList:
       $ref: '#/components/schemas/partnership_qanda_summary_list.schema'
+    ChatRequest:
+      $ref: '#/components/schemas/ai_chat_request.schema'
+    ChatResponse:
+      $ref: '#/components/schemas/ai_chat_response.schema'
+    LlmModelList:
+      $ref: '#/components/schemas/ai_model_list.schema'
     user_session.schema:
       $id: user_session.schema.json
       type: object
@@ -8715,6 +8803,43 @@ components:
           description: Provider email address
       required: []
       additionalProperties: false
+    ai_chat_request.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      type: object
+      required:
+        - prompt
+      properties:
+        prompt:
+          type: string
+          minLength: 1
+        model:
+          type:
+            - string
+            - 'null'
+        system:
+          type:
+            - string
+            - 'null'
+      additionalProperties: false
+    ai_chat_response.schema:
+      $id: ai_chat_response.schema.json
+      $schema: http://json-schema.org/draft-07/schema#
+      type: object
+      properties:
+        model:
+          type: string
+        response:
+          type: string
+      required:
+        - model
+        - response
+      additionalProperties: false
+    ai_model_list.schema:
+      $id: ai_model_list.schema.json
+      $schema: http://json-schema.org/draft-07/schema#
+      type: array
+      items:
+        type: string
     create_event.schema:
       $id: event.schema.json
       type: object

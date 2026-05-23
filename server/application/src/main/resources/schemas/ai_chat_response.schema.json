@@ -1,0 +1,11 @@
+{
+  "$id": "ai_chat_response.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "model": { "type": "string" },
+    "response": { "type": "string" }
+  },
+  "required": ["model", "response"],
+  "additionalProperties": false
+}
