@@ -30,4 +30,8 @@ object SystemVarEnv {
     object QontoProvider {
         val baseUrl: String = System.getenv("QONTO_BASE_URL") ?: "https://thirdparty.qonto.com"
     }
+
+    object Llm {
+        val ollamaBaseUrl: String = System.getenv("OLLAMA_BASE_URL") ?: "http://localhost:11434"
+    }
 }
