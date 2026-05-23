@@ -111,7 +111,13 @@
       "sending": "Sending...",
       "success": "Email sent successfully to {count} recipient(s).",
       "error": "Unable to send email. Please try again.",
-      "required": "*"
+      "required": "*",
+      "prompt": "AI prompt",
+      "promptPlaceholder": "Describe what the email should be about (e.g. remind partners about the flyer deadline)",
+      "promptHint": "Optional. Used to generate a draft message body that you can then edit.",
+      "generate": "Generate",
+      "generating": "Generating...",
+      "generateError": "Unable to generate draft. Please try again."
     },
     "editor": {
       "loading": "Loading editor...",

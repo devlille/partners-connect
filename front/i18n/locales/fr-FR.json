@@ -111,7 +111,13 @@
       "sending": "Envoi en cours...",
       "success": "Email envoyé avec succès à {count} destinataire(s).",
       "error": "Impossible d'envoyer l'email. Veuillez réessayer.",
-      "required": "*"
+      "required": "*",
+      "prompt": "Prompt IA",
+      "promptPlaceholder": "Décrivez le sujet de l'email (par ex. rappeler la deadline du flyer aux partenaires)",
+      "promptHint": "Optionnel. Permet de générer un brouillon du message que vous pouvez ensuite modifier.",
+      "generate": "Générer",
+      "generating": "Génération en cours...",
+      "generateError": "Impossible de générer le brouillon. Veuillez réessayer."
     },
     "editor": {
       "loading": "Chargement de l'éditeur...",
