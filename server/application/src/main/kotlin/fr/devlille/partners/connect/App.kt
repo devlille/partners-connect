@@ -1,6 +1,8 @@
 package fr.devlille.partners.connect
 
 import fr.devlille.partners.connect.agenda.infrastructure.bindings.agendaModule
+import fr.devlille.partners.connect.ai.infrastructure.api.aiRoutes
+import fr.devlille.partners.connect.ai.infrastructure.bindings.aiModule
 import fr.devlille.partners.connect.auth.infrastructure.api.authRoutes
 import fr.devlille.partners.connect.auth.infrastructure.bindings.authModule
 import fr.devlille.partners.connect.auth.infrastructure.plugins.configureSecurity
@@ -21,6 +23,7 @@ import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenExcepti
 import fr.devlille.partners.connect.internal.infrastructure.api.PayloadTooLargeException
 import fr.devlille.partners.connect.internal.infrastructure.api.RequestBodyValidationException
 import fr.devlille.partners.connect.internal.infrastructure.api.ResponseException
+import fr.devlille.partners.connect.internal.infrastructure.api.ServiceUnavailableException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnauthorizedException
 import fr.devlille.partners.connect.internal.infrastructure.api.UnsupportedMediaTypeException
 import fr.devlille.partners.connect.internal.infrastructure.api.UserSession
@@ -105,6 +108,7 @@ data class ApplicationConfig(
         providerModule,
         webhookModule,
         digestModule,
+        aiModule,
     ),
 )
 
@@ -148,6 +152,7 @@ fun Application.module(config: ApplicationConfig = ApplicationConfig()) {
         integrationRoutes()
         providersRoutes()
         digestRoutes()
+        aiRoutes()
     }
 }
 
@@ -281,6 +286,15 @@ private fun Application.configureStatusPage() {
                 status = HttpStatusCode.PayloadTooLarge,
                 message = ResponseException(
                     message = cause.message ?: "413 Payload Too Large",
+                    stack = cause.cause?.stackTraceToString(),
+                ),
+            )
+        }
+        exception<ServiceUnavailableException> { call, cause ->
+            call.respond(
+                status = HttpStatusCode.ServiceUnavailable,
+                message = ResponseException(
+                    message = cause.message ?: "503 Service Unavailable",
                     stack = cause.cause?.stackTraceToString(),
                 ),
             )
