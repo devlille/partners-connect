@@ -1997,6 +1997,36 @@ export interface SendPartnershipEmailResponseSchema {
 export type SendPartnershipEmailResponse = SendPartnershipEmailResponseSchema;
 
 /**
+ * Request body for generating an AI-drafted partnership email body from a list of partnership IDs and an organiser prompt.
+ */
+export interface DraftPartnershipEmailRequestSchema {
+  /**
+     * Partnership IDs to include as context in the system prompt. All IDs MUST belong to the requested event.
+     * @minItems 1
+     * @maxItems 100
+     */
+  partnership_ids: string[];
+  /**
+     * Free-text organiser brief describing what the email is about.
+     * @minLength 1
+     * @maxLength 2000
+     */
+  prompt: string;
+}
+
+export type DraftPartnershipEmailRequest = DraftPartnershipEmailRequestSchema;
+
+/**
+ * AI-generated email body ready to populate the message field on the front-end.
+ */
+export interface DraftPartnershipEmailResponseSchema {
+  /** Email body produced by the LLM. Subject and greeting/signature placeholders are not included. */
+  draft: string;
+}
+
+export type DraftPartnershipEmailResponse = DraftPartnershipEmailResponseSchema;
+
+/**
  * Data type of the filter parameter (enum: 'string' or 'boolean')
  */
 export type FilterDefinitionSchemaType = typeof FilterDefinitionSchemaType[keyof typeof FilterDefinitionSchemaType];
@@ -2234,6 +2264,28 @@ export type PartnershipQandaSummary = PartnershipQandaSummarySchema;
 export type PartnershipQandaSummaryListSchema = PartnershipQandaSummarySchema[];
 
 export type PartnershipQandaSummaryList = PartnershipQandaSummaryListSchema;
+
+export interface AiChatRequestSchema {
+  /** @minLength 1 */
+  prompt: string;
+  /** @nullable */
+  model?: string | null;
+  /** @nullable */
+  system?: string | null;
+}
+
+export type ChatRequest = AiChatRequestSchema;
+
+export interface AiChatResponseSchema {
+  model: string;
+  response: string;
+}
+
+export type ChatResponse = AiChatResponseSchema;
+
+export type AiModelListSchema = string[];
+
+export type LlmModelList = AiModelListSchema;
 
 export type GetCompaniesParams = {
 /**
@@ -3597,6 +3649,35 @@ export const deleteOrgsProviders = (
     }
 
 /**
+ * Single round-trip chat call backed by the organisation-scoped Ollama LLM. Defaults to `gemma3:1b`; pass `model` to override per request. Requires organisation membership.
+ * @summary Send a prompt to the self-hosted LLM
+ */
+export const postOrgsAiChat = (
+    orgSlug: string,
+    aiChatRequestSchema: AiChatRequestSchema,
+ options?: SecondParameter<typeof customFetch<AiChatResponseSchema>>,) => {
+      return customFetch<AiChatResponseSchema>(
+      {url: `/orgs/${orgSlug}/ai/chat`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: aiChatRequestSchema
+    },
+      options);
+    }
+
+/**
+ * Returns the list of model names currently available on the Ollama backend, so the caller can pick a valid `model` value for `/ai/chat`. Requires organisation membership.
+ * @summary List models pulled into the Ollama instance
+ */
+export const getOrgsAiModels = (
+    orgSlug: string,
+ options?: SecondParameter<typeof customFetch<AiModelListSchema>>,) => {
+      return customFetch<AiModelListSchema>(
+      {url: `/orgs/${orgSlug}/ai/models`, method: 'GET'
+    },
+      options);
+    }
+
+/**
  * List events for an organization (paginated)
  * @summary Get organization details
  */
@@ -4521,6 +4602,27 @@ export const postPartnershipEmail = (
     }
 
 /**
+ * Generates a draft email body from a list of partnership IDs and an organiser prompt.
+ * The draft is produced by the self-hosted LLM and is intended to populate the email
+ * body field on the front-end before the organiser reviews and sends. Requires edit
+ * permission on the organisation.
+ *
+ * @summary Generate an AI draft for a partnership email body
+ */
+export const postPartnershipEmailDraft = (
+    orgSlug: string,
+    eventSlug: string,
+    draftPartnershipEmailRequestSchema: DraftPartnershipEmailRequestSchema,
+ options?: SecondParameter<typeof customFetch<DraftPartnershipEmailResponseSchema>>,) => {
+      return customFetch<DraftPartnershipEmailResponseSchema>(
+      {url: `/orgs/${orgSlug}/events/${eventSlug}/partnerships/email/draft`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: draftPartnershipEmailRequestSchema
+    },
+      options);
+    }
+
+/**
  * List providers attached to an event with pagination (requires organization membership)
  * @summary List event providers
  */
@@ -4710,6 +4812,8 @@ export type PutOrgsResult = NonNullable<Awaited<ReturnType<typeof putOrgs>>>
 export type PostOrgsProvidersResult = NonNullable<Awaited<ReturnType<typeof postOrgsProviders>>>
 export type PutOrgsProvidersResult = NonNullable<Awaited<ReturnType<typeof putOrgsProviders>>>
 export type DeleteOrgsProvidersResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsProviders>>>
+export type PostOrgsAiChatResult = NonNullable<Awaited<ReturnType<typeof postOrgsAiChat>>>
+export type GetOrgsAiModelsResult = NonNullable<Awaited<ReturnType<typeof getOrgsAiModels>>>
 export type GetOrgsEventsResult = NonNullable<Awaited<ReturnType<typeof getOrgsEvents>>>
 export type PostOrgsEventsResult = NonNullable<Awaited<ReturnType<typeof postOrgsEvents>>>
 export type PutOrgsEventsResult = NonNullable<Awaited<ReturnType<typeof putOrgsEvents>>>
@@ -4765,6 +4869,7 @@ export type PutPartnershipPricingResult = NonNullable<Awaited<ReturnType<typeof 
 export type GetPartnershipEmailHistoryResult = NonNullable<Awaited<ReturnType<typeof getPartnershipEmailHistory>>>
 export type PostPartnershipTriggerWebhookResult = NonNullable<Awaited<ReturnType<typeof postPartnershipTriggerWebhook>>>
 export type PostPartnershipEmailResult = NonNullable<Awaited<ReturnType<typeof postPartnershipEmail>>>
+export type PostPartnershipEmailDraftResult = NonNullable<Awaited<ReturnType<typeof postPartnershipEmailDraft>>>
 export type GetOrgsEventsProvidersResult = NonNullable<Awaited<ReturnType<typeof getOrgsEventsProviders>>>
 export type PostOrgsEventsProvidersResult = NonNullable<Awaited<ReturnType<typeof postOrgsEventsProviders>>>
 export type DeleteOrgsEventsProvidersResult = NonNullable<Awaited<ReturnType<typeof deleteOrgsEventsProviders>>>
