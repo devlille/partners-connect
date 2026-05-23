@@ -13,6 +13,7 @@ import kotlinx.serialization.json.Json
 val schemas by lazy {
     JsonSchemaLoader.create()
         .register(readResourceFile("/schemas/address.schema.json"), SchemaType.DRAFT_7)
+        .register(readResourceFile("/schemas/ai_chat_request.schema.json"), SchemaType.DRAFT_7)
         .register(readResourceFile("/schemas/attach_options_to_pack.schema.json"), SchemaType.DRAFT_7)
         .register(readResourceFile("/schemas/billing_contact.schema.json"), SchemaType.DRAFT_7)
         .register(readResourceFile("/schemas/booth_location_request.schema.json"), SchemaType.DRAFT_7)
