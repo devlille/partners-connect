@@ -138,11 +138,7 @@ class AiRoutesTest {
     }
 }
 
-/**
- * Fires a real HTTP call against a Ktor `MockEngine` that returns the configured status,
- * so the call surfaces `ClientRequestException` (4xx) or `ServerResponseException` (5xx)
- * exactly as Koog's `OllamaClient` and the shared `HttpClient` would.
- */
+// Surfaces a real `ClientRequestException` / `ServerResponseException` for the configured status.
 private class ResponseStatusThrowingGateway(
     private val status: HttpStatusCode,
 ) : LlmGateway {
