@@ -5572,6 +5572,69 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/email/draft:
+    post:
+      summary: Generate an AI draft for a partnership email body
+      operationId: postPartnershipEmailDraft
+      description: |
+        Generates a draft email body from a list of partnership IDs and an organiser prompt.
+        The draft is produced by the self-hosted LLM and is intended to populate the email
+        body field on the front-end before the organiser reviews and sends. Requires edit
+        permission on the organisation.
+      tags:
+        - Partnerships
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orgSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organisation slug identifier
+        - name: eventSlug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event slug identifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/draft_partnership_email_request.schema'
+      responses:
+        '200':
+          description: OK - Draft generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/draft_partnership_email_response.schema'
+        '400':
+          description: Bad Request - prompt empty or schema validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '401':
+          description: Unauthorized - Missing/invalid token or user lacks edit permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '404':
+          description: Not Found - At least one partnership ID does not belong to the event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
+        '503':
+          description: Service Unavailable - LLM backend unreachable or returned an error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events/{eventSlug}/providers:
     get:
       summary: List event providers
@@ -6124,6 +6187,10 @@ components:
       $ref: '#/components/schemas/send_partnership_email_request.schema'
     SendPartnershipEmailResponse:
       $ref: '#/components/schemas/send_partnership_email_response.schema'
+    DraftPartnershipEmailRequest:
+      $ref: '#/components/schemas/draft_partnership_email_request.schema'
+    DraftPartnershipEmailResponse:
+      $ref: '#/components/schemas/draft_partnership_email_response.schema'
     PaginationMetadata:
       $ref: '#/components/schemas/pagination_metadata.schema'
     FilterDefinition:
@@ -10047,6 +10114,41 @@ components:
           examples:
             - 25
             - 150
+      additionalProperties: false
+    draft_partnership_email_request.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      type: object
+      title: Draft Partnership Email Request
+      description: Request body for generating an AI-drafted partnership email body from a list of partnership IDs and an organiser prompt.
+      required:
+        - partnership_ids
+        - prompt
+      properties:
+        partnership_ids:
+          type: array
+          description: Partnership IDs to include as context in the system prompt. All IDs MUST belong to the requested event.
+          items:
+            type: string
+            format: uuid
+          minItems: 1
+          maxItems: 100
+        prompt:
+          type: string
+          description: Free-text organiser brief describing what the email is about.
+          minLength: 1
+          maxLength: 2000
+      additionalProperties: false
+    draft_partnership_email_response.schema:
+      $schema: http://json-schema.org/draft-07/schema#
+      type: object
+      title: Draft Partnership Email Response
+      description: AI-generated email body ready to populate the message field on the front-end.
+      required:
+        - draft
+      properties:
+        draft:
+          type: string
+          description: Email body produced by the LLM. Subject and greeting/signature placeholders are not included.
       additionalProperties: false
     create_by_identifiers.schema:
       $id: create_by_identifiers.schema.json

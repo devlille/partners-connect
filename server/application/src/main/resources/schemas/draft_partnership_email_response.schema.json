@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Draft Partnership Email Response",
+  "description": "AI-generated email body ready to populate the message field on the front-end.",
+  "required": ["draft"],
+  "properties": {
+    "draft": {
+      "type": "string",
+      "description": "Email body produced by the LLM. Subject and greeting/signature placeholders are not included."
+    }
+  },
+  "additionalProperties": false
+}

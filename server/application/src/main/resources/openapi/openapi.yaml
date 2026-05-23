@@ -5549,6 +5549,69 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /orgs/{orgSlug}/events/{eventSlug}/partnerships/email/draft:
+    post:
+      summary: "Generate an AI draft for a partnership email body"
+      operationId: "postPartnershipEmailDraft"
+      description: |
+        Generates a draft email body from a list of partnership IDs and an organiser prompt.
+        The draft is produced by the self-hosted LLM and is intended to populate the email
+        body field on the front-end before the organiser reviews and sends. Requires edit
+        permission on the organisation.
+      tags:
+        - "Partnerships"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "orgSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Organisation slug identifier"
+        - name: "eventSlug"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Event slug identifier"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DraftPartnershipEmailRequest"
+      responses:
+        "200":
+          description: "OK - Draft generated"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DraftPartnershipEmailResponse"
+        "400":
+          description: "Bad Request - prompt empty or schema validation failed"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "Unauthorized - Missing/invalid token or user lacks edit permission"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Not Found - At least one partnership ID does not belong to the event"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: "Service Unavailable - LLM backend unreachable or returned an error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /orgs/{orgSlug}/events/{eventSlug}/providers:
     get:
       summary: "List event providers"
@@ -6104,6 +6167,10 @@ components:
       $ref: "../schemas/send_partnership_email_request.schema.json"
     SendPartnershipEmailResponse:
       $ref: "../schemas/send_partnership_email_response.schema.json"
+    DraftPartnershipEmailRequest:
+      $ref: "../schemas/draft_partnership_email_request.schema.json"
+    DraftPartnershipEmailResponse:
+      $ref: "../schemas/draft_partnership_email_response.schema.json"
     PaginationMetadata:
       $ref: "../schemas/pagination_metadata.schema.json"
     FilterDefinition:

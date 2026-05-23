@@ -19,6 +19,7 @@ import fr.devlille.partners.connect.partnership.domain.InvoiceStatus
 import fr.devlille.partners.connect.partnership.domain.PackCount
 import fr.devlille.partners.connect.partnership.domain.Partnership
 import fr.devlille.partners.connect.partnership.domain.PartnershipDetail
+import fr.devlille.partners.connect.partnership.domain.PartnershipDraftContext
 import fr.devlille.partners.connect.partnership.domain.PartnershipFilters
 import fr.devlille.partners.connect.partnership.domain.PartnershipItem
 import fr.devlille.partners.connect.partnership.domain.PartnershipListMetadata
@@ -248,6 +249,26 @@ class PartnershipRepositoryExposed : PartnershipRepository {
             .singleByEventAndPartnership(event.id.value, partnershipId)
             ?: throw NotFoundException("Partnership not found")
         partnership.company.toDomain(partnership.company.socials.map(CompanySocialEntity::toDomain))
+    }
+
+    override fun getDraftContexts(
+        eventSlug: String,
+        partnershipIds: List<UUID>,
+    ): List<PartnershipDraftContext> = transaction {
+        val event = EventEntity.findBySlug(eventSlug)
+            ?: throw NotFoundException("Event with slug $eventSlug not found")
+        partnershipIds.map { partnershipId ->
+            val partnership = PartnershipEntity
+                .singleByEventAndPartnership(event.id.value, partnershipId)
+                ?: throw NotFoundException("Partnership $partnershipId not found")
+            val pack = partnership.validatedPack() ?: partnership.selectedPack
+            PartnershipDraftContext(
+                companyName = partnership.company.name,
+                packName = pack?.name,
+                language = partnership.language,
+                status = partnership.deriveDraftStatus(),
+            )
+        }
     }
 
     override fun listByEvent(
@@ -536,4 +557,10 @@ class PartnershipRepositoryExposed : PartnershipRepository {
 
         partnership.id.value
     }
+}
+
+private fun PartnershipEntity.deriveDraftStatus(): String = when {
+    declinedAt != null -> "declined"
+    validatedAt != null -> "signed"
+    else -> "pending"
 }

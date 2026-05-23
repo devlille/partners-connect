@@ -16,6 +16,12 @@ interface PartnershipRepository {
 
     fun getCompanyByPartnershipId(eventSlug: String, partnershipId: UUID): Company
 
+    /**
+     * Fetches a minimal projection per partnership for use in AI email-drafting prompts.
+     * Throws NotFoundException if any [partnershipIds] entry does not belong to [eventSlug].
+     */
+    fun getDraftContexts(eventSlug: String, partnershipIds: List<UUID>): List<PartnershipDraftContext>
+
     fun listByEvent(
         eventSlug: String,
         filters: PartnershipFilters = PartnershipFilters(),

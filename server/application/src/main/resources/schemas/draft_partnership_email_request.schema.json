@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Draft Partnership Email Request",
+  "description": "Request body for generating an AI-drafted partnership email body from a list of partnership IDs and an organiser prompt.",
+  "required": ["partnership_ids", "prompt"],
+  "properties": {
+    "partnership_ids": {
+      "type": "array",
+      "description": "Partnership IDs to include as context in the system prompt. All IDs MUST belong to the requested event.",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "minItems": 1,
+      "maxItems": 100
+    },
+    "prompt": {
+      "type": "string",
+      "description": "Free-text organiser brief describing what the email is about.",
+      "minLength": 1,
+      "maxLength": 2000
+    }
+  },
+  "additionalProperties": false
+}
