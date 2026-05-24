@@ -114,21 +114,16 @@ const columns = computed(() => [
   {
     header: 'Favori',
     accessorKey: 'slug',
-    cell: (info: any) => {
+    cell: (info: TableRow<EventSummary>) => {
       const event = info.row.original;
       return h('button', {
         onClick: (e: Event) => {
           e.stopPropagation();
-          toggleFavorite({
-            orgSlug: slug.value,
-            orgName: organisationName.value,
-            eventSlug: event.slug,
-            eventName: event.name
-          });
+          toggleFavorite(event.slug, event);
         },
         class: 'text-2xl hover:scale-110 transition-transform',
-        title: isFavorite(slug.value, event.slug) ? 'Retirer des favoris' : 'Ajouter aux favoris'
-      }, isFavorite(slug.value, event.slug) ? '⭐' : '☆');
+        title: isFavorite(event.slug) ? 'Retirer des favoris' : 'Ajouter aux favoris'
+      }, isFavorite(event.slug) ? '⭐' : '☆');
     }
   }
 ]);
