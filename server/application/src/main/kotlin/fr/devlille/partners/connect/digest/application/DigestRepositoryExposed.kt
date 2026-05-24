@@ -14,6 +14,8 @@ import fr.devlille.partners.connect.internal.infrastructure.db.PromotionStatus
 import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.organisations.application.mappers.toItemDomain
 import fr.devlille.partners.connect.partnership.infrastructure.db.BillingEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.CommunicationPlanEntity
+import fr.devlille.partners.connect.partnership.infrastructure.db.CommunicationPlansTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipSupportVideoEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
@@ -22,6 +24,8 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.hasFlyerTemplat
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.isNotNull
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
@@ -115,12 +119,21 @@ class DigestRepositoryExposed : DigestRepository {
             .listByEventAndStatus(eventId, PromotionStatus.PENDING)
             .map { DigestEntry(it.partnership.company.name, buildLink(eventSlug, it.partnership.id.value)) }
 
-    private fun queryFlyerEligible(eventId: UUID, eventSlug: String): List<DigestEntry> =
-        PartnershipEntity
+    private fun queryFlyerEligible(eventId: UUID, eventSlug: String): List<DigestEntry> {
+        val partnershipsWithPlanSupport = CommunicationPlanEntity
+            .find {
+                (CommunicationPlansTable.eventId eq eventId) and
+                    CommunicationPlansTable.supportUrl.isNotNull()
+            }
+            .mapNotNull { it.partnership?.id?.value }
+            .toSet()
+        return PartnershipEntity
             .find { PartnershipsTable.eventId eq eventId }
             .filter { partnership ->
                 partnership.communicationSupportUrl == null &&
+                    partnership.id.value !in partnershipsWithPlanSupport &&
                     partnership.validatedPack()?.hasFlyerTemplate() == true
             }
             .map { DigestEntry(it.company.name, buildLink(eventSlug, it.id.value)) }
+    }
 }

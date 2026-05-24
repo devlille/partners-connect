@@ -4,6 +4,7 @@ import fr.devlille.partners.connect.companies.factories.insertMockedCompany
 import fr.devlille.partners.connect.events.factories.insertMockedFutureEventWithSlug
 import fr.devlille.partners.connect.internal.moduleSharedDb
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
+import fr.devlille.partners.connect.partnership.factories.insertMockedCommunicationPlan
 import fr.devlille.partners.connect.partnership.factories.insertMockedPartnership
 import fr.devlille.partners.connect.partnership.factories.insertMockedValidatedPartnership
 import fr.devlille.partners.connect.sponsoring.factories.insertMockedFlyerEnabledPack
@@ -31,10 +32,12 @@ class DigestFlyerEligibilityTest {
         val plainPackId = UUID.randomUUID()
         val eligibleCompanyId = UUID.randomUUID()
         val alreadyGeneratedCompanyId = UUID.randomUUID()
+        val alreadyCommunicatedCompanyId = UUID.randomUUID()
         val plainPackCompanyId = UUID.randomUUID()
         val notValidatedCompanyId = UUID.randomUUID()
         val eligiblePartnershipId = UUID.randomUUID()
         val alreadyGeneratedPartnershipId = UUID.randomUUID()
+        val alreadyCommunicatedPartnershipId = UUID.randomUUID()
         val plainPackPartnershipId = UUID.randomUUID()
         val notValidatedPartnershipId = UUID.randomUUID()
 
@@ -46,6 +49,7 @@ class DigestFlyerEligibilityTest {
                 insertMockedFutureEventWithSlug(eventId, slug = eventSlug, orgId = orgId)
                 insertMockedCompany(eligibleCompanyId)
                 insertMockedCompany(alreadyGeneratedCompanyId)
+                insertMockedCompany(alreadyCommunicatedCompanyId)
                 insertMockedCompany(plainPackCompanyId)
                 insertMockedCompany(notValidatedCompanyId)
                 insertMockedFlyerEnabledPack(packId = flyerPackId, eventId = eventId)
@@ -62,6 +66,17 @@ class DigestFlyerEligibilityTest {
                     companyId = alreadyGeneratedCompanyId,
                     selectedPackId = flyerPackId,
                 ).apply { communicationSupportUrl = "https://example.com/flyer.jpg" }
+                insertMockedValidatedPartnership(
+                    id = alreadyCommunicatedPartnershipId,
+                    eventId = eventId,
+                    companyId = alreadyCommunicatedCompanyId,
+                    selectedPackId = flyerPackId,
+                )
+                insertMockedCommunicationPlan(
+                    eventId = eventId,
+                    partnershipId = alreadyCommunicatedPartnershipId,
+                    supportUrl = "https://example.com/communication-support.jpg",
+                )
                 insertMockedValidatedPartnership(
                     id = plainPackPartnershipId,
                     eventId = eventId,
