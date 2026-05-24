@@ -4,10 +4,12 @@ import fr.devlille.partners.connect.events.application.EventBudgetRepositoryExpo
 import fr.devlille.partners.connect.events.application.EventRepositoryExposed
 import fr.devlille.partners.connect.events.application.EventStatsRepositoryExposed
 import fr.devlille.partners.connect.events.application.EventStorageRepositoryGoogleStorage
+import fr.devlille.partners.connect.events.application.FavoriteEventRepositoryExposed
 import fr.devlille.partners.connect.events.domain.EventBudgetRepository
 import fr.devlille.partners.connect.events.domain.EventRepository
 import fr.devlille.partners.connect.events.domain.EventStatsRepository
 import fr.devlille.partners.connect.events.domain.EventStorageRepository
+import fr.devlille.partners.connect.events.domain.FavoriteEventRepository
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import org.koin.dsl.module
 
@@ -24,4 +26,5 @@ val eventModule = module {
     single<EventBudgetRepository> {
         EventBudgetRepositoryExposed()
     }
+    single<FavoriteEventRepository> { FavoriteEventRepositoryExposed() }
 }
