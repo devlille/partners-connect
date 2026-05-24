@@ -24,12 +24,9 @@ export const useFavoriteEvents = () => {
     favorites: computed<EventSummary[]>(() => store.items),
     top5: computed<EventSummary[]>(() => store.top5),
     isFavorite: (eventSlug: string): boolean => store.isFavorite(eventSlug),
-    addFavorite: (eventSlug: string, optimistic?: EventSummary) =>
-      store.add(eventSlug, optimistic),
+    addFavorite: (eventSlug: string, optimistic?: EventSummary) => store.add(eventSlug, optimistic),
     removeFavorite: (eventSlug: string) => store.remove(eventSlug),
     toggleFavorite: (eventSlug: string, optimistic?: EventSummary) =>
-      store.isFavorite(eventSlug)
-        ? store.remove(eventSlug)
-        : store.add(eventSlug, optimistic),
+      store.isFavorite(eventSlug) ? store.remove(eventSlug) : store.add(eventSlug, optimistic),
   };
 };

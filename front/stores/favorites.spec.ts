@@ -127,7 +127,7 @@ describe("useFavoritesStore", () => {
 
       expect(store.items).toEqual([]);
       expect(toastErrorMock).toHaveBeenCalledWith(
-        "Impossible d'ajouter ce favori. Veuillez réessayer."
+        "Impossible d'ajouter ce favori. Veuillez réessayer.",
       );
     });
   });
@@ -170,7 +170,7 @@ describe("useFavoritesStore", () => {
       expect(getUsersMeFavoriteEvents).toHaveBeenCalled();
       expect(store.items).toEqual(fresh);
       expect(toastErrorMock).toHaveBeenCalledWith(
-        "Impossible de retirer ce favori. Veuillez réessayer."
+        "Impossible de retirer ce favori. Veuillez réessayer.",
       );
     });
   });
