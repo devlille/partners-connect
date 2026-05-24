@@ -52,32 +52,14 @@ class EventRepositoryExposed(
         entity.all()
             .orderBy(EventsTable.startTime to SortOrder.ASC)
             .paginated(page, pageSize)
-            .map {
-                EventSummary(
-                    slug = it.slug,
-                    name = it.name,
-                    startTime = it.startTime,
-                    endTime = it.endTime,
-                    submissionStartTime = it.submissionStartTime,
-                    submissionEndTime = it.submissionEndTime,
-                )
-            }
+            .map { it.toEventSummary() }
             .toPaginatedResponse(total, page, pageSize)
     }
 
     override fun findByOrgSlug(orgSlug: String): List<EventSummary> = transaction {
         val organisation = OrganisationEntity.orgFindBySlug(orgSlug)
             ?: throw NotFoundException("Organisation with slug $orgSlug not found")
-        entity.find { EventsTable.organisationId eq organisation.id }.map {
-            EventSummary(
-                slug = it.slug,
-                name = it.name,
-                startTime = it.startTime,
-                endTime = it.endTime,
-                submissionStartTime = it.submissionStartTime,
-                submissionEndTime = it.submissionEndTime,
-            )
-        }
+        entity.find { EventsTable.organisationId eq organisation.id }.map { it.toEventSummary() }
     }
 
     override fun findByOrgSlugPaginated(
@@ -92,16 +74,7 @@ class EventRepositoryExposed(
         eventQuery
             .orderBy(EventsTable.startTime to SortOrder.ASC)
             .paginated(page, pageSize)
-            .map {
-                EventSummary(
-                    slug = it.slug,
-                    name = it.name,
-                    startTime = it.startTime,
-                    endTime = it.endTime,
-                    submissionStartTime = it.submissionStartTime,
-                    submissionEndTime = it.submissionEndTime,
-                )
-            }
+            .map { it.toEventSummary() }
             .toPaginatedResponse(total, page, pageSize)
     }
 
