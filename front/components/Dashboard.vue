@@ -32,6 +32,8 @@
         </NuxtLink>
       </nav>
 
+      <DashboardFavorites />
+
       <div class="border-t border-gray-200 my-4" />
 
       <nav class="p-4 space-y-2">
