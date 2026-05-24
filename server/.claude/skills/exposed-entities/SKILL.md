@@ -11,6 +11,73 @@ All database access uses JetBrains Exposed ORM with the DAO (Entity) API. Tables
 
 ---
 
+## 0 — Canonical Imports (Exposed 1.3.0+)
+
+This codebase runs **Exposed 1.3.0** on Kotlin 2.3+. Two recent breaking changes from earlier Exposed versions are easy to get wrong because the *old* import paths still resolve — they just resolve to the wrong thing (or to deprecated APIs). Always copy from these exact paths.
+
+### 0.1 Table / Entity / EntityClass — use the `.java.` subpackage
+
+The unsuffixed names (`UUIDTable`, `UUIDEntity`, `UUIDEntityClass`) now target Kotlin's `kotlin.uuid.Uuid`. This project uses `java.util.UUID` everywhere (foreign keys, factory parameters, route handlers), so we always import the **`.java.`** variants:
+
+```kotlin
+// In <Name>Table.kt files:
+import org.jetbrains.exposed.v1.core.dao.id.java.UUIDTable
+
+// In <Name>Entity.kt files:
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.dao.java.UUIDEntity
+import org.jetbrains.exposed.v1.dao.java.UUIDEntityClass
+import java.util.UUID
+```
+
+The same rule applies to the non-UUID variants when you need a custom-PK entity: prefer the `.java.` subpackage when you intend to interoperate with `java.util.UUID` foreign keys.
+
+### 0.2 DSL operators — top-level functions on `org.jetbrains.exposed.v1.core.*`
+
+`eq`, `neq`, `and`, `or`, `like`, `inList`, `less`, `greaterEq`, etc. **are no longer infix methods on the `SqlExpressionBuilder` receiver** — they are top-level functions in `org.jetbrains.exposed.v1.core`. Every entity companion and repository must explicitly import each operator it uses:
+
+```kotlin
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.and
+// add more (neq, or, like, inList, less, greaterEq, ...) as the predicate grows
+```
+
+Symptom of the old-style usage: `find { Table.col eq value }` compiles only if `eq` is in scope as a top-level import; otherwise you get `Unresolved reference: eq`.
+
+### 0.3 UUID column type — `javaUUID(...)` for `java.util.UUID` columns
+
+`uuid("...")` (the unsuffixed function on `Table`) now produces a `kotlin.uuid.Uuid` column. To declare a `java.util.UUID` column (which is what foreign keys to `UUIDTable.id` expect), use `javaUUID("...")`. The unsuffixed `uuid(...)` is now reserved for the rare cases where you genuinely want a Kotlin `Uuid` column.
+
+### 0.4 Transactions, JDBC helpers, `SizedIterable`
+
+These paths did **not** move and are stable:
+
+```kotlin
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.insert
+import org.jetbrains.exposed.v1.jdbc.SchemaUtils         // for migrations
+import org.jetbrains.exposed.v1.jdbc.SizedIterable       // for SizedIterable<E> return types
+```
+
+### 0.5 Time — `kotlin.time.Clock`, not `kotlinx.datetime.Clock`
+
+Since the `kotlinx-datetime 0.8.0` upgrade, `Clock` and `Instant` come from `kotlin.time`. `LocalDateTime`, `TimeZone`, and `toLocalDateTime` still live in `kotlinx.datetime`:
+
+```kotlin
+import kotlin.time.Clock
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+```
+
+Use `Clock.System.now().toLocalDateTime(TimeZone.UTC)` for `clientDefault` blocks.
+
+### 0.6 When in doubt
+
+Open any live entity or table file as a reference — for example `events/infrastructure/db/EventsTable.kt`, `events/infrastructure/db/EventEntity.kt`, or `users/infrastructure/db/OrganisationPermissionEntity.kt`. These are kept current with the codebase; copy their import block verbatim.
+
+---
+
 ## 1 — Table Definitions
 
 Tables define the database schema. They live in `<domain>/infrastructure/db/<Name>Table.kt`.

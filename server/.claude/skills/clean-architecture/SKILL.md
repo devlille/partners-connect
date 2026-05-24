@@ -203,6 +203,8 @@ private fun Route.orgsPackRoutes() {
 | Entity class | `<Name>Entity.kt` | `CompanyEntity.kt`, `SponsoringPackEntity.kt` |
 | Join table | `<Name>Table.kt` (extends `Table`) | `PackOptionsTable.kt` |
 
+> **Imports**: Exposed 1.3.0 + kotlinx-datetime 0.8 changed several package paths. See `exposed-entities` § 0 "Canonical Imports" for the exact paths to use (`UUIDTable` lives in `.java.`; DSL operators like `eq`/`and` are top-level functions; `Clock` moved from `kotlinx.datetime` to `kotlin.time`).
+
 #### Table rules
 
 - **Extend `UUIDTable`** (or `Table` for join tables without their own UUID).
