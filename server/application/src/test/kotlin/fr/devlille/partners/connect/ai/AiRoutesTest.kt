@@ -55,12 +55,6 @@ class AiRoutesTest {
         assertEquals(HttpStatusCode.OK, chatResponse.status)
         val body = Json.parseToJsonElement(chatResponse.bodyAsText()).jsonObject
         assertEquals("end-to-end response", body["response"]?.jsonPrimitive?.content)
-
-        val modelsResponse = client.get("/orgs/$orgId/ai/models") {
-            header(HttpHeaders.Authorization, "Bearer valid")
-        }
-        assertEquals(HttpStatusCode.OK, modelsResponse.status)
-        assertEquals(listOf("gemma3:1b"), Json.decodeFromString<List<String>>(modelsResponse.bodyAsText()))
     }
 
     @Test
@@ -90,7 +84,7 @@ class AiRoutesTest {
     }
 
     @Test
-    fun `models returns 503 when Ollama responds with 5xx`() = testApplication {
+    fun `chat returns 503 when LLM backend responds with 5xx`() = testApplication {
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
 
@@ -106,15 +100,17 @@ class AiRoutesTest {
             }
         }
 
-        val response = client.get("/orgs/$orgId/ai/models") {
+        val response = client.post("/orgs/$orgId/ai/chat") {
+            contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
+            setBody("""{"prompt":"Hello"}""")
         }
 
         assertEquals(HttpStatusCode.ServiceUnavailable, response.status)
     }
 
     @Test
-    fun `models returns 503 when Ollama responds with 4xx`() = testApplication {
+    fun `chat returns 503 when LLM backend responds with 4xx`() = testApplication {
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
 
@@ -130,8 +126,10 @@ class AiRoutesTest {
             }
         }
 
-        val response = client.get("/orgs/$orgId/ai/models") {
+        val response = client.post("/orgs/$orgId/ai/chat") {
+            contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
+            setBody("""{"prompt":"Hello"}""")
         }
 
         assertEquals(HttpStatusCode.ServiceUnavailable, response.status)
@@ -159,12 +157,7 @@ private class ResponseStatusThrowingGateway(
         system: String?,
         modelName: String,
     ): String {
-        client.get("https://ollama.test/api/generate")
-        error("MockEngine should have thrown before this point")
-    }
-
-    override suspend fun listOllamaModels(): List<String> {
-        client.get("https://ollama.test/api/tags")
+        client.get("https://llm.test/v1/generate")
         error("MockEngine should have thrown before this point")
     }
 }

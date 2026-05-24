@@ -26,18 +26,18 @@ class LlmRepositoryDefaultTest {
     }
 
     @Test
-    fun `chat defaults to gemma3 1b when model is null`() = runBlocking {
+    fun `chat defaults to gemini-2 0-flash when model is null`() = runBlocking {
         val repo = LlmRepositoryDefault(FakeLlmGateway(response = "hi"))
         val response = repo.chat(createChatRequest(prompt = "hello", model = null))
-        assertEquals("gemma3:1b", response.model)
+        assertEquals("gemini-2.0-flash", response.model)
         assertEquals("hi", response.response)
     }
 
     @Test
     fun `chat passes through caller-provided model`() = runBlocking {
         val repo = LlmRepositoryDefault(FakeLlmGateway(response = "hi"))
-        val response = repo.chat(createChatRequest(prompt = "hello", model = "llama3.2:3b"))
-        assertEquals("llama3.2:3b", response.model)
+        val response = repo.chat(createChatRequest(prompt = "hello", model = "gemini-2.0-flash-lite"))
+        assertEquals("gemini-2.0-flash-lite", response.model)
     }
 
     @Test
@@ -71,21 +71,6 @@ class LlmRepositoryDefaultTest {
         )
         assertFailsWith<ServiceUnavailableException> {
             repo.chat(createChatRequest(prompt = "hello"))
-        }
-        Unit
-    }
-
-    @Test
-    fun `listModels delegates to gateway`() = runBlocking {
-        val repo = LlmRepositoryDefault(FakeLlmGateway(models = listOf("gemma3:1b", "llama3.2:3b")))
-        assertEquals(listOf("gemma3:1b", "llama3.2:3b"), repo.listModels())
-    }
-
-    @Test
-    fun `listModels maps ConnectException to ServiceUnavailableException`() = runBlocking {
-        val repo = LlmRepositoryDefault(FakeLlmGateway(throws = ConnectException("refused")))
-        assertFailsWith<ServiceUnavailableException> {
-            repo.listModels()
         }
         Unit
     }

@@ -6,6 +6,4 @@ interface LlmGateway {
         system: String?,
         modelName: String,
     ): String
-
-    suspend fun listOllamaModels(): List<String>
 }

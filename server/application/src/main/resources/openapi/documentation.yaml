@@ -2404,41 +2404,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response.schema'
-  /orgs/{orgSlug}/ai/models:
-    get:
-      summary: List models pulled into the Ollama instance
-      operationId: getOrgsAiModels
-      description: Returns the list of model names currently available on the Ollama backend, so the caller can pick a valid `model` value for `/ai/chat`. Requires organisation membership.
-      tags:
-        - ai
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: orgSlug
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Organization slug
-      responses:
-        '200':
-          description: OK - List of available model names
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ai_model_list.schema'
-        '401':
-          description: Unauthorized - Missing/invalid authentication or no organisation membership
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response.schema'
-        '503':
-          description: Service Unavailable - LLM backend unreachable or returned an error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error_response.schema'
   /orgs/{orgSlug}/events:
     get:
       summary: Get organization details
@@ -6227,8 +6192,6 @@ components:
       $ref: '#/components/schemas/ai_chat_request.schema'
     ChatResponse:
       $ref: '#/components/schemas/ai_chat_response.schema'
-    LlmModelList:
-      $ref: '#/components/schemas/ai_model_list.schema'
     user_session.schema:
       $id: user_session.schema.json
       type: object
@@ -8901,12 +8864,6 @@ components:
         - model
         - response
       additionalProperties: false
-    ai_model_list.schema:
-      $id: ai_model_list.schema.json
-      $schema: http://json-schema.org/draft-07/schema#
-      type: array
-      items:
-        type: string
     create_event.schema:
       $id: event.schema.json
       type: object

@@ -32,6 +32,6 @@ object SystemVarEnv {
     }
 
     object Llm {
-        val ollamaBaseUrl: String = System.getenv("OLLAMA_BASE_URL") ?: "http://localhost:11434"
+        val geminiApiKey: String? = System.getenv("GEMINI_API_KEY")?.takeIf { it.isNotBlank() }
     }
 }
