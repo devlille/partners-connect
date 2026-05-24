@@ -16,7 +16,10 @@ export const useFavoriteEvents = () => {
   const store = useFavoritesStore();
 
   // Lazy hydrate on first read in a client-side context.
-  if (import.meta.client && !store.loaded && !store.loading) {
+  // Guard against retry storms on persistent failure: once `store.error` is set,
+  // don't auto-retry on each new component mount. A full page reload discards
+  // the Pinia state and re-triggers the load fresh.
+  if (import.meta.client && !store.loaded && !store.loading && !store.error) {
     store.load();
   }
 
