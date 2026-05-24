@@ -97,7 +97,7 @@ class FavoriteEventRouteDeleteTest {
         val userId = UUID.randomUUID()
         val ownerOrgId = UUID.randomUUID()
         val eventId = UUID.randomUUID()
-        val slug = "event-other-org"
+        val slug = "event-other-org-delete"
 
         application {
             moduleSharedDb(userId)
