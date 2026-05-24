@@ -81,6 +81,7 @@ jobs:
             echo "postgres_user=${{ secrets.EXPOSED_DB_USER_PP }}" >> $GITHUB_OUTPUT
             echo "postgres_password=${{ secrets.EXPOSED_DB_PASSWORD_PP }}" >> $GITHUB_OUTPUT
             echo "qonto_base_url=https://thirdparty-sandbox.staging.qonto.co" >> $GITHUB_OUTPUT
+            echo "ollama_base_url=${{ secrets.OLLAMA_BASE_URL }}" >> $GITHUB_OUTPUT
           fi
 
       - name: Install Clever Tools
