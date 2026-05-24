@@ -48,8 +48,8 @@ export const useFavoritesStore = defineStore("favorites", {
       this.loading = true;
       this.error = null;
       try {
-        const response = await getUsersMeFavoriteEvents({ responseType: "json" });
-        this.items = response.data as unknown as EventSummary[];
+        const response = await getUsersMeFavoriteEvents();
+        this.items = response.data;
         this.loaded = true;
       } catch (e) {
         this.error = e instanceof Error ? e.message : String(e);

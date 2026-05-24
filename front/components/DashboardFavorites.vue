@@ -26,8 +26,11 @@ const { formatDate } = useDateFormatter();
 // Show on /orgs and any /orgs/* path that is NOT inside a specific event.
 // Eligible: /orgs, /orgs/favorites, /orgs/create, /orgs/foo, /orgs/foo/users.
 // NOT eligible: /orgs/foo/events, /orgs/foo/events/bar/anything.
+// Specifically gate on segments[2] (the "events" segment after /orgs/{slug})
+// rather than `.includes("events")` so a hypothetical org slug literally named
+// "events" doesn't accidentally hide the widget.
 const show = computed(() => {
   const segments = route.path.split("/").filter(Boolean);
-  return segments[0] === "orgs" && !segments.includes("events");
+  return segments[0] === "orgs" && (segments.length < 3 || segments[2] !== "events");
 });
 </script>
