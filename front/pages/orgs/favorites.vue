@@ -18,7 +18,7 @@
 
     <div class="p-6">
       <div
-        v-if="favoritesList.length === 0"
+        v-if="favorites.length === 0"
         class="bg-gray-50 border border-gray-200 text-gray-700 px-4 py-8 rounded text-center"
       >
         <i class="i-heroicons-star text-4xl text-gray-400 mb-2" />
@@ -28,7 +28,7 @@
         </p>
       </div>
 
-      <UTable v-else :data="favoritesList" :columns="columns" />
+      <UTable v-else :data="favorites" :columns="columns" />
     </div>
   </Dashboard>
 </template>
@@ -36,79 +36,73 @@
 <script setup lang="ts">
 import authMiddleware from "~/middleware/auth";
 import type { TableRow } from "@nuxt/ui";
-import type { FavoriteEvent } from "~/composables/useFavoriteEvents";
+import type { EventSummary } from "~/utils/api";
 
 const { mainLinks, footerLinks } = useDashboardLinks();
-const { getFavorites, removeFavorite } = useFavoriteEvents();
+const { favorites, removeFavorite } = useFavoriteEvents();
+const { formatDate } = useDateFormatter();
 
 definePageMeta({
   middleware: authMiddleware,
-  ssr: false
+  ssr: false,
 });
-
-const favoritesList = computed(() => getFavorites());
 
 const columns = [
   {
     header: 'Événement',
-    accessorKey: 'eventName',
-    cell: (info: TableRow<FavoriteEvent>) => {
-      const fav = info.row.original;
+    accessorKey: 'name',
+    cell: (info: TableRow<EventSummary>) => {
+      const event = info.row.original;
       return h('div', {
-        onClick: () => navigateTo(`/orgs/${fav.orgSlug}/events/${fav.eventSlug}`),
-        class: 'cursor-pointer hover:underline'
-      }, info.getValue('eventName'));
-    }
+        onClick: () => navigateTo(`/orgs/${event.org_slug}/events/${event.slug}`),
+        class: 'cursor-pointer hover:underline',
+      }, info.getValue('name'));
+    },
   },
   {
     header: 'Organisation',
-    accessorKey: 'orgName',
-    cell: (info: TableRow<FavoriteEvent>) => {
-      const fav = info.row.original;
+    accessorKey: 'org_name',
+    cell: (info: TableRow<EventSummary>) => {
+      const event = info.row.original;
       return h('div', {
-        onClick: () => navigateTo(`/orgs/${fav.orgSlug}/events/${fav.eventSlug}`),
-        class: 'cursor-pointer'
-      }, info.getValue('orgName'));
-    }
+        onClick: () => navigateTo(`/orgs/${event.org_slug}/events/${event.slug}`),
+        class: 'cursor-pointer',
+      }, info.getValue('org_name'));
+    },
   },
   {
-    header: 'Ajouté le',
-    accessorKey: 'addedAt',
-    cell: (info: TableRow<FavoriteEvent>) => {
-      const fav = info.row.original;
-      const date = new Date(info.getValue('addedAt') as string);
+    header: "Date de l'événement",
+    accessorKey: 'start_time',
+    cell: (info: TableRow<EventSummary>) => {
+      const event = info.row.original;
       return h('div', {
-        onClick: () => navigateTo(`/orgs/${fav.orgSlug}/events/${fav.eventSlug}`),
-        class: 'cursor-pointer'
-      }, date.toLocaleDateString('fr-FR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      }));
-    }
+        onClick: () => navigateTo(`/orgs/${event.org_slug}/events/${event.slug}`),
+        class: 'cursor-pointer',
+      }, formatDate(info.getValue('start_time') as string));
+    },
   },
   {
     header: 'Actions',
-    accessorKey: 'eventSlug',
-    cell: (info: any) => {
-      const fav = info.row.original;
+    accessorKey: 'slug',
+    cell: (info: TableRow<EventSummary>) => {
+      const event = info.row.original;
       return h(resolveComponent('UButton'), {
         onClick: (e: Event) => {
           e.stopPropagation();
-          removeFavorite(fav.orgSlug, fav.eventSlug);
+          removeFavorite(event.slug);
         },
         icon: 'i-heroicons-trash',
         size: 'md',
         color: 'red',
         variant: 'ghost',
         square: true,
-        title: 'Retirer des favoris'
+        title: 'Retirer des favoris',
       });
-    }
-  }
+    },
+  },
 ];
 
 useHead({
-  title: "Événements Favoris | DevLille"
+  title: "Événements Favoris | DevLille",
 });
 </script>
