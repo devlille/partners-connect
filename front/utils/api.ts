@@ -250,6 +250,8 @@ export interface EventSummarySchema {
   end_time: string;
   submission_start_time: string;
   submission_end_time: string;
+  org_slug: string;
+  org_name: string;
 }
 
 export type EventSummary = EventSummarySchema;
@@ -4737,6 +4739,45 @@ export const getUsersMeOrgs = (
       options);
     }
 
+/**
+ * Returns the caller's favorite events ordered by start_time ascending. Favorites whose event belongs to an organisation the caller no longer has permission on are filtered out.
+ * @summary List the authenticated user's favorite events
+ */
+export const getUsersMeFavoriteEvents = (
+
+ options?: SecondParameter<typeof customFetch<EventSummarySchema[]>>,) => {
+      return customFetch<EventSummarySchema[]>(
+      {url: `/users/me/favorite-events`, method: 'GET'
+    },
+      options);
+    }
+
+/**
+ * Idempotent at the HTTP level only insofar as repeating the call surfaces a 409 Conflict; otherwise creates one row in favorite_events.
+ * @summary Add an event to the authenticated user's favorites
+ */
+export const putUsersMeFavoriteEvent = (
+    eventSlug: string,
+ options?: SecondParameter<typeof customFetch<void>>,) => {
+      return customFetch<void>(
+      {url: `/users/me/favorite-events/${eventSlug}`, method: 'PUT'
+    },
+      options);
+    }
+
+/**
+ * Returns 204 on success. Returns 404 for both an unknown event slug and a known event that is not in the caller's favorites.
+ * @summary Remove an event from the authenticated user's favorites
+ */
+export const deleteUsersMeFavoriteEvent = (
+    eventSlug: string,
+ options?: SecondParameter<typeof customFetch<void>>,) => {
+      return customFetch<void>(
+      {url: `/users/me/favorite-events/${eventSlug}`, method: 'DELETE'
+    },
+      options);
+    }
+
 export type GetAuthCallbackResult = NonNullable<Awaited<ReturnType<typeof getAuthCallback>>>
 export type GetAuthLoginResult = NonNullable<Awaited<ReturnType<typeof getAuthLogin>>>
 export type GetAuthLogoutResult = NonNullable<Awaited<ReturnType<typeof getAuthLogout>>>
@@ -4861,3 +4902,6 @@ export type PostOrgsUsersRevokeResult = NonNullable<Awaited<ReturnType<typeof po
 export type PostDigestJobResult = NonNullable<Awaited<ReturnType<typeof postDigestJob>>>
 export type GetUsersMeEventsResult = NonNullable<Awaited<ReturnType<typeof getUsersMeEvents>>>
 export type GetUsersMeOrgsResult = NonNullable<Awaited<ReturnType<typeof getUsersMeOrgs>>>
+export type GetUsersMeFavoriteEventsResult = NonNullable<Awaited<ReturnType<typeof getUsersMeFavoriteEvents>>>
+export type PutUsersMeFavoriteEventResult = NonNullable<Awaited<ReturnType<typeof putUsersMeFavoriteEvent>>>
+export type DeleteUsersMeFavoriteEventResult = NonNullable<Awaited<ReturnType<typeof deleteUsersMeFavoriteEvent>>>
