@@ -2393,41 +2393,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-  /orgs/{orgSlug}/ai/models:
-    get:
-      summary: "List models pulled into the Ollama instance"
-      operationId: "getOrgsAiModels"
-      description: "Returns the list of model names currently available on the Ollama backend, so the caller can pick a valid `model` value for `/ai/chat`. Requires organisation membership."
-      tags:
-        - ai
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: "orgSlug"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-          description: "Organization slug"
-      responses:
-        "200":
-          description: "OK - List of available model names"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/LlmModelList"
-        "401":
-          description: "Unauthorized - Missing/invalid authentication or no organisation membership"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "503":
-          description: "Service Unavailable - LLM backend unreachable or returned an error"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
   /orgs/{orgSlug}/events:
     get:
       summary: "Get organization details"
@@ -6207,5 +6172,3 @@ components:
       $ref: "../schemas/ai_chat_request.schema.json"
     ChatResponse:
       $ref: "../schemas/ai_chat_response.schema.json"
-    LlmModelList:
-      $ref: "../schemas/ai_model_list.schema.json"

@@ -45,7 +45,7 @@ class AiChatRoutePostTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
         val body = Json.parseToJsonElement(response.bodyAsText()).jsonObject
-        assertEquals("gemma3:1b", body["model"]?.jsonPrimitive?.content)
+        assertEquals("gemini-2.0-flash", body["model"]?.jsonPrimitive?.content)
         assertEquals("hi from test", body["response"]?.jsonPrimitive?.content)
     }
 
@@ -66,12 +66,12 @@ class AiChatRoutePostTest {
         val response = client.post("/orgs/$orgId/ai/chat") {
             contentType(ContentType.Application.Json)
             header(HttpHeaders.Authorization, "Bearer valid")
-            setBody("""{"prompt":"Hello","model":"llama3.2:3b"}""")
+            setBody("""{"prompt":"Hello","model":"gemini-2.0-flash-lite"}""")
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
         val body = Json.parseToJsonElement(response.bodyAsText()).jsonObject
-        assertEquals("llama3.2:3b", body["model"]?.jsonPrimitive?.content)
+        assertEquals("gemini-2.0-flash-lite", body["model"]?.jsonPrimitive?.content)
     }
 
     @Test

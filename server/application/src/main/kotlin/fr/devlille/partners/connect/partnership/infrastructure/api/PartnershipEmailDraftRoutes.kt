@@ -18,7 +18,7 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
-private const val MAIL_DRAFT_MODEL = "qwen2.5:3b"
+private const val MAIL_DRAFT_MODEL = "gemini-2.0-flash"
 
 fun Route.partnershipEmailDraftRoutes() {
     val partnershipRepository by inject<PartnershipRepository>()

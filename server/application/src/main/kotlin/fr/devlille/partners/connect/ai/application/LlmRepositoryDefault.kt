@@ -11,7 +11,7 @@ import io.ktor.client.plugins.ServerResponseException
 import io.ktor.server.plugins.BadRequestException
 import java.net.ConnectException
 
-private const val DEFAULT_MODEL = "gemma3:1b"
+private const val DEFAULT_MODEL = "gemini-2.0-flash"
 
 class LlmRepositoryDefault(
     private val gateway: LlmGateway,
@@ -19,17 +19,14 @@ class LlmRepositoryDefault(
     override suspend fun chat(request: ChatRequest): ChatResponse {
         if (request.prompt.isBlank()) throw BadRequestException("prompt must not be blank")
         val modelName = request.model ?: DEFAULT_MODEL
-        val response = withOllamaErrorHandling {
+        val response = withGeminiErrorHandling {
             gateway.chat(request.prompt, request.system, modelName)
         }
         return ChatResponse(model = modelName, response = response)
     }
 
-    override suspend fun listModels(): List<String> =
-        withOllamaErrorHandling { gateway.listOllamaModels() }
-
     // Map upstream 4xx/5xx to 503 — partners-connect made the request, so the caller can't fix it.
-    private suspend fun <T> withOllamaErrorHandling(block: suspend () -> T): T =
+    private suspend fun <T> withGeminiErrorHandling(block: suspend () -> T): T =
         try {
             block()
         } catch (e: ConnectException) {
