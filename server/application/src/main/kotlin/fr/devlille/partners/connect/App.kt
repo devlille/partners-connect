@@ -15,6 +15,7 @@ import fr.devlille.partners.connect.events.infrastructure.api.eventBoothPlanRout
 import fr.devlille.partners.connect.events.infrastructure.api.eventBudgetRoutes
 import fr.devlille.partners.connect.events.infrastructure.api.eventExternalLinkRoutes
 import fr.devlille.partners.connect.events.infrastructure.api.eventRoutes
+import fr.devlille.partners.connect.events.infrastructure.api.favoriteEventRoutes
 import fr.devlille.partners.connect.events.infrastructure.bindings.eventModule
 import fr.devlille.partners.connect.integrations.infrastructure.api.integrationRoutes
 import fr.devlille.partners.connect.integrations.infrastructure.bindings.integrationModule
@@ -148,6 +149,7 @@ fun Application.module(config: ApplicationConfig = ApplicationConfig()) {
         eventExternalLinkRoutes()
         eventBudgetRoutes()
         userRoutes()
+        favoriteEventRoutes()
         sponsoringRoutes()
         partnershipRoutes()
         partnershipEmailDraftRoutes()
