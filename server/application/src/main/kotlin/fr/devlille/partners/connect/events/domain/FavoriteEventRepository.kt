@@ -9,7 +9,7 @@ interface FavoriteEventRepository {
 
     /**
      * @return true if a new favorite row was inserted, false if it already existed.
-     * @throws fr.devlille.partners.connect.internal.infrastructure.api.NotFoundException if the event slug is unknown.
+     * @throws io.ktor.server.plugins.NotFoundException if the event slug is unknown.
      * @throws fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException if the event belongs to an org the caller has no permission on.
      */
     fun addFavorite(userEmail: String, eventSlug: String): Boolean
