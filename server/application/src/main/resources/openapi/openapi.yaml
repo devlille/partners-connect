@@ -5950,6 +5950,96 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/OrganisationItem"
+  /users/me/favorite-events:
+    get:
+      summary: "List the authenticated user's favorite events"
+      operationId: "getUsersMeFavoriteEvents"
+      description: "Returns the caller's favorite events ordered by start_time ascending. Favorites whose event belongs to an organisation the caller no longer has permission on are filtered out."
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/EventSummary"
+        "401":
+          description: "Unauthorized - Missing or invalid authentication token"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /users/me/favorite-events/{eventSlug}:
+    parameters:
+      - name: "eventSlug"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+        description: "Event slug to favorite or un-favorite"
+    put:
+      summary: "Add an event to the authenticated user's favorites"
+      operationId: "putUsersMeFavoriteEvent"
+      description: "Idempotent at the HTTP level only insofar as repeating the call surfaces a 409 Conflict; otherwise creates one row in favorite_events."
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: "Created"
+        "401":
+          description: "Unauthorized - Missing or invalid authentication token"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Forbidden - The event exists but belongs to an organisation the caller has no permission on"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Not Found - Unknown event slug"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: "Conflict - The caller has already favorited this event"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      summary: "Remove an event from the authenticated user's favorites"
+      operationId: "deleteUsersMeFavoriteEvent"
+      description: "Returns 204 on success. Returns 404 for both an unknown event slug and a known event that is not in the caller's favorites."
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: "No Content - Favorite removed"
+        "401":
+          description: "Unauthorized - Missing or invalid authentication token"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: "Forbidden - The event exists but belongs to an organisation the caller has no permission on"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: "Not Found - The event is not in the caller's favorites (or the slug is unknown)"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   securitySchemes:
     bearerAuth:
