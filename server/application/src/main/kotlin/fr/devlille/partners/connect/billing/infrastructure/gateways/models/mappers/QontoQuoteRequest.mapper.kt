@@ -3,9 +3,9 @@ package fr.devlille.partners.connect.billing.infrastructure.gateways.models.mapp
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoInvoiceItem
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoQuoteRequest
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
 
 internal fun EventEntity.toQontoQuoteRequest(
     clientId: String,

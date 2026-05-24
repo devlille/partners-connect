@@ -18,6 +18,7 @@ import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.atTime
 import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class OrganisationRepositoryExposed : OrganisationRepository {

@@ -11,12 +11,13 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.SpeakerPartner
 import fr.devlille.partners.connect.partnership.infrastructure.db.SpeakerPartnershipTable
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
+import kotlin.time.Clock
 
 /**
  * Exposed-based implementation of PartnershipSpeakerRepository.

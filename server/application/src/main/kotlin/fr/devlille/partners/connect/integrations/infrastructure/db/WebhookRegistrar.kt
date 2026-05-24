@@ -9,7 +9,7 @@ import fr.devlille.partners.connect.internal.infrastructure.api.EmptyStringValid
 import fr.devlille.partners.connect.internal.infrastructure.uuid.toUUID
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import io.ktor.server.plugins.NotFoundException
-import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.insertAndGetId

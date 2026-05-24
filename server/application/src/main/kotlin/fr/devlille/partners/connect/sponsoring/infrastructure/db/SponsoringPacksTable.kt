@@ -3,7 +3,7 @@
 package fr.devlille.partners.connect.sponsoring.infrastructure.db
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
-import org.jetbrains.exposed.v1.core.dao.id.UUIDTable
+import org.jetbrains.exposed.v1.core.dao.id.java.UUIDTable
 
 object SponsoringPacksTable : UUIDTable("sponsoring_packs") {
     val eventId = reference("event_id", EventsTable)

@@ -14,6 +14,7 @@ import fr.devlille.partners.connect.internal.infrastructure.api.ConflictExceptio
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID

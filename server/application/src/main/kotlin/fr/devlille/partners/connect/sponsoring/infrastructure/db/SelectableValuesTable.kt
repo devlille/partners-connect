@@ -2,11 +2,11 @@
 
 package fr.devlille.partners.connect.sponsoring.infrastructure.db
 
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.jetbrains.exposed.v1.core.dao.id.UUIDTable
+import org.jetbrains.exposed.v1.core.dao.id.java.UUIDTable
 import org.jetbrains.exposed.v1.datetime.datetime
+import kotlin.time.Clock
 
 /**
  * Database table for storing selectable values associated with TYPED_SELECTABLE sponsoring options.

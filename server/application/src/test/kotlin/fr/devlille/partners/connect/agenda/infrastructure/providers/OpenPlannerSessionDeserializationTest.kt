@@ -1,10 +1,10 @@
 package fr.devlille.partners.connect.agenda.infrastructure.providers
 
-import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.time.Instant
 
 class OpenPlannerSessionDeserializationTest {
     private val json = Json { ignoreUnknownKeys = true }

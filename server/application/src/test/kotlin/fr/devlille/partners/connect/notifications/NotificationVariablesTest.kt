@@ -13,13 +13,13 @@ import fr.devlille.partners.connect.organisations.domain.OrganisationItem
 import fr.devlille.partners.connect.organisations.domain.Owner
 import fr.devlille.partners.connect.partnership.domain.Partnership
 import fr.devlille.partners.connect.partnership.domain.PartnershipPack
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
+import kotlin.time.Clock
 
 class NotificationVariablesTest {
     private lateinit var event: Event

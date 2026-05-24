@@ -24,8 +24,9 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.hasFlyerTemplat
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
-import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.isNotNull
 import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.isNotNull
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 

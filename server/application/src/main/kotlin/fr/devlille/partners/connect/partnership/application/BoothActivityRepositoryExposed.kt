@@ -10,6 +10,7 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEnt
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 

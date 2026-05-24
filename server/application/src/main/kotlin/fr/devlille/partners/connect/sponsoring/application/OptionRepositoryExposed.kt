@@ -33,9 +33,10 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.allByEvent
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionsAttachedByEventAndOption
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.singlePackById
 import io.ktor.server.plugins.NotFoundException
-import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.v1.core.and
-import org.jetbrains.exposed.v1.dao.UUIDEntityClass
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.inList
+import org.jetbrains.exposed.v1.dao.java.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll

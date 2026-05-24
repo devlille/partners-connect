@@ -1,7 +1,7 @@
 package fr.devlille.partners.connect.organisations.infrastructure.db
 
 import fr.devlille.partners.connect.users.infrastructure.db.UsersTable
-import org.jetbrains.exposed.v1.core.dao.id.UUIDTable
+import org.jetbrains.exposed.v1.core.dao.id.java.UUIDTable
 import org.jetbrains.exposed.v1.datetime.datetime
 
 object OrganisationsTable : UUIDTable("organisations") {

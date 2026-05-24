@@ -17,6 +17,7 @@ import fr.devlille.partners.connect.users.infrastructure.db.singleEventPermissio
 import fr.devlille.partners.connect.users.infrastructure.db.singleUserByEmail
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class UserRepositoryExposed : UserRepository {

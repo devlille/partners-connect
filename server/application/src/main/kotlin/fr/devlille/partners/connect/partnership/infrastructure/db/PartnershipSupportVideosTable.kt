@@ -3,11 +3,11 @@ package fr.devlille.partners.connect.partnership.infrastructure.db
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
 import fr.devlille.partners.connect.internal.infrastructure.db.PromotionStatus
 import fr.devlille.partners.connect.users.infrastructure.db.UsersTable
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.jetbrains.exposed.v1.core.dao.id.UUIDTable
+import org.jetbrains.exposed.v1.core.dao.id.java.UUIDTable
 import org.jetbrains.exposed.v1.datetime.datetime
+import kotlin.time.Clock
 
 object PartnershipSupportVideosTable : UUIDTable("partnership_support_videos") {
     val partnershipId = reference("partnership_id", PartnershipsTable)

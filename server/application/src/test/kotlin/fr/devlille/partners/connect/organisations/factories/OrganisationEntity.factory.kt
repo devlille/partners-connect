@@ -4,11 +4,11 @@ import fr.devlille.partners.connect.internal.infrastructure.slugify.slugify
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
 import fr.devlille.partners.connect.users.factories.insertMockedUser
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
-import kotlinx.datetime.Clock.System
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import java.util.UUID
+import kotlin.time.Clock.System
 
 @Suppress("LongParameterList")
 fun insertMockedOrganisationEntity(

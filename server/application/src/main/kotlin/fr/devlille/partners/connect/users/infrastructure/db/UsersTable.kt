@@ -2,11 +2,11 @@
 
 package fr.devlille.partners.connect.users.infrastructure.db
 
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.jetbrains.exposed.v1.core.dao.id.UUIDTable
+import org.jetbrains.exposed.v1.core.dao.id.java.UUIDTable
 import org.jetbrains.exposed.v1.datetime.datetime
+import kotlin.time.Clock
 
 object UsersTable : UUIDTable("users") {
     val email = varchar("email", 255).uniqueIndex()

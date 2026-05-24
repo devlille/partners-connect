@@ -8,11 +8,11 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipOpt
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringOptionEntity
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackEntity
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import java.util.UUID
+import kotlin.time.Clock
 
 @Suppress("LongParameterList")
 fun insertMockedPartnership(
