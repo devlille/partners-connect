@@ -18,6 +18,8 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import org.koin.ktor.ext.inject
 
+private const val MAIL_DRAFT_MODEL = "qwen2.5:3b"
+
 fun Route.partnershipEmailDraftRoutes() {
     val partnershipRepository by inject<PartnershipRepository>()
     val llmRepository by inject<LlmRepository>()
@@ -35,6 +37,7 @@ fun Route.partnershipEmailDraftRoutes() {
             val draft = llmRepository.chat(
                 ChatRequest(
                     prompt = request.prompt,
+                    model = MAIL_DRAFT_MODEL,
                     system = buildSystemPrompt(contexts),
                 ),
             )
