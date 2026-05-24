@@ -7,7 +7,7 @@ import ai.koog.prompt.llm.LLMProvider
 import ai.koog.prompt.llm.LLModel
 import fr.devlille.partners.connect.ai.domain.LlmGateway
 
-// Generous default. Gemini 2.0 Flash supports 1M tokens; this caps what Koog requests.
+// 1M tokens — matches Gemini 2.0 Flash's max context window.
 private const val DEFAULT_CONTEXT_LENGTH = 1_048_576L
 
 class GeminiLlmGateway(
