@@ -5,11 +5,12 @@ import fr.devlille.partners.connect.internal.infrastructure.db.PromotionStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import org.jetbrains.exposed.v1.core.SortOrder
-import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
-import org.jetbrains.exposed.v1.dao.UUIDEntity
-import org.jetbrains.exposed.v1.dao.UUIDEntityClass
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.inList
+import org.jetbrains.exposed.v1.dao.java.UUIDEntity
+import org.jetbrains.exposed.v1.dao.java.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.SizedIterable
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import java.util.UUID

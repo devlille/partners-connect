@@ -7,10 +7,10 @@ import fr.devlille.partners.connect.billing.infrastructure.gateways.models.Qonto
 import fr.devlille.partners.connect.billing.infrastructure.gateways.models.QontoPaymentMethods
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.internal.infrastructure.api.ForbiddenException
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import kotlin.time.Clock
 
 internal fun EventEntity.toQontoInvoiceRequest(
     clientId: String,

@@ -30,6 +30,7 @@ import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
+import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test

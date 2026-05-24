@@ -2,11 +2,11 @@ package fr.devlille.partners.connect.companies.factories
 
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyJobOfferEntity
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import java.util.UUID
+import kotlin.time.Clock
 
 @Suppress("LongParameterList")
 fun insertMockedJobOffer(

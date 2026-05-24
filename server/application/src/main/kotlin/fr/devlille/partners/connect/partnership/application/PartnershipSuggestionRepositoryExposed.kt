@@ -15,11 +15,11 @@ import fr.devlille.partners.connect.sponsoring.infrastructure.db.SponsoringPackE
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listOptionalOptionsByPack
 import fr.devlille.partners.connect.sponsoring.infrastructure.db.listTranslationsByOptionAndLanguage
 import io.ktor.server.plugins.NotFoundException
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
+import kotlin.time.Clock
 
 class PartnershipSuggestionRepositoryExposed : PartnershipSuggestionRepository {
     override fun suggest(

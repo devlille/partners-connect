@@ -2,12 +2,12 @@ package fr.devlille.partners.connect.events.factories
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationEntity
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import java.util.UUID
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 
 @Suppress("LongParameterList")

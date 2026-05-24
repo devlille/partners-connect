@@ -13,13 +13,13 @@ import fr.devlille.partners.connect.users.factories.insertMockedUser
 import io.ktor.client.request.delete
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Clock
 
 class PartnershipSpeakerDetachmentRouteDeleteTest {
     @Test

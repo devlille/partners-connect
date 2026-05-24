@@ -7,7 +7,6 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.HttpHeaders
 import io.ktor.http.isSuccess
-import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -15,6 +14,7 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlin.time.Instant
 
 class OpenPlannerProvider(
     private val httpClient: HttpClient,

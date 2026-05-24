@@ -1,11 +1,11 @@
 package fr.devlille.partners.connect.companies.infrastructure.db
 
 import fr.devlille.partners.connect.companies.domain.CompanyStatus
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.jetbrains.exposed.v1.core.dao.id.UUIDTable
+import org.jetbrains.exposed.v1.core.dao.id.java.UUIDTable
 import org.jetbrains.exposed.v1.datetime.datetime
+import kotlin.time.Clock
 
 object CompaniesTable : UUIDTable("companies") {
     val name = text("name")

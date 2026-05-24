@@ -4,11 +4,11 @@ import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.IntegrationUsage
 import fr.devlille.partners.connect.integrations.infrastructure.db.IntegrationEntity
 import fr.devlille.partners.connect.integrations.infrastructure.db.SlackIntegrationsTable
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.v1.jdbc.insert
 import java.util.UUID
+import kotlin.time.Clock
 
 fun insertMockedIntegration(
     id: UUID = UUID.randomUUID(),

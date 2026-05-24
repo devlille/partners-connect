@@ -7,7 +7,7 @@ import fr.devlille.partners.connect.sponsoring.domain.NumberDescriptor
 import fr.devlille.partners.connect.sponsoring.domain.OptionType
 import fr.devlille.partners.connect.sponsoring.domain.QuantitativeDescriptor
 import fr.devlille.partners.connect.sponsoring.domain.SelectableDescriptor
-import org.jetbrains.exposed.v1.core.dao.id.UUIDTable
+import org.jetbrains.exposed.v1.core.dao.id.java.UUIDTable
 
 object SponsoringOptionsTable : UUIDTable("sponsoring_options") {
     val eventId = reference("event_id", EventsTable)

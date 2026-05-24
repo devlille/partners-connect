@@ -13,6 +13,7 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.RecipientDeliv
 import fr.devlille.partners.connect.users.application.toDomain
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
 import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 

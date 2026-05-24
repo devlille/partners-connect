@@ -4,7 +4,7 @@ import fr.devlille.partners.connect.internal.infrastructure.migrations.Migration
 import fr.devlille.partners.connect.partnership.infrastructure.db.CommunicationPlanEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
-import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.isNotNull
+import org.jetbrains.exposed.v1.core.isNotNull
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 

@@ -5,10 +5,10 @@ import fr.devlille.partners.connect.internal.infrastructure.db.PromotionStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipSupportVideoEntity
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import java.util.UUID
+import kotlin.time.Clock
 
 private const val DEFAULT_BUCKET_BASE = "https://storage.googleapis.com/test-bucket/events"
 

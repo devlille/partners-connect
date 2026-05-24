@@ -6,10 +6,10 @@ import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.internal.infrastructure.db.PromotionStatus
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import java.util.UUID
+import kotlin.time.Clock
 
 @Suppress("LongParameterList")
 fun insertMockCompanyJobOfferPromotion(

@@ -10,6 +10,7 @@ import fr.devlille.partners.connect.webhooks.domain.WebhookGateway
 import fr.devlille.partners.connect.webhooks.domain.WebhookRepository
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 

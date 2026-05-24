@@ -10,10 +10,10 @@ import io.ktor.server.application.Application
 import io.ktor.server.response.respond
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.ktor.ext.inject
+import kotlin.time.Clock
 
 fun Application.digestRoutes() {
     val digestRepository by inject<DigestRepository>()

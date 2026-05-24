@@ -17,7 +17,7 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.QandaQuestions
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.SortOrder
-import org.jetbrains.exposed.v1.core.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID

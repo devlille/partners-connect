@@ -1,11 +1,11 @@
 package fr.devlille.partners.connect.partnership.infrastructure.db
 
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.v1.core.ReferenceOption
-import org.jetbrains.exposed.v1.core.dao.id.UUIDTable
+import org.jetbrains.exposed.v1.core.dao.id.java.UUIDTable
 import org.jetbrains.exposed.v1.datetime.datetime
+import kotlin.time.Clock
 
 object BoothActivitiesTable : UUIDTable("booth_activities") {
     val partnershipId = reference("partnership_id", PartnershipsTable, onDelete = ReferenceOption.CASCADE)

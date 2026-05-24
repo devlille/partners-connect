@@ -14,14 +14,15 @@ import fr.devlille.partners.connect.internal.infrastructure.api.ValidationExcept
 import fr.devlille.partners.connect.internal.infrastructure.api.paginated
 import fr.devlille.partners.connect.internal.infrastructure.api.toPaginatedResponse
 import io.ktor.server.plugins.NotFoundException
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
+import kotlin.time.Clock
 
 /**
  * Exposed-based implementation of CompanyJobOfferRepository.

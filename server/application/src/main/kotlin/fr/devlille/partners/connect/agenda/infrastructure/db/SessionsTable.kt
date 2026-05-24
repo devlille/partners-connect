@@ -1,11 +1,11 @@
 package fr.devlille.partners.connect.agenda.infrastructure.db
 
 import fr.devlille.partners.connect.events.infrastructure.db.EventsTable
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.jetbrains.exposed.v1.core.dao.id.UUIDTable
+import org.jetbrains.exposed.v1.core.dao.id.java.UUIDTable
 import org.jetbrains.exposed.v1.datetime.datetime
+import kotlin.time.Clock
 
 object SessionsTable : UUIDTable("sessions") {
     val externalId = varchar("externalId", length = 255).uniqueIndex()

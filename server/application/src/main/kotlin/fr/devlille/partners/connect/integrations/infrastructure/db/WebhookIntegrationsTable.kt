@@ -5,6 +5,8 @@ import fr.devlille.partners.connect.internal.infrastructure.system.SystemVarEnv
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipsTable
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.Table
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.java.javaUUID
 import org.jetbrains.exposed.v1.crypt.encryptedVarchar
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -19,7 +21,7 @@ data class WebhookConfig(
 )
 
 object WebhookIntegrationsTable : Table("webhook_integrations") {
-    val integrationId = uuid("integration_id").references(IntegrationsTable.id)
+    val integrationId = javaUUID("integration_id").references(IntegrationsTable.id)
     val url = text("url")
     val healthUrl = text("health_url").nullable()
     val headerAuth = encryptedVarchar(

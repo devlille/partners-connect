@@ -1,7 +1,7 @@
 package fr.devlille.partners.connect.users.infrastructure.db
 
 import fr.devlille.partners.connect.organisations.infrastructure.db.OrganisationsTable
-import org.jetbrains.exposed.v1.core.dao.id.UUIDTable
+import org.jetbrains.exposed.v1.core.dao.id.java.UUIDTable
 
 object OrganisationPermissionsTable : UUIDTable("organisation_permissions") {
     val organisationId = reference("organisation_id", OrganisationsTable)

@@ -1,6 +1,6 @@
 package fr.devlille.partners.connect.sponsoring.infrastructure.db
 
-import org.jetbrains.exposed.v1.core.dao.id.UUIDTable
+import org.jetbrains.exposed.v1.core.dao.id.java.UUIDTable
 
 object OptionTranslationsTable : UUIDTable("option_translations") {
     val option = reference("option_id", SponsoringOptionsTable)

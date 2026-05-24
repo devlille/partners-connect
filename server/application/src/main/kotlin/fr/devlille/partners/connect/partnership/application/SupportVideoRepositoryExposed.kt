@@ -10,11 +10,11 @@ import fr.devlille.partners.connect.partnership.domain.SupportVideoResponse
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipSupportVideoEntity
 import io.ktor.server.plugins.NotFoundException
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
+import kotlin.time.Clock
 
 class SupportVideoRepositoryExposed : SupportVideoRepository {
     override fun submit(eventSlug: String, partnershipId: UUID, url: String): UUID = transaction {

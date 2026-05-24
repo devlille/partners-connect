@@ -6,11 +6,11 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEma
 import fr.devlille.partners.connect.partnership.infrastructure.db.PartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.RecipientDeliveryStatusEntity
 import fr.devlille.partners.connect.users.infrastructure.db.UserEntity
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import java.util.UUID
+import kotlin.time.Clock
 
 /**
  * Factory function for creating mock partnership email history records in tests.

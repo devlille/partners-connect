@@ -1,6 +1,8 @@
 package fr.devlille.partners.connect.partnership.infrastructure.db
 
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.inList
 import org.jetbrains.exposed.v1.dao.Entity
 import org.jetbrains.exposed.v1.dao.EntityClass
 import org.jetbrains.exposed.v1.jdbc.SizedIterable

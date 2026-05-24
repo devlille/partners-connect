@@ -36,7 +36,8 @@ import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.and
-import org.jetbrains.exposed.v1.dao.UUIDEntityClass
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.dao.java.UUIDEntityClass
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug as eventFindBySlug
