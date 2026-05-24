@@ -5,6 +5,7 @@ import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddCompanyStatusColumnMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddEventExternalLinksMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddEventWebhooksMigration
+import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddFavoriteEventsTableMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddFlyerTemplateColumnsToSponsoringPacksMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddHealthUrlColumnMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddIntegrationCreatedAtMigration
@@ -63,6 +64,7 @@ object MigrationRegistry {
         AddSpeakerSourceColumnMigration,
         CreatePartnershipSupportVideosTableMigration,
         AddFlyerTemplateColumnsToSponsoringPacksMigration,
+        AddFavoriteEventsTableMigration,
     )
 
     /**
