@@ -23,6 +23,12 @@
     "submission_end_time": {
       "type": "string",
       "format": "datetime"
+    },
+    "org_slug": {
+      "type": "string"
+    },
+    "org_name": {
+      "type": "string"
     }
   },
   "required": [
@@ -31,6 +37,8 @@
     "start_time",
     "end_time",
     "submission_start_time",
-    "submission_end_time"
+    "submission_end_time",
+    "org_slug",
+    "org_name"
   ]
 }

@@ -10,4 +10,6 @@ internal fun EventEntity.toEventSummary(): EventSummary = EventSummary(
     endTime = endTime,
     submissionStartTime = submissionStartTime,
     submissionEndTime = submissionEndTime,
+    orgSlug = organisation.slug,
+    orgName = organisation.name,
 )

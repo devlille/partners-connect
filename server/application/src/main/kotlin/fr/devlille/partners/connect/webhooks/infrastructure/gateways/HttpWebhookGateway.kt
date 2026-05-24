@@ -4,7 +4,7 @@ import fr.devlille.partners.connect.agenda.domain.Speaker
 import fr.devlille.partners.connect.companies.application.mappers.toDomain
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanyJobOfferPromotionEntity
 import fr.devlille.partners.connect.companies.infrastructure.db.CompanySocialEntity
-import fr.devlille.partners.connect.events.domain.EventSummary
+import fr.devlille.partners.connect.events.application.mappers.toEventSummary
 import fr.devlille.partners.connect.events.infrastructure.db.EventEntity
 import fr.devlille.partners.connect.integrations.domain.IntegrationProvider
 import fr.devlille.partners.connect.integrations.domain.WebhookType
@@ -117,14 +117,7 @@ class HttpWebhookGateway(
                 ),
                 company = partnership.company
                     .toDomain(partnership.company.socials.map(CompanySocialEntity::toDomain)),
-                event = EventSummary(
-                    slug = eventEntity.slug,
-                    name = eventEntity.name,
-                    startTime = eventEntity.startTime,
-                    endTime = eventEntity.endTime,
-                    submissionStartTime = eventEntity.submissionStartTime,
-                    submissionEndTime = eventEntity.submissionEndTime,
-                ),
+                event = eventEntity.toEventSummary(),
                 jobs = jobs,
                 activities = activities,
                 questions = questions,

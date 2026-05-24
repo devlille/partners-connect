@@ -4,8 +4,9 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@Suppress("LongParameterList")
 @Serializable
-class EventSummary(
+data class EventSummary(
     val slug: String,
     val name: String,
     @SerialName("start_time")
@@ -16,4 +17,8 @@ class EventSummary(
     val submissionStartTime: LocalDateTime,
     @SerialName("submission_end_time")
     val submissionEndTime: LocalDateTime,
+    @SerialName("org_slug")
+    val orgSlug: String,
+    @SerialName("org_name")
+    val orgName: String,
 )
