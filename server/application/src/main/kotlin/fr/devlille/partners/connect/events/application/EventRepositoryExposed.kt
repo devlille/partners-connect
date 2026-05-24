@@ -1,5 +1,6 @@
 package fr.devlille.partners.connect.events.application
 
+import fr.devlille.partners.connect.events.application.mappers.toEventSummary
 import fr.devlille.partners.connect.events.domain.Contact
 import fr.devlille.partners.connect.events.domain.CreateEventExternalLinkRequest
 import fr.devlille.partners.connect.events.domain.Event
@@ -245,16 +246,7 @@ class EventRepositoryExposed(
                 EventsTable.organisationId eq permission.organisation.id
             }
             orgEvents.forEach { event ->
-                events.add(
-                    EventSummary(
-                        slug = event.slug,
-                        name = event.name,
-                        startTime = event.startTime,
-                        endTime = event.endTime,
-                        submissionStartTime = event.submissionStartTime,
-                        submissionEndTime = event.submissionEndTime,
-                    ),
-                )
+                events.add(event.toEventSummary())
             }
         }
         events
