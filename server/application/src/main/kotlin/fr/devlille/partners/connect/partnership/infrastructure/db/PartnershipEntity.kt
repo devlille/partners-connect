@@ -8,10 +8,8 @@ import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.eq
-import org.jetbrains.exposed.v1.core.greaterEq
 import org.jetbrains.exposed.v1.core.isNotNull
 import org.jetbrains.exposed.v1.core.isNull
-import org.jetbrains.exposed.v1.core.less
 import org.jetbrains.exposed.v1.core.neq
 import org.jetbrains.exposed.v1.dao.java.UUIDEntity
 import org.jetbrains.exposed.v1.dao.java.UUIDEntityClass
@@ -90,19 +88,6 @@ class PartnershipEntity(id: EntityID<UUID>) : UUIDEntity(id) {
                     PartnershipsTable.declinedAt.isNull() and
                     PartnershipsTable.validatedAt.isNotNull() and
                     PartnershipsTable.selectedPackId.isNotNull()
-            }.toList()
-
-        fun findSocialMediaDue(
-            eventId: UUID,
-            startOfDay: LocalDateTime,
-            endOfDay: LocalDateTime,
-        ): List<PartnershipEntity> =
-            find {
-                (PartnershipsTable.eventId eq eventId) and
-                    PartnershipsTable.declinedAt.isNull() and
-                    PartnershipsTable.communicationPublicationDate.isNotNull() and
-                    (PartnershipsTable.communicationPublicationDate greaterEq startOfDay) and
-                    (PartnershipsTable.communicationPublicationDate less endOfDay)
             }.toList()
 
         fun singleByEventAndCompany(eventId: UUID, companyId: UUID): PartnershipEntity? = this

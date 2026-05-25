@@ -26,7 +26,9 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.greaterEq
 import org.jetbrains.exposed.v1.core.isNotNull
+import org.jetbrains.exposed.v1.core.less
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
@@ -107,8 +109,18 @@ class DigestRepositoryExposed : DigestRepository {
             END_OF_DAY_MINUTE,
             END_OF_DAY_SECOND,
         )
-        return PartnershipEntity.findSocialMediaDue(eventId, startOfDay, endOfDay)
-            .map { DigestEntry(it.company.name, buildLink(eventSlug, it.id.value)) }
+        return CommunicationPlanEntity
+            .find {
+                (CommunicationPlansTable.eventId eq eventId) and
+                    CommunicationPlansTable.scheduledDate.isNotNull() and
+                    (CommunicationPlansTable.scheduledDate greaterEq startOfDay) and
+                    (CommunicationPlansTable.scheduledDate less endOfDay)
+            }
+            .mapNotNull { plan ->
+                val partnership = plan.partnership ?: return@mapNotNull null
+                if (partnership.declinedAt != null) return@mapNotNull null
+                DigestEntry(partnership.company.name, buildLink(eventSlug, partnership.id.value))
+            }
     }
 
     private fun queryPendingJobOffers(eventId: UUID, eventSlug: String): List<DigestEntry> =
