@@ -14,11 +14,14 @@ class CompanyImageProcessingRepositoryDefault : CompanyImageProcessingRepository
         png250 = ImageProcessor.resizeSvg(bytes, width = 250) ?: error("Failed to resize SVG to 250px"),
     )
 
-    override fun processImage(bytes: ByteArray): MediaBinary = MediaBinary(
-        mimeType = MimeType.PNG,
-        original = bytes,
-        png1000 = ImageProcessor.resizeImage(bytes, width = 1000) ?: error("Failed to resize image to 1000px"),
-        png500 = ImageProcessor.resizeImage(bytes, width = 500) ?: error("Failed to resize image to 500px"),
-        png250 = ImageProcessor.resizeImage(bytes, width = 250) ?: error("Failed to resize image to 250px"),
-    )
+    override fun processImage(bytes: ByteArray): MediaBinary {
+        val resized = ImageProcessor.resizeImageToWidths(bytes, listOf(1000, 500, 250))
+        return MediaBinary(
+            mimeType = MimeType.PNG,
+            original = bytes,
+            png1000 = resized.getValue(1000),
+            png500 = resized.getValue(500),
+            png250 = resized.getValue(250),
+        )
+    }
 }
