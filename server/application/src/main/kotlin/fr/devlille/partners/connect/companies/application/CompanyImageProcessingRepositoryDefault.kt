@@ -9,19 +9,25 @@ class CompanyImageProcessingRepositoryDefault : CompanyImageProcessingRepository
     override fun processSvg(bytes: ByteArray): MediaBinary = MediaBinary(
         mimeType = MimeType.SVG,
         original = bytes,
-        png1000 = ImageProcessor.resizeSvg(bytes, width = 1000) ?: error("Failed to resize SVG to 1000px"),
-        png500 = ImageProcessor.resizeSvg(bytes, width = 500) ?: error("Failed to resize SVG to 500px"),
-        png250 = ImageProcessor.resizeSvg(bytes, width = 250) ?: error("Failed to resize SVG to 250px"),
+        png1000 = ImageProcessor.resizeSvg(bytes, width = WIDTH_LARGE) ?: error("Failed to resize SVG to 1000px"),
+        png500 = ImageProcessor.resizeSvg(bytes, width = WIDTH_MEDIUM) ?: error("Failed to resize SVG to 500px"),
+        png250 = ImageProcessor.resizeSvg(bytes, width = WIDTH_SMALL) ?: error("Failed to resize SVG to 250px"),
     )
 
     override fun processImage(bytes: ByteArray): MediaBinary {
-        val resized = ImageProcessor.resizeImageToWidths(bytes, listOf(1000, 500, 250))
+        val resized = ImageProcessor.resizeImageToWidths(bytes, listOf(WIDTH_LARGE, WIDTH_MEDIUM, WIDTH_SMALL))
         return MediaBinary(
             mimeType = MimeType.PNG,
             original = bytes,
-            png1000 = resized.getValue(1000),
-            png500 = resized.getValue(500),
-            png250 = resized.getValue(250),
+            png1000 = resized.getValue(WIDTH_LARGE),
+            png500 = resized.getValue(WIDTH_MEDIUM),
+            png250 = resized.getValue(WIDTH_SMALL),
         )
+    }
+
+    companion object {
+        private const val WIDTH_LARGE = 1000
+        private const val WIDTH_MEDIUM = 500
+        private const val WIDTH_SMALL = 250
     }
 }
