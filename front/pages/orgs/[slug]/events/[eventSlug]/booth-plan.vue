@@ -76,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { postOrgsEventsBoothPlan } from "~/utils/api";
+import { getEventBySlug, postOrgsEventsBoothPlan } from "~/utils/api";
 import { useBoothPlanStore } from "~/stores/boothPlan";
 import { useBoothSponsors } from "~/composables/useBoothSponsors";
 import BoothLocationsList from "~/components/booth/BoothLocationsList.vue";
@@ -116,6 +116,18 @@ const isUploading = ref(false);
 const uploadError = ref<string | null>(null);
 
 const boothPlanUrl = computed(() => boothPlanStore.getUrl(eventSlug.value));
+
+onMounted(async () => {
+  try {
+    const response = await getEventBySlug(eventSlug.value);
+    const url = response.data.event.booth_plan_image_url;
+    if (url) {
+      boothPlanStore.setUrl(eventSlug.value, url);
+    }
+  } catch (err) {
+    console.error("Failed to load booth plan image url:", err);
+  }
+});
 
 function handleFileChange(event: Event) {
   const target = event.target as HTMLInputElement;
