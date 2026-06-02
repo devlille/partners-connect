@@ -23,6 +23,7 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.QandaQuestions
 import fr.devlille.partners.connect.partnership.infrastructure.db.SpeakerPartnershipEntity
 import fr.devlille.partners.connect.partnership.infrastructure.db.SpeakerPartnershipTable
 import fr.devlille.partners.connect.partnership.infrastructure.db.validatedPack
+import fr.devlille.partners.connect.webhooks.application.mappers.toWebhookQuestion
 import fr.devlille.partners.connect.webhooks.domain.WebhookEventType
 import fr.devlille.partners.connect.webhooks.domain.WebhookGateway
 import fr.devlille.partners.connect.webhooks.domain.WebhookPayload
@@ -36,6 +37,7 @@ import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.serialization.json.Json
+import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
@@ -83,7 +85,8 @@ class HttpWebhookGateway(
                 .map { it.toDomain() }
             val questions = QandaQuestionEntity
                 .find { QandaQuestionsTable.partnershipId eq partnershipId }
-                .map { it.toDomain() }
+                .orderBy(QandaQuestionsTable.createdAt to SortOrder.ASC)
+                .mapIndexed { index, entity -> entity.toWebhookQuestion(index) }
             val speakers = SpeakerPartnershipEntity
                 .find { SpeakerPartnershipTable.partnershipId eq partnershipId }
                 .map { association ->
