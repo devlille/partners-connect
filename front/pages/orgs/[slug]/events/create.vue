@@ -110,6 +110,7 @@ async function onSave(eventData: Omit<EventDisplay, 'slug'>) {
       qanda_enabled: !!eventData.qanda_config,
       qanda_max_questions: eventData.qanda_config?.max_questions ?? null,
       qanda_max_answers: eventData.qanda_config?.max_answers ?? null,
+      qanda_submission_deadline: eventData.qanda_config?.submission_deadline ?? null,
     };
 
     const response = await postOrgsEvents(slug.value, eventPayload);
