@@ -25,6 +25,7 @@ import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class EventQandaConfigRoutePutTest {
     private val json = Json { ignoreUnknownKeys = true }
@@ -182,5 +183,42 @@ class EventQandaConfigRoutePutTest {
         }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
+    }
+
+    @Test
+    fun `PUT with Q&A disabled clears a previously set submission deadline`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId = userId)
+            transaction {
+                insertMockedOrganisationEntity(id = orgId)
+                insertMockedUser(userId)
+                val event = insertMockedFutureEvent(eventId, orgId = orgId)
+                event.qandaEnabled = true
+                event.qandaMaxQuestions = 3
+                event.qandaMaxAnswers = 4
+                event.qandaSubmissionDeadline = LocalDateTime.parse("2026-12-01T18:30:15")
+                insertMockedOrgaPermission(orgId = orgId, userId = userId)
+            }
+        }
+
+        val event = createEvent(qandaEnabled = false)
+        val putResponse = client.put("/orgs/$orgId/events/$eventId") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(json.encodeToString(event))
+        }
+        assertEquals(HttpStatusCode.OK, putResponse.status)
+
+        val getResponse = client.get("/events/$eventId")
+        val body = Json.parseToJsonElement(getResponse.bodyAsText()).jsonObject
+        val eventObj = body["event"]!!.jsonObject
+        assertTrue(
+            !eventObj.containsKey("qanda_config") ||
+                eventObj["qanda_config"] is kotlinx.serialization.json.JsonNull,
+        )
     }
 }
