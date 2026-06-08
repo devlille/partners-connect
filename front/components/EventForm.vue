@@ -106,6 +106,19 @@
             @update:model-value="val => form.qanda_max_answers = val === '' ? null : Number(val)"
           />
         </div>
+
+        <div>
+          <label for="qanda_submission_deadline" class="block text-sm font-medium text-gray-700 mb-2">
+            Date limite de soumission (optionnel)
+          </label>
+          <UInput
+            id="qanda_submission_deadline"
+            :model-value="form.qanda_submission_deadline ?? ''"
+            type="datetime-local"
+            class="w-full"
+            @update:model-value="val => form.qanda_submission_deadline = val === '' ? null : String(val)"
+          />
+        </div>
       </div>
 
       <UDivider label="Contact" />
@@ -158,6 +171,7 @@ type FormState = Omit<EventDisplay, 'slug' | 'qanda_config'> & {
   qanda_enabled: boolean
   qanda_max_questions: number | null
   qanda_max_answers: number | null
+  qanda_submission_deadline: string | null
 }
 
 const form = ref<FormState>({
@@ -165,14 +179,25 @@ const form = ref<FormState>({
   qanda_enabled: !!data.qanda_config,
   qanda_max_questions: data.qanda_config?.max_questions ?? null,
   qanda_max_answers: data.qanda_config?.max_answers ?? null,
+  qanda_submission_deadline: data.qanda_config?.submission_deadline ?? null,
 })
 
 function onSave() {
-  const { qanda_enabled, qanda_max_questions, qanda_max_answers, ...rest } = form.value
+  const {
+    qanda_enabled,
+    qanda_max_questions,
+    qanda_max_answers,
+    qanda_submission_deadline,
+    ...rest
+  } = form.value
   emit('save', {
     ...rest,
     qanda_config: qanda_enabled
-      ? { max_questions: qanda_max_questions, max_answers: qanda_max_answers }
+      ? {
+          max_questions: qanda_max_questions,
+          max_answers: qanda_max_answers,
+          submission_deadline: qanda_submission_deadline,
+        }
       : null,
   })
 }
