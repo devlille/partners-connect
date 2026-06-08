@@ -9,8 +9,10 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
@@ -91,7 +93,7 @@ class EventQandaConfigRouteGetTest {
                 event.qandaMaxQuestions = 3
                 event.qandaMaxAnswers = 4
                 event.qandaSubmissionDeadline =
-                    kotlinx.datetime.LocalDateTime.parse("2026-12-01T18:30:15")
+                    LocalDateTime.parse("2026-12-01T18:30:15")
                 insertMockedUser(userId)
                 insertMockedOrgaPermission(orgId = orgId, userId = userId)
             }
@@ -104,7 +106,7 @@ class EventQandaConfigRouteGetTest {
         val eventObj = body["event"]!!.jsonObject
         val qandaConfig = eventObj["qanda_config"]?.jsonObject
         assertNotNull(qandaConfig)
-        assertTrue(qandaConfig["submission_deadline"].toString().contains("2026-12-01T18:30:15"))
+        assertEquals("2026-12-01T18:30:15", qandaConfig["submission_deadline"]!!.jsonPrimitive.content)
     }
 
     @Test

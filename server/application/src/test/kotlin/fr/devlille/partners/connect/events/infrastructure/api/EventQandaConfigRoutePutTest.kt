@@ -6,19 +6,25 @@ import fr.devlille.partners.connect.internal.moduleSharedDb
 import fr.devlille.partners.connect.organisations.factories.insertMockedOrganisationEntity
 import fr.devlille.partners.connect.users.factories.insertMockedOrgaPermission
 import fr.devlille.partners.connect.users.factories.insertMockedUser
+import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class EventQandaConfigRoutePutTest {
     private val json = Json { ignoreUnknownKeys = true }
@@ -129,7 +135,7 @@ class EventQandaConfigRoutePutTest {
             qandaEnabled = true,
             qandaMaxQuestions = 3,
             qandaMaxAnswers = 4,
-            qandaSubmissionDeadline = kotlinx.datetime.LocalDateTime.parse("2026-12-01T18:30:15"),
+            qandaSubmissionDeadline = LocalDateTime.parse("2026-12-01T18:30:15"),
         )
         val response = client.put("/orgs/$orgId/events/$eventId") {
             contentType(ContentType.Application.Json)
@@ -138,6 +144,14 @@ class EventQandaConfigRoutePutTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
+        val getResponse = client.get("/events/$eventId")
+        val body = Json.parseToJsonElement(getResponse.bodyAsText()).jsonObject
+        val qandaConfig = body["event"]!!.jsonObject["qanda_config"]?.jsonObject
+        assertNotNull(qandaConfig)
+        assertEquals(
+            "2026-12-01T18:30:15",
+            qandaConfig["submission_deadline"]!!.jsonPrimitive.content,
+        )
     }
 
     @Test
