@@ -26,6 +26,7 @@ object EventsTable : UUIDTable("events") {
     val qandaEnabled = bool("qanda_enabled").default(false)
     val qandaMaxQuestions = integer("qanda_max_questions").nullable()
     val qandaMaxAnswers = integer("qanda_max_answers").nullable()
+    val qandaSubmissionDeadline = datetime("qanda_submission_deadline").nullable()
     val createdAt = datetime("created_at").clientDefault {
         Clock.System.now().toLocalDateTime(TimeZone.UTC)
     }
