@@ -13,6 +13,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
+import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
@@ -249,5 +250,51 @@ class QandaQuestionRoutePostTest {
         }
 
         assertEquals(HttpStatusCode.Conflict, response.status)
+    }
+
+    @Test
+    fun `POST returns 403 when submission deadline has passed`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val partnershipId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedOrganisationEntity(orgId)
+                val event = insertMockedFutureEvent(eventId, orgId = orgId)
+                event.qandaEnabled = true
+                event.qandaMaxQuestions = 3
+                event.qandaMaxAnswers = 4
+                event.qandaSubmissionDeadline = LocalDateTime.parse("2000-01-01T00:00:00")
+                insertMockedCompany(companyId)
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedPartnership(
+                    id = partnershipId,
+                    eventId = eventId,
+                    companyId = companyId,
+                    selectedPackId = packId,
+                )
+            }
+        }
+
+        val body = """
+            {
+                "question": "Test?",
+                "answers": [
+                    {"answer": "A", "is_correct": false},
+                    {"answer": "B", "is_correct": true}
+                ]
+            }
+        """.trimIndent()
+        val response = client.post("/events/$eventId/partnerships/$partnershipId/qanda/questions") {
+            contentType(ContentType.Application.Json)
+            setBody(body)
+        }
+
+        assertEquals(HttpStatusCode.Forbidden, response.status)
     }
 }
