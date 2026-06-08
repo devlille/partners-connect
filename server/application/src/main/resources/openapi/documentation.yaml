@@ -6268,6 +6268,8 @@ components:
       $ref: '#/components/schemas/sponsoring_option_with_count.schema'
     QandaAnswer:
       $ref: '#/components/schemas/qanda_answer.schema'
+    QandaConfig:
+      $ref: '#/components/schemas/qanda_config.schema'
     QandaQuestion:
       $ref: '#/components/schemas/qanda_question.schema'
     QandaQuestionList:
@@ -6998,6 +7000,24 @@ components:
         - type
         - website
         - created_at
+    qanda_config.schema:
+      $id: qanda_config.schema.json
+      type: object
+      properties:
+        max_questions:
+          type: integer
+          minimum: 1
+        max_answers:
+          type: integer
+          minimum: 2
+        submission_deadline:
+          type:
+            - string
+            - 'null'
+          format: datetime
+      required:
+        - max_questions
+        - max_answers
     event_display.schema:
       $id: event_display.schema.json
       type: object
@@ -7032,6 +7052,10 @@ components:
           type:
             - string
             - 'null'
+        qanda_config:
+          anyOf:
+            - $ref: '#/components/schemas/qanda_config.schema'
+            - type: 'null'
       required:
         - slug
         - name
@@ -8994,6 +9018,11 @@ components:
             - integer
             - 'null'
           minimum: 2
+        qanda_submission_deadline:
+          type:
+            - string
+            - 'null'
+          format: datetime
       required:
         - name
         - start_time

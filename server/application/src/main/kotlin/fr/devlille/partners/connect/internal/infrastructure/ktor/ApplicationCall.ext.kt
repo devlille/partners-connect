@@ -32,6 +32,7 @@ val schemas by lazy {
         .register(readResourceFile("/schemas/create_ticket_data.schema.json"), SchemaType.DRAFT_7)
         .register(readResourceFile("/schemas/event.schema.json"), SchemaType.DRAFT_7)
         .register(readResourceFile("/schemas/event_contact.schema.json"), SchemaType.DRAFT_7)
+        .register(readResourceFile("/schemas/qanda_config.schema.json"), SchemaType.DRAFT_7)
         .register(readResourceFile("/schemas/event_display.schema.json"), SchemaType.DRAFT_7)
         .register(readResourceFile("/schemas/event_external_link.schema.json"), SchemaType.DRAFT_7)
         .register(readResourceFile("/schemas/event_summary.schema.json"), SchemaType.DRAFT_7)

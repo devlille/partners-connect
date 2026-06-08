@@ -41,6 +41,12 @@
     },
     "booth_plan_image_url": {
       "type": ["string", "null"]
+    },
+    "qanda_config": {
+      "anyOf": [
+        { "$ref": "qanda_config.schema.json" },
+        { "type": "null" }
+      ]
     }
   },
   "required": [
