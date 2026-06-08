@@ -231,15 +231,18 @@ const questions = ref<FormQuestion[]>([]);
 const saving = ref(new Set<string>());
 const deleting = ref(new Set<string>());
 
+// The server stores the deadline as a timezone-naive UTC datetime, so parse it as UTC
+// (append 'Z'). Evaluated at render time and not live-refreshed; the server enforces the
+// deadline on every mutation regardless, so this is purely UX.
 const isDeadlinePassed = computed(() => {
   const d = qandaSubmissionDeadline.value;
-  return d ? new Date() > new Date(d) : false;
+  return d ? new Date() > new Date(d + 'Z') : false;
 });
 
 const formattedDeadline = computed(() => {
   const d = qandaSubmissionDeadline.value;
   return d
-    ? new Date(d).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' })
+    ? new Date(d + 'Z').toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' })
     : '';
 });
 
