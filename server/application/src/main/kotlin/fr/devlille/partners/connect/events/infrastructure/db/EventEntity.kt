@@ -24,6 +24,7 @@ class EventEntity(id: EntityID<UUID>) : UUIDEntity(id) {
     var qandaEnabled by EventsTable.qandaEnabled
     var qandaMaxQuestions by EventsTable.qandaMaxQuestions
     var qandaMaxAnswers by EventsTable.qandaMaxAnswers
+    var qandaSubmissionDeadline by EventsTable.qandaSubmissionDeadline
 }
 
 fun UUIDEntityClass<EventEntity>.findBySlug(slug: String): EventEntity? =

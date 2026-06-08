@@ -127,6 +127,7 @@ class EventRepositoryExposed(
                 QandaConfig(
                     maxQuestions = eventEntity.qandaMaxQuestions ?: 1,
                     maxAnswers = eventEntity.qandaMaxAnswers ?: 2,
+                    submissionDeadline = eventEntity.qandaSubmissionDeadline,
                 )
             } else {
                 null
@@ -164,6 +165,7 @@ class EventRepositoryExposed(
             this.qandaEnabled = event.qandaEnabled
             this.qandaMaxQuestions = if (event.qandaEnabled) event.qandaMaxQuestions else null
             this.qandaMaxAnswers = if (event.qandaEnabled) event.qandaMaxAnswers else null
+            this.qandaSubmissionDeadline = if (event.qandaEnabled) event.qandaSubmissionDeadline else null
         }
         slug
     }
@@ -189,9 +191,11 @@ class EventRepositoryExposed(
                 ?: throw BadRequestException("qanda_max_answers is required when Q&A is enabled")
             eventEntity.qandaMaxQuestions = maxQuestions
             eventEntity.qandaMaxAnswers = maxAnswers
+            eventEntity.qandaSubmissionDeadline = event.qandaSubmissionDeadline
         } else {
             eventEntity.qandaMaxQuestions = null
             eventEntity.qandaMaxAnswers = null
+            eventEntity.qandaSubmissionDeadline = null
         }
         eventSlug
     }

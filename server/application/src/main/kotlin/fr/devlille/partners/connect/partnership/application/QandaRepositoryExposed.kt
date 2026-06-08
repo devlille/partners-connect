@@ -16,11 +16,14 @@ import fr.devlille.partners.connect.partnership.infrastructure.db.QandaQuestionE
 import fr.devlille.partners.connect.partnership.infrastructure.db.QandaQuestionsTable
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.NotFoundException
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
+import kotlin.time.Clock
 import fr.devlille.partners.connect.events.infrastructure.db.findBySlug as eventFindBySlug
 
 class QandaRepositoryExposed : QandaRepository {
@@ -75,6 +78,8 @@ class QandaRepositoryExposed : QandaRepository {
             throw ForbiddenException("Q&A is not enabled for this event")
         }
 
+        verifyDeadlineNotPassed(eventEntity)
+
         validateAnswers(request, eventEntity.qandaMaxAnswers)
 
         val currentCount = QandaQuestionEntity
@@ -111,6 +116,8 @@ class QandaRepositoryExposed : QandaRepository {
         val eventEntity = EventEntity.eventFindBySlug(eventSlug)
             ?: throw NotFoundException("Event with slug $eventSlug not found")
 
+        verifyDeadlineNotPassed(eventEntity)
+
         validateAnswers(request, eventEntity.qandaMaxAnswers)
 
         val questionEntity = QandaQuestionEntity.findById(questionId)
@@ -131,14 +138,24 @@ class QandaRepositoryExposed : QandaRepository {
     }
 
     override fun delete(partnershipId: UUID, questionId: UUID): Unit = transaction {
-        PartnershipEntity.findById(partnershipId)
+        val partnership = PartnershipEntity.findById(partnershipId)
             ?: throw NotFoundException("Partnership $partnershipId not found")
+
+        verifyDeadlineNotPassed(partnership.event)
 
         val questionEntity = QandaQuestionEntity.findById(questionId)
             ?.takeIf { it.partnership.id.value == partnershipId }
             ?: throw NotFoundException("Question not found")
 
         questionEntity.delete()
+    }
+
+    private fun verifyDeadlineNotPassed(event: EventEntity) {
+        val deadline = event.qandaSubmissionDeadline ?: return
+        val now = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+        if (now > deadline) {
+            throw ForbiddenException("Q&A submission deadline has passed")
+        }
     }
 
     private fun validateAnswers(request: QandaQuestionRequest, maxAnswers: Int?) {

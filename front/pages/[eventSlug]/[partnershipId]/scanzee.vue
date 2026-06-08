@@ -36,6 +36,15 @@
         </div>
 
         <template v-else>
+          <div
+            v-if="isDeadlinePassed"
+            role="alert"
+            class="mb-6 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded"
+          >
+            La période de soumission est terminée (depuis le {{ formattedDeadline }}). Vous ne pouvez
+            plus ajouter, modifier ou supprimer de questions.
+          </div>
+
           <UCard class="mb-6">
             <div class="flex items-start gap-4">
               <i
@@ -80,7 +89,7 @@
               <UButton
                 icon="i-heroicons-plus"
                 label="Ajouter une question"
-                :disabled="qandaMaxQuestions !== null && questions.length >= qandaMaxQuestions"
+                :disabled="isDeadlinePassed || (qandaMaxQuestions !== null && questions.length >= qandaMaxQuestions)"
                 @click="addQuestion"
               />
             </div>
@@ -107,6 +116,7 @@
                     v-model="q.question"
                     placeholder="Entrez votre question..."
                     class="w-full"
+                    :disabled="isDeadlinePassed"
                   />
                 </div>
                 <UButton
@@ -115,6 +125,7 @@
                   icon="i-heroicons-trash"
                   class="mt-6"
                   :loading="deleting.has(q._key)"
+                  :disabled="isDeadlinePassed"
                   :aria-label="`Supprimer la question ${qi + 1}`"
                   @click="deleteQuestion(qi)"
                 />
@@ -133,7 +144,7 @@
                     variant="ghost"
                     icon="i-heroicons-plus"
                     label="Ajouter"
-                    :disabled="qandaMaxAnswers !== null && q.answers.length >= qandaMaxAnswers"
+                    :disabled="isDeadlinePassed || (qandaMaxAnswers !== null && q.answers.length >= qandaMaxAnswers)"
                     @click="addAnswer(qi)"
                   />
                 </div>
@@ -141,15 +152,17 @@
                 <div v-for="(a, ai) in q.answers" :key="ai" class="flex items-center gap-2">
                   <UCheckbox
                     v-model="a.is_correct"
+                    :disabled="isDeadlinePassed"
                     :aria-label="`Marquer la réponse ${ai + 1} comme correcte`"
                   />
-                  <UInput v-model="a.answer" placeholder="Réponse..." class="flex-1" />
+                  <UInput v-model="a.answer" placeholder="Réponse..." class="flex-1" :disabled="isDeadlinePassed" />
                   <UButton
                     v-if="q.answers.length > 2"
                     color="neutral"
                     variant="ghost"
                     icon="i-heroicons-x-mark"
                     size="xs"
+                    :disabled="isDeadlinePassed"
                     :aria-label="`Supprimer la réponse ${ai + 1}`"
                     @click="removeAnswer(qi, ai)"
                   />
@@ -159,7 +172,7 @@
               <div class="flex justify-end mt-4">
                 <UButton
                   :loading="saving.has(q._key)"
-                  :disabled="!q.question.trim() || q.answers.length < 2 || q.answers.some(a => !a.answer.trim())"
+                  :disabled="isDeadlinePassed || !q.question.trim() || q.answers.length < 2 || q.answers.some(a => !a.answer.trim())"
                   icon="i-heroicons-check"
                   label="Sauvegarder"
                   @click="saveQuestion(qi)"
@@ -200,6 +213,7 @@ const {
   partnership,
   qandaMaxQuestions,
   qandaMaxAnswers,
+  qandaSubmissionDeadline,
   loadPartnership,
 } = usePublicPartnership();
 
@@ -216,6 +230,21 @@ const error = ref<string | null>(null);
 const questions = ref<FormQuestion[]>([]);
 const saving = ref(new Set<string>());
 const deleting = ref(new Set<string>());
+
+// The server stores the deadline as a timezone-naive UTC datetime, so parse it as UTC
+// (append 'Z'). Evaluated at render time and not live-refreshed; the server enforces the
+// deadline on every mutation regardless, so this is purely UX.
+const isDeadlinePassed = computed(() => {
+  const d = qandaSubmissionDeadline.value;
+  return d ? new Date() > new Date(d + 'Z') : false;
+});
+
+const formattedDeadline = computed(() => {
+  const d = qandaSubmissionDeadline.value;
+  return d
+    ? new Date(d + 'Z').toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' })
+    : '';
+});
 
 async function loadQuestions() {
   try {

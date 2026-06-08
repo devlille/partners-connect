@@ -93,6 +93,7 @@ async function onSave(updatedEvent: Omit<EventDisplay, 'slug'>) {
       qanda_enabled: !!updatedEvent.qanda_config,
       qanda_max_questions: updatedEvent.qanda_config?.max_questions ?? null,
       qanda_max_answers: updatedEvent.qanda_config?.max_answers ?? null,
+      qanda_submission_deadline: updatedEvent.qanda_config?.submission_deadline ?? null,
     };
 
     await putOrgsEvents(orgSlug.value, eventSlug.value, eventPayload);

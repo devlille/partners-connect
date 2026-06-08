@@ -1,0 +1,19 @@
+{
+  "$id": "qanda_config.schema.json",
+  "type": "object",
+  "properties": {
+    "max_questions": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "max_answers": {
+      "type": "integer",
+      "minimum": 2
+    },
+    "submission_deadline": {
+      "type": ["string", "null"],
+      "format": "datetime"
+    }
+  },
+  "required": ["max_questions", "max_answers"]
+}

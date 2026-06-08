@@ -6248,6 +6248,8 @@ components:
       $ref: "../schemas/sponsoring_option_with_count.schema.json"
     QandaAnswer:
       $ref: "../schemas/qanda_answer.schema.json"
+    QandaConfig:
+      $ref: "../schemas/qanda_config.schema.json"
     QandaQuestion:
       $ref: "../schemas/qanda_question.schema.json"
     QandaQuestionList:

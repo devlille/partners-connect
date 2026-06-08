@@ -15,6 +15,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
+import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 import kotlin.test.Test
@@ -171,5 +172,57 @@ class QandaQuestionRoutePutTest {
             }
 
         assertEquals(HttpStatusCode.BadRequest, response.status)
+    }
+
+    @Test
+    fun `PUT returns 403 when submission deadline has passed`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+        val packId = UUID.randomUUID()
+        val companyId = UUID.randomUUID()
+        val partnershipId = UUID.randomUUID()
+        val questionId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedOrganisationEntity(orgId)
+                val event = insertMockedFutureEvent(eventId, orgId = orgId)
+                event.qandaEnabled = true
+                event.qandaMaxQuestions = 3
+                event.qandaMaxAnswers = 4
+                event.qandaSubmissionDeadline = LocalDateTime.parse("2000-01-01T00:00:00")
+                insertMockedCompany(companyId)
+                insertMockedSponsoringPack(packId, eventId)
+                insertMockedPartnership(
+                    id = partnershipId,
+                    eventId = eventId,
+                    companyId = companyId,
+                    selectedPackId = packId,
+                )
+                insertMockedQandaQuestion(id = questionId, partnershipId = partnershipId)
+                insertMockedQandaAnswer(questionId = questionId, answer = "A", isCorrect = true)
+                insertMockedQandaAnswer(questionId = questionId, answer = "B", isCorrect = false)
+            }
+        }
+
+        val body = """
+            {
+                "question": "Updated?",
+                "answers": [
+                    {"answer": "A", "is_correct": true},
+                    {"answer": "B", "is_correct": false}
+                ]
+            }
+        """.trimIndent()
+        val response = client.put(
+            "/events/$eventId/partnerships/$partnershipId/qanda/questions/$questionId",
+        ) {
+            contentType(ContentType.Application.Json)
+            setBody(body)
+        }
+
+        assertEquals(HttpStatusCode.Forbidden, response.status)
     }
 }

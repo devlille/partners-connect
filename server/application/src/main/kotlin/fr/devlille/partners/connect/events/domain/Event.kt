@@ -23,6 +23,8 @@ data class Event(
     val qandaMaxQuestions: Int? = null,
     @SerialName("qanda_max_answers")
     val qandaMaxAnswers: Int? = null,
+    @SerialName("qanda_submission_deadline")
+    val qandaSubmissionDeadline: LocalDateTime? = null,
 )
 
 @Serializable

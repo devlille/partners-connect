@@ -24,6 +24,7 @@ export const usePublicPartnership = () => {
   const qandaEnabled = useState<boolean>("qanda-enabled", () => false);
   const qandaMaxQuestions = useState<number | null>("qanda-max-questions", () => null);
   const qandaMaxAnswers = useState<number | null>("qanda-max-answers", () => null);
+  const qandaSubmissionDeadline = useState<string | null>("qanda-submission-deadline", () => null);
 
   /**
    * Load partnership data using public API endpoints
@@ -45,6 +46,7 @@ export const usePublicPartnership = () => {
       qandaEnabled.value = event.qanda_config !== null && event.qanda_config !== undefined;
       qandaMaxQuestions.value = event.qanda_config?.max_questions ?? null;
       qandaMaxAnswers.value = event.qanda_config?.max_answers ?? null;
+      qandaSubmissionDeadline.value = event.qanda_config?.submission_deadline ?? null;
 
       // Load billing data
       try {
@@ -224,6 +226,7 @@ export const usePublicPartnership = () => {
     qandaEnabled,
     qandaMaxQuestions,
     qandaMaxAnswers,
+    qandaSubmissionDeadline,
     loadPartnership,
     handleCompanySave,
     handleBillingSave,

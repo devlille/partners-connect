@@ -17,6 +17,7 @@ fun createEvent(
     qandaEnabled: Boolean = false,
     qandaMaxQuestions: Int? = null,
     qandaMaxAnswers: Int? = null,
+    qandaSubmissionDeadline: LocalDateTime? = null,
 ): Event = Event(
     name = name,
     startTime = startTime,
@@ -28,4 +29,5 @@ fun createEvent(
     qandaEnabled = qandaEnabled,
     qandaMaxQuestions = qandaMaxQuestions,
     qandaMaxAnswers = qandaMaxAnswers,
+    qandaSubmissionDeadline = qandaSubmissionDeadline,
 )

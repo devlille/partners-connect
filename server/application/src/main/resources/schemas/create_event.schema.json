@@ -37,6 +37,10 @@
     "qanda_max_answers": {
       "type": ["integer", "null"],
       "minimum": 2
+    },
+    "qanda_submission_deadline": {
+      "type": ["string", "null"],
+      "format": "datetime"
     }
   },
   "required": [
