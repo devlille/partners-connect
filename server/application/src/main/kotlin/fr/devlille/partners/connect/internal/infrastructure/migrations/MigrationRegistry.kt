@@ -15,6 +15,7 @@ import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPartnershipPriceOverridesMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddPolymorphicSponsoringOptionsMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddProviderManagementMigration
+import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddQandaSubmissionDeadlineColumnMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddSelectableValuePricingMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.AddSpeakerSourceColumnMigration
 import fr.devlille.partners.connect.internal.infrastructure.migrations.versions.CreateBoothActivitiesTableMigration
@@ -65,6 +66,7 @@ object MigrationRegistry {
         CreatePartnershipSupportVideosTableMigration,
         AddFlyerTemplateColumnsToSponsoringPacksMigration,
         AddFavoriteEventsTableMigration,
+        AddQandaSubmissionDeadlineColumnMigration,
     )
 
     /**
