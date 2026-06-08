@@ -110,6 +110,37 @@ class EventQandaConfigRoutePutTest {
     }
 
     @Test
+    fun `PUT updates event with Q&A submission deadline and returns 200`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId = userId)
+            transaction {
+                insertMockedOrganisationEntity(id = orgId)
+                insertMockedUser(userId)
+                insertMockedFutureEvent(eventId, orgId = orgId)
+                insertMockedOrgaPermission(orgId = orgId, userId = userId)
+            }
+        }
+
+        val event = createEvent(
+            qandaEnabled = true,
+            qandaMaxQuestions = 3,
+            qandaMaxAnswers = 4,
+            qandaSubmissionDeadline = kotlinx.datetime.LocalDateTime.parse("2026-12-01T18:30:15"),
+        )
+        val response = client.put("/orgs/$orgId/events/$eventId") {
+            contentType(ContentType.Application.Json)
+            header(HttpHeaders.Authorization, "Bearer valid")
+            setBody(json.encodeToString(event))
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+    }
+
+    @Test
     fun `PUT returns 400 when Q&A enabled without max limits`() = testApplication {
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()

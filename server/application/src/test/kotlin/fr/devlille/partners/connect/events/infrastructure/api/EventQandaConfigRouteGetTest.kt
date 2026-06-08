@@ -77,6 +77,37 @@ class EventQandaConfigRouteGetTest {
     }
 
     @Test
+    fun `GET event returns qanda_config submission_deadline when set`() = testApplication {
+        val userId = UUID.randomUUID()
+        val orgId = UUID.randomUUID()
+        val eventId = UUID.randomUUID()
+
+        application {
+            moduleSharedDb(userId)
+            transaction {
+                insertMockedOrganisationEntity(orgId)
+                val event = insertMockedFutureEvent(eventId, orgId = orgId)
+                event.qandaEnabled = true
+                event.qandaMaxQuestions = 3
+                event.qandaMaxAnswers = 4
+                event.qandaSubmissionDeadline =
+                    kotlinx.datetime.LocalDateTime.parse("2026-12-01T18:30:15")
+                insertMockedUser(userId)
+                insertMockedOrgaPermission(orgId = orgId, userId = userId)
+            }
+        }
+
+        val response = client.get("/events/$eventId")
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val body = Json.parseToJsonElement(response.bodyAsText()).jsonObject
+        val eventObj = body["event"]!!.jsonObject
+        val qandaConfig = eventObj["qanda_config"]?.jsonObject
+        assertNotNull(qandaConfig)
+        assertTrue(qandaConfig["submission_deadline"].toString().contains("2026-12-01T18:30:15"))
+    }
+
+    @Test
     fun `GET event returns qanda_config when Q&A enabled via public route`() = testApplication {
         val userId = UUID.randomUUID()
         val orgId = UUID.randomUUID()
